@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>vimeo tag plugin - mizzy.org</title>
+  <title>Vimeo tag plugin - mizzy.org</title>
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content=" Black Hole Sun - Astronomic Landscape and Milky Way TimeLapse from Christoph Malin on Vimeo. ">
+  <meta name="description" content="Black Hole Sun - Astronomic Landscape and Milky Way TimeLapse from Christoph Malin on Vimeo. A Liquid tag for Jekyll sites that allows embedding &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://mizzy.org/blog/2011/10/30/vimeo-tag-plugin">
+  <link rel="canonical" href="http://mizzy.github.com/blog/2011/10/30/vimeo-tag-plugin">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -58,7 +58,7 @@
 </ul>
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input type="hidden" name="q" value="site:mizzy.github.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -102,6 +102,100 @@
 
 
 
+
+<figure class='code'><figcaption><span>A Liquid tag for Jekyll sites that allows embedding vimeo movies (vimeo_tag.rb)</span> <a href='/downloads/code/vimeo_tag.rb'>download</a></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="c1"># A Liquid tag for Jekyll sites that allows embedding vimeo movies</span>
+</span><span class='line'><span class="c1"># by: Gosuke Miyashita</span>
+</span><span class='line'><span class="c1">#</span>
+</span><span class='line'><span class="c1"># Example usage: {% vimeo 28040685 800 600 %}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;multi_json&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Jekyll</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">VimeoTag</span> <span class="o">&lt;</span> <span class="no">Liquid</span><span class="o">::</span><span class="no">Tag</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">super</span>
+</span><span class='line'>      <span class="vi">@text</span> <span class="o">=</span> <span class="n">text</span>
+</span><span class='line'>      <span class="vi">@cache_dir</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span> <span class="s2">&quot;../.vimeo-cache&quot;</span><span class="p">,</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span>
+</span><span class='line'>      <span class="no">FileUtils</span><span class="o">.</span><span class="n">mkdir_p</span> <span class="vi">@cache_dir</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">parts</span> <span class="o">=</span> <span class="vi">@text</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sr">/(\d+) (\d+) (\d+)/</span><span class="p">)</span>
+</span><span class='line'>        <span class="nb">id</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">parts</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">strip</span><span class="p">,</span> <span class="n">parts</span><span class="o">[</span><span class="mi">2</span><span class="o">].</span><span class="n">strip</span><span class="p">,</span> <span class="n">parts</span><span class="o">[</span><span class="mi">3</span><span class="o">].</span><span class="n">strip</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">vimeo</span> <span class="o">=</span> <span class="n">get_vimeo</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</span><span class='line'>      <span class="o">&lt;&lt;-</span><span class="no">HTML</span>
+</span><span class='line'><span class="sh">&lt;iframe src=&quot;http://player.vimeo.com/video/#{id}?color=ffffff&quot; width=&quot;#{width}&quot; height=&quot;#{height}&quot; frameborder=&quot;0&quot; webkitAllowFullScreen allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;http://vimeo.com/#{id}&quot;&gt;#{vimeo[&quot;title&quot;]}&lt;/a&gt; from &lt;a href=&quot;#{vimeo[&quot;author_url&quot;]}&quot;&gt;#{vimeo[&quot;author_name&quot;]}&lt;/a&gt; on &lt;a href=&quot;http://vimeo.com&quot;&gt;Vimeo&lt;/a&gt;.&lt;/p&gt;</span>
+</span><span class='line'><span class="no">      HTML</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">get_vimeo</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">cache_file</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">join</span> <span class="vi">@cache_dir</span><span class="p">,</span> <span class="nb">id</span>
+</span><span class='line'>      <span class="k">if</span> <span class="no">File</span><span class="o">.</span><span class="n">exist?</span> <span class="n">cache_file</span>
+</span><span class='line'>        <span class="no">MultiJson</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">read</span> <span class="n">cache_file</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>        <span class="n">json</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;http://vimeo.com/api/oembed.json?url=http%3A//vimeo.com/</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span>
+</span><span class='line'>        <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">io</span><span class="o">|</span>
+</span><span class='line'>          <span class="n">io</span><span class="o">.</span><span class="n">write</span> <span class="n">json</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="no">MultiJson</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Liquid</span><span class="o">::</span><span class="no">Template</span><span class="o">.</span><span class="n">register_tag</span><span class="p">(</span><span class="s1">&#39;vimeo&#39;</span><span class="p">,</span> <span class="no">Jekyll</span><span class="o">::</span><span class="no">VimeoTag</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
 </div>
 
 
@@ -127,7 +221,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2011/10/30/vimeo-tag-plugin/" data-via="" data-counturl="http://mizzy.org/blog/2011/10/30/vimeo-tag-plugin/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.github.com/blog/2011/10/30/vimeo-tag-plugin/" data-via="" data-counturl="http://mizzy.github.com/blog/2011/10/30/vimeo-tag-plugin/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -162,7 +256,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
       <li class="post">
@@ -206,8 +300,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://mizzy.org/blog/2011/10/30/vimeo-tag-plugin';
-        var disqus_url = 'http://mizzy.org/blog/2011/10/30/vimeo-tag-plugin';
+        var disqus_identifier = 'http://mizzy.github.com/blog/2011/10/30/vimeo-tag-plugin';
+        var disqus_url = 'http://mizzy.github.com/blog/2011/10/30/vimeo-tag-plugin';
         var disqus_script = 'embed.js';
       
     (function () {
