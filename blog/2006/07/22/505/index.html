@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Fedora Core 4 への Courier-IMAP の導入 - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="訳あって Fedora Core 4 上でメールサーバを構築する必要があったので、Courier-IMAP を導入しました。mizzy.org のサーバでも使っていて慣れているし、今のところトラブルもないので安心して利用できるので。 RPM は嫌いなんですが、Fedora Core &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2006/07/22/505">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Fedora Core 4 への Courier-IMAP の導入</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-22T19:45:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>
+訳あって Fedora Core 4 上でメールサーバを構築する必要があったので、<a class="ext-link" href="http://www.courier-mta.org/imap/"><span class="icon"></span>Courier-IMAP</a> を導入しました。mizzy.org のサーバでも使っていて慣れているし、今のところトラブルもないので安心して利用できるので。
+</p>
+
+
+<p>
+RPM は嫌いなんですが、Fedora Core を使うのであれば、できる限り RPM で入れた方がいいよな、と思い RPM パッケージを探したのですが、Courier-IMAP のソース（ソース RPM ではない）から RPM パッケージを作成できることが判明。ただ、ソース付属の INSALL 読んだだけですんなりインストールできたわけではないので、ここに導入メモを残しておきます。
+</p>
+
+
+<h3 id="expectのインストール">expect のインストール</h3>
+
+
+<p>
+expect に依存してるので、入ってなければインストール。
+</p>
+
+
+<pre class="wiki">
+$ sudo yum install expect
+</pre>
+
+
+<h3 id="libtool-ltdl-develのインストール">libtool-ltdl-devel のインストール</h3>
+
+
+<p>
+Courier-IMAP は <a class="ext-link" href="http://www.courier-mta.org/authlib/"><span class="icon"></span>Courier-Authlib</a> に依存してるのですが、Courier-Authlib の RPM パッケージ作成時に、libtool-ltdl-devel がないと、最後の最後に以下の様なエラーが出ます。
+</p>
+
+
+<pre class="wiki">
+Checking for unpackaged file(s): /usr/lib/rpm/check-files /var/tmp/courier-authlib-0.58-1.4-root
+error: Installed (but unpackaged) file(s) found:
+   /usr/lib/libltdl.a
+   /usr/lib/libltdl.la
+   /usr/lib/libltdl.so
+   /usr/lib/libltdl.so.3
+   /usr/lib/libltdl.so.3.1.0
+</pre>
+
+
+<p>
+なので、まずは yum で libtool-ltdl-devel をインストール。
+</p>
+
+
+<pre class="wiki">
+$ sudo yum install libtool-ltdl-devel
+</pre>
+
+
+<h3 id="Courier-Authlibのインストール">Courier-Authlib のインストール</h3>
+
+
+<p>
+<a class="ext-link" href="http://www.courier-mta.org/?download.php~authlib"><span class="icon"></span>ここから</a> Courier-Authlib のソースをダウンロード。展開はせずにそのまま
+</p>
+
+
+<pre class="wiki">
+$ sudo rpmbuild -ta courier-authlib-0.58.tar.bz2
+</pre>
+
+
+<p>
+を実行。しばらくビルド作業が続き、以下の様に複数の RPM パッケージを生成して完了。
+</p>
+
+
+<pre class="wiki">
+Wrote: /usr/src/redhat/SRPMS/courier-authlib-0.58-1.4.src.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-devel-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-userdb-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-ldap-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-mysql-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-pgsql-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-pipe-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-debuginfo-0.58-1.4.i386.rpm
+Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.17424
++ umask 022
++ cd /usr/src/redhat/BUILD
++ cd courier-authlib-0.58
++ rm -rf /var/tmp/courier-authlib-0.58-1.4-root
++ exit 0
+</pre>
+
+
+<p>
+このうち courier-authlib と courier-authlib-devel は必須なのでインストールしておきます。
+</p>
+
+
+<pre class="wiki">
+$ rpm -Uvh /usr/src/redhat/RPMS/i386/courier-authlib-0.58-1.4.i386.rpm
+$ rpm -Uvh /usr/src/redhat/RPMS/i386/courier-authlib-devel-0.58-1.4.i386.rpm
+</pre>
+
+
+<p>
+後は必要なものを適宜インストール。
+</p>
+
+
+<h3 id="gamin-develのインストール">gamin-devel のインストール</h3>
+
+
+<p>
+Courier-IMAP の RPM パッケージを作成しようとすると、
+</p>
+
+
+<pre class="wiki">
+error: Failed build dependencies:
+        /usr/include/fam.h is needed by courier-imap-4.1.1-1.4.i386
+</pre>
+
+
+<p>
+と怒られるので、このファイルが含まれる gamin-devel をインストールします。
+</p>
+
+
+<pre class="wiki">
+$ sudo yum install gamin-devel
+</pre>
+
+
+<h3 id="Courier-IMAPのインストール">Courier-IMAP のインストール</h3>
+
+
+<p>
+ソースから Perl を入れている場合には、生成された RPM パッケージをインストールしようとすると、
+</p>
+
+
+<pre class="wiki">
+error: Failed dependencies:
+        /usr/local/bin/perl is needed by courier-imap-4.1.1-1.4.i386
+</pre>
+
+
+<p>
+と怒られるので、PATH から /usr/local を外しておきます。
+</p>
+
+
+<pre class="wiki">
+$ export PATH=/bin:/usr/bin
+</pre>
+
+
+<p>
+で、いよいよ Courier-IMAP の  RPM パッケージの作成ですが、
+</p>
+
+
+<pre class="wiki">
+$ sudo rpmbuild -ta courier-imap-4.1.1.tar.bz2
+</pre>
+
+
+<p>
+と実行すると、
+</p>
+
+
+<pre class="wiki">
+configure: WARNING: === Do not compile Courier-IMAP as root.  Compile
+configure: WARNING: === Courier-IMAP as a non-root user then su to
+configure: WARNING: === root before running make install.  You must now
+configure: WARNING: === remove this entire directory and then extract the
+configure: WARNING: === source code from the tarball as a non-root user
+configure: WARNING: === and rerun the configure script.  If you have read
+configure: WARNING: === the INSTALL file you should have known this.  So
+configure: WARNING: === you better read INSTALL again.
+configure: error: aborted.
+error: Bad exit status from /var/tmp/rpm-tmp.46388 (%prep)
+</pre>
+
+
+<p>
+と怒られるので sudo を外すと、
+</p>
+
+
+<pre class="wiki">
+$ rpmbuild -ta courier-imap-4.1.1.tar.bz2
+error: Failed to rename /usr/src/redhat/SPECS/rpm-spec.oF7pub to /usr/src/redhat/SPECS/rpm-spec.oF7pub: Permission denied: No such file or directory
+</pre>
+
+
+<p>
+と怒られる。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://www.courier-mta.org/?FAQ.html~rpm"><span class="icon"></span>http://www.courier-mta.org/?FAQ.html~rpm</a> に対処方法が書いてあるので、これにしたがって non-root ユーザで以下の様に実行。
+</p>
+
+
+<pre class="wiki">
+$ mkdir $HOME/rpm
+$ mkdir $HOME/rpm/SOURCES
+$ mkdir $HOME/rpm/SPECS
+$ mkdir $HOME/rpm/BUILD
+$ mkdir $HOME/rpm/SRPMS
+$ mkdir $HOME/rpm/RPMS
+$ mkdir $HOME/rpm/RPMS/i386
+echo "%_topdir    $HOME/rpm" >> $HOME/.rpmmacros
+rpmbuild -ta courier-imap-4.1.1.tar.bz2
+</pre>
+
+
+<p>
+RPM パッケージが生成されるので、インストール。
+</p>
+
+
+<pre class="wiki">
+$ sudo rpm -Uvh /home/miya/rpm/RPMS/i386/courier-imap-4.1.1-1.4.i386.rpm
+</pre>
+
+
+<p>
+ここまでやって、よし、設定して起動するか、と思ったところで、<a class="ext-link" href="http://dovecot.org/"><span class="icon"></span>Dovecot</a> が既にインストールされていて起動していることに気づいた…せっかく Courier 入れたけど、Dovecot 使ったことないので、いい機会なのでこっちを使うことにした。
+</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2006-07-22T19:45:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2006/07/22/505/" data-via="" data-counturl="http://mizzy.org/blog/2006/07/22/505/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2006/07/20/303/" title="Previous Post: Catalyst Tips #1 default アクションでの args の扱い">&laquo; Catalyst Tips #1 default アクションでの args の扱い</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2006/07/22/448/" title="next Post: catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)">catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9) &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2006/07/22/505';
+        var disqus_url = 'http://mizzy.org/blog/2006/07/22/505';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

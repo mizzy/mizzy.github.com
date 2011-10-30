@@ -1,1 +1,1325 @@
-My Octopress Page is coming soon &hellip;
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content=" Black Hole Sun - Astronomic Landscape and Milky Way TimeLapse from Christoph Malin on Vimeo. ">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo Tag Plugin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-10-30T23:27:00+09:00" pubdate>Oct 30<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/10/30/vimeo-tag-plugin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><iframe src="http://player.vimeo.com/video/24149087?color=ffffff" width="800" height="600" frameborder="0" webkitAllowFullScreen allowFullScreen></iframe>
+
+
+<p><a href="http://vimeo.com/24149087">Black Hole Sun - Astronomic Landscape and Milky Way TimeLapse</a> from <a href="http://vimeo.com/user1722616">Christoph Malin</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-10-29T21:34:00+09:00" pubdate>Oct 29<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/10/29/typo-to-octopress/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve moved my <a href="http://fdv.github.com/typo/">Typo</a> blog contents to this octopress blog.</p>
+
+<p>For this purpose I made this tiny script.</p>
+
+<div><script src='https://gist.github.com/1324352.js?file='></script>
+<noscript><pre><code>require &quot;rubygems&quot;
+require &quot;active_record&quot;
+
+ActiveRecord::Base.establish_connection(
+    :adapter  =&gt; &quot;mysql2&quot;,
+    :host     =&gt; &quot;192.168.10.12&quot;,
+    :user     =&gt; &quot;root&quot;,
+    :password =&gt; &quot;root&quot;,
+    :database =&gt; &quot;typo&quot;,
+    :encoding =&gt; &quot;utf8&quot;
+)
+
+class Content &lt; ActiveRecord::Base
+  Content.inheritance_column = 'foo'
+end
+
+contents = Content.all
+
+contents.each do |content|
+  dt = content.published_at
+  date = sprintf(&quot;%04s-%02d-%02d&quot;, dt.year, dt.month, dt.day)
+  datetime = date + sprintf(&quot; %02d:%02d&quot;, dt.hour, dt.min)
+  file = date + &quot;-&quot; + content.id.to_s + &quot;.markdown&quot;
+
+  body = &lt;&lt;BODY
+---
+layout: post
+title: &quot;#{content.title}&quot;
+date: #{datetime}
+comments: true
+categories:
+---
+#{content.body}
+BODY
+
+  File.open(file, 'w') do |file|
+    file.write(body)
+  end
+end
+</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/21/twan-tag-plugin/">TWAN Tag Plugin for Jekyll</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-10-21T00:04:00+09:00" pubdate>Oct 21<span>st</span>, 2011</time>
+        
+         | <a href="/blog/2011/10/21/twan-tag-plugin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve written <a href="https://github.com/mizzy/jekyll-plugins/blob/master/twan_tag.rb">TWAN tag plugin</a> for <a href="https://github.com/mojombo/jekyll">Jekyll</a> which shows the image of <a href="http://www.twanight.org/newTWAN/index.asp">The World At Night</a>.</p>
+
+<p>If you call this plugin in a post like this:</p>
+
+<pre><code>{% twan 3003406 %}
+</code></pre>
+
+<p>The image shows up like this.</p>
+
+<p><a href="http://www.twanight.org/newTWAN/photos.asp?ID=3003406"><img src="/images/twan/3003406.jpg" /></a></br />
+<a href="http://www.twanight.org/newTWAN/photos.asp?ID=3003406">Draconid Meteors Composite by Juan Carlos Casado</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-10-17T22:25:00+09:00" pubdate>Oct 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/10/17/first-post/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>10年ぐらい稼働していた mizzy.org の自宅サーバが死にました。（四男がコンセントぶち抜いたら起動してこなくなった。）</p>
+
+<p>メールの方は Google Apps に移行したんですが、ブログはどうしようかなー、できれば GitHub でファイル管理したいなー、と思ってたところに、<a href="http://mattn.kaoriya.net/software/lang/ruby/20111017205717.htm">@mattn_jp さんのタイムリーなエントリ</a> が。</p>
+
+<p>とても良さそうなので、しばらくこれで運用してみます。</p>
+
+<p>過去エントリについては、Trac に入ってた分ぐらいは移行しようかな、と考えてます。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/05/MyResume/">MyResume</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-10-05T17:14:06+09:00" pubdate>Oct 5<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/10/05/MyResume/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Educations</h1>
+
+<ul>
+<li>Hokkaido University (1993-1997)
+
+<ul>
+<li>Department of Economics
+
+<ul>
+<li>Operations Research</li>
+<li>Linear Programming</li>
+<li>Multivariable Analysis</li>
+<li>A theme of graduation thesis is &#8220;Analyze NBA Players ablility with Multivariable Analysis&#8221;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<h1>Jobs</h1>
+
+<ul>
+<li><a href="http://www.ctc-g.co.jp/en/">CTC</a>
+
+<ul>
+<li>1997-
+
+<ul>
+<li>Netscape Server Software Products Engineer
+
+<ul>
+<li>Netscape Enterprise Server (Web Server)</li>
+<li>Netscape Messaging Server (Mail Server)</li>
+<li>Netscape Directory Server (LDAP Server)</li>
+<li>and so on</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>1998-
+
+<ul>
+<li>Support Engineer of Netscape Server Software Products at Netscape Japan</li>
+</ul>
+</li>
+<li>1999-2000
+
+<ul>
+<li>QA of I18N Netscpe Server Software Products at Netscape US</li>
+<li>Working at Mountain View</li>
+<li>Lining in Sunnyvale</li>
+</ul>
+</li>
+<li>2000-2005
+
+<ul>
+<li>iPlanet(formerly known as Netscape) Server Software Products Engineer at CTC again.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<ul>
+<li><a href="http://www.netmarks.co.jp/english/index.html">Netmarks</a>
+
+<ul>
+<li>2005-
+
+<ul>
+<li>Testing Network Quarantine Systems
+
+<ul>
+<li>It is for blocking insecure computers automatically.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<ul>
+<li><a href="http://www.paperboy.co.jp/">paperboy&amp;co.</a> (Now)
+
+<ul>
+<li>2006-
+
+<ul>
+<li>Software Engineer</li>
+<li>JugemKey (http://jugemkey.jp/)
+
+<ul>
+<li>Central authorization system for multiple services in paperboy&amp;co.</li>
+<li>Write backend API with Perl</li>
+</ul>
+</li>
+<li>JugemKey Authentication API
+
+<ul>
+<li>Similar to Flickr authentication API</li>
+<li>Write frontend with PHP and backend with Perl</li>
+</ul>
+</li>
+<li>JUGEM (http://jugem.jp/)
+
+<ul>
+<li>Blog service</li>
+<li>Write accounting function by credit cards with PHP</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>2007-
+
+<ul>
+<li>Technical Manager</li>
+<li>30days Album (http://30d.jp/)
+
+<ul>
+<li>A photo Album Service</li>
+<li>In charge of overall architect design</li>
+<li>Write some Perlbal plugins</li>
+<li>Write frontend API for MogileFS
+
+<ul>
+<li>Perl + Catalyst</li>
+</ul>
+</li>
+<li>Other technology stacks
+
+<ul>
+<li>Linux, Ruby On Rails, lighttpd, Gearman, TheSchwartz</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Lolipop Rental Server (http://lolipop.jp/)
+
+<ul>
+<li>A plain old style rental servers</li>
+<li>In charge of overall architect design in system renewal</li>
+<li>Designed Internal API and implemented a proto type</li>
+<li>Other technology stacks
+
+<ul>
+<li>Linux, Cobbler, LVS, Apache, MySQL, Postfix, qpsmtpd, Courier-IMAP, ClamAV, Puppet, Func</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Improve development environments in the company
+
+<ul>
+<li>Introduce Subversion and Trac</li>
+<li>Recently introduce Git and Jenkins CI</li>
+<li>Now writing original internal cloud tool
+
+<ul>
+<li>Very simple system with kvm, libvirtd, virt-clone and zeromq
+
+<ul>
+<li>https://github.com/mizzy/maglica</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<h1>Talks</h1>
+
+<ul>
+<li><a href="http://tokyo2007.yapcasia.org/blog/">YAPC::Asia 2007 Tokyo</a>
+
+<ul>
+<li><a href="http://tokyo2007.yapcasia.org/sessions/2007/02/assurer_a_pluggable_server_tes.html">Assurer - a pluggable server testing/monitoring framework</a></li>
+<li><a href="http://www.slideshare.net/mizzy/assurer-a-pluggable-server-testingmonitoring-framework">SlideShare</a></li>
+<li><a href="https://github.com/mizzy/Assurer">Code on github</a></li>
+</ul>
+</li>
+<li><a href="http://conferences.yapcasia.org/ya2008/index.html">YAPC::Asia 2008 Tokyo</a>
+
+<ul>
+<li><a href="http://conferences.yapcasia.org/ya2008/talk/973">Easy system administration programming with a framework</a></li>
+<li><a href="https://github.com/mizzy/Punc">Code on github</a></li>
+</ul>
+</li>
+<li><a href="http://conferences.yapcasia.org/ya2009/">YAPC::Asia 2009 Tokyo</a>
+
+<ul>
+<li><a href="http://conferences.yapcasia.org/ya2009/talk/2166">How to use Perl in paperboy&amp;co.</a></li>
+<li><a href="http://conferences.yapcasia.org/ya2009/talk/2220">How Danga::Socket handles asynchronous processing and how to write asynchronous Perlbal plugins</a></li>
+</ul>
+</li>
+<li>Xen Summit 2008 Tokyo
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/xen-summit-2008-tokyo-operating-xen-domains-through-llperlpython-with-libvirt-presentation">Operating Xen domains through LL(Perl/Python) with libvirt</a></li>
+</ul>
+</li>
+<li><a href="http://www.tlug.jp/wiki/Meetings:2008:09">TLUG Meeting 2008/09/13</a>
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">How To Build A Scalable Storage System with OSS</a></li>
+</ul>
+</li>
+<li><a href="http://dsas.blog.klab.org/archives/51208101.html">KLab Study #4</a>
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/open-source-system-administration-framework-func">Open Source System Administration Framework - Func</a> (Japanese)</li>
+</ul>
+</li>
+<li><a href="http://techlife.cookpad.com/2009/10/24/techlife_introduction/">techlife lightning talk at Cookpad</a>
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/puppet-best-practices-at-cookpad">Puppet Best Practices?</a> (Japanese)</li>
+</ul>
+</li>
+<li><a href="http://heartbeats.jp/hbstudy/2010/02/hbstudy8.html">hbstudy #8</a>
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/puppet-3258268">About Puppet</a> (Japanese)</li>
+</ul>
+</li>
+<li><a href="http://partake.in/events/b5472f43-5bc0-42d0-9469-dc70d7d95b24">DevOps Conference</a>
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/10devops">DevOps in 10 minutes</a> (Japanese)</li>
+</ul>
+</li>
+<li>Tech Talk at NTT Resonant Inc
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/devops-4156440">What is DevOps?</a> (Japanese)</li>
+</ul>
+</li>
+<li><a href="http://k-of.jp/2008/">Kansai Open Source 2008</a>
+
+<ul>
+<li><a href="http://www.slideshare.net/mizzy/2008-30days-album-presentation">Inside 30days Album&#8217;s Backend</a> (Japanese)</li>
+</ul>
+</li>
+<li><a href="http://shibuya.pm.org/blosxom/techtalks/200610.html">Shibuya.pm Technical Talk #7</a>
+
+<ul>
+<li>LT: Plagger Plugins development process by using SVK</li>
+</ul>
+</li>
+<li><a href="http://shibuya.pm.org/blosxom/techtalks/200710.html">Shibuya.pm Technical Talk #8</a>
+
+<ul>
+<li>LT: About Pushmi</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<h1>Others</h1>
+
+<ul>
+<li>I4PC (Instagram for PC)
+
+<ul>
+<li>http://www.i4pc.jp/</li>
+</ul>
+</li>
+<li>CPAN
+
+<ul>
+<li>http://search.cpan.org/~mizzy/</li>
+</ul>
+</li>
+<li>GitHub
+
+<ul>
+<li>https://github.com/mizzy</li>
+</ul>
+</li>
+<li>codewall
+
+<ul>
+<li>http://coderwall.com/mizzy</li>
+</ul>
+</li>
+<li>twitter
+
+<ul>
+<li>http://twitter.com/gosukenator</li>
+</ul>
+</li>
+<li>Facebook
+
+<ul>
+<li>http://www.facebook.com/gosukenator</li>
+</ul>
+</li>
+<li>SlideShare
+
+<ul>
+<li>http://www.slideshare.net/mizzy/presentations</li>
+</ul>
+</li>
+<li>Articles about Puppet in gihyo.jp (Japanese)
+
+<ul>
+<li>http://gihyo.jp/admin/serial/01/puppet</li>
+</ul>
+</li>
+<li>Articles about Puppet in Software Design magazine (Japanese)
+
+<ul>
+<li>http://gihyo.jp/magazine/SD/archive/2007/200712</li>
+</ul>
+</li>
+<li>Interview articles (Japanese)
+
+<ul>
+<li>http://japan.cnet.com/extra/paperboy_0907/story/0,3800098768,20394957,00.htm</li>
+<li>http://web-engineer.buyuden.net/buyuden/2010/01/39paperboyco.html</li>
+<li>http://jibun.atmarkit.co.jp/lcom01/rensai/comrade04/comrade01.html</li>
+</ul>
+</li>
+<li>LinkedIn
+
+<ul>
+<li>http://www.linkedin.com/in/mizzy</li>
+</ul>
+</li>
+<li>Personal sites
+
+<ul>
+<li>http://mizzy.org/</li>
+<li>http://astralscape.tumblr.com/</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<p>mailto: gosukenator at gmail.com</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/09/03/SSLCertOfLolipop/">SSLCertOfLolipop</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-09-03T01:41:19+09:00" pubdate>Sep 3<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/09/03/SSLCertOfLolipop/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://blog2.or6.jp/ftpisdead">FFFTP開発終了で大騒ぎしている人たちへ</a> にて、</p>
+
+<pre><code>SSL証明書がまともなものでないと接続時にエラーが出るのですが、ロリポップなんかだと
+このエラーを無視するように公式ドキュメントに書いてあるので、かなり悪質です。
+</code></pre>
+
+<p>と書かれていますので、これについて説明させて頂きます。</p>
+
+<p>この方が指摘されているのは、<del><a href="http://lolipop.jp/manual/hp/w-fz/">Win FileZillaの設定 / ホームページ / マニュアル - ロリポップ！</a> </del>(FileZilla非推奨のため現在は削除されています)の中の、</p>
+
+<pre><code> 証明書の確認を行います。『今後もこの証明書を常に信用する(A)』にチェックを入れて、『OK』をクリックします。
+</code></pre>
+
+<p>という部分だと思われるのですが、確かに、無条件で信用するにチェックを入れるようお客様に指示するのは大変良くないですね。</p>
+
+<p>ロリポップでは <a href="http://www.digicert.ne.jp/">DigiCert Inc社</a> によって発行されている証明書を利用しているのですが、Filezillaでは警告が出てしまうようです。</p>
+
+<p>調べてみたところ、FilezillaはルートCAの証明書を保持しておらず、どのような証明書であっても、ユーザが「信用する」にチェックを入れなければ警告が出る仕様となっているようです。</p>
+
+<p><a href="http://forum.filezilla-project.org/viewtopic.php?f=2&amp;t=20767">how to install root CA certificate on Filezilla</a></p>
+
+<p>OR6 blog 様のご指摘により、このような証明書の検証をきちんと行っていないソフトウェアをお客様に推奨すべきではないと判断いたしましたので、Windows/Mac版ともに存在し、証明書の検証をきちんと行っている <a href="http://cyberduck.ch/">Cyberduck</a> を推奨するよう、マニュアルを変更させて頂くことになりました。</p>
+
+<p>また、蛇足ですが、ロリポップの <a href="http://lolipop.jp/service/plan-chicappa/">チカッパプラン</a> では SSH サービスを提供していますので、FTPS の代わりに SCP/SFTP もご利用頂けます。</p>
+
+<p>OR6 blog 様、この度はご指摘誠にありがとうございました。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/08/18/MaglicaInternalCloudTool/">MaglicaInternalCloudTool</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-08-18T17:25:28+09:00" pubdate>Aug 18<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/08/18/MaglicaInternalCloudTool/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Overview</h1>
+
+<p><a href="https://github.com/mizzy/maglica">Maglica</a> is a Python library and command-line tool for an internal cloud. (This tool is very primitive beta now.)</p>
+
+<p>This is very simple and based on libvirt, virt-clone and zeromq (for RPC).</p>
+
+<p>The name &#8220;Maglica&#8221; is derived from a Bosnian word that means &#8220;Nebula.&#8221;</p>
+
+<p>I&#8217;m developing this tool because other internal cloud tools(CloudStack, OpenStack, Eucalyptus and so on) are so complicated for internal use.I need a simple tool.</p>
+
+<hr />
+
+<h1>Architecture of Maglica</h1>
+
+<p>Maglica has four components.</p>
+
+<ol>
+<li>Library</li>
+<li>CLI</li>
+<li>Client worker</li>
+<li>Host workers</li>
+</ol>
+
+
+<p>Maglica library is a main component of Maglica.Maglica CLI calls the library
+to do the jobs.The library talks to libvirtd on other hosts directly to get
+virtual machines information.</p>
+
+<p>Maglica client worker is running on the same host on which CLI runs.
+Client worker binds zeromq PUB socket to tcp://<em>:5555 and REP socket
+to tcp://</em>:5556.</p>
+
+<p>Client worker recieves requests from library through REP socket and throws
+request to host workers through PUB socket.Also REP socket recives job results
+from host workers.</p>
+
+<p>Host workers are running on hosts which virtual machines are running on.</p>
+
+<p>Host workers connect to the PUB socket of a client worker to receive job
+requests and the REP socket of a client worker to throw job results.</p>
+
+<p>[[Image(http://mizzy.org/img/maglica_architecture.jpg)]]</p>
+
+<hr />
+
+<h1>How to use Maglica</h1>
+
+<p>You must setup libvirtd running on host machines and accessible through
+tcp port. (See http://libvirt.org/remote.html)</p>
+
+<p>Clone Maglica on a host machine and run the host worker.</p>
+
+<pre><code># git clone git://github.com/mizzy/maglica.git
+# cd maglica
+# cp etc/maglica.conf.example etc/maglica.conf
+</code></pre>
+
+<p>Edit etc/maglica.conf that points to the correct client worker host and port.</p>
+
+<pre><code># ./scripts/maglica_host_worker
+</code></pre>
+
+<p>Clone Maglica on a client machine.</p>
+
+<pre><code># git clone git://github.com/mizzy/maglica.git
+# cd maglica
+# cp etc/maglica.conf.example etc/maglica.conf
+</code></pre>
+
+<p>Edit etc/maglica.conf that points to host machines.</p>
+
+<p>Run the client worker.</p>
+
+<pre><code># ./scripts/maglica_client_worker
+</code></pre>
+
+<p>Run maglica command to list up &#8220;original images&#8221;(which name is end with
+the string &#8220;oroginal&#8221;).</p>
+
+<pre><code># PYTHONPATH=. ./scripts/maglica image list
+Name                                     Host
+---------------------------------------------------------
+SL6.0-x86_64.original                    host0.example.jp  
+SL6.1-x86_64.original                    host0.example.jp  
+SL6.0-x86_64.original                    host1.example.jp  
+SL6.1-x86_64.original                    host1.example.jp  
+</code></pre>
+
+<p>Run maclica command to clone a virtual machine image.</p>
+
+<pre><code># ./scripts/maglica vm clone --image=SL6.1-x86_64.original --hostname=vm0.example.jp
+</code></pre>
+
+<p>This command clones the image on a host and rewrites network setting of the image with libguestfs.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/24/HowToGetGraphiteWorkingOnScientificLinux6/">HowToGetGraphiteWorkingOnScientificLinux6</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-07-24T23:18:15+09:00" pubdate>Jul 24<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/24/HowToGetGraphiteWorkingOnScientificLinux6/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I found a interest tool, <a href="http://graphite.wikidot.com/">Graphite</a> when I was exploring https://github.com/etsy .(<a href="http://graphite.wikidot.com/screen-shots">Screen Shots of Graphite</a>.)</p>
+
+<h1>Install Carbon</h1>
+
+<p><a href="http://graphite.wikidot.com/carbon">Carbon</a> is a backend storage application for Graphite.</p>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
+# tar zxvf carbon-0.9.8.tar.gz
+# pushd carbon-0.9.8
+# python setup.py install
+# popd
+</code></pre>
+
+<h1>Install Whisper</h1>
+
+<p><a href="http://graphite.wikidot.com/whisper">Whisper</a> is an alternate to RRD.</p>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
+# tar zxvf whisper-0.9.8.tar.gz
+# pushd whisper-0.9.8
+# python setup.py install
+# popd
+</code></pre>
+
+<h1>Install Graphite</h1>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
+# tar zxvf graphite-web-0.9.8.tar.gz
+# pushd graphite-web-0.9.8      
+</code></pre>
+
+<p>Run check-dependencies.py.</p>
+
+<pre><code># ./check-dependencies.py 
+[FATAL] Unable to import the 'cairo' module, do you have pycairo installed for python 2.6.5?
+[FATAL] Unable to import the 'django' module, do you have Django installed for python 2.6.5?
+[WARNING] Unable to import the 'mod_python' module, do you have mod_python installed for python 2.6.5?
+This means you will only be able to run graphite in the development server mode, which is not
+recommended for production use.
+[WARNING]
+Unable to import the 'memcache' module, do you have python-memcached installed for python 2.6.5?
+This feature is not required but greatly improves performance.
+
+[WARNING]
+Unable to import the 'ldap' module, do you have python-ldap installed for python 2.6.5?
+Without python-ldap, you will not be able to use LDAP authentication in the graphite webapp.
+
+[WARNING]
+Unable to import the 'twisted' package, do you have Twisted installed for python 2.6.5?
+Without Twisted, you cannot run carbon on this server.
+[WARNING]
+Unable to import the 'txamqp' module, this is required if you want to use AMQP.
+Note that txamqp requires python 2.5 or greater.
+2 necessary dependencies not met. Graphite will not function until these dependencies are fulfilled.
+5 optional dependencies not met. Please consider the warning messages before proceeding.
+</code></pre>
+
+<p>I use a development server included in Graphite, so mod_python is not needed.</p>
+
+<p>Install packages other than mod_python.</p>
+
+<pre><code># yum install pycairo
+# rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+# yum install Django python-twisted python-memcached python-ldap
+# yum install python-setuptools gcc python-devel
+# easy_install txamqp
+</code></pre>
+
+<p>You need bitmap fonts, so intall it.</p>
+
+<pre><code># yum install bitmap-console-fonts
+</code></pre>
+
+<p>Install Graphite and setup it.</p>
+
+<pre><code># python setup.py install
+# python /opt/graphite/webapp/graphite/manage.py syncdb
+# pushd /opt/graphite/conf
+# cp carbon.conf.example carbon.conf
+# cp storage-schemas.conf.example storage-schemas.conf
+# cp dashboard.conf.example dashboard.conf
+</code></pre>
+
+<p>Edit dashborad.conf and uncomment these.</p>
+
+<pre><code>[ui]
+default_graph_width = 400
+default_graph_height = 250
+automatic_variants = true
+refresh_interval = 60
+</code></pre>
+
+<p>Start Carbon.</p>
+
+<pre><code># /opt/graphite/bin/carbon-cache.py start
+</code></pre>
+
+<p>Start example-client included in Graphite source code to send load average data to Carbon.</p>
+
+<pre><code># popd
+# python ./examples/example-client.py
+</code></pre>
+
+<p>Start a develepment server of Graphite.</p>
+
+<pre><code># /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite  
+</code></pre>
+
+<p>Access to port 8080 of this server and you&#8217;ll see the screen of Graphite.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/">HowDotCloudLazyCopyImplementsCopyOnWrite</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-07-17T23:44:34+09:00" pubdate>Jul 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://github.com/dotcloud/lazycopy">dotcloud/lazycopy</a> is a copy-on-write version of cp.It&#8217;s based on <a href="http://aufs.sourceforge.net/">aufs</a>.</p>
+
+<p>Scientific Linux 5 has aufs rpm on its base repo.So I tried aufs and lazycopy on SL5.CentOS and SL6 don&#8217;t have aufs rpm.</p>
+
+<p>I created source directories and files in them first.</p>
+
+<pre><code># mkdir /tmp/source0
+# mkdir /tmp/source1
+# mkdir /tmp/source2
+# echo source0 &gt; /tmp/source0/0
+# echo source1 &gt; /tmp/source1/1
+# echo source2 &gt; /tmp/source2/2
+</code></pre>
+
+<p>And copied these directories to /tmp/dest with lazycopy command.</p>
+
+<pre><code># lazycopy /tmp/source0 /tmp/source1 /tmp/source2 /tmp/dest
+['/tmp/source0', '/tmp/source1', '/tmp/source2'] -&gt; /tmp/dest
+</code></pre>
+
+<p>Confirmed that three files wiere there and the content of one of the files.</p>
+
+<pre><code># ls /tmp/dest/
+0  1  2
+# cat /tmp/dest/0
+source0
+</code></pre>
+
+<p>Changed the content of /tmp/dest/0 and confirmed that /tmp/source0/0 was not changed.</p>
+
+<pre><code># echo dest &gt; /tmp/dest/0 
+# cat /tmp/dest/0 
+dest
+# cat /tmp/source0/0 
+source0
+</code></pre>
+
+<p>Lazycopy implements copy-on-write by mounting directories with aufs like this.</p>
+
+<pre><code># mount
+...
+none on /tmp/dest type aufs (rw,br:/tmp/dest/.aufs/0=rw:/tmp/source0=ro:/tmp/source1=ro:/tmp/source2=ro)
+</code></pre>
+
+<p>Lazycopy creates .aufs/0 directory in the destination directory if it doesn&#8217;t exist and mounts it with rw mode as one of the aufs branch.Other source directories are mounted with ro mode, so files in these directories will not be changed.</p>
+
+<p>Changed files and newly created files are saved under /tmp/dest/.aufs/0 directory.So you can see the directory structures like this after unmounting /tmp/dest.</p>
+
+<pre><code># touch /tmp/dest/3
+# umount /tmp/dest
+# tree -a /tmp/dest
+/tmp/dest
+`-- .aufs
+    `-- 0
+        |-- .wh..wh..tmp
+        |-- .wh..wh.aufs
+        |-- .wh..wh.plnk
+        |-- 0
+        `-- 3
+</code></pre>
+
+<p>So if you unmount /tmp/dest directory and run lazycopy with same options again, you can see the changed files and created files again.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/17/LinuxContainer00/">LinuxContainer00</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-07-17T16:33:08+09:00" pubdate>Jul 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/17/LinuxContainer00/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Make and install lxc rpm packages</h1>
+
+<p>The spec file for lxc is included in lxc source code.So you can make rpm packages of lxc easily.</p>
+
+<pre><code># yum -y update kernel
+# reboot
+# yum -y install rpm-build libcap-devel docbook-utils kernel-devel gcc make
+# wget http://lxc.sourceforge.net/download/lxc/lxc-0.7.4.2.tar.gz
+# tar zxvf lxc-0.7.4.2.tar.gz
+# mkdir -p ~/rpmbuild/SOURCES
+# cp lxc-0.7.4.2.tar.gz ~/rpmbuild/SOURCES
+# chown root:root lxc-0.7.4.2/lxc.spec
+# rpmbuild -ba lxc-0.7.4.2/lxc.spec --define 'ksrc /usr/src/kernels/`uname -r`'
+# rpm -Uvh ~/rpmbuild/RPMS/x86_64/lxc-0.7.4.2-1.x86_64.rpm
+</code></pre>
+
+<hr />
+
+<h1>Check whether this os is lxc ready or not</h1>
+
+<p>All statuses should be &#8220;enabled&#8221;.</p>
+
+<pre><code># lxc-checkconfig 
+Kernel config /proc/config.gz not found, looking in other places...
+Found kernel config file /boot/config-2.6.32-131.2.1.el6.x86_64
+--- Namespaces ---
+Namespaces: enabled
+Utsname namespace: enabled
+Ipc namespace: enabled
+Pid namespace: enabled
+User namespace: enabled
+Network namespace: enabled
+Multiple /dev/pts instances: enabled
+
+--- Control groups ---
+Cgroup: enabled
+Cgroup namespace: enabled
+Cgroup device: enabled
+Cgroup sched: enabled
+Cgroup cpu account: enabled
+Cgroup memory controller: enabled
+Cgroup cpuset: enabled
+
+--- Misc ---
+Veth pair device: enabled
+Macvlan: enabled
+Vlan: enabled
+File capabilities: enabled
+enabled
+</code></pre>
+
+<hr />
+
+<h1>Quick Start</h1>
+
+<p>In the man of lxc, you can get how to start lxc quickly.</p>
+
+<pre><code>QUICK START
+       You are in a hurry, and you don’t want to read this man page. Ok, with-
+       out warranty, here are the commands to launch a  shell  inside  a  con-
+       tainer   with   a  predefined  configuration  template,  it  may  work.
+       /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/
+       lxc-macvlan.conf /bin/bash
+</code></pre>
+
+<p>But before running lxc-execute, you should mount croup.</p>
+
+<pre><code># mount -t cgroup cgroup /cgroup
+# /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/lxc-macvlan.conf /bin/bash
+</code></pre>
+
+<p>In the container, processes are like this.</p>
+
+<pre><code># ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 10:54 ttyS0    00:00:00 /usr/lib64/lxc/lxc-init -- /bin/
+root         2     1  0 10:54 ttyS0    00:00:00 /bin/bash
+root        11     2  0 10:55 ttyS0    00:00:00 ps -ef
+</code></pre>
+
+<p>You can also see the processes in the container from the outside of the container.</p>
+
+<pre><code># lxc-ps --name=foo
+CONTAINER    PID TTY          TIME CMD
+foo         1654 ttyS0    00:00:00 lxc-init
+foo         1656 ttyS0    00:00:00 bash
+</code></pre>
+
+<p>The sample lxc conf is like this.</p>
+
+<pre><code># cat /usr/share/doc/lxc/examples/lxc-macvlan.conf 
+# Container with network virtualized using the macvlan device driver
+lxc.utsname = alpha
+lxc.network.type = macvlan
+lxc.network.flags = up
+lxc.network.link = eth0
+lxc.network.hwaddr = 4a:49:43:49:79:bd
+lxc.network.ipv4 = 1.2.3.4/24
+lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/2/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

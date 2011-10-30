@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>puppet の通信の仕組みにちょっと立ち入ってみる - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="puppet のクライアント/サーバ間通信は https + XMLRPC で、認証は SSLv3 の証明書認証が利用されています。 通常、SSLv3 で証明書認証とかいうと、CA とか、自己署名証明書とか、色々めんどくさかったりしますが、puppet &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2007/03/21/426">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Puppet の通信の仕組みにちょっと立ち入ってみる</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-03-21T00:08:00+09:00" pubdate>Mar 21<span>st</span>, 2007</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>
+puppet のクライアント/サーバ間通信は https + XMLRPC で、認証は SSLv3 の証明書認証が利用されています。
+</p>
+
+
+<p>
+通常、SSLv3 で証明書認証とかいうと、CA とか、自己署名証明書とか、色々めんどくさかったりしますが、puppet はこの辺りはほとんど自動で処理してくれるので、とても楽です。
+</p>
+
+
+<p>
+例えば、puppet サーバ側では、puppetmasterd をはじめて起動した時に、CA 関連ファイルや自己署名証明書などを、/etc/puppet/ssl 以下に勝手に作ってくれます。
+</p>
+
+
+<pre class="wiki">
+$ ls -R /etc/puppet/ssl
+/etc/puppet/ssl:
+ca/  certs/  csr_kenny.southpark.pem  private/  private_keys/  public_keys/
+
+/etc/puppet/ssl/ca:
+ca_crl.pem  ca_key.pem  inventory.txt  requests/  signed/
+ca_crt.pem  ca_pub.pem  private/       serial
+
+/etc/puppet/ssl/ca/private:
+ca.pass
+
+/etc/puppet/ssl/ca/requests:
+
+/etc/puppet/ssl/ca/signed:
+kenny.southpark.pem
+
+/etc/puppet/ssl/certs:
+ca.pem  kenny.southpark.pem
+
+/etc/puppet/ssl/private:
+
+/etc/puppet/ssl/private_keys:
+kenny.southpark.pem
+
+/etc/puppet/ssl/public_keys:
+kenny.southpark.pem 
+</pre>
+
+
+<p>
+あれ、CA 証明書っぽいものが二つある、と思ったら、ca/ca_crt.pem と certs/ca.pem はまったく同じものでした。
+</p>
+
+
+<p>
+また、CA 証明書とは別に、kenny.southpark.pem というものができていますが、これはおそらく、自身が puppet クライアントになる時に利用するものと思われます。
+</p>
+
+
+<p>
+CA 証明書の中身を覗いてみるとこんな感じ。
+</p>
+
+
+<pre class="wiki">
+$ sudo openssl x509 -text -in /etc/puppet/ssl/ca/ca_crt.pem
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 0 (0x0)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: CN=kenny.southpark
+        Validity
+            Not Before: Mar 20 14:29:16 2007 GMT
+            Not After : Mar 18 14:29:16 2012 GMT
+        Subject: CN=kenny.southpark
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:ea:83:02:5a:83:08:02:c8:bc:cd:d0:26:07:e7:
+                    44:f7:a0:0e:0f:26:23:82:ba:e4:ed:d7:c8:88:c6:
+                    43:b7:0a:5d:16:39:a2:6a:48:f9:8f:a5:9d:35:2f:
+                    24:1e:ec:38:6b:73:0f:23:17:84:70:7e:08:08:96:
+                    bd:e6:51:53:f2:fe:1d:ec:2f:d0:9a:5b:3d:ea:92:
+                    8a:39:f5:ff:02:ff:6b:e4:d2:ef:9f:d2:c3:d6:35:
+                    d8:5c:51:42:d9:16:59:62:c5:da:9a:9d:cd:f7:91:
+                    a7:06:0b:28:8e:7f:4a:52:bc:5f:c3:5c:cb:b3:e3:
+                    81:d0:1b:ca:b6:7f:73:b2:3f
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            Netscape Comment:
+            Puppet Ruby/OpenSSL Generated Certificate
+            X509v3 Basic Constraints: critical
+            CA:TRUE
+            X509v3 Subject Key Identifier:
+            82:0D:36:AD:29:30:30:2D:CC:2D:EB:EA:F9:32:07:44:80:11:D3:E6
+            X509v3 Key Usage:
+            Certificate Sign, CRL Sign
+    Signature Algorithm: sha1WithRSAEncryption
+        e0:0b:a7:28:39:8e:09:cc:91:85:ce:13:19:c1:9b:ba:21:c3:
+        d8:09:c2:ee:93:ac:8d:76:91:18:7a:31:01:fc:55:8b:84:e6:
+        69:3f:f5:a3:62:ce:cc:af:87:21:42:d4:0d:ab:02:62:26:4f:
+        c2:f4:a2:22:4f:52:a5:06:bd:88:4c:65:89:9e:98:4c:cb:82:
+        ce:09:50:e0:4b:67:59:1e:d7:26:75:2f:6f:3d:d3:d4:92:55:
+        79:06:5e:56:39:2b:15:b0:67:d9:00:79:09:37:86:1a:a1:30:
+        e0:ce:e8:2b:0a:16:92:73:a3:b8:1f:16:c8:60:f7:7d:c5:24:
+        09:66
+-----BEGIN CERTIFICATE-----
+MIICIzCCAYygAwIBAgIBADANBgkqhkiG9w0BAQUFADAaMRgwFgYDVQQDDA9rZW5u
+eS5zb3V0aHBhcmswHhcNMDcwMzIwMTQyOTE2WhcNMTIwMzE4MTQyOTE2WjAaMRgw
+FgYDVQQDDA9rZW5ueS5zb3V0aHBhcmswgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
+AoGBAOqDAlqDCALIvM3QJgfnRPegDg8mI4K65O3XyIjGQ7cKXRY5ompI+Y+lnTUv
+JB7sOGtzDyMXhHB+CAiWveZRU/L+Hewv0JpbPeqSijn1/wL/a+TS75/Sw9Y12FxR
+QtkWWWLF2pqdzfeRpwYLKI5/SlK8X8Ncy7PjgdAbyrZ/c7I/AgMBAAGjeTB3MDgG
+CWCGSAGG+EIBDQQrFilQdXBwZXQgUnVieS9PcGVuU1NMIEdlbmVyYXRlZCBDZXJ0
+aWZpY2F0ZTAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSCDTatKTAwLcwt6+r5
+MgdEgBHT5jALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQEFBQADgYEA4AunKDmOCcyR
+hc4TGcGbuiHD2AnC7pOsjXaRGHoxAfxVi4TmaT/1o2LOzK+HIULUDasCYiZPwvSi
+Ik9SpQa9iExliZ6YTMuCzglQ4EtnWR7XJnUvbz3T1JJVeQZeVjkrFbBn2QB5CTeG
+GqEw4M7oKwoWknOjuB8WyGD3fcUkCWY=
+-----END CERTIFICATE-----    
+</pre>
+
+
+<p>
+次にクライアント側ですが、こちらもはじめて puppetd（クライアント側で起動するデーモン）を実行した時に、秘密鍵、公開鍵、CSR を自動的に作成し、サーバに対して CSR への署名を求めることが、起動時のメッセージから読み取れます。
+</p>
+
+
+<pre class="wiki">
+$ sudo /usr/sbin/puppetd --server mizzy.org --test
+err: No certificate; running with reduced functionality.
+info: Creating a new SSL key at /var/lib/puppet/ssl/private_keys/cartman.southpark.pem
+info: Creating a new certificate request for cartman.southpark
+info: Requesting certificate
+warning: peer certificate won't be verified in this SSL session
+notice: Did not receive certificate
+</pre>
+
+
+<p>
+サーバ側では、証明書リクエストが来ていることを、次のようなコマンドで確認できます。
+</p>
+
+
+<pre class="wiki">
+$ sudo puppetca --list
+cartman.southpark
+</pre>
+
+
+<p>
+これに署名するには、
+</p>
+
+
+<pre class="wiki">
+$ sudo puppetca --sign cartman.southpark
+</pre>
+
+
+<p>
+と実行するだけです。これで puppet クライアント/サーバ間で無事通信できるようになります。
+</p>
+
+
+<p>
+セキュアな通信が割りと簡単に実現できていい感じ。
+</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2007-03-21T00:08:00+09:00" pubdate>Mar 21<span>st</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2007/03/21/426/" data-via="" data-counturl="http://mizzy.org/blog/2007/03/21/426/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2007/03/19/440/" title="Previous Post: puppet でファイルが変更されたら指定したコマンドを実行するレシピ">&laquo; puppet でファイルが変更されたら指定したコマンドを実行するレシピ</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2007/03/21/499/" title="next Post: puppet の実行ファイル">puppet の実行ファイル &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2007/03/21/426';
+        var disqus_url = 'http://mizzy.org/blog/2007/03/21/426';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

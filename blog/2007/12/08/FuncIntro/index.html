@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>FuncIntro - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="Open Tech Press で知った、Func がおもしろそうだ。 とりあえずどんなツールかを要約すると、 複数のサーバに対して、何らかの処理を一括でまとめて実行して結果が取得できる。たとえば、yum でパッケージをインストールとか。
+「何らかの処理」の部分は、モジュールで拡張できる。
+「 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2007/12/08/FuncIntro">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">FuncIntro</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-12-08T01:58:14+09:00" pubdate>Dec 8<span>th</span>, 2007</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="http://opentechpress.jp/developer/07/12/06/0046247.shtml">Open Tech Press</a> で知った、<a href="https://hosted.fedoraproject.org/projects/func/">Func</a> がおもしろそうだ。</p>
+
+<p>とりあえずどんなツールかを要約すると、</p>
+
+<ul>
+<li>複数のサーバに対して、何らかの処理を一括でまとめて実行して結果が取得できる。たとえば、yum でパッケージをインストールとか。</li>
+<li>「何らかの処理」の部分は、モジュールで拡張できる。</li>
+<li>「何らかの処理」はコマンドラインから実行して単に結果を表示、ということもできるし、Python API でプログラマブルに処理することもできる。</li>
+<li>クライアント/サーバアーキテクチャ</li>
+</ul>
+
+
+<p>これだけだと何となくわかるようでわからない。触ってみるのが一番。というわけでまずはインストール。</p>
+
+<h1>インストール</h1>
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/InstallAndSetupGuide">InstallAndSetupGuide</a> を読むと、（おそらく最近の）Fedora であれば yum 一発でインストールできるみたいだけど、手元にある CentOS 5 用のパッケージがなさそうなので、ソース RPM からパッケージをつくる。（noarch なので FC7 用でもそのまま入りそうだけど、せっかくだからつくってみる。）</p>
+
+<p>まずは <a href="https://hosted.fedoraproject.org/projects/func/wiki/FuncReleases">FuncReleases</a> から func-0.13-3.fc7.src.rpm をゲット。</p>
+
+<p>次にソース RPM からリビルドするために必要なパッケージをインストール。</p>
+
+<pre><code>$ sudo yum -y install rpm-build python-devel python-setuptools 
+</code></pre>
+
+<p>リビルドしてインストール。依存パッケージの PyOpenSSL も忘れずに。</p>
+
+<pre><code>$ sudo rpmbuild --rebuild func-0.13-3.fc7.src.rpm
+$ sudo yum -y install pyOpenSSL
+$ sudo rpm -ivh /usr/src/redhat/RPMS/noarch/func-0.13-3.noarch.rpm
+</code></pre>
+
+<p>サーバを起動する。サーバは master と呼ばれるみたい。</p>
+
+<pre><code>$ sudo /etc/init.d/certmaster start
+</code></pre>
+
+<p>次にクライアント側。クライアントは minion と呼ばれているようだ。インストール手順は master と同じなので省略。</p>
+
+<p>クライアント側では設定ファイル /etc/func/minion.conf を修正する必要がある。といっても、certmaster で master を指定してあげるだけでとりあえず OK。</p>
+
+<pre><code># configuration for minions
+
+[main]
+log_level = DEBUG
+certmaster = server.example.org
+cert_dir = /etc/pki/func
+acl_dir = /etc/func/minion-acl.d 
+</code></pre>
+
+<p>クライアント側で常駐するデーモン funcd を起動。</p>
+
+<pre><code>$ sudo /etc/init.d/funcd start   
+</code></pre>
+
+<p>master と minion の通信は SSL 証明書での認証が必要なので、master 側で証明書リクエストに対して署名を行う。（この辺りはPuppetと一緒だ。）</p>
+
+<pre><code>$ sudo certmaster-ca --list
+client.example.org
+$ sudo certmaster-ca --sign client.example.org
+</code></pre>
+
+<p>これで使うための準備はできた。</p>
+
+<h1>コマンド実行</h1>
+
+<p>master 上で func コマンドを実行する。まずは minion の一覧を表示。</p>
+
+<pre><code>$ sudo func "*" list_minions
+['https://client0.example.org:51234', 'https://client1.example.org:51234']
+client0.example.org
+client1.example.org
+0
+</code></pre>
+
+<p>www ではじまる minion だけを表示。</p>
+
+<pre><code>$ sudo func "www*" list_minions
+['https://www0.example.org:51234', 'https://www1.example.org:51234']
+www0.example.org
+www1.example.org
+0
+</code></pre>
+
+<p>各 minion で利用できるモジュールの一覧を表示。</p>
+
+<pre><code>$ sudo func "*" call system list_modules
+on https://client0.example.org:51234 running system list_modules ()
+['command', 'copyfile', 'func_module', 'hardware', 'nagios-check', 'process', 'reboot', 'rpms', 'service', 'smart', 'snmp', 'test', 'yum']
+on https://client1.example.org:51234 running system list_modules ()
+['command', 'copyfile', 'func_module', 'hardware', 'nagios-check', 'process', 'reboot', 'rpms', 'service', 'smart', 'snmp', 'test', 'yum']
+{'client0.example.org': ['command',
+                        'copyfile',
+                        'func_module',
+                        'hardware',
+                        'nagios-check',
+                        'process',
+                        'reboot',
+                        'rpms',
+                        'service',
+                        'smart',
+                        'snmp',
+                        'test',
+                        'yum'],
+ 'client1.example.org': ['command',
+                        'copyfile',
+                        'func_module',
+                        'hardware',
+                        'nagios-check',
+                        'process',
+                        'reboot',
+                        'rpms',
+                        'service',
+                        'smart',
+                        'snmp',
+                        'test',
+                        'yum']}   
+</code></pre>
+
+<p>service モジュールで使えるメソッド一覧を表示。</p>
+
+<pre><code>$ sudo func "client0.example.org" call service list_methods
+on https://client0.example.org:51234 running service list_methods ()
+['status', 'reload', 'get_running', 'stop', 'start', 'inventory', 'get_enabled', 'restart', 'module_description', 'module_version', 'module_api_version', 'list_methods']
+{'client0.example.org': ['status',
+                        'reload',
+                        'get_running',
+                        'stop',
+                        'start',
+                        'inventory',
+                        'get_enabled',
+                        'restart',
+                        'module_description',
+                        'module_version',
+                        'module_api_version',
+                        'list_methods']} 
+</code></pre>
+
+<p>service モジュールの status メソッドで ntpd の起動状態を確認。以下はすべての minion で ntpd が停止してる状態での実行結果。</p>
+
+<pre><code>$ sudo func "*" call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+3
+on https://client1.example.org:51234 running service status (ntpd)
+3
+{'client1.example.org': 3, 'client0.example.org': 3}
+</code></pre>
+
+<p>ntpd を起動。</p>
+
+<pre><code>$ sudo func "*" call service start ntpd
+on https://client0.example.org:51234 running service start (ntpd)
+0
+on https://client1.example.org:51234 running service start (ntpd)
+0
+{'client1.example.org': 0, 'client0.example.org': 0}   
+</code></pre>
+
+<p>ntpd の起動状態を確認。</p>
+
+<pre><code>$ sudo func "*" call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+0
+on https://client1.example.org:51234 running service status (ntpd)
+0
+{'client1.example.org': 0, 'client0.example.org': 0}   
+</code></pre>
+
+<p>*.example.org のみをターゲットにする。</p>
+
+<pre><code>$ sudo func "*.example.org" call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+0
+on https://client1.example.org:51234 running service status (ntpd)
+0
+{'client1.example.org': 0, 'client0.example.org': 0}   
+</code></pre>
+
+<p>client0.example.org と client1.example.org のみをターゲットにする。</p>
+
+<pre><code>$ sudo func "client0.example.org; client1.example.org" call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+0
+on https://client1.example.org:51234 running service status (ntpd)
+0
+{'client1.example.org': 0, 'client0.example.org': 0}   
+</code></pre>
+
+<p>ここまで実行してみれば、何となく感じは掴めると思う。</p>
+
+<h1>モジュール</h1>
+
+<p>デフォルトで付属しているモジュールには以下のものがある。</p>
+
+<ul>
+<li>command</li>
+<li>copyfile</li>
+<li>func_module</li>
+<li>hardware</li>
+<li>nagios-check</li>
+<li>process</li>
+<li>reboot</li>
+<li>rpms</li>
+<li>service</li>
+<li>smart</li>
+<li>snmp</li>
+<li>test</li>
+<li>yum</li>
+</ul>
+
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/#ListofStockModules">使い方はこの辺参照。</a></p>
+
+<p>とりあえず</p>
+
+<pre><code>$ sudo func client0.example.org system list_modules
+</code></pre>
+
+<p>で利用できるモジュールを調べて、</p>
+
+<pre><code>$sudo func client0.example.org call module list_methods
+</code></pre>
+
+<p>でモジュールで使えるメソッド一覧を表示してみると、どんなモジュールがあるか、そのモジュールはどんなことができるのか、がおおよそわかるはず。</p>
+
+<h1>モジュールの書き方</h1>
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/HowToWriteAndDistributeNewModules">ここに書かれてる。</a>これで自分が好きなように機能拡張ができる。</p>
+
+<h1>Python プログラムから呼び出し</h1>
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/PythonApiExamples">ここにサンプルがある。</a></p>
+
+<p>今後は [wiki:Func こちらの Wiki ページ] に情報まとめていく予定。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2007-12-08T01:58:14+09:00" pubdate>Dec 8<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2007/12/08/FuncIntro/" data-via="" data-counturl="http://mizzy.org/blog/2007/12/08/FuncIntro/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2007/12/08/Func/" title="Previous Post: Func">&laquo; Func</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2007/12/29/Cobbler/" title="next Post: Cobbler">Cobbler &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

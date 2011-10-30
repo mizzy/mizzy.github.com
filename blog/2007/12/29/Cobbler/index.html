@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Cobbler - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="ネットワークインストール環境がさくっと構築できる Cobbler がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。 サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）
+サーバの構築を簡単にするためのステップ （その6：Cobber編 Part2 ） &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2007/12/29/Cobbler">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Cobbler</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-12-29T00:19:56+09:00" pubdate>Dec 29<span>th</span>, 2007</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>ネットワークインストール環境がさくっと構築できる <a href="http://cobbler.et.redhat.com/">Cobbler</a> がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。</p>
+
+<ul>
+<li><a href="http://www.cafechantant.com/blog/2007/08/09/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae5/">サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）</a></li>
+<li><a href="http://www.cafechantant.com/blog/2007/09/05/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae6/">サーバの構築を簡単にするためのステップ （その6：Cobber編 Part2 ）</a></li>
+<li><a href="http://www.asahi-net.or.jp/~aa4t-nngk/pxeinstall.html">PXEネットワークインストール(Cobbler)</a></li>
+<li><a href="http://www.cafechantant.com/trac/wiki/cobbler_top">cobbler_top - Cafe Chantant Info Repositry - Trac</a></li>
+</ul>
+
+
+<p>以下、Fedora 7 で Cobbler を動かしてみたメモ。</p>
+
+<h1>インストール</h1>
+
+<p>yum で一発インストール。</p>
+
+<pre><code>$ sudo yum install cobbler
+</code></pre>
+
+<h1>設定</h1>
+
+<p>cobbler check コマンドを実行すると、見直すべき設定ポイントを教えてくれる。親切。</p>
+
+<pre><code>$ sudo cobbler check
+The following potential problems were detected:
+#0: The 'server' field in /var/lib/cobbler/settings must be set to something other than localhost, or kickstarting features will not work.  This should be a resolvable hostname or IP for the boot server as reachable by all machines that will use it.
+#1: For PXE to be functional, the 'next_server' field in /var/lib/cobbler/settings must be set to something other than 127.0.0.1, and should match the IP of the boot server on the PXE network.
+#2: service cobblerd is not running
+#3: syslinux should be installed but is not, expecting to find something at /usr/lib/syslinux/pxelinux.0
+#4: service xinetd is not running
+#5: change 'disable' to 'no' in /etc/xinetd.d/tftp
+#6: service httpd is not running
+#7: since iptables may be running, ensure 69, 80, 25150, and 25151 are unblocked#8: reposync is not installed, need for cobbler reposync, install/upgrade yum-utils?
+#9: yumdownloader is not installed, needed for cobbler repo add with --rpm-list
+parameter, install/upgrade yum-utils? 
+</code></pre>
+
+<p>これを元に設定変更を行っていく。まずは /var/lib/cobbler/settings を以下のように修正。</p>
+
+<pre><code>manage_dhcp: 1
+next_server: '192.168.10.12'
+server: 192.168.10.12
+</code></pre>
+
+<p>192.168.10.12 は Cobbler が動いているマシンの IP アドレス。</p>
+
+<p>cobblerd を起動。</p>
+
+<pre><code>$ sudo /sbin/chkconfig cobblerd on 
+$ sudo /etc/init.d/cobblerd start 
+</code></pre>
+
+<p>syslinux をインストール。</p>
+
+<pre><code>$ sudo yum install syslinux
+</code></pre>
+
+<p>tftpd と xinetd を起動。</p>
+
+<pre><code>$ sudo /sbin/chkconfig tftp on
+$ sudo /sbin/chkconfig xinetd on 
+$ sudo /etc/init.d/xinetd start 
+</code></pre>
+
+<p>httpd を起動。</p>
+
+<pre><code>$ sudo /sbin/chkconfig httpd on
+$ sudo /etc/init.d/httpd start 
+</code></pre>
+
+<p>iptables はとりあえずオフにしとく。</p>
+
+<pre><code>$ sudo /sbin/chkconfig iptables off
+$ sudo /etc/init.d/iptables stop 
+</code></pre>
+
+<p>yum-utils のインストール。</p>
+
+<pre><code>$ sudo yum install yum-utils
+</code></pre>
+
+<p>/etc/cobbler/dhcp.template を以下のような感じで修正。</p>
+
+<pre><code># ******************************************************************
+# Cobbler managed dhcpd.conf file
+#
+# generated from cobbler dhcp.conf template ($date)
+#
+# ******************************************************************
+
+ddns-update-style interim;
+
+allow booting;
+allow bootp;
+
+ignore client-updates;
+set vendorclass = option vendor-class-identifier;
+
+subnet 192.168.10.0 netmask 255.255.255.0 {
+     option routers          192.168.10.1;
+     option subnet-mask      255.255.255.0;
+     range dynamic-bootp     192.168.10.100 192.168.10.254;
+     filename                "/pxelinux.0";
+     default-lease-time      21600;
+     max-lease-time          43200;
+     next-server             $next_server;
+}
+
+$insert_cobbler_system_definitions
+</code></pre>
+
+<p>dhcp をインストールしておく。dhcpd はこの段階では起動しなくていい。（起動してもエラーになる。）</p>
+
+<pre><code>$ sudo yum install dhcp
+$ sudo /sbin/chkconfig dhcpd on
+</code></pre>
+
+<h1>ネットワークインストールに必要なファイルの用意</h1>
+
+<p>インストールイメージとか、キックスタートファイルとかを作成。</p>
+
+<pre><code>$ sudo cobbler import --path=rsync://ftp.jaist.ac.jp/pub/Linux/Fedora/releases/7/Fedora/i386/os --name=f7
+</code></pre>
+
+<p>このコマンド一発で必要なものを全部つくってくれる。超簡単。時間はかかるけど。</p>
+
+<p>cobbler report を実行すると、どこにどんなファイルがあるかとかを表示してくれる。</p>
+
+<pre><code>$ sudo cobbler report
+distro          : f7-i386
+kernel          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/vmlinuz
+initrd          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/initrd.img
+kernel options  : {}
+architecture    : x86
+ks metadata     : {'tree': 'http://@@server@@/cblr/links/f7-i386'}
+breed           : redhat
+
+distro          : f7-xen-i386
+kernel          : /var/www/cobbler/ks_mirror/f7/images/xen/vmlinuz
+initrd          : /var/www/cobbler/ks_mirror/f7/images/xen/initrd.img
+kernel options  : {}
+architecture    : x86
+ks metadata     : {'tree': 'http://@@server@@/cblr/links/f7-xen-i386'}
+breed           : redhat
+
+profile         : f7-i386
+distro          : f7-i386
+kickstart       : /etc/cobbler/kickstart_fc6.ks
+kernel options  : {}
+ks metadata     : {}
+virt file size  : 5
+virt ram        : 512
+virt type       : auto
+virt path       :
+virt bridge     : xenbr0
+virt cpus       : 1
+repos           : []
+dhcp tag        : default
+server          : &lt;&lt;inherit&gt;&gt;
+
+profile         : f7-xen-i386
+distro          : f7-xen-i386
+kickstart       : /etc/cobbler/kickstart_fc6.ks
+kernel options  : {}
+ks metadata     : {}
+virt file size  : 5
+virt ram        : 512
+virt type       : auto
+virt path       :
+virt bridge     : xenbr0
+virt cpus       : 1
+repos           : []
+dhcp tag        : default
+server          : &lt;&lt;inherit&gt;&gt;
+</code></pre>
+
+<p>これを見て分かるとおり、Xen 用のイメージなんかも勝手に作ってくれる。</p>
+
+<p>あとは必要に応じてキックスタートファイル（/etc/cobbler/kickstart_fc6.ks）なんかをいじる。何かファイルを修正したりしたら、cobbler sync を忘れずに実行。</p>
+
+<pre><code>$ sudo cobbler sync
+</code></pre>
+
+<h1>ネットワークインストールを実行する</h1>
+
+<p>ここまできたら、別のマシンを PXE ブートで起動して、boot プロンプトで cobbler import で作成したイメージの名前を入力。</p>
+
+<pre><code>boot: f7-i386
+</code></pre>
+
+<p>あとは勝手にインストールが始まる。</p>
+
+<p>以下のように system 登録しておくと、PXE ブート時にイメージ名を入力しなくても、勝手に割り当てられたイメージでブートしてくれる。</p>
+
+<pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386
+</code></pre>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2007-12-29T00:19:56+09:00" pubdate>Dec 29<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2007/12/29/Cobbler/" data-via="" data-counturl="http://mizzy.org/blog/2007/12/29/Cobbler/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2007/12/08/FuncIntro/" title="Previous Post: FuncIntro">&laquo; FuncIntro</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2007/12/29/CobblerWebUi/" title="next Post: CobblerWebUi">CobblerWebUi &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

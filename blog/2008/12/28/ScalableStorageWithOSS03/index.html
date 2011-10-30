@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>ScalableStorageWithOSS03 - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2] のつづき。今回はストレージサーバ側で GNBD によりブロックデバイスをエクスポートし、クライアント側でインポートするまでの手順を紹介します。 ストレージクラスタ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2008/12/28/ScalableStorageWithOSS03">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">ScalableStorageWithOSS03</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-12-28T17:22:39+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2] のつづき。今回はストレージサーバ側で GNBD によりブロックデバイスをエクスポートし、クライアント側でインポートするまでの手順を紹介します。</p>
+
+<h1>ストレージクラスタ</h1>
+
+<p>用途的にはクラスタリングする必要はないのですが、GNBD でエクスポートする際に、<a href="http://sources.redhat.com/cluster/cman/">cman(Cluster Manager)</a> を動かす必要があるため、まずは cman をインストール、設定、起動して、ストレージクラスタを構成します。</p>
+
+<p>といっても、クラスタリングは本来の趣旨とははずれるので、設定は適当。</p>
+
+<p>まずは storage0a と storage0b をクラスタリング。最初に storage0a で cman をインストール。</p>
+
+<pre><code>$ sudo yum -y install cman
+</code></pre>
+
+<p>storage0a で ccs_tool を実行し、/etc/cluster/cluster.conf のスケルトンを作成。</p>
+
+<pre><code>$ sudo /sbin/ccs_tool create storage0
+</code></pre>
+
+<p>/etc/cluster/cluster.conf を以下のように修正。</p>
+
+<pre><code>&lt;?xml version="1.0"?&gt;
+&lt;cluster name="storage0" config_version="1"&gt;
+    &lt;clusternodes&gt;
+        &lt;clusternode name="storage0a.example.org" nodeid="1" votes="1"/&gt;
+    &lt;/clusternodes&gt;
+  &lt;fencedevices/&gt;
+  &lt;rm&gt;
+    &lt;failoverdomains/&gt;
+    &lt;resources/&gt;
+  &lt;/rm&gt;
+&lt;/cluster&gt;
+</code></pre>
+
+<p>cman を起動。</p>
+
+<pre><code>$ sudo /etc/init.d/cman start
+</code></pre>
+
+<p>次に、sorage0b をクラスタに追加するべく、/etc/cluster/cluster.conf を、storage0a 上で修正。</p>
+
+<pre><code>&lt;?xml version="1.0"?&gt;
+&lt;cluster name="storage0" config_version="2"&gt;
+    &lt;clusternodes&gt;
+        &lt;clusternode name="storage0a.example.org" nodeid="1" votes="1"/&gt;
+        &lt;clusternode name="storage0b.example.org" nodeid="2" votes="1"/&gt;
+    &lt;/clusternodes&gt;
+  &lt;fencedevices/&gt;
+  &lt;rm&gt;
+    &lt;failoverdomains/&gt;
+    &lt;resources/&gt;
+  &lt;/rm&gt;
+&lt;/cluster&gt;
+</code></pre>
+
+<p>config_version の値をインクリメントしておくのがポイント。ccs_tool update を実行して、設定を反映。</p>
+
+<pre><code>$ sudo /sbin/ccs_tool update /etc/cluster/cluster.conf
+</code></pre>
+
+<p>次に storage0b 側で cman を起動。</p>
+
+<pre><code>$ sudo yum -y install cman
+$ sudo /sbin/ccs_tool create storage0
+$ sudo /etc/init.d/cman start
+</code></pre>
+
+<p>/etc/cluster/cluster.conf は、storage0a から自動的にコピーされる。cman_tool nodes を実行すると、クラスタメンバが表示される。</p>
+
+<pre><code>$ sudo /sbin/cman_tool nodes
+Node  Sts   Inc   Joined               Name
+   1   M     24   2008-10-25 04:29:59  storage0a.example.org
+   2   M      4   2008-10-25 04:23:50  storage0b.example.org
+</code></pre>
+
+<p>storage0a と storage0b のクラスタリングができたら、storage1a と storage1b を同様にクラスタリング。上記で storage0 と書かれているところを storage1 と読み替えて、同じ手順を実行。</p>
+
+<h1>GNBD エクスポート</h1>
+
+<p>次に、storage0a, storage0b で GNBD によりブロックデバイスをエクスポート。まずは gnbd をインストール。</p>
+
+<pre><code>$ sudo yum -y install gnbd
+</code></pre>
+
+<p>gnbd_serv を起動。</p>
+
+<pre><code>$ sudo /sbin/gnbd_serv
+gnbd_serv: startup succeeded
+</code></pre>
+
+<p>エクスポート。storage0a では以下のように。-d で指定するデバイス名は、DRBD デバイスを指定。-e では適当なエクスポート名をつける。</p>
+
+<pre><code>$ sudo /sbin/gnbd_export -d /dev/drbd0 -e gnbd0a -u0
+gnbd_export: created GNBD gnbd0a serving file /dev/drbd0
+</code></pre>
+
+<p>storage0b では以下のように、-e オプションで指定するエクスポート名を変える。-u で指定する UID は、storage0a と storage0b で同じにする必要がある。（Device-Mapper Multipath で同一デバイスと認識させるため。）</p>
+
+<pre><code>$ sudo /sbin/gnbd_export -d /dev/drbd0 -e gnbd0b -u0
+gnbd_export: created GNBD gnbd0b serving file /dev/drbd0
+</code></pre>
+
+<p>-l オプションで、エクスポート状態を確認できる。</p>
+
+<pre><code>$ sudo /sbin/gnbd_export -l
+Server[1] : gnbd0a
+--------------------------
+      file : /dev/drbd0
+   sectors : 2096944
+  readonly : no
+    cached : no
+   timeout : 60
+       uid : 0
+</code></pre>
+
+<p>strage1a, storage1b でも同様にエクスポートする。</p>
+
+<h1>クライアントクラスタ</h1>
+
+<p>GNBD でインポートするクライアント側でも cman を動かす必要があるので、client0, client1 で cman を動かす。後に出てくる CLVM でも必要。注意点は、ccs_tool create で指定するクラスタ名を、ストレージクラスタで指定したものを別にすること。</p>
+
+<pre><code>$ sudo /sbin/ccs_tool create client  
+</code></pre>
+
+<p>あとの手順はストレージの時と一緒。</p>
+
+<h1>GNBD インポート</h1>
+
+<p>client0, client1 でストレージサーバからエクスポートされているデバイスをインポートする。以下の手順を、client0, client1 双方で実行。</p>
+
+<p>まずは GNBD カーネルモジュールと GNBD をインストール。</p>
+
+<pre><code>$ sudo yum -y install kmod-gnbd-xen gnbd
+</code></pre>
+
+<p>インポートする。</p>
+
+<pre><code>$ sudo /sbin/modprobe gnbd
+$ sudo /sbin/gnbd_import -i storage0a.example.org
+$ sudo /sbin/gnbd_import -i storage0b.example.org
+$ sudo /sbin/gnbd_import -i storage1a.example.org
+$ sudo /sbin/gnbd_import -i storage1b.example.org
+</code></pre>
+
+<p>-l オプションでインポート状況を確認。</p>
+
+<pre><code>$ sudo /sbin/gnbd_import -l
+Device name : gnbd0a
+----------------------
+    Minor # : 0
+ sysfs name : /block/gnbd0
+     Server : storage0a.example.org
+       Port : 14567
+      State : Close Connected Clear
+   Readonly : No
+    Sectors : 2096944
+
+Device name : gnbd0b
+----------------------
+    Minor # : 1
+ sysfs name : /block/gnbd1
+     Server : storage0b.example.org
+       Port : 14567
+      State : Close Connected Clear
+   Readonly : No
+    Sectors : 2096944
+
+Device name : gnbd1a
+----------------------
+    Minor # : 2
+ sysfs name : /block/gnbd2
+     Server : storage1a.example.org
+       Port : 14567
+      State : Close Connected Clear
+   Readonly : No
+    Sectors : 2096944
+
+Device name : gnbd1b
+----------------------
+    Minor # : 3
+ sysfs name : /block/gnbd3
+     Server : storage1b.example.org
+       Port : 14567
+      State : Close Connected Clear
+   Readonly : No
+    Sectors : 2096944
+</code></pre>
+
+<p>デバイスファイルを確認してみる。</p>
+
+<pre><code>$ ls /dev/gnbd/
+gnbd0a  gnbd0b  gnbd1a  gnbd1b 
+</code></pre>
+
+<p>/dev/gnbd/gnbd0a は、/dev/gnbd0 と同じデバイス。他も同様。</p>
+
+<h1>現在の状態</h1>
+
+<p>ここまでセットアップした状態を図にすると、以下のようになります。GNBD により、ネットワーク越しにブロックデバイスにアクセスできるようになっています。</p>
+
+<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS03/storages_with_gnbd.jpg?format=raw)]]</p>
+
+<p>次回は DM-MP あたりを解説予定。</p>
+
+<h1>関連エントリ</h1>
+
+<ul>
+<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
+<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
+<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
+<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
+<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2008-12-28T17:22:39+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2008/12/28/ScalableStorageWithOSS03/" data-via="" data-counturl="http://mizzy.org/blog/2008/12/28/ScalableStorageWithOSS03/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/12/28/ScalableStorageWithOSS02/" title="Previous Post: ScalableStorageWithOSS02">&laquo; ScalableStorageWithOSS02</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/12/28/ScalableStorageWithOSS04/" title="next Post: ScalableStorageWithOSS04">ScalableStorageWithOSS04 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

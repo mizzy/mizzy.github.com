@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>lighttpd の認証を LDAP で - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="おうち trac が認証を一切せずに、誰でも wiki の書き換えができたり、ticket の発行ができたり、という状態だったので、それはまずかろうってことで認証かけることにした。 「trac を lighttpd + FastCGI で動かす」 で触れたとおり、trac は lighttpd &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2006/05/21/279">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Lighttpd の認証を LDAP で</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-21T15:17:00+09:00" pubdate>May 21<span>st</span>, 2006</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/" target="_blank">おうち trac</a> が認証を一切せずに、誰でも wiki の書き換えができたり、ticket の発行ができたり、という状態だったので、それはまずかろうってことで認証かけることにした。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/linux/trac_and_lighty.html" target="_blank">「trac を lighttpd + FastCGI で動かす」</a> で触れたとおり、trac は lighttpd 上で動いているので、認証は lighttpd で設定します。やりかたは lighttpd のサイトにある <a href="http://www.lighttpd.net/documentation/authentication.html" target="_blank">「Using Authentication Module: mod_auth」</a> の通りなので、あまり難しいことはないのですが、とりあえずやったことをメモ。
+</p>
+
+
+
+
+<p class="entryBody">
+うちの Linux サーバ上で動いているサービスは、ほとんどが LDAP で認証しているので、lighttpd も LDAP で認証するようにします。
+</p>
+
+
+
+
+<p class="entryBody">
+まず、lighty のデフォルト configure オプションでは、auth_ldap が disable になってるので、以下の様にして再インストール。
+</p>
+
+
+
+
+<pre class="code">
+$ ./configure --with-ldap
+$ make
+$ sudo make install
+</pre>
+
+
+
+
+<p class="entryBody">
+でもって、/usr/local/etc/lighttpd.conf を書き換え。関連する部分だけ抜き出すとこんな感じ。
+</p>
+
+
+
+
+<pre class="code">
+server.modules              = (
+                               "mod_auth",
+                               "mod_fastcgi",
+                              )
+
+auth.backend = "ldap"
+auth.backend.ldap.hostname = "kenny"
+auth.backend.ldap.base-dn = "ou=people,o=southpark"
+auth.backend.ldap.filter = "(uid=$)"
+
+auth.require = ( "/public/login" =>
+                 (
+                   "method"  => "basic",
+                   "realm"   => "trac admin area",
+                   "require" => "user=xxx"
+                  )
+                )
+</pre>
+
+
+
+
+<p class="entryBody">
+これで lighty を再起動すれば OK。あとは<a href="http://projects.edgewall.com/trac/wiki/TracPermissions" target="_blank">「Trac Permissions」</a> を参照しながら trac-admin コマンドでパーミッション設定。<a href="http://projects.edgewall.com/trac/wiki/WebAdmin" target="_blank">Web Admin Plugin</a> を導入している場合は trac-admin 使わずにウェブから設定。
+</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2006-05-21T15:17:00+09:00" pubdate>May 21<span>st</span>, 2006</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2006/05/21/279/" data-via="" data-counturl="http://mizzy.org/blog/2006/05/21/279/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2006/05/21/359/" title="Previous Post: Plagger::Plugin::CustomFeed::Xmltv">&laquo; Plagger::Plugin::CustomFeed::Xmltv</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2006/05/22/433/" title="next Post: Plagger::Plugin::CustomFeed::iTMS #0">Plagger::Plugin::CustomFeed::iTMS #0 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2006/05/21/279';
+        var disqus_url = 'http://mizzy.org/blog/2006/05/21/279';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

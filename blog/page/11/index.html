@@ -1,0 +1,1173 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="現在、LISA という大規模システム管理者向けカンファレンスへの参加のため、ダラスに来ています。自分は 11/14 - 11/16 に開催されるテクニカルセッションのみに参加していて、本日はテクニカルセッションの初日でした。今日聞いた中で気になったテーマについて、さらっとご紹介、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/11">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/16/LISA07TechSessionFirstDay/">LISA07TechSessionFirstDay</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-11-16T07:09:21+09:00" pubdate>Nov 16<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/11/16/LISA07TechSessionFirstDay/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>現在、<a href="http://www.usenix.org/events/lisa07/">LISA</a> という大規模システム管理者向けカンファレンスへの参加のため、ダラスに来ています。自分は 11/14 - 11/16 に開催されるテクニカルセッションのみに参加していて、本日はテクニカルセッションの初日でした。今日聞いた中で気になったテーマについて、さらっとご紹介、というか自分用にまとめてみます。</p>
+
+<h1>CAMP: A Common API for Measuring Performance</h1>
+
+<p>名前の通り、パフォーマンス計測のための API。異なる OS が混在する分散システムでのパフォーマンステストを正確に行うために、共通な API を定義しよう、という試み。</p>
+
+<p><a href="http://www.usenix.org/events/lisa07/tech/gabel.html">概要はこちら</a>。ここから論文すべて（HTML or PDF）を参照できる。（2008年11月までは、USENIX メンバーじゃないとアクセスできない、と書いてあるけど、アクセス制限はかかってないみたい。いいのかな？）</p>
+
+<p>CAMP は Python で実装されていて、以下のようなコードでパフォーマンスデータが取得できる。</p>
+
+<pre><code>#!python
+# Calculate the current transfer rate (Both
+# in and out) for the given network adapter.
+def BulkByteTransferRate(adapter):
+    # Query CAMP for the initial state.
+    initial = GetNetBytesSent(adapter)
+    initial += GetNetBytesRecvd(adapter)
+    time.sleep(SAMPLE_INTERVAL)
+    # Query CAMP for the final state.
+    final = GetNetBytesSent(adapter)
+    final += GetNetBytesRecvd(adapter)
+    return (final - initial)/SAMPLE_INTERVAL
+</code></pre>
+
+<p>GetNetBytesSent や GetNetBytesRecvd が CAMP によって提供されているメソッド。</p>
+
+<p>現在対応している OS は、</p>
+
+<ul>
+<li>Linux 2.6</li>
+<li>Win32 (Windows NT/2000/XP)</li>
+<li>Solaris (SunOS kernel 5.x)</li>
+</ul>
+
+
+<p>の3種類。パフォーマンスデータの取得は、Linux では proc、Windows では Microsoft&#8217;s performance data handler (PDH) interface、Solaris では proc と kstat を利用しているとのこと。</p>
+
+<p>論文の中では、CAMP によって取得できるパフォーマンスデータの妥当性に関する検証や、CAMP 自体のパフォーマンス、オーバーヘッドに関する検証データも載っている。</p>
+
+<p>proc ファイルシステムへのアクセスオーバヘッドの低さから、特に Linux でのパフォーマンスは高いみたい。</p>
+
+<p>パフォーマンスデータを取得するのであれば、SNMP でもできるのでは、と思ったけど、これについても論文でちゃんと触れられていて、SNMP は UDP によるアプリケーションプロトコルであり、CAMP を利用することで OS に依存しない SNMP エージェントを実装する、といった形での住み分けができる、といったことが書かれていた。</p>
+
+<p><a href="http://wiki.csc.calpoly.edu/camp">CAMP の Trac サイト</a>が存在するけど、内容はまだ何もない。「<strong> Download coming soon! </strong>」ということなので、ソースが公開されたら要チェック。</p>
+
+<h1>Application Buffer-Cache Management for Performance: Running the World’s Largest MRTG</h1>
+
+<p>OS のディスク I/O 先読みとバッファキャッシュは通常、アプリケーションのパフォーマンスを高めるものであるが、大規模ネットワークで MRTG を運用していると、逆にパフォーマンスを低下させてしまう、ということについて、何がボトルネックになっているのか、どうやってそのボトルネックを解消するのか、といったことに関する考察。<a href="http://www.usenix.org/events/lisa07/tech/plonka.html">概要はこちら</a>。</p>
+
+<p>まず、大規模ネットワークサイトでの MRTG の処理時間がグラフで示されている。これによると、5分おきに MRTG を実行しているにも関わらず、半分ほどの処理が5分以内に完了していない、という結果に。そして、MRTG のボトルネックはディスク I/O であり、特に read の比率が高い、ということが示されている。</p>
+
+<p>MRTG は RRDtool を利用しているが、RRD ファイルは特性として、一度の操作で読み書きするブロックがシーケンシャルになっていない。そのため、OS がシーケンシャルにファイルを先読みすることによって、読み込む必要のないブロックまで読み込んでしまい、余分な I/O が発生する、ということがボトルネックの一因。いわゆる余計なお世話。</p>
+
+<p>また、必要のないブロックを読み込んでバッファキャッシュに載せるため、キャッシュに本当に載せてほしいブロックが載らずに、ページフォルトが発生する、というのもボトルネックの一因。</p>
+
+<p>この調査のために、<a href="http://net.doit.wisc.edu/~plonka/fincore/">fincore</a> という、指定したファイルのどのページがバッファキャッシュに載っているのかを表示するツールを作っている。</p>
+
+<p>ボトルネックを解消するアプローチのひとつは、独自のキャッシュライブラリを作成して、MRTG にこのライブラリ経由でファイル操作をさせる、というもの。これにより、ほとんどの処理が1分以内で完了するようになった。（ただし、キャッシュの処理は図を見るとちょっと複雑。）</p>
+
+<p>もうひとつのアプローチは、アプリケーションのファイルアクセス特性を OS に伝えることによって、OS のディスクI/O に関する挙動を変えたり、キャッシュアルゴリズムを変えたり、といったことが可能な、<a href="http://docs.hp.com/ja/B2355-60129/fadvise.2.html">POSIX fadvise システムコール</a>を利用して MRTG を動かす、というもの。</p>
+
+<p><a href="http://net.doit.wisc.edu/~plonka/fadvise/">fadvise を実行する Perl スクリプト</a> も作成している。</p>
+
+<p>論文では FADV_RANDOM を指定することによって、OS に対してアプリケーションが、シーケンシャルではなくランダムにファイルアクセスすることを伝えている。これにより OS は先読みをしなくなり余計なI/Oが発生しないし、余分なデータを読み込まないのでバッファキャッシュも無駄なく利用できる。（FADV_RANDOM という言葉は出てないけど、たぶんそうだと思う。）</p>
+
+<p>このアプローチでもほとんどの処理が1分以内に完了する、という結果に。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/12/PerlbalPluginProxyPass/">PerlbalPluginProxyPass</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-11-12T00:15:48+09:00" pubdate>Nov 12<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/11/12/PerlbalPluginProxyPass/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Perlbal で Vpaths プラグインをつかって、</p>
+
+<pre><code>LOAD vpaths
+
+CREATE POOL apache
+  POOL apache ADD 127.0.0.1
+
+CREATE SERVICE apache_proxy
+  SET role = reverse_proxy
+  SET pool = apache
+ENABLE apache_proxy
+
+CREATE SERVICE selector
+  SET   listen  = 0.0.0.0:8080
+  SET   role    = selector
+  SET   plugins = vpaths
+  VPATH /apache = apache_proxy
+ENABLE selector
+</code></pre>
+
+<p>みたいな設定をすると、</p>
+
+<pre><code>http://localhost:8080/apache -&gt; http://localhost:80/apache
+</code></pre>
+
+<p>といった形でプロキシしてくれるんだけど、これを</p>
+
+<pre><code>http://localhost:8080/apache -&gt; http://localhost:80/
+</code></pre>
+
+<p>としたくてプラグイン書いてみた。もしかしてプラグイン書かなくてもできるかもしれないけど、やり方がわからなかったのと、プラグインを書く練習ってことで。プラグイン名は Apache mod_proxy の ProxyPass ディレクティブにちなんでます。</p>
+
+<pre><code>#!perl
+package Perlbal::Plugin::ProxyPass;
+
+use strict;
+use warnings;
+
+sub load {
+    my $class = shift;
+
+    Perlbal::register_global_hook('manage_command.proxypass', sub {
+        my $mc = shift-&gt;parse(qr/proxypass\s+(?:(\w+)\s+)?(\S+)\s*=\s*(\S+)$/,
+                              "usage: ProxyPass [&lt;service&gt;] &lt;source path&gt; = &lt;dest path&gt;");
+        my ($selname, $source, $target) = $mc-&gt;args;
+        unless ($selname ||= $mc-&gt;{ctx}{last_created}) {
+            return $mc-&gt;err("omitted service name not implied from context");
+        }
+
+        my $ss = Perlbal-&gt;service($selname);
+        return $mc-&gt;err("Service '$selname' is not a reverse_proxy service")
+            unless $ss &amp;&amp; $ss-&gt;{role} eq "reverse_proxy";
+
+        $ss-&gt;{extra_config}-&gt;{_proxypass} ||= [];
+        push @{$ss-&gt;{extra_config}-&gt;{_proxypass}}, [ $source, $target ];
+
+        return $mc-&gt;ok;
+    });
+
+    return 1;
+}
+
+sub register {
+    my ($class, $svc) = @_;
+    unless ($svc &amp;&amp; $svc-&gt;{role} eq "reverse_proxy") {
+        die "You can't load the proxypass plugin on a service not of role reverse_proxy.\n";
+    }
+
+    $svc-&gt;register_hook(
+        'ProxyPass' =&gt; 'start_proxy_request', sub {
+            my Perlbal::ClientProxy $client = shift;
+            for my $proxypass ( @{ $svc-&gt;{extra_config}-&gt;{_proxypass} } ) {
+                my $source = $proxypass-&gt;[0];
+                my $target = $proxypass-&gt;[1];
+                $client-&gt;{req_headers}-&gt;{uri} =~ s/$source/$target/;
+                $client-&gt;{req_headers}-&gt;{uri} =~ s!//!/!;
+            }
+            return 0;
+        }
+    );
+
+    return 1;
+}
+
+1;
+</code></pre>
+
+<p>設定はこんな感じ。</p>
+
+<pre><code>LOAD vpaths
+LOAD ProxyPass
+
+CREATE POOL apache
+  POOL apache ADD 127.0.0.1
+
+CREATE SERVICE apache_proxy
+  SET       role    = reverse_proxy
+  SET       pool    = apache
+  SET       plugins = ProxyPass
+  ProxyPass /apache = /   
+ENABLE apache_proxy
+
+CREATE SERVICE selector
+  SET   listen  = 0.0.0.0:8080
+  SET   role    = selector
+  SET   plugins = vpaths
+  VPATH /apache = apache_proxy
+ENABLE selector
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/08/CampAndLisa/">CampAndLisa</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-11-08T17:35:02+09:00" pubdate>Nov 8<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/11/08/CampAndLisa/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>今出張で福岡に来ていて、これから帰るところなのですが、帰ったと思ったら明日はペパボの<a href="http://www.paperboy.co.jp/next/osan/">開発合宿</a>です。</p>
+
+<p>で、13日からは<a href="http://www.usenix.org/events/lisa07/">LISA</a>のテクニカルセッションへの参加のため、ダラスに行ってきます。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/10/28/ModSuid2AndModRuidAndLinuxCapability/">ModSuid2AndModRuidAndLinuxCapability</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-10-28T01:45:53+09:00" pubdate>Oct 28<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/10/28/ModSuid2AndModRuidAndLinuxCapability/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Apache の suEXEC では setuid/setgid を使って、httpd 実行ユーザとは異なるユーザ権限で CGI プログラムや SSI プログラムを実行できるわけですが、mod_php で処理される PHP プログラムのように、httpd 内で処理されるプログラムは、httpd 実行ユーザの権限で実行されてしまいます。こういったものまで httpd とは異なるユーザ権限で実行するためのモジュールとして、<a href="http://bluecoara.net/download/mod_suid2/">mod_suid2</a> や <a href="http://websupport.sk/~stanojr/projects/mod_ruid/">mod_ruid</a> といったものがあります。</p>
+
+<p>mod_suid2 は、httpd を root で起動しておいて、リクエストに応じて（VirtualHost 単位等で）setuid/setgid して実行ユーザを切り替える、という動作をします。そのため、以下のような問題があります。</p>
+
+<ul>
+<li>-DBIG_SECURITY_HOLE つきで Apache をコンパイルする必要がある。</li>
+<li>root でプロセスを起動する危険性。</li>
+<li>MaxRequestsPerChild が 1 に設定されることによるパフォーマンスの劣化。（一度 setuid/setgid してしまうと、root ではなくなり setuid/setgid できなくなるので、リクエストを処理するたびにプロセス/スレッドを殺す必要があるため）</li>
+</ul>
+
+
+<p>これに対し、mod_ruid は Linux に実装されている POSIX 1003.1e で定義された<a href="http://opentechpress.jp/security/03/08/06/0941214.shtml">ケーパビリティ</a> を利用して、root で httpd を起動することなく、setuid/segid できる権限のみ与えて、プロセス/スレッドの実行ユーザを切り替えています。そのため、mod_suid2 が抱える問題点の多くを解消しています。（また、mod_suid2 と違い、参照するファイルやディレクトリのユーザ/グループに実行権限を切り替える機能もあります。）</p>
+
+<p>ここで気になったのは、「setuid/setgid って、プロセス単位じゃなくてスレッド単位でもできるの？」ということ。もしできないのであれば、worker ではなく prefork で動かす必要もある、ということになる。で、結論からいうと「できる」でした。<a href="http://d.hatena.ne.jp/naoya/20071010/1192040413">マルチスレッドのコンテキスト切り替えに伴うコスト - naoyaのはてなダイアリー</a> をご覧になると分かるように、スレッドを生成する毎に dup_task_struct(current) して、各スレッドが個別にプロセスディスクリプタを持つので、当然と言えば当然なのですが、mod_ruid を有効にした Apache のプロセス状態を表示することによって、スレッドごとに実行ユーザがちゃんと異なっていることを確認しました。（mod_ruid はリクエスト処理後に元のユーザに戻してしまうため、確認のため戻さないようにソースを少しいじってます。）</p>
+
+<pre><code>$ ps -efL
+UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD 
+daemon    4156  4153  4188  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start 
+miya      4156  4153  4189  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
+puppet    4156  4153  4225  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
+</code></pre>
+
+<p>ちなみに、Linux での setuid の処理は、kernel/sys.c で以下のようになっています。</p>
+
+<pre><code>#!c
+asmlinkage long sys_setuid(uid_t uid)
+{
+    int old_euid = current-&gt;euid;
+    int old_ruid, old_suid, new_suid;
+    int retval;
+
+    retval = security_task_setuid(uid, (uid_t)-1, (uid_t)-1, LSM_SETID_ID);
+    if (retval)
+        return retval;
+
+    old_ruid = current-&gt;uid;
+    old_suid = current-&gt;suid;
+    new_suid = old_suid;
+
+    if (capable(CAP_SETUID)) {
+        if (uid != old_ruid &amp;&amp; set_user(uid, old_euid != uid) &lt; 0)
+            return -EAGAIN;
+        new_suid = uid;
+    } else if ((uid != current-&gt;uid) &amp;&amp; (uid != new_suid))
+        return -EPERM;
+
+    if (old_euid != uid) {
+        set_dumpable(current-&gt;mm, suid_dumpable);
+        smp_wmb();
+    }
+    current-&gt;fsuid uid;
+    current-&gt;suid = new_suid;
+
+    key_fsuid_changed(current);
+    proc_id_connector(current, PROC_EVENT_UID);
+
+    return security_task_post_setuid(old_ruid, old_euid, old_suid, LSM_SETID_ID);
+}
+</code></pre>
+
+<p>task_struct 構造体の、fsuid, euid, suid あたりを書き換えているようですね。</p>
+
+<p>まとまりのないエントリになってしまいましたが、ケーパビリティとか、スレッド単位で setuid/setgid できるとか、はじめて知ることが多かったのでとりあえずメモ。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/10/27/MigrateBlogToTrac/">MigrateBlogToTrac</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-10-27T17:08:57+09:00" pubdate>Oct 27<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/10/27/MigrateBlogToTrac/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://blog.mizzy.org/">自分のブログ</a>を <a href="http://typosphere.org/">typo</a> から Trac に移行しました。</p>
+
+<p>どうも typo が不安定で、新規ポスト時とかにエラーが出まくってなかなかポストできず、イラつくことが多いので。（自分のマシンのメモリが少なかったり、といったところにも原因はありそうですが。）あと、typo がサポートしてる Markdown とか Textile にも馴染めなかったり。</p>
+
+<p>以前 blosxom 使ってたときは、Trac Wiki フォーマットで書けるプラグイン作ったり、そのために CPAN モジュール作ったりするぐらい、Trac Wiki フォーマットが好き（というか慣れている）なので、Trac Wiki フォーマットがデフォルトで使える（当たり前）のはとても良いですね。シンタックスカラーリングをサポートしているのも、ソースコード貼り付けることが多い自分にはいい感じです。</p>
+
+<p>過去エントリは <a href="http://blog.mizzy.org/">blog.mizzy.org</a> にそのまま残しておきます。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/10/08/529/">FLV::Info で Ustream の FLV ファイル情報をとろうとするとエラーになる件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-10-08T14:07:00+09:00" pubdate>Oct 8<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/10/08/529/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ustream の FLV をダウンロードして音声変換する方法は、&#8221;typesterさんのとこに詳しく書いてある&#8221;:http://unknownplace.org/memo/2007/10/03 わけですが、sox に渡すときにサンプルレートを指定する必要があったりします。</p>
+
+<p>で、これを Plagger プラグインで実現するためには、何らかの方法で元ファイルのサンプルレートを取得しないといけないわけで、&#8221;FLV::Info&#8221;:http://search.cpan.org/dist/FLV-Info/ でできそうだな、と思ったところ</p>
+
+<pre><code>Failed to read FLV file: Tag size is too small (0) at byte 193 (0xc1) at /usr/local/lib/perl5/site_perl/5.8.7/FLV/Tag.pm line 81.
+</code></pre>
+
+
+<p>といったエラーが出ます。色々調べてみたところ、ustream の FLV ファイル中に、ボディが 0 のオーディオタグが存在するから、ということがわかったので、&#8221;パッチを書いて RT に投げておきました。&#8221;:https://rt.cpan.org/Ticket/Display.html?id=29831</p>
+
+<p>パッチ自体は数行コメントアウトして1行追加しただけ、という簡単なものなのですが、このパッチを書くために、&#8221;FLVのファイルフォーマット&#8221;:http://osflash.org/flv を調べて、音声フォーマットを取得する Perl スクリプトを自分で書いてみたりと、えらく回り道しました。せっかくなんでスクリプトを載せておきます。スクリプト作成にあたって、<a href="http://code.google.com/p/nelly2pcm/">nelly2pcm</a> のソースも参考にしています。</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">Readonly</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$FLV_TAG_TYPE_AUDIO</span>                <span class="o">=&gt;</span> <span class="mh">0x08</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_MASK_STEREO</span>                 <span class="o">=&gt;</span> <span class="mh">0x01</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_MASK_16bit</span>                  <span class="o">=&gt;</span> <span class="mh">0x02</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_MASK_RATE</span>                   <span class="o">=&gt;</span> <span class="mh">0x0c</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_RATE_5point5KHZ</span>             <span class="o">=&gt;</span> <span class="mh">0x00</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_RATE_11KHZ</span>                  <span class="o">=&gt;</span> <span class="mh">0x04</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_RATE_22KHZ</span>                  <span class="o">=&gt;</span> <span class="mh">0x08</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_RATE_44KHZ</span>                  <span class="o">=&gt;</span> <span class="mh">0x0c</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_MASK_FORMAT</span>                 <span class="o">=&gt;</span> <span class="mh">0xf0</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_FORMAT_UNCOMPRESSED</span>         <span class="o">=&gt;</span> <span class="mh">0x00</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_FORMAT_ADPCM</span>                <span class="o">=&gt;</span> <span class="mh">0x10</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_FORMAT_MP3</span>                  <span class="o">=&gt;</span> <span class="mh">0x20</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_FORMAT_NELLYMOSER_8KHZ_MONO</span> <span class="o">=&gt;</span> <span class="mh">0x50</span><span class="p">;</span>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">$AUDIO_FORMAT_NELLYMOSER</span>           <span class="o">=&gt;</span> <span class="mh">0x60</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">%AUDIO_RATE</span> <span class="o">=&gt;</span> <span class="p">(</span>
+</span><span class='line'>    <span class="nv">$AUDIO_RATE_5point5KHZ</span> <span class="o">=&gt;</span> <span class="mf">5.5</span><span class="p">,</span>
+</span><span class='line'>    <span class="nv">$AUDIO_RATE_11KHZ</span>      <span class="o">=&gt;</span> <span class="mi">11</span><span class="p">,</span>
+</span><span class='line'>    <span class="nv">$AUDIO_RATE_22KHZ</span>      <span class="o">=&gt;</span> <span class="mi">22</span><span class="p">,</span>
+</span><span class='line'>    <span class="nv">$AUDIO_RATE_44KHZ</span>      <span class="o">=&gt;</span> <span class="mi">44</span><span class="p">,</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Readonly</span> <span class="k">my</span> <span class="nv">%AUDIO_FORMAT</span> <span class="o">=&gt;</span> <span class="p">(</span>
+</span><span class='line'>    <span class="nv">$AUDIO_FORMAT_UNCOMPRESSED</span>         <span class="o">=&gt;</span> <span class="s">&#39;Uncompressed&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nv">$AUDIO_FORMAT_ADPCM</span>                <span class="o">=&gt;</span> <span class="s">&#39;ADPCM&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nv">$AUDIO_FORMAT_MP3</span>                  <span class="o">=&gt;</span> <span class="s">&#39;MP3&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nv">$AUDIO_FORMAT_NELLYMOSER_8KHZ_MONO</span> <span class="o">=&gt;</span> <span class="s">&#39;Nellymoser 8kHz mono&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nv">$AUDIO_FORMAT_NELLYMOSER</span>           <span class="o">=&gt;</span> <span class="s">&#39;Nellymoser&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">my</span> <span class="nv">$file</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">open</span> <span class="k">my</span> <span class="nv">$fh</span><span class="p">,</span> <span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="nv">$file</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">my</span> <span class="nv">$header</span> <span class="o">=</span> <span class="n">read_header</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">eof</span> <span class="nv">$fh</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$tag</span> <span class="o">=</span> <span class="n">read_tag</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span> <span class="nv">$tag</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">type</span><span class="p">}</span> <span class="o">==</span> <span class="nv">$FLV_TAG_TYPE_AUDIO</span> <span class="ow">and</span> <span class="nv">$tag</span><span class="o">-&gt;</span><span class="p">{</span><span class="nb">length</span><span class="p">}</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$first_byte</span> <span class="o">=</span> <span class="nv">$tag</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">first_byte</span><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">my</span> <span class="nv">$stereo</span>       <span class="o">=</span> <span class="nv">$first_byte</span> <span class="o">&amp;</span> <span class="nv">$AUDIO_MASK_STEREO</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">my</span> <span class="nv">$audio_size</span>  <span class="o">=</span> <span class="nv">$first_byte</span> <span class="o">&amp;</span> <span class="nv">$AUDIO_MASK_16bit</span> <span class="p">?</span> <span class="mi">16</span> <span class="p">:</span> <span class="mi">8</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$audio_rate</span>   <span class="o">=</span> <span class="nv">$AUDIO_RATE</span><span class="p">{</span> <span class="nv">$first_byte</span> <span class="o">&amp;</span> <span class="nv">$AUDIO_MASK_RATE</span> <span class="p">}</span> <span class="o">||</span> <span class="s">&#39;unknown&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$audio_format</span> <span class="o">=</span> <span class="nv">$AUDIO_FORMAT</span><span class="p">{</span> <span class="nv">$first_byte</span> <span class="o">&amp;</span> <span class="nv">$AUDIO_MASK_FORMAT</span> <span class="p">}</span> <span class="o">||</span> <span class="s">&#39;unknown&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&#39;audio type: &#39;</span> <span class="o">.</span> <span class="p">(</span> <span class="nv">$stereo</span> <span class="p">?</span> <span class="s">&#39;stereo&#39;</span> <span class="p">:</span> <span class="s">&#39;mono&#39;</span> <span class="p">)</span> <span class="o">.</span> <span class="s">&quot;\n&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;audio size: $audio_size bit\n&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;audio rate: $audio_rate Hz\n&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;audio format: $audio_format\n&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">last</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">sub </span><span class="nf">read_header</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fh</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$sig</span><span class="p">,</span>       <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$version</span><span class="p">,</span>   <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$flag</span><span class="p">,</span>      <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$offset</span><span class="p">,</span>    <span class="mi">4</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$prev_tag</span><span class="p">,</span>  <span class="mi">4</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">sig</span> <span class="o">=&gt;</span> <span class="nv">$sig</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">version</span> <span class="o">=&gt;</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&#39;H*&#39;</span><span class="p">,</span> <span class="nv">$version</span><span class="p">),</span>
+</span><span class='line'>        <span class="n">flag</span>    <span class="o">=&gt;</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&#39;H*&#39;</span><span class="p">,</span> <span class="nv">$flag</span><span class="p">),</span>
+</span><span class='line'>        <span class="n">offset</span>  <span class="o">=&gt;</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&#39;H*&#39;</span><span class="p">,</span> <span class="nv">$offset</span><span class="p">),</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">sub </span><span class="nf">read_tag</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fh</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$type</span><span class="p">,</span>               <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$length</span><span class="p">,</span>             <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$timestamp</span><span class="p">,</span>          <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$timestamp_extended</span><span class="p">,</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$stream_id</span><span class="p">,</span>          <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$first_byte</span><span class="p">,</span>         <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$pos</span> <span class="o">=</span> <span class="nb">hex</span> <span class="nb">unpack</span> <span class="s">&#39;H*&#39;</span><span class="p">,</span> <span class="nv">$length</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">seek</span> <span class="nv">$fh</span><span class="p">,</span> <span class="nv">$pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">read</span> <span class="nv">$fh</span><span class="p">,</span> <span class="k">my</span> <span class="nv">$prev_tag</span><span class="p">,</span>  <span class="mi">4</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">type</span>       <span class="o">=&gt;</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="nv">$type</span><span class="p">),</span>
+</span><span class='line'>        <span class="nb">length</span>     <span class="o">=&gt;</span> <span class="nv">$pos</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">first_byte</span> <span class="o">=&gt;</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="nv">$first_byte</span><span class="p">),</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>こんな感じで FLV ファイルの音声情報を表示します。</p>
+
+<pre><code>$ ./get_flv_info.pl broadcast_35957_1191232400660.flv
+audio type: mono
+audio size: 16 bit
+audio rate: 11 Hz
+audio format: Nellymoser  
+</code></pre>
+
+
+<p>あとは Plagger プラグインを書くだけ、という感じなのですが、リビドーが沸いてこないのでちょっと保留。FFmpeg で Nellymoser に対応する予定がある（既に SVN HEAD には Nellymoser という文字列がコード中にある）ようなので、それまで待ってもいいかなー、と。</p>
+
+<p>音声変換するプラグイン &#8220;Filter::Audio&#8221;:http://coderepos.org/share/browser/lang/perl/plagger/lib/Plagger/Plugin/Filter/Audio.pm は coderepos にあげてありますので、俺が対応してやるぜ、という方はお好きなようにいじってください。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/10/01/528/">Shibuya.pm テクニカルトーク #8 でしゃべってきました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-10-01T23:18:00+09:00" pubdate>Oct 1<span>st</span>, 2007</time>
+        
+         | <a href="/blog/2007/10/01/528/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>プレゼン途中にバッテリーが切れるという失態をやらかしたため、yusukebeさん言うところの「お口で」のみのプレゼンとなってしまいました。ごめんなさい。<a href="http://mizzy.org/archives/2007/pushmi_shibuya_pm_8.pdf">会場でお見せできなかった幻の資料はこちらにアップしておきます</a>。</p>
+
+<p>Thinkpad X60sはバッテリー残量表示が1時間になっていても、プレゼンやると2,3分でバッテリー切れますので、みなさんご注意下さい。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/08/30/524/">puppet-mode.el のパッチ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-08-30T00:30:00+09:00" pubdate>Aug 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/08/30/524/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Puppet で同じタイプのリソースを大量に記述する時には、</p>
+
+<pre><code>package { sudo:
+  ensure => latest
+}
+
+package { ntp:
+  ensure => latest
+}
+
+package { ssh:
+  ensure => latest
+}
+</code></pre>
+
+
+<p>なんて書くのはだるいので、</p>
+
+<pre><code>package {
+  sudo:
+    ensure => latest;
+  ntp:
+    ensure => latest;
+  ssh:
+    ensure => latest;
+}
+</code></pre>
+
+
+<p>と書きたいのですが、Emacs + &#8220;puppet-mode.el&#8221;:https://reductivelabs.com/svn/puppet/trunk/ext/emacs/puppet-mode.el では、後者みたいな書き方だと、インデントが意図した通りにならなくて、イラっときてパッチ書いた。</p>
+
+<pre><code>=== puppet-mode.el
+==================================================================
+--- puppet-mode.el      (revision 1800)
++++ puppet-mode.el      (local)
+@@ -106,7 +106,9 @@
+                  (progn
+                     (setq cur-indent (- (current-indentation) 2))
+                    (setq not-indented nil))
+-               (setq cur-indent (- (current-indentation) 2))))
++               (setq cur-indent (- (current-indentation) 2)))
++              (if (looking-at "^.*;")
++                  (setq cur-indent (- cur-indent 2))))
+            (if (< cur-indent 0)     ; We can't indent past the left margin
+                (setq cur-indent 0)))
+        (save-excursion
+@@ -125,6 +127,18 @@
+                    (setq cur-indent (+ (current-indentation) 2))
+                    (setq not-indented nil))
+                (if (bobp)
++                   (setq not-indented nil)))
++             (if (looking-at "^.*:\s*$")
++                 (progn
++                   (setq cur-indent (+ (current-indentation) 2))
++                   (setq not-indented nil))
++               (if (bobp)
++                   (setq not-indented nil)))
++             (if (looking-at "^.*;")
++                 (progn
++                    (setq cur-indent (- (current-indentation) 2))
++                   (setq not-indented nil))
++               (if (bobp)
+                    (setq not-indented nil)))))))
+       (if cur-indent
+          (indent-line-to cur-indent) 
+</code></pre>
+
+
+<p>他にもインデントまわりの動作で微妙なところはあるけど、ちょっとはましになった。インデントまわりの処理で参考になる emacs-lisp って何かないかな？</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/08/09/521/">Trac の SearchHyperEstraierPlugin を Trac 0.10.x で動かすパッチ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-08-09T03:03:00+09:00" pubdate>Aug 9<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/08/09/521/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>&#8220;SearchHyperEstraierPlugin&#8221;:http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SearchHyperEstraierPlugin が、Trac 0.10.x というか、うちの環境で動かないので、パッチ書いた。初 Python プログラミング。（というほどのものじゃないけど。）</p>
+
+<pre><code>
+=== searchhyperestraier/searchhyperestraier.py
+==================================================================
+--- searchhyperestraier/searchhyperestraier.py  (revision 892)
++++ searchhyperestraier/searchhyperestraier.py  (local)
+@@ -2,8 +2,9 @@
+ # SearchRepositoryWithNamazu plugin
+
+ from trac.core import *
+-from trac.Search import ISearchSource, query_to_sql, shorten_result
++from trac.Search import ISearchSource, shorten_result
+ from trac.util import NaivePopen
++from trac.util.text import to_unicode
+ from StringIO import StringIO
+ import urllib
+ import time
+@@ -44,9 +45,9 @@
+         browse_trac = self.env.config.get('searchhyperestraier', 'browse_trac','enabled')
+ 
+ 
+-        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,unicode(query,'utf-8').encode(estcmd_encode))
++        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,' '.join(query))
+         self.log.debug('SearchHyperEstraier:%s' % cmdline)
+-        np = NaivePopen(cmdline)
++        np = NaivePopen( cmdline.encode(estcmd_encode) )
+         #self.log.debug('Result:%s' % unicode(np.out,'utf-8').encode('mbcs'))
+         #self.log.debug('Result:%s' % np.out)
+         if np.errorlevel or np.err:
+@@ -74,7 +75,7 @@
+             attrelem_array = element.getElementsByTagName("attribute")
+             for attrelem in attrelem_array:
+                 attr_name = attrelem.getAttribute("name")
+-                attr_value = unicode(attrelem.getAttribute("value")).encode('utf-8')
++                attr_value = to_unicode(attrelem.getAttribute("value"))
+                 #URLとタイトルを生成
+                 if attr_name == "_lreal":
+                     attr_value=attr_value[len(replace_left):].replace("\\","/")
+</code></pre>
+
+
+<p>エラーが出るたびに、適当にいじってたら動いた、という感じ。なので、こんなんでいいのかはよく分からない。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/08/03/520/">Pushmi つかってます & 技術者募集中 at 福岡</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-08-03T01:52:00+09:00" pubdate>Aug 3<span>rd</span>, 2007</time>
+        
+         | <a href="/blog/2007/08/03/520/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>&#8220;弊社&#8221;:http://www.paperboy.co.jp/ は東京と福岡にオフィスがあり、それぞれの拠点に Subversion + Trac 環境を構築し、&#8221;OpenVPN&#8221;:http://openvpn.net/ により VPN 接続してお互いの開発状況を公開しています。サービス絡みの開発は基本的に、東京は東京、福岡は福岡で完結しているので、この方式で問題はないのですが、サーバ管理関連のスクリプトなんかは、東京と福岡で共通するものが多いため、別々の SVN リポジトリで管理されてると不便なんですよね。かといって、どちらかの拠点だけしかリポジトリがないと、VPN の障害発生時に、リポジトリのない拠点からはまったくアクセスができない、という困ったことになってしまいます。</p>
+
+<p>そこで、SVN リポジトリレプリケーションツール &#8220;Pushmi&#8221;:http://search.cpan.org/dist/Pushmi/lib/Pushmi.pm を導入してみました。詳細は &#8220;YAPC::Asia での 作者 Cl Kao によるスピーチ動画&#8221;:http://video.google.com/videoplay?docid=-7181301487103062288&amp;q=yapc+asia+2007&amp;total=46&amp;start=0&amp;num=50&amp;so=1&amp;type=search&amp;plindex=13 を見て頂くとして、ここでは行った設定についてメモを残しておきます。ほとんど perldoc Pushmi の内容と同じですが。</p>
+
+<p>まず当然 Pushmi のインストールが必要です。これの手順は省略。また、より良いアトミックロック実現のために &#8220;memcached&#8221;:http://www.danga.com/memcached/ を利用している、ということなのでインストールしておきます。これも手順は省略。</p>
+
+<p>memcached を起動します。</p>
+
+<pre><code>$ sudo /usr/bin/memcached -p 8123 -dP /var/run/memcached.pid -u nobody
+</code></pre>
+
+
+<p>/etc/pushmi.conf を設定します。弊社の環境では memcached のポートのみ指定してます。</p>
+
+<pre><code>authproxy_port: 8123
+</code></pre>
+
+
+<p>ミラーリポジトリを作成します。</p>
+
+<pre><code>$ pushmi mirror /var/db/my-local-mirror http://master.repository/svn
+Mirror initialized.
+</code></pre>
+
+
+<p>ミラーリポジトリとマスターリポジトリを同期します。</p>
+
+<pre><code>$ pushmi sync /var/db/my-local-mirror
+Retrieving log information from 1 to 62
+</code></pre>
+
+
+<p>ミラーリポジトリは、svnadmin create で作成するのと同様なディレクトリ、ファイル構造になってますが、Pushmi 用の pre-commit スクリプトと post-commit スクリプトが置かれている、というところが異なります。</p>
+
+<p>pre-commit では以下の様なコマンドが実行され、ミラーリポジトリにコミットされた内容を、マスターリポジトリにコミットしに行きます。</p>
+
+<pre><code>/usr/bin/pushmi runhook $1 --txnname $2
+</code></pre>
+
+
+<p>post-commit では以下の様なコマンドが実行され、ミラーとマスターの整合性を確認しています。</p>
+
+<pre><code>/usr/bin/pushmi verify $1 --revision $2
+</code></pre>
+
+
+<p>Apache + WebDAV で SVN リポジトリにアクセスするために、以下の様な設定を Apache で行います。</p>
+
+<pre><code><Location /svn/server>
+  PerlSetVar SVNPath /var/db/my-local-mirror
+  PerlSetVar Pushmi /usr/bin/pushmi
+  PerlSetVar PushmiConfig /etc/pushmi.conf
+  <LimitExcept GET PROPFIND OPTIONS REPORT>
+    AuthName "mirrored private area"
+    AuthType Basic
+    Require valid-user
+    AuthLDAPURL ldap://localhost:389/ou=people,o=paperboy?uid?sub?(objectclass=*)
+    PerlAuthenHandler Pushmi::Apache::AuthCommit
+  </LimitExcept>
+</Location>
+</code></pre>
+
+
+<p>設定見て分かると思いますが、mod_perl を利用していて、Apche2 + mod_perl の環境が必要です。Apache は 2.0 系でも 2.2 系でも大丈夫なようです。弊社では 2.0 系を利用しています。</p>
+
+<p>特にポイントとなるのは、</p>
+
+<pre><code>PerlAuthenHandler Pushmi::Apache::AuthCommit
+</code></pre>
+
+
+<p>の部分で、認証で渡されたユーザ名、パスワードをこのモジュールで memcached にキャッシュしておき、マスタリポジトリへのコミット時の認証に利用します。Apache 2.2 系の場合には、以下の様に設定します。</p>
+
+<pre><code>AuthBasicProvider Pushmi::Apache::RelayProvider
+</code></pre>
+
+
+<p>この状態では、ミラーへのコミットは即マスターに反映されますが、マスターへのコミットはミラーに反映されませんので、以下の様な cron 設定を行い、5分おきにマスターとミラーを同期するようにします。</p>
+
+<pre><code>*/5 * * * * /usr/bin/pushmi sync --nowait /var/db/my-local-mirror
+</code></pre>
+
+
+<p>今のところこれで問題なく動いています。</p>
+
+<p>話変わりまして、弊社福岡支社では、&#8221;プログラマ&#8221;:http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=1&amp;ty=0&amp;rm=0 と &#8220;サーバエンジニア&#8221;:http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=2&amp;ty=0&amp;rm=0 を募集しています。Pushmi を実戦で使ってみたい！という方はぜひ。メガネ女子プログラマもいますよ。（東京本社にもいます。人妻ですが。）</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/12/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/10/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

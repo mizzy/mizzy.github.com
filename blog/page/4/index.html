@@ -1,0 +1,1537 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="ドクターペッパー飲み放題に釣られて、NTTレゾナントさんで DevOps の話をしてきました。 プレゼン資料をslideshareにあげておきます。
+">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/4">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/05/20/DevOpsPresentationSlide/">DevOpsPresentationSlide</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-05-20T14:14:35+09:00" pubdate>May 20<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/05/20/DevOpsPresentationSlide/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://twitter.com/daiba/status/12491343137">ドクターペッパー飲み放題</a>に釣られて、NTTレゾナントさんで DevOps の話をしてきました。</p>
+
+<p><a href="http://www.slideshare.net/mizzy/devops-4156440">プレゼン資料をslideshareにあげておきます</a>。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/">HadoopAndScalaPackagesForCentOS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-04-14T14:53:27+09:00" pubdate>Apr 14<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>2010/04/14 追記</em></p>
+
+<p>太田さんから twitter で<a href="http://twitter.com/kzk_mover/status/12147992526">Hadoopは基本的にSun JDKのみでテストされているので、OpenJDKでの使用は危険らしいです。</a> とご指摘いただきました。ありがとうございます。</p>
+
+<p>となると、Hadoop 以外にも Java 関連パッケージを利用したい場合には、Hadoop を OpenJDK 用にビルドするんじゃなくて、他の Java 関連パッケージを Sun JDK 用にビルドしなおすか、気持ち悪いけど併用するか、のどちらかになってしまうんですかね。</p>
+
+<hr />
+
+<p>Hadoop を CentOS5 で利用する場合、<a href="http://www.cloudera.com/hadoop/">Cloudera’s Distribution for Hadoop (CDH)</a> を <a href="http://archive.cloudera.com/docs/_yum.html">yum でインストール</a> するのが簡単なんですが、http://java.sun.com/ から入手できる JDK パッケージに依存してるので、CentOS5で yum install できる OpenJDK パッケージ が使えません。</p>
+
+<p>Hadoop 使うだけならそれでもいいんですが、他の yum で入る ant 等の Java 製ソフトウェアを利用しようと思うと、Sun から入手した JDK パッケージと yum で入る OpenJDK パッケージが同居して、気持ちが悪いです。</p>
+
+<p>幸い、<a href="http://archive.cloudera.com/redhat/cdh/3/SRPMS/">CDH の SRPM</a> も入手できるので、こいつを OpenJDK パッケージを利用する形でパッケージングしなおしました。</p>
+
+<ul>
+<li>http://svn.mizzy.org/public/yum/SRPMS/hadoop-0.20-0.20.2+228-1.centos.src.rpm</li>
+</ul>
+
+
+<p>こいつをビルドするために ant 1.7 以降が必要なのだけど、CentOS で yum で入るのは 1.6 なので、ant 1.7 のパッケージもつくった。</p>
+
+<ul>
+<li>http://svn.mizzy.org/public/yum/SRPMS/ant-1.7.1-11.1.src.rpm</li>
+</ul>
+
+
+<p>また、Hadoop + Scala を試してみたいので、Scala のパッケージと、Scala に必要な jline のパッケージもつくった。</p>
+
+<ul>
+<li>http://svn.mizzy.org/public/yum/SRPMS/scala-2.7.7-1.centos.src.rpm</li>
+<li>http://svn.mizzy.org/public/yum/SRPMS/jline-0.9.94-0.6.src.rpm</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/26/OpenSourceProvisioningToolchain/">OpenSourceProvisioningToolchain</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-03-26T00:40:19+09:00" pubdate>Mar 26<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/03/26/OpenSourceProvisioningToolchain/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>DevOps に関する理解を深めるために、資料にあたってまとめてみるシリーズ。</p>
+
+<p>今回は <a href="http://en.oreilly.com/velocity-mar2010">Velocity Online Conference - March 17, 2010</a> でのプレゼン <a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Provisioning Toolchain</a> から。スライドのタイトルは「OpenSource Provisioning Toolchain」となっている。</p>
+
+<p>[wiki:DevOps 昨日のエントリ]でいうと、「インフラの自動化」や「ワンステップビルド＆デプロイ」に関連する話。</p>
+
+<p>Toolchain というのは何らかの目的を達成するためのソフトウェアの集まり、ってことなので、Provisioning Toolchain は、プロビジョニングを行うためのソフトウェアの集まり、ってことですね。つまり OpenSource Provisioning Toolchain は、プロビジョニングを行うためのオープンソースソフトウェアの集まり、ということ。</p>
+
+<p>ここでわざわざ Toolchain といってるのは、ひとつの大きなソフトウェアで全部やるんじゃなくて、小さなソフトウェアを組み合わせることで、プロビジョニング全体をカバーしよう、という考えから。</p>
+
+<p>小さなツールを組み合わせることによるメリットを、UNIX哲学的な話と絡めて説明してるけど、この辺はよくある話なので省略。</p>
+
+<p>また、なぜこのような Toolchain が必要なのか、って話を、クラウドや仮想化の波が押し寄せてきて DevOps 問題が発生する云々、的なスライドがあるんだけど、それ以上の詳しい説明が特にないのでこれも省略。</p>
+
+<p>個人的に参考になったのは、プロビジョニングを3つの領域にわけて、それぞれの領域に対応するオープンソースソフトウェアを挙げているところ。（オープンソースじゃないモノも混じってるけど。）</p>
+
+<p>3つの領域とは以下の通り。</p>
+
+<ul>
+<li>Orchestration
+
+<ul>
+<li>Application Service Deployment</li>
+</ul>
+</li>
+<li>Configuration
+
+<ul>
+<li>System Configuration</li>
+</ul>
+</li>
+<li>Bootstrapping
+
+<ul>
+<li>OS install</li>
+<li>Cloud or VM Image Launch</li>
+</ul>
+</li>
+</ul>
+
+
+<p>下の方がプロビジョニングの初期段階で、上に行くほどレイヤーが上がるイメージ。</p>
+
+<p>で、それぞれに対応するソフトウェアは以下の通り。</p>
+
+<ul>
+<li>Orchestration
+
+<ul>
+<li><a href="http://www.capify.org/index.php/Capistrano">Capistrano</a></li>
+<li><a href="http://controltier.org/wiki/Main_Page">ControlTier</a></li>
+<li><a href="http://docs.fabfile.org/">Fabric</a></li>
+<li><a href="https://fedorahosted.org/func/">Func</a></li>
+</ul>
+</li>
+<li>Configuration
+
+<ul>
+<li><a href="http://trac.mcs.anl.gov/projects/bcfg2">BCFG</a></li>
+<li><a href="http://www.cfengine.org/">Cfengine</a></li>
+<li><a href="http://www.opscode.com/chef">Chef</a></li>
+<li><a href="http://www.puppetlabs.com/">Puppet</a></li>
+<li><a href="http://wiki.smartfrog.org/wiki/display/sf/SmartFrog+Home">SmartFrog</a></li>
+</ul>
+</li>
+<li>Bootstrapping
+
+<ul>
+<li><a href="http://aws.amazon.com/">AWS</a></li>
+<li><a href="https://fedorahosted.org/cobbler/">Cobbler</a></li>
+<li><a href="http://www.eucalyptus.com/">Eucalyptus</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Jumpstart_%28Solaris%29">Jumpstart</a></li>
+<li><a href="http://fedoraproject.org/wiki/Anaconda/Kickstart">Kickstart</a></li>
+<li><a href="http://www.opennebula.org/start">OpenNebula</a></li>
+<li><a href="http://www.openqrm.com/">OpenQRM</a></li>
+<li><a href="http://www.vmware.com/">VMWare</a></li>
+</ul>
+</li>
+</ul>
+
+
+<p>ペパボの場合だと、全部のサービスがそうというわけではないけど、Bootstrapping レイヤーで Cobbler、Configuration レイヤーで Puppet、Orchestration レイヤーで Capistrano(Webistrano) や Func、といった感じ。ここにないものだと、Orchestration レイヤーで Archer なんかも使ってる。</p>
+
+<p>今日は手抜きだけどこれでお終い。これから <a href="http://www.jp.playstation.com/scej/title/mag/">MAG</a> やるので。DLC第1弾トルーパーパックが配信されたしね。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/25/DevOps/">DevOps</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-03-25T10:18:35+09:00" pubdate>Mar 25<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/03/25/DevOps/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/">DevOps: Why Silos Suck And How To Break Them</a> というエントリをたまたま目にして、「DevOps」という見なれない言葉が出てきたので、気になって調べてみたところ、自分が何となくやっていたことや、今までもやもやと考えていたことに一定の方向性が与えらえた気がしたので、整理してみることにします。</p>
+
+<hr />
+
+<h1>DevOps とは？</h1>
+
+<p>簡単に言ってしまうと<em>「開発者と運用者の間の壁を取り払うためのベストプラクティス」</em>と言えそうです。</p>
+
+<hr />
+
+<h1>開発者と運用者の間の壁？</h1>
+
+<p>Flickr の中の人による <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr">10+ Deploys Per Day: Dev and Ops Cooperation at Flickr</a> という Velocity 2009 でのプレゼンスライドには「Devs versus Ops」という章があり、以下のような言葉が載っていました。</p>
+
+<p>  &#8220;It&#8217;s not my machines, it&#8217;s your code!&#8221;</p>
+
+<p>「それは俺のマシンじゃないし、お前のコードだろ」って感じでしょうか。実際、開発者と運用者が明確に分かれている組織では、多かれ少なかれ、また、ニュアンスや詳細は違うでしょうが、こういった言葉が交わされることがあるのではないでしょうか。これは開発者と運用者だけではなく、ウェブ開発者とサーバエンジニア、フロントエンジニアとバックエンドエンジニア、といった形で、明確に役割分担されている組織では起こりうる問題であり、これにより開発がスケジュールから大幅に遅れたり、トラブルがなかなか解決しない、といったような事態を招くこともあるんじゃないかと思います。</p>
+
+<p>また、上記スライドでは以下のような考えを「伝統的な考え」と述べています。</p>
+
+<ul>
+<li>開発者の仕事は新しい機能を追加すること</li>
+<li>運用者の仕事はサイトを速くて安定した状態に保つこと</li>
+</ul>
+
+
+<p>そして、「運用者の仕事はサイトを速くて安定した状態に保つこと<em>ではない<em>&#8216;」とし、「ビジネスには変化が必要」であり、&#8221;&#8217;「安定性をとって変化を捨てる」&#8221;&#8217;か&#8217;</em>「必要に応じて変化が起こることを許容する」</em>か、といった選択肢を提示しています。</p>
+
+<hr />
+
+<h1>どうやってその壁を取り除くのか</h1>
+
+<p>では、このような開発者と運用者（あるいはウェブ開発者とサーバエンジニアなど、自身の置かれた状況に置き変えてみてください）の壁を取り払うためには、どうすればいいのでしょうか。上で見たように、壁の原因は<em>「運用者の仕事はサイトを速くて安定した状態に保つこと」<em>&#8216;という伝統的な考えにありそうです。（これは別に運用者が悪い、と言っているわけではありません。）そして、提示された選択肢のうちの後者&#8217;</em>「必要に応じて変化が起こることを許容する」</em>ことが容易に実現できるようにすることが大事なのではないかと考えられます。これを実現するために重要なことは、</p>
+
+<ul>
+<li>ツール</li>
+<li>文化</li>
+</ul>
+
+
+<p>の2つに分けることができそうです。</p>
+
+<hr />
+
+<h1>ツール</h1>
+
+<p>「10+ Deploys Per Day: Dev and Ops Cooperation at Flick」では、ツールとして以下のようなものをあげています。</p>
+
+<ul>
+<li>インフラの自動化</li>
+<li>共有されたバージョンコントロール</li>
+<li>ワンステップビルド＆デプロイ</li>
+<li>機能フラグ</li>
+<li>メトリックの共有</li>
+<li>IRC and IM robots</li>
+</ul>
+
+
+<p>ひとつひとつの解説は省略しますが、いずれも状態やその変化を記録、可視化し、変更しやすい、あるいは変更をコントロールしやすい環境をつくるためのツール、と言えそうです。</p>
+
+<hr />
+
+<h1>文化</h1>
+
+<p>また、文化としては以下のような項目を挙げています。</p>
+
+<ul>
+<li>尊敬</li>
+<li>信頼</li>
+<li>失敗を許容する</li>
+<li>責めない</li>
+</ul>
+
+
+<p>まあこれは、人と協調して仕事をスムーズに進めるためにはどれも重要なことですよね。</p>
+
+<hr />
+
+<p>以上が DevOps について、自分なりに得たことのまとめです。ツールについては、自分がペパボに入社してから導入や利用促進してきたもの、これから導入したいと思っているものなんかが、軒並み上のリストに含まれていて、DevOps の概念が頭にあったわけではないんですが、思いがけずそういう方向に行こうとしていたんだな、ということがこの言葉に出会うことによって確認できました。（それでエントリのタイトルがあんな感じになってます。）</p>
+
+<p>DevOps 自体まだ定義として固まっているものではないようですし、かなり端折った形でまとめましたので、興味がある方は自分が参考にした以下のURLや、更にそこからのリンクを辿ってみてください。</p>
+
+<ul>
+<li>参考URL
+
+<ul>
+<li>http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/</li>
+<li>http://dev2ops.org/blog/2010/2/22/what-is-devops.html</li>
+<li>http://code.google.com/p/devops-toolchain/</li>
+<li>http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr</li>
+</ul>
+</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/20/KindleJapaneseTitle/">KindleJapaneseTitle</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-03-20T19:04:33+09:00" pubdate>Mar 20<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/03/20/KindleJapaneseTitle/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Kindle Store で樋口一葉、芥川龍之介、夏目漱石らの日本語書籍が出てたのは以前から知っていたのですが、最近 <a href="http://www.atpress.ne.jp/view/14142">Amazon Kindleで日本語のコンテンツが読める！ 日本語電子書籍「想隆社文庫」創刊！一般向けおよび図書館向けに提供を開始</a> といったプレスリリースが出てたので、どんなものか確認するために、実際に購入してみました。</p>
+
+<p>結論から言うと、「6インチ Kindle 上では薄くて読みづらい。お金出して買う価値なし。今出てるタイトルなら、青空キンドルを使っとけ。」といったところでしょうか。</p>
+
+<hr />
+
+<p>以前から出てた日本語タイトルのスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/kokoro.gif, 25%)]]</p>
+
+<hr />
+
+<p>最近プレスリリースが出ていた、「これまでの電子書籍と異なり、従来の紙の本好きが違和感なく読めることを重視。書籍DTPを行う職人による組版を採用し、版面の美しさを追求しました。」と謳われているもののスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/sumidagawa.gif, 25%)]]</p>
+
+<hr />
+
+<p>青空キンドルのスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/bottyan02.gif, 25%)]]</p>
+
+<hr />
+
+<p>自分でスキャンしたもののスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/mahjong03.gif, 25%)]]</p>
+
+<hr />
+
+<p>こうして比較してみると、青空キンドルが神すぎる。また、自分でスキャンしたものは文字サイズが小さいけど、濃さ的には上2つよりも読みやすい。実際、Kindle実機上だと上2つは、スクリーンショットのものよりも更に薄くて読みづらい。</p>
+
+<p>どうやら上2つの Kindle Store で手に入る日本語タイトルは、すべて画像データの模様。（ちなみに、Kindle の azw フォーマットは、Mobipocket フォーマットをベースにしていて、文字データは HTML で記述する。）フォントの関係で、画像になっちゃうのはしかたないのかもしれないけど、文字サイズ変更もできないし、テキスト読み上げもできないし、その上読みづらい、といった感じで、Kindle 版を購入するメリットがまったくない。</p>
+
+<p>発売されている（またはこれから発売予定の）タイトルも、すべて青空文庫で手に入るタイトルばかりのようなので、現段階なら青空キンドルを利用するのがベスト。</p>
+
+<p>DX の方だともう少し読みやすかったりするのかもしれないけど、小説の類はDXで読むメリットはあまりないと思う。</p>
+
+<hr />
+
+<p>ちなみに、実際にファイルを展開してみたら、やはり全部画像ファイルでした。ファイルの展開は Perl の EBook::Tools モジュールを利用すると簡単にできます。</p>
+
+<pre><code>$ perl -MEBook::Tools::Unpack \
+ -e 'EBook::Tools::Unpack-&gt;new(
+ file =&gt; "Natsume Soseki Story Selection v-asin_B00300H6UY-type_EBOK-v_0.azw"
+ )-&gt;unpack'
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/24/PuppetAtHbStudy8/">PuppetAtHbStudy8</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-02-24T23:43:33+09:00" pubdate>Feb 24<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/02/24/PuppetAtHbStudy8/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://heartbeats.jp/hbstudy/2010/02/hbstudy8.html">hbstudy#8</a> で、「Puppet のススメ」というタイトルでプレゼンさせていただきました。機会をくださった<a href="http://heartbeats.jp/">株式会社ハートビーツ</a>の藤崎さん、馬場さん、坂口さん、また、運営スタッフのみなさま、聞きに来て下さったみなさま、twitter やブログで感想述べてくださったみなさま、本当にありがとうございました。</p>
+
+<p>当日の資料は <a href="http://www.slideshare.net/mizzy/puppet-3258268">slideshare にアップしています</a>。</p>
+
+<p>内容は主に Puppet を知らない方、これから使ってみようかどうか検討している方をターゲットとして、</p>
+
+<ul>
+<li>Puppet とはどんなものか</li>
+<li>どんな風に動かすのか</li>
+<li>どういった使い方をすればいいのか</li>
+<li>使うために知っておいた方がいいこと</li>
+<li>使ってみて微妙だなと思うところ</li>
+</ul>
+
+
+<p>といったお話をさせて頂きました。Puppet を既に実運用でバリバリ使っている方には、特に目新しい話はなかったと思いますが、そういった方からは逆にこちらが知らないこと、見落としてること、間違ってることなんかの情報をもらえればいいなー、という思いでプレゼンさせていただきました。</p>
+
+<p>これだけではなんなので、プレゼンの補足事項とか、twitter のハッシュタグ #hbstudy やブログなんかで色々コメント頂いてますので、その辺まとめてみようと思います。</p>
+
+<p>まずは twitter からいくつかピっくアップしてみます。</p>
+
+<p>  matsuu puppetの気づきにくいメリットの１つは、puppetをいつでもやめられること。puppetをやめても既存の設定はpuppetに依存しないのでいつでもやめられる。これ大きいよね。 http://twitter.com/matsuu/statuses/9521601261</p>
+
+<p>これは確かにおっしゃる通りですね。Puppet でサーバ構築しても、できあがったものは特に Puppet に縛られるものではないので、いつ使うのやめても大丈夫です。そして、プレゼンでも触れましたが、単に動かしてみるだけなら、比較的さくっと試せます。使いはじめる、あるいは使うのをやめる敷居が低い、というのは良いツールの条件だと思いますので、これはとても大きいメリットですね。</p>
+
+<p>  yuzorock puppetの気付きにくいメリットの1つはsshではないこと。 http://twitter.com/yuzorock/statuses/9521698444</p>
+
+<p>おっしゃる通り、メリットでもあると思うのですが、<a href="http://d.hatena.ne.jp/tokuhirom/20100224/1266979391">sshd で代用できたらいいのに</a> という意見もあったりで、ここはなかなか難しい問題だなー、と思います。SSH ではないことは、メリットでもあるしデメリットでもありそうですね。メリットとしては、SSH 経由でマニフェストを適用するとなると、そのためのユーザ管理や鍵の管理、sudo まわりの設定、といったものが必要になるけど、そういった手間がかからない、といったところでしょうか。（他にもあれば教えて下さい。）逆にデメリットとしては、デーモンが常時上がってるとメモリ食うし、常にあがってる必要がないものがあがってる、という気持ち悪さ、といったあたりですかね。とくに、運用監視系のツールを色々入れていて、それぞれがデーモン持ってる、という状態はあまり好ましくないのではないかと思います。</p>
+
+<p>  xaicron manifest の学習コストはどうなんだろ http://twitter.com/xaicron/statuses/9521881525</p>
+
+<p>  yuzorock manifestの学習コストはたいしたこと無い。コマンド打つのとやることは同じだから。 http://twitter.com/yuzorock/statuses/9521927420</p>
+
+<p>ここは感じ方は人それぞれだと思うので、一般的に学習コストがどうなのかを言うのは難しいのですが、自分は yuzorock さんと同意見で、それほど学習コスト高くないと思っています。</p>
+
+<p>  matsuu #hbstudy puppetでcron設定管理してるとcrontabがどんどん汚れていくんだぜ&#8230;gentooだけかも http://twitter.com/matsuu/statuses/9522038117</p>
+
+<p>最近はマニフェストで cron リソース定義するよりも、file リソースで /etc/cron.d にファイル置く方がわかりやすいかな、と思ったりしてます。</p>
+
+<p>  matsuu あ、puppetのテンプレートの機能の話でてきた？ http://twitter.com/matsuu/statuses/9522545344</p>
+
+<p>すみません、忘れてました！話したいことが多すぎて…テンプレートについて詳しく知りたい方は、 http://gihyo.jp/admin/serial/01/puppet/0007 とか Software Design の記事なんかをご覧ください。</p>
+
+<p>  hirose31 なにげに PSP がリモコン http://twitter.com/hirose31/statuses/9522592495</p>
+
+<p><a href="http://coderepos.org/share/wiki/PSPSlidePanel">スライド操作パネル for PSP</a> つかってます！これは超便利です。スライドの進行状況と残り時間がわかりやすく視覚化されるので、話しながら時間調整ができます。（Puppet関係ないですね。）</p>
+
+<p>  mkouhei うーむ、良い点よりも不満の方が多いように聞こえる。 http://twitter.com/mkouhei/statuses/9522637899</p>
+
+<p>デメリットに触れているような文章はあまり見かけないので、敢えて不満点を色々上げてみましたが、こっちの方が目立っちゃいましたかね。自分としてはとても良いツールだと思っています。</p>
+
+<p>次はブログから拾ってみます。</p>
+
+<p><a href="http://d.hatena.ne.jp/tokuhirom/20100224/1266979391">tokuhirom さんのブログ</a>。tokuhirom さんの感想を見て思ったのは、Puppet を導入してメリットがあるかどうか、というのは、どういう状況に置かれてるのか、どういったことをツールで解決したいのか、に大きく依存するので、それ抜きでは語れないな、と。Puppet に限った話でもないし、当り前のことなのですが、再確認させていただきました。</p>
+
+<p>これと併せて <a href="http://www.sssg.org/blogs/naoya/archives/1717">n0ts さんのブログ</a> を読んでみると、やはり重要なのは、「いかに楽をするか」だよね、と。n0ts さんの意見にとても賛成です。でも、置かれてる状況や人によって、「どこで楽をするのか」は異なってきそうですね。tokuhirom さんの感想にある、</p>
+
+<p>  「シェルスクリプトで構築すればこれ簡単なのに!」みたいな場合に、いちいち puppet rule 書くのダルくね?</p>
+
+<p>も、構築を自動化する、というポイントに置いて楽をしたいのであれば、シェルスクリプトでやっちゃうのが楽だと思います。そこを少し視線を変えて、構築シェルスクリプトはずっとメンテし続ける必要があるし、かといって作成した人がずっとメンテできるわけではないし、ずっとメンテできるとしても、長年メンテしつづけて作成した人にとってもカオスになることもあり得る、という状況が考えられる場合には、Puppet も選択肢のひとつとして検討に値する、といったことになるのではないかと。これはまさに、tokuhirom さんの感想にある</p>
+
+<p>  自由度を制限して、属人性を排除するというアプローチはアリだとおもう。</p>
+
+<p>の通り、属人性を排除する、ということを考えると、Puppet は有力な選択肢になる、という例だと思います。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/17/OpenSocialAppDeveloperRecruiting/">OpenSocialAppDeveloperRecruiting</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-02-17T19:44:03+09:00" pubdate>Feb 17<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/02/17/OpenSocialAppDeveloperRecruiting/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ペパボではこれからOpenSocialアプリの分野にも力を入れていきますよ、ってことで、<a href="http://www.paperboy.co.jp/recruit/job/100212p.php">開発者を募集しています</a>。</p>
+
+<p>また、それ以外のサービス、職種でも募集していますので、興味のある方はぜひエントリしてください。</p>
+
+<p>http://www.paperboy.co.jp/recruit/</p>
+
+<p>例によって、採用された方にはドクターペッパーチェリーを差し上げます。最近追加購入したのでたっぷりあります。合い言葉は「ドクターペッパーチェリー飲みたい！」です。僕との面接時に必ず声に出して言ってください。</p>
+
+<p>[[Image(http://gyazo.com/37db61b8bd76e406987622d9863fbe5f.png)]]</p>
+
+<p>技術職じゃない方は僕との面接はありませんが、入社してお会いした時にでも声かけて下さい。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/07/KindleScreenShots/">KindleScreenShots</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-02-07T19:56:58+09:00" pubdate>Feb 7<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/02/07/KindleScreenShots/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近、4人目の子供も生まれ、子供たちが成長するにつれて家がどんどん手狭になっていくため、<a href="http://www.amazon.com/dp/B0015T963C">Kindle</a>（DX じゃない方）と <a href="http://scansnap.fujitsu.com/jp/product/s1500/index.html?userid=ss1500">ScanSnap S1500</a>、<a href="http://store.shopping.yahoo.co.jp/shop-nexstage/542.html">裁断機</a> を買って家の本を電子化していっています。</p>
+
+<p>で、Kindle にはスクリーンショットが撮れる機能があるため、どんな感じで Kindle 上で表示されるのか、様々な種類の本で示したいと思います。</p>
+
+<p>Kindle の購入を検討している方のご参考になれば幸いです。</p>
+
+<p>（画像はクリックすると大きいサイズで表示されます。）</p>
+
+<hr />
+
+<h1>Kindle Store から購入した本（Perl Best Practices）</h1>
+
+<p><a href="http://www.amazon.co.jp/dp/0596001738">Perl Best Practices</a> は既に持っているのですが、Damian Conway の直筆サイン入りなので裁断機でバラして電子化するわけにはいかず、Kindle Edition を買ってみました。</p>
+
+<p>文字サイズは3番目に小さい文字。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/perl01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/perl02.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/perl03.gif, 25%)]]</p>
+
+<p>コードとそうじゃない部分や、ボールドとそうじゃない部分がもっと区別がつきやすいといいなー、と思ったけど、それ以外は今のところ特に不満なし。</p>
+
+<hr />
+
+<h1>青空キンドルで生成された PDF</h1>
+
+<p><a href="http://a2k.aill.org/">青空キンドル</a> で青空文庫のテキストを PDF にしたものです。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/bottyan01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/bottyan02.gif, 25%)]]</p>
+
+<p>とても読みやすいです。</p>
+
+<hr />
+
+<p>ここから以下は、すべて ScanSnap で PDF 化したものです。</p>
+
+<hr />
+
+<h1>文庫本（麻雀放浪記（一） 青春編）</h1>
+
+<p>[[Image(http://mizzy.org/img/kindle/mahjong01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/mahjong02.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/mahjong03.gif, 25%)]]</p>
+
+<p>青空キンドルより文字は若干小さめ。でも許容できる範囲。</p>
+
+<hr />
+
+<h1>新書（北方謙三の『水滸伝』ノート）</h1>
+
+<p>[[Image(http://mizzy.org/img/kindle/suiko01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/suiko02.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/suiko03.gif, 25%)]]</p>
+
+<p>Kindle で読むとやや文字が小さいけど、許容範囲内。</p>
+
+<hr />
+
+<h1>フルカラーの新書（暗黒宇宙で銀河が生まれる）</h1>
+
+<p>[[Image(http://mizzy.org/img/kindle/ginga01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/ginga02.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/ginga03.gif, 25%)]]</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/ginga04.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/ginga05.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/ginga06.gif, 25%)]]</p>
+
+<p>フルカラーのものは残念な感じ。カラーページがモノクロになるのはしかたないにしても、ScanSnap でスキャン時の色設定を、カラーやグレースケールにすると、文字が薄くなってしまって読みにくい。設定の調整でもっと見やすくできるかもだけど、そんな苦労をするよりは、iPad でフルカラーで見る方がいいと思う。</p>
+
+<hr />
+
+<h1>単行本（楊令伝 十二 九天の章）</h1>
+
+<p>[[Image(http://mizzy.org/img/kindle/youreiden01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/youreiden02.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/youreiden03.gif, 25%)]]</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/youreiden04.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/youreiden05.gif, 25%)]]</p>
+
+<p>Kindle で読むとやや文字が小さいけど、許容範囲内。実際一冊読み切ってみたけど、特に目が疲れるということもなかった。</p>
+
+<hr />
+
+<h1>漫画（海皇紀 1, 寸法 17.2 x 11.6 x 1.8 cm）</h1>
+
+<p>漫画ではもっとも一般的なサイズと思われるもの。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/kaiouki01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/kaiouki02.gif, 25%)]]</p>
+
+<p>本編はグレースケールではなく白黒で取り込んでいるせいか、若干荒い感じ。でもそれほど読みづらくはない。</p>
+
+<hr />
+
+<h1>漫画（OL進化論 14, 寸法 20.8 x 14.8 x 1.6 cm）</h1>
+
+<p>四コマ漫画に多い、ちょっと大きめサイズの本。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/ol01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/ol02.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/ol03.gif, 25%)]]</p>
+
+<p>真ん中のカラーページを取り込んだモノは、やはり見づらい。白黒ページはかなり見やすい。</p>
+
+<hr />
+
+<h1>技術本（DNS &amp; BINDクックブック)</h1>
+
+<p>オライリー本。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/bind01.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/bind02.gif, 25%)]]
+[[Image(http://mizzy.org/img/kindle/bind03.gif, 25%)]]</p>
+
+<p>グレースケールでの取り込みは文字が薄くなり読みにくいので、白黒で取り込んでいるが、そのせいかグレーで網掛けになっている部分は見づらい感じ。また、6インチ Kindle では文字が小さくて読みにくい。これは DX じゃないと読む気になれない。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/01/26/Karesansui/">Karesansui</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-01-26T00:10:07+09:00" pubdate>Jan 26<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/01/26/Karesansui/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://karesansui-project.info/">Karesansui</a> が <a href="http://builder.japan.zdnet.com/news/story/0,3800079086,20407326,00.htm">KVM に対応というニュース</a> を見たので、試してみることにした。</p>
+
+<p><a href="http://karesansui-project.info/wiki/karesansui/Ja_tutorial">チュートリアル</a> では OS インストールから解説されていてとても親切なんだけれど、うちの既存環境は CentOS 5.3 から 5.4 にアップグレードして KVM 環境を整えたせいか、いくつかはまったポイントが。</p>
+
+<p>チュートリアルでは、kvm-qemu-img を削除しておけ、と書いてるんだけど、うちの環境では、以下の qemu と名のつくパッケージをすべて削除する必要があった。</p>
+
+<ul>
+<li>qemu</li>
+<li>qemu-system-sh4</li>
+<li>qemu-system-ppc</li>
+<li>qemu-system-arm</li>
+<li>qemu-system-x86</li>
+<li>qemu-system-cris</li>
+<li>qemu-system-sparc</li>
+<li>qemu-system-mips</li>
+<li>qemu-system-m68k</li>
+<li>qemu-user</li>
+<li>qemu-common</li>
+<li>qemu-img</li>
+</ul>
+
+
+<p>また、PyXML も別途インストールが必要だった。</p>
+
+<p>あとはチュートリアルの通りに、karesansui-install を実行して、画面に従ってインストール。設定も特にいらず、簡単。</p>
+
+<p>まだインストールしてブラウザでアクセスしただけなんだけど、気になった点がいくつか。</p>
+
+<ul>
+<li>既にある KVM ゲストが一覧に表示されない
+
+<ul>
+<li>おそらくどこか(/var/opt/karesansui/karesansui.db あたり？)にゲスト情報を持つことになってるんだろうけど、libvirt あたりつかって既存のゲストを自動認識、とかしてくれるといいな</li>
+</ul>
+</li>
+<li>同じ理由で、Cobbler + Koan でゲスト作成しても認識してくれなさそう</li>
+<li>リモートホストのゲスト管理
+
+<ul>
+<li><a href="http://karesansui-project.info/wiki/karesansui/Ja_howto_multi_host">複数ホスト構成にするには？</a> を見ると、すべてのホストに Karesansui をインストールすることで、一カ所でまとめて管理できるみたいだけど、Karesansui 入れるのは一カ所だけで、あとは libvirtd さえ動いてれば OK、とかできるといいなー。おそらく事情があってこうなってないんでしょうけど。</li>
+</ul>
+</li>
+</ul>
+
+
+<p>まあ、オープンソースなんでグダグダ言ってないでパッチ書け、ってとこですかね。とりあえず動作を追ってみるところからはじめてみます。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/01/22/PowerDNSTest/">PowerDNSTest</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-01-22T01:44:00+09:00" pubdate>Jan 22<span>nd</span>, 2010</time>
+        
+         | <a href="/blog/2010/01/22/PowerDNSTest/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[wiki:BindDlzVsPowerDns 前回のエントリ] のつづき。今度は BIND + DLZ との比較ではなく、PowerDNS 単体、実サーバ上でパフォーマンス測定したり、長時間負荷かけてみたり、更新かつキャッシュパージしながら参照したり、といったテストをした時の記録。こちらもやはり2年ちょいぐらい前に作ったモノ。</p>
+
+<hr />
+
+<p>[[PageOutline(2-4, 目次, inline)]]</p>
+
+<hr />
+
+<h1>テスト環境について</h1>
+
+<ul>
+<li>DNSサーバ
+
+<ul>
+<li>AMD Athlon(tm) 64 X2 Dual Core Processor 4600+</li>
+<li>2GB メモリ</li>
+</ul>
+</li>
+<li>MySQLサーバ
+
+<ul>
+<li>AMD Athlon(tm) 64 X2 Dual Core Processor 4600+</li>
+<li>2GB メモリ</li>
+</ul>
+</li>
+<li>テスト用 DNS クライアント
+
+<ul>
+<li>AMD Athlon(tm) 64 X2 Dual Core Processor 4600+</li>
+<li>2GB メモリ</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<h1>テストデータの投入</h1>
+
+<h2>テスト用ゾーンデータを SQL 形式で準備</h2>
+
+<p>具体的なデータは大人の事情で省略。ゾーン数が26万、レコード数が280万ほど。バックエンドが MySQL なので、SQL 形式でデータを準備。</p>
+
+<h2>SQL データを MySQL へ投入</h2>
+
+<pre><code>$ time mysql --disable-pager -uroot -f pdns &lt; zone.sql 2&gt; err.log
+real    54m56.423s
+user    0m30.502s
+sys     0m32.974s
+</code></pre>
+
+<p>投入後のレコード数を見てみる。</p>
+
+<pre><code>mysql&gt; select count(*) from domains;
++----------+
+| count(*) |
++----------+
+|   263238 |
++----------+
+1 row in set (0.14 sec)
+
+mysql&gt; select count(*) from records;
++----------+
+| count(*) |
++----------+
+|  2798571 |
++----------+
+</code></pre>
+
+<p>データベースディレクトリのサイズ。</p>
+
+<pre><code># cd /var/lib/mysql
+# du -sk
+726304  .
+</code></pre>
+
+<hr />
+
+<h1>queryperf 用データ生成</h1>
+
+<p>以下のようなスクリプトで、BIND ゾーンファイルからデータファイルを生成。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Path::Class;
+
+my $dir = shift or die "usage : $0 &lt;dir&gt;\n";
+
+dir($dir)-&gt;recurse(
+    callback =&gt; sub {
+        my $file = shift;
+        return if $file !~ m{.+/([^/]+)\.zone$};
+        my $zone = $1;
+
+        open my $fh, '&lt;', $file or die $!;
+        while ( &lt;$fh&gt; ) {
+            if ( $_ =~ /([^\s]*)\s+(A|MX|CNAME)\s+(.+)$/ ) {
+                my $domain = $1 ? "$1.$zone" :  $zone;
+                my $type   = $2;
+                my $value  = $3;
+
+                $value =~ s/^\d+\s+// if $type eq 'MX';
+
+                print "$domain $type\n";
+            }
+        }
+    }
+);
+
+exit;
+</code></pre>
+
+<p>データファイルの内容は、こんな感じ。これが 2,517,990 行ある。</p>
+
+<pre><code>example.com A
+example.com MX
+www.example.com A
+ftp.example.com
+example.jp A
+example.jp MX
+www.example.jp A
+ftp.example.jp
+...
+</code></pre>
+
+<hr />
+
+<h1>参照負荷/パフォーマンステスト</h1>
+
+<h2>負荷のかけかた/パフォーマンス測定方法</h2>
+
+<p>負荷をかけるのとパフォーマンスを測定するのは、BIND 付属の queryperf コマンドを利用。queryperf コマンドは、上記で生成した大量負荷用データファイル内のレコードに対するクエリを、上から順番に実行していく。</p>
+
+<h2>負荷をかける前のプロセスの状態</h2>
+
+<p>起動直後（何もキャッシュしていない状態）の pdns_server プロセスの状態。</p>
+
+<pre><code>$ ps aux
+USER       PID %CPU %MEM   VSZ   RSS   TTY      STAT START   TIME COMMAND
+root     31715  0.0  0.0 16556 1212 ?        Ssl  11:03   0:00 /usr/local/sbin/pdns_server --daemon --guardian=yes
+root     31717  0.2  0.1 88688 2660 ?        Sl   11:03   0:00 /usr/local/sbin/pdns_server-instance --daemon --guardian=yes
+</code></pre>
+
+<ul>
+<li>実際に処理を担当し、プロセスをキャッシュする（と思われる）子プロセスの仮想メモリサイズは約 90M。</li>
+</ul>
+
+
+<h2>大量/長時間負荷をかけた場合の安定度</h2>
+
+<p>5時間にわたって負荷をかけつづけた結果。</p>
+
+<pre><code>$ queryperf -s 192.168.50.43 -d queryperf.dat -l 19800
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 192.168.50.43)
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       19800 seconds
+  Ran through file:     43 times
+
+  Queries sent:         110458827 queries
+  Queries completed:    110454675 queries
+  Queries lost:         4152 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              0.820253 sec
+  RTT min:              0.000053 sec
+  RTT average:          0.003381 sec
+  RTT std deviation:    0.045216 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 27 02:11:58 2007
+  Finished at:          Thu Sep 27 07:42:01 2007
+  Ran for:              19803.489895 seconds
+
+  Queries per second:   5577.535858 qps
+</code></pre>
+
+<p>この時の pdns_server プロセスの仮想メモリサイズ。</p>
+
+<pre><code>USER       PID %CPU %MEM   VSZ   RSS   TTY      STAT START   TIME COMMAND
+root     28130  0.0  0.0 15464  1212   ?        Ssl  02:11   0:00 /usr/local/sbin/pdns_server --daemon --guardian=yes
+root     28132 65.2 20.7 550480 427176 ?     Sl   02:11 329:49 /usr/local/sbin/pdns_server-instance --daemon --guardian=yes
+</code></pre>
+
+<ul>
+<li>この状態で全レコードをキャッシュしている模様（MySQLの負荷がまったくない状態になってる）</li>
+<li>200万以上のレコードをすべてキャッシュしても、pdns_serverプロセスの仮想メモリサイズは 550M ほど。</li>
+<li>5577クエリ/秒を5時間続けても、安定して動いている。</li>
+<li>大量クエリ発行中に、別のところから dig を叩いても、すぐにレスポンスが返る。</li>
+<li>結論としては、5000クエリ/秒のパフォーマンスを長時間安定して出すことができている、と言えそう。</li>
+</ul>
+
+
+<h2>1件のレコードのみを繰り返し検索した場合のパフォーマンス（ローカル）</h2>
+
+<p>example.jp の A レコードを queryperf で localhost に対してひたすら問い合わせ。メモリには1件だけキャッシュされた状態となる。</p>
+
+<p>これにより [wiki:BindDlzVsPowerDns VM環境でのテスト] と比較してみる。</p>
+
+<pre><code>$ queryperf -s localhost -d 1record.dat -l 10
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 127.0.0.1)
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       10 seconds
+  Ran through file:     523722 times
+
+  Queries sent:         523723 queries
+  Queries completed:    523723 queries
+  Queries lost:         0 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              0.000850 sec
+  RTT min:              0.000075 sec
+  RTT average:          0.000348 sec
+  RTT std deviation:    0.000006 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 27 12:34:52 2007
+  Finished at:          Thu Sep 27 12:35:02 2007
+  Ran for:              10.000307 seconds
+
+  Queries per second:   52370.692220 qps
+</code></pre>
+
+<p>VM環境でのテストでは、約4000クエリ/秒なので、10倍以上のパフォーマンス。</p>
+
+<h2>1件のレコードのみを繰り返し検索した場合のパフォーマンス（リモート）</h2>
+
+<p>ローカルの場合と同じく、example.jp の A レコードを今度はネットワーク越しにひたすら参照して比較してみる。</p>
+
+<pre><code>$ queryperf -s 192.168.50.43 -d 1record.dat -l 10
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 192.168.50.43)
+[Timeout] Query timed out: msg id 18924
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       10 seconds
+  Ran through file:     390784 times
+
+  Queries sent:         390785 queries
+  Queries completed:    390784 queries
+  Queries lost:         1 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              1.677650 sec
+  RTT min:              0.000075 sec
+  RTT average:          0.000454 sec
+  RTT std deviation:    0.002683 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 27 12:38:04 2007
+  Finished at:          Thu Sep 27 12:38:16 2007
+  Ran for:              12.191577 seconds
+
+  Queries per second:   32053.605534 qps
+</code></pre>
+
+<p>ローカルに比べると、32053 / 52370 = 約60% ほどにパフォーマンスがおちる。</p>
+
+<h2>全レコードをキャッシュした状態でのパフォーマンス</h2>
+
+<p>長時間クエリを走らせて、すべてのクエリをキャッシュさせた状態でパフォーマンスを計測。</p>
+
+<pre><code>$ queryperf -s 192.168.50.43 -d ./queryperf.dat -l 10
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 192.168.50.43)
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       10 seconds
+  Ran through file:     0 times
+
+  Queries sent:         60000 queries
+  Queries completed:    60000 queries
+  Queries lost:         0 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              0.734255 sec
+  RTT min:              0.000214 sec
+  RTT average:          0.003470 sec
+  RTT std deviation:    0.046068 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 27 12:22:15 2007
+  Finished at:          Thu Sep 27 12:22:25 2007
+  Ran for:              10.448189 seconds
+
+  Queries per second:   5742.621999 qps
+</code></pre>
+
+<p>『1件のレコードのみを繰り返し検索した場合のパフォーマンス（リモート）』と比較して、5742 / 32053 = 17% ほどにパフォーマンスが落ちる。（約1/6）</p>
+
+<p>データ量が 2,500,000 倍で、パフォーマンスが 1/6 は数値としてはかなり優秀だと思う。これについて軽く考察してみる。</p>
+
+<p>例えば、大量データの探索によく使われている二分木構造でレコードが管理されていると仮定した場合、250万レコード登録されていると、目的のレコードを探し当てるまでのツリーの探索回数は、最大で22回、平均で20回となる。</p>
+
+<p>したがって、バイナリツリーでレコードが管理されていると想定した場合には、レコード数が 1 から 2,500,000 に増えれば、パフォーマンスは理論的には 1/20 に落ちる、ということになる。これが 1/6 程度に抑えられているので、大量にキャッシュを保持した状態でも、かなり高いパフォーマンスを実現している、と言えるのではないかと。</p>
+
+<p>また、同様のパフォーマンステストをネットワーク越しではなくローカルで実行してみると、以下の様になった。</p>
+
+<pre><code>$ queryperf -s localhost -d queryperf.dat -l 10
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 127.0.0.1)
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       10 seconds
+  Ran through file:     0 times
+
+  Queries sent:         60005 queries
+  Queries completed:    60005 queries
+  Queries lost:         0 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              0.738513 sec
+  RTT min:              0.000142 sec
+  RTT average:          0.003365 sec
+  RTT std deviation:    0.045920 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 27 13:47:33 2007
+  Finished at:          Thu Sep 27 13:47:43 2007
+  Ran for:              10.134120 seconds
+
+  Queries per second:   5921.086389 qps
+</code></pre>
+
+<p>これを『1件のレコードのみを繰り返し検索した場合のパフォーマンス（ローカル）』と比較してみる。こちらの方がネットワークのボトルネックを考慮しなくて良いので、より正確なパフォーマンス劣化具合が見られる。</p>
+
+<p>ローカルの場合には、5930 / 52370 = 約 1/10 となる。これでもなお理論値の 1/20 よりは高いパフォーマンスが出ている。</p>
+
+<h2>全レコードの半分ほどをキャッシュした状態でのパフォーマンス</h2>
+
+<p>参考までに、キャッシュで保持しているデータを半分ほどにした時のパフォーマンスを見るために、pdns_server プロセスの仮想メモリサイズが 300M ほどの状態でパフォーマンスを測定してみた。</p>
+
+<pre><code>$ queryperf -s 192.168.50.43 -d ./mizzy/queryperf.dat -l 10
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 192.168.50.43)
+[Timeout] Query timed out: msg id 53362
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       10 seconds
+  Ran through file:     0 times
+
+  Queries sent:         92879 queries
+  Queries completed:    92878 queries
+  Queries lost:         1 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              0.428813 sec
+  RTT min:              0.000076 sec
+  RTT average:          0.002126 sec
+  RTT std deviation:    0.025852 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 27 12:28:24 2007
+  Finished at:          Thu Sep 27 12:28:35 2007
+  Ran for:              10.894836 seconds
+
+  Queries per second:   8524.956227 qps
+</code></pre>
+
+<p>当然だけどパフォーマンスは上がってる。</p>
+
+<hr />
+
+<h1>大量更新テスト</h1>
+
+<p>以下の内容を実行するテスト用スクリプトを作成。</p>
+
+<ol>
+<li>queryperf 用データファイルからレコードを1件読み取る</li>
+<li>対象レコードを DNS 参照してキャッシュに載せる。</li>
+<li>対象レコードの変更を MySQL に対して行う。</li>
+<li>対象レコードを DNS 参照する。この時点ではキャッシュのクリアを行っていないため、変更前の値が返ってくることを確認する。</li>
+<li>ssh 経由で「pdns_control purge レコード名」を実行して、対象レコードのキャッシュをクリア、</li>
+<li>対象レコードを DNS 参照する。キャッシュがクリアされているはずなので、変更後の値が返ってくることを確認する。</li>
+<li>最初に戻って繰り返す。</li>
+</ol>
+
+
+<p>これを queryperf で参照系の負荷をかけながら行う。</p>
+
+<p>スクリプトの内容は以下の通り。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use DBI;
+use Net::DNS;
+use Test::More qw( no_plan );
+
+#my $file  = shift;
+my $file = 'queryperf.dat';
+
+my $limit = 1000;
+
+my $dsn      = 'DBI:mysql:pdns:192.168.50.44';
+my $user     = 'pdns';
+my $password = 'pdns';
+my $dbh      = DBI-&gt;connect($dsn, $user, $password);
+
+my %method_hash = (
+    A     =&gt; 'address',
+    MX    =&gt; 'exchange',
+    CNAME =&gt; 'cname',
+);
+
+my $count    = 0;
+my $resolver &gt; [ '192.168.50.43' ] );
+
+srand time;
+
+open my $fh, '&lt;', $file or die $!;
+while ( &lt;$fh&gt; ) {
+
+    my ( $domain, $type ) ~ /^([^\s]+)\s+(A|MX|CNAME)/ );
+    $type ||= 'A';
+
+    # DNS参照してキャッシュに載せる
+    my $res = $resolver-&gt;query($domain, $type);
+    my $method = $method_hash{$type};
+    my $answer = ($res-&gt;answer)[0]-&gt;$method;
+
+    # DBを書き換える
+    my $sth    ? WHERE name ?');
+    my $update = generate_random_value($domain, $type);
+    $sth-&gt;execute($update, $domain, $type);
+
+    # DNS参照して、古いデータが返ってくることを確認する
+    $res = $resolver-&gt;query($domain, $type);
+    is( ($res-&gt;answer)[0]-&gt;$method, $answer);
+
+    # キャッシュをpurgeする
+    system "ssh 192.168.50.43 sudo pdns_control purge $domain";
+
+    # DNS参照して、新しいデータが返ってくることを確認する
+    $res = $resolver-&gt;query($domain, $type);
+    is( ($res-&gt;answer)[0]-&gt;$method, $update);
+
+    last if $count &gt; $limit;
+    $count++;
+}
+
+close $fh;
+
+exit;
+
+sub generate_random_value {
+    my $domain = shift;
+    my $type   = shift;
+
+    if ( $type eq 'A' ) {
+        my $a1 = int rand 255 + 1;
+        my $a2 = int rand 255 + 1;
+        my $a3 = int rand 255 + 1;
+        my $a4 = int rand 255 + 1;
+
+        return "$a1.$a2.$a3.$a4";
+    }
+    else {
+        return crypt( ( rand 100000 ), 'AA' ) . ".$domain";
+    }
+}
+</code></pre>
+
+<p>queryperf で参照負荷をかけながら1000 回ループを繰り返してみたところ、キャッシュのクリアができずに古いレコードが返ってくる、というケースは 0 件だった。ただし、レコード変更後に、キャッシュをクリアする前に新しいレコードが返ってくる、というケースが 20 件あった。おそらく負荷等の問題でうまくキャッシュに載らなかったためと思われるが、この場合でも新しいレコードが取得できていたので、特に問題はないと判断。</p>
+
+<p>というわけで、レコードの更新とキャッシュのクリアはまったく問題なし。（後日10,000回ループを繰り返したが、こちらも問題なかった。）</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/5/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/3/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

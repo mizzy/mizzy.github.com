@@ -1,0 +1,1185 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="!html &lt;a href="http://www.amazon.co.jp/dp/4774145823"&gt;&lt;img src="http://image.gihyo.co.jp/assets/images/cover/2011/9784774145822.jpg" /&gt;& &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/3">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/04/05/NagiosBook/">NagiosBook</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-04-05T01:03:02+09:00" pubdate>Apr 5<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/04/05/NagiosBook/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>!html</h1>
+
+<pre><code>&lt;a href="http://www.amazon.co.jp/dp/4774145823"&gt;&lt;img src="http://image.gihyo.co.jp/assets/images/cover/2011/9784774145822.jpg" /&gt;&lt;/a&gt;
+</code></pre>
+
+<p>技術評論社様よりご献本頂きました。</p>
+
+<p>タイトルの通り、監視ソフトウェア <a href="http://www.nagios.org/">Nagios</a> のリファレンス本です。日本語の Nagios に関する書籍としては、<a href="http://www.amazon.co.jp/dp/4839920168">Nagios 2.0オープンソースではじめるシステム&amp;ネットワーク監視</a> につづいて2冊目ですかね。（著者は同じ方のようです。）</p>
+
+<p>本書の目次は以下のようになっています。</p>
+
+<ul>
+<li>第1章 Nagiosクイックスタート</li>
+<li>第2章 Nagios標準プラグイン</li>
+<li>第3章 メイン設定ファイル</li>
+<li>第4章 CGI設定ファイル</li>
+<li>第5章 オブジェクト設定ファイル</li>
+<li>Appendix A Nagiosと周辺ツールの導入</li>
+<li>Appendix B リソース設定ファイルとNagios標準マクロの概要</li>
+</ul>
+
+
+<p>同じ Software Design plus シリーズの監視ソフトウェアを扱った書籍である [wiki:ZabbixBook Zabbix統合監視「実践」入門 〜障害通知、傾向分析、可視化による省力運用〜] は、タイトルの通り入門書という感じで、はじめて Zabbix に触れる人を対象に、インストールから設定まで丁寧に書かれてるのに対し、こちらは「リファレンス」の名の通り、どちらかというと既に Nagios を利用している人向けのリファレンスとなっています。</p>
+
+<p>第1章ではざっくりと Nagios とは何かの説明がされてますが、第2章以降はすべてプラグインや設定ファイル、設定項目ひとつひとつに関する説明がひたすら続いていきます。（Appendix A でインストールに関する説明があります。）</p>
+
+<p>実際にサービス運用監視で Nagios を利用している人が手元に置いておいて、あれ、このプラグインのパラメータって何をどういう風に渡すんだっけ、とか、この設定項目いじると何がどうなるんだっけ、などといった時にパラパラめくったりするのに良さそうですね。</p>
+
+<p>とは言うものの、<a href="http://www.paperboy.co.jp/">ペパボ</a> では Nagios 使ってるんですが、自分はサービスの運用監視には直接関わっていないため、Nagios にほとんど触れることがないんで、宝の持ち腐れですね。（監視シフトに合わせてウェブ上で timeperiods.cfg を設定するようなツールを作ったことがあるぐらいですね。） 良い機会なので、自宅サーバに Nagios 導入してみようかな。</p>
+
+<p>あとこの本とは関係ないですが、Nagios といえば度々話題になるのは、どう発音するのか、ですよね。FAQ へのリンク貼っておきます。</p>
+
+<ul>
+<li><a href="http://support.nagios.com/knowledgebase/faqs/index.php?option=com_content&amp;view=article&amp;id=52&amp;catid=35&amp;faq_id=3&amp;expand=false&amp;showdesc=true">How do you pronounce Nagios?</a></li>
+<li><a href="http://community.nagios.org/2007/02/20/nagios-pronunciation/">Nagios pronunciation</a></li>
+</ul>
+
+
+<p>2番目のエントリには以前音声ファイルがあった気がするんですが、今はないみたいですね。（たしか「<em>ナ</em>ギオス」と発音してました。「ナ」にアクセント。）</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/03/02/I4PC/">I4PC</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-03-02T08:47:20+09:00" pubdate>Mar 2<span>nd</span>, 2011</time>
+        
+         | <a href="/blog/2011/03/02/I4PC/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[[Image(http://distillery.s3.amazonaws.com/media/2011/02/27/719cf326faad469c8a46d4e0148091f1_6.jpg)]]</p>
+
+<p>[wiki:InstagramForPC Instagram for PC について] で書いていたウェブアプリですが、Instagram 公式 API が使えるようになったためようやく公開できるようになりました。（上の画像はデザインしてくださった <a href="http://daiskip.com">daiskip 先生</a> が撮影したもの。）名前を I4PC にあらためて公開しています。</p>
+
+<p><a href="http://www.i4pc.jp/">I4PC</a></p>
+
+<p>つくった人については、 <a href="http://www.i4pc.jp/about">About ページ</a> をご参照ください。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/02/23/TeXPageFilledWithImage/">TeXPageFilledWithImage</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-02-23T23:45:53+09:00" pubdate>Feb 23<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/02/23/TeXPageFilledWithImage/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>TeX で表紙画像的なものが作りたくて色々調べてたら、<a href="https://groups.google.com/group/fj.comp.texhax/browse_thread/thread/0be2662c944adf8f/6a4fdf56cfaeecaa?hl=ja&amp;pli=1">Google グループで見つけた</a> のでメモ。</p>
+
+<pre><code>#!tex
+\documentclass[a4paper]{jsbook}
+\usepackage[dvipdfmx,hiresbb]{graphicx}
+\begin{document}
+
+\enlargethispage{\paperwidth}
+\thispagestyle{empty}
+\vspace*{-1truein}
+\vspace*{-\topmargin}
+\vspace*{-\headheight}
+\vspace*{-\headsep}
+\vspace*{-\topskip}
+\noindent\hspace*{-1in}\hspace*{-\oddsidemargin}
+\includegraphics[width=\paperwidth,height=\paperheight]{cover_image.png}
+
+\end{document}
+</code></pre>
+
+<p>いくつか注意が必要で、</p>
+
+<pre><code>#!tex
+\enlargethispage{\paperwidth}
+</code></pre>
+
+<p>は、これがないと、1ページ目を画像いっぱいのページにしようと思っても空白ページになってしまい、画像いっぱいのページは2ページ目になってしまう。また、</p>
+
+<pre><code>#!tex
+\noindent\hspace*{-1in}\hspace*{-\oddsidemargin}
+</code></pre>
+
+<p>は奇数ページの場合なので、偶数ページの場合は、</p>
+
+<pre><code>#!tex
+\noindent\hspace*{-1in}\hspace*{-\evensidemargin}
+</code></pre>
+
+<p>とする。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/02/17/JSONParserWithParseYapp/">JSONParserWithParseYapp</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-02-17T00:28:16+09:00" pubdate>Feb 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/02/17/JSONParserWithParseYapp/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>構文解析をちゃんと学ばないとなー、と前々から思いつつしばらく放置だったけど、なんとなくやる気になったのでやってみる。</p>
+
+<p><a href="http://twitter.com/zigorou">ZIGOROu</a> さんの <a href="http://d.hatena.ne.jp/ZIGOROu/20080422/1208849930">Parse::Yapp ヨチヨチ歩き</a> で <a href="http://search.cpan.org/~fdesar/Parse-Yapp/lib/Parse/Yapp.pm">Parse::Yapp</a> の使い方を学びつつ、<a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> でパーサの書き方の基礎がなんとなくわかった気になり、でも実際は自分で書いてみなきゃわからん、ってことで、<a href="http://twitter.com/hakobe">hakobe</a> さんの <a href="http://d.hatena.ne.jp/hakobe932/20090130/1233327296">Parse::RecDescentでJSONをパース</a> を参考に、Parse::Yapp で JSON パーサを書いてみることにした。</p>
+
+<p>パーサ＋スキャナは以下のような感じ。</p>
+
+<pre><code>#!perl
+%{
+use strict;
+use warnings;
+%}
+%%
+JSON       : value
+           ;
+value      : atom
+           | number
+           | string
+           | '[' array             { return $_[2] }
+           | '{' object            { return $_[2] }
+           ;
+array      : ']'                   { return [] }
+           | ',' ']'               { return [] }
+           | element array_cdr     { unshift @{$_[2]}, $_[1];return $_[2] }
+           ;
+array_cdr  : ']'                   { return [] }
+           | ',' ']'               { return [] }
+           | ',' element array_cdr { unshift @{$_[3]}, $_[2];return $_[3] }
+           ;
+element    : value
+           ;
+object     : '}'                   { return {} }
+           | ',' '}'               { return {} }
+           | member object_cdr     { return { %{ $_[2] }, %{ $_[1] } } }
+           ;
+object_cdr : '}'                   { return {} }
+           | ',' '}'               { return {} }
+           | ',' member object_cdr { return { %{ $_[3] }, %{ $_[2] } } }
+           ;
+member     : key ':' value         { return { $_[1] =&gt; $_[3] } }
+           ;
+key        : string
+           | identifier
+           ;
+%%
+sub yyerror {}
+
+sub yylex {
+    my ( $self ) = @_;
+    my $number = qr/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]\d+)?/;
+    my $double_quoted_string = qr/
+            ^"([^\x00-\x1f\"\\]*
+            (?:\\(?:[\"\\\/bfnrt]|u[0-9a-fA-F]{4})
+            [^\x00-\x1f\"\\]*)*)"
+        /xms;
+    my $single_quoted_string = qr/
+            ^'([^\x00-\x1f\'\\]*
+            (?:\\(?:[\'\\\/bfnrt]|u[0-9a-fA-F]{4})
+            [^\x00-\x1f\'\\]*)*)'
+        /xms;
+
+    for ( $self-&gt;YYData-&gt;{INPUT} ) {
+        s|\s+||;
+        s|^($number)||                and return ('number', $1);
+        s/^(true|false|null)//        and return ('atom', $1);
+        s|^([_a-zA-Z][_a-zA-Z0-9]*)|| and return ('identifier', $1);
+        s|$double_quoted_string||     and return ('string', $1);
+        s|$single_quoted_string||     and return ('string', $1);
+        s|^(.)||                      and return ($1, $1);
+    }
+    return ('', undef);
+}
+
+sub run {
+    my $self = shift;
+    return $self-&gt;YYParse( yylex =&gt; \&amp;yylex, yyerror =&gt; \&amp;yyerror );
+}
+</code></pre>
+
+<p>こいつを yapp コマンドにかけるとパーサモジュールができる。</p>
+
+<pre><code>#!sh
+$ yapp -m JSONParser json.yp
+</code></pre>
+
+<p>このモジュールを使ってパースしてみる。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Test::More qw(no_plan);
+use JSONParser;
+
+my $parser = JSONParser-&gt;new;
+$parser-&gt;YYData-&gt;{INPUT} = q{[
+        'Mercury',
+        "Venus",
+        ["Earth", ['Moon']],
+        ['Mars', ["Phobos", 'Deimos']],
+        ['Jupiter',["Io", 'Europa', "Ganymede", 'Callisto']]
+]};
+my $result = $parser-&gt;run;
+
+is_deeply($result, ['Mercury', "Venus", ["Earth", ['Moon']], ['Mars', ["Phobos", 'Deimos']], ['Jupiter',["Io", 'Europa', "Ganymede", 'Callisto']]]);
+</code></pre>
+
+<p>うん、なんとなくわかってきた気がする。</p>
+
+<p><a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> の中で「客観的に見てもこの分野に関しては一番わかりやすい本」とオススメされていた<a href="http://www.amazon.co.jp/dp/4756137091">Rubyを256倍使うための本 無道編</a> も買ってみた。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/02/11/PtexLiveOnCentOS5/">PtexLiveOnCentOS5</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-02-11T11:31:55+09:00" pubdate>Feb 11<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/02/11/PtexLiveOnCentOS5/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ptexlive のビルドに必要なパッケージインストール用 Puppet マニフェスト</p>
+
+<pre><code>package {
+  'xz':
+    ensure =&gt; present;
+  'libXt-devel':
+    ensure =&gt; present;
+  'libXaw-devel':
+    ensure =&gt; present;
+  'gcc':
+    ensure =&gt; present;
+  'make':
+    ensure =&gt; present;
+  'gcc-c++':
+    ensure =&gt; present;
+  'fontconfig-devel':
+    ensure =&gt; present;
+  'ghostscript':
+    ensure =&gt; present;
+}
+</code></pre>
+
+<p>ビルド＆インストール用シェルスクリプト</p>
+
+<pre><code>#!sh
+#!/bin/sh
+
+wget ftp://tug.org/historic/systems/texlive/2009/texlive2009-20091107.iso.xz
+unxz texlive2009-20091107.iso.xz
+
+mount -o loop texlive2009-20091107.iso /mnt
+
+cd /mnt
+
+./install-tl
+
+cd
+
+wget http://tutimura.ath.cx/~nob/tex/ptexlive/ptexlive-20100711.tar.gz
+tar zxvf ptexlive-20100711.tar.gz
+
+cd ptexlive-20100711
+cp ptexlive.sample ptexlive.cfg
+
+sed -i 's!ISO_DIR=/media/TeXLive2009!ISO_DIR=/mnt!g' ptexlive.cfg
+sed -i 's!# conf_option --without-x!conf_option --without-x!g' ptexlive.cfg
+sed -i 's!# conf_option --disable-xdvik!conf_option --disable-xdvik!g' ptexlive.cfg
+sed -i 's!# conf_option --disable-pxdvik!conf_option --disable-pxdvik!g' ptexlive.cfg
+sed -i 's!# XDVI=echo!XDVI=echo!g' ptexlive.cfg
+
+sed -i 's/grep "recursive calls"/grep "Loop in Pages tree"/g' 8test.sh
+
+yes yes | make
+
+make install
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/12/14/InstagramForPC/">InstagramForPC</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-12-14T21:41:45+09:00" pubdate>Dec 14<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/12/14/InstagramForPC/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://instagrampc.appspot.com/">Instagram for PC</a> というものを <a href="http://daiskip.com/">daiskip さん</a> と一緒につくって、あまりおおっぴらにもせず、かといって制限かけるわけでもなく、主にペパボの人たちに使ってもらってたんですが、他の人たちにも捕捉されて tweet されたりなんかしてるので、これについて書いときます。</p>
+
+<p>Instagram for PC は、もちろん言うまでもなく <a href="http://instagr.am/">Instagram</a> の PC 版で、遅い3G回線や小さい iPhone のディスプレイで見るよりも、速い回線やPCの大きな画面で見たいな、ってことでつくりはじめました。画面こんな感じです。</p>
+
+<p>[[Image(http://distillery.s3.amazonaws.com/media/2010/10/23/879c0bd9444e4e00a60469d99b777f13_6.jpg)]]</p>
+
+<p>Google App Engine 上で動かしてるんですが、tweet されたことでアクセスが増え、Over Quota になってアクセスできない状態になってたので、とりあえずはアクセスできるアカウントを制限した形で現在は公開しています。ごめんなさい。</p>
+
+<p>とは言うものの、好意的な反応をしてくださってる tweet が多く、できれば制限なしで公開したいと思ってます。ただ、なにぶん非公開な API を叩いてるため、本家の許可無く公開するのはよろしくないため、まずは本家とコンタクトをとって許可を得たいと思います。</p>
+
+<p>パスワードについて懸念されてる方がいますが、こちらで保存はしてないと言っても、信じない人は信じないでしょうし、気になる人は使わないでください、としかこちらとしては言いようがないですね。Instagram が oAuth なんかに対応してくれるといいんですけどね。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/07/13/SystemTap01/">SystemTap01</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-07-13T02:44:59+09:00" pubdate>Jul 13<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/07/13/SystemTap01/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[wiki:SystemTap00 SystemTap メモ #0] の続き。今回は <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">SystemTap Beginners Guide</a> の <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/scripts.html">3.2. SystemTap Scripts</a> から抜粋。</p>
+
+<hr />
+
+<h1>スクリプトのフォーマット</h1>
+
+<p>SystemTap スクリプトのフォーマットはこんな感じ。</p>
+
+<pre><code>probe event { statements }
+</code></pre>
+
+<p>なので、[wiki:SystemTap00 前回] 出てきた、</p>
+
+<pre><code>$ stap -v -e 'probe vfs.read { printf("read performed\n"); exit() }'
+</code></pre>
+
+<p>をフォーマットと照らし合わせて読み解くと、<em>「vfs.read イベントが発生したら read performed と表示して exit する」</em>といった意味になる。</p>
+
+<p><em>{ statements }<em>&#8217; の部分は &#8221;&#8217;handler&#8221;&#8217; と呼ばれ、&#8221;&#8217;event&#8221;&#8217; と それに対応した &#8221;&#8217;handler&#8221;&#8217; をあわせて &#8217;</em>probe</em> と呼ぶらしい。</p>
+
+<p>スクリプトの中では関数を定義して呼び出すこともできる。</p>
+
+<pre><code>function function_name(arguments) { statements }
+
+probe event { function_name(arguments) }
+</code></pre>
+
+<hr />
+
+<h1>イベント</h1>
+
+<p>イベントは同期イベントと非同期イベントに分かれる。</p>
+
+<h2>同期イベント</h2>
+
+<p>同期イベントはカーネルコード中の特定の場所で命令が実行された場合に発生するイベント。（非同期イベントは後で説明するが、命令実行とは関係なしに発生するイベント。）</p>
+
+<p>同期イベントには以下のようなものがある。</p>
+
+<p><em>syscall.<em>&#8221;&#8221;&#8221;system_call</em></em></p>
+
+<p><em>system_call&#8221; というシステムコールの呼び始めに発生するイベント。呼び終わりに発生するイベントは syscall.&#8221;system_call</em>.return 。close システムコールの呼び始めに発生するイベントは syscall.close、呼び終わりに発生するイベントは syscall.close.return 。</p>
+
+<p><em>vfs.<em>&#8221;&#8221;&#8221;file_operation</em></em></p>
+
+<p>VFS に対して <em>file_operation</em> の呼び始めに発生するイベント。syscall と同様、 .return を付加すると、呼び終わりイベントとなる。</p>
+
+<p><em>kernel.function(&#8221;<em>&#8221;&#8221;&#8221;function&#8221;&#8221;&#8221;</em>&#8221;)</em></p>
+
+<p>カーネルファンクション <em>function</em> の呼び始めに発生するイベント。例えば <em>kernel.function(&#8220;sys_open&#8221;)</em> は sys_open の呼び始めに発生するイベント。.return がつくと呼び終わりイベント。ワイルドカードとして * がつかえる。また、以下のように特定のソースファイル中のファンクションも指定できる。</p>
+
+<pre><code>probe kernel.function("*@net/socket.c") { }
+probe kernel.function("*@net/socket.c").return { }
+</code></pre>
+
+<p><em>kernel.trace(&#8221;<em>&#8221;&#8221;&#8221;tracepoint&#8221;&#8221;&#8221;</em>&#8221;)</em></p>
+
+<p>カーネル内の特定のトレースポイントで発生するイベント。例えば、<em>kernel.trace(&#8220;kfree_skb&#8221;)</em> だと、カーネル内のネットワークバッファが解放された時にイベントが発生する。</p>
+
+<p><em>module(&#8221;<em>&#8221;&#8221;&#8221;module&#8221;&#8221;&#8221;&#8221;&#8221;).function(&#8220;&#8221;&#8221;&#8221;&#8221;function&#8221;&#8221;&#8221;</em>&#8221;)</em></p>
+
+<p>モジュール内の特定のファンクションが呼ばれた場合に発生するイベント。</p>
+
+<pre><code>probe module("ext3").function("*") { }
+probe module("ext3").function("*").return { }
+</code></pre>
+
+<p>この例だと、前者は ext3 モジュール内のすべてのファンクションの呼び始めに発生するイベント、後者は呼び終わりに発生するイベント、となる。</p>
+
+<h2>非同期イベント</h2>
+
+<p>非同期イベントはカーネルコード内の命令実行とは無関係に発生するイベント。以下のようなイベントがある。</p>
+
+<p><em>begin</em></p>
+
+<p>SystemTap セッションの開始時（SystemTap スクリプトの実行開始時）に発生するイベント。</p>
+
+<p><em>end</em></p>
+
+<p>SystemTap セッションの終了時に発生するイベント。</p>
+
+<p><em>timer events</em></p>
+
+<p>タイマーイベント。以下の例では4秒ごとにイベントを発生させる。</p>
+
+<pre><code>probe timer.s(4)
+{
+  printf("hello world\n")
+}
+</code></pre>
+
+<p>時間単位は上の例の秒以外にも、以下のように指定できる。</p>
+
+<ul>
+<li>timer.ms(<em>milliseconds</em>)</li>
+<li>timer.us(<em>microseconds</em>)</li>
+<li>timer.ns(<em>nanoseconds</em>)</li>
+<li>timer.hz(<em>hertz</em>)</li>
+<li>timer.jiffies(<em>jiffies</em>)</li>
+</ul>
+
+
+<p>イベントは他にもたくさんあるので、詳しく知りたければ <em>man stapprobes</em> すべし。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/07/08/SystemTap00/">SystemTap00</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-07-08T01:45:26+09:00" pubdate>Jul 8<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/07/08/SystemTap00/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://sourceware.org/systemtap/">SystemTap</a> が以前から気になってたので、ちゃんと調べてみることに。</p>
+
+<p>ざっとググってみた感じだと、<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">SystemTap Beginners Guide</a> がしっかりまとまっていてわかりやすそうなので、これをベースに調べたことをメモしていく。<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide.pdf">PDF 版</a>もあるので Kindle に入れて持ち運べるし。</p>
+
+<h1>SystemTap とは？</h1>
+
+<ul>
+<li>カーネルの動きをモニタリングするためのフレームワーク</li>
+<li>netstat, ps, top, iostat なんかで得られるのと同じような情報が取得できる</li>
+<li>こういった情報が得られるだけではなく、フィルタリングしたり解析したりもできる</li>
+</ul>
+
+
+<p>といったもののようです。DTrace を知ってる方なら、それに似たようなもの、と言えばわかりやすいのかもしれません。（自分は DTrace よく知りませんが。）</p>
+
+<ul>
+<li>参考 URL
+
+<ul>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/introduction.html</li>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/intro-systemtap-vs-others.html</li>
+</ul>
+</li>
+</ul>
+
+
+<h1>SystemTap の利用</h1>
+
+<p>CentOS 5 でインストールした際のメモ。</p>
+
+<p>利用している kernel と同じバージョンの kernel-devel パッケージをインストール。（systemtap パッケージを入れると依存で勝手に入るけど、利用中の kernel バージョンと異なる場合もあるので、先に入れておくといいです。）</p>
+
+<pre><code>$ sudo yum install kernel-devel-2.6.18-164.el5
+</code></pre>
+
+<p>systemtap パッケージをインストール。</p>
+
+<pre><code>$ sudo yum install sytemtap
+</code></pre>
+
+<p>kernel-debuginfo と kernel-debuginfo-common のインストールのために、debuginfo-install コマンドが含まれる yum-utils パッケージをインストール。</p>
+
+<pre><code>$ sudo yum install yum-utils
+</code></pre>
+
+<p>kernel-debuginfo と kernel-debuginfo-common を yum で取得できるように、以下のような /etc/yum.repos.d/CentOS-debuginfo.repo を作成。</p>
+
+<pre><code>[debuginfo]
+name=CentOS debuginfo
+baseurl=http://debuginfo.centos.org/$releasever/$basearch/
+gpgcheck=0
+enabled=1
+</code></pre>
+
+<p>kernel-debuginfo と kernel-debuginfo-common を インストール。</p>
+
+<pre><code>$ sudo debuginfo-install kernel
+</code></pre>
+
+<p>kernel-headers も必要かも？</p>
+
+<p>あとは stap コマンドを実行すれば OK。(root 権限が必要だけど、stapdev グループに属しているユーザであれば、権限は不要。)</p>
+
+<pre><code>$ stap -v -e 'probe vfs.read {printf("read performed\n"); exit()}'
+Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 170usr/50sys/210real ms.
+Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116696virt/75204res/41808shr kb, in 310usr/50sys/369real ms.
+Pass 3: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.c
+Pass 4: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.ko
+Pass 5: starting run.
+read performed
+Pass 5: run completed in 20usr/50sys/96real ms.
+</code></pre>
+
+<p>-v オプションで詳細表示。v を増やすと更に詳細に。</p>
+
+<p>表示されるメッセージを見るとなんとなくわかるけど、SystemTap スクリプトをコンパイルしてカーネルモジュールを生成して実行してる。なので gcc や make なんかも必要。（なはず。）</p>
+
+<ul>
+<li>参考 URL
+
+<ul>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/using-systemtap.html</li>
+</ul>
+</li>
+</ul>
+
+
+<h1>他のマシンで実行できる SystemTap モジュールを生成</h1>
+
+<p>上で見たように、SystemTap の利用には、コンパイラや debuginfo パッケージのインストールが必要なんだけど、ポリシー的にそれが許されない環境ではどうするか？実は SystemTap にはコンパイル済みのモジュールを実行する仕組みもある。（このコンパイル済みモジュールのことを、ドキュメントでは Instrumentation と呼んでいる。）</p>
+
+<p>コンパイル済みモジュールは以下のように stap コマンドで生成できる。(-r と -m オプションを指定する。）</p>
+
+<pre><code>$ stap -r 2.6.18-164.el5 -e 'probe vfs.read {exit()}' -m simple -v  [miya@h026]
+Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 180usr/20sys/205real ms.
+Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116816virt/75200res/41808shr kb, in 320usr/40sys/364real ms.
+Pass 3: translated to C into "/tmp/stapPGBW7a/simple.c" using 116816virt/75940res/42548shr kb, in 230usr/10sys/269real ms.
+Pass 4: compiled C into "simple.ko" in 3820usr/790sys/4619real ms.
+Pass 5: starting run.
+Pass 5: run completed in 20usr/50sys/97real ms.
+</code></pre>
+
+<p>simple.ko が生成されるので、これを実行したいマシンにコピーする。そのマシン上では、systemtap-runtime パッケージがインストールされていれば良い。で、以下のように staprun コマンドを叩いてモジュールを実行する。</p>
+
+<pre><code>$ staprun simple.ko -v
+stapio:cleanup_and_exit:400 detach=0
+stapio:cleanup_and_exit:417 closing control channel
+staprun:remove_module:205 Module simple removed.
+</code></pre>
+
+<p>これも root 権限が必要だけど、stapusr グループに属していれば権限は必要ない。（stapdev グループでももちろん実行できる。）</p>
+
+<ul>
+<li>参考 URL
+
+<ul>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/cross-compiling.html</li>
+</ul>
+</li>
+</ul>
+
+
+<p>今日はここまで。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/07/03/LargeServiceTechnologyIntroBook/">LargeServiceTechnologyIntroBook</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-07-03T23:07:01+09:00" pubdate>Jul 3<span>rd</span>, 2010</time>
+        
+         | <a href="/blog/2010/07/03/LargeServiceTechnologyIntroBook/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>!html</h1>
+
+<pre><code>&lt;a href="http://www.amazon.co.jp/dp/4774143073"&gt;&lt;img src="http://ec3.images-amazon.com/images/I/51GW5jxmdvL._SL500_AA300_.jpg" /&gt;&lt;/a&gt;
+</code></pre>
+
+<p><a href="http://www.amazon.co.jp/dp/4774143073">Web開発者のための大規模サービス技術入門 —データ構造、メモリ、OS、DB、サーバ/インフラ</a> という本を献本頂きました。<a href="http://gihyo.jp/">技術評論社様</a>、<a href="http://twitter.com/naoya_ito">@naoya_ito</a> さん、<a href="http://twitter.com/stanaka">@stanaka</a> さん、ありがとうございます。</p>
+
+<p>目次の詳細は<a href="http://gihyo.jp/magazine/wdpress/plus/978-4-7741-4307-1">技術評論社様のサイト</a>をご覧頂くとして、アウトラインは以下のようになっています。</p>
+
+<hr />
+
+<ul>
+<li>第1回　大規模Webサービスの開発オリエンテーション―全体像を把握する
+
+<ul>
+<li>Lesson 0　本書の源 ―本書で説明すること，しないこと</li>
+<li>Lesson 1　大規模なサービスと小規模なサービス</li>
+<li>Lesson 2　成長し続けるサービスと，大規模化の壁</li>
+<li>Lesson 3　サービス開発の現場</li>
+</ul>
+</li>
+<li>第2回　大規模データ処理入門 ―メモリとディスク，Webアプリケーションと負荷
+
+<ul>
+<li>Lesson 4　はてなブックマークのデータ規模 ―データが大きいと処理に時間がかかる</li>
+<li>Lesson 5 大規模データ処理の難所 ―メモリとディスク</li>
+<li>Lesson 6　スケーリングの要所</li>
+<li>Lesson 7　大規模データを扱うための基礎知識</li>
+</ul>
+</li>
+<li>第3回　OSのキャッシュと分散 ―大きなデータを効率良く扱うしくみ
+
+<ul>
+<li>Lesson 8　OSのキャッシュ機構</li>
+<li>Lesson 9　I/O負荷の軽減策</li>
+<li>Lesson 10　局所性を活かす分散</li>
+</ul>
+</li>
+<li>第4回　DBのスケールアウト戦略 ―分散を考慮したMySQLの運用
+
+<ul>
+<li>Lesson 11　インデックスを正しく運用する ―分散を考慮したMySQL運用の大前提</li>
+<li>Lesson 12　MySQLの分散 ―スケーリング前提のシステム設計</li>
+<li>Lesson 13　MySQLのスケールアウトとパーティショニング</li>
+</ul>
+</li>
+<li>第5回　大規模データ処理［実践］入門 ―アプリケーション開発の勘所
+
+<ul>
+<li>Lesson 14　用途特化型インデクシング ―大規模データを捌く</li>
+<li>Lesson 15　理論と実践の両側から取り組む</li>
+</ul>
+</li>
+<li>第6回　［課題］圧縮プログラミング ―データサイズ，I/O高速化との関係を意識する
+
+<ul>
+<li>Lesson 16　［課題］整数データをコンパクトに持つ</li>
+<li>Lesson 17　VB Codeと速度感覚</li>
+<li>Lesson 18　課題の詳細と回答例</li>
+</ul>
+</li>
+<li>第7回　アルゴリズムの実用化 ―身近な例で見る理論・研究の実践投入
+
+<ul>
+<li>Lesson 19　アルゴリズムと評価</li>
+<li>Lesson 20　はてなダイアリーのキーワードリンク</li>
+<li>Lesson 21　はてなブックマークの記事カテゴライズ</li>
+</ul>
+</li>
+<li>第8回　［課題］はてなキーワードリンクの実装 ―応用への道筋を知る
+
+<ul>
+<li>Lesson 22　［課題］はてなキーワードリンクを作る</li>
+<li>Lesson 23　回答例と考え方</li>
+</ul>
+</li>
+<li>第9回　全文検索技術に挑戦 ―大規模データ処理のノウハウ満載
+
+<ul>
+<li>Lesson 24　全文検索技術の応用範囲</li>
+<li>Lesson 25　検索システムのアーキテクチャ</li>
+<li>Lesson 26　検索エンジンの内部構造</li>
+</ul>
+</li>
+<li>第10回　［課題］全文検索エンジンの作成 ―基本部分，作り込み，速度と精度の追求
+
+<ul>
+<li>Lesson 27　［課題］はてなブックマーク全文検索を作る</li>
+<li>Lesson 28　回答例と考え方</li>
+</ul>
+</li>
+<li>第11回　大規模データ処理を支えるサーバ/インフラ入門 ―Webサービスのバックエンド
+
+<ul>
+<li>Lesson 29　エンタープライズ vs. Webサービス</li>
+<li>Lesson 30　クラウドvs.自前インフラ</li>
+</ul>
+</li>
+<li>第12回　スケーラビリティの確保に必要な考え方 ―規模の増大とシステムの拡張
+
+<ul>
+<li>Lesson 31　レイヤとスケーラビリティ</li>
+<li>Lesson 32　負荷の把握，チューニング</li>
+</ul>
+</li>
+<li>第13回　冗長性の確保，システムの安定化 ―ほぼ100％の稼動率を実現するしくみ
+
+<ul>
+<li>Lesson 33　冗長性の確保</li>
+<li>Lesson 34　システムの安定化</li>
+<li>Lesson 35　システムの安定化対策</li>
+</ul>
+</li>
+<li>第14回　効率向上作戦 ―ハードウェアのリソースの使用率を上げる
+
+<ul>
+<li>Lesson 36　仮想化技術</li>
+<li>Lesson 37　ハードウェアと効率向上 ―低コストを実現する要素技術</li>
+</ul>
+</li>
+<li>第15回　Webサービスとネットワーク ―ネットワークで見えてくるサービスの成長
+
+<ul>
+<li>Lesson 38　ネットワークの分岐点</li>
+<li>Lesson 39　さらなる上限へ</li>
+</ul>
+</li>
+<li>特別編　いまどきのWebサービス構築に求められる実践技術 ―大規模サービスに対応するために
+
+<ul>
+<li>Special Lesson 1　ジョブキューシステム ―TheSchwartz､ Gearman</li>
+<li>Special Lesson 2　ストレージの選択 ―RDBMSかkey-valueストアか</li>
+<li>Special Lesson 3　キャッシュシステム ―Squid，Varnish</li>
+<li>Special Lesson 4　計算クラスタ ―Hadoop</li>
+</ul>
+</li>
+</ul>
+
+
+<hr />
+
+<p>ものすごいボリュームです。はてなさんで毎年行っているインターンシップのカリキュラムを書籍化したそうで、ペパボでは最近新卒採用を開始したんですが、これは新人教育用の教科書としても使えそうです。</p>
+
+<p>特に、はてなさんで苦労した内容なんかもふんだんに盛り込まれており、理論だけに偏らず、具体的にどういったことで苦労して、それをどう克服しかた、という実践的な話はとても興味深く読ませて頂きました。こういう話ってなかなか書籍では出てこないんじゃないかと思います。</p>
+
+<p><a href="http://www.amazon.co.jp/dp/4774135666">「24時間365日 サーバ/インフラを支える技術 — スケーラビリティ、ハイパフォーマンス、省力運用」</a> も、発売当時にペパボ内の技術者に、これは読んでおけと勧めたのですが、本書もやはり読むように勧めたいと思います。</p>
+
+<hr />
+
+<p>併せて読みたい</p>
+
+<ul>
+<li><a href="http://d.hatena.ne.jp/naoya/20100701/1277955080">著者の naoya さんのブログエントリ</a></li>
+<li><a href="http://d.hatena.ne.jp/hirose31/20100702/1278057502">hirose31 さんのブログエントリ</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/06/27/ZabbixBook/">ZabbixBook</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-06-27T01:43:55+09:00" pubdate>Jun 27<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/06/27/ZabbixBook/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>!html</h1>
+
+<pre><code>&lt;a href="http://www.amazon.co.jp/dp/4774142131"&gt;&lt;img src="http://ec2.images-amazon.com/images/I/51muk-EBA-L._SL500_AA300_.jpg" /&gt;&lt;/a&gt;
+</code></pre>
+
+<p>技術評論社様よりご献本頂いてたのですが、感想を書くのがすっかり遅くなってしまいました。</p>
+
+<p>タイトルの通り、統合監視ソフトウェア Zabbix について書かれた本です。和書では初の Zabbix 本ですね。（ですよね？）Software Design plus シリーズの第1弾ということで、今後のシリーズ展開がとても楽しみです。</p>
+
+<p>本書の目次は以下のようになっています。</p>
+
+<ul>
+<li>はじめに</li>
+<li>1章: 統合監視ソフトウェアZabbixとは</li>
+<li>2章: Zabbixのインストール</li>
+<li>3章: クイックスタートガイド</li>
+<li>4章: 監視対象と監視項目の設定</li>
+<li>5章: 障害検知と障害通知の設定</li>
+<li>6章: グラフィカル表示の設定</li>
+<li>7章: テンプレートの利用とエクスポート/インポート</li>
+<li>8章: 一般設定とユーザ設定</li>
+<li>9章: Zabbixによるシステム監視サーバ構築実践</li>
+<li>10章: 障害発生時のスクリプト実行機能の活用</li>
+<li>11章: アプリケーションの詳細監視</li>
+<li>12章: Zabbixサーバの運用とメンテナンス</li>
+<li>13章: 大規模システムの監視</li>
+<li>14章: Appendix</li>
+</ul>
+
+
+<p>そもそも監視とは何か、といった話から、Zabbix の概要、インストール、設定、運用、大規模システムの監視と、Zabbix を知り実際に利用するために必要な知識がほとんど網羅されているのではないかと思います。Zabbix は機能豊富で全体像がすぐには掴みにくいソフトウェアなので、こういった形で一冊の本にまとまっているのは非常にありがたいですね。</p>
+
+<p>Zabbix で特にいいなー、と思ったのは、リソースグラフの表示範囲や日時を自由に変更できるところ。自分が使ったことがあるリソースモニタリングツールだと、直近のデータ1時間分、といった表示はできても、過去のある時点の詳細を見たいと思った場合に、その時点のデータは1時間分ではなく、1日分や1週間分といった非常に大雑把なデータになってしまい、こちらが望む細かい粒度でのリソース動向を追うことができないという不満があるけれど、Zabbix であればこちらが望む形でリソースグラフを確認することができそうです。<a href="http://www.zabbix.jp/modules/bwiki/index.php?zabbixdemo">デモサイト</a> でもこの辺については確認できます。</p>
+
+<p>逆に Zabbix のあまり好きではない点は、機能が豊富すぎるところ。稼働監視、リソース監視、アプリケーション監視をすべて網羅していて、オールインワンなソフトウェアを求めている人にはとてもいいソリューションだけれども、既に Nagios のような稼働監視ソフトウェアを利用していて、そこにリソース監視ソフトウェアを導入したいとか、あるいはその逆パターンとか、そういった場合には、既存で導入しているソフトウェアと機能が被る面が多いので導入しづらいかな、という懸念があります。</p>
+
+<p>また、自分は目的特化した小さなソフトウェアを組み合わせて必要に応じてカスタマイズするのが好きなので、Zabbix のような大きなソフトウェアの導入はためらってしまいますね。</p>
+
+<p>とは言っても、本書を読んで Zabbix は非常によくできたソフトウェアだと思いましたので、統合監視ソフトウェアの導入を検討している方にはとても参考になると思います。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/4/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/2/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

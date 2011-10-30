@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9) - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは Account Auto-Discovery データを追加するプラグインを書いてみた。 blosxom でも 同様のプラグイン を書いているのですが、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2006/07/22/448">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Catlxom の Account Auto-Discovery プラグイン (Catlxom メモ #9)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-22T23:16:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>
+catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは <a class="ext-link" href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery"><span class="icon"></span>Account Auto-Discovery</a> データを追加するプラグインを書いてみた。
+</p>
+
+
+<p>
+blosxom でも <a class="ext-link" href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/account_auto_discovery"><span class="icon"></span>同様のプラグイン</a> を書いているのですが、一番大きな違いは、blosxom プラグインはテンプレートの修正が必要なのに対し、catlxom プラグインはテンプレートの修正が一切必要ありません。XML::TreeBuilder を利用して、HTML ヘッダにデータを追加するような作りにしています。
+</p>
+
+
+<p>
+利用上の注意点として、Template::TT よりも後にこのプラグインをロードしなければいけいのですが、自動ロードを有効にしてると先にロードされちゃうので、自動ロードをオフにして yaml で明示的に利用プラグインを指定する必要があります。
+</p>
+
+
+<pre class="wiki">
+package Catlxom::Plugin::Format::AccountAutoDiscovery;
+use strict;
+use warnings;
+use base qw/Catlxom::Plugin/;
+
+use NEXT;
+use XML::TreeBuilder;
+
+sub interpolate {
+    my ( $self, $c ) = @_;
+
+    my $accounts = $c-&gt;config-&gt;{account_auto_discovery};
+
+    my $tree = XML::TreeBuilder-&gt;new();
+    $tree-&gt;parse($c-&gt;res-&gt;body);
+
+    my $head = $tree-&gt;find('head');
+
+    for ( @$accounts ){
+        my $rdf = XML::Element-&gt;new(
+            'rdf:RDF',
+            'xmlns:rdf'  =&gt; 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            'xmlns:foaf' =&gt; 'http://xmlns.com/foaf/0.1/',
+        );
+
+        my $rdf_description = XML::Element-&gt;new(
+            'rdf:Description',
+            'rdf:about' =&gt; $c-&gt;req-&gt;uri,
+        );
+
+        my $foaf_maker = XML::Element-&gt;new(
+            'foaf:maker',
+            'rdf:parseType' =&gt; 'Resource',
+        );
+
+        my $foaf_holds_acount = XML::Element-&gt;new( 'foaf:holdsAccount' );
+
+        my $foaf_online_account = XML::Element-&gt;new(
+            'foaf:OnlineAccount',
+            'foaf:accountName' =&gt; $_-&gt;{account_name},
+        );
+
+        my $foaf_account_service_homepage = XML::Element-&gt;new(
+            'foaf:accountServiceHomepage',
+            'rdf:resource' =&gt; $_-&gt;{account_service_homepage},
+        );
+
+        $head-&gt;push_content($rdf);
+        $rdf-&gt;push_content($rdf_description);
+        $rdf_description-&gt;push_content($foaf_maker);
+        $foaf_maker-&gt;push_content($foaf_holds_acount);
+        $foaf_holds_acount-&gt;push_content($foaf_online_account);
+        $foaf_online_account-&gt;push_content($foaf_account_service_homepage);
+    }
+
+    $c-&gt;res-&gt;{body} = $tree-&gt;as_HTML;
+    $self-&gt;NEXT::interpolate($c);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Catlxom::Plugin::Format::AccountAutoDiscovery
+
+=head1 SYNOPSIS
+
+account_auto_discovery:
+  - account_name: gosukenator
+    account_service_homepage: http://www.hatena.ne.jp/
+  - account_name: xxxx
+    account_service_homepage: http://xxx.ne.jp/
+
+=head1 DESCRIPTION
+
+This plugin inserts Account Auto-Discovery data into HTML header.
+
+=head1 AUTHOR
+
+Gosuke Miyashita
+
+=head1 SEE ALSO
+
+L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;
+
+=cut
+</pre>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2006-07-22T23:16:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2006/07/22/448/" data-via="" data-counturl="http://mizzy.org/blog/2006/07/22/448/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2006/07/22/505/" title="Previous Post: Fedora Core 4 への Courier-IMAP の導入">&laquo; Fedora Core 4 への Courier-IMAP の導入</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2006/07/27/340/" title="next Post: FFmpeg::Command - A wrapper class for ffmpeg command line utility #0">FFmpeg::Command - A wrapper class for ffmpeg command line utility #0 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2006/07/22/448';
+        var disqus_url = 'http://mizzy.org/blog/2006/07/22/448';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

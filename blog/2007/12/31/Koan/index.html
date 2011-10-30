@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Koan - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="Koan (Kickstart over a network) を使うと、Cobbler と連携して、PXE ブートを使わずに OS を再インストールしたり、Xen または QEMU のゲスト OS をコマンド一発でインストールすることができます。 以下、Fedora 7 で Koan &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2007/12/31/Koan">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Koan</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-12-31T20:33:54+09:00" pubdate>Dec 31<span>st</span>, 2007</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="http://cobbler.et.redhat.com/docs/koan.html">Koan (Kickstart over a network)</a> を使うと、Cobbler と連携して、PXE ブートを使わずに OS を再インストールしたり、Xen または QEMU のゲスト OS をコマンド一発でインストールすることができます。</p>
+
+<p>以下、Fedora 7 で Koan を試してみたメモ。</p>
+
+<h1>Koan のインストール</h1>
+
+<pre><code>$ sudo yum install koan
+</code></pre>
+
+<h1>プロファイルやシステムの一覧を表示</h1>
+
+<p>プロファイル一覧を表示する。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --list-profile
+fc7-i386
+fc7-xen-i386 
+</code></pre>
+
+<p>システム一覧を表示する。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --list-system
+test-server.example.org
+</code></pre>
+
+<p>cobbler.example.org は cobbler が動いてるサーバ。koan による OS インストールを行うときには、プロファイルかシステムのどちらかを指定する。</p>
+
+<h1>OS の再インストール</h1>
+
+<p>OS を再インストールする時には、&#8211;replace-self オプション と &#8211;profile または &#8211;system を指定して koan を実行。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --replace-self --profile=f7-i386
+- using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+downloading initrd initrd.img to /boot/initrd.img
+url=http://cobbler.example.org/cobbler/images/f7-i386/initrd.img
+- using kickstart from cobbler: http://cobbler.example.org/cobbler/images/f7-i386/initrd.img
+downloading kernel vmlinuz to /boot/vmlinuz
+url=http://cobbler.example.org/cobbler/images/f7-i386/vmlinuz
+- using kickstart from cobbler: http://cobbler.example.org/cobbler/images/f7-i386/vmlinuz
+- kickstart: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+- downloading http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+- using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+- ['/bin/bash', '/var/spool/koan/insert.sh']
+cpio
+14535 blocks
+14538 blocks
+done
+- ['/sbin/grubby', '--grub', '--add-kernel', '/boot/vmlinuz', '--initrd', '/boot/initrd.img', '--make-default', '--title', 'kick1199098439', '--args', 'ksdevice=eth0 lang=  kssendmac syslog=cobbler.example.org:25150 text  ks=file:ks.cfg', '--copy-default']
+- reboot to apply changes 
+</code></pre>
+
+<p>ネットワークインストール用の /boot/initrd.img とか /boot/vmlinuz とかを cobbler サーバからダウンロードして、/boot/grub/menu.lst を書き換えてくれる。</p>
+
+<p>あとは再起動すれば、OS の再インストールが勝手にはじまる。</p>
+
+<h1>Xen ゲスト OS のインストール</h1>
+
+<h2>Xen のインストールと Xen カーネルの起動</h2>
+
+<p>当然 Xen 環境が必要になるので、Xen をインストール。</p>
+
+<pre><code>$ sudo yum install kernel-xen xen
+</code></pre>
+
+<p>インストール後、/boot/grub/menu.lst を書き換えて、デフォルトで Xen カーネルが起動するようにして再起動する。</p>
+
+<h2>koan コマンドでの Xen ゲスト OS インストール</h2>
+
+<p>&#8211;replace-self ではなく &#8211;virt を指定する。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --virt --profile=f7-xen-i386
+</code></pre>
+
+<p>これで Xen ゲスト OS のインストールがはじまる、はずなんだけど、うちの環境では Segmentation Fault になってしまった。VMWare 上で Xen を動かすというのは無理があるのかもしれない。</p>
+
+<p>実機で試したいところだけど、試せるサーバがないので保留。Yappo さんあたりが試してレポートしてくれるに違いない、きっと。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2007-12-31T20:33:54+09:00" pubdate>Dec 31<span>st</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2007/12/31/Koan/" data-via="" data-counturl="http://mizzy.org/blog/2007/12/31/Koan/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2007/12/29/CobblerWebUi/" title="Previous Post: CobblerWebUi">&laquo; CobblerWebUi</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2008/01/05/VirtFactory/" title="next Post: VirtFactory">VirtFactory &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

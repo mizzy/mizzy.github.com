@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>SetupRemedie - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="overlast さんのこれから15分で Remedie を始めるための資料 に触発されて書いてみました。こっちは CPAN モジュールをインストールする時間も入れて15分。ただし限定された環境のみ。 Remedie 用に CPAN モジュールの RPM パッケージ作ったので、これプラス &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2009/01/13/SetupRemedie">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">SetupRemedie</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-01-13T14:05:45+09:00" pubdate>Jan 13<span>th</span>, 2009</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>overlast さんの<a href="http://overlasting.dyndns.org/2009-01-07-1.html">これから15分で Remedie を始めるための資料</a> に触発されて書いてみました。こっちは CPAN モジュールをインストールする時間も入れて15分。ただし限定された環境のみ。</p>
+
+<p>Remedie 用に CPAN モジュールの RPM パッケージ作ったので、これプラス Puppet を利用します。ただし、RPM パッケージを CentOS 5 x86_64 でビルドしてるので、この環境限定。<a href="http://svn.mizzy.org/public/yum/SRPMS/">SRPM</a> はあるので、他の環境の方はこいつをビルドして使ってください。</p>
+
+<p>まずは Puppet をインストールするための yum リポジトリ設定。以下の内容で /etc/yum.repos.d/dlutter.repo を作成。</p>
+
+<pre><code>[dlutter]
+name=lutter
+baseurl=http://people.redhat.com/dlutter/yum/rhel/$releasever/$basearch/
+enabled=1
+gpgcheck=0
+</code></pre>
+
+<p>Puppet のインストール。</p>
+
+<pre><code># yum -y install puppet-server
+</code></pre>
+
+<p>Puppet で署名するのはだるいので、以下の内容で /etc/puppet/autosign.conf を作成。</p>
+
+<p>*</p>
+
+<p>/etc/puppet/manifests ディレクトリを作成。</p>
+
+<pre><code># mkdir /etc/puppet/manifests
+</code></pre>
+
+<p>以下の内容の /etc/puppet/manifests/site.pp を作成。</p>
+
+<pre><code>node default {
+
+  yumrepo {
+    'mizzy':
+      baseurl  =&gt; 'http://svn.mizzy.org/public/yum/RPMS/centos/$releasever/$basearch/',
+      enabled  =&gt; 1,
+      gpgcheck =&gt; 0;
+    'dag':
+      baseurl  =&gt; 'http://ftp.riken.jp/Linux/dag/redhat/el$releasever/en/$basearch/dag/',
+      enabled  =&gt; 1,
+      gpgcheck =&gt; 0;
+    'updates':
+      exclude =&gt; 'perl';
+    'extras':
+      exclude =&gt; 'perl';
+  }
+
+  Package {
+    require =&gt; [ Yumrepo['mizzy'], Yumrepo['dag'], Yumrepo['updates'], Yumrepo[extras] ],
+  }  
+
+  package {
+    'git':
+      ensure =&gt; present;
+    'perl':
+      ensure =&gt; '5.8.8-15.1';
+    'perl-Moose':
+      ensure =&gt; present;
+    'perl-Class-C3':
+      ensure =&gt; present;
+    'perl-Sub-Name':
+      ensure =&gt; present;
+    'perl-Devel-GlobalDestruction':
+      ensure =&gt; present;
+    'perl-Rose-DB':
+      ensure =&gt; present;
+    'perl-Rose-DB-Object':
+      ensure =&gt; present;
+    'perl-DateTime-TimeZone':
+      ensure =&gt; '0.8301-8';
+    'perl-MooseX-Types-Path-Class':
+      ensure =&gt; present;
+    'perl-DBD-SQLite':
+      ensure =&gt; present;
+    'perl-FindBin-libs':
+      ensure =&gt; present;
+    'perl-HTTP-Engine':
+      ensure =&gt; present;
+    'perl-MIME-Types':
+      ensure =&gt; present;
+    'perl-Path-Class-URI':
+      ensure =&gt; present;
+    'perl-String-CamelCase':
+      ensure =&gt; present;
+    'perl-Log-Dispatch':
+      ensure =&gt; present;
+    'perl-JSON-XS':
+      ensure =&gt; present;
+    'perl-MooseX-Getopt':
+      ensure =&gt; present;
+    'perl-MooseX-ConfigFromFile':
+      ensure =&gt; present;
+    'perl-File-Find-Rule':
+      ensure =&gt; present;
+    'perl-UNIVERSAL-require':
+      ensure =&gt; present;
+    'perl-Class-Accessor':
+      ensure =&gt; present;
+    'perl-DateTime-Format-Strptime':
+      ensure =&gt; present;
+    'perl-Feed-Find':
+      ensure =&gt; present;
+    'perl-Class-ErrorHandler':
+      ensure =&gt; present;
+    'perl-XML-Atom':
+      ensure =&gt; present;
+    'perl-XML-XPath':
+      ensure =&gt; present;
+    'perl-XML-Feed':
+      ensure =&gt; present;
+    'perl-Template-Toolkit':
+      ensure =&gt; present;
+    'perl-DateTime-Format-ISO8601':
+      ensure =&gt; present;
+    'perl-MooseX-ClassAttribute':
+      ensure =&gt; present;
+    'perl-XML-OPML-LibXML':
+      ensure =&gt; present;
+    'perl-File-Find-Rule-Filesys-Virtual':
+      ensure =&gt; present;
+    'perl-HTTP-Response-Encoding':
+      ensure =&gt; present;
+    'perl-HTML-ResolveLink':
+      ensure =&gt; present;
+    'perl-HTML-Selector-XPath':
+      ensure =&gt; present;
+    'perl-HTML-TreeBuilder-XPath':
+      ensure =&gt; present;
+    'perl-YAML':
+      ensure =&gt; present;
+    'perl-YAML-Syck':
+      ensure =&gt; present;
+    'perl-HTML-Scrubber':
+      ensure =&gt; present;
+    'perl-Image-Info':
+      ensure =&gt; present;
+    'perl-Text-Tags':
+      ensure =&gt; present;
+    'perl-XML-RSS-LibXML':
+      ensure =&gt; present;
+    'perl-Web-Scraper':
+      ensure =&gt; present;
+  }
+
+}
+</code></pre>
+
+<p>puppetmasterd を起動。</p>
+
+<pre><code># puppetmasterd --verbose --no-daemonize
+</code></pre>
+
+<p>puppetd を起動して、マニフェストを適用。注意点としては、localhost とかではなく、きちんと FQDN で指定すること。（puppetmasterd 初回起動時に自動作成される証明書中の CN と &#8211;server で指定するサーバ名が一致してないと怒られる。）</p>
+
+<pre><code># puppetd --server host.example.org --verbose --no-daemonize
+</code></pre>
+
+<p>このままログを見ながらしばらく待つ。完了したら Remedie を github.com から取得して起動。</p>
+
+<pre><code># git clone git://github.com/miyagawa/remedie.git
+# cd remedie
+# perl -Ilib -MRemedie::DB::Schema -e 'Remedie::DB::Schema-&gt;install'
+# ./bin/remedie-server.pl
+</code></pre>
+
+<p>自分でやったら10分ぐらいで終わった。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2009-01-13T14:05:45+09:00" pubdate>Jan 13<span>th</span>, 2009</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2009/01/13/SetupRemedie/" data-via="" data-counturl="http://mizzy.org/blog/2009/01/13/SetupRemedie/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2008/12/28/ScalableStorageWithOSS04/" title="Previous Post: ScalableStorageWithOSS04">&laquo; ScalableStorageWithOSS04</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009/02/06/HowToRpmizeCpanModules/" title="next Post: HowToRpmizeCpanModules">HowToRpmizeCpanModules &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

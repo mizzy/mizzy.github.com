@@ -1,0 +1,974 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="特にコンセプトとか目的とかはないです。なんとく「俺」が滲み出てる、そんなサイトであればいいな、と。 blosxomつかってます。カスタマイズしやすいのが魅力的。まだカスタマイズ不十分なところがあるので、ちょくちょくいじることになるかと。そのせいで、エラーで見られなくことがあるかもしれませんが、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/38">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/25/292/">このサイトについて</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-25T23:28:00+09:00" pubdate>Apr 25<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/25/292/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+特にコンセプトとか目的とかはないです。なんとく「俺」が滲み出てる、そんなサイトであればいいな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://www.blosxom.com/">blosxom</a>つかってます。カスタマイズしやすいのが魅力的。まだカスタマイズ不十分なところがあるので、ちょくちょくいじることになるかと。そのせいで、エラーで見られなくことがあるかもしれませんが、そんな時は「ああ、あいつカスタマイズ失敗してやがんの。」と笑ってやってください。
+</p>
+
+
+
+
+<p class="entryBody">
+インデックスページではajax使って、ページ遷移なしにコメントとトラックバックを表示したり、コメントの投稿ができるようになっています。（asynchronousじゃないけど。）Javascriptオフの場合や、xmlHttpRequestに対応していないブラウザでは、ページ遷移する様にしています。
+</p>
+
+
+
+
+<p class="entryBody">
+Win IE6, Win Mozilla Firefox, Mac Camino, Mac Safariで表示確認してます。Mac IEお断り。表示が崩れます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/24/460/">ajaxでdel.icio.usを使いやすく #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-24T15:51:00+09:00" pubdate>Apr 24<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/24/460/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+話的には<a href="/program/rss2xbel01.html" target="_blank">前回</a>の続きなんだけど、もはやRSSは関係ないのでタイトル変えます。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://del.icio.us" target="_blank">del.icio.us</a>はソーシャルブックマークとしてはともかく、自分用ブックマークとしてはいまいち使いづらいんですよね。なので、最近は<a href="http://www.spurl.net" target="_blank">Spurl</a>ばかり使っています。Spurlには自分用ブックマークとして使うのにとても便利な、Spurl Barというものがあるので。
+</p>
+
+
+
+
+<p class="entryBody">
+じゃあ、del.icio.usにも似たようなサイドバーがあれば、もっと使いやすくなるのでは、ということで、del.icio.us barを作ってみました。以下がサンプルとソースです。（Firefoxでしか動作確認してません。IEではJavascriptエラーになります。）
+</p>
+
+
+
+
+<ul class="entryBody">
+<li><a href="/delside/index.html" target="_blank">サイドバーに入れずにdel.icio.us barを試す。</a></li>
+<li><a href="javascript:sidebar.addPanel('del.icio.us bar','http://mizzy.org/delside/index.html','')">サイドバーに入れてdel.icio.us barを試す。(Firefox用）</a></li>
+<li><a href="/archives/delside.tar.gz">ソース</a></li>
+</ul>
+
+
+
+
+<p class="entryBody">
+Spurl Barの劣化コピーです。アイコンも拝借してしまいました。（ほんとは良くないんだろうけど…）tagフォームに文字を入れると、tagリストが絞り込まれていきます。タグをクリックすると、そのタグを持つリンクを表示します。サンプルのブックマークは俺がdel.icio.usにポストしたものを、<a href="http://del.icio.us/doc/api" target="_blank">API</a>経由で取得しています。
+</p>
+
+
+
+
+<p class="entryBody">
+技術的には、API経由で取得したデータをperl CGIで<a href="http://www.crockford.com/JSON/index.html" target="_blank">json</a>形式に整形し、それをJavascriptのxmlHttpRequestで取得してevalでオブジェクトに変換、ってことをやってます。
+</p>
+
+
+
+
+<p class="entryBody">
+現在は単一のタグだけしか対応していません。複数タグでの絞込みができるといいのですが、それは次の機会に。
+</p>
+
+
+
+
+<p class="entryBody">
+相変わらず適当に作ってるので、色々問題はありますが、改良していけば結構いいものになりそうな気が。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/24/287/">ソーシャルブックマークのRSSをブラウザのブックマークに取り込む #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-24T01:44:00+09:00" pubdate>Apr 24<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/24/287/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/program/rss2xbel00.html">前回のエントリ</a>で、RSSをXBELに変換するゲートウェイについて触れましたが、Firefoxを使う限りにおいてはLive Bookmarks機能を使えばそれで済むので、せっかっく作ったゲートウェイがあまり意味がないことに気づきました。
+</p>
+
+
+
+
+<p class="entryBody">
+それもなんだか悔しいので、今度は<a href="http://del.icio.us/" target="_blank">del.icio.us</a>の<a href="http://del.icio.us/doc/api" target="_blank">API</a>を利用して、自分がpostしたブックマークをすべて、XBELに変換するためのゲートウェイを作りました。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="/del2xbel/index.cgi" target="_blank">サンプル</a>と<a href="/archives/del2xbel.tar.gz">ソース</a>
+</p>
+
+
+
+
+<p class="entryBody">
+前回と違って、タグ毎にフォルダを分けるようにしています。Firefoxの<a href="http://extensionroom.mozdev.org/more-info/booksync" target="_blank">Bookmarks Synchronizer extension</a>で取り込んで、サイドバーに表示すると、こんな感じでタグ別にフォルダ分けして表示されます。
+</p>
+
+
+
+
+<p class="entryBody">
+<img src="/img/del2xbel.jpg" />
+</p>
+
+
+
+
+<p class="entryBody">
+これはLive Bookmarksではできないことなので、ちょっと満足しました。まあ、色々と足りないところはあるのですが、自分は<a href="http://www.spurl.net" target="_blank">Spurl</a>サイドバーで満足してるので、これを使うことはないですね。なので、要望があれば改良していきますが、なければこのままほっときます。
+</p>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/23/264/">ソーシャルブックマークのRSSをブラウザのブックマークに取り込む #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-23T15:54:00+09:00" pubdate>Apr 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/23/264/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://d.hatena.ne.jp/naoya/" target="_blank">はてなのnaoyaさん</a>が<a href="http://b.hatena.ne.jp/naoya/" target="_blank">naoyaのブックマーク</a>にて、「del.icio.us の RSS をブックマークのお気に入りに取り込めるようにしたいなあ。」と呟いていたのを見て、こんなものを作ってみた。（naoyaさんが考えているものと違うかもしれませんが。もしかしてはてなブックマークのお気に入りのこと？）
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/rss2xbel/index.cgi" target="_blank">RSSをXBELに変換するゲートウェイ</a>と<a href="/archives/rss2xbel.tar.gz">そのソース</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+使い方は簡単で、フォームにソーシャルブックマークのRSSフィードURLを入力してsubmitすると、XBELに変換されたものが表示されます。
+</p>
+
+
+
+
+<p class="entryBody">
+で、これをXBELに対応したインポートツールで取り込めばOK、って感じです。Mozilla Firefoxであれば、<a href="http://extensionroom.mozdev.org/more-info/booksync" target="_blank">Bookmarks Synchronizer</a>というextensionがあります。(FTPと書いてますが、HTTP/HTTPSも対応してます。）このextensionでsubmit後のURLを設定しておけば、ブラウザを起動するたびに、指定したRSSフィードをブックマークにインポートしてくれます。試しに<a href="http://del.icio.us/rss/popular/" target="_blank">del.icio.us/popular</a>をインポートしみると、以下の様になりました。
+</p>
+
+
+
+
+<p class="entryBody">
+<img src="/img/rss2xbel.jpg" alt="rss2xbel firefox sidebar" />
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://antipop.zapto.org/mt/" target="_blank">antipop2.0のけんたろさん</a>が作成された<a href="http://antipop.zapto.org/mt/archives/001278.php" target="_blank">Alpha Geek Tracker</a>も試しにインポートしてみたのですが、途中までは取り込めたものの、データ量が多すぎるためか、Bookmarks Synchronizerが途中でハングしてしまいました…
+</p>
+
+
+
+
+<p class="entryBody">
+試しに作ってみただけなので、現段階では単一のRSSフィードしか扱えませんが、次は複数のRSSフィードをフォルダ分けしてXBELに変換する、という機能の追加を考えてます。
+</p>
+
+
+
+
+<p class="entryBody">
+でも、FirefoxだとLive BookmarksでRSSを直接ブックマークに取り込めるから、XBELに変換する意味がないと今気づいた…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/21/351/">SiteBar 3.3を試してみた</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-21T22:34:00+09:00" pubdate>Apr 21<span>st</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/21/351/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://sitebar.org/" target="_blank">SiteBar</a>という、PHPでできていて、自分でサーバに設置して利用できるオンラインブックマークツールを試してみました。
+</p>
+
+
+
+
+<p class="entryBody">
+以下に簡単に設置方法をメモしておきます。PHPとMySQLが使える環境であれば、レンタルサーバでも設置できると思います。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://sitebar.org/downloads.php" target="_blank">ダウンロードページ</a>からSiteBar-3.3.tar.bz2をダウンロードして展開、適当なディレクトリにmvします。
+</p>
+
+
+
+
+<p class="entryBody">
+$ bzip2 -dc SiteBar-3.3.tar.bz2|tar xvf -<br />
+$ mv SiteBar-3.3 /path/to/htdocs/sitebar<br />
+$ cd /path/to/htdocs/sitebar<br />
+$ sudo chown nobody:nobody inc (Apacheの起動ユーザ/グループに書き込み権限が必要なため）<br />
+</p>
+
+
+
+
+<p class="entryBody">
+次に、http://yourhost/sitebar/index.php にアクセスして設定を行います。
+</p>
+
+
+
+
+<p class="entryBody">
+<img class="screenshot" src="/img/sitebar_install.jpg" float="left" />
+環境に合わせて設定して下さい。データベースが存在しない場合には、[Create Database]を栗kkすることで、作成することができます。
+</p>
+
+
+
+
+<p class="entryBody">
+設定項目入力後、[Check Settings]をクリックすることで、設定が正しいかどうか確認できます。設定が正しければ、 [Write To File]をクリックして設定を保存します。
+</p>
+
+
+
+
+<p class="entryBody">
+すると、Your database does not contain SiteBar tables.と表示されますので、[Install]をクリックしてください。
+<br class="screenshot" />
+</p>
+
+
+
+
+<hr />
+
+
+
+
+<p class="entryBody">
+<img class="screenshot" src="/img/sitebar_after_install.jpg" float="left" />
+[Install]をクリック後、この様な画面になります。
+</p>
+
+
+
+
+<p class="entryBody">
+[Setup]をクリックして、適当に設定してください。
+</p>
+
+
+
+
+<p class="entryBody">
+設定が終わると、ログインした状態になるはずです。普段はこの画面をサイドバーに表示させて利用する、という形になるのですが、Firefoxのextensionがあるので、次はこのextensionを入れてみます。
+<br class="screenshot" />
+</p>
+
+
+
+
+<hr />
+
+
+
+
+<p class="entryBody">
+<img class="screenshot" src="/img/sitebar_sidebar.jpg" float="left" />
+extensionはここのサイトに行ってインストールします。
+<a href="http://sitebarsidebar.knowledge-emporium.com/" target="_blank">http://sitebarsidebar.knowledge-emporium.com/</a>
+</p>
+
+
+
+
+<p class="entryBody">
+インストールすると、サイドバーに左の様な画面を出すことができます。
+</p>
+
+
+
+
+<p class="entryBody">
+上部一番左にあるチェックマークアイコンをクリックして、Sitebar Hostの設定をします。http://yourhost/sitebar/index.php という形で、自分で設置したSiteBarのURLを設定します。
+</p>
+
+
+
+
+<p class="entryBody">
+設定を終えたら、Log Inをクリックして、セットアップ時に設定したメールアドレスとパスワードでログインします。
+</p>
+
+
+
+
+<p class="entryBody">
+一番基本的な使い方ですが、現在見ているサイトをブックマークに追加するには、上部左から3番目の家アイコンをクリックします。Admin&#8217;s Bookmarksというリンクを右クリックするとメニューが出てきて、フォルダを追加したり、色々とできます。
+</p>
+
+
+
+
+<p class="entryBody">
+あとはご自身で色々と試してみてください。
+<br class="screenshot" />
+</p>
+
+
+
+
+<p class="entryBody">
+で、軽く使ってみて感じたのは、こりゃ常用するのは無理だな、ってことです。
+</p>
+
+
+
+
+<p class="entryBody">
+自分がオンラインブックマークとして常用しているのは、<a href="http://www.spurl.net" target="_blank">Spurl</a>のFirefox extensionなのですが、Spurlではフォルダによる分類に加えてタギングすることもでき、タグによるブックマーク検索ができたり、タグを絞り込んでいくインターフェースがすごく使い勝手がよかったりと、オンラインブックマークとしてはかなりできの良いものになっています。（ソーシャルブックマークとしての評価はまた別ですが。）
+</p>
+
+
+
+
+<p class="entryBody">
+この階層+タギングによる分類が恐ろしく便利で、SiteBarの様にフォルダでしか分類できないものや、<a href="http://del.icio.us/" target="_blank">del.icio.us</a>の様にタグでしか分類でないものは、自分用オンラインブックマークとして使う気にはなれません。（もちろん、ソーシャルブックマークとしてのdel.icio.usはすばらしっすよ。）
+</p>
+
+
+
+
+<p class="entryBody">
+ただ、Spurlはサイドバーを表示させる時のレスポンスがいまいち悪いんですよね。自サーバで自分専用に設置できるSiteBarの方がその辺は勝ってます。Spurlがもっとレスポンスが良くなるか、SiteBarがタギングできるようになると最高なんですけどねぇ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/21/422/">ウェブサイトのスタイルというものについて考えてみる　#0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-21T11:15:00+09:00" pubdate>Apr 21<span>st</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/21/422/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/index.xhtml" target="_blank">旧サイト</a>から今のブログ形式に移行した理由のひとつは、ウェブサイトはどうあるべきか、という問いに対して、サイトスタイルを変えてみることにより、何か見えてくるものがあるんじゃないか、という実験的なものだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+旧サイトの様に、トップページがあり、また各テーマ毎のページがあり、トップにメニューを置いて各テーマに対してリンクする（または更にサブメニューがある）、というスタイルは俺がウェブサイトを作り始めた95年あたりでもごく普通のものだったし、今でも変わらずそうなんじゃないかと思う。
+</p>
+
+
+
+
+<p class="entryBody">
+これはこれでサイトのスタイルとしては一般的だし、一般的だからこそ分かりやすい、必要な情報にたどりつきやすいものだと思って、内容やデザインは違えど、今までずっとこのスタイルで通してきたわけですが、果たして本当に、このスタイルが一番いいものなのだろうか？と疑問を抱いたのが、ブログへの移行のきっかけのひとつだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+移行するのは別にブログでなくても、他のスタイルでもよかったのですが、画期的なスタイルをつくれるほどの創造性が俺にあるわけでもないので、とりあえずブログ形式を選択してみた、という感じです。要するに何でもいいからスタイルを変えてみて、そこから何かが見えるのか、あるいは見えないのか、とりあえずやってみようぜ、と。
+</p>
+
+
+
+
+<p class="entryBody">
+で、この２週間ほど、blosxomを導入して、既成のプラグインをつっこんでみたり改造してみたり、自分でプラグインをつくってみたり、ちょっとajax的なものを入れてみたり、という感じで自分なりのブログスタイルみたいなものをつくってきたわけですが、今までのスタイルと比較しての、ブログスタイルのメリット、デメリットみたいなものがちょっと見えてきた気がするので、まずはそれについて整理をしてみたいな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+続く。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/21/291/">Blosxomでtagging #6</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-21T08:17:00+09:00" pubdate>Apr 21<span>st</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/21/291/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/archives/tagging">taggingプラグイン</a>、以下のバグ修正と仕様変更を行う。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>個別エントリの表示の際に、タグの絞込み動作がおかしかったのを修正。</li>
+<li>個別エントリ表示時は、タグリストは全エントリに含まれるタグを表示していたのを、エントリが属するカテゴリのタグのみ表示する様に変更。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+それに合わせて、Javascriptやフレーバも修正。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/19/281/">Blosxomでtagging #5</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-19T23:19:00+09:00" pubdate>Apr 19<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/19/281/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+taggingプラグインをアップデート。約束通り、ajax（もどき）でタグを絞り込めるように改造。xmlHttpRequestに対応しているブラウザであれば、find tagフォームに文字を入れると、前方一致でダイナミックにタグが絞り込まれる様を見ることができます。対応していないブラウザでも、文字を入れてEnterを押せば同様にタグの絞込みができます。download: <a href="/archives/tagging">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+もちろん、xmlHttpRequestによる検索はこのプラグインだけでなく、Javascriptも必要です。Javascriptのコードについては、このサイトのソースをご参照下さい。
+</p>
+
+
+
+
+<p class="entryBody">
+これで大体欲しい機能は実装できたので、後はいじるとすると、バグフィックスとかパフォーマンス改善とか、その辺りかな。yuuさんからコメントでStorableモジュールを使わないで済むコードを頂いたのですが、こちらのコードに取り込むのはやめにしました。理由は、
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>Storableモジュールはperl5.8では標準で入ってるらしい。いまどき5.8が使えない環境は少ないだろう。</li>
+<li>今後キャッシュデータが増えたり、データ構造を変えたりするかもしれないので、その度にシリアライズルーチンを変更するのも面倒。それならば汎用的なシリアライザを使ったほうが良いだろう。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+といったところです。yuuさん、せっかく頂いたのに申し訳ありません。
+</p>
+
+
+
+
+<p class="entryBody">
+ちゃんとドキュメントつくらないとなぁ…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/18/342/">Blosxomでtagging #4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-18T23:12:00+09:00" pubdate>Apr 18<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/18/342/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+taggingプラグインをアップデート。現在自分がいるカテゴリ内のエントリにあるタグだけを表示できる様にしてみました。カテゴリ移動時に左のtagsメニューにご注目頂ければ、どんな動作かおわかりになるかと思います。download: <a href="/archives/tagging">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+カテゴリ名の表示には、<a href="http://hail2u.net/archives/blugins.html#categories" target="_blank">hail2u.net kyoさんのcategoriesプラグイン</a>を更に改造したものを使わせて頂いております。
+</p>
+
+
+
+
+<p class="entryBody">
+次の目標。タグが増えてくると目的のタグを探すのがつらくなるので、タグの絞込みができるフォームをつける。もちろん、Javascript + xmlHttpRequest + DOMを利用して、文字入力するたびにダイナミックに候補が絞り込まれていく様にする。（前も違う言葉で同じようなこと言ってた気がするけど&#8230;）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/17/272/">Blosxom + Rast #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-17T14:26:00+09:00" pubdate>Apr 17<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/17/272/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+blosxomのエントリを<a href="http://www.netlab.jp/rast/" target="_blank">Rast</a>で検索するためのプラグインを作ってみました。download: <a href="/archives/rast" target="_blank">rastプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+使い方の説明とかはまったく書いていませんので、使いたいという方がいらっしゃれば、ご連絡下さい。
+</p>
+
+
+
+
+<p class="entryBody">
+こんな少ないエントリのブログで、検索なんか必要ないだろう、と思われるかもしれませんが、検索が目的ではなくて、Rastをいじることが目的ですので。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/39/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/37/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

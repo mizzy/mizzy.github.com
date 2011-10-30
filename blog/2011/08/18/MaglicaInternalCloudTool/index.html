@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>MaglicaInternalCloudTool - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="Overview Maglica is a Python library and command-line tool for an internal cloud. (This tool is very primitive beta now.) This is very simple and &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2011/08/18/MaglicaInternalCloudTool">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">MaglicaInternalCloudTool</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-08-18T17:25:28+09:00" pubdate>Aug 18<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Overview</h1>
+
+<p><a href="https://github.com/mizzy/maglica">Maglica</a> is a Python library and command-line tool for an internal cloud. (This tool is very primitive beta now.)</p>
+
+<p>This is very simple and based on libvirt, virt-clone and zeromq (for RPC).</p>
+
+<p>The name &#8220;Maglica&#8221; is derived from a Bosnian word that means &#8220;Nebula.&#8221;</p>
+
+<p>I&#8217;m developing this tool because other internal cloud tools(CloudStack, OpenStack, Eucalyptus and so on) are so complicated for internal use.I need a simple tool.</p>
+
+<hr />
+
+<h1>Architecture of Maglica</h1>
+
+<p>Maglica has four components.</p>
+
+<ol>
+<li>Library</li>
+<li>CLI</li>
+<li>Client worker</li>
+<li>Host workers</li>
+</ol>
+
+
+<p>Maglica library is a main component of Maglica.Maglica CLI calls the library
+to do the jobs.The library talks to libvirtd on other hosts directly to get
+virtual machines information.</p>
+
+<p>Maglica client worker is running on the same host on which CLI runs.
+Client worker binds zeromq PUB socket to tcp://<em>:5555 and REP socket
+to tcp://</em>:5556.</p>
+
+<p>Client worker recieves requests from library through REP socket and throws
+request to host workers through PUB socket.Also REP socket recives job results
+from host workers.</p>
+
+<p>Host workers are running on hosts which virtual machines are running on.</p>
+
+<p>Host workers connect to the PUB socket of a client worker to receive job
+requests and the REP socket of a client worker to throw job results.</p>
+
+<p>[[Image(http://mizzy.org/img/maglica_architecture.jpg)]]</p>
+
+<hr />
+
+<h1>How to use Maglica</h1>
+
+<p>You must setup libvirtd running on host machines and accessible through
+tcp port. (See http://libvirt.org/remote.html)</p>
+
+<p>Clone Maglica on a host machine and run the host worker.</p>
+
+<pre><code># git clone git://github.com/mizzy/maglica.git
+# cd maglica
+# cp etc/maglica.conf.example etc/maglica.conf
+</code></pre>
+
+<p>Edit etc/maglica.conf that points to the correct client worker host and port.</p>
+
+<pre><code># ./scripts/maglica_host_worker
+</code></pre>
+
+<p>Clone Maglica on a client machine.</p>
+
+<pre><code># git clone git://github.com/mizzy/maglica.git
+# cd maglica
+# cp etc/maglica.conf.example etc/maglica.conf
+</code></pre>
+
+<p>Edit etc/maglica.conf that points to host machines.</p>
+
+<p>Run the client worker.</p>
+
+<pre><code># ./scripts/maglica_client_worker
+</code></pre>
+
+<p>Run maglica command to list up &#8220;original images&#8221;(which name is end with
+the string &#8220;oroginal&#8221;).</p>
+
+<pre><code># PYTHONPATH=. ./scripts/maglica image list
+Name                                     Host
+---------------------------------------------------------
+SL6.0-x86_64.original                    host0.example.jp  
+SL6.1-x86_64.original                    host0.example.jp  
+SL6.0-x86_64.original                    host1.example.jp  
+SL6.1-x86_64.original                    host1.example.jp  
+</code></pre>
+
+<p>Run maclica command to clone a virtual machine image.</p>
+
+<pre><code># ./scripts/maglica vm clone --image=SL6.1-x86_64.original --hostname=vm0.example.jp
+</code></pre>
+
+<p>This command clones the image on a host and rewrites network setting of the image with libguestfs.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2011-08-18T17:25:28+09:00" pubdate>Aug 18<span>th</span>, 2011</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2011/08/18/MaglicaInternalCloudTool/" data-via="" data-counturl="http://mizzy.org/blog/2011/08/18/MaglicaInternalCloudTool/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/07/24/HowToGetGraphiteWorkingOnScientificLinux6/" title="Previous Post: HowToGetGraphiteWorkingOnScientificLinux6">&laquo; HowToGetGraphiteWorkingOnScientificLinux6</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/09/03/SSLCertOfLolipop/" title="next Post: SSLCertOfLolipop">SSLCertOfLolipop &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

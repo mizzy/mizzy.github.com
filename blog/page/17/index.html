@@ -1,0 +1,1105 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="さすがにPlaggerでもこれは無理だと思いたい。PythonでYahoo!Booksのランキングをとってくる。 というエントリを見て、なんか釣りっぽいタイトルだけど敢えて釣られてみた。 ちょっとアウトプット違うけど、Plagger なら 10 分でできた。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/17">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/24/375/">Plagger で Yahoo!Booksのランキングをとってくる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-24T00:44:00+09:00" pubdate>Feb 24<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/24/375/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://pythonbeginner.blog78.fc2.com/blog-entry-213.html"><span class="icon"></span>さすがにPlaggerでもこれは無理だと思いたい。PythonでYahoo!Booksのランキングをとってくる。</a> というエントリを見て、なんか釣りっぽいタイトルだけど敢えて釣られてみた。
+</p>
+
+
+<p>
+ちょっとアウトプット違うけど、Plagger なら 10 分でできた。
+</p>
+
+
+<p>
+<img src="http://mizzy.org/img/plagger-ybooks-s.jpg" alt="http://mizzy.org/img/plagger-ybooks-s.jpg" />
+</p>
+
+
+<p>
+以下の2つのファイルを用意してやるだけ。
+</p>
+
+
+<p>
+config.yaml
+</p>
+
+
+<pre class="wiki">
+plugins:
+  - module: Subscription::Config
+    config:
+      feed:
+        - url: http://books.yahoo.co.jp/ranking/general/all/all/weekly/index.html
+          meta:
+            follow_link: /book_detail/.*
+
+  - module: CustomFeed::Simple
+
+  - module: Filter::EntryFullText
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: plagger@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+        attach_enclosures: 1
+
+</pre>
+
+
+<p>
+EntryFullText 用 yaml
+</p>
+
+
+<pre class="wiki">
+author: Gosuke Miyashita
+handle: http:\/\/books\.yahoo\.co\.jp\/book_detail\/\d+
+extract: &lt;!-- 書籍紹介 --&gt;.+&lt;small&gt;(.*?)&lt;/small&gt;.+&lt;!-- //書籍紹介 --&gt;
+extract_capture: body
+</pre>
+
+
+<p>
+既存の設定からほぼコピペなので、10 分のうち7割ぐらいは、EFT 用 yaml の文字コードが UTF-8 じゃないといけないのに、euc-jp にしてて「なんかうまくいかねー」とかやってた時間。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/17/386/">デブサミ出張 Shibuya イベントの補足</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-17T20:57:00+09:00" pubdate>Feb 17<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/17/386/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/archives/assurer_devsumi.pdf"><span class="icon"></span>デブサミ発表資料</a>中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。
+</p>
+
+
+<p>
+テストプラグインのコードはこの様になっています。
+</p>
+
+
+<pre class="wiki">
+package Assurer::Plugin::Test::SMTP;
+
+use strict;
+use warnings;
+<span style="color: blue;">use base qw( Assurer::Plugin::Test ); #(A)</span>
+<span style="color: blue;">use Assurer::Test; #(B)</span>
+use Net::SMTP;
+<div style="color: blue;">
+sub register {
+    my $self = shift;
+    $self->register_tests( qw/ connect / );          #(C)
+}
+</div>
+sub connect {
+    my ( $self, $context, $args ) = @_;
+
+    my $conf = $self->conf;
+
+    my $host     = $conf->{host}     || $context->conf->{host};
+    my $timeout  = $conf->{timeout}  || 10;
+
+    my $smtp = Net::SMTP->new(Host => $host, Timeout => $timeout);
+    <span style="color: blue;">ok($smtp, "smtp ok $host"); #(D)</span>
+}
+
+1;
+</pre>
+
+
+<p>
+青字の部分が、プラグインを書く際のお約束というかポイントとなる部分なので、順に説明していきます。
+</p>
+
+
+<p>
+(A) では Assurer::Plugin::Test を継承しているわけですが、テストプラグイン共通の処理はすべて Assurer::Plugin::Test に記述することにより、各プラグインでのコード量を減らそうという目論見になってます。
+</p>
+
+
+<p>
+(B) で Assurer::Test を use することより、ok(), is(), like() といったテスト用メソッドをインポートしています。
+</p>
+
+
+<p>
+(C) ではテストを行うメソッドを登録しています。複数登録する場合には、
+</p>
+
+
+<pre class="wiki">
+$self->register_tests( qw/ test1 test2 test3 / ); 
+</pre>
+
+
+<p>
+といった記述をします。この場合、test1(), test2(), test3() の順で実行されます。
+</p>
+
+
+<p>
+(D) が実際にテストを行っているところで、Test::More の ok() と同じ動作をします。この ok() は上で書いたように、Assurer::Test からインポートしたメソッドです。このような組み込みのテストメソッドを使うことで、if 文で結果を判断して適切なステータスを返す、といった処理を書く必要がなくなります。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://blog.nomadscafe.jp/archives/000713.html"><span class="icon"></span>kazeburo さんの発表</a>にある、Nagios プラグインと対比してみると、Nagios は exit 時のステータスコードだけ気にすればいい、というのに対して、Assurer では、上のコード (A), (B), (C) の様に、Assurer 特有のお約束を守る必要があるものの、exit コードは気にしなくていい、といった特徴があります。また、お約束を守ることによってコード量も減らせます。（特に結果判定で if を書かなくていい。）
+</p>
+
+
+<p>
+Nagios の場合、ステータスコードだけ気にすればいい、とは言っても、ステータスが OK, Warning, Crtitical, Unknown とあるわけで、OK はまだしも、どういった場合が Warning でどういった場合が Critical なのか、ということを気にするのは、ちょっと面倒な気もします。
+</p>
+
+
+<p>
+また、結果を受け取る側も、Warning とか Unknown とか受け取ると、それって問題あるの？ないの？って迷ったりしないのかな、とか、Warning と Critical の解釈って、人によって違うんじゃないかな、って思ったりします。（Nagios使ったことないんで、変なこと言ってるかもしれませんが。）
+</p>
+
+
+<p>
+そういった曖昧さをなくしたくて、Assurer では OK か NOT OK かの2種類の結果しか返さない、というポリシーにしました。
+</p>
+
+
+<p>
+とは言っても、Nagios の様にステータスが何種類かある方が便利だという場面はあるんでしょうね。その辺りは Assurer では、エラーメッセージでフィルタリングできるようにして、「こういったエラーメッセージの場合は、問題ないから OK にする」といった設定ができるような形にして、結果の解釈を利用者に委ねられるようにしようと考えています。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/14/314/">デブサミ出張 Shibuya イベント</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-14T21:58:00+09:00" pubdate>Feb 14<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/14/314/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200702.html"><span class="icon"></span>デブサミ出張 Shibuya イベント</a>で、Assurer についてしゃべってきました。発表資料を<a class="ext-link" href="http://mizzy.org/archives/assurer_devsumi.pdf"><span class="icon"></span>ここに置いておきます</a>。
+</p>
+
+
+<p>
+感想とか書きたいのですが、嘔吐下痢性の風邪にやれられて、一日何も食べることができず、打ち上げにも参加できないぐらい体調悪いので、今日はこの辺で。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/12/484/">Assurer にシェルモード</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-12T19:56:00+09:00" pubdate>Feb 12<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/12/484/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://assurer.jp/trac"><span class="icon"></span>Assurer</a> についてその後あんまり書いてないですが、何もしてないわけではなく、リトライをハンドリングできるようにしたり、並列実行できるようにしたりと、ちょこちょこと開発は進めています。
+</p>
+
+
+<p>
+で、<a class="ext-link" href="http://mizzy.org/program/archer00.html"><span class="icon"></span>前回のエントリ</a> で、<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> にシェルモードをつけてみたわけなんですが、シェルモードってテスト/監視ツールにこそふさわしい、と思ったので、Assurer にもつけてみました。こんな感じになります。
+</p>
+
+
+<pre class="wiki">
+$ assurer.pl --config=config.yaml --shell --role=app --para=3
+shell> uptime
+[www.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[svn.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[ftp.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+shell> 
+</pre>
+
+
+<p>
+&#8211;role がなければ、config.yaml で列挙されているホスト全部で実行します。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/12/392/">デプロイツール Archer #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-12T03:35:00+09:00" pubdate>Feb 12<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/12/392/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/"><span class="icon"></span>id:tokuhirom</a> さん作のデプロイツール <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> を最近使い始めたのですが、これがすげーいいっす。
+</p>
+
+
+<p>
+で、この週末は更に便利に使えるように、Archer 用のプラグイン書いたりしてました。
+</p>
+
+
+<ul><li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Log.pm"><span class="icon"></span>Archer::Plugin::SVN::Log</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Diff.pm"><span class="icon"></span>Archer::Plugin::SVN::Diff</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Update.pm"><span class="icon"></span>Archer::Plugin::SVN::Update</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Rsync.pm"><span class="icon"></span>Archer::Plugin::Rsync</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Shell.pm"><span class="icon"></span>Archer::Plugin::Shell</a></li></ul>
+
+
+<pre class="wiki">
+global:
+  work_dir: /home/miya/work
+  dest_dir: /home/miya/assurer
+
+tasks:
+  init:
+    - module: SVN::Diff
+
+    - module: Confirm
+      config:
+        msg: really update? [y/n]
+
+    - module: SVN::Update
+
+    - module: Confirm
+      config:
+        msg: really deploy? [y/n]
+
+  process:
+    - module: Rsync
+
+projects:
+  Assurer:
+    app:
+      - mizzy.org
+</pre>
+
+
+<p>
+こんな感じの設定をして、
+</p>
+
+
+<pre class="wiki">
+$ archer.pl Assurer -c assurer.yaml
+</pre>
+
+
+<p>
+とか実行すると、
+</p>
+
+
+<p>
+<ul>
+<li>/home/miya/work/Assurer にある svn co したファイルと、SVN HEAD の diff を表示。</li>
+<li>svn up するかどうか、プロンプト表示。</li>
+<li>svn up 実行。</li>
+<li>実際にデプロイするか、プロンプトを表示。</li>
+<li>ローカルの /home/miya/work/Assurer から リモートサーバ上の /home/miya/assurer へ rsync でファイルコピー。</li>
+</ul>
+</p>
+
+
+<p>
+といった動作になります。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://code.mfac.jp/trac/file/Archer/examples/config.yaml"><span class="icon"></span>Archer 同梱の config.yaml</a> では、svn log, svn up, rsync は Exec::Local プラグインで実行しているのですが、この辺りの記述をできるだけ簡略化したいな、ということで、こういったプラグインをつくってみました。
+</p>
+
+
+<p>
+また、ライブドアテクノロジーセミナーの <a class="ext-link" href="http://d.hatena.ne.jp/naoya/20061214/1166063145"><span class="icon"></span>naoya さんのプレゼン</a> で、Capistrano にはシェルプロンプトを表示して、指定したコマンドを複数のリモートサーバ上で一発で実行できる、という機能があって、これがうらやましかったので、Archer プラグインとして実装してみました。
+</p>
+
+
+<pre class="wiki">
+tasks:
+  init:
+    - module: Shell
+      config:
+        role: app
+        para: 1
+
+projects:
+  mizzy.org:
+    app:
+      - www.mizzy.org
+      - svn.mizzy.org
+      - ftp.mizzy.org
+</pre>
+
+
+<p>
+といった設定をしやると、以下の様な感じで実行できます。（3つのサーバは実体が同じなので、結果が同じですが。）
+</p>
+
+
+<pre class="wiki">
+$ ./archer.pl -c shell.yaml mizzy.org
+[info] run hook init
+[debug] load Archer::Plugin::Shell
+[info] run Archer::Plugin::Shell
+shell> uptime
+[www.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[svn.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[ftp.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+shell> 
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://code.mfac.jp/svn/Archer/"><span class="icon"></span>Archer はこちらから</a>入手できます。また、俺が書いたプラグインなんかは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Archer/"><span class="icon"></span>ここに置いてあります</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/18/470/">Assurer のプロジェクトサイト立ち上げました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-18T01:19:00+09:00" pubdate>Jan 18<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/18/470/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+irc#assurer@freenode での会話が盛り上がったので、勢いで <a class="ext-link" href="http://assurer.jp/trac"><span class="icon"></span>ドメインを取得して、独立した trac と svn repos を立ち上げてみました</a>。（最低限の体裁だけ。しかも <a class="ext-link" href="http://plagger.org/"><span class="icon"></span>plagger.org</a> からコピペ。）
+</p>
+
+
+<p>
+<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/"><span class="icon"></span>id:tokuhirom</a> さんからの contribute で、テストプラグインも増えてます。また、<a class="ext-link" href="http://blog.yappo.jp/"><span class="icon"></span>信頼のおける Yappo</a> さんから、Publish::File プラグインを提供してもらいました。感謝感謝。
+</p>
+
+
+<p>
+IRC での会話の流れで、テストだけではなく監視もカバーする、という方向性で行くことになりました。会話の断片はこちらで参照できます。
+</p>
+
+
+<ul><li><a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20070117/1169018818"><span class="icon"></span>http://d.hatena.ne.jp/tokuhirom/20070117/1169018818</a></li>
+<li><a class="ext-link" href="http://subtech.g.hatena.ne.jp/yappo/20070117/1169031325"><span class="icon"></span>http://subtech.g.hatena.ne.jp/yappo/20070117/1169031325</a></li></ul>
+
+
+<p>
+なんか略称がヒドイことになってます…（その略称に OK を出したのは自分ですが…）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/17/483/">Assurer - サーバテスティングフレームワーク #4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-17T00:10:00+09:00" pubdate>Jan 17<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/17/483/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) を修正。テストのターゲットとなるホストを、以下の3つのパターンのいずれかで指定できるようにしてみました。
+</p>
+
+
+<h3 id="config.yaml中のテストプラグイン設定で直接指定">config.yaml 中のテストプラグイン設定で直接指定</h3>
+
+
+<pre class="wiki">
+test:
+  - module: HTTP
+    config:
+      host: svn.mizzy.org
+      content: It works!
+</pre>
+
+
+<p>
+一番オーソドックスなパターンですね。
+</p>
+
+
+<h3 id="コマンドラインオプションで指定">コマンドラインオプションで指定</h3>
+
+
+<pre class="wiki">
+test:
+  - module: HTTP
+    config:
+      content: It works!
+</pre>
+
+
+<p>
+といった感じで config.yaml には host を書かずに、
+</p>
+
+
+<pre class="wiki">
+$ ./assurer.pl --config=configy.yaml --host=svn.mizzy.org
+</pre>
+
+
+<p>
+とコマンド実行時に指定。同じテストを複数のホストに対して実行する場合、いちいち config.yaml を書き換えるよりも、こっちの方が楽ですね。
+</p>
+
+
+<h3 id="config.yamlでターゲットホストをリストで指定">config.yaml でターゲットホストをリストで指定</h3>
+
+
+<pre class="wiki">
+test:
+  - module: HTTP
+    config:
+      content: It works!
+
+hosts:
+  - svn.mizzy.org
+  - trac.mizzy.org
+</pre>
+
+
+<p>
+2番目のパターンと同じ用に、テストプラグインの設定には host を記述しませんが、別なところにターゲットホストをリストアップしておきます。複数のホストに対して一気に実行するのであれば、この方法が楽ですね。
+</p>
+
+
+<p>
+これの変形で、
+</p>
+
+
+<pre class="wiki">
+test:
+  - module: HTTP
+    role: web
+    config:
+      contnet: It works!
+
+  - module: MySQL
+    role: mysql
+
+hosts:
+  web:
+    - svn.mizzy.org
+    - trac.mizzy.org
+  mysql:
+    - mysql.mizzy.org
+</pre>
+
+
+<p>
+といった感じで設定すると、HTTP のテストは svn.mizzy.org と trac.mizzy.org に、MySQL のテストは mysql.mizzy.org に対して実行される、という動作になります。（MySQL テスト用プラグインはまだ存在しませんが。）
+</p>
+
+
+<p>
+複数の役割の異なるホストに対してテストを実行するには、このパターンで。
+</p>
+
+
+<p>
+最後のやつは <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> からのインスパイヤです。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/14/267/">Assurer - サーバテスティングフレームワーク #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-14T16:04:00+09:00" pubdate>Jan 14<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/14/267/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) を修正。主な修正点は以下の通りです。
+</p>
+
+
+<ul><li>テスト結果を保持する Assurer::Results クラスを削除。代わりに Test::TAP::Model を使うようにした。</li>
+<li>Format, Publish まわりを実装し、Format::Text, Format::HTML, Publish::Term を実装。</li>
+<li>Assurer::Test でテスト結果をターミナルに表示していたのを、Publish::Term に分離。</li></ul>
+
+
+<pre class="wiki">
+format:
+  - module: HTML
+    config:
+      css_uri: htmlmatrix.css
+
+publish:
+  - module: Term
+</pre>
+
+
+<p>
+といった設定をして、
+</p>
+
+
+<pre class="wiki">
+$ ./assurer.pl -c examples/config.yaml > tap.html
+</pre>
+
+
+<p>
+と実行すると、<a class="ext-link" href="http://mizzy.org/archives/tap.html"><span class="icon"></span>こんな感じの HTML</a> が得られます。
+</p>
+
+
+<p>
+これで大枠はだいぶ整ってきた気がする。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/12/394/">Net::LDAPx::Simple と Catalyst::Model::LDAPx::Simple</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-12T23:31:00+09:00" pubdate>Jan 12<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/12/394/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/net-ldap-abstract00.html"><span class="icon"></span>Net::LDAP::Alterntive あらため Net::LDAP::Abstract</a> ですが、この名前だと Net::LDAP の中のモジュールと区別がつかないし、パッと見何をやるモジュールなのか分からないので、<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Net-LDAPx-Simple"><span class="icon"></span>Net::LDAPx::Simple</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Net-LDAPx-Simple/"><span class="icon"></span>SVN</a>) とまた名称を変更しました。DBIx::Simple からの連想です。
+以下の様な感じで CRUD が一通りできるようになってます。
+</p>
+
+
+<pre class="wiki">
+# Create
+my $res = $ldap->create({
+    dn => 'uid=mizzy, ou=people, o=southpark',
+    objectclass => [ 'person', 'inetorgperson' ],
+    sn => 'Miyashita',
+    cn => 'Gosuke Miyashita',
+    uid => 'mizzy',
+});
+
+# Retrieve
+my $entries = $ldap->search({
+    -or => {
+        uid => 'miya',
+        cn  => 'miyashita*',
+        },
+    }
+});
+
+# Update
+my $entry = $entries->first;
+$entry->telephonenumber('00-0000-0000');
+$entry->update;
+
+# Delete
+$entry->delete;
+</pre>
+
+
+<p>
+ついでに <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Catalyst-Model-LDAPx-Simple"><span class="icon"></span>Catalyst::Model::LDAPx::Simple</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Catalyst-Model-LDAPx-Simple/"><span class="icon"></span>SVN</a>) もつくりました。Catalyst::Model::* つくるのはじめてなので、こんな感じでいいのかちょっと不安。もう少し他の Catalyst::Model::* のソースを読んでみる。
+</p>
+
+
+<p>
+もうちょいエラーハンドリングちゃんとして、POD 書いたり Helper つくったりした後に CPAN に up 予定。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/08/361/">Assurer - サーバテスティングフレームワーク #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-08T01:19:00+09:00" pubdate>Jan 8<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/08/361/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) をまた修正。
+</p>
+
+
+<p>
+プラグインの実行フェーズを、test, format, publish の3つにわけてみました。
+</p>
+
+
+<pre class="wiki">
+test:
+  - module: HTTP
+    name: http://svn.mizzy.org/ #0
+    config:
+      url: http://svn.mizzy.org/
+      match: It works!
+
+format:
+  - module: HTML
+
+publish:
+  - module: Mail
+
+</pre>
+
+
+<p>
+こんな感じで config.yaml を書くと、テスト結果を HTML でフォーマットしてメールで飛ばす、みないな動作になることを意図しています。（まだ Format::HTML や Publish::Mail はつくってないですが。）
+</p>
+
+
+<pre class="wiki">
+format:
+  - module: Text
+
+publish:
+  - module: File
+</pre>
+
+
+<p>
+とかやると、テキスト形式でファイルに吐き出すとか、そんな感じで。
+</p>
+
+
+<p>
+単にターミナルに結果を表示するだけであれば、format と publish は必要ないです。
+</p>
+
+
+<p>
+これにともなって、プラグインのネームスペースも、Plugin::Test::*, Plugin::Format::*, Plugin::Publish::* の3つに分割しています。
+</p>
+
+
+<p>
+また、Assurer::Results というクラスも新たに追加しました。Plugin::Test::* によるテスト結果を保持しておいて、Plugin::Format::* に渡すためのクラスです。
+</p>
+
+
+<p>
+こんな感じで遅々としてますが、少しづつ前進しています。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/18/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/16/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

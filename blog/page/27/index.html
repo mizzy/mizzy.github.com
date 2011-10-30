@@ -1,0 +1,889 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="Plagger::Plugin::CustomFeed::iTunesRecentPlay をアップデートして本家に commit しました。修正点は以下の通り。 $entry->title をセットするようにした。フォーマットは config.yaml で変更可能。 $entry-> &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/27">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/04/02/265/">Plagger と iTunes</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-04-02T17:08:00+09:00" pubdate>Apr 2<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/04/02/265/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://plagger.org/trac/browser/trunk/plagger/lib/Plagger/Plugin/CustomFeed/iTunesRecentPlay.pm" target="_blank">Plagger::Plugin::CustomFeed::iTunesRecentPlay</a> をアップデートして本家に commit しました。修正点は以下の通り。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>$entry->title をセットするようにした。フォーマットは config.yaml で変更可能。 </li>
+<li>$entry->author にアーティスト名をセット。</li>
+<li>Net::Amazon を利用して、$entry->link に Amazon へのリンクをセットしたり、$entry->icon に画像をセットしたり。config.yaml で Developer Token, Associate ID, locale を設定。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+Gmail に投げるとこんな感じ。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/img/itunes_plagger.jpg" target="_blank"><img src="http://mizzy.org/img/itunes_plagger_t.jpg" /></a>
+</p>
+
+
+
+
+<p class="entryBody">
+Publish::MTWidget で MTのサイドバーに表示するとこんな感じ。以前に載せた画像と変わりないですが、今回は Amazon へのリンクがちゃんと入っているところがポイントです。
+</p>
+
+
+
+
+<p class="entryBody">
+<img src="http://mizzy.org/img/itunes_mtwidget.jpg" />
+</p>
+
+
+
+
+<p class="entryBody">
+これでやっとまともに使えるようになったかな、という感じですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/04/02/343/">Blosxom で Tagging #13</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-04-02T13:59:00+09:00" pubdate>Apr 2<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/04/02/343/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/blosxomWithTagging12.html#comments" target="_blank">Pe7 さんのリクエスト</a> により、 <a href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/tagging" target="_blank">tagging プラグイン</a> をアップデート。タグでエントリを絞り込むと、関連するタグリストを表示できるようにしました。そこから更にタグで絞り込む、ということが可能です。
+</p>
+
+
+
+
+<p class="entryBody">
+使い方ですが、関連タグを表示したいところに、$tagging::related_tags と入れてください。左サイドバーの「related tags」の様な感じになります。
+</p>
+
+
+
+
+<p class="entryBody">
+表示フォーマットが気に入らない場合には、169 行目から 176 行目を適当にいじってください。
+</p>
+
+
+
+
+<p class="entryBody">
+もっとこうして欲しいとか、ご要望があればお気軽にどうぞ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/30/345/">Plagger と Google Video #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-30T23:36:00+09:00" pubdate>Mar 30<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/30/345/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/GoogleVideo.pm" target="_blank">CustomFeed::GoogleVideo</a> をアップデートしてみた。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>LWP::Simple ではなく Plagger::UserAgent を使うようにしてみた。</li>
+<li>pod 書いた。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+本当は enclosure に length を入れるために、HEAD でファイルサイズ取得しようと思って、Plagger::UserAgent 使ってみたんだけど、HEAD だと Content-length に 0 が返ってきてしまうので、意味がなかった…
+</p>
+
+
+
+
+<p class="entryBody">
+あと、Google Video が返す RSS の item には、media:content が 4つ含まれます。type が video/x-flv, video/x-msvideo, video/mp4 が 2つ、という感じで。で、video/mp4 のものは、どっちが PSP 用でどっちが iPod 用かが、RSS 見ただけでは区別がつかないので、最初のものが iPod 用、2番目のものが PSP 用と決めうちにしてます。
+</p>
+
+
+
+
+<p class="entryBody">
+0.7 で enclosure や MediaRSS に対応するとのことなので、それまでは 本家の方には取り込まずに野良プラグインとして転がしておきます。（そうしてくれ、と宮川さんから言われましたので。）
+</p>
+
+
+
+
+<p class="entryBody">
+プラグイン名も、Google Video は最初から RSSを吐いてるので CustomFeed ではなく Subscription なのかなぁ、とか思ったりしてるのですが、その辺りは 0.7 で取り込まれるときに、宮川さんが良きにはからってくれるでしょう。
+</p>
+
+
+
+
+<p class="entryBody">
+これで GoogleVideo の方はほぼ完成ということで、次は YouTube 行きます。あ、iTunesRecentPlay もまだ中途半端だった…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/27/427/">DBIx::Class のカスタム JOIN ではまる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-27T12:42:00+09:00" pubdate>Mar 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/27/427/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://search.cpan.org/~mstrout/DBIx-Class-0.06000/lib/DBIx/Class/ResultSet.pm#from" target="_blank">DBIx::Class::ResultSet の from メソッドの説明</a> にしたがって、カスタム JOIN を試みるものの、どうしても join type が指定できない、という現象にはまる。 
+</p>
+
+
+
+
+<p class="entryBody">
+ドキュメント上では -join-type => &#8216;inner|left|right&#8217; って書いてあって、この通りに記述してるのに、全然指定通りの JOIN ができない。で、色々ソース眺めてたら、DBIx::Class::ResultSource のソースにこんな記述が。
+</p>
+
+
+
+
+<pre class="code">
+return [ { $as => $self->related_source($join)->from,
+           <strong>-join_type => $type</strong> }
+         $self->resolve_condition($rel_info->{cond}, $as, $alias) ];
+</pre>
+
+
+
+
+<p class="entryBody">
+-join-type じゃなくて -join_type かよ！これで 3,4 時間無駄にしました…。-join_type に変えたらうまくいきましたよ。
+</p>
+
+
+
+
+<p class="entryBody">
+自分の様な犠牲者をこれ以上出さないために、Matt S Trout にドキュメントなおしといてね、とメールしておきました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/26/349/">開発合宿と Plagger と Google Video</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-26T06:32:00+09:00" pubdate>Mar 26<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/26/349/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+現在、<a href="http://solvalou.net/" target="_blank">オオヒダさん</a>、<a href="http://yasuhisa.com/could/" target="_blank">ヤスヒサさん</a>、<a href="http://purpr.in/" target="_blank">purprin さん</a>、<a href="http://vgzh.dtdns.net/mt/index.html" target="_blank">モイモラさん</a>、ボンヌさん、タロさんと伊東の温泉旅館で開発合宿中です。
+</p>
+
+
+
+
+<p class="entryBody">
+何をやるかまったく考えないまま来てしまったのですが、プログラマだけでなくデザインや Flash などに詳しいクリエータも一緒なので、お互い最近プライベートで作っているものを見せ合ったり、こんなのおもしろいよね、などと話しているだけでもとても刺激になります。で、色々話しているうちに自分の合宿のテーマは、「Plagger で Google Video の検索結果を取得して、それを iPod で取り込むようなものをつくる」と決めました。決めた時には既に夜遅い時間だったのですが。
+</p>
+
+
+
+
+<p class="entryBody">
+とりあえず今回は形にすることを最優先にしたため、まだまだブラッシュアップが必要ですが、一応 iPod に取り込むという目標は達成できたので、合宿の成果としてプログラムを公開します。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li><a href="http://mizzy.org/archives/GoogleVideo.pm" target="_blank">Plagger::Plugin::CustomFeed::GoogleVideo</a></li>
+<li><a href="http://mizzy.org/archives/PodCast.pm" target="_blank">Plagger::Plugin::Publish::PodCast</a></li>
+<li><a href="http://mizzy.org/archives/TinyURL.pm" target="_blank">Plagger::Plugin::Filter::TinyURL</a></li>
+</ul>
+
+
+
+
+<p class="entryBody">
+P::P::CustomFeed::GoogleVideo では、config.yaml 中で指定した検索条件にしたがって、Google Video から MediaRSS を取得してパースしています。
+</p>
+
+
+
+
+<p class="entryBody">
+P::P::Publish::PodCast では、PodCast フィードを生成します。このフィードを iTunes に登録してビデオをダウンロード、iPod に取り込むということをやってます。現在 Plagger::Entry には enclosure 用のアクセサがないため、$entry->meta->{enclosure} に enclosure 関連の情報を突っ込んで処理する、ということをやっているのですが、今後宮川さんが Plagger コアで eclosure 対応してくれる、とのことでした。
+</p>
+
+
+
+
+<p class="entryBody">
+また、P::P::Publish::PodCast は P::P::Publish::Feed で吸収できるかな、と思ったのですが、P::P::Publish::Feed で利用している XML::Feed::Entry は enclosure に対応していないので、XML::RSS を使うことにしました。それ以外の部分は宮川さんのコードをほとんどそのまま利用させて頂いてます。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、P::P::Filter::TinyURL は、enclosure の URL を TinyURL に変換するために作りました。なんでこんなことをするかというと、Google Video の URL は長すぎて、iTunes に登録するとエラーとなってしまうためです。また、拡張子がないとやはり怒られるので、TinyURL にダミーで拡張子をつける処理もしています。これは以前モイモラさんがはまった際に、みんなで解決策を考えた、という経緯があったので、今回ははまらずに済みました。
+</p>
+
+
+
+
+<p class="entryBody">
+ちなみに、CustomFeed::GoogleVideo と　Publish::Gmail を組み合わせると<a href="http://mizzy.org/img/video_gmail.png" target="_blank">こんな感じになります</a>。もちろんメール中のリンクをクリックすれば Google Video のページに飛んで、すぐに動画を見ることができます。
+</p>
+
+
+
+
+<p class="entryBody">
+とりあえず形にしただけで、まだまだブラッシュアップが必要なので、commit はしてません。宮川さんや他の開発者の方々と相談しながら、いいものにしていきたいな、と思ってます。あと、YouTube にも対応させたいですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/10/420/">Plagger::Plugin::CustomFeed::iTunesRecentPlay #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-10T10:42:00+09:00" pubdate>Mar 10<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/10/420/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+PLAYLOG が関係なくなったので、タイトル変更。Publish::MTWidget と組み合わせて、MT + <a href="http://www.majordojo.com/projects/SidebarManager/" target="_blank">Sidebar Manager</a> の環境で、サイドバーに iTunes で最近聴いた曲を表示できるように、エントリの title に曲名とアーティスト名をセットするようにしてみました。こんな感じで表示されます。
+</p>
+
+
+
+
+<p class="entryBody">
+<img src="http://mizzy.org/img/irp.jpg" />
+</p>
+
+
+
+
+<p class="entryBody">
+ですがまだ課題が色々あるので、コミットしてません。ここに TODO をまとめておきます。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>「曲名 - アーティスト名」というフォーマット決めうちなので、config.yaml で自由にカスタマイズできるようにしたい。MTWidget だけでなく、他の Publish 系プラグインと組み合わせるには、どの要素に何を入れるかカスタマイズできる必要があるので、ここは必須かな。</li>
+<li>link 要素に Amazon へのリンクを入れたい。Filter でやるのがスマートかなぁ。</li>
+<li>表示する件数を固定できるようにしたい。今は duration でしか制御ができない。</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/07/496/">PLAYLOG HACKS With Plagger #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-07T22:57:00+09:00" pubdate>Mar 7<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/07/496/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Plagger Plugin の <a href="http://plagger.org/trac/browser/trunk/plagger/lib/Plagger/Plugin/CustomFeed/iTunesRecentPlay.pm" target="_blank">CustomFeed::iTunesRecentPlay</a> をアップデート。
+</p>
+
+
+
+
+<p class="entryBody">
+前回廃止した reload_period ですが、ライブラリが大きいとメモリ食いまくるからあった方がいいかも、と宮川さんから助言があったため、復活しました。ただし、Rule::Fresh と合わせてパラメータ名は duration とし、分単位で指定するようにしています。
+</p>
+
+
+
+
+<p class="entryBody">
+また、otsune さんからリクエストあがっていた、URL を指定しての iTunes Music Library.xml の取得処理の実装は見送ることにしました。というのも、iTunes を動かしていないどこかのサーバで plagger を動かす場合、直接 iTunes が動いているマシンから HTTP GET で iTunes Music Library.xml を取得することはないでしょうから、必ずどこかにファイルを移すことになると思います。であれば、plagger を動かすサーバに直接ファイルをアップして、 config.yaml の library_path でパスを指定すれば事足りるかな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、ローカルファイルの場合はファイルハンドルを while で回して処理、URL 指定の場合は一度変数にデータを格納してから処理、という違いがあり、この違いをエレガントに吸収する仕組みがすぐに思いつかなかった、という理由もあったりします。
+</p>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/07/493/">PLAYLOG HACKS With Plagger #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-07T14:57:00+09:00" pubdate>Mar 7<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/07/493/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアップデート。<a href="http://plagger.org/trac" target="_blank">本家サイト</a> にコミットしてますので、こちらをご参照ください。
+</p>
+
+
+
+
+<p class="entryBody">
+宮川さんの助言にしたがって、CustomFeed::iTunesRecentPlay の中の reload_period を廃止して、Rule::Fresh を利用するようにししました。
+</p>
+
+
+
+
+<p class="entryBody">
+それにともない、Publish::Playlog も publish.feed の代わりに publish.entry を利用するようにしています。（entry ひとつひとつの日時を見る必要があるため。）
+</p>
+
+
+
+
+<p class="entryBody">
+最初、宮川さんが CustomFeed::iTunesRecentPlay を修正しているのに気づかないままローカルコピーをいじってました…。svn update する癖をつけないといかんですね。
+</p>
+
+
+
+
+<p class="entryBody">
+次のタスクは、宮川さんの助言にある「スマートリストまたは iTunes API の利用」と otsune さんの助言にある「iTunes Music Library.xml の URL 指定での取得」ですね。といっても、実は「スマートリストの利用」というのが具体的にどうするのかがわからなかったりします。XML をパースするわけでもなく、API も利用せずに、スマートリストを取得する方法があるのでしょうか？#plagger-ja に宮川さんがいらっしゃれば聞いてみようと思ったのですが、誰もいなかったので忘れないようにここにメモしておきます。またコメントしてくれることを期待して:-)
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>2006/03/07 14:50 追記</strong><br />
+深夜に回線ダウンしている間に、宮川さんからメールで回答頂けました。多謝。 #plagger-ja に誰もいなかったのは、単にサーバ選択を間違えていたからでした。 IRC ビギナーなので、クライアントでサーバ選択できるのを見て、「分散システムになってて、どこのサーバ選んでもいいのかな？」と激しく勘違いしてました…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/07/317/">PLAYLOG HACKS With Plagger #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-07T00:41:00+09:00" pubdate>Mar 7<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/07/317/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/playlog_hacks.html" target="_blank">iTunes や iPod で聴いた曲情報を非同期で PLAYLOG へアップするスクリプト</a> を Plagger Plugin として書き直してみました。よくわかってないので、他の方がつくったプラグインの見様見真似で。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li><a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTunesRecentPlay.pm" target="_blank">Plagger::Plugin::CustomFeed::iTunesRecentPlay</a></li>
+<li><a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Publish/Playlog.pm" target="_blank">Plagger::Plugin::Publish::Playlog</a></li>
+</ul>
+
+
+
+
+<p class="entryBody">
+とりあえず気になった点をここに書いておけば、宮川さんとかが答えてくれるかも。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>CustomFeed の下に置くのは適切？</li>
+<li>iTunes Music Library.xml から取得した曲データは、全部 $entry->meta につっこんでるけど、このやり方は正しい？</li>
+<li>今後「最近聴いた曲」以外の情報を取得するプラグインとかも必要になるかもしれないから、Plugin::iTunes とか作って、その下に Plugin::iTunes::RecentPlay とか作った方がいいかも。</li>
+<li>Publish::Playlog も、Publish::AtomPP::Playlog とかにした方がいいかも。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+この辺りもっとブラッシュアップしてから、commit 権もらって commit させてもらおうっと。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/04/451/">Svk のインストールではまる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-04T23:53:00+09:00" pubdate>Mar 4<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/04/451/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+正確には svk ではなく、subversion の perl binding のインストールではまったのでメモ。svk をインストールしようとすると、「SVN::Core がねーよ、subversion の perl binding をちゃんと入れとけ」みたいなことを言われたので、subversion のソースディレクトリで make swig-pl; make check-swig-pl したところで、以下の様なエラーが大量に出る。
+
+</p>
+
+
+
+
+<p class="code">
+../../../../../subversion/bindings/swig/perl/native/t/4pool&#8230;&#8230;Can&#8217;t load &#8216;/home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so&#8217; for module SVN::_Core: /home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so: undefined symbol: svn_swig_pl_thunk_config_enumerator at /usr/local/lib/perl5/5.8.7/i686-linux/DynaLoader.pm line 230.
+</p>
+
+
+
+
+<p class="entryBody">
+「undefined symbol: svn_swig_pl_thunk_config_enumerator」と出てるので、こいつが含まれるライブラリがリンクされてないんだろうな、と思いまずはライブラリ探し。これは libsvn_swig_perl-1.so であることを発見。で、ldd _Core.so を実行してみると、案の定このライブラリがリンクされてない。
+</p>
+
+
+
+
+<p class="entryBody">
+というわけで、subversion/bindings/swig/perl/native/Makefile の LOADLIBS の行の最後に、-lsvn_swig_perl-1 を追加して make swig-pl; make check-swig-pl すると今度はエラーもなくチェック完了。このまま make install で無事インストールができた。
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>追記</strong><br />
+あとで最初からやりなおしてみたら、最初から Makefile に -lsvn_swig_perl-1 があった。なんだったんだろう？
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/28/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/26/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1464 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="perl で ffmpeg を扱うモジュールには、FFmpeg というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/23">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/27/340/">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-27T01:17:00+09:00" pubdate>Jul 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/27/340/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+perl で ffmpeg を扱うモジュールには、<a class="ext-link" href="http://search.cpan.org/~allenday/FFmpeg-5704/FFmpeg.pm"><span class="icon"></span>FFmpeg</a> というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、じゃあラッパー作ろうと思ったら、ボンヌさんも作っているということで待っていたのですが、音沙汰がないのと、早急に必要なのもあって、とりあえず作ってみました。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"><span class="icon"></span>FFmpeg::Command</a>
+</p>
+
+
+<p>
+まだ pod が不完全ですが、とりあえず YouTube から拾った flv 動画を mpeg4 に変換して iTunes で観たり、サムネイルを JPEG で切り出したり、といったことができることを確認しました。
+</p>
+
+
+<p>
+使い方は SYNOPSYS にも書いてますが、動画の変換であればこんな感じで。
+</p>
+
+
+<pre class="wiki">
+my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
+
+$ffmpeg->input_options({
+    file => 'nba.flv',
+});
+
+$ffmpeg->output_options({
+    file                => 'nba.mp4',
+    format              => 'mp4',
+    video_codec         => 'mpeg4',
+    bitrate             => '640',
+    size                => '320x240',
+    audio_codec         => 'aac',
+    audio_sampling_rate => '44100',
+    audio_bit_rate      => '128',
+});
+
+$ffmpeg->exec();
+</pre>
+
+
+<p>
+サムネイルの切り出しはこんな感じ。（任意のオプションで実行する機能。）
+</p>
+
+
+<pre class="wiki">
+my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
+
+$ffmpeg->input_file('nba.flv');
+$ffmpeg->output_file('nba.mp4');
+
+$ffmpeg->options(
+    '-y',
+    '-f'       => 'image2',
+    '-pix_fmt' => 'jpg',
+    '-vframes' => 1,
+    '-ss'      => 30,
+    '-s'       => '320x240',
+    '-an',
+);
+
+$ffmpeg->exec();
+</pre>
+
+
+<p>
+これから実装したいと思っている機能は、以下の様な指定をすれば、iPod や PSP に適切なパラメータを勝手に設定して変換してくれる、というもの。もちろん、自分の好きな値でパラメータを上書きすることも可能な感じで。
+</p>
+
+
+<pre class="wiki">
+my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
+
+$ffmpeg->input_options({
+    file => 'nba.flv',
+});
+
+$ffmpeg->output_options({
+    file   => 'nba.mp4',
+    <strong>device => 'ipod' or 'psp',</strong>
+});
+
+$ffmpeg->exec();
+</pre>
+
+
+<p>
+ボンヌさんが作られているものと統合して、いいものになるといいな。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/22/448/">Catlxom の Account Auto-Discovery プラグイン (Catlxom メモ #9)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-22T23:16:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/22/448/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは <a class="ext-link" href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery"><span class="icon"></span>Account Auto-Discovery</a> データを追加するプラグインを書いてみた。
+</p>
+
+
+<p>
+blosxom でも <a class="ext-link" href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/account_auto_discovery"><span class="icon"></span>同様のプラグイン</a> を書いているのですが、一番大きな違いは、blosxom プラグインはテンプレートの修正が必要なのに対し、catlxom プラグインはテンプレートの修正が一切必要ありません。XML::TreeBuilder を利用して、HTML ヘッダにデータを追加するような作りにしています。
+</p>
+
+
+<p>
+利用上の注意点として、Template::TT よりも後にこのプラグインをロードしなければいけいのですが、自動ロードを有効にしてると先にロードされちゃうので、自動ロードをオフにして yaml で明示的に利用プラグインを指定する必要があります。
+</p>
+
+
+<pre class="wiki">
+package Catlxom::Plugin::Format::AccountAutoDiscovery;
+use strict;
+use warnings;
+use base qw/Catlxom::Plugin/;
+
+use NEXT;
+use XML::TreeBuilder;
+
+sub interpolate {
+    my ( $self, $c ) = @_;
+
+    my $accounts = $c-&gt;config-&gt;{account_auto_discovery};
+
+    my $tree = XML::TreeBuilder-&gt;new();
+    $tree-&gt;parse($c-&gt;res-&gt;body);
+
+    my $head = $tree-&gt;find('head');
+
+    for ( @$accounts ){
+        my $rdf = XML::Element-&gt;new(
+            'rdf:RDF',
+            'xmlns:rdf'  =&gt; 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            'xmlns:foaf' =&gt; 'http://xmlns.com/foaf/0.1/',
+        );
+
+        my $rdf_description = XML::Element-&gt;new(
+            'rdf:Description',
+            'rdf:about' =&gt; $c-&gt;req-&gt;uri,
+        );
+
+        my $foaf_maker = XML::Element-&gt;new(
+            'foaf:maker',
+            'rdf:parseType' =&gt; 'Resource',
+        );
+
+        my $foaf_holds_acount = XML::Element-&gt;new( 'foaf:holdsAccount' );
+
+        my $foaf_online_account = XML::Element-&gt;new(
+            'foaf:OnlineAccount',
+            'foaf:accountName' =&gt; $_-&gt;{account_name},
+        );
+
+        my $foaf_account_service_homepage = XML::Element-&gt;new(
+            'foaf:accountServiceHomepage',
+            'rdf:resource' =&gt; $_-&gt;{account_service_homepage},
+        );
+
+        $head-&gt;push_content($rdf);
+        $rdf-&gt;push_content($rdf_description);
+        $rdf_description-&gt;push_content($foaf_maker);
+        $foaf_maker-&gt;push_content($foaf_holds_acount);
+        $foaf_holds_acount-&gt;push_content($foaf_online_account);
+        $foaf_online_account-&gt;push_content($foaf_account_service_homepage);
+    }
+
+    $c-&gt;res-&gt;{body} = $tree-&gt;as_HTML;
+    $self-&gt;NEXT::interpolate($c);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Catlxom::Plugin::Format::AccountAutoDiscovery
+
+=head1 SYNOPSIS
+
+account_auto_discovery:
+  - account_name: gosukenator
+    account_service_homepage: http://www.hatena.ne.jp/
+  - account_name: xxxx
+    account_service_homepage: http://xxx.ne.jp/
+
+=head1 DESCRIPTION
+
+This plugin inserts Account Auto-Discovery data into HTML header.
+
+=head1 AUTHOR
+
+Gosuke Miyashita
+
+=head1 SEE ALSO
+
+L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;
+
+=cut
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/22/505/">Fedora Core 4 への Courier-IMAP の導入</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-22T19:45:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/22/505/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+訳あって Fedora Core 4 上でメールサーバを構築する必要があったので、<a class="ext-link" href="http://www.courier-mta.org/imap/"><span class="icon"></span>Courier-IMAP</a> を導入しました。mizzy.org のサーバでも使っていて慣れているし、今のところトラブルもないので安心して利用できるので。
+</p>
+
+
+<p>
+RPM は嫌いなんですが、Fedora Core を使うのであれば、できる限り RPM で入れた方がいいよな、と思い RPM パッケージを探したのですが、Courier-IMAP のソース（ソース RPM ではない）から RPM パッケージを作成できることが判明。ただ、ソース付属の INSALL 読んだだけですんなりインストールできたわけではないので、ここに導入メモを残しておきます。
+</p>
+
+
+<h3 id="expectのインストール">expect のインストール</h3>
+
+
+<p>
+expect に依存してるので、入ってなければインストール。
+</p>
+
+
+<pre class="wiki">
+$ sudo yum install expect
+</pre>
+
+
+<h3 id="libtool-ltdl-develのインストール">libtool-ltdl-devel のインストール</h3>
+
+
+<p>
+Courier-IMAP は <a class="ext-link" href="http://www.courier-mta.org/authlib/"><span class="icon"></span>Courier-Authlib</a> に依存してるのですが、Courier-Authlib の RPM パッケージ作成時に、libtool-ltdl-devel がないと、最後の最後に以下の様なエラーが出ます。
+</p>
+
+
+<pre class="wiki">
+Checking for unpackaged file(s): /usr/lib/rpm/check-files /var/tmp/courier-authlib-0.58-1.4-root
+error: Installed (but unpackaged) file(s) found:
+   /usr/lib/libltdl.a
+   /usr/lib/libltdl.la
+   /usr/lib/libltdl.so
+   /usr/lib/libltdl.so.3
+   /usr/lib/libltdl.so.3.1.0
+</pre>
+
+
+<p>
+なので、まずは yum で libtool-ltdl-devel をインストール。
+</p>
+
+
+<pre class="wiki">
+$ sudo yum install libtool-ltdl-devel
+</pre>
+
+
+<h3 id="Courier-Authlibのインストール">Courier-Authlib のインストール</h3>
+
+
+<p>
+<a class="ext-link" href="http://www.courier-mta.org/?download.php~authlib"><span class="icon"></span>ここから</a> Courier-Authlib のソースをダウンロード。展開はせずにそのまま
+</p>
+
+
+<pre class="wiki">
+$ sudo rpmbuild -ta courier-authlib-0.58.tar.bz2
+</pre>
+
+
+<p>
+を実行。しばらくビルド作業が続き、以下の様に複数の RPM パッケージを生成して完了。
+</p>
+
+
+<pre class="wiki">
+Wrote: /usr/src/redhat/SRPMS/courier-authlib-0.58-1.4.src.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-devel-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-userdb-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-ldap-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-mysql-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-pgsql-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-pipe-0.58-1.4.i386.rpm
+Wrote: /usr/src/redhat/RPMS/i386/courier-authlib-debuginfo-0.58-1.4.i386.rpm
+Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.17424
++ umask 022
++ cd /usr/src/redhat/BUILD
++ cd courier-authlib-0.58
++ rm -rf /var/tmp/courier-authlib-0.58-1.4-root
++ exit 0
+</pre>
+
+
+<p>
+このうち courier-authlib と courier-authlib-devel は必須なのでインストールしておきます。
+</p>
+
+
+<pre class="wiki">
+$ rpm -Uvh /usr/src/redhat/RPMS/i386/courier-authlib-0.58-1.4.i386.rpm
+$ rpm -Uvh /usr/src/redhat/RPMS/i386/courier-authlib-devel-0.58-1.4.i386.rpm
+</pre>
+
+
+<p>
+後は必要なものを適宜インストール。
+</p>
+
+
+<h3 id="gamin-develのインストール">gamin-devel のインストール</h3>
+
+
+<p>
+Courier-IMAP の RPM パッケージを作成しようとすると、
+</p>
+
+
+<pre class="wiki">
+error: Failed build dependencies:
+        /usr/include/fam.h is needed by courier-imap-4.1.1-1.4.i386
+</pre>
+
+
+<p>
+と怒られるので、このファイルが含まれる gamin-devel をインストールします。
+</p>
+
+
+<pre class="wiki">
+$ sudo yum install gamin-devel
+</pre>
+
+
+<h3 id="Courier-IMAPのインストール">Courier-IMAP のインストール</h3>
+
+
+<p>
+ソースから Perl を入れている場合には、生成された RPM パッケージをインストールしようとすると、
+</p>
+
+
+<pre class="wiki">
+error: Failed dependencies:
+        /usr/local/bin/perl is needed by courier-imap-4.1.1-1.4.i386
+</pre>
+
+
+<p>
+と怒られるので、PATH から /usr/local を外しておきます。
+</p>
+
+
+<pre class="wiki">
+$ export PATH=/bin:/usr/bin
+</pre>
+
+
+<p>
+で、いよいよ Courier-IMAP の  RPM パッケージの作成ですが、
+</p>
+
+
+<pre class="wiki">
+$ sudo rpmbuild -ta courier-imap-4.1.1.tar.bz2
+</pre>
+
+
+<p>
+と実行すると、
+</p>
+
+
+<pre class="wiki">
+configure: WARNING: === Do not compile Courier-IMAP as root.  Compile
+configure: WARNING: === Courier-IMAP as a non-root user then su to
+configure: WARNING: === root before running make install.  You must now
+configure: WARNING: === remove this entire directory and then extract the
+configure: WARNING: === source code from the tarball as a non-root user
+configure: WARNING: === and rerun the configure script.  If you have read
+configure: WARNING: === the INSTALL file you should have known this.  So
+configure: WARNING: === you better read INSTALL again.
+configure: error: aborted.
+error: Bad exit status from /var/tmp/rpm-tmp.46388 (%prep)
+</pre>
+
+
+<p>
+と怒られるので sudo を外すと、
+</p>
+
+
+<pre class="wiki">
+$ rpmbuild -ta courier-imap-4.1.1.tar.bz2
+error: Failed to rename /usr/src/redhat/SPECS/rpm-spec.oF7pub to /usr/src/redhat/SPECS/rpm-spec.oF7pub: Permission denied: No such file or directory
+</pre>
+
+
+<p>
+と怒られる。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://www.courier-mta.org/?FAQ.html~rpm"><span class="icon"></span>http://www.courier-mta.org/?FAQ.html~rpm</a> に対処方法が書いてあるので、これにしたがって non-root ユーザで以下の様に実行。
+</p>
+
+
+<pre class="wiki">
+$ mkdir $HOME/rpm
+$ mkdir $HOME/rpm/SOURCES
+$ mkdir $HOME/rpm/SPECS
+$ mkdir $HOME/rpm/BUILD
+$ mkdir $HOME/rpm/SRPMS
+$ mkdir $HOME/rpm/RPMS
+$ mkdir $HOME/rpm/RPMS/i386
+echo "%_topdir    $HOME/rpm" >> $HOME/.rpmmacros
+rpmbuild -ta courier-imap-4.1.1.tar.bz2
+</pre>
+
+
+<p>
+RPM パッケージが生成されるので、インストール。
+</p>
+
+
+<pre class="wiki">
+$ sudo rpm -Uvh /home/miya/rpm/RPMS/i386/courier-imap-4.1.1-1.4.i386.rpm
+</pre>
+
+
+<p>
+ここまでやって、よし、設定して起動するか、と思ったところで、<a class="ext-link" href="http://dovecot.org/"><span class="icon"></span>Dovecot</a> が既にインストールされていて起動していることに気づいた…せっかく Courier 入れたけど、Dovecot 使ったことないので、いい機会なのでこっちを使うことにした。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/20/303/">Catalyst Tips #1 Default アクションでの Args の扱い</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-20T19:05:00+09:00" pubdate>Jul 20<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/20/303/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Catalyst では /controller/action/foo/bar といった パスでアクセスした場合、$c-&gt;req-&gt;args-&gt;<a class="changeset" href="/changeset/0">[0]</a> で foo、$c-&gt;req-&gt;args-&gt;<a class="changeset" href="/changeset/1">[1]</a> で bar が取り出せるのですが、/controller/foo/bar といったアクションの指定がないパスだと、$c-&gt;req-&gt;args-&gt;<a class="changeset" href="/changeset/0">[0]</a> には controller が入ってしまいます。
+</p>
+
+
+<p>
+$c-&gt;req-&gt;args は Catalyst::Dispatcher の prepare_action メソッドでセットされるのですが、default アクションが呼び出される場合には、更に Catalyst::DispatchType::Default 中の以下のコードが実行され、$c-&gt;req-&gt;args に コントローラ名がつっこまれる、という仕様になっているようです。
+</p>
+
+
+<pre class="wiki">
+# default methods receive the controller name as the first argument
+unshift @{ $c-&gt;req-&gt;args }, $path if $path;  
+</pre>
+
+
+<p>
+default アクションとその他のアクションで、$c-&gt;req-&gt;args の値の入り方が違うのは気持ち悪いし、共通のサブルーチンで args を処理する場合に面倒なので、以下の様なコードで回避することにしました。
+</p>
+
+
+<pre class="wiki">
+sub default : Private {
+    my ( $self, $c ) = @_;
+    shift @{ $c-&gt;req-&gt;args };
+    ...
+}
+</pre>
+
+
+<p>
+それにしても、なぜ default アクションの場合、コントローラ名を args に入れる必要があるんだろう？
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/20/502/">Vox で英語ブログはじめました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-20T19:04:00+09:00" pubdate>Jul 20<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/20/502/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://www.sixapart.com/vox/"><span class="icon"></span>ここ</a> でメールアドレスを登録しておいたら、招待状が届きました。というわけで、せっかくなので<a class="ext-link" href="http://mizzy.vox.com/"><span class="icon"></span>英語ブログ</a> をはじめることにしました。なんか最近ギークな人たちの間で英語ブログが流行ってるみたいなので、便乗してみます。
+</p>
+
+
+<p>
+このブログは perl プログラミング関連のことばかり書いていて、見に来てくださる方々もそれを期待していると思われるので、他のことが書きにくいんですよね。なので、vox ではここには書かない、割とどうでもいい日常的なことばかり書くことになると思います。
+</p>
+
+
+<p>
+さて、いつまで続くことやら…そのうち英語で書くのがめんどくなって、日本語になりそうな予感。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/18/366/">『ふつうの Haskell』を読む前に</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-18T22:01:00+09:00" pubdate>Jul 18<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/18/366/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+『<a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/4274065979/httshemizorg-22/ref=nosim"><span class="icon"></span>ハッカーと画家</a>』を読んだ時に、関数型言語を何かひとつ、かじる程度でいいから学びたいなぁ、と思っていたのですが、当時はどこから学んで良いのかもよく分からない状態でした。
+</p>
+
+
+<p>
+そのまますっかりそのことは忘れていたのですが、最近の Haskell ブームのあおりでふと思い出したので、『<a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/4797336021/httshemizorg-22/ref=nosim"><span class="icon"></span>ふつうの Haskell</a>』 を Amazon に発注して、それが今日届きました。何か乗り遅れた感がありますが気にしない。
+</p>
+
+
+<p>
+で、以前に、関数型言語とセットでよく出てくる「ラムダ」って何？と思って調べていて参考になった資料を以下に挙げておきます。
+</p>
+
+
+<ul><li><a class="ext-link" href="http://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%A0%E3%83%80%E8%A8%88%E7%AE%97"><span class="icon"></span>ラムダ計算 - Wikipedia</a></li>
+<li><a class="ext-link" href="http://members.at.infoseek.co.jp/nbz/ref/lambda.html"><span class="icon"></span>ラムダ計算ＡＢＣ</a></li>
+<li><a class="ext-link" href="http://www.kurims.kyoto-u.ac.jp/~cs/csnyumon/appendix_A.pdf"><span class="icon"></span>ラムダ計算：プログラミング言語の数学モデル (pdf)</a></li>
+<li><a class="ext-link" href="http://www.kb.ecei.tohoku.ac.jp/~sumii/class/keisanki-software-kougaku-2005/lambda.pdf"><span class="icon"></span>ラムダ計算入門 (pdf)</a></li></ul>
+
+
+<p>
+ラムダ計算は関数型言語の理論的基盤なので、Haskell の理解に役立つのではないかと。『ふつうの Haskell』の最初の方でも、「関数適用」や「変数の束縛」などといった用語が出てきますが、これらはラムダ計算の用語ですし。
+</p>
+
+
+<p>
+ただし、知っていれば Haskell の理解に役立つかもしれないけど、知らないと理解できないというものでもないので、数学苦手な方は読まない方がいいと思います。この本の著者の方も、数学知らなくても Haskell 学ぶことはできる、っておっしゃってますし。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/02/316/">Atom Threading Extensions</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-02T13:49:00+09:00" pubdate>Jul 2<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/02/316/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+IRC で miyagawa さんが貼っていた URL 経由で見つけたのですが、<a class="ext-link" href="http://www.ietf.org/internet-drafts/draft-snell-atompub-feed-thread-12.txt"><span class="icon"></span>Atom Threading Extensions</a> なんてものがあったのですね。
+</p>
+
+
+<p>
+要するに、Atom Syndication Format で、メーリングリストや掲示板の様なスレッドを表現するための仕組みです。
+</p>
+
+
+<p>
+コメントやトラックバックの関連を視覚化、というアイデアは色んな人達が考えていると思うのですが、それをサポートするような規格が既にあったとは知りませんでした。
+</p>
+
+
+<p>
+ここではざっと要点だけご紹介します。詳細知りたい方は原文をお読みください。そんなにボリュームないですし。（このエントリも間違っている可能性があるので、できれば原文読んで頂いた方が良いかと。）
+</p>
+
+
+<h3 id="in-reply-to拡張要素">&#8216;in-reply-to&#8217; 拡張要素</h3>
+
+
+<p>
+entry 要素の子要素として指定するもので、そのエントリが、どのエントリに対する reply なのかを示す要素です。
+</p>
+
+
+<pre class="wiki">
+&lt;feed xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0"&gt;
+    &lt;id&gt;http://www.example.org/myfeed&lt;/id&gt;
+    &lt;title&gt;My Example Feed&lt;/title&gt;
+    &lt;updated&gt;2005-07-28T12:00:00Z&lt;/updated&gt;
+    &lt;link href="http://www.example.org/myfeed" /&gt;
+    &lt;author&gt;&lt;name&gt;James&lt;/name&gt;&lt;/author&gt;
+    &lt;entry&gt;
+        &lt;id&gt;tag:example.org,2005:1&lt;/id&gt;
+        &lt;title&gt;My original entry&lt;/title&gt;
+        &lt;updated&gt;2006-03-01T12:12:12Z&lt;/updated&gt;
+        &lt;link
+          type="application/xhtml+xml"
+          href="http://www.example.org/entries/1" /&gt;
+        &lt;summary&gt;This is my original entry&lt;/summary&gt;
+    &lt;/entry&gt;
+    &lt;entry&gt;
+        &lt;id&gt;tag:example.org,2005:1,1&lt;/id&gt;
+        &lt;title&gt;A response to the original&lt;/title&gt;
+        &lt;updated&gt;2006-03-01T12:12:12Z&lt;/updated&gt;
+        &lt;link href="http://www.example.org/entries/1/1" /&gt;
+        <strong>&lt;thr:in-reply-to
+          ref="tag:example.org,2005:1"
+          type="application/xhtml+xml"
+          href="http://www.example.org/entries/1"/&gt;</strong>
+        &lt;summary&gt;This is a response to the original entry&lt;/summary&gt;
+    &lt;/entry&gt;
+&lt;/feed&gt;
+</pre>
+
+
+<p>
+この例では、2番目の entry が最初の entry に対する reply となっています。各属性の意味は以下の通りです。
+</p>
+
+
+<dl>
+<dt>ref</dt>
+<dd>
+元エントリの atom:id 要素。
+</dd>
+<dt>href</dt>
+<dd>
+元エントリの IRI。
+</dd>
+<dt>type</dt>
+<dd>
+元エントリのメディアタイプ。
+</dd>
+<dt>source</dt>
+<dd>
+元エントリが含まれる Atom Feed または Entry の IRI。
+</dd>
+</dl>
+
+
+<h3 id="replieslinkrelation">&#8216;replies&#8217; link relation</h3>
+
+
+<p>
+link 要素の rel 属性として replies を指定することで、その entry に対する reply が含まれている（かもしれない）リソースを参照します。
+</p>
+
+
+<pre class="wiki">
+&lt;feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:thr="http://purl.org/syndication/thread/1.0"&gt;
+    &lt;id&gt;http://www.example.org/myfeed&lt;/id&gt;
+    &lt;title&gt;My Example Feed&lt;/title&gt;
+    &lt;updated&gt;2005-07-28T12:00:00Z&lt;/updated&gt;
+    &lt;link href="http://www.example.org/myfeed" /&gt;
+    &lt;author&gt;&lt;name&gt;James&lt;/name&gt;&lt;/author&gt;
+    &lt;entry&gt;
+        &lt;id&gt;tag:entries.com,2005:1&lt;/id&gt;
+        &lt;title&gt;My original entry&lt;/title&gt;
+        &lt;updated&gt;2006-03-01T12:12:12Z&lt;/updated&gt;
+        &lt;link href="http://www.example.org/entries/1" /&gt;
+        <strong>&lt;link rel="replies"
+              type="application/atom+xml"
+              href="http://www.example.org/mycommentsfeed.xml"
+              thr:count="10" thr:updated="2005-07-28T12:10:00Z" /&gt;</strong>
+        &lt;summary&gt;This is my original entry&lt;/summary&gt;
+    &lt;/entry&gt;
+&lt;/feed&gt;
+</pre>
+
+
+<p>
+この link 要素は thr:count 属性と thr:updated 属性を持つことができます。各属性の意味は以下の通りです。
+</p>
+
+
+<dl>
+<dt>thr:count</dt>
+<dd>
+href で示されるリソースに含まれている reply の数。
+</dd>
+<dt>thr:updated</dt>
+<dd>
+href で示されるリソース内の reply の最終更新日時。
+</dd>
+</dl>
+
+
+<p>
+どちらの属性も補助的なものであって、正確な数値でなくとも良い、という点には注意が必要です。
+</p>
+
+
+<h3 id="total拡張要素">&#8216;total&#8217; 拡張要素</h3>
+
+
+<p>
+entry に対する reply の総数です。ドラフトにはサンプルがなかったので、以下の例は適当です。間違ってたらごめんなさい。
+</p>
+
+
+<pre class="wiki">
+&lt;feed xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0"&gt;
+    &lt;id&gt;http://www.example.org/myfeed&lt;/id&gt;
+    &lt;title&gt;My Example Feed&lt;/title&gt;
+    &lt;updated&gt;2005-07-28T12:00:00Z&lt;/updated&gt;
+    &lt;link href="http://www.example.org/myfeed" /&gt;
+    &lt;author&gt;&lt;name&gt;James&lt;/name&gt;&lt;/author&gt;
+    &lt;entry&gt;
+        &lt;id&gt;tag:example.org,2005:1&lt;/id&gt;
+        &lt;title&gt;My original entry&lt;/title&gt;
+        &lt;updated&gt;2006-03-01T12:12:12Z&lt;/updated&gt;
+        &lt;link
+          type="application/xhtml+xml"
+          href="http://www.example.org/entries/1" /&gt;
+        &lt;summary&gt;This is my original entry&lt;/summary&gt;
+        <strong>&lt;thr:total&gt;10&lt;/thr:total&gt;</strong>
+    &lt;/entry&gt;
+    &lt;/entry&gt;
+&lt;/feed&gt;
+</pre>
+
+
+<p>
+これもやはり補助的な数値なので、正確な数値だと期待してはいけないようです。
+</p>
+
+
+<p>
+thr:count, thr:updated, total の数値が正確なものでなくて良い理由については、ドラフトの「6.  Considerations for using thr:count, thr:updated and total」について書かれていますので、ここでは省略します。（書くのめんどくさくなった。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/25/309/">PPerl と Plagger</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-25T18:19:00+09:00" pubdate>Jun 25<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/25/309/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/0596526741/httshemizorg-22/ref=nosim"><span class="icon"></span>Perl Hacks</a> に載ってた Hack <a class="ticket" href="/ticket/81">#81</a> の <a class="ext-link" href="http://search.cpan.org/dist/PPerl/"><span class="icon"></span>PPerl</a> を plagger で試してみよう、と思ったら <a class="ext-link" href="http://d.hatena.ne.jp/odz/20060524/1148529647"><span class="icon"></span>既に試していらっしゃる方</a> がおりました。
+</p>
+
+
+<p>
+というわけで、PPerl が何なのかは <a class="ext-link" href="http://d.hatena.ne.jp/odz/"><span class="icon"></span>id:odz さん</a> の上記エントリを見てください。
+</p>
+
+
+<p>
+と、これだけでも何なので、PPerl について気になって調べたことをメモ。まず、global セクションだけ書いた config.yaml で plagger を起動して、ps コマンドで仮想メモリ容量を見てみると、こんな感じになってます。
+</p>
+
+
+<pre class="wiki">
+$ pperl plagger                                           [~/plagger]
+Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep           [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 <strong>18592</strong> plagger
+ 6472  6470 10772 plagger
+ 6473  6470 10772 plagger
+ 6474  6470 10772 plagger
+ 6475  6470 10772 plagger
+</pre>
+
+
+<p>
+さらにもう2回ほど pperl plagger を実行すると、
+</p>
+
+
+<pre class="wiki">
+$ pperl plagger                                           [~/plagger]
+Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
+$ pperl plagger                                           [~/plagger]
+Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep           [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 <strong>18592</strong> plagger
+ 6472  6470 <strong>18582</strong> plagger
+ 6473  6470 <strong>18582</strong> plagger
+ 6474  6470 10772 plagger
+ 6475  6470 10772 plagger
+</pre>
+
+
+<p>
+さらにもう何回か実行してみる。
+</p>
+
+
+<pre class="wiki">
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep      [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 <strong>18592</strong> plagger
+ 6472  6470 <strong>18592</strong> plagger
+ 6473  6470 <strong>18592</strong> plagger
+ 6474  6470 <strong>18592</strong> plagger
+ 6475  6470 <strong>18592</strong> plagger
+</pre>
+
+
+<p>
+こんな感じで、プロセス ID 6470 が大元の親プロセスになって、他の plagger プロセスをフォークしていて、 親プロセスの仮想メモリ容量が 10772KB、他の子プロセスの仮想メモリ容量との差分である 7820KB が plagger 関連モジュールが確保している仮想メモリ容量なんだろうなぁ、ということが分かります。
+</p>
+
+
+<p>
+で、今度は普段使っているコンフィグで起動してみます。
+</p>
+
+
+<pre class="wiki">
+$ pperl plagger --config=gmail.yaml
+Plagger [info] plugin Plagger::Plugin::Subscription::Bloglines loaded.
+Plagger [info] plugin Plagger::Plugin::Subscription::Config loaded.
+Plagger [info] plugin Plagger::Plugin::CustomFeed::Simple loaded.
+Plagger [info] plugin Plagger::Plugin::CustomFeed::YajiumaWatch loaded.
+Plagger [info] plugin Plagger::Plugin::CustomFeed::KotonohaInbox loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::EntryFullText loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::TruePermalink loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::StripRSSAd loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::BloglinesContentNormalize loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::HatenaDiaryKeywordUnlink loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::Rule loaded.
+Plagger [info] plugin Plagger::Plugin::Widget::Delicious loaded.
+Plagger [info] plugin Plagger::Plugin::Widget::BloglinesSubscription loaded.
+Plagger [info] plugin Plagger::Plugin::Publish::Gmail loaded.
+... snip ...
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep      [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 18592 plagger
+ 6472  6470 18592 plagger
+ 6473  6470 18592 plagger
+ 6474  6470 18592 plagger
+ 6475  6470 <strong>37388</strong> plagger
+</pre>
+
+
+<p>
+と、こんな感じで、ID 6475 のプロセスが大きくなってます。これがこのコンフィグで増えた Plagger Plugin モジュールのメモリ容量みたいですね。
+</p>
+
+
+<p>
+といったように、pperl を最初に起動した時のモジュールだけをメモリ上に確保するだけではなく、その後新たに読み込まれたモジュールもちゃんとメモリ上に確保してくれているようです。当たり前っちゃ当たり前の気もしますが、何となく気になったので。 
+</p>
+
+
+<p>
+他に気になった点として、起動するプロセスの数を増やしたり、制限したりできるのかな、と思ったところ、以下の様なオプションがあるので、この辺りも制御できるようですね。
+</p>
+
+
+<pre class="wiki">
+$ pperl --help                                            [~/plagger]
+pperl version 0.25
+Usage: pperl [options] filename
+perl options are passed to your perl executable (see the perlrun man page).
+pperl options control the persistent perl behaviour
+
+PPerl Options:
+  -k  or --kill      Kill the currently running pperl for that script
+  -h  or --help      This page
+  --prefork          The number of child processes to prefork (default=5)
+  --maxclients       The number of client connections each child
+                       will process (default=100)
+  -z  or --anyuser   Allow any user (after the first) to access the socket
+                       WARNING: This has severe security implications. Use
+                       at your own risk
+  --no-cleanup       Skip the cleanup stage at the end of running your script
+                       this may make your code run faster, but if you forget
+                       to close files then they will remain unflushed and unclosed
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/20/352/">Text::Trac - Trac Wiki 記法パーサ #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-20T15:07:00+09:00" pubdate>Jun 20<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/20/352/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+昨日の時点では実装されていなかった autolink まわりを <a class="ext-link" href="http://d.hatena.ne.jp/drawnboy/"><span class="icon"></span>id:drawnboy さん</a> が実装してくれて、最低限の機能は実装されたかな、という状態になりましたので、とりあえず <a class="ext-link" href="http://search.cpan.org/~mizzy/Text-Trac/"><span class="icon"></span>CPAN に up</a> しました。
+</p>
+
+
+<p>
+id:drawnboy さんには autolink まわりだけではなく、他にも色々実装してもらい、大変助かりました。ありがとうございます！
+</p>
+
+
+<p>
+Yappo さんご所望の挙動をカスタマイズできる機能は、これから実装をどうするかを含めて検討しますので、もう少しお待ちください。
+</p>
+
+
+<p>
+挙動カスタマイズ機能も必要だけど、タグの class 設定とか、リンクの target 設定とかをカスタマイズできるようにもしたい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/20/384/">Text::Trac - Trac Wiki 記法パーサ #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-20T00:26:00+09:00" pubdate>Jun 20<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/20/384/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3 id="Text::Tracをblosxomから呼び出してみるテスト">Text::Trac を blosxom から呼び出してみる テスト</h3>
+
+
+<p>
+Text::Trac が形になってきたので、実際に文章を書いてテストしてみる。
+</p>
+
+
+<h4 id="もういっちょ見出しのテスト">もういっちょ見出しのテスト</h4>
+
+
+<p>
+paragraph 1<br />
+paragraph 1<br />
+paragraph 1
+</p>
+
+
+<p>
+paragraph 2<br />
+paragraph 2<br />
+paragraph 2
+</p>
+
+
+<ul><li>リスト 1</li>
+<li>リスト 2</li>
+<li>リスト 3</li></ul>
+
+
+<ol start="1"><li>リスト 1</li>
+<li>リスト 2</li>
+<li>リスト 3</li></ol>
+
+
+<dl>
+<dt>定義リスト1</dt>
+<dd>
+内容その1
+</dd>
+<dt>定義リスト2</dt>
+<dd>
+内容その2
+</dd>
+</dl>
+
+
+<p>
+上の内容は実際にはこんな感じで書いてます。
+</p>
+
+
+<pre class="wiki">
+= Text::Trac を blosxom から呼び出してみる テスト =
+
+== もういっちょ見出しのテスト ==
+
+paragraph 1[[BR]]
+paragraph 1[[BR]]
+paragraph 1
+
+paragraph 2[[BR]]
+paragraph 2[[BR]]
+paragraph 2
+
+ * リスト 1
+ * リスト 2
+ * リスト 3
+
+ 1. リスト 1
+ 1. リスト 2
+ 1. リスト 3
+
+ 定義リスト1::
+   内容その1
+ 定義リスト2::
+   内容その2
+</pre>
+
+
+<p>
+blosxom からは以下の様なプラグインで Text::Trac を呼び出してます。
+</p>
+
+
+<pre class="wiki">
+# Blosxom Plugin: text_trac
+# Author: Gosuke Miyashita &lt;miya at mizzy.org&gt;
+# Version: 2006-06-20
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package text_trac;
+
+use strict;
+use Text::Trac;
+
+sub start {
+  1;
+}
+
+sub story {
+  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+
+  if ( $meta::syntax eq 'trac' ){
+      my $parser = Text::Trac-&gt;new( min_heading_level =&gt; 3 );
+      $parser-&gt;parse($$body_ref);
+      $$body_ref = $parser-&gt;html;
+  }
+
+  return 1;
+}
+
+1;
+
+__END__
+</pre>
+
+
+<p>
+Text::Trac 自体はもうちょいで CPAN にアップできると思います。ただし、Yappo さんご所望の機能はもう少し時間ください。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/24/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/22/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

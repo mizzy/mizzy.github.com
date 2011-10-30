@@ -1,0 +1,1963 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="id:drawnboy さんがつくった Catlxom::Plugin::Format::Hatena を見て、「お、それいい！」と思ったんだけど、そもそも自分ははてダ使っていなくて、この手の記法で唯一使ってるのは Trac の Wiki 記法 なので、Catlxom::Plugin:: &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/24">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/17/412/">Text::Trac - Trac Wiki 記法パーサ #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-17T01:11:00+09:00" pubdate>Jun 17<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/17/412/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://d.hatena.ne.jp/drawnboy/" target="_blank">id:drawnboy</a> さんがつくった <a href="http://d.hatena.ne.jp/drawnboy/20060616/1150384749">Catlxom::Plugin::Format::Hatena</a> を見て、「お、それいい！」と思ったんだけど、そもそも自分ははてダ使っていなくて、この手の記法で唯一使ってるのは <a href="http://projects.edgewall.com/trac/wiki/WikiFormatting" target="_blank">Trac の Wiki 記法</a> なので、Catlxom::Plugin::Format::Trac が欲しいな、と思ったわけですが、Perl のパーサがないんですよね。
+</p>
+
+
+
+
+<p class="entryBody">
+で、IRC の #catlxom での会話の流れで、自分が <a href="http://trac.mizzy.org/public/browser/library/perl/trunk/Text-Trac" target="_balnk">Text::Trac</a> をつくることになりました。といってもまだつくりかけなので、CPAN にアップするのはまだ先になりそう。とりあえず興味ある方は以下の要領で取得してみてください。
+</p>
+
+
+
+
+<pre class="code">
+svn co http://svn.mizzy.org/public/library/perl/trunk/Text-Trac
+</pre>
+
+
+
+
+<p class="entryBody">
+もうほとんど <a href="http://search.cpan.org/~jkondo/Text-Hatena/" target="_blank">Text::Hatena</a> のコードそのまんまです。<a href="http://d.hatena.ne.jp/jkondo/" target="_blank">id:jkondo さん</a> と <a href="http://d.hatena.ne.jp/tociyuki/" target="_blank">id:tociyuki さん</a> に感謝感謝です。 
+</p>
+
+
+
+
+<p class="entryBody">
+とりあえず
+</p>
+
+
+
+
+<pre class="code">
+= heading1 =
+</pre>
+
+
+
+
+<p class="entryBody">
+から
+</p>
+
+
+
+
+<pre class="code">
+&lt;h1 id="heading1"&gt;heading1&lt;/h1&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+への変換のみ実装済み。
+</p>
+
+
+
+
+<p class="entryBody">
+Text::Hatena と異なる点は、
+</p>
+
+
+
+
+<pre class="code">
+my $p = Text::Trac-&gt;new(
+    custom_notation =&gt; {
+        h1node =&gt; '&lt;p&gt;$1&lt;/p&gt;',
+    },
+);
+</pre>
+
+
+
+
+<p class="entryBody">
+などと指定すると、
+</p>
+
+
+
+
+<pre class="code">
+= heading1 =
+</pre>
+
+
+
+
+<p class="entryBody">
+を
+</p>
+
+
+
+
+<pre class="code">
+&lt;p&gt;heading1&lt;/p&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+と変換する、といった感じで、記法をカスタマイズすることができます。また、
+</p>
+
+
+
+
+<pre class="code">
+my $p = Text::Trac-&gt;new(
+    min_heading_level =&gt; 2,
+);
+</pre>
+
+
+
+
+<p class="entryBody">
+と指定すると、
+</p>
+
+
+
+
+<pre class="code">
+= heading1 =
+</pre>
+
+
+
+
+<p class="entryBody">
+が
+</p>
+
+
+
+
+<pre class="code">
+&lt;h2 id="heading1"&gt;heading1&lt;/h2&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+と変換されます。なぜこんな機能をつけたかというと、catlxom プラグインとして使うことを考えた場合、通常 h1 はブログのトップ見出し、h2 はエントリのタイトルに使われるので、エントリの中では h3 以降を使うことになるかと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+だからといってエントリを書くときにいちいち、「えーと、h3 にしないといけないから、 === hogehoge === だな」とかやるのもうざいので、こんな機能をつけてみました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/15/413/">Catlxom 本家に Mizzy ブランチができたよ (Catlxom メモ #8)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-15T22:12:00+09:00" pubdate>Jun 15<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/15/413/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://catlxom.org/repos/" target="_blank">catlxom 本家の svn リポジトリ</a> に、<a href="http://catlxom.org/repos/branches/mizzy/catlxom/" target="_blank">mizzy ブランチ</a> ができました。<a href="http://catlxom.org/trac/browser/branches/mizzy/catlxom" target="_blank">trac から見る場合はこちら。</a> <a href="http://catlxom.org/trac" target="_blank">trac トップページ</a> の Authors にも名前いれてもらっちゃいました。typester さん、ありがとうございます！
+</p>
+
+
+
+
+<p class="entryBody">
+今までこのブログで書いてきた catlxom の修正は、このブランチに反映させてありますので、ご興味のある方は今後こちらからご参照/ご取得ください。
+</p>
+
+
+
+
+<p class="entryBody">
+微力ながら、catlxom の発展に貢献させてもらえればなぁと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+次はプラグインづくりに入ろうかと思います。まずは今 blosxom で利用しているプラグインの移植から。本家本元 catlxom のプラグイン機構が今後どうなるかは分かりませんが、そんなに大きく修正しなくても対応できると思うので、今からちまちま作っていきます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/14/371/">Catlxom の プラグイン機構を Plagger ライクに #2 (Catlxom メモ #7)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-14T23:15:00+09:00" pubdate>Jun 14<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/14/371/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/catlxom_memo_06.html" target="_blank">前回のエントリ</a>で、catlxom のプラグイン機構を plagger っぽくしてみたのですが、
+</p>
+
+
+
+
+<pre class="code">
+sub register {
+    my ($class, $c) = @_;
+    $c-&gt;catlxom-&gt;register_hook(
+        $class,
+        'setup'       =&gt; 'setup',
+        'interpolate' =&gt; 'interpolate',
+    );
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+といった感じで、各プラグイン毎にいちいちプラグインを実行する hook ポイントと、その hook ポイントで実行するメソッドを記述するのもちょっと冗長だなぁ、と。
+</p>
+
+
+
+
+<p class="entryBody">
+なので、hook ポイント名とメソッド名は同じ、という規約を作ってしまって、Catalxom::Plugins でプラグインロードする際に register_hook してやれば、いちいち register を書く必要がなくなってハッピーだと思ったのでコード書いてみた。
+</p>
+
+
+
+
+<pre class="code">
+Index: lib/Catlxom/Plugins.pm
+===================================================================
+--- lib/Catlxom/Plugins.pm      (revision 23)
++++ lib/Catlxom/Plugins.pm      (working copy)
+@@ -51,7 +51,15 @@
+         ( my $plugin = 'Catlxom::Plugin::' . join( '::', @path ) . $file-&gt;basename )
+             =~ s/\.pm$//;
+
+-        unshift @Catlxom::Context::ISA, $plugin;
++        for ( qw(setup initialize start update filter sort paginate fixedup
++                 interpolate end) ){
++            if ( $plugin-&gt;can($_) ){
++                $c-&gt;catlxom-&gt;register_hook(
++                    $plugin,
++                    $_ =&gt; $_,
++                );
++            }
++        }
+     }
+
+     if ( $c-&gt;debug ) {
+</pre>
+
+
+
+
+<p class="entryBody">
+これでプラグインのコードがちょっとだけすっきりする。<a href="http://mizzy.org/archives/catlxom.patch" target="_blank">本家からの全差分はこちら。</a>
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/12/335/">Catlxom の プラグイン機構を Plagger ライクに #1 (Catlxom メモ #6)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-12T22:23:00+09:00" pubdate>Jun 12<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/12/335/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/catlxom_memo_05.html" target="_blank">昨日のエントリ</a>の続き。filter もちゃんと実装して、ついでにプラグインも全て新しいプラグイン機構に対応させてみた。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://catlxom.org/trac" target="_blank">本家</a> の Rev.23 との全差分です。
+</p>
+
+
+
+
+<pre class="code">
+Index: plugins/Entry/Blosxom.pm
+===================================================================
+--- plugins/Entry/Blosxom.pm    (revision 23)
++++ plugins/Entry/Blosxom.pm    (working copy)
+@@ -9,6 +9,15 @@
+ 
+ __PACKAGE__-&gt;classdata-&gt;{entries} = [];
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'setup'  =&gt; 'setup',
++        'update' =&gt; 'update',
++    );
++}
++
+ sub setup {
+     my ( $self, $c ) = @_;
+ 
+@@ -49,15 +58,11 @@
+         }
+     );
+ 
+-    $self-&gt;entries-&gt;add( __PACKAGE__ );
+-
+-    $self-&gt;NEXT::setup($c);
++    $c-&gt;catlxom-&gt;entries-&gt;add( __PACKAGE__ );
+ }
+ 
+ sub update {
+     my ( $self, $c ) = @_;
+-
+-    $self-&gt;NEXT::update($c);
+ }
+ 
+ 1;
+Index: plugins/Filter/Path.pm
+===================================================================
+--- plugins/Filter/Path.pm  (revision 23)
++++ plugins/Filter/Path.pm  (working copy)
+@@ -4,6 +4,14 @@
+ 
+ our $VERSION = '0.01';
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'filter' =&gt; 'filter',
++    );
++}
++
+ sub filter {
+     my ( $self, $c, $entry ) = @_;
+ 
+Index: plugins/Filter/Date.pm
+===================================================================
+--- plugins/Filter/Date.pm  (revision 23)
++++ plugins/Filter/Date.pm  (working copy)
+@@ -6,6 +6,14 @@
+ 
+ our $VERSION = '0.01';
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'filter' =&gt; 'filter',
++    );
++}
++
+ sub filter {
+     my ( $self, $c, $entry ) = @_;
+ 
+Index: plugins/Format/Textile.pm
+===================================================================
+--- plugins/Format/Textile.pm   (revision 23)
++++ plugins/Format/Textile.pm   (working copy)
+@@ -3,29 +3,33 @@
+ use warnings;
+ use base qw/Catlxom::Plugin/;
+ 
+-use NEXT;
+ use Text::Textile;
+ 
+ our $VERSION = '0.01';
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'setup'   =&gt; 'setup',
++        'fixedup' =&gt; 'fixedup',
++    );
++}
++
+ sub setup {
+     my ( $self, $c ) = @_;
+ 
+     $self-&gt;classdata-&gt;{textile} = Text::Textile-&gt;new;
+     $self-&gt;classdata-&gt;{textile}-&gt;charset('utf-8');
+-
+-    $self-&gt;NEXT::setup($c);
+ }
+ 
+ sub fixedup {
+     my ( $self, $c ) = @_;
+ 
+-    for my $entry ( @{ $self-&gt;entries-&gt;filtered } ) {
++    for my $entry ( @{ $c-&gt;catlxom-&gt;entries-&gt;filtered } ) {
+         $entry-&gt;content(
+             $self-&gt;classdata-&gt;{textile}-&gt;process( $entry-&gt;content ) );
+     }
+-
+-    $self-&gt;NEXT::fixedup($c);
+ }
+ 
+ 1;
+Index: plugins/Paginate/Simple.pm
+===================================================================
+--- plugins/Paginate/Simple.pm  (revision 23)
++++ plugins/Paginate/Simple.pm  (working copy)
+@@ -1,27 +1,32 @@
+ package Catlxom::Plugin::Paginate::Simple;
+ use strict;
+ use warnings;
+-use NEXT;
+ 
+ use Data::Page;
+ use Data::Page::Navigation;
+ 
+ our $VERSION = '0.01';
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'paginate' =&gt; 'paginate',
++    );
++}
++
+ sub paginate {
+     my ( $self, $c ) = @_;
+ 
+     my $page = int( $c-&gt;req-&gt;params-&gt;{page} || 1 );
+     $page = 1 unless $page &gt;= 1;
+ 
+-    my $pager = $self-&gt;stash-&gt;{pager}
+-        = Data::Page-&gt;new( scalar @{ $self-&gt;entries },
++    my $pager = $c-&gt;catlxom-&gt;stash-&gt;{pager}
++        = Data::Page-&gt;new( scalar @{ $c-&gt;catlxom-&gt;entries },
+         $c-&gt;config-&gt;{num_entries} ||= 20, $page, );
+ 
+-    $self-&gt;entries-&gt;filtered(
+-        [ $pager-&gt;splice( $self-&gt;entries-&gt;filtered ) ] );
+-
+-    $self-&gt;NEXT::paginate($c);
++    $c-&gt;catlxom-&gt;entries-&gt;filtered(
++        [ $pager-&gt;splice( $c-&gt;catlxom-&gt;entries-&gt;filtered ) ] );
+ }
+ 
+ 1;
+Index: plugins/Template/TT.pm
+===================================================================
+--- plugins/Template/TT.pm  (revision 23)
++++ plugins/Template/TT.pm  (working copy)
+@@ -6,19 +6,27 @@
+ use Catlxom::Util;
+ use List::Util qw/first/;
+ use Template;
+-use NEXT;
+ 
+ our $VERSION = '0.01';
+ 
++my $template_dir = Catlxom::Util::load_dir('template');
++my $path_root    = join '/', $template_dir-&gt;dir_list;
++
+ __PACKAGE__-&gt;classdata-&gt;{templates} = {};
+-__PACKAGE__-&gt;classdata-&gt;{tt}        = Template-&gt;new;
++__PACKAGE__-&gt;classdata-&gt;{tt}        = Template-&gt;new( INCLUDE_PATH =&gt; $path_root );
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'setup'       =&gt; 'setup',
++        'interpolate' =&gt; 'interpolate',
++    );
++}
++
+ sub setup {
+     my ( $self, $c ) = @_;
+ 
+-    my $template_dir = Catlxom::Util::load_dir('template');
+-    my $path_root    = join '/', $template_dir-&gt;dir_list;
+-
+     $template_dir-&gt;recurse(
+         callback =&gt; sub {
+             my $file = shift;
+@@ -48,8 +56,6 @@
+             };
+         }
+     );
+-
+-    $self-&gt;NEXT::setup($c);
+ }
+ 
+ sub interpolate {
+@@ -78,16 +84,14 @@
+             \$template-&gt;{template},
+             {
+                 name =&gt; $c-&gt;config-&gt;{name},
+-                %{ $self-&gt;stashall },
+-                entries =&gt; $self-&gt;entries-&gt;filtered,
++                %{ $c-&gt;catlxom-&gt;stashall },
++                entries =&gt; $c-&gt;catlxom-&gt;entries-&gt;filtered,
+ 
+                 c =&gt; $c,
+             },
+             \$c-&gt;res-&gt;{body},
+-        );
++        ) or $c-&gt;error( $self-&gt;classdata-&gt;{tt}-&gt;error );
+     }
+-
+-    $self-&gt;NEXT::interpolate($c);
+ }
+ 
+ 1;
+Index: lib/Catlxom/Context/Base.pm
+===================================================================
+--- lib/Catlxom/Context/Base.pm (revision 23)
++++ lib/Catlxom/Context/Base.pm (working copy)
+@@ -5,7 +5,6 @@
+ 
+ use Catlxom::Plugins;
+ use Catlxom::Entries;
+-use NEXT;
+ 
+ __PACKAGE__-&gt;mk_classdata( plugin  =&gt; Catlxom::Plugins-&gt;new );
+ __PACKAGE__-&gt;mk_classdata( entries =&gt; Catlxom::Entries-&gt;new );
+@@ -14,50 +13,56 @@
+ 
+ sub setup {
+     my ($self, $c) = @_;
++    $self-&gt;plugin-&gt;load($c);
++    $self-&gt;run_hook($c, 'setup');
++}
+ 
+-    $self-&gt;plugin-&gt;load($c);
+-    {
+-        # plugin setup
+-        no warnings 'redefine';
+-        local *setup = sub { };
+-        $self-&gt;setup($c);
++sub register_hook {
++    my ($self, $plugin, @hooks) = @_;
++    while (my($hook, $callback) = splice @hooks, 0, 2) {
++        push @{ $self-&gt;{hooks}-&gt;{$hook} }, {
++            callback  =&gt; $callback,
++            plugin    =&gt; $plugin,
++        };
+     }
+ }
+ 
+-sub initialize {
+-    my ( $self, $c ) = @_;
+-
+-    $self-&gt;_stash( {} );
++sub run_hook {
++    my($self, $c, $hook, $args) = @_;
++    for my $action (@{ $self-&gt;{hooks}-&gt;{$hook} }) {
++        my $plugin   = $action-&gt;{plugin};
++        my $callback = $action-&gt;{callback};
++        no strict 'refs';
++        $plugin-&gt;$callback($c, $args);
++    }
+ }
+ 
+-sub start       { }
+-sub update      { }
+-sub sort        { }
+-sub paginate    { }
+-sub fixedup     { }
+-sub interpolate { }
+-sub end         { }
+-
+ sub dispatch {
+     my ( $self, $c ) = @_;
+ 
+-    $self-&gt;initialize($c);
++    $self-&gt;_stash( {} );
++    $self-&gt;run_hook($c, 'initialize');
+ 
+-    $self-&gt;start($c);
+-    $self-&gt;update($c);
++    $self-&gt;run_hook($c, 'start');
++    $self-&gt;run_hook($c, 'update');
+ 
+-    $self-&gt;entries-&gt;filter($c);
+-    $self-&gt;sort($c);
+-    $self-&gt;paginate($c);
++    $self-&gt;entries-&gt;filtered( [] );
++    for my $entry ( @{ $self-&gt;entries } ){
++        $self-&gt;run_hook($c, 'filter', $entry);
++        push @{ $self-&gt;entries-&gt;filtered }, $entry-&gt;clone;
++    }
++    $self-&gt;run_hook($c, 'sort');
++    $self-&gt;run_hook($c, 'paginate');
+ 
+-    $self-&gt;fixedup($c);
+-    $self-&gt;interpolate($c);
+-    $self-&gt;end($c);
++    $self-&gt;run_hook($c, 'fixedup');
++    $self-&gt;run_hook($c, 'interpolate');
++    $self-&gt;run_hook($c, 'end');
+ }
+ 
+ sub stash {
+     my $self   = shift;
+-    my $caller = caller(0);
++    ( my $caller = lc caller(0) ) =~ s/Catlxom::Plugin:://i;
++    $caller =~ s/::/_/g;
+ 
+     if (@_) {
+         my $stash = @_ &gt; 1 ? {@_} : $_[0];
+Index: lib/Catlxom/Entries.pm
+===================================================================
+--- lib/Catlxom/Entries.pm  (revision 23)
++++ lib/Catlxom/Entries.pm  (working copy)
+@@ -4,7 +4,6 @@
+ use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
+ 
+ use Catalyst::Exception;
+-use NEXT;
+ 
+ use Catlxom::Entry;
+ 
+@@ -30,21 +29,4 @@
+     \@entries;
+ }
+ 
+-sub filter {
+-    my ( $self, $c ) = @_;
+-
+-    $self-&gt;filtered( [] );
+-
+-    my @plugins = grep { $_-&gt;can('filter') } @{ $c-&gt;catlxom-&gt;plugin };
+-
+-FILTER:
+-    for my $entry ( @{ $self-&gt;entries } ) {
+-        for my $plugin (@plugins) {
+-            next FILTER unless $plugin-&gt;filter( $c, $entry );
+-        }
+-        push @{ $self-&gt;filtered }, $entry-&gt;clone;
+-    }
+-}
+-
+ 1;
+-
+Index: lib/Catlxom/Plugins.pm
+===================================================================
+--- lib/Catlxom/Plugins.pm  (revision 23)
++++ lib/Catlxom/Plugins.pm  (working copy)
+@@ -51,7 +51,7 @@
+         ( my $plugin = 'Catlxom::Plugin::' . join( '::', @path ) . $file-&gt;basename )
+             =~ s/\.pm$//;
+ 
+-        unshift @Catlxom::Context::ISA, $plugin;
++        $plugin-&gt;register($c);
+     }
+ 
+     if ( $c-&gt;debug ) {
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/11/274/">Catlxom の プラグイン機構を Plagger ライクに #0 (Catlxom メモ #5)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-11T21:55:00+09:00" pubdate>Jun 11<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/11/274/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/catlxom_memo_04.html" target="_blank">前回のエントリ</a>の続き。実際に plagger の hook 機構をパクってみた。
+</p>
+
+
+
+
+<p class="entryBody">
+これに合わせて、Entry::Blosxom と Template::TT も修正してますが、他のプラグインはまだ対応させてないので、動かないです。また、plugin 機構以外の、今までのエントリで挙げた修正もこの中に含まれてます。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、filter 部分はまだ着手してないです。ここだけ他の hook と扱いが違うので、どうすればキレイに実装できるかなぁ、と思案中。
+</p>
+
+
+
+
+<pre class="code">
+Index: plugins/Entry/Blosxom.pm
+===================================================================
+--- plugins/Entry/Blosxom.pm    (revision 23)
++++ plugins/Entry/Blosxom.pm    (working copy)
+@@ -9,6 +9,15 @@
+ 
+ __PACKAGE__-&gt;classdata-&gt;{entries} = [];
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'setup'  =&gt; 'setup',
++        'update' =&gt; 'update',
++    );
++}
++
+ sub setup {
+     my ( $self, $c ) = @_;
+ 
+@@ -44,20 +53,15 @@
+                     )
+                 }
+             );
+-
+             push @{ $self-&gt;classdata-&gt;{entries} }, $entry;
+         }
+     );
+ 
+-    $self-&gt;entries-&gt;add( __PACKAGE__ );
+-
+-    $self-&gt;NEXT::setup($c);
++    $c-&gt;catlxom-&gt;entries-&gt;add( __PACKAGE__ );
+ }
+ 
+ sub update {
+     my ( $self, $c ) = @_;
+-
+-    $self-&gt;NEXT::update($c);
+ }
+ 
+ 1;
+Index: plugins/Template/TT.pm
+===================================================================
+--- plugins/Template/TT.pm  (revision 23)
++++ plugins/Template/TT.pm  (working copy)
+@@ -10,15 +10,24 @@
+ 
+ our $VERSION = '0.01';
+ 
++my $template_dir = Catlxom::Util::load_dir('template');
++my $path_root    = join '/', $template_dir-&gt;dir_list;
++
+ __PACKAGE__-&gt;classdata-&gt;{templates} = {};
+-__PACKAGE__-&gt;classdata-&gt;{tt}        = Template-&gt;new;
++__PACKAGE__-&gt;classdata-&gt;{tt}        = Template-&gt;new( INCLUDE_PATH =&gt; $path_root );
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'setup'       =&gt; 'setup',
++        'interpolate' =&gt; 'interpolate',
++    );
++}
++
+ sub setup {
+     my ( $self, $c ) = @_;
+ 
+-    my $template_dir = Catlxom::Util::load_dir('template');
+-    my $path_root    = join '/', $template_dir-&gt;dir_list;
+-
+     $template_dir-&gt;recurse(
+         callback =&gt; sub {
+             my $file = shift;
+@@ -48,8 +57,6 @@
+             };
+         }
+     );
+-
+-    $self-&gt;NEXT::setup($c);
+ }
+ 
+ sub interpolate {
+@@ -78,16 +85,14 @@
+             \$template-&gt;{template},
+             {
+                 name =&gt; $c-&gt;config-&gt;{name},
+-                %{ $self-&gt;stashall },
+-                entries =&gt; $self-&gt;entries-&gt;filtered,
++                %{ $c-&gt;catlxom-&gt;stashall },
++                entries =&gt; $c-&gt;catlxom-&gt;entries-&gt;filtered,
+ 
+                 c =&gt; $c,
+             },
+             \$c-&gt;res-&gt;{body},
+-        );
++        ) or $c-&gt;error( $self-&gt;classdata-&gt;{tt}-&gt;error );
+     }
+-
+-    $self-&gt;NEXT::interpolate($c);
+ }
+ 
+ 1;
+Index: lib/Catlxom/Context/Base.pm
+===================================================================
+--- lib/Catlxom/Context/Base.pm (revision 23)
++++ lib/Catlxom/Context/Base.pm (working copy)
+@@ -14,14 +14,8 @@
+ 
+ sub setup {
+     my ($self, $c) = @_;
+-
+     $self-&gt;plugin-&gt;load($c);
+-    {
+-        # plugin setup
+-        no warnings 'redefine';
+-        local *setup = sub { };
+-        $self-&gt;setup($c);
+-    }
++    $self-&gt;run_hook($c, 'setup');
+ }
+ 
+ sub initialize {
+@@ -30,34 +24,48 @@
+     $self-&gt;_stash( {} );
+ }
+ 
+-sub start       { }
+-sub update      { }
+-sub sort        { }
+-sub paginate    { }
+-sub fixedup     { }
+-sub interpolate { }
+-sub end         { }
++sub register_hook {
++    my ($self, $plugin, @hooks) = @_;
++    while (my($hook, $callback) = splice @hooks, 0, 2) {
++        push @{ $self-&gt;{hooks}-&gt;{$hook} }, {
++            callback  =&gt; $callback,
++            plugin    =&gt; $plugin,
++        };
++    }
++}
+ 
++sub run_hook {
++    my($self, $c, $hook) = @_;
++    for my $action (@{ $self-&gt;{hooks}-&gt;{$hook} }) {
++        my $plugin   = $action-&gt;{plugin};
++        my $callback = $action-&gt;{callback};
++        no strict 'refs';
++        $plugin-&gt;$callback($c);
++    }
++}
++
+ sub dispatch {
+     my ( $self, $c ) = @_;
+ 
+-    $self-&gt;initialize($c);
++    $self-&gt;run_hook($c, 'initialize');
+ 
+-    $self-&gt;start($c);
+-    $self-&gt;update($c);
++    $self-&gt;run_hook($c, 'start');
++    $self-&gt;run_hook($c, 'update');
+ 
+     $self-&gt;entries-&gt;filter($c);
+-    $self-&gt;sort($c);
+-    $self-&gt;paginate($c);
++    $self-&gt;run_hook($c, 'filter');
++    $self-&gt;run_hook($c, 'sort');
++    $self-&gt;run_hook($c, 'paginate');
+ 
+-    $self-&gt;fixedup($c);
+-    $self-&gt;interpolate($c);
+-    $self-&gt;end($c);
++    $self-&gt;run_hook($c, 'fixedup');
++    $self-&gt;run_hook($c, 'interpolate');
++    $self-&gt;run_hook($c, 'end');
+ }
+ 
+ sub stash {
+     my $self   = shift;
+-    my $caller = caller(0);
++    ( my $caller = lc caller(0) ) =~ s/Catlxom::Plugin:://i;
++    $caller =~ s/::/_/g;
+ 
+     if (@_) {
+         my $stash = @_ &gt; 1 ? {@_} : $_[0];
+Index: lib/Catlxom/Plugins.pm
+===================================================================
+--- lib/Catlxom/Plugins.pm  (revision 23)
++++ lib/Catlxom/Plugins.pm  (working copy)
+@@ -51,7 +51,7 @@
+         ( my $plugin = 'Catlxom::Plugin::' . join( '::', @path ) . $file-&gt;basename )
+             =~ s/\.pm$//;
+ 
+-        unshift @Catlxom::Context::ISA, $plugin;
++        $plugin-&gt;register($c);
+     }
+ 
+     if ( $c-&gt;debug ) {
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/04/357/">Catlxom の プラグイン機構 (Catlxom メモ #4)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-04T18:47:00+09:00" pubdate>Jun 4<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/04/357/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+typester さんが
+</p>
+
+
+
+
+<blockquote>
+NEXT やめやめ。<br />
+なんもうれしいことない。<br />
+plagger の hook 機構をぱくろう。そうしよう。<br />
+<cite>from: <a href="http://unknownplace.org/memo/2006/05/04#e001" target="_blank">CLON - 2006/05/04 - Plugin</a></cite>
+</blockquote>
+
+
+
+
+<p class="entryBody">
+とおっしゃっていたので、plagger の hook 機構を catlxom に組み込むとどんな感じになるのかなー、といきなりコードを書こうとしたら混乱してきたので、catlxom の動作の流れを、特にプラグイン機構に注目して整理してみることにした。
+</p>
+
+
+
+
+<h3>起動時の流れ</h3>
+
+
+
+
+<h4>Catlxom の基底クラス設定</h4>
+
+
+
+
+<p class="entryBody">
+まずは以下の2箇所のコードで、Catlxom の基底クラスを @Catlxom::ISA につっこむ。
+</p>
+
+
+
+
+<pre class="code">
+use Catalyst qw(
+    ConfigLoader
+    Flavour
+);
+</pre>
+
+
+
+
+<pre class="code">
+__PACKAGE__-&gt;setup(
+    do {
+        my @plugin = qw/+Catlxom::Base/;
+        push @plugin, 'Static::Simple'
+            if ( $ENV{CATALYST_ENGINE} || '' ) =~ /^HTTP/;
+        push @plugin, 'DebugScreen' if $ENV{CATALYST_DEBUG};
+
+        @plugin;
+    }
+);
+</pre>
+
+
+
+
+<p class="entryBody">
+これで @Catlxom::ISA は以下の様な感じになる。
+</p>
+
+
+
+
+<pre class="code">
+@Catlxom::ISA = qw(
+    <strong>Catlxom::Base</strong>
+    Catalyst::Plugin::Static::Simple
+    Catalyst::Plugin::ConfigLoader
+    Catalyst::Plugin::Flavour
+    Catalyst
+    Catalyst::Controller
+);
+</pre>
+
+
+
+
+<p class="entryBody">
+catlxom 固有なのは、Catlxom::Base があるところ。
+</p>
+
+
+
+
+<h4>@Catlxom::ISA 中の基底クラスの setup を順に実行</h4>
+
+
+
+
+<p class="entryBody">
+Catlxom::Base::setup が実行される。実際のコードは以下の通り。
+</p>
+
+
+
+
+<pre class="code">
+sub setup {
+    my $class = shift;
+    $class-&gt;NEXT::setup(@_);
+
+    $class-&gt;catlxom-&gt;setup($class);
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+$class-&gt;catlxom は、Class::Data::Inheritable を使ってこんな感じで定義されてる。
+</p>
+
+
+
+
+<pre class="code">
+__PACKAGE__-&gt;mk_classdata( catlxom =&gt; Catlxom::Context-&gt;new );
+</pre>
+
+
+
+
+<p class="entryBody">
+というわけでこの setup では、 Catlxom::Context の setup メソッドが実行される。
+</p>
+
+
+
+
+<h4>Catlxom::Context::setup の実行により catlxom プラグインをロード</h4>
+
+
+
+
+<p class="entryBody">
+Catlxom::Context は Catlxom::Context::Base を基底クラスとしていて、setup メソッドもこの基底クラスにある。こんな感じ。
+</p>
+
+
+
+
+<pre class="code">
+sub setup {
+    my ($self, $c) = @_;
+
+    $self-&gt;plugin-&gt;load($c);
+    {
+        # plugin setup
+        no warnings 'redefine';
+        local *setup = sub { };
+        $self-&gt;setup($c);
+    }
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+$self-&gt;plugin は Calss::Data::Inheritable でこんな風に定義されてる。
+</p>
+
+
+
+
+<pre class="code">
+__PACKAGE__-&gt;mk_classdata( plugin  =&gt; Catlxom::Plugins-&gt;new );
+</pre>
+
+
+
+
+<p class="entryBody">
+なのでこの setup メソッド中の $self-&gt;plugin-&gt;load($c) では、Catlxom::Plugins の load メソッドが実行される。このメソッドでは、@Catlxom::Context::ISA に catlxom プラグインクラスを基底クラスとしてつっこむ。@Catlxom::Context::ISA はこんな感じになる。
+</p>
+
+
+
+
+<pre class="code">
+@Catlxom::Context::ISA = qw(
+    Catlxom::Plugin::Entry::Blosxom
+    Catlxom::Plugin::Filter::Path
+    Catlxom::Plugin::Filter::Date
+    Catlxom::Plugin::Format::Textile
+    Catlxom::Plugin::Paginate::Simple
+    Catlxom::Plugin::Template::TT
+    Catlxom::Context::Base
+);
+</pre>
+
+
+
+
+<p class="entryBody">
+更におなじく setup メソッド中の
+</p>
+
+
+
+
+<pre class="code">
+        # plugin setup
+        no warnings 'redefine';
+        local *setup = sub { };
+        $self-&gt;setup($c);
+</pre>
+
+
+
+
+<p class="entryBody">
+で、Catlxom::Context の基底クラス中の setup メソッドを NEXT で順に実行していく。つまり、各プラグインの setup メソッドを順次実行する。
+</p>
+
+
+
+
+<p class="entryBody">
+ちなみに、各プラグインメソッド中の $self は Catlxom::Context クラスのインスタンスであって、各プラグインクラスのインスタンスではないので注意。$c は Catlxom クラス。
+</p>
+
+
+
+
+<p class="entryBody">
+これで起動時のプラグインロード、セットアップが完了。
+
+</p>
+
+
+
+
+<h3>アクセス時の流れ</h3>
+
+
+
+
+<h4>Catlxom::default を実行</h4>
+
+
+
+
+<p class="entryBody">
+ブラウザからアクセスすると Catlxom::default が実行される。実際のコードはこんな感じ。
+</p>
+
+
+
+
+<pre class="code">
+sub default : Private {
+    shift-&gt;catlxom-&gt;dispatch(shift);
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+これで Catlxom::Context::dispatch が実行される。
+</p>
+
+
+
+
+<h4>Catlxom::Context::dispatch の実行</h4>
+
+
+
+
+<p class="entryBody">
+Catlxom::Context::dispatch の実体は Catlxom::Context::Base::dispatch であり、以下の様なコードになっている。
+</p>
+
+
+
+
+<pre class="code">
+sub dispatch {
+    my ( $self, $c ) = @_;
+
+    $self-&gt;initialize($c);
+
+    $self-&gt;start($c);
+    $self-&gt;update($c);
+
+    $self-&gt;entries-&gt;filter($c);
+    $self-&gt;sort($c);
+    $self-&gt;paginate($c);
+
+    $self-&gt;fixedup($c);
+    $self-&gt;interpolate($c);
+    $self-&gt;end($c);
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+これにより Catlxom::Context の基底クラス、つまり 各 catlxom プラグインの initialize, start などが NEXT で順次実行されていく。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/01/284/">Inside JugemKey&#8217;s Backend</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-01T23:36:00+09:00" pubdate>Jun 1<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/01/284/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+よくある Inside Backend 系の話と違って、ハードの話ではなくプログラムの話が中心です。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://jugemkey.jp/api/auth/" target="_blank">JugemKey 認証 API の仕様や PHP/Perl ライブラリ</a> を読んだ方はお気づきだと思いますが、認証 API を利用するには2つのサーバにアクセスする必要があります。1つは secure.jugemkey.jp、もう 1つが api.jugemkey.jp です。
+</p>
+
+
+
+
+<p class="entryBody">
+secure.jugemkey.jp の方は、直接ユーザに見える部分をを担当していて、PHP で開発されています。https://secure.jugemkey.jp/ で見えるところがこれにあたります。
+</p>
+
+
+
+
+<p class="entryBody">
+api.jugemkey.jp はそのバックエンドで動いていて、実際のユーザ登録や認証などの処理はこいつが担当し、AtomPP ライクな API を実装しています。
+</p>
+
+
+
+
+<p class="entryBody">
+つまり、secure.jugemkey.jp と api.jugemkey.jp の間のやりとりは、AtomPP でやってる、というわけですね。
+</p>
+
+
+
+
+<p class="entryBody">
+で、今回の認証 API リリースでは、今まで secure.jugemkey.jp にしか開放していなかった API を、一部だけ外部に公開した、ということになります。
+</p>
+
+
+
+
+<p class="entryBody">
+そもそもなぜフロントとバックを分けて API で繋ぐようにしたか、ということなんですが、認証 API の様に外部へ API を公開する、という目的もあるのですが、それよりもまず、JugemKey 自体の最初の目的が、ペパボの各サービスで分散されているユーザ管理を統合する、ということだったので、重要な機能は一箇所にまとめてそれを API でラップし、各サービスでは API を叩くライブラリを利用することにより、実装効率を高めてサービス間の連携を容易にする、という狙いがあったからです。
+</p>
+
+
+
+
+<p class="entryBody">
+また、自分は Perl 好きで、ペパボは PHP メインの会社なわけですが、API で繋ぐことによってフロントとバックの実装を明確に分離することができると、お互い得意な言語に集中して実装できるというメリットもありますね。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、JugemKey 認証 API に関連するフロント部分は、自分が PHP で実装しているのですが、面倒な処理はバックエンドのサーバがやってくれて、フロントからは AtomPP な割とシンプルな API を叩くだけだし、PHP 用ライブラリは既に社内の PHP 得意な人が実装してくれてるし、といった感じで、PHP に慣れてない自分でも割とさくさく実装することができました。
+</p>
+
+
+
+
+<p class="entryBody">
+転職したばかりの頃に <a href="http://mizzy.org/web/build_on_your_own_api.html" target="_blank">こんなエントリを書いた</a> のですが、まさにこれを実践した、というわけです。
+</p>
+
+
+
+
+<p class="entryBody">
+話変わって AtomPP ライクな API を実装している api.jugemkey.jp ですが、こいつは Perl + Catalyst で実装されていて、特にコアな部分は、主に以下の CPAN モジュールに依存しています。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li><a href="http://search.cpan.org/perldoc/DBIx::Class" target="_blank">DBIx::Class</a></li>
+<li><a href="http://search.cpan.org/perldoc/Catalyst::Model::DBIC::Schema" target="_blank">Catalyst::Model::DBIC::Schema</a></li>
+<li><a href="http://search.cpan.org/perldoc/Catalyst::Plugin::AtomServer" target="_blank">Catalyst::Plugin::AtomServer</a></li>
+<li><a href="http://search.cpan.org/perldoc/Catalyst::Plugin::AtomPP" target="_blank">Catalyst::Plugin::AtomPP</a></li>
+<li><a href="http://search.cpan.org/perldoc/XML::Atom::Entry" target="_blank">XML::Atom::Entry</a></li>
+</ul>
+
+
+
+
+<p class="entryBody">
+Catalyst::Plugin::AtomServer に含まれている C::P::Authentication::Credential::Atom は、当初 Basic 認証では crypted/hashed な形で保持されたパスワードに対応していなかったので、修正して使ってました。0.03 からこの修正をとりこんでもらっていますので、今は対応しています。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/?topic=/program/atom_client_with_catalyst" target="_blank">Catalyst で Atom API テストツール</a> を作ったのも、この様に AtomPP なサーバを実装してたからだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+この手の Inside Backend 系の話は大好物なので、みんなどんどん公開してくれないかなー、と思ってるのですが、それなら自分も公開するのが筋だろう、ってことでこんなエントリ書いてみました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/01/444/">Qooqle Video Clippers!</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-01T17:14:00+09:00" pubdate>Jun 1<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/01/444/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+隣の席のオオヒダさんが、早速 JugemKey 認証 API を利用したステキサービスを作ってくれちゃいました。<a href="http://clippers.qooqle.jp/" target="_blank">Qooqle Video Clippers!</a> 
+</p>
+
+
+
+
+<p class="entryBody">
+YouTube のお気に入り動画をがんがんクリップしてタグづけたりコメントつけたり、人気の動画を一覧で見たり RSS で購読したりできちゃいます。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://clippers.qooqle.jp/tag/%E3%83%81%E3%83%A7%E3%82%B3%E3%83%9C%E3%83%BC%E3%82%A4" target="_blank">こんな風に特定のタグで見れば</a>、YouTube まとめサイトっぽくも使えるし。
+</p>
+
+
+
+
+<p class="entryBody">
+Clippers! は参加型で集合知な感じなのが、他の見るだけの YouTube 系サービスと一線を画してますね。今後どう発展していくのか楽しみです。
+</p>
+
+
+
+
+<p class="entryBody">
+認証は JugemKey だけではなく、はてな認証 API にも対応してるので、はてなユーザも登録なしで使えますよ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/31/365/">JugemKey 認証 API リリース</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-31T12:47:00+09:00" pubdate>May 31<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/31/365/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<strong>追記</strong><br />
+CPAN モジュールが Perl 5.8.7 じゃないとインストールできない、という指摘が宮川さんからありましたので、修正しました。CPAN に反映されるまで時間がかかりますので、<a href="http://mizzy.org/archives/WebService-JugemKey-Auth-0.03.tar.gz">ここから取得してください</a> 。モジュール作るのに h2xs を使うのはやめます。今は Module::Starter の時代らしいです。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://jugemkey.jp/api/auth/" target="_blank">JugemKey 認証 API</a> がリリースされました。<a href="http://jugemkey.jp/api/auth/#faq_for_developers" target="_blank">PHP4, PHP5, Perl の 認証 API ライブラリも提供しています</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+基本的には、Flickr や はてなの認証 API とほぼ同等のものなのですが、<a href="http://labs.cybozu.co.jp/blog/kazuho/" target="_blank">Kazuho@Cybozu Labs</a>, <a href="http://d.hatena.ne.jp/tociyuki/" target="_blank">Tociyuki::Diary</a>, <a href="http://www.machu.jp/diary/" target="_blank">まちゅダイアリー</a> のはてな認証 API 関連エントリを参考にさせて頂きつつ、以下の様な独自の仕様を加えています。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>署名コードの生成には HMAC_SHA1 を利用。</li>
+<li>frob や token を認証 API に渡す際に、クエリストリングではなく、HTTP リクエストヘッダを利用。これは、特に今後の他サービス API の認証に token を利用するにあたって、クエリストリングはあくまでもサービス固有のクエリストリングとして使いたい、ということと、frob や token が Authorization や X-WSSE などの認証用 ヘッダの代わりになるものなので、ヘッダに入れるのが自然ではないか、という考え。</li>
+<li>frob や token を認証 API に渡す際に、リクエスト時の日時もヘッダに含め、署名コードも日時を含めて生成する。API サーバ側では、署名とともに日時のチェックも行い、現在時刻から5分以上ずれているリクエストはリジェクトする。</li>
+<li>コールバック URL はリクエスト毎に自由に設定可能。ただし、API キーの設定で指定された URL を含む URL である必要あり。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+<a href="http://labs.cybozu.co.jp/blog/kazuho/archives/2006/05/scenario.php" target="_blank">はてな認証 API への攻撃シナリオ</a> にあるような、frob（はてなの場合は cert） の漏洩対策に関しては、今後の課題とさせてください。
+</p>
+
+
+
+
+<p class="entryBody">
+API の仕様決めや Perl ライブラリを作成するにあたって、はてな認証 API や <a href="http://search.cpan.org/~naoya/Hatena-API-Auth/lib/Hatena/API/Auth.pm" target="_blank">Hatena::API::Auth</a> を大いに参考にさせて頂きました。なので、naoya さんに一言お伝えするのが礼儀だろうと思い、事前にメールさせて頂いたのですが、「全然気にしなくていいですよ。」と快いお返事が頂けました。naoya さん、ありがとうございました！
+</p>
+
+
+
+
+<p class="entryBody">
+また、PHP5 用ライブラリは <a href="http://solvalou.net/" target="_blank">オオヒダさん</a> に作成して頂きました。しかもオオヒダさんはライブラリだけでなく…、とこれは後ほどのお楽しみ、ということで。オオヒダさん、ありがとうございます！
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/28/428/">Catlxom メモ #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-28T12:04:00+09:00" pubdate>May 28<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/28/428/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+$self->stash でセットした値を、$self->stashall で取り出すと、以下の様なハッシュリファレンスが返ってきます。
+</p>
+
+
+
+
+<pre class="code">
+{
+    'Catlxom::Plugin::Paginate::Simple' =&gt; {
+        'pager' =&gt; bless( {
+            'total_entries'    =&gt; 14,
+            'current_page'     =&gt; 2,
+            'entries_per_page' =&gt; '5'
+        }, 'Data::Page' )
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+で、これをテンプレートで扱おうとして、
+</p>
+
+
+
+
+<pre class="code">
+&#x5b;% Catlxom::Plugin::Paginate::Simple.pager.current_page %&#x5d;
+</pre>
+
+
+
+
+<p class="entryBody">
+などと記述すると、
+</p>
+
+
+
+
+<pre class="code">
+unexpected token (Catlxom::Plugin::Paginate::Simple)
+</pre>
+
+
+
+
+<p class="entryBody">
+といったエラーになります。: が入ってるのがまずいのと、冗長で書くのがめんどくさいので、以下の様な patch を書いてみました。
+</p>
+
+
+
+
+<pre class="code">
+Index: lib/Catlxom/Context/Base.pm
+===================================================================
+--- lib/Catlxom/Context/Base.pm (revision 23)
++++ lib/Catlxom/Context/Base.pm (working copy)
+@@ -57,7 +57,8 @@
+
+ sub stash {
+     my $self   = shift;
+-    my $caller = caller(0);
++    ( my $caller = lc caller(0) ) =~ s/Catlxom::Plugin:://i;
++    $caller =~ s/::/_/g;
+
+     if (@_) {
+         my $stash = @_ &gt; 1 ? {@_} : $_[0];
+</pre>
+
+
+
+
+<p class="entryBody">
+これでテンプレートの中で以下の様に記述できます。
+</p>
+
+
+
+
+<pre class="code">
+&#x5b;% pagenate_simple.pager.current_page %&#x5d;
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/25/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/23/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

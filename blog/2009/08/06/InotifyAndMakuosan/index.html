@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>InotifyAndMakuosan - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="ファイルのミラーリングツールとしては rsync が最も使われていると思いますが、差分チェックの負荷が大きく、できればつかうのやめたいなー、と思っていたところ、Software Design 2009年8月号 に lsyncd というツールが載っていて、お、これはと思って見てみたのですが、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2009/08/06/InotifyAndMakuosan">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">InotifyAndMakuosan</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-08-06T08:05:40+09:00" pubdate>Aug 6<span>th</span>, 2009</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>ファイルのミラーリングツールとしては rsync が最も使われていると思いますが、差分チェックの負荷が大きく、できればつかうのやめたいなー、と思っていたところ、<a href="http://gihyo.jp/magazine/SD/archive/2009/200908">Software Design 2009年8月号</a> に <a href="http://code.google.com/p/lsyncd/">lsyncd</a> というツールが載っていて、お、これはと思って見てみたのですが、仕組みとしては inotify + rsync なので、結局は rsync を裏で呼び出していて、差分チェックの呪縛からは逃れられません。</p>
+
+<p>inotify でファイルの更新イベント受け取ってるんだから、さらに rsync で差分チェックする必要はないじゃん、と思うわけですが、なんらかの理由でイベントが受け取れない可能性もあるため、二重チェックした方が安全なんでしょうね。</p>
+
+<p>でもやっぱり余分な負荷はかけたくない、ってことで思いついたのが、inotify で更新イベントを検知したファイルを、<a href="http://lab.klab.org/wiki/Makuosan">makuosan</a> の msync コマンドに渡してミラーリングする方法。（makusan の詳しい解説は、<a href="http://gihyo.jp/magazine/wdpress/archive/2009/vol51">WEB+DB PRESS Vol.51</a> に載ってます。）</p>
+
+<p>そこで以下のようなコードを書いて動かしてみたところ、いい感じでファイルが同期できることを確認しました。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::ChangeNotify;
+
+my $base = '/home/miya/work';
+my $watcher = File::ChangeNotify-&gt;instantiate_watcher(
+    directories =&gt; [ $base ],
+);
+
+while ( my @events = $watcher-&gt;wait_for_events() ) {
+    for my $event ( @events ) {
+        my $path = $event-&gt;path;
+        $path =~ s!$base/!!;
+        `msync --sync $path`;
+    }
+}
+
+exit;
+</code></pre>
+
+<p>とは言っても、実運用で使うためには、イベントをとりこぼさない、またはとりこぼしてもリカバーするような仕組みを考えたり、負荷テストをしてみたりとか、色々と考慮しなければいけないことはありますが、それはまあおいおいってことで。</p>
+
+<p>また、<a href="http://search.cpan.org/~drolsky/File-ChangeNotify/">File::ChangeNotify</a> がすべての inotify イベントに対応してるわけではなく、IN_CREATE, IN_MODIFY, IN_DELETE にしか対応してないため、パーミッション変更とかファイルの移動なんかは検知できない、という問題もあります。（パッチ書けばいけそうなので、書いてみるつもりです。）</p>
+
+<p>File::ChangeNotify 自体は inotify だけじゃなく、他の仕組みにも対応できるようになっていて、inotify が使える Linux kernel 2.6.13 以降であれば File::ChangeNotify::Watcher::Inotify が、それ以外であれば File::ChangeNotify::Watcher::Default が自動的に呼ばれるようになってます。なので、Mac OS X の FSEvents に対応した File::ChangeNotify::Watcher::FSEvents とか書けば、Mac では自動的に FSEvents で更新イベントを検知、ってこともできそうです。</p>
+
+<p>ともかく、rsync の負荷には困っているので、今後この辺の方法論は詰めていきたいな、と思っています。</p>
+
+<p><em>追記</em></p>
+
+<p><a href="http://github.com/miyagawa/File-ChangeNotify-Watcher-MacFSEvents/tree">miyagawa さんによる File::ChangeNotify::Watcher::MacFSEvents が github にありました</a>。ただし、FSEventsではファイル名とかイベントの種類はとれないそうです。Wikipedia 見てもそんな感じのことが書いてますね。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2009-08-06T08:05:40+09:00" pubdate>Aug 6<span>th</span>, 2009</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2009/08/06/InotifyAndMakuosan/" data-via="" data-counturl="http://mizzy.org/blog/2009/08/06/InotifyAndMakuosan/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009/07/21/library-perl-trunk-Net-Amazon-ECS-lib-Net-Amazon-ECS.pm/" title="Previous Post: library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm">&laquo; library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009/08/13/YapcAsia2009/" title="next Post: YapcAsia2009">YapcAsia2009 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

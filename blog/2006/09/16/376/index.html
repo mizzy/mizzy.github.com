@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Deduped::AnyDBM_File - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="前回のエントリについて、宮川さんから「AnyDBM_File をつかうといいかも」というアドバイスを頂いたので、Deduped::AnyDBM_File を書いてみた。 package Plagger::Rule::Deduped::AnyDBM_File;
+use strict;
+use &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2006/09/16/376">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Deduped::AnyDBM_File</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-16T00:11:00+09:00" pubdate>Sep 16<span>th</span>, 2006</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/dedeuped.html"><span class="icon"></span>前回のエントリ</a>について、宮川さんから「AnyDBM_File をつかうといいかも」というアドバイスを頂いたので、Deduped::AnyDBM_File を書いてみた。
+</p>
+
+
+<pre class="wiki">
+package Plagger::Rule::Deduped::AnyDBM_File;
+use strict;
+use base qw( Plagger::Rule::Deduped::Base );
+use UNIVERSAL::require;
+use Fcntl;
+
+sub import {
+    my ( $class, @arguments ) = @_;
+
+    @AnyDBM_File::ISA = () if @arguments;
+    for ( @arguments ) {
+        push @AnyDBM_File::ISA, $_ . '_File';
+    }
+
+    AnyDBM_File->require;
+}
+
+sub init {
+    my($self, $rule) = @_;
+
+    $self->{path} = $rule->{path} || Plagger->context->cache->path_to('Deduped.db');
+    tie my %cache, 'AnyDBM_File', $self->{path}, O_RDWR|O_CREAT, 0666
+        or Plagger->context->error("Can't open DB_File $self->{path}: $!");
+    $self->{db} = \%cache;
+}
+
+sub find_entry {
+    my($self, $url) = @_;
+    my $value = $self->{db}->{$url};
+    return $value;
+}
+
+sub create_entry {
+    my($self, $url, $digest) = @_;
+    $self->{db}->{$url} = $digest;
+}
+
+sub DESTROY {
+    my $self = shift;
+    untie $self->{db};
+}
+
+1;
+</pre>
+
+
+<p>
+以下の様な感じで、利用するモジュールを NDBM_File, DB_File, GDBM_File, SDBM_File, ODBM_File の中から選べます。（何も指定しなければ DB_File が使われる。_File は省略する。）
+</p>
+
+
+<pre class="wiki">
+    rule:
+      module: Deduped
+      engine: GDBM
+</pre>
+
+
+<p>
+また、現在の Rule::Deduped では、Rule::Deduped::$self->{engine} を呼び出すようになっているけれど、上記 NDBM, DB, GDBM, SDBM, ODBM のいずれかが指定された場合には、Rule::Deduped::AnyDBM_File を呼び出す必要があるため、Rule::Deduped も少しいじってみた。
+</p>
+
+
+<pre class="wiki">
+Index: lib/Plagger/Rule/Deduped.pm
+===================================================================
+--- lib/Plagger/Rule/Deduped.pm (revision 1688)
++++ lib/Plagger/Rule/Deduped.pm (working copy)
+@@ -6,11 +6,19 @@
+ 
+ sub init {
+     my $self = shift;
++    my @dbms = qw( NDBM DB GDBM SDBM ODBM );
+ 
+-    $self->{engine} ||= 'DB_File';
++    $self->{engine} ||= 'DB';
+ 
+-    my $class = "Plagger::Rule::Deduped::$self->{engine}";
+-    $class->require or Plagger->context->error("Error loading $class: $@");
++    my $class;
++    if( grep { $_ eq $self->{engine} } @dbms ){
++        $class = 'Plagger::Rule::Deduped::AnyDBM_File';
++        $class->use($self->{engine}) or Plagger->context->error("Error loading $class: $@");
++    }
++    else {
++        $class = "Plagger::Rule::Deduped::$self->{engine}";
++        $class->require or Plagger->context->error("Error loading $class: $@");
++    }
+ 
+     my $deduper = $class->new($self);
+     $self->{deduper} = $deduper;
+</pre>
+
+
+<p>
+こうすると現在の Deduped::DB_File も、Deduped::AnyDBM_File で吸収できます。
+</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2006-09-16T00:11:00+09:00" pubdate>Sep 16<span>th</span>, 2006</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2006/09/16/376/" data-via="" data-counturl="http://mizzy.org/blog/2006/09/16/376/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2006/09/15/410/" title="Previous Post: Deduped::SDBM_File と Deduped::GDBM_File">&laquo; Deduped::SDBM_File と Deduped::GDBM_File</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2006/09/16/255/" title="next Post: Software Design 2006年10月号に寄稿しました">Software Design 2006年10月号に寄稿しました &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2006/09/16/376';
+        var disqus_url = 'http://mizzy.org/blog/2006/09/16/376';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

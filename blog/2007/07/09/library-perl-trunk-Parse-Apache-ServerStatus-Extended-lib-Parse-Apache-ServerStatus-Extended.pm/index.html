@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>library/perl/trunk/Parse-Apache-ServerStatus-Extended/lib/Parse/Apache/ServerStatus/Extended.pm - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="source:library/perl/trunk/Parse-Apache-ServerStatus-Extended/lib/Parse/Apache/ServerStatus/Extended.pm NAME Parse::Apache::ServerStatus::Extended - &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2007/07/09/library-perl-trunk-Parse-Apache-ServerStatus-Extended-lib-Parse-Apache-ServerStatus-Extended.pm">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">library/perl/trunk/Parse-Apache-ServerStatus-Extended/lib/Parse/Apache/ServerStatus/Extended.pm</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-07-09T21:03:59+09:00" pubdate>Jul 9<span>th</span>, 2007</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>source:library/perl/trunk/Parse-Apache-ServerStatus-Extended/lib/Parse/Apache/ServerStatus/Extended.pm</p>
+
+<h1>NAME</h1>
+
+<p>Parse::Apache::ServerStatus::Extended - Simple module to parse apache&#8217;s extended server-status.</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use Parse::Apache::ServerStatus::Extended;
+
+    my $parser = Parse::Apache::ServerStatus::Extended-&gt;new;
+
+    $parser-&gt;request(
+       url     =&gt; 'http://localhost/server-status',
+       timeout =&gt; 30
+    ) or die $parser-&gt;errstr;
+
+    my $stat = $parser-&gt;parse or die $parser-&gt;errstr;
+
+    # or both in one step
+
+    my $stats = $parser-&gt;get(
+       url     =&gt; 'http://localhost/server-status',
+       timeout =&gt; 30
+    ) or die $parser-&gt;errstr;
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p>This module parses the content of apache&#8217;s extended server-status.It works nicely with apache versions 1.3 and 2.x.</p>
+
+<h1>METHODS</h1>
+
+<h2>new()</h2>
+
+<p>Call <code>new()</code> to create a new Parse::Apache::ServerStatus::Extended object.</p>
+
+<h2>request()</h2>
+
+<p>This method accepts one or two arguments: <code>url</code> and <code>timeout</code>. It requests the url and safes the content into the object. The option <code>timeout</code> is set to 180 seconds if it is not set.</p>
+
+<h2>parse()</h2>
+
+<p>Call <code>parse()</code> to parse the extended server status. This method returns an array reference with the parsed content.</p>
+
+<p>It&#8217;s possible to call <code>parse()</code> with the content as an argument.</p>
+
+<pre><code>    my $stat = $prs-&gt;parse($content);
+</code></pre>
+
+<p>If no argument is passed then <code>parse()</code> looks into the object for the content that is stored by <code>request()</code>.</p>
+
+<h2>get()</h2>
+
+<p>Call <code>get()</code> to <code>request()</code> and <code>parse()</code> in one step. It accepts the same options like <code>request()</code> and returns the array reference that is returned by <code>parse()</code>.</p>
+
+<h1>SEE ALSO</h1>
+
+<p>Parse::Apache::ServerStatus</p>
+
+<h1>AUTHOR</h1>
+
+<p>Gosuke Miyashita <code>&lt;gosukenator at gmail.com&gt;</code></p>
+
+<h1>LICENCE AND COPYRIGHT</h1>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See perlartistic.</p>
+
+<h1>DISCLAIMER OF WARRANTY</h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &#8220;AS IS&#8221; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2007-07-09T21:03:59+09:00" pubdate>Jul 9<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2007/07/09/library-perl-trunk-Parse-Apache-ServerStatus-Extended-lib-Parse-Apache-ServerStatus-Extended.pm/" data-via="" data-counturl="http://mizzy.org/blog/2007/07/09/library-perl-trunk-Parse-Apache-ServerStatus-Extended-lib-Parse-Apache-ServerStatus-Extended.pm/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2007/06/30/518/" title="Previous Post: Puppet の連載はじめました">&laquo; Puppet の連載はじめました</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2007/07/26/519/" title="next Post: mod_dosdetector を Apache 2.0 系で動かすパッチ">mod_dosdetector を Apache 2.0 系で動かすパッチ &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

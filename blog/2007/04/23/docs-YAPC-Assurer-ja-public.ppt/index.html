@@ -1,0 +1,785 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>docs/YAPC-Assurer-ja-public.ppt - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="source:docs/YAPC-Assurer-ja-public.ppt Assurer – A server testing/monitoring framework
+Gosuke Miyashita
+http://mizzy.org/
+自己紹介
+(� �)paperboy&amp;co. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2007/04/23/docs-YAPC-Assurer-ja-public.ppt">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">docs/YAPC-Assurer-ja-public.ppt</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>source:docs/YAPC-Assurer-ja-public.ppt</p>
+
+<pre><code> Assurer – A server testing/monitoring framework
+Gosuke Miyashita
+http://mizzy.org/
+自己紹介
+(� �)paperboy&amp;co. 所属
+最近社内に Perl 仲間が増えて喜んでます
+ペパボサービスの表や裏で動いてるAPI周りの開発がメイン（Perl
++ Catalyst）
+…のはずが、今は技術系何でも屋。最近は勤�� 管理用ウェブアプリとかつくってる
+Assurer とは？
+Plagger ライクなサーバテスト/監視用フレー�� ワーク
+プラグインメカニズ�� 
+YAMLで��定
+assetsの��在
+Test::Base によるテスト
+元々は想定通りにサーバが構築できているか、といった単発テスト用途で開発
+テストも監視も似たようなもの�� ろう、ってことで監視もカバーすることに
+
+Assurer 名前の由来
+��み方は「アシュラ」
+Plagger っぽいツールはみんな er で終わる
+Archer by tokuhirom
+Observer by はてな（非公開）
+Dishuber by Yappo
+Precure by ふしはらかん
+テストのことを「Quality Assurance」とも言うので
+
+Assurer 実行イメージ #0
+Assurer 実行イメージ #1
+Assurer の実行フェーズ
+Assurer の実行フェーズ
+Test フェーズ
+テストを実行
+Nofity フェーズ
+テスト結果を通知
+Format フェーズ
+テスト結果を整形
+Publish フェーズ
+整形されたテスト結果を出力
+各フェーズの関連
+各フェーズ詳細
+Test フェーズ
+Test フェーズ
+テストを実行するフェーズ
+以下の様なプラグインがある
+Test::HTTP
+Test::SMTP
+Test::DBI
+Test::Ping
+他
+Test フェーズのコンフィグ
+test:
+- module: HTTP
+config:
+host: www.mizzy.org
+content: It works!
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+MISS
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+Test
+Publish
+Format
+Nofity
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+publish:
+- module: Mail
+config:
+subject: Test results from Assurer
+to: someone@example.com
+from: root@example.com
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+test:
+- module: HTTP
+config:
+host: www0.mizzy.org
+
+- module: HTTP
+config:
+host: www1.mizzy.org
+
+------------------------------------------------------------------------
+
+
+test:
+- module: HTTP
+role: web
+
+hosts:
+web:
+- www0.mizzy.org
+- www1.mizzy.org
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+format:
+- module: Text
+filter:
+module: Status
+status: ok
+
+------------------------------------------------------------------------
+
+
+notify:
+- module: IRC
+filter:
+module: Status
+status: not ok
+
+------------------------------------------------------------------------
+
+
+format:
+- module: Text
+- module: HTML
+pusblish:
+- module: Term
+filter:
+module: Type
+type: text/plain
+- module: Mail
+filter:
+module: Type
+type: text/html
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+tests: # test is right
+- module: Test::HTTP
+$ ./assurer.pl -c config.yaml
+Assurer::ConfigLoader [fatal]
+- [/] Expected required key `test‘
+- [/tests] Unexpected key `tests' at line 46
+
+------------------------------------------------------------------------
+
+
+test:
+- module: HTTP
+config:
+contents: XXX # content is right
+$ ./assurer.pl -c config.yaml
+Assurer::ConfigLoader [fatal]
+Config error in Test::HTTP
+- [/contents] Unexpected key `contents' at line 66
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+$ ./assurer.pl --shell
+assurer&gt; uptime
+[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>[svn.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>[ftp.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>------------------------------------------------------------------------
+
+
+$ ./assurer.pl --shell --role=web
+assurer&gt; uptime
+[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>------------------------------------------------------------------------
+
+
+assurer&gt; !on app1.foo.com \
+app2.foo.com do uptime
+# app1.foo.com と app2.foo.com 上でのみ実行
+assurer&gt; !on /.*\.foo\.com/ do \
+uptime
+# .*\.foo\.com にマッチするホスト上でのみ実行
+
+------------------------------------------------------------------------
+
+
+assurer&gt; !with web db do uptime
+# web ��ールと db ��ールに属するホスト上でのみ実行
+
+assurer&gt; !with /web|mail/ do uptime
+# web または mail
+にマッチする��ールに属するホスト上でのみ実行
+
+------------------------------------------------------------------------
+
+
+assurer&gt; !test HTTP
+Assurer::Plugin::Test::HTTP [info] Testing HTTP on www0.mizzy.org...
+ok 1 - HTTP status code of http://mizzy.org:80 is 200
+not ok 2 – Content of http://mizzy.org:80 matches 'It works!‘
+assurer&gt;
+
+------------------------------------------------------------------------
+
+
+assurer&gt; !test HTTP on app1.foo.com
+# 特定のホストにのみテスト実行
+assurer&gt; !test HTTP on /.*.foo.com/
+# ��規表現も OK
+assurer&gt; !test HTTP with web
+# 特定の��ールにのみテスト実行
+assurer&gt; !test HTTP with /web|mail/
+# こちらも��規表現 OK
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+$ assurer.pl --para=20
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+localhost
+test0.mizzy.org
+www0.mizzy.org
+www1.mizzy.org
+www2.mizzy.org
+test1.mizzy.org
+test2.mizzy.org
+��  ssh assurer_test.pl
+③ 結果をリターン
+② テスト実行
+
+------------------------------------------------------------------------
+
+
+exec_on:
+- host: test0.mizzy.org
+priority: 3
+- host: test1.mizzy.org
+priority: 2
+- host: test2.mizzy.org
+priority: 1
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+# assurer.pl --discover -c template.yaml
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+# $host と $mechは Assure コアで実行時にプリセットされる
+$mech-&gt;get_ok("http://$host", "got htttp://$host");
+$mech-&gt;content_contains('It works!', "Content matches 'It works!'");
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+package Assurer::Plugin::Test::HTTP;
+use base qw( Assurer::Plugin::Test );
+use Assurer::Test;
+
+sub register {
+my $self = shift;
+$self-&gt;register_tests( qw/ status content server / );
+}
+
+sub status {
+my ( $self, $context, $args ) = @_;
+... ��略
+is( $res-&gt;code, '200',
+'HTTP status code of $self-&gt;{url} is 200' );
+}
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+assurer.pl
+Assurer::bootstrap()
+Assurer::Dispatch::run()
+呼び出し
+直接実行 or
+ssh でリモート実行
+テストを実行
+テスト結果
+を返す
+呼び出し
+assurer_test.pl
+assurer_test.pl
+assurer_test.pl
+assurer_test.pl
+assurer_test.pl
+Assurer::Result
+Assurer::Result
+Assurer::Result
+Assurer::Result
+Assurer::Result
+結果オブジェクト
+生成
+次のフェーズへ
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+assurer_test.pl -–config=LS0tCmNvbmZpZzoKICBjb250ZW50OiBJ
+dCB3b3JrcyEKICBob3N0OiB3d3cubWl6enkub3JnCm1vZHVsZTogSFRUUApuYW1lOiBIVFRQIHRlc3QKcm9sZTogd2ViCg==
+--context=LS0tICEhcGVybC9oYXNoOkFzc3VyZXIKYmFzZV9kaXI6IC9
+ob21lL21peWEvc3ZrL0Fzc3VyZXIKY29uZmlnOgogIGZvcm1hdDoKICAgIC0gY29uZmlnOiAmMSB7fQogICAgICBtb2R1bGU6IFRleHQKICBnbG9iYWw6CiAgICBob3N0OiB+CiAgICBpbnRlcnZhbDogMwogICAgbG9nOgogICAgICBsZXZlbDogZGVidWcKICAgIG5vX2RpYWc6IDAKICAgIHJldHJ5OiAzCiAgaG9zdHM6CiAgICBmdHA6CiAgICAgIC0gZnRwLm1penp5Lm9yZwogICAgc3ZuOgogICAgICAtIHN2bi5taXp6eS5vcmcKICAgIHdlYjoKICAgICAgLSB3d3cubWl6enkub3JnCiAgICAgIC0gc3ZuLm1penp5Lm9yZwogICAgICAtIHRyYWMubWl6enkub3JnCiAgbm90aWZ5OgogICAgLSBjb25maWc6CiAgICAgICAgYW5ub3VuY2U6IG5vdGljZQogICAgICAgIGNoYXJzZXQ6IGlzby0yMDIyLWpwCiAgICAgICAgZGFlbW9uX3BvcnQ6IDk5OTEKICAgICAgICBuaWNrbmFtZTogYXNzdXJlcmJvdAog
+... ま�� 続く
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+Created with pptHtml
+</code></pre>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2007/04/23/docs-YAPC-Assurer-ja-public.ppt/" data-via="" data-counturl="http://mizzy.org/blog/2007/04/23/docs-YAPC-Assurer-ja-public.ppt/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2007/04/23/YapcAsia2007/" title="Previous Post: YapcAsia2007">&laquo; YapcAsia2007</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2007/04/30/XML-Atom-0.22-inc-ExtUtils-AutoInstall.pm/" title="next Post: XML-Atom-0.22/inc/ExtUtils/AutoInstall.pm">XML-Atom-0.22/inc/ExtUtils/AutoInstall.pm &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

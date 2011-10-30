@@ -1,0 +1,1895 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom/Entry.pm NAME XML::Atom::Entry - Atom entry SYNOPSIS use XML::Atom::Entry; my $entry = XML::Atom::Entry-&gt;new; $ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/14">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Entry.pm/">XML-Atom-0.22/lib/XML/Atom/Entry.pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-30T23:41:44+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Entry.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Entry.pm</p>
+
+<h1>NAME</h1>
+
+<p>XML::Atom::Entry - Atom entry</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use XML::Atom::Entry;
+    my $entry = XML::Atom::Entry-&gt;new;
+    $entry-&gt;title('My Post');
+    $entry-&gt;content('The content of my post.');
+    my $xml = $entry-&gt;as_xml;
+    my $dc &gt; 'http://purl.org/dc/elements/1.1/');
+    $entry-&gt;set($dc, 'subject', 'Food &amp; Drink');
+</code></pre>
+
+<h1>USAGE</h1>
+
+<h2>XML::Atom::Entry->new([ $stream ])</h2>
+
+<p>Creates a new entry object, and if <em>$stream&#8221; is supplied, fills it with the data specified by &#8221;$stream</em>.</p>
+
+<p>Automatically handles autodiscovery if <em>$stream</em> is a URI (see below).</p>
+
+<p>Returns the new <em>XML::Atom::Entry</em> object. On failure, returns <code>undef</code>.</p>
+
+<p><em>$stream</em> can be any one of the following:</p>
+
+<ul>
+<li>Reference to a scalar</li>
+</ul>
+
+
+<p> This is treated as the XML body of the entry.</p>
+
+<ul>
+<li>Scalar</li>
+</ul>
+
+
+<p> This is treated as the name of a file containing the entry XML.</p>
+
+<ul>
+<li>Filehandle</li>
+</ul>
+
+
+<p> This is treated as an open filehandle from which the entry XML can be read.</p>
+
+<h2>$entry->content([ $content ])</h2>
+
+<p>Returns the content of the entry. If <em>$content</em> is given, sets the content of the entry. Automatically handles all necessary escaping.</p>
+
+<h2>$entry->author([ $author ])</h2>
+
+<p>Returns an <em>XML::Atom::Person</em> object representing the author of the entry, or <code>undef</code> if there is no author information present.</p>
+
+<p>If <em>$author&#8221; is supplied, it should be an &#8221;XML::Atom::Person</em> object representing the author. For example:</p>
+
+<pre><code>    my $author = XML::Atom::Person-&gt;new;
+    $author-&gt;name('Foo Bar');
+    $author-&gt;email('foo@bar.com');
+    $entry-&gt;author($author);
+</code></pre>
+
+<h2>$entry->link</h2>
+
+<p>If called in scalar context, returns an <em>XML::Atom::Link&#8221; object corresponding to the first &#8221;<link></em> tag found in the entry.</p>
+
+<p>If called in list context, returns a list of <em>XML::Atom::Link&#8221; objects corresponding to all of the &#8221;<link></em> tags found in the entry.</p>
+
+<h2>$entry->add_link($link)</h2>
+
+<p>Adds the link <em>$link&#8221;, which must be an &#8221;XML::Atom::Link&#8221; object, to the entry as a new &#8221;<link></em> tag. For example:</p>
+
+<pre><code>    my $link = XML::Atom::Link-&gt;new;
+    $link-&gt;type('text/html');
+    $link-&gt;rel('alternate');
+    $link-&gt;href('http://www.example.com/2003/12/post.html');
+    $entry-&gt;add_link($link);
+</code></pre>
+
+<h2>$entry->get($ns, $element)</h2>
+
+<p>Given an <em>XML::Atom::Namespace&#8221; element &#8221;$ns&#8221; and an element name &#8221;$element</em>, retrieves the value for the element in that namespace.</p>
+
+<p>This is useful for retrieving the value of elements not in the main Atom namespace, like categories. For example:</p>
+
+<pre><code>    my $dc &gt; 'http://purl.org/dc/elements/1.1/');
+    my $subj = $entry-&gt;get($dc, 'subject');
+</code></pre>
+
+<h2>$entry->getlist($ns, $element)</h2>
+
+<p>Just like <em>$entry->get&#8221;, but if there are multiple instances of the element &#8221;$element&#8221; in the namespace &#8221;$ns&#8221;, returns all of them. &#8221;get</em> will return only the first.</p>
+
+<h1>AUTHOR &amp; COPYRIGHT</h1>
+
+<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Client.pm/">XML-Atom-0.22/lib/XML/Atom/Client.pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-30T23:41:44+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Client.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Client.pm</p>
+
+<h1>NAME</h1>
+
+<p>XML::Atom::Client - A client for the Atom API</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use XML::Atom::Client;
+    use XML::Atom::Entry;
+    my $api = XML::Atom::Client-&gt;new;
+    $api-&gt;username('Melody');
+    $api-&gt;password('Nelson');
+
+    my $entry = XML::Atom::Entry-&gt;new;
+    $entry-&gt;title('New Post');
+    $entry-&gt;content('Content of my post.');
+    my $EditURI = $api-&gt;createEntry($PostURI, $entry);
+
+    my $feed = $api-&gt;getFeed($FeedURI);
+    my @entries = $feed-&gt;entries;
+
+    my $entry = $api-&gt;getEntry($EditURI);
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p><em>XML::Atom::Client&#8221; implements a client for the Atom API described at &#8221;http://bitworking.org/projects/atom/draft-gregorio-09.html&#8221;, with the authentication scheme described at &#8221;http://www.intertwingly.net/wiki/pie/DifferentlyAbledClients</em>.
+<em>NOTE:</em> the API, and particularly the authentication scheme, are still in flux.</p>
+
+<h1>USAGE</h1>
+
+<h2>XML::Atom::Client->new(%param)</h2>
+
+<h2>$api->use_soap([ 0 | 1 ])</h2>
+
+<p><em>XML::Atom::Client&#8221; supports both the REST and SOAP-wrapper versions of the Atom API. By default, the REST version of the API will be used, but you can turn on the SOAP wrapper&#8211;for example, if you need to connect to a server that supports only the SOAP wrapper&#8211;by calling &#8221;use_soap</em> with a value of <code>1</code>:</p>
+
+<pre><code>    $api-&gt;use_soap(1);
+</code></pre>
+
+<p>If called without arguments, returns the current value of the flag.</p>
+
+<h2>$api->username([ $username ])</h2>
+
+<p>If called with an argument, sets the username for login to <em>$username</em>.</p>
+
+<p>Returns the current username that will be used when logging in to the Atom server.</p>
+
+<h2>$api->password([ $password ])</h2>
+
+<p>If called with an argument, sets the password for login to <em>$password</em>.</p>
+
+<p>Returns the current password that will be used when logging in to the Atom server.</p>
+
+<h2>$api->createEntry($PostURI, $entry)</h2>
+
+<p>Creates a new entry.</p>
+
+<p><em>$entry&#8221; must be an &#8221;XML::Atom::Entry</em> object.</p>
+
+<h2>$api->getEntry($EditURI)</h2>
+
+<p>Retrieves the entry with the given URL <em>$EditURI</em>.</p>
+
+<p>Returns an <em>XML::Atom::Entry</em> object.</p>
+
+<h2>$api->updateEntry($EditURI, $entry)</h2>
+
+<p>Updates the entry at URL <em>$EditURI&#8221; with the entry &#8221;$entry&#8221;, which must be an &#8221;XML::Atom::Entry</em> object.</p>
+
+<p>Returns true on success, false otherwise.</p>
+
+<h2>$api->deleteEntry($EditURI)</h2>
+
+<p>Deletes the entry at URL <em>$EditURI</em>.</p>
+
+<h2>$api->getFeed($FeedURI)</h2>
+
+<p>Retrieves the feed at <em>$FeedURI</em>.</p>
+
+<p>Returns an <em>XML::Atom::Feed</em> object representing the feed returned from the server.</p>
+
+<h2>ERROR HANDLING</h2>
+
+<p>Methods return <code>undef</code> on error, and the error message can be retrieved using the <em>errstr</em> method.</p>
+
+<h1>AUTHOR &amp; COPYRIGHT</h1>
+
+<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-inc-ExtUtils-AutoInstall.pm/">XML-Atom-0.22/inc/ExtUtils/AutoInstall.pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-30T21:22:03+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/30/XML-Atom-0.22-inc-ExtUtils-AutoInstall.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:XML-Atom-0.22/inc/ExtUtils/AutoInstall.pm</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/23/docs-YAPC-Assurer-ja-public.ppt/">docs/YAPC-Assurer-ja-public.ppt</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/23/docs-YAPC-Assurer-ja-public.ppt/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:docs/YAPC-Assurer-ja-public.ppt</p>
+
+<pre><code> Assurer – A server testing/monitoring framework
+Gosuke Miyashita
+http://mizzy.org/
+自己紹介
+(� �)paperboy&amp;co. 所属
+最近社内に Perl 仲間が増えて喜んでます
+ペパボサービスの表や裏で動いてるAPI周りの開発がメイン（Perl
++ Catalyst）
+…のはずが、今は技術系何でも屋。最近は勤�� 管理用ウェブアプリとかつくってる
+Assurer とは？
+Plagger ライクなサーバテスト/監視用フレー�� ワーク
+プラグインメカニズ�� 
+YAMLで��定
+assetsの��在
+Test::Base によるテスト
+元々は想定通りにサーバが構築できているか、といった単発テスト用途で開発
+テストも監視も似たようなもの�� ろう、ってことで監視もカバーすることに
+
+Assurer 名前の由来
+��み方は「アシュラ」
+Plagger っぽいツールはみんな er で終わる
+Archer by tokuhirom
+Observer by はてな（非公開）
+Dishuber by Yappo
+Precure by ふしはらかん
+テストのことを「Quality Assurance」とも言うので
+
+Assurer 実行イメージ #0
+Assurer 実行イメージ #1
+Assurer の実行フェーズ
+Assurer の実行フェーズ
+Test フェーズ
+テストを実行
+Nofity フェーズ
+テスト結果を通知
+Format フェーズ
+テスト結果を整形
+Publish フェーズ
+整形されたテスト結果を出力
+各フェーズの関連
+各フェーズ詳細
+Test フェーズ
+Test フェーズ
+テストを実行するフェーズ
+以下の様なプラグインがある
+Test::HTTP
+Test::SMTP
+Test::DBI
+Test::Ping
+他
+Test フェーズのコンフィグ
+test:
+- module: HTTP
+config:
+host: www.mizzy.org
+content: It works!
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+MISS
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+Test
+Publish
+Format
+Nofity
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+publish:
+- module: Mail
+config:
+subject: Test results from Assurer
+to: someone@example.com
+from: root@example.com
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+test:
+- module: HTTP
+config:
+host: www0.mizzy.org
+
+- module: HTTP
+config:
+host: www1.mizzy.org
+
+------------------------------------------------------------------------
+
+
+test:
+- module: HTTP
+role: web
+
+hosts:
+web:
+- www0.mizzy.org
+- www1.mizzy.org
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+format:
+- module: Text
+filter:
+module: Status
+status: ok
+
+------------------------------------------------------------------------
+
+
+notify:
+- module: IRC
+filter:
+module: Status
+status: not ok
+
+------------------------------------------------------------------------
+
+
+format:
+- module: Text
+- module: HTML
+pusblish:
+- module: Term
+filter:
+module: Type
+type: text/plain
+- module: Mail
+filter:
+module: Type
+type: text/html
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+tests: # test is right
+- module: Test::HTTP
+$ ./assurer.pl -c config.yaml
+Assurer::ConfigLoader [fatal]
+- [/] Expected required key `test‘
+- [/tests] Unexpected key `tests' at line 46
+
+------------------------------------------------------------------------
+
+
+test:
+- module: HTTP
+config:
+contents: XXX # content is right
+$ ./assurer.pl -c config.yaml
+Assurer::ConfigLoader [fatal]
+Config error in Test::HTTP
+- [/contents] Unexpected key `contents' at line 66
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+$ ./assurer.pl --shell
+assurer&gt; uptime
+[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>[svn.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>[ftp.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>------------------------------------------------------------------------
+
+
+$ ./assurer.pl --shell --role=web
+assurer&gt; uptime
+[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+</code></pre>
+
+<p>1.16, 0.17</p>
+
+<pre><code>------------------------------------------------------------------------
+
+
+assurer&gt; !on app1.foo.com \
+app2.foo.com do uptime
+# app1.foo.com と app2.foo.com 上でのみ実行
+assurer&gt; !on /.*\.foo\.com/ do \
+uptime
+# .*\.foo\.com にマッチするホスト上でのみ実行
+
+------------------------------------------------------------------------
+
+
+assurer&gt; !with web db do uptime
+# web ��ールと db ��ールに属するホスト上でのみ実行
+
+assurer&gt; !with /web|mail/ do uptime
+# web または mail
+にマッチする��ールに属するホスト上でのみ実行
+
+------------------------------------------------------------------------
+
+
+assurer&gt; !test HTTP
+Assurer::Plugin::Test::HTTP [info] Testing HTTP on www0.mizzy.org...
+ok 1 - HTTP status code of http://mizzy.org:80 is 200
+not ok 2 – Content of http://mizzy.org:80 matches 'It works!‘
+assurer&gt;
+
+------------------------------------------------------------------------
+
+
+assurer&gt; !test HTTP on app1.foo.com
+# 特定のホストにのみテスト実行
+assurer&gt; !test HTTP on /.*.foo.com/
+# ��規表現も OK
+assurer&gt; !test HTTP with web
+# 特定の��ールにのみテスト実行
+assurer&gt; !test HTTP with /web|mail/
+# こちらも��規表現 OK
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+$ assurer.pl --para=20
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+localhost
+test0.mizzy.org
+www0.mizzy.org
+www1.mizzy.org
+www2.mizzy.org
+test1.mizzy.org
+test2.mizzy.org
+��  ssh assurer_test.pl
+③ 結果をリターン
+② テスト実行
+
+------------------------------------------------------------------------
+
+
+exec_on:
+- host: test0.mizzy.org
+priority: 3
+- host: test1.mizzy.org
+priority: 2
+- host: test2.mizzy.org
+priority: 1
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+# assurer.pl --discover -c template.yaml
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+# $host と $mechは Assure コアで実行時にプリセットされる
+$mech-&gt;get_ok("http://$host", "got htttp://$host");
+$mech-&gt;content_contains('It works!', "Content matches 'It works!'");
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+package Assurer::Plugin::Test::HTTP;
+use base qw( Assurer::Plugin::Test );
+use Assurer::Test;
+
+sub register {
+my $self = shift;
+$self-&gt;register_tests( qw/ status content server / );
+}
+
+sub status {
+my ( $self, $context, $args ) = @_;
+... ��略
+is( $res-&gt;code, '200',
+'HTTP status code of $self-&gt;{url} is 200' );
+}
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+assurer.pl
+Assurer::bootstrap()
+Assurer::Dispatch::run()
+呼び出し
+直接実行 or
+ssh でリモート実行
+テストを実行
+テスト結果
+を返す
+呼び出し
+assurer_test.pl
+assurer_test.pl
+assurer_test.pl
+assurer_test.pl
+assurer_test.pl
+Assurer::Result
+Assurer::Result
+Assurer::Result
+Assurer::Result
+Assurer::Result
+結果オブジェクト
+生成
+次のフェーズへ
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+assurer_test.pl -–config=LS0tCmNvbmZpZzoKICBjb250ZW50OiBJ
+dCB3b3JrcyEKICBob3N0OiB3d3cubWl6enkub3JnCm1vZHVsZTogSFRUUApuYW1lOiBIVFRQIHRlc3QKcm9sZTogd2ViCg==
+--context=LS0tICEhcGVybC9oYXNoOkFzc3VyZXIKYmFzZV9kaXI6IC9
+ob21lL21peWEvc3ZrL0Fzc3VyZXIKY29uZmlnOgogIGZvcm1hdDoKICAgIC0gY29uZmlnOiAmMSB7fQogICAgICBtb2R1bGU6IFRleHQKICBnbG9iYWw6CiAgICBob3N0OiB+CiAgICBpbnRlcnZhbDogMwogICAgbG9nOgogICAgICBsZXZlbDogZGVidWcKICAgIG5vX2RpYWc6IDAKICAgIHJldHJ5OiAzCiAgaG9zdHM6CiAgICBmdHA6CiAgICAgIC0gZnRwLm1penp5Lm9yZwogICAgc3ZuOgogICAgICAtIHN2bi5taXp6eS5vcmcKICAgIHdlYjoKICAgICAgLSB3d3cubWl6enkub3JnCiAgICAgIC0gc3ZuLm1penp5Lm9yZwogICAgICAtIHRyYWMubWl6enkub3JnCiAgbm90aWZ5OgogICAgLSBjb25maWc6CiAgICAgICAgYW5ub3VuY2U6IG5vdGljZQogICAgICAgIGNoYXJzZXQ6IGlzby0yMDIyLWpwCiAgICAgICAgZGFlbW9uX3BvcnQ6IDk5OTEKICAgICAgICBuaWNrbmFtZTogYXNzdXJlcmJvdAog
+... ま�� 続く
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+
+Created with pptHtml
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/23/YapcAsia2007/">YapcAsia2007</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/23/YapcAsia2007/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[[PageOutline(2, 目次, inline)]]</p>
+
+<h1>Mark Json Dominus - Higher-order parsing techniques</h1>
+
+<p><a href="http://perl.plover.com/yak/parsing/">プレゼン資料</a></p>
+
+<p>Higher-Order Perl という本で有名な人。通称 mjd.
+日本の Perl ギークは「マジデ」と呼ぶ。（こともある。）</p>
+
+<p>プレゼンの内容は Higher-Order Perl にも書かれてるみたい。</p>
+
+<p>高階関数やクロージャを使うと、構文解析プログラムがこんなにすっきり書けるよ！というお話。</p>
+
+<p>このプレゼン自体では、高階関数やクロージャの説明がなかった。ので簡単に説明すると、クロージャとは、Perl で書くとこんな感じ。（言葉の定義は <a href="http://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AD%E3%83%BC%E3%82%B8%E3%83%A3">Wikipedia</a> とか参照。たぶん、言葉の定義だけ見てもよくわからないと思う。）</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use wanings;
+
+sub calc {
+    my $op = shift;
+    return sub {
+        my ( $a, $b ) = @_;
+        return eval "$a $op $b";
+    };
+    # このリターンされている無名サブルーチンがクロージャ。
+    # サブルーチンの外で定義されている $op を内部で参照している
+    # ことに注目。この様に外部で定義された変数を内部に閉じ込める
+    # ので「クロージャ（Closure, 閉包）」と呼ばれる。
+}
+
+my $plus = calc('+');
+print $plus-&gt;(3, 2); # 結果は 5
+
+my $minus = calc('-');
+print $minus-&gt;(3, 2); # 結果は 1
+</code></pre>
+
+<p>こんな感じで、加算する関数と減算する関数を、ひとつの関数定義から生成できる、という感じで、クロージャを使うと似たような関数の生成が楽になる。（クロージャの用法はこれ以外にもあるけど。）</p>
+
+<p>また高階関数とは、「関数を引数にとる関数」のこと。例えばこんな感じ。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+sub calc {
+    my $op = shift;
+    return sub {
+        my ( $a, $b ) = @_;
+        return eval "$a $op $b";
+    };
+}
+
+my $plus  = calc('+');
+my $minus = calc('-');
+
+# ここまではクロージャの例と一緒
+
+# 複数の関数の結果を掛け合わせる関数
+# これが高階関数
+# 引数だけでなく、結果も関数となっている（クロージャ）
+sub multiply {
+    my @funcs = @_;
+    return sub {
+        my ( $a, $b ) = @_;
+        my $result = 1;
+        for ( @funcs ) {
+            $result *= $_-&gt;($a, $b);
+        }
+        return $result;
+    };
+}
+
+# 加算関数と減算関数を掛け合わせる関数を multiply で生成し、
+# 引数に 5 と 3 を与える
+multiply($plus, $minus)-&gt;(5, 3); # ( 5 + 3 ) * ( 5 - 3 ) が実行され結果は 16
+</code></pre>
+
+<p>高階関数とかクロージャとか知らない人は、これだけでお腹いっぱいになる気がする。</p>
+
+<p>クロージャとか高階関数って、どんなものかは知っていても、使うことがあまりなかったり、どう使うのかがよく分からなかったりするが、このプレゼンでの構文解析プログラムがその回答のひとつ。</p>
+
+<p>あとは細かい Perl コードの話になるので省略。クロージャ使って似たようなパーサコードの生成を簡略化し、連続した関数の実行を if + &amp;&amp; でやっているところを、高階関数をつかうことによってまとめてすっきりさせる、というのがだいたいの流れ。</p>
+
+<p>あと、「バックトラッキングも重要だけど、詳しくは本を読んで」とのこと。</p>
+
+<p>Ingy からの「Wiki パーサにも応用できるか」との質問に「できる」と回答してた。自分も Trac の Wiki 記法パーサモジュールを CPAN にあげてるので、参考になりそう。特に、リストのパースは自分で書いた処理がいけてなくて、時々動きがおかしかったりするのだけど、<a href="http://perl.plover.com/classes/parsing/samples/slide032.html">これを参考にすれば</a> いい感じで書けそうだ。というわけで、Higher-Order Perl 買う。</p>
+
+<h1>Naoya Ito - Perl and UNIX Network Programming</h1>
+
+<p><a href="http://bloghackers.net/~naoya/ppt/070404Perl_and_UNIX_Network_Programming.ppt">プレゼン資料(PPT)</a></p>
+
+<p>Perl の「今風な」ネットワークプログラミングに関するお話。</p>
+
+<h2>Perl による UNIX ネットワークプログラミングの基礎</h2>
+
+<ul>
+<li>BSD Socket API with C (not perl)</li>
+<li>Socket モジュール (C API に近い)</li>
+<li>IO::Socket モジュール (オブジェクト指向で書きやすい)</li>
+</ul>
+
+
+<h2>ブロッキング</h2>
+
+<ul>
+<li>sysread でブロックが発生</li>
+<li>busy loop と blocking は別 (busy loop は CPU 時間を消費、blocking は消費しない)</li>
+<li>ブロックされているプロセスは TASK_UNITERRUPTIBLE になり、デバイスからの割り込み待ちとなる</li>
+</ul>
+
+
+<h2>並列処理</h2>
+
+<ul>
+<li>プロセスフォーク</li>
+<li>スレッド</li>
+<li>シグナル I/O</li>
+<li>I/O 多重化</li>
+<li>非同期 I/O</li>
+</ul>
+
+
+<h2>I/O 多重化</h2>
+
+<ul>
+<li>ファイルディスクリプタの I/O イベントを監視</li>
+<li>fork/threads よりもリソース消費量が少ない</li>
+<li>select(2)/poll(2) を利用</li>
+</ul>
+
+
+<h2>select</h2>
+
+<ul>
+<li>perl だと select() か IO::Select を利用</li>
+<li>FD_SETSIZE の制限がある</li>
+<li>非効率 (FDs のカーネルへのコピー、全ての FDs をスキャン)</li>
+</ul>
+
+
+<h2>select(2)/poll(2) よりもモダンな API</h2>
+
+<ul>
+<li>epoll (Linux 2.6)</li>
+<li>/dev/kqueue (BSD)</li>
+<li>devpoll (Solaris)</li>
+</ul>
+
+
+<h2>epoll(4)</h2>
+
+<ul>
+<li>FDs の制限なし</li>
+<li>O(1) スケーラビリティ
+
+<ul>
+<li>FDs のコピーの必要なし</li>
+<li>イベントの発生した FDs のみリターンされる</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>epoll on perl</h2>
+
+<ul>
+<li>Sys::Syscall</li>
+<li>IO::Epoll</li>
+</ul>
+
+
+<h2>今風の Perl ネットワークプログラミングライブラリ</h2>
+
+<ul>
+<li>POE</li>
+<li>Event::Lib</li>
+<li>Danga::Socket</li>
+<li>Event</li>
+<li>Stem</li>
+<li>Coro</li>
+<li><p>&#8230;</p></li>
+<li><p>イベントベースで並列化</p></li>
+<li>システムコールの抽象化
+
+<ul>
+<li>select(2) / poll(2) / epoll / kqueue(2) / devpoll</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>POE</h2>
+
+<ul>
+<li>イベントドリブンな並列処理用フレームワーク</li>
+<li><p>プログラミングを容易にしてくれるコンポーネントがたくさん</p>
+
+<ul>
+<li>PoCo::IRC</li>
+<li>PoCo::Client::HTTP</li>
+<li>PoCo::Server::HTTP</li>
+<li>PoCo::EasyDBI</li>
+<li>PoCo::Cron</li>
+<li>PoCo::Client::MSN</li>
+<li>PoCo::Client::Lingr</li>
+<li>&#8230;</li>
+</ul>
+</li>
+<li><p>POE::Loop::Epoll</p></li>
+</ul>
+
+
+<h2>Event::Lib</h2>
+
+<ul>
+<li>libevent のラッパー</li>
+<li>libevent は
+
+<ul>
+<li>イベントベースプログラミング</li>
+<li>システムコールの抽象化</li>
+</ul>
+</li>
+<li>Event.pm に似てる</li>
+<li>シンプル</li>
+</ul>
+
+
+<h2>Danga::Socket</h2>
+
+<ul>
+<li>Brad Fitzpatrick (イケメン) 作</li>
+<li>イベントドリブンプログラミングと epoll の抽象化</li>
+<li>Perlbal とか MogileFS とかで使われてる</li>
+</ul>
+
+
+<h2>まとめ</h2>
+
+<ul>
+<li>ネットワークプログラミングには、OS、特にプロセススケジューリング, I/O, TCP/IP の実装に関する知識が必要</li>
+<li>コードをシンプルに保つために、モダンなライブラリを使おう</li>
+<li>perl にはいいライブラリがたくさんあるよ</li>
+</ul>
+
+
+<h1>Ben Trott - How we build Vox</h1>
+
+<p><a href="http://www.slideshare.net/miyagawa/how-we-build-vox/">発表資料</a></p>
+
+<h2>APIs: Tools</h2>
+
+<ul>
+<li>カスタムライブラリを使う
+
+<ul>
+<li>Net::Amazon や Net::Flickr はつかわない</li>
+<li>XML パーサがたくさんあって、それぞれ利用するパーサが異なる</li>
+<li>XML::LibXML のみを使う</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>APIs: Open Media Profile</h2>
+
+<ul>
+<li>Open Search のメディアデータ版？</li>
+</ul>
+
+
+<h2>APIs: Outboud</h2>
+
+<ul>
+<li>Atom Publishing Protocol</li>
+<li>すべての情報を Atom/RSS で</li>
+<li>Cool URIs
+
+<ul>
+<li>/library/posts/atom.xml</li>
+<li>/library/posts/2007/03/atom.xml</li>
+<li>/library/posts/2007/03/tags/yapc/atom.xml</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Ajax</h2>
+
+<ul>
+<li>JSON でシリアライズ
+
+<ul>
+<li>軽量</li>
+<li>よく使われている</li>
+</ul>
+</li>
+<li>Catalyst + JSON-RPC</li>
+<li>すべてが API</li>
+<li>独自コア JS ライブラリ</li>
+</ul>
+
+
+<h2>Data::ObjectDriver</h2>
+
+<ul>
+<li>MT や TypePad で使われている OR マッパー</li>
+</ul>
+
+
+<h2>Data::ObjectDriver: Caching</h2>
+
+<ul>
+<li><p>memcached のビルトインサポート</p>
+
+<p>  #!perl
+  Data::ObjectDriver::Driver::Cache::Memcached->new(</p>
+
+<pre><code>  cache    =&gt; Cache::Memcached-&gt;new({ servers =&gt; [ ... ] }),
+  fallback =&gt; Data::ObjectDriver::Driver::DBI-&gt;new(
+      dsn =&gt; 'dbi:SQLite:dbname=global.db',
+  ),
+</code></pre>
+
+<p>  );</p></li>
+</ul>
+
+
+<h2>Data::ObjectDriver: Partitioning</h2>
+
+<pre><code>#!perl
+Data::ObjectDriver::Driver::Cache::Cache-&gt;new(
+    cache =&gt; Cache::Memcached-&gt;new({ servers =&gt; [ ... ] }),
+    fallback =&gt; Data::ObjectDriver::Driver::SimplePartiotion-&gt;new(
+        using =&gt; 'Recipe',
+    ),
+);
+</code></pre>
+
+<h2>JobQueueing</h2>
+
+<ul>
+<li>重い処理を Apache から切り離して実行</li>
+<li>TheSchwartz
+
+<ul>
+<li>非同期、信頼性の高いジョブキュー</li>
+<li>N データベース</li>
+<li>ジョブハンドリングのためのワーカープール</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Template Toolkit</h2>
+
+<ul>
+<li>重い</li>
+<li>キャッシュを有効活用</li>
+<li>バージョン化されたキャッシュ</li>
+</ul>
+
+
+<h2>Perlbal</h2>
+
+<ul>
+<li>Perl 製負荷分散リバースプロキシ</li>
+<li>CSS, 画像, JavaScript など、スタティックファイルの配信もできる</li>
+<li>複数の JS や CSS をひとまとめにして配信できる</li>
+<li>Last-Modified や If-Modified-Since もちゃんとハンドリングできる</li>
+</ul>
+
+
+<p>http://code.sixapart.com/</p>
+
+<h1>Tomohiro Ikebe - Inside livedoor 2006 - 2007</h1>
+
+<ul>
+<li><a href="http://www.i-revo.jp/yapcasia/archive/08.html">動画</a></li>
+<li><p><a href="http://blog.livedoor.jp/techblog/paper/YAPC-livedoor.pdf">プレゼン資料(PDF)</a></p></li>
+<li><p>Livedoor でも LiveDoor でもなく livedoor が正しい</p></li>
+</ul>
+
+
+<h2>Softwares</h2>
+
+<ul>
+<li>FreeBSD or Linux</li>
+<li>Apache 2.0, 2.2 - Reverse Proxy</li>
+<li>Apache 1.3 - mod_perl</li>
+<li>MySQL 4.0, 5.0</li>
+<li>memcached</li>
+<li>Sledge</li>
+</ul>
+
+
+<p>WEB+DB PRESS とかまるごと Perl とか見れば詳しく載ってる。</p>
+
+<h2>CVS から Subversion へ</h2>
+
+<ul>
+<li>CVS ださい/飽き飽きしてきた（が、なんとかなる、意外といける）</li>
+<li>「CVS は小学生まで」ということを事あるごとに言う人がいるので乗り換え</li>
+<li>mod_dav_svn</li>
+<li>HTTP Authentication</li>
+<li>mod_dav_svn + mod_auth_mysql + Catalyst</li>
+<li>Trac</li>
+</ul>
+
+
+<h2>Sledge</h2>
+
+<ul>
+<li>MVC フレームワーク</li>
+<li>2001年からある</li>
+<li>安定してるけど古い</li>
+</ul>
+
+
+<h2>Sledge 2.0</h2>
+
+<ul>
+<li>Rails, Catalyst いいよね</li>
+<li>なのでぱくる</li>
+<li>stash, Sledge::View, Helper, module name based dispatch など</li>
+<li>10分でつくる Sledge アプリと言う名のタイピング自慢 by にぽたん</li>
+<li>Sledge 2.0 はムーブメント（なので完成すると思わないでほしい）</li>
+</ul>
+
+
+<h2>他の言語</h2>
+
+<ul>
+<li>Perl 90%</li>
+<li>C - Apache モジュール</li>
+<li>Java - Lucene</li>
+</ul>
+
+
+<h2>Apache module</h2>
+
+<ul>
+<li>ちょっぱや</li>
+<li>APR 便利（メモリ管理、文字列操作）</li>
+<li>mod_livedoor_sso.so</li>
+<li>mod_livedoor_page.so</li>
+</ul>
+
+
+<h2>mod_livedoor_page.so</h2>
+
+<ul>
+<li>ClearSilver テンプレートエンジン</li>
+</ul>
+
+
+<h2>ClearSilver vs. Template Toolkit</h2>
+
+<ul>
+<li>ClearSilver が圧倒的に速い</li>
+</ul>
+
+
+<h2>Catalyst</h2>
+
+<ul>
+<li>カスタマサポートツールとかバックオフィスツール</li>
+</ul>
+
+
+<h2>Madeleine CMS</h2>
+
+<ul>
+<li>Catalyst + DBIx::Class</li>
+<li><a href="http://radiantcms.org/">Radiant CMS</a> っぽいもの</li>
+<li>Write your pages with TT syntax.</li>
+<li>Yahoo UI Library, FCKEditor</li>
+<li><a href="http://svn.shebang.jp/repos/Madeleine/trunk">Open Source!</a></li>
+</ul>
+
+
+<h2>クローラ</h2>
+
+<ul>
+<li>Xango</li>
+<li>Parallel::ForkManaer</li>
+</ul>
+
+
+<h2>Next Stage</h2>
+
+<ul>
+<li>No RDBMS</li>
+<li>分散ファイルシステム</li>
+<li>ashiatod, ○○d (ちっちゃい仕事をするデーモンをいっぱいつくる)</li>
+<li>文書のクラスタリング、カテゴライズ</li>
+</ul>
+
+
+<h2>Coming Soon</h2>
+
+<ul>
+<li>認証 API（ユーザハッシュ or ID ベースの認証）</li>
+<li>livedoor Reader 英語バージョン</li>
+<li>新しいブログサービス</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/23/OpenVPN/">OpenVPN</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/23/OpenVPN/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>ダウンロード</h1>
+
+<p>http://openvpn.net/ からダウンロード</p>
+
+<h1>インストール</h1>
+
+<pre><code>$ tar zxvf openvpn-2.0.9.tar.gz
+$ cd openvpn-2.0.9
+$ ./configure --with-ssl-headers=/usr/local/ssl/include --with-ssl-lib=/usr/local/ssl/lib
+$ make
+$ sudo make install
+</code></pre>
+
+<h1>サーバの設定/起動</h1>
+
+<h2>キーの生成</h2>
+
+<pre><code>$ sudo mkdir /etc/openvpn
+$ sudo /usr/local/sbin/openvpn --genkey --secret /etc/openvpn/server.key
+</code></pre>
+
+<h2>設定ファイル</h2>
+
+<p>/etc/openvpn/server.conf</p>
+
+<pre><code>proto tcp-server
+
+dev tap
+
+ifconfig 172.16.0.1 255.255.255.0
+route 192.168.25.0 255.255.255.0 172.16.0.2
+secret /etc/openvpn/server.key
+link-mtu 1200
+
+ping 10
+ping-restart 60
+ping-timer-rem
+persist-key
+persist-tun
+verb 3     
+</code></pre>
+
+<p>デフォルトのポート番号は 1194。</p>
+
+<h2>起動</h2>
+
+<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;
+</code></pre>
+
+<h1>クライアントの設定/起動</h1>
+
+<h2>キー</h2>
+
+<p>サーバで生成したものをコピー</p>
+
+<h2>設定ファイル</h2>
+
+<pre><code>remote mizzy.org
+proto tcp-client
+port 1194
+dev tap
+verb 3
+ping    3600
+secret /etc/openvpn/server.key
+ifconfig 172.16.0.2 255.255.255.0
+route 192.168.10.0 255.255.255.0 172.16.0.1 
+</code></pre>
+
+<h2>起動</h2>
+
+<p>サーバと一緒。</p>
+
+<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/client.conf &amp;
+</code></pre>
+
+<h1>その他</h1>
+
+<p>Linux のルーティング設定が必要。</p>
+
+<p>/etc/sysconfig/network</p>
+
+<pre><code>FORWARD_IPV4=yes
+</code></pre>
+
+<p>即反映するなら</p>
+
+<pre><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/22/TitleIndex/">TitleIndex</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-22T19:46:22+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/22/TitleIndex/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[[TitleIndex]]</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/22/SandBox/">SandBox</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-22T19:46:22+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/22/SandBox/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is just a page to practice and learn WikiFormatting.</p>
+
+<p>Go ahead, edit it freely.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/22/InterMapTxt/">InterMapTxt</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-22T19:46:22+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/22/InterMapTxt/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>This is the place for defining InterWiki prefixes</h1>
+
+<p>This page was modelled after the MeatBall:InterMapTxt page.
+In addition, an optional comment is allowed after the mapping.</p>
+
+<p>This page is interpreted in a special way by Trac, in order to support
+InterWiki links in a flexible and dynamic way.</p>
+
+<p>The code block after the first line separator in this page
+will be interpreted as a list of InterWiki specifications:</p>
+
+<pre><code>prefix &lt;space&gt; URL [&lt;space&gt; # comment]
+</code></pre>
+
+<p>By using <code>$1</code>, <code>$2</code>, etc. within the URL, it is possible to create
+InterWiki links which support multiple arguments, e.g. Trac:ticket:40.
+The URL itself can be optionally followed by a comment,
+which will subsequently be used for decorating the links
+using that prefix.</p>
+
+<p>New InterWiki links can be created by adding to that list, in real time.
+Note however that <em>deletions</em> are also taken into account immediately,
+so it may be better to use comments for disabling prefixes.</p>
+
+<p>Also note that InterWiki prefixes are case insensitive.</p>
+
+<h1>List of Active InterWiki Prefixes</h1>
+
+<p>[[InterWiki]]</p>
+
+<hr />
+
+<h1>Prefix Definitions</h1>
+
+<pre><code>PEP     http://www.python.org/peps/pep-$1.html                                       # Python Enhancement Proposal 
+TracML  http://thread.gmane.org/gmane.comp.version-control.subversion.trac.general/  # Trac Mailing List
+
+#
+# A arbitrary pick of InterWiki prefixes...
+#
+Acronym          http://www.acronymfinder.com/af-query.asp?String=exact&amp;Acronym=
+C2find           http://c2.com/cgi/wiki?FindPage&amp;value=
+Cache            http://www.google.com/search?q=cache:
+CPAN             http://search.cpan.org/perldoc?
+DebianBug        http://bugs.debian.org/
+DebianPackage    http://packages.debian.org/
+Dictionary       http://www.dict.org/bin/Dict?Database=*&amp;Form=Dict1&amp;Strategy=*&amp;Query=
+Google           http://www.google.com/search?q=
+GoogleGroups     http://groups.google.com/groups?q=
+JargonFile       http://downlode.org/perl/jargon-redirect.cgi?term=
+MeatBall         http://www.usemod.com/cgi-bin/mb.pl?
+MetaWiki         http://sunir.org/apps/meta.pl?
+MetaWikiPedia    http://meta.wikipedia.org/wiki/
+MoinMoin         http://moinmoin.wikiwikiweb.de/
+WhoIs            http://www.whois.sc/
+Why              http://clublet.com/c/c/why?
+Wiki             http://c2.com/cgi/wiki?
+WikiPedia        http://en.wikipedia.org/wiki/
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/22/RecentChanges/">RecentChanges</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-22T19:46:21+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/22/RecentChanges/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[[RecentChanges]]</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/15/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/13/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

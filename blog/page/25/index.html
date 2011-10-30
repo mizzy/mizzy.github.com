@@ -1,0 +1,888 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="catlxom の Template::TT プラグイン で、$self-&gt;classdata-&gt;{tt}-&gt;process() がエラーになっても、真っ白な画面が表示されるだけで、エラーログにも何も出なくてかなり悩む羽目になったので patch 。 Index: &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/25">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/28/409/">Catlxom メモ #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-28T02:11:00+09:00" pubdate>May 28<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/28/409/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+catlxom の Template::TT プラグイン で、$self-&gt;classdata-&gt;{tt}-&gt;process() がエラーになっても、真っ白な画面が表示されるだけで、エラーログにも何も出なくてかなり悩む羽目になったので patch 。
+</p>
+
+
+
+
+<pre class="code">
+Index: plugins/Template/TT.pm
+===================================================================
+--- plugins/Template/TT.pm      (revision 23)
++++ plugins/Template/TT.pm      (working copy)
+@@ -84,7 +84,7 @@
+                 c =&gt; $c,
+             },
+             \$c-&gt;res-&gt;{body},
+-        );
++        ) or $c-&gt;error( $self-&gt;classdata-&gt;{tt}-&gt;error );
+     }
+
+     $self-&gt;NEXT::interpolate($c);
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/27/290/">Catlxom メモ #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-27T21:10:00+09:00" pubdate>May 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/27/290/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+catlxom の Template::TT プラグインで、INCLUDE_PATH を指定するための patch 。
+</p>
+
+
+
+
+<pre class="code">
+Index: plugins/Template/TT.pm
+===================================================================
+--- plugins/Template/TT.pm      (revision 23)
++++ plugins/Template/TT.pm      (working copy)
+@@ -10,15 +10,15 @@
+
+ our $VERSION = '0.01';
+
++my $template_dir = Catlxom::Util::load_dir('template');
++my $path_root    = join '/', $template_dir->dir_list;
++
+ __PACKAGE__->classdata->{templates} = {};
+-__PACKAGE__->classdata->{tt}        = Template->new;
++__PACKAGE__->classdata->{tt}        = Template->new( INCLUDE_PATH => $path_root );
+
+ sub setup {
+     my ( $self, $c ) = @_;
+
+-    my $template_dir = Catlxom::Util::load_dir('template');
+-    my $path_root    = join '/', $template_dir->dir_list;
+-
+     $template_dir->recurse(
+         callback => sub {
+             my $file = shift;
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/27/456/">Catlxom メモ #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-27T20:05:00+09:00" pubdate>May 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/27/456/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+今イタリアにいるらしい <a href="http://unknownplace.org/memo/" target="_blank">typester さん</a> 作の Catalyst meets Blosxom な <a href="http://catlxom.org/trac" target="_blank">catlxom</a> を最近触り始めました。（<a href="http://unknownplace.org/slides/catlxom/start.html" target="_blank">説明はこちら。</a>キャットルームと読むらしいです。）
+</p>
+
+
+
+
+<p class="entryBody">
+で、Catalyst::Plugin::Flavour でいくつかはまったのでメモです。
+</p>
+
+
+
+
+<p class="entryBody">
+まず、cpan コマンドで Catalyst::Plugin::Flavour をインストールすると、バージョン 0.02 が入るのですが、これだと catlxom は動きません。DEVELOPER RELEASE の 0.029_01 のソースをもってきてインストールする必要があります。
+</p>
+
+
+
+
+<p class="entryBody">
+次に、個別エントリのパーマリンクページを表示させようとしても、全エントリが表示されてしまうので、調べてみたところ $c-&gt;flavour-&gt;fn の返り値が undef でした。というわけで Catalyst::Plugin::Flavour に一行追加してみた。
+</p>
+
+
+
+
+<pre class="code">
+--- Flavour.pm.org      2006-05-27 19:31:19.000000000 +0900
++++ Flavour.pm  2006-05-27 19:57:43.000000000 +0900
+@@ -79,6 +79,7 @@
+     }
+     elsif ( my ( $fn, $flavour ) = $path[-1] =~ /(.*)\.(.*?)$/ ) {
+
++        $c-&gt;flavour-&gt;fn($fn);
+         $c-&gt;flavour-&gt;flavour($flavour);
+         if ( $fn eq 'index' ) {
+             pop @path;
+</pre>
+
+
+
+
+<p class="entryBody">
+これで個別パーマリンクページがちゃんと表示されました。
+</p>
+
+
+
+
+<p class="entryBody">
+いずれこのブログは、blosxom から catlxom へ移行しようと思います。まずは必要な blosxom プラグインの移植からですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/23/288/">Plagger::Plugin::Aggregator::Simple の Media RSS サポート</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-23T22:31:00+09:00" pubdate>May 23<span>rd</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/23/288/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Aggregator/Simple.pm" target="_blank">Aggregator::Simple を Media RSS に対応させてみた</a>。<a href="http://trac.mizzy.org/public/changeset/124" target="_blank">diff はこちら</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+でも、つくってから気づいたんだけど、Google Video の RSS にはちゃんと enclosure も入ってるので、別に Media RSS 対応させる必要なかった…。といっても、enclosure に入っているのは iPod 用の mpeg4 だけで、media:content 要素には他に flv, wmv, PSP 用の mpeg4 も含まれてるので、対応しておいても損ではないかな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+これで <a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/GoogleVideo.pm" target="_blank">CustomFeed::GoogleVideo</a> はもう必要ないですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/22/318/">Plagger::Plugin::CustomFeed::iTMS #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-22T21:38:00+09:00" pubdate>May 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/22/318/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTMS.pm" target="_blank">CustomFeed::iTMS</a> は内部で <a href="http://search.cpan.org/~billh/LWP-UserAgent-iTMS_Client/" target="_blank">LWP::UserAgent::iTMS_Client</a> を利用しているのですが、コンストラクタで国名を指定してもちゃんとハンドリングしてくれないので、パッチ書いた。ついでにモジュール作者にパッチ送っておいた。
+</p>
+
+
+
+
+<pre class="code">
+--- iTMS_Client.pm.org  2006-05-22 16:06:46.000000000 +0900
++++ iTMS_Client.pm      2006-05-22 16:11:27.000000000 +0900
+@@ -466,7 +466,7 @@
+         'X-Apple-Tz'          => msec_since_epoch(),
+         'X-Apple-Validation'  => $self->compute_validator( $url, $agent_name ),
+         'Accept-Encoding'     => "gzip, x-aes-cbc",
+-        'X-Apple-Store-Front' => $self->store_front,
++        'X-Apple-Store-Front' => $self->store_front($self->{protocol}->{country}),
+     );
+     $hdr->header( 'X-Token' => $self->{protocol}->{password_token} )
+       if $self->{protocol}->{password_token};       
+</pre>
+
+
+
+
+<p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTMS.pm" target="_blank">CustomFeed::iTMS</a> も修正して、国を指定できるようにし、pod も追加しました。これで日本の iTMS からも検索できます。query も UTF-8 であれば日本語も大丈夫。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/22/433/">Plagger::Plugin::CustomFeed::iTMS #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-22T16:17:00+09:00" pubdate>May 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/22/433/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTMS.pm" target="_blank">CustomFeed::iTMS</a> プラグイン作った。iTunes Music Store から指定の条件で検索して、entry や encolosure に検索結果をつっこみます。
+</p>
+
+
+
+
+<pre class="code">
+plugins:
+  - module: CustomFeed::iTMS
+    config:
+      query:
+        artist: Zebrahead
+
+  - module: Publish::Feed
+    config:
+      format: RSS
+      dir: /path/to/rss
+      filename: %t.rss
+</pre>
+
+
+
+
+<p class="entryBody">
+とかやると、Zebrahead の曲を Podcast で試聴、といったことができるはず。
+</p>
+
+
+
+
+<p class="entryBody">
+今後の課題としては、日本の iTMS にも対応させたりとか、Plagger core で media API が実装されたら、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/AmazonWebService.pm" target="_blank">Filter::AmazonWebService</a> を対応させて、Amazon からサムネイル画像とってくるとかやりたい。
+</p>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/21/279/">Lighttpd の認証を LDAP で</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-21T15:17:00+09:00" pubdate>May 21<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/21/279/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/" target="_blank">おうち trac</a> が認証を一切せずに、誰でも wiki の書き換えができたり、ticket の発行ができたり、という状態だったので、それはまずかろうってことで認証かけることにした。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/linux/trac_and_lighty.html" target="_blank">「trac を lighttpd + FastCGI で動かす」</a> で触れたとおり、trac は lighttpd 上で動いているので、認証は lighttpd で設定します。やりかたは lighttpd のサイトにある <a href="http://www.lighttpd.net/documentation/authentication.html" target="_blank">「Using Authentication Module: mod_auth」</a> の通りなので、あまり難しいことはないのですが、とりあえずやったことをメモ。
+</p>
+
+
+
+
+<p class="entryBody">
+うちの Linux サーバ上で動いているサービスは、ほとんどが LDAP で認証しているので、lighttpd も LDAP で認証するようにします。
+</p>
+
+
+
+
+<p class="entryBody">
+まず、lighty のデフォルト configure オプションでは、auth_ldap が disable になってるので、以下の様にして再インストール。
+</p>
+
+
+
+
+<pre class="code">
+$ ./configure --with-ldap
+$ make
+$ sudo make install
+</pre>
+
+
+
+
+<p class="entryBody">
+でもって、/usr/local/etc/lighttpd.conf を書き換え。関連する部分だけ抜き出すとこんな感じ。
+</p>
+
+
+
+
+<pre class="code">
+server.modules              = (
+                               "mod_auth",
+                               "mod_fastcgi",
+                              )
+
+auth.backend = "ldap"
+auth.backend.ldap.hostname = "kenny"
+auth.backend.ldap.base-dn = "ou=people,o=southpark"
+auth.backend.ldap.filter = "(uid=$)"
+
+auth.require = ( "/public/login" =>
+                 (
+                   "method"  => "basic",
+                   "realm"   => "trac admin area",
+                   "require" => "user=xxx"
+                  )
+                )
+</pre>
+
+
+
+
+<p class="entryBody">
+これで lighty を再起動すれば OK。あとは<a href="http://projects.edgewall.com/trac/wiki/TracPermissions" target="_blank">「Trac Permissions」</a> を参照しながら trac-admin コマンドでパーミッション設定。<a href="http://projects.edgewall.com/trac/wiki/WebAdmin" target="_blank">Web Admin Plugin</a> を導入している場合は trac-admin 使わずにウェブから設定。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/21/359/">Plagger::Plugin::CustomFeed::Xmltv</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-21T00:04:00+09:00" pubdate>May 21<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/21/359/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/Xmltv.pm" target="_blank">CustomFeed::Xmltv</a> プラグイン作った。
+</p>
+
+
+
+
+<p class="entryBody">
+これを利用して、Filter::EntryTitle とか Publish::TvRecReserveMail といったプラグイン作って、番組名に特定のワードを含むものを、メール録画に対応した機器で録画予約、とかやりたい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/18/374/">マルチプロセッサ/マルチスレッド メモリアロケータ Hoard</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-18T23:43:00+09:00" pubdate>May 18<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/18/374/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.hoard.org/" target="_blank">Hoard</a> というメモリアロケータを、弊社サーバエンジニアの方から教えてもらいました。
+</p>
+
+
+
+
+<p class="entryBody">
+使い方は簡単で、
+</p>
+
+
+
+
+<pre class="code">
+export LD_PRELOAD="/path/libhoard.so:/lib/libdl.so"
+</pre>
+
+
+
+
+<p class="entryBody">
+などとしておくと、アプリケーション実行時に Hoard のライブラリを読み込み、malloc/free を Hoard のものに置き換えます。これにより、マルチプロセッサ/マルチスレッド環境でパフォーマンスを発揮する Hoard のメモリアロケーションアルゴリズムが、アプリに一切手を加えることなく利用できる、というわけです。
+</p>
+
+
+
+
+<p class="entryBody">
+もちろん仕組み上、<a href="http://www.cs.umass.edu/~emery/hoard/faqs.html">FAQ</a> にあるように、スタティックリンクされたアプリや、malloc/free を使わずに独自のメモリアロケータを使っているアプリでは利用することはできませんが、ほとんどのアプリには利用できるんじゃないでしょうか。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/17/417/">Trac を Lighttpd + FastCGI で動かす</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-17T23:40:00+09:00" pubdate>May 17<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/17/417/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/trac.html" target="_blank">このエントリ</a> の様な経緯で、うちでは apache + tracd という構成で trac を動かしてるのですが、tracd がしょっちゅう落ちるんですよね。1日に2, 3回ぐらいは落ちる感じ。で、5分ごとに cron で tracd プロセスを監視して、落ちてたら再起動ってなことをやってるんですが、<a href="http://unknownplace.org/memo/" target="_blank">typester さん</a> から「うちは lighttpd + FastCGI でやってるよ」というアドバイスを頂いたので、試してみました。
+</p>
+
+
+
+
+<p class="entryBody">
+やったことは以下の通り。
+</p>
+
+
+
+
+<ol class="entryBody">
+<li>FastCGI のインストール</li>
+<li>lighttpd のインストール</li>
+<li>lighttpd.conf を書く</li>
+<li>lighttpd の起動</li>
+</ol>
+
+
+
+
+<p class="entryBody">
+1, 2 については省略。ディストリビューションによって違うでしょうし、うちは Slackware だからあんまり参考にならないだろうし。3 については以下の様な内容の /usr/local/etc/lighttpd.conf を作成した。
+</p>
+
+
+
+
+<pre class="code">
+server.modules              = (
+                               "mod_fastcgi",
+                              )
+server.document-root        = "/home/miya/html"
+server.errorlog             = "/var/log/lighttpd.error.log"
+mimetype.assign             = (
+  ".png"          =>      "image/png",
+ )
+static-file.exclude-extensions = ( ".fcgi" )
+server.port                = 81
+server.bind                = "localhost"
+server.username            = "svn"
+server.groupname           = "svn"
+fastcgi.server = ("/public" =>
+                   ("public" =>
+                     ("socket" => "/tmp/trac-fastcgi.sock",
+                      "bin-path" => "/usr/local/share/trac/cgi-bin/trac.fcgi",
+                      "check-local" => "disable",
+                      "bin-environment" =>
+                        ("TRAC_ENV" => "/home/miya/trac/public")
+                     )
+                   )
+</pre>
+
+
+
+
+<p class="entryBody">
+たったこれだけの設定でちゃんと動きました。起動は以下のコマンドで。
+</p>
+
+
+
+
+<pre class="code">
+$ sudo /usr/local/sbin/lighttpd -f /usr/local/etc/lighttpd.conf
+</pre>
+
+
+
+
+<p class="entryBody">
+あとは apache の設定を変更してやれば OK。<a href="http://trac.mizzy.org/public/" target="_blank">こんな感じで</a> 動いてます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/26/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/24/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Plagger::Event - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="Amazon2iCal で、本やCDなんかの発売日に Google Calendar でメール通知してもらおうと思って設定したのだけど、Google Calendar が通知してくれない。 これはもしかして、Publish::iCal で生成した iCalendar &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2006/08/26/324">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Plagger::Event</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-26T01:32:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/?topic=/program/amazon2ical"><span class="icon"></span>Amazon2iCal</a> で、本やCDなんかの発売日に Google Calendar でメール通知してもらおうと思って設定したのだけど、Google Calendar が通知してくれない。
+</p>
+
+
+<p>
+これはもしかして、Publish::iCal で生成した iCalendar データに時刻が入ってないせいかな、と思い時刻も入れようと思ったんだけど、どうせなら Plagger::Event とか作って、イベントハンドリングしやすくしてしまえ、ってことで、Plagger::Enclosure の様な感じで作ってみた。たったこれだけだけど。
+</p>
+
+
+<pre class="wiki">
+package Plagger::Event;
+
+use strict;
+
+use base qw( Plagger::Thing );
+__PACKAGE__->mk_accessors(qw( dtstart dtend summary description location organizer ));
+
+1;
+</pre>
+
+
+<p>
+Event だと色んな意味があって曖昧な気がするから Plagger::iCal::Event とかの方がいいかな、と思ったけど、とりあえずの実装なのでまあいいか、と。
+</p>
+
+
+<p>
+でもってこれに合わせて Plagger::Entry も修正。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Entry.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Entry.pm (revision 238)
++++ plagger/trunk/lib/Plagger/Entry.pm (revision 241)
+@@ -19,4 +19,5 @@
+         meta    => {},
+         enclosures => [],
++        events     => [],
+     }, $class;
+ }
+@@ -102,4 +103,24 @@
+ }
+ 
++sub add_event {
++    my($self, $event) = @_;
++    push @{ $self->{events} }, $event;
++}
++
++sub event {
++    my $self = shift;
++    wantarray ? @{$self->{events}} : $self->{events}->[0];
++}
++
++sub events {
++    my $self = shift;
++    wantarray ? @{$self->{events}} : $self->{events};
++}
++
++sub has_event {
++    my $self = shift;
++    scalar @{$self->{events}} > 0;
++}
++
+ 1;
+</pre>
+
+
+<p>
+更にこれに合わせて、Publish::iCal と CustomFeed::AmazonWebService も修正。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm (revision 233)
++++ plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm (revision 241)
+@@ -35,17 +35,19 @@
+ 
+     for my $entry ($feed->entries) {
+-        my $address = ( Email::Address->parse($entry->author) )[0];
+-        my $mail = eval { $address->address } || 'nobody@example.com';
+-        my $name = eval { $address->name } || $entry->author;
++        my $ev = $entry->event;
++        my $organizer = $ev ? $ev->organizer : $entry->author;
++        my $address = ( Email::Address->parse($organizer) )[0];
++        my $mail = $address ? $address->address : 'nobody@example.com';
++        my $name = $address ? $address->name : $organizer;
++        my $dtstart = $ev ? $ev->dtstart : $entry->date;
++        my $dtend   = $ev ? $ev->dtend   : $entry->date;
+ 
+-        my $date = $entry->date;
+         my $event = Data::ICal::Entry::Event->new;
+         $event->add_properties(
+-            summary     => $entry->title . ' - ' . $entry->author,
+-            description => $entry->summary || $entry->body,
++            summary     => $ev ? $ev->summary : $entry->title,
++            description => $ev ? $ev->description : $entry->summary || $entry->body,
+             organizer   => [ "MAILTO:$mail", { cn => $name } ],
+-            url         => $entry->link,
+-            dtstart     => join('', split('-', $date->ymd)),
+-            dtend       => join('', split('-', Plagger::Date->from_epoch(epoch => $date->epoch + 60*60*24)->ymd)),
++            dtstart     => Date::ICal->new( epoch => $dtstart->epoch )->ical,
++            dtend       => Date::ICal->new( epoch => $dtend->epoch )->ical,
+         );
+         $ical->add_entry($event);
+</pre>
+
+
+<pre class="wiki">
+--- plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm (revision 232)
++++ plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm (revision 241)
+@@ -6,4 +6,5 @@
+ use Net::Amazon::Request::Keyword;
+ use Encode;
++use Plagger::Event;
+ 
+ sub register {
+@@ -59,4 +60,11 @@
+             $entry->date($date);
+ 
++            my $event = Plagger::Event->new;
++            $event->dtstart($date);
++            $event->dtend( $date->clone->add( hours => 1 ) );
++            $event->summary($entry->title . ' - ' . $entry->author);
++            $event->organizer($entry->author);
++            $entry->add_event($event);
++
+             $feed->add_entry($entry);
+         }
+@@ -91,5 +99,5 @@
+ 
+ *Net::Amazon::Property::Music::author = *Net::Amazon::Property::Music::artist;
+-*Net::Amazon::Property::DVD::author = sub { return ( $_[0]->starring() )[0] };
++*Net::Amazon::Property::DVD::author   = sub { return ( $_[0]->starring() )[0] };
+ 
+ 1;
+</pre>
+
+
+<p>
+あと、どうも意図したタイムゾーン通りの時刻にならないと思ったら、Plagger::Date::strptime で使われている DateTime::Format::Strptime は、time_zone を指定しないと、floating になってしまうみたい。なので、config.yaml で指定しているタイムゾーンを使うように修正してみました。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Date.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Date.pm (revision 240)
++++ plagger/trunk/lib/Plagger/Date.pm (revision 241)
+@@ -42,5 +42,8 @@
+     my($class, $pattern, $date) = @_;
+     Encode::_utf8_on($pattern);
+-    my $format = DateTime::Format::Strptime->new(pattern => $pattern);
++    my $format = DateTime::Format::Strptime->new(
++        pattern   => $pattern,
++        time_zone => Plagger->context->conf->{timezone} || 'local',
++    );
+     $class->parse($format, $date);
+ }
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/changeset/241"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+floating になってるのは <a class="ext-link" href="http://plagger.org/trac/ticket/211"><span class="icon"></span>こういう理由がある</a> ということで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/242"><span class="icon"></span>CustomFeed::AmazonWebService の方で global: timezone の値を見て、set_time_zone するように修正しました</a>。
+</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2006-08-26T01:32:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2006/08/26/324/" data-via="" data-counturl="http://mizzy.org/blog/2006/08/26/324/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2006/08/24/500/" title="Previous Post: Plagger::Plugin::Filter::FFmpeg #3">&laquo; Plagger::Plugin::Filter::FFmpeg #3</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2006/08/26/280/" title="next Post: Filter::FutureEvents">Filter::FutureEvents &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2006/08/26/324';
+        var disqus_url = 'http://mizzy.org/blog/2006/08/26/324';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

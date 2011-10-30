@@ -1,0 +1,1696 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="前回のエントリについて、nektixeさんから、「Greasemonkey限定であれば、GM_xmlhttpRequest という関数を使うことで、外部ドメインのデータも受信可能みたいです」というコメントを頂きました。ありがとうございます。確かに、「GM_xmlhttpRequest is &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/35">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/07/02/269/">Javascriptの皮を被ったXML #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-07-02T15:17:00+09:00" pubdate>Jul 2<span>nd</span>, 2005</time>
+        
+         | <a href="/blog/2005/07/02/269/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/javaScriptOverXml.html" target="_blank">前回のエントリ</a>について、<a href="http://amazie.jp/" target="_blank">nektixe</a>さんから、「Greasemonkey限定であれば、GM_xmlhttpRequest という関数を使うことで、外部ドメインのデータも受信可能みたいです」というコメントを頂きました。ありがとうございます。確かに、<a href="http://diveintogreasemonkey.org/api/gm_xmlhttprequest.html" target="_blank">「GM_xmlhttpRequest is not restricted to the current domain」</a>って書いてありますね。これは強力。
+</p>
+
+
+
+
+<p class="entryBody">
+というわけで、「Javascriptの皮を被ったXML構想」は、Greasemonkeyであれば実現できそうな感じです。この構想の要点をおさらいとして整理すると、
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>Javascriptから直接APIにアクセスしてXMLを取得して、UIを被せる。</li>
+<li>UIとなるHTMLはJavasciptから分離する。</li>
+<li>各サービスに合わせて外部XSLTファイルを用意し、JavascriptでXSLT変換する。これにより様々なサービスに統一的なUIを適用する。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+といった感じです。
+</p>
+
+
+
+
+<p class="entryBody">
+構想の実現に向けて、まずはGM_xmlhttpRequest関数で遊んでみようかと思ったのですが、その前にdel.icio.us direc.torをGreasemonkeyで動かしてみることにしました。といっても、やってみるとものすごく簡単で、del.icio.us direc.torのおおもとのJavascriptである、<a href="http://johnvey.com/features/deliciousdirector/dboot.js" target="_blank">dboot.js</a>の先頭に、以下の様にGreasemonkey用の記述を数行加えてあげるだけです。
+</p>
+
+
+
+
+<pre class="code">
+// ==UserScript==
+// @name            del.icio.us direc.tor greasemonkey user script
+// @namespace       http://mizzy.org/
+// @description     When open a folder in bloglines, close other folders.
+// @include         http://del.icio.us/mizzy/director
+// ==/UserScript==
+
+var d = '&lt;form&gt;&lt;img src="http://johnvey.com/features/deliciousdirector/director-logo.gif" width="206" height="18" alt="Delicious Director" style="float:left;padding:2px 10px 0 0" /&gt;';
+d += '&lt;input id="q" name="q" type="text" size="60" onkeyup="rd.filter(this.value)" autocomplete="off" /&gt;';
+d += '&lt;input type="checkbox" id="h" checked="checked" onchange="rd.th()" /&gt;&lt;label for="h"&gt;Highlight Terms&lt;/label&gt;&lt;/form&gt;';
+d += '&lt;h2&gt;Tag Browser&lt;/h2&gt;';
+d += '&lt;div id="browser"&gt;';
+d += '  &lt;div id="br1" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br2" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br3" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br4" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br5" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br6" class="browserPane"&gt;&lt;/div&gt;';
+d += '&lt;/div&gt;';
+d += '&lt;h2 id="summary"&gt;Bookmarks&lt;/h2&gt;';
+d += '&lt;div id="ps"&gt;&lt;p&gt;Loading your del.icio.us bookmarks...&lt;/p&gt;&lt;/div&gt;';
+d += '&lt;p id="ft"&gt;&#169; 2005 Johnvey Hwang. &lt;a href="http://johnvey.com/features/deliciousdirector/" target="_blank"&gt;del.icio.us direc.tor project page&lt;/a&gt;. Released under the &lt;a href="http://www.gnu.org/copyleft/gpl.html" target="_blank"&gt;GPL&lt;/a&gt;.&lt;/p&gt;';
+
+function init() {
+
+    var i, a, main;
+
+    document.body.innerHTML = "";
+    document.body.innerHTML = d;
+    
+    for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
+      if(a.getAttribute("rel").indexOf("style") != -1) {
+        a.disabled = true;
+      }
+    }
+    
+    var ns = document.createElement("link");
+    ns.rel = "stylesheet";
+    ns.type = "text/css";
+    ns.href = "http://johnvey.com/features/deliciousdirector/d.css";
+    document.body.appendChild(ns);
+    
+    var js = document.createElement("script");
+    js.language = "javascript";
+    js.src = "http://johnvey.com/features/deliciousdirector/d.js";
+    document.body.appendChild(js);
+    
+    document.title += " (Direc.tor)";
+}
+
+init();
+</pre>
+
+
+
+
+<p class="entryBody">
+実際に試してみたい方は、<a href="http://mizzy.org/js/dboot.user.js" target="_blank">こちらからどうぞ</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+@includeで指定されるページは、適宜変更してください。自分は、http://del.icio.us/mizzy/director にアクセスした時にお猿さんが発動するようにしていますが、そこは各自のお好みで。
+</p>
+
+
+
+
+<p class="entryBody">
+次回は実際にGM_xmlhttpRequest関数を利用して、外部HTMLテンプレートを読み込むのに挑戦したいと思います。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/07/02/348/">Javascriptの皮を被ったXML #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-07-02T14:50:00+09:00" pubdate>Jul 2<span>nd</span>, 2005</time>
+        
+         | <a href="/blog/2005/07/02/348/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://johnvey.com/features/deliciousdirector/" target="_blank">del.icio.us direc.tor</a>を見て、「APIが提供するXMLに、JavascriptでUIを被せるのはアリだな。」と思った方は多いのではないでしょうか。この辺りについては、ma.laさんが<a href="http://la.ma.la/blog/diary_200506291043.htm" target="_blank">「XMLはメタデータというより&#8230;」</a>というエントリでご指摘されている通りで、俺なんかから言うことは何もなかったりするのですが、この「del.icio.us direc.torメソッド」が普及、発展するためには、以下の2点がクリアになる必要があるのではないかな、と、名古屋出張帰りの新幹線の中で考えていました。
+</p>
+
+
+
+
+<ol class="entryBody">
+<li>JavascriptとHTMLの分離。言い換えるとテンプレートエンジンの実装。これにより開発がより容易に。</li>
+<li>様々なXML形式への対応。ma.laさんが上記エントリで、「はてなブックマークがdel.icio.usと同じ形式で出力するAPIを備えていれば」といったお話をされているのですが、逆に異なる形式であっても、外部XSLTファイルを各サービスごとに用意しておいて、Javascript側でXSLT変換して形式をそろえてあげればいんじゃないかと。これにより、ひとつのUIを様々なサービスに適用可能になる。</li>
+</ol>
+
+
+
+
+<p class="entryBody">
+とはいうものの、これを実装するのは技術的に結構難しそう。まず、1に関しては、現在いくつかのJavascriptテンプレートエンジンが存在しますが、どれもHTMLからscriptタグを呼び出して、テンプレート処理させるものになってます。それに対し、direc.torメソッドはまずはJavascriptありきなので、JavascriptからHTMLを呼び出して、テンプレート処理する必要があります。ところが、クロスドメインの問題により、HTMLテンプレートをxmlHttpRequestで呼び出すことができません。そうすると、document.createElementによるscript呼び出し、という案が考えられるのですが、呼び出す対象がHTMLであってJavascriptではないため、エラーになるでしょう。
+</p>
+
+
+
+
+<p class="entryBody">
+2も同様に、クロスドメインの問題でxmlHttpRequestでは外部XSLTファイルが取得できないですし、script呼び出ししようにも、やはりJavascriptではないためエラー。
+</p>
+
+
+
+
+<p class="entryBody">
+そうなると妥協点としては、サーバ側での処理もやはり必要かなぁ、ということになるのですが、できるならpure javascriptで実現したいですよね。
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>2005/06/30追記</strong><br />
+pure javascriptで実現したい理由は、プログラムをJavascriptに一本化した方が楽だから、というのもあるのですが、認証情報が第三者のサーバを経由しない、ってところも重要なポイントですね。
+</p>
+
+
+
+
+<p class="entryBody">
+と、ここまで考えたところで、これ以上アイデアが出てこなくなってしまいました。中途半端ですみませんが、これを読んだ頭の良い方が、「こうすればいいんじゃね？」とか「そもそもこの考え方はだめ。こっちの方がいい。」とか言ってくれるのを期待して、晒しておきます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/27/294/">del.icio.us direc.torの謎</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-27T14:23:00+09:00" pubdate>Jun 27<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/27/294/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+いや、謎ってほどのものじゃないんですが、噂の<a href="http://johnvey.com/features/deliciousdirector/" target="_blank">del.icio.us direc.tor</a>を使ってみて、「あれ、Javascriptから直接del.icio.us apiを叩いてるみたいだけど、どうやってるんだろう？」と疑問に思ったので、調べてみました。
+</p>
+
+
+
+
+<p class="entryBody">
+まず、del.icio.us direc.torは以下の様な順にHTTPリクエストを出しています。
+</p>
+
+
+
+
+<ol class="entryBody">
+<li>ブックマークレットからhttp://johnvey.com/features/deliciousdirector/dboot.js を呼び出して実行</li>
+<li>dboot.jsからhttp://johnvey.com/features/deliciousdirector/d.js を呼び出して実行</li>
+<li>d.jsからhttp://del.icio.us/api/posts/all を叩いて、del.icio.usの全ポストを取得</li>
+</ol>
+
+
+
+
+<p class="entryBody">
+最初の2つは、<a href="http://la.ma.la/blog/" target="_blank">最速インターフェース研究会</a>のma.laさんが、<a href="http://la.ma.la/blog/diary_200504140039.htm" target="_blank">[Ajax] JSAN構想とリモートデータの取得とUserJavaScript</a>でおっしゃっている通り、scriptタグを使って呼び出しているので、ドメインはどこでもいいわけですが、最後のdel.icio.us apiを叩いている部分はxmlHttpRequestを使っています。
+</p>
+
+
+
+
+<p class="entryBody">
+自分の理解では、xmlHttpRequestでリモートデータを取得する場合、呼び出し元のJavascriptファイルが置いてあるドメインと、呼び出し先のウェブサーバのドメインが同じじゃないといけないと思っていたのですが、この動作を見てると、そうはなっていないようです。で、d.jsのソースを見てみると、xmlHttpRequestで /api/posts/all を叩いている部分は見受けられるものの、特にdel.ico.usという指定はされていません。
+</p>
+
+
+
+
+<p class="entryBody">
+どうやら、一度del.icio.usを開いてからブックマークレットを実行してるところがポイントらしい、と思い、「同じじゃないといけないのは、呼び出し元のJavascriptファイルが置いてあるドメインではなく、Javascriptを呼び出しているページのドメインではないか？」という仮説を立てて、実験してみました。
+</p>
+
+
+
+
+<p class="entryBody">
+まず、以下の様なJavascriptファイルを用意します。
+</p>
+
+
+
+
+<pre class="code">
+function load() {
+  try {
+    xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+  } catch (e) {
+    try {
+      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    } catch (e) {
+      xmlhttp = false;
+    }
+  }
+  if (!xmlhttp &amp;&amp; typeof XMLHttpRequest!='undefined') {
+    xmlhttp = new XMLHttpRequest();
+  }
+  if (xmlhttp) {
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 &amp;&amp; xmlhttp.status == 200) {
+      document.body.innerHTML = xmlhttp.responseText;
+      }
+    }
+    xmlhttp.open('GET', '/');
+    xmlhttp.send(null);
+  }
+}
+
+load();
+</pre>
+
+
+
+
+<p class="entryBody">
+次に、こいつを呼び出すブックマークレットを作成します。<a href="javascript:void((function() {var%20element=document.createElement('script'); element.setAttribute('src', 'http://mizzy.org/js/test.js'); document.body.appendChild(element)})())">こんな感じで</a>。そしてブックマークに入れます。
+</p>
+
+
+
+
+<p class="entryBody">
+どこか適当なウェブサイトを開きます。この時、http://www.google.co.jp/ といったドメインのトップのページではなく、http://www.google.co.jp/imode といった感じで、ディレクトリ名やファイル名が含まれるURLにアクセスして下さい。（javascriptでトップページを読み込んで表示させる、という実験なので、最初からトップページを開いていると、ページ遷移したことが分かりません。）
+</p>
+
+
+
+
+<p class="entryBody">
+で、先のブックマークレットを実行します。すると、実行前に開いていたページが所属するドメインのトップページが表示されると思います。
+</p>
+
+
+
+
+<p class="entryBody">
+というわけで、xmlHttpRequestのクロスドメインの問題は、「呼び出し元のJavascriptファイルが置いてあるドメインと、呼び出し先のウェブサーバのドメインが同じじゃないといけない」わけではなく、「Javascriptを呼び出しているページのドメインと、呼び出し先のウェブサーバのドメインが同じじゃないといけない」わけで、Javascriptファイルがどこにあっても関係ないようです。（もしかして常識？）
+</p>
+
+
+
+
+<p class="entryBody">
+おそらく、ブックマークレットを使わなくても、呼び出し元のページを編集して、直接scriptタグによりJavascriptを呼び出すようにしてもいいんでしょうけど、編集できる権限があるぐらいなら、そもそもクロスドメインがどうとか考える必要はないわけで、ブックマークレットで呼び出すのが現実的なんでしょうね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/23/355/">Blosxomでtagging #12</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-23T10:46:00+09:00" pubdate>Jun 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/23/355/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/archives/tagging" target="_blank">taggingプラグイン</a>を修正。カテゴリ毎のタグの数を足すべきところを、単にインクリメントしてただけ、というなんともお間抜けな間違いを犯してました…
+</p>
+
+
+
+
+<p class="entryBody">
+しかもよく見ると、カエルチュウイホウさんの<a href="http://kerolin.jspeed.jp/Computer/blosxom/tagging050620.html" target="_blank">taggingプラグイン(其の弐)</a>でご提示頂いている修正内容とほとんど同じですね。さらに、自分の方は間違っているという間抜けぶり…せっかく修正してくれてるのだから、コードちゃんと読めよ。＞ 自分
+</p>
+
+
+
+
+<p class="entryBody">
+カエルチュウイホウのkzfmさん、お手数ですが再度差し替えて頂けますでしょうか。すみません。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/21/424/">Blosxomでtagging #11</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-21T21:19:00+09:00" pubdate>Jun 21<span>st</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/21/424/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://kerolin.jspeed.jp/" target="blank">カエルチュウイホウ</a>さんの<a href="http://kerolin.jspeed.jp/Computer/blosxom/tagging050619.html" target="blank">taggingプラグイン</a>というエントリにて指摘されている問題を修正しました。こちらではカテゴリが1階層しかないため、全く気づいていませんでした。ご指摘感謝です。<br />
+download: <a href="/archives/tagging" target="_blank">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+「下の階層のタグが表示されない」という問題については、カエルチュウイホウさんの修正をそのまま反映させて頂いております。
+</p>
+
+
+
+
+<p class="entryBody">
+「同じタグが複数表示されてしまう場合がある」という問題については、以下の様にコードを修正しました。
+</p>
+
+
+
+
+<pre class="code">
+$ diff tagging tagging.20050508
+3c3
+&lt; # Version: 2005-06-21
+---
+&gt; # Version: 2005-05-08
+50d49
+&lt;       my %tags;
+52,53c51,52
+&lt;           if($category =~ /$path/){
+&lt;               foreach my $tag (keys %{$tags_list_per_category-&gt;{$category}}){
+---
+&gt;           if($path eq $category){
+&gt;               foreach my $tag (sort keys %{$tags_list_per_category-&gt;{$category
+}}){
+55c54,56
+&lt;                       $tags{$tag}++;
+---
+&gt;                       my $encoded_tag = $tag;
+&gt;                       $encoded_tag =~ s/(\W)/sprintf("%%%02X", ord($1))/ego;
+&gt;                       $list .= "&lt;li&gt;&lt;a href='$url?tag=$encoded_tag'&gt;$tag&lt;/a&gt; (
+$tags_list_per_category-&gt;{$category}-&gt;{$tag})&lt;/li&gt;\n";
+60,65d60
+&lt;
+&lt;       foreach my $tag (sort keys %tags){
+&lt;           my $encoded_tag = $tag;
+&lt;           $encoded_tag =~ s/(\W)/sprintf("%%%02X", ord($1))/ego;
+&lt;           $list .= "&lt;li&gt;&lt;a href='$url?tag=$encoded_tag'&gt;$tag&lt;/a&gt; ($tags{$tag})
+&lt;/li&gt;\n";
+&lt;       }
+93c88
+&lt;       foreach (sort keys %$files){
+---
+&gt;       foreach (keys %$files){
+</pre>
+
+
+
+
+<p class="entryBody">
+各カテゴリのタグの数の算出と、HTMLで表示するリストの生成を一緒のforeachループ内で行っていたのが問題の原因だったので、各カテゴリのタグの数を算出してタグ毎に積算するのと、HTMLリストの生成を分けるようにしました。
+</p>
+
+
+
+
+<p class="entryBody">
+こちらで試した限りは意図した通りに動いていますが、どんなもんでしょ？
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/19/441/">Perlで人工無脳 #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-19T21:58:00+09:00" pubdate>Jun 19<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/19/441/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+今回はマルコフ連鎖を利用した文章の自動生成について考えてみます。
+</p>
+
+
+
+
+<p class="entryBody">
+A → B → C → D という一連の事象が発生する場合に、ある事象の発生する確率が、直前の事象にのみ依存するような状態を、マルコフ連鎖といいます。つまり、Cという事象が発生する確率は、Bにのみ依存していて、Bの前にAが起こっていることは全く関係ない、ということですね。
+</p>
+
+
+
+
+<p class="entryBody">
+このマルコフ連鎖を利用した文章の自動生成を行うために、まずはマルコフ連鎖に基づいた文章生成用のデータを作成する必要があります。このデータをマルコフ辞書と呼びます。マルコフ辞書の中には、『「A」という単語の後には「B」という単語がつながる』という情報がたくさん入る、というイメージになります。
+</p>
+
+
+
+
+<p class="entryBody">
+マルコフ辞書の生成も、前回のパターン辞書と同様に、予め発言データ用意しておいて、そこから生成することを考えます。
+</p>
+
+
+
+
+<p class="entryBody">
+例えば、「私の息子はカレーパンマンと言うことができず、いつもカレーアンパンマンと言っています。」という文章があった場合、形態素解析を利用して以下の様なデータを作成します。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>私 → の</li>
+<li>の → 息子</li>
+<li>息子 → は</li>
+<li>は → カレー</li>
+<li>カレー → パン</li>
+<li>パン → マン</li>
+<li>（… 以下続く …）</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+ところが、この様に1対1の関係でデータを作成すると、言葉が細切れ過ぎて、うまいこと文章になってくれない確率が高くなってしまいます。そこで、連鎖の最初の部分（プレフィクスと呼びます）を2つの単語で構成する様にして、以下の様なデータを作成します。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>「私」「の」 → 「息子」</li>
+<li>「の」「息子」 → 「は」</li>
+<li>「息子」「は」 → 「カレー」</li>
+<li>「は」「カレー」 → 「パン」</li>
+<li>「カレー」「パン」ー → 「マン」</li>
+<li>（… 以下続く …）</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+これを2単語プレフィクスのマルコフ辞書、と呼ぶそうです。これをperlのハッシュを使って表すと、以下の様になります。
+</p>
+
+
+
+
+<pre class="code">
+$data = {
+    '私' => {
+    'の' => ['息子', ... ],
+    },
+    'の' => {
+    '息子' => ['は', ... ],
+    },
+    '息子' => {
+    'は' => ['カレー', ... ],
+    },
+    'は' => {
+    'カレー' => ['パン', ...],
+    },
+    'カレー' => {
+    'パン' => ['マン', ...],
+    },
+    ...
+};
+</pre>
+
+
+
+
+<p class="entryBody">
+各連鎖の最後の部分（サフィクスと呼びます）は配列としておいて、実際に文章を生成する際には、この配列からランダムに選択します。例えば、データ生成用の発言データに、上記のカレー云々という発言の他に「私の特技は手を使わずに、口にくわえたポッキーを鼻の穴に入れることです。」という文章があった場合、以下の様なデータが生成されます。
+</p>
+
+
+
+
+<pre class="code">
+$data = {
+    '私' => {
+    'の' => ['息子', '特技' ],
+    },
+};
+</pre>
+
+
+
+
+<p class="entryBody">
+このデータから文章を自動生成すると、「私の息子」または「私の特技」ではじまる文章が生成される、というわけです。
+</p>
+
+
+
+
+<p class="entryBody">
+では、前回と同様に、1行1発言というデータファイルから、マルコフ辞書を生成するスクリプトをperlで書いてみると、以下の様になります。
+</p>
+
+
+
+
+<pre class="code">
+#!/usr/local/bin/perl
+
+use MeCab;
+use strict;
+use Storable qw(lock_retrieve lock_store);
+
+my $text_file = $ARGV[0];
+open(IN, $text_file) or die $!;
+
+my $markov_dic_file = "markov_dic";
+my $markov_start_file = "markov_start";
+my $markov_dic = {};
+my $markov_start = [];
+
+#eval { $markov_dic = lock_retrieve($markov_dic_file); };
+#eval { $markov_start = lock_retrieve($markov_start_file); };
+
+my @arg = ($0);
+my $m = new MeCab::Tagger(\@arg);
+
+while(&lt;IN&gt;){
+    my $n = $m->parseToNode($_);
+    my @s;
+
+    my $start = 0;
+    while ($n->hasNode) {
+    if($n->getSurface){
+        if(!$start){
+        push(@$markov_start, $n->getSurface);
+        $start = 1;
+        }
+        push(@s, $n->getSurface);
+        if($#s &lt; 1){
+        if($n->hasNode){
+            $n = $n->next;
+            if($n->getSurface){
+            push(@s, $n->getSurface);
+            }
+        } else {
+            last;
+        }
+        }
+    }
+
+    $n = $n->next;
+    if($n->hasNode){
+        if($#s eq '1' and $n->getSurface){
+        push(@{$markov_dic->{$s[0]}->{$s[1]}}, $n->getSurface);
+        shift(@s);
+        }
+    } else {
+        last;
+    }
+    }
+}
+
+lock_store($markov_dic, $markov_dic_file);
+lock_store($markov_start, $markov_start_file);
+
+exit;
+</pre>
+
+
+
+
+<p class="entryBody">
+マルコフ辞書とともに、各発言の最初の単語を抜き出して配列にしたものを、別ファイルとして保存しています。</p>
+
+
+
+
+<p class="entryBody">
+マルコフ辞書の生成はこれでOKなので、次はこの辞書から文章を生成する方法を考えてみます。
+</p>
+
+
+
+
+<p class="entryBody">
+まずは文章の書き出しの単語を決める必要があるわけですが、これはマルコフ辞書生成時に、発言の最初の単語を抜き出して配列にしていますので、この配列からランダムに選択します。
+</p>
+
+
+
+
+<p class="entryBody">
+書き出しの単語さえ決まってしまえば、あとはマルコフ辞書のハッシュを順番に辿っていって、文章を作っていきます。例えば、書き出しが「息子」の場合に、上のサンプルハッシュデータを利用すると、「息子はカレー」という連鎖が得られます。次に「はカレー」を元にしてまたハッシュを辿ると、「はカレーパン」という連鎖を引き出すことができ、さらに「カレーパン」を元にハッシュを辿ると、「カレーパンマン」という連鎖が引き出せます。こうして得られた連鎖を繋ぎ合わせると、「息子はカレーパンマン」という文章になります。これを繰り返していって、文章を作っていきます。
+</p>
+
+
+
+
+<p class="entryBody">
+発言データが豊富にあれば、連鎖は一本道ではなく複数に枝分かれするはずですので、その場合はランダムに枝を選択していくことになり、生成される文章も様々なバリエーションを持つようになります。
+</p>
+
+
+
+
+<p class="entryBody">
+これをコードで表すと、以下の様になります。
+</p>
+
+
+
+
+<pre class="code">
+package bot;
+
+use base qw(CGI::Application);
+use strict;
+use Storable qw(lock_retrieve);
+
+my $pattern_dic_file = 'pattern_dic';
+my $markov_dic_file = 'markov_dic';
+my $markov_start_file = 'markov_start';
+
+sub setup {
+    my $self = shift;
+    $self->mode_param('rm');
+    $self->start_mode('bot');
+    $self->run_modes ( bot => 'bot');
+    $self->param(
+         pattern_dic => lock_retrieve($pattern_dic_file),
+         markov_dic => lock_retrieve($markov_dic_file),
+         markov_start => lock_retrieve($markov_start_file),
+         );
+
+    $self->header_props(
+            -type => 'text/html',
+            -charset => 'euc-jp',
+            );
+    $self->tmpl_path('/home/miya/html/www.mizzy.org/chat');
+    
+}
+
+sub bot {
+    my $self = shift;
+    my $input = $self->query->param('input');
+
+    my @responder = ('pattern_responder', 'markov_responder');
+    my $responder = $responder[int(rand($#responder+1))];
+
+    my $output = $self->$responder($input);
+
+    my $template = $self->load_tmpl('bot.html', die_on_bad_params => 0);
+    $template->param(
+             input => $input,
+             output => $output,
+             );
+    return $template->output;
+}
+
+sub markov_responder {
+    my $self = shift;
+    my $input = shift;
+    my $markov_dic = $self->param('markov_dic');
+    my $markov_start = $self->param('markov_start');
+
+    my @words;
+    my $p1 = $markov_start->[int(rand($#{$markov_start}+1))];
+
+    my @p2;
+    foreach (keys %{$markov_dic->{$p1}}){
+    push(@p2, $_);
+    }
+
+    my $p2 = $p2[int(rand($#p2 + 1))];
+
+    push(@words, $p1, $p2);
+
+    my $cnt;
+    while($cnt &lt; 20){
+    my $s = $markov_dic->{$p1}->{$p2}->[int(rand($#{$markov_dic->{$p1}->{$p2}} + 1))];
+    push(@words, $s);
+    if($s =~ /。/){
+        last;
+    }
+    $p1 = $p2;
+    $p2 = $s;
+    $cnt++;
+    }
+
+    return join('', @words);
+}
+
+sub pattern_responder {
+    my $self = shift;
+    my $input = shift;
+
+    my $pattern_dic = $self->param('pattern_dic');
+
+    my $output;
+    foreach (keys %$pattern_dic){
+    if($input =~ /$_/ig){
+        my $num = $#{$pattern_dic->{$_}};
+        $output = $pattern_dic->{$_}->[int(rand($num+1))];
+        last;
+    }
+    }
+
+    if(!$output){
+    $output = "何それ？";
+    }
+
+    return $output;
+}
+
+1;
+</pre>
+
+
+
+
+<p class="entryBody">
+マルコフ辞書を利用して応答を返すルーチンをmarkov_responser()、パターン辞書を利用して応答を返すルーチンをpattern_responder()として、ランダムにレスポンダを切り替える様にしています。
+</p>
+
+
+
+
+<p class="entryBody">
+今回は<a href="http://mizzy.org/archives/bot/bot.cgi" target="_blank">サンプルを公開します</a>。発言データは前と同様、ごく私的なチャットなのですが、発言そのままではないのでまあいいか、と。（公開してるものはmarkov_responser()だけ使ってます。）
+</p>
+
+
+
+
+<p class="entryBody">
+わりと日本語っぽくなってますね。
+</p>
+
+
+
+
+<p class="entryBody">
+前回のパターン辞書と、今回のマルコフ辞書の特徴を整理してみると、以下の様な感じでしょうか。
+</p>
+
+
+
+
+<dl class="entryBody">
+<dt>パターン辞書</dt>
+<dd>特定のインプットに対するアウトプットを設定できるので、比較的会話になりやすい。</dd>
+<dd>設定した文章どおりに返すので、ちゃんとした日本語になる。</dd>
+<dd>決められたパターンでしか応答しないので、バリエーションに乏しい。</dd>
+<dt>マルコフ辞書</dt>
+<dd>文章を適当に組み立てるので、会話にならない。</dd>
+<dd>ちゃんとした日本語にならないことが多い。</dd>
+<dd>単語をばらして再構成するので、バリエーションは豊富。</dd>
+</dl>
+
+
+
+
+<p class="entryBody">
+それぞれに欠点はありますが、単に発言するという目的であれば、そんなに悪くないのではないかと。なので、後はいかにして会話が成立するようにするか、といったところですね。特にマルコフ辞書の方は、バリエーション豊富なのが魅力的ですが、会話を成立させるのが難しそう。今後はそのあたりを重点的に考えてみよう。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/18/477/">Perlで人工無脳 #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-18T23:42:00+09:00" pubdate>Jun 18<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/18/477/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+ちょっと興味と必要があって、人工無脳に手を出してみることになりました。まあ、人工無脳なんて今更って気もしますが、とりあえずやってみたことはどんなにしょぼくても公開する、というポリシーですので、<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4839917299/httshemizorg-22/ref=nosim" target="_blank">恋するプログラム―Rubyでつくる人工無脳</a>を参考にしながら、perlで実装していく過程をここに載せていきたいと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+といっても、この本の流れに沿っていくわけではなく、俺の思いつきのままにやっていきますので、そこんとこよろしくです。
+</p>
+
+
+
+
+<p class="entryBody">
+で、今回は人工無脳のパターン辞書を、何らかのデータから自動生成することを考えてみます。
+</p>
+
+
+
+
+<p class="entryBody">
+パターン辞書というのは、人工無脳への問いかけの中に、「A」という言葉がある場合に、「B」という応答を返す、というパターンが記述された辞書です。これをひとつひとつ設定していくのではなく、自動的に生成するにはどうすればいいのか、という話ですね。
+</p>
+
+
+
+
+<p class="entryBody">
+これは形態素解析を利用して、以下の様な処理を行います。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>まず、何らかの発言データファイルを用意する。俺はとあるチャットのログから、1行1発言のテキストファイルを生成しています。</li>
+<li>発言データを1行づつ形態素解析で処理して、名詞を抜き出す。</li>
+<li>抜き出した名詞と発言データを関連づけて、それを辞書データとする。例えば、「私の息子はカレーパンマンと言うことができず、いつもカレーアンパンマンと言っています。」という発言データの場合、「カレー」という名詞に、「私の息子はカレーパンマンと言うことができず、いつもカレーアンパンマンと言っています。」という発言を関連づける。</li>
+<li>これにより、人工無脳への問いかけの中に、「カレー」という言葉が含まれていれば、「私の息子はカレーパンマンと言うことができず、いつもカレーアンパンマンと言っています。」と応答するようになる。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+perlで実装してみるとこんな感じです。形態素解析にはMeCabを利用しています。（たまたまインストールされていたので。）
+</p>
+
+
+
+
+<pre class="code">
+#!/usr/local/bin/perl
+
+use MeCab;
+use strict;
+use Storable qw(lock_retrieve lock_store);
+
+my $text_file = $ARGV[0];
+open(IN, $text_file) or die $!;
+
+my $pattern_dic_file = "pattern_dic";
+
+my $pattern_dic = {};
+eval { $pattern_dic = lock_retrieve($pattern_dic_file); };
+
+my @arg = ($0);
+my $m = new MeCab::Tagger(\@arg);
+while(&lt;IN&gt;){
+    my $n = $m->parseToNode($_);
+
+    while ($n->hasNode () != 0) {
+    my $s = $n->getSurface;
+    my $f = $n->getFeature;
+
+    if($f =~ /名詞/ and ($f =~ /一般/ or $f =~ /固有/ or $f =~ /サ変/ or $f =~ /形容動詞語幹/)){
+        push(@{$pattern_dic->{$s}}, $_);
+    }
+
+    $n = $n->next ();
+    }
+}
+
+lock_store($pattern_dic, $pattern_dic_file);
+
+exit;
+</pre>
+
+
+
+
+<p class="entryBody">
+辞書を作っただけではおもしろくないので、実際に辞書データをもとに応答してくれる簡単な人工無脳ボットbot.pmを作ってみます。
+</p>
+
+
+
+
+<pre class="code">
+package bot;
+
+use base qw(CGI::Application);
+use strict;
+use Storable qw(lock_retrieve);
+
+my $pattern_dic_file = 'pattern_dic';
+
+sub setup {
+    my $self = shift;
+    $self->mode_param('rm');
+    $self->start_mode('bot');
+    $self->run_modes ( bot => 'bot');
+    $self->param(
+         pattern_dic => lock_retrieve($pattern_dic_file),
+         );
+
+    $self->header_props(
+            -type => 'text/html',
+            -charset => 'euc-jp',
+            );
+    $self->tmpl_path('/path/to/template');
+    
+}
+
+sub bot {
+    my $self = shift;
+    my $pattern_dic = $self->param('pattern_dic');
+    my $input = $self->query->param('input');
+    my $output;
+    foreach (keys %$pattern_dic){
+    if($input =~ /$_/ig){
+        my $num = $#{$pattern_dic->{$_}};
+        $output = $pattern_dic->{$_}->[int(rand($num+1))];
+        last;
+    }
+    }
+
+    if(!$output){
+    $output = "何それ？";
+    }
+
+    my $template = $self->load_tmpl('bot.html', die_on_bad_params => 0);
+    $template->param(
+             input => $input,
+             output => $output,
+             );
+    return $template->output;
+}
+
+1;
+</pre>
+
+
+
+
+<p class="entryBody">
+こいつをCGIとして呼び出すコードbot.cgiです。
+</p>
+
+
+
+
+<pre class="code">
+#!/usr/local/bin/perl
+
+use bot;
+use strict;
+
+my $bot = bot->new;
+$bot->run;
+</pre>
+
+
+
+
+<p class="entryBody">
+あと、HTMLファイルbot.htmlですね。
+</p>
+
+
+
+
+<pre class="code">
+&lt;form method="post" action="bot.cgi"&gt;
+&lt;input type="text" name="input" size="50" id="input" value="&lt;!-- TMPL_VAR NAME=input --&gt;"&gt;
+&lt;input type="submit" value="submit"&gt;
+&lt;/form&gt;
+
+&lt;!-- TMPL_VAR NAME=output --&gt;
+
+&lt;script type="text/javascript"&gt;
+document.getElementById('input').select();
+&lt;/script&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+試しに、「最近おもしろいゲームある？」と聞いてみたところ、「MGS3もおまけゲームが魅力的です。」という答えが返ってきました。どうやらこの人工無脳、メタルギアソリッド3のおまけゲームであるサルゲッチュが好きなようです。といっても、この様に会話になることはまだ稀で、もう一度同じ質問をしたところ、「セガとサミーがくっつくわ、ファルコムは韓国からゲーム買うようになっちまったわ」とか「今日横断歩道で プーさんの格好でスクーターに乗った人を見かけたけど、その人もバツゲームかなあ。」なんて返してきました。
+</p>
+
+
+
+
+<p class="entryBody">
+こんな感じで、まだまだお馬鹿ではありますが、発言データさえ豊富にあれば、簡単なコードでも十分楽しいもんですね。本当は今回作った人工無脳ボット、実際に動いているものを公開したいのですが、なにしろ発言データをすごくプライベートなチャットから採っているものですから、勘弁して頂きたいと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+これをベースに、今後少しづつ改良していって、より自然な文章が作れるものを目指したいと思います。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/04/504/">Same_topicプラグイン #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-04T22:18:00+09:00" pubdate>Jun 4<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/04/504/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://ext3.jp.land.to/blosxom/customize10.html" target="_blank">Extension3 - blosxomのカスタマイズ#10</a>にて、same_topicプラグインのバグフィックス情報を頂きましたので、こちらのものに反映してみました。download: <a href="/archives/same_topic" target="_blank">same_topicプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://ext3.jp.land.to/index.html" target="_blank">Extension3</a>のshelaさん、ありがとうございます!
+</p>
+
+
+
+
+<p class="entryBody">
+shelaさんのご指摘通り、pagingプラグインを併用していると、ソートがらみでおかしくなるので、デフォルトではsortサブルーチンでは何もしないようにしました。（自分の環境では複数ページになるトピックがなかったので、気づきませんでした。）
+</p>
+
+
+
+
+<p class="entryBody">
+ただ、プラグインをつくった目的が、「同一のトピックについて最初から順に追いたい時に使う」なので、古い順に並べたいんですよね。どうしよっかな。できれば各プラグインの独立性は保ちたいので、pagingプラグインはいじりたくないしなぁ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/29/476/">JKL.ParseXMLを試してみた</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-29T18:44:00+09:00" pubdate>May 29<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/29/476/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://prototype.conio.net/" target="_blank">prototype</a>, <a href="http://www.twilightuniverse.com/2005/05/sack-of-ajax/" target="_blank">Sack of Ajax</a>と、ajax関連のjavascriptライブラリをここでは取り上げて来ましたが、大本命と言えるものが登場してきました。<a href="http://zerobase.jp/blog/entry-215.html" target="_blank">ajax ml</a>で話題の、川崎さん作<a href="http://www.kawa.net/works/js/jkl/parsexml.html" target="_blank">JKL.ParseXML</a>です。
+</p>
+
+
+
+
+<p class="entryBody">
+使い方は川崎さんのサイトに詳しくありますので、ここでは説明しません。代わりに、このライブラリを使うと何がうれしいのか、語っちゃいます。
+</p>
+
+
+
+
+<p class="entryBody">
+まず1点目。XMLをJavascriptのオブジェクトに変換してくれちゃうことですね。そのためのライブラリなので当たり前なのですが。でもこれって、ものすごく需要があると思うんですよね。
+</p>
+
+
+
+
+<p class="entryBody">
+現在、様々なウェブ上のサービスがRESTベースのAPIを提供していますよね。で、そのAPIを利用したサイトというのもまた色々があるわけですが、これらのサイトはおそらく、RESTで取得したXMLを、サーバサイドで加工してHTMLに出力、という様な処理をしてることが多いんじゃないかと思います。で、これにajaxを加えようとすると、俺に考えつくのは、
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>サーバサイドで加工したHTMLをinnerHTMLでウェブページにつっこむ。ただし、Javascriptでデータを加工する自由がない。</li>
+<li>サーバサイドでXMLからJSONに変換して、Javascriptで処理する。ただし、XMLからJSONへの汎用的な変換ツールを知らないので、自分でルーチン書いてた。しかも正規表現で汎用性がないやつ。</li>
+<li>サーバサイドでは何もせずにJavascriptに渡し、JavascriptでXSLTなりDOMなりでいじる。これはめんどくさそうで実際に試す気になれなかった。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+という、どれもイマイチな方法ばかりなんですよ。これがJKL.ParseXMLを使うと、
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>サーバサイドでは何もせずにJavascriptにXMLを渡し、JKL.ParseXMLがXMLをオブジェクトに変換してくれる。それもものすごく簡単に。後はこのオブジェクトを好きなように加工するだけ。超ラクチン!</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+ってことになります。ほんっと、すばらしいです。
+</p>
+
+
+
+
+<p class="entryBody">
+で、2点目の良い点なのですが、xmlHttpRequestでデータを取得するルーチンがものすごく簡単に書ける、ということですね。どれぐらい簡単か、<a href="http://mizzy.org/program/sackOfAjax.html" target="_blank">Sack of Ajax</a>で説明したのと同様に、prototypeやSackと比較してみます。
+</p>
+
+
+
+
+<p class="entryBody">
+前と同じ例ですが、まずはprototypeのコード。
+</p>
+
+
+
+
+<pre class="code">
+new Ajax.Request(
+    '/deislde/index.cgi',
+    {
+      method: 'GET',
+      onComplete: function(request){
+        eval('tagsListObj = ' +  request.responseText);
+    displayTags();
+      }
+    });
+</pre>
+
+
+
+
+<p class="entryBody">
+次にSackでのコード。（<a href="http://mizzy.org/program/sackOfAjax.html" target="_blank">Sack of Ajax</a>でのサンプルは微妙に間違ってます。こっちが正しいです。）
+</p>
+
+
+
+
+<pre class="code">
+ajax = new sack('/delside/index.cgi');
+ajax.method = 'GET';
+ajax.onCompletion = function() {
+                        var response = ajax.response;
+                eval('tagsListObj = ' +  response);
+                displayTags();
+                    };
+ajax.runAjax();
+
+</pre>
+
+
+
+
+<p class="entryBody">
+これをJKL.ParseXMLで書き直すと、
+</p>
+
+
+
+
+<pre class="code">
+var url = "/delside/index.cgi";
+var xml = new JKL.ParseXML( url );
+var tagsListObj = xml.parse();
+displayTags();
+</pre>
+
+
+
+
+<p class="entryBody">
+といった感じで、ものすごく簡略化できます。<strong>しかも</strong>、しかもですよ、簡略化されるのはJavascriptだけではありません。prototypeとSackでは、サーバ側でXMLをJSONに変換しているのですが、JKL.ParseXMLはそれすらも不要!XMLのまんまでJavascriptに渡してやればいいんです。<strong>素敵です。</strong>
+</p>
+
+
+
+
+<p class="entryBody">
+今ちょうど、作りかけのajaxアプリがあるので、早速使わせて頂きます。川崎さん、<strong>ありがとうございます!</strong>
+</p>
+
+
+
+
+<p class="entryBody">
+俺も人が作ったものばかり使ってないで、こういうものを提供できるようにならないとなぁ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/29/383/">タグの関連性の可視化 #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-29T15:26:00+09:00" pubdate>May 29<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/29/383/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.fladdict.net/blog-jp/" target="_blank">fladdict.net blog</a>の中の人が書かれている、<a href="http://www.fladdict.net/blog-jp/archives/2005/05/post_79.php" target="_blank">「ソーシャルブックマーク考　タギングの可視化について」</a>というエントリを見て、自分も最近別方向からのタグの可視化について考えていたので、それについて書いてみる。
+</p>
+
+
+
+
+<p class="entryBody">
+fladdict.net blogの中の人は、タグの出現頻度を可視化する手法が画一的なのに対して問題提起をしておられるのですが、自分が考えているのは、「頻度だけを可視化するのでは情報として不十分じゃないのか？」ということです。
+</p>
+
+
+
+
+<p class="entryBody">
+出現頻度の可視化により、タグづけしている人の趣味嗜好や関心事の傾向がひと目で把握できるのはおもしろいのですが、頻度だけから得られる情報には限りがあるなぁ、と。例えば、このブログでのタグの出現頻度をとると、「blosxom」が19で最多、次いで「plugin」が18といった感じなのですが、これだけを見ると「こいつはblosxomとpluginに関心があるのかぁ。で、pluginって何のplugin？」といった感じになるわけですが、実際にはblosxomというタグとpluginというタグはほとんどが同一のエントリにタグづけされているわけで、「blosxomのplugin」に関する話題が多いわけですよ。タグ間の関連性まで可視化できて、blosxomタグとpluginタグの関連性が強いということがひとめで分かれば、「こいつはblosxomのpluginラブなんだな」というところまで読み取れるわけで、なんとかうまく関連性を可視化できる方法はないものかなぁ、と考えていたりします。
+</p>
+
+
+
+
+<p class="entryBody">
+で、とりあえず頻度は今まで通り、フォントのサイズで表すとして、関連性は何で表そうということになるのですが、色がいいのではないかと。ここまではすぐに思いつくのですが、じゃあ、いったいどういう形で色づけしていくのか、というのがノーアイデアだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+関連性の計算については、昨日のBlog Hacks Conで知った相互情報量とやらでいけそうだし、ひとつのタグを取り出して、それに関連するタグを引っ張り出すことは容易だと思います。しかし、すべてのタグをならべた状態で、各タグ間の関連を可視化するのは容易ではなさそうです。
+</p>
+
+
+
+
+<p class="entryBody">
+たとえば、A, B, C3つのタグがあるとして、AとB、BとCが関連が強く、AとCは関連がない、といった場合、どういう色で表せばいいのだろう？AとBは関連があるので同系色、BとCも関連があるので同系色、としてしまうと、関係のないAとCまでもが同系色になってしまいます。
+</p>
+
+
+
+
+<p class="entryBody">
+こんな感じで、「関連性を可視化できるといいんじゃね？」ということは思いついても、具体的にどう実装するかがノーアイデアという情けない状態だったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+もっと整理できてからエントリあげようかと思ったのですが、ここを読んだ頭の良い方が、「こうすれば簡単じゃね？」と言ってくれるのを期待して、ここに記すことにしました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/36/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/34/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

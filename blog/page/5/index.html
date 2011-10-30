@@ -1,0 +1,1307 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="とある IRC チャネルで DNS ソフトウェアの話になって、当然 BIND や djbdns があがってくるわけなんですが、うち PowerDNS つかってて、ベンチマークとった資料とかあるよ、と言ったら、あんま事例ないと思うのでブログで公開するとうれしい人が多いかも、と Ficia を &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/5">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/01/22/BindDlzVsPowerDns/">BindDlzVsPowerDns</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-01-22T01:20:16+09:00" pubdate>Jan 22<span>nd</span>, 2010</time>
+        
+         | <a href="/blog/2010/01/22/BindDlzVsPowerDns/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>とある IRC チャネルで DNS ソフトウェアの話になって、当然 BIND や djbdns があがってくるわけなんですが、うち PowerDNS つかってて、ベンチマークとった資料とかあるよ、と言ったら、あんま事例ないと思うのでブログで公開するとうれしい人が多いかも、と <a href="http://ficia.com/">Ficia</a> を <a href="http://d.hatena.ne.jp/hirose31/">アツく語る人</a> から言われたので公開します。2年ちょいぐらい前につくった資料で、細かいこと忘れちゃってますし、社内向けに書いたものを公開するので、マズいところは省いたりしてます。</p>
+
+<p>まずは VM 環境で、BIND + DLZ と PowerDNS（どちらもバックエンドに MySQL を使用）のパフォーマンス比較した資料を公開します。</p>
+
+<h1>BIND + DLZ のパフォーマンス</h1>
+
+<h2>/etc/named.conf</h2>
+
+<pre><code>dlz "Mysql zone" {
+   database "mysql
+   {host=localhost dbname=dns_data ssl=false}
+   {select zone from dns_records where zone = '%zone%'}
+   {select ttl, type, mx_priority, case when lower(type)='txt' then concat('\"', data, '\"')
+        else data end from dns_records where zone '%record%'
+        and not (type 'NS')}
+   {select ttl, type, mx_priority, data, resp_person, serial, refresh, retry, expire, minimum
+        from dns_records where zone 'SOA' or type='NS')}
+   {select ttl, type, host, mx_priority, data, resp_person, serial, refresh, retry, expire,
+        minimum from dns_records where zone 'SOA' or type = 'NS')}
+   {select zone from xfr_table where zone '%client%'}
+   {update data_count set count '%zone%'}";
+};
+</code></pre>
+
+<h2>MySQLに登録された DNS レコード</h2>
+
+<pre><code>mysql&gt; select * from dns_records;
++-------------+------+------+--------------+-------+-------------+---------+-------+---------+---------+----------+-------------------+------------+
+| zone        | host | type | data         | ttl   | mx_priority | refresh | retry | expire  | minimum | serial   | resp_person       | primary_ns |
++-------------+------+------+--------------+-------+-------------+---------+-------+---------+---------+----------+-------------------+------------+
+| example.org | @    | SOA  | localhost.   | 86400 | 10          |    3600 |   200 | 3600000 |    3600 | 20070919 | test.example.org. | NULL       |
+| example.org | www  | A    | 192.168.32.1 |  NULL | NULL        |    NULL |  NULL |    NULL |    NULL |     NULL | NULL              | NULL       |
+| example.org | abc  | A    | 192.168.32.2 |  NULL | NULL        |    NULL |  NULL |    NULL |    NULL |     NULL | NULL              | NULL       |
+| example.org | test | A    | 192.168.32.3 |  NULL | NULL        |    NULL |  NULL |    NULL |    NULL |     NULL | NULL              | NULL       |
++-------------+------+------+--------------+-------+-------------+---------+-------+---------+---------+----------+-------------------+------------+
+</code></pre>
+
+<h2>dns_records テーブルのインデックスの状態</h2>
+
+<pre><code>mysql&gt; show index from dns_records;
++-------------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+
+| Table       | Non_unique | Key_name   | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment |
++-------------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+
+| dns_records |          1 | host_index |            1 | host        | A         |        NULL |       20 | NULL   | YES  | BTREE      |         |
+| dns_records |          1 | zone_index |            1 | zone        | A         |        NULL |       30 | NULL   | YES  | BTREE      |         |
+| dns_records |          1 | type_index |            1 | type        | A         |        NULL |        8 | NULL   | YES  | BTREE      |         |
++-------------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+
+</code></pre>
+
+<h2>queryperf 用ファイル</h2>
+
+<pre><code>test.example.org A
+</code></pre>
+
+<h2>queryperf の実行結果</h2>
+
+<pre><code># queryperf -d ~/dlz_test.dat -s 127.0.0.1 -l 10
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 127.0.0.1)
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       10 seconds
+  Ran through file:     974 times
+
+  Queries sent:         975 queries
+  Queries completed:    975 queries
+  Queries lost:         0 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              2.775003 sec
+  RTT min:              0.043778 sec
+  RTT average:          0.253777 sec
+  RTT std deviation:    0.335064 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 20 19:38:22 2007
+  Finished at:          Thu Sep 20 19:38:35 2007
+  Ran for:              12.619786 seconds
+
+  Queries per second:   77.259630 qps
+</code></pre>
+
+<hr />
+
+<h1>PowerDNS のパフォーマンス</h1>
+
+<h2>MySQL に登録された DNS レコード</h2>
+
+<pre><code>mysql&gt; select * from records;
++----+-----------+--------------------+------+-------------------------+-------+------+-------------+
+| id | domain_id | name               | type | content                 | ttl   | prio | change_date |
++----+-----------+--------------------+------+-------------------------+-------+------+-------------+
+|  1 |         1 | test.com           | SOA  | localhost ahu@ds9a.nl 1 | 86400 | NULL |        NULL |
+|  2 |         1 | test.com           | NS   | dns-us1.powerdns.net    | 86400 | NULL |        NULL |
+|  3 |         1 | test.com           | NS   | dns-eu1.powerdns.net    | 86400 | NULL |        NULL |
+|  4 |         1 | www.test.com       | A    | 199.198.197.196         |   120 | NULL |        NULL |
+|  5 |         1 | mail.test.com      | A    | 195.194.193.192         |   120 | NULL |        NULL |
+|  6 |         1 | localhost.test.com | A    | 127.0.0.1               |   120 | NULL |        NULL |
+|  7 |         1 | test.com           | MX   | mail.test.com           |   120 |   25 |        NULL |
++----+-----------+--------------------+------+-------------------------+-------+------+-------------+
+</code></pre>
+
+<h2>records テーブルのインデックスの状態</h2>
+
+<pre><code>mysql&gt; show index from records;
++---------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+
+| Table   | Non_unique | Key_name       | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment |
++---------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+
+| records |          0 | PRIMARY        |            1 | id          | A         |           7 |     NULL | NULL   |      | BTREE      |         |
+| records |          1 | rec_name_index |            1 | name        | A         |           7 |     NULL | NULL   | YES  | BTREE      |         |
+| records |          1 | nametype_index |            1 | name        | A         |           7 |     NULL | NULL   | YES  | BTREE      |         |
+| records |          1 | nametype_index |            2 | type        | A         |           7 |     NULL | NULL   | YES  | BTREE      |         |
+| records |          1 | domain_id      |            1 | domain_id   | A         |           2 |     NULL | NULL   | YES  | BTREE      |         |
++---------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+
+</code></pre>
+
+<h2>queryperf 用設定ファイルの内容</h2>
+
+<pre><code>www.test.com A
+</code></pre>
+
+<h2>queryperf の実行結果</h2>
+
+<pre><code># queryperf -d ~/pdns_test.dat -s 127.0.0.1 -l 10
+
+DNS Query Performance Testing Tool
+Version: $Id: queryperf.c,v 1.8.192.3 2005/10/29 00:21:12 jinmei Exp $
+
+[Status] Processing input data
+[Status] Sending queries (beginning with 127.0.0.1)
+[Status] Testing complete
+
+Statistics:
+
+  Parse input file:     multiple times
+  Run time limit:       10 seconds
+  Ran through file:     42159 times
+
+  Queries sent:         42160 queries
+  Queries completed:    42160 queries
+  Queries lost:         0 queries
+  Queries delayed(?):   0 queries
+
+  RTT max:              0.013259 sec
+  RTT min:              0.000331 sec
+  RTT average:          0.002268 sec
+  RTT std deviation:    0.001248 sec
+  RTT out of range:     0 queries
+
+  Percentage completed: 100.00%
+  Percentage lost:        0.00%
+
+  Started at:           Thu Sep 20 19:36:47 2007
+  Finished at:          Thu Sep 20 19:36:57 2007
+  Ran for:              10.000367 seconds
+
+  Queries per second:   4215.845278 qps
+</code></pre>
+
+<hr />
+
+<h1>結論</h1>
+
+<p>BIND + DLZ: 77.259630 qps、PowerDNS: 4215.845278 qps で PowerDNS の圧勝。これは BIND + DLZ がリクエスト毎に MySQL 問い合わせしてるのに対し、PowerDNS はメモリにキャッシュしていちいち MySQL に問い合わせないから、だろう。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/01/20/GoopeRecruiting/">GoopeRecruiting</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-01-20T17:50:11+09:00" pubdate>Jan 20<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/01/20/GoopeRecruiting/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://goope.jp/info/information/?id=35">インフォーメーションがアレだったり</a>、<a href="http://blog.goope.jp/">チュートリアルブログがアレだったり</a> する <a href="http://www.paperboy.co.jp/">ペパボ</a> のサービス <a href="http://goope.jp/">グーペ</a> では <a href="http://www.paperboy.co.jp/recruit/job/091110p.php">開発者を募集してます</a>。</p>
+
+<p>以下の応募条件をしっかりと守ってご応募ください。</p>
+
+<p> ※応募フォーム『自己PR』の最後に、自分が過去にやらかした経験を、さも他人事のように教えてください。</p>
+
+<p> 例：昔の彼女の誕生日に趣味の悪い紫色のオルゴールを送り、翌日交換日記経由でフラれたことがある知り合いがいます。あと、噛んでいたガムを妹のズボンのポケットに捨てていて母親に死ぬほど怒られたことがあるって、この間友達が言ってました。</p>
+
+<p>関連サイト
+* <a href="http://blog.livedoor.jp/kensuu/archives/50948984.html">グーペの細かすぎる機能こそがPaperboy&amp;co.の強み : ロケスタ社長日記</a>
+* <a href="http://www.japan-manganews.jp/?p=1587">日本漫画新聞 >> paperboy&amp;co.が「グーペ」のプレスリリース失敗をお知らせ</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/01/15/LsyncdRsyncTargetDirectory/">LsyncdRsyncTargetDirectory</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-01-15T18:12:39+09:00" pubdate>Jan 15<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/01/15/LsyncdRsyncTargetDirectory/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[wiki:InotifyAndMakuosan inotify + makuosan でいい感じのリアルタイムミラーリング] で、lsyncd は結局は rsync を裏で呼び出してるので、差分チェックの呪縛からは逃れられない、的なことを書いてたんですが、ふと、「もしかして、inotify から rsyncを呼び出すときに、同期対象となるファイルは、指定したディレクトリ以下のもの全部ではなく、変更があったファイルがあるディレクト以下のものだけ、なんて動きをしてくれるのかな？」と気になったので、実際に試してみました。結果から先に言うと、想定通りの動きとなってます。これって常識なんですかね？以下、試した時のログ。</p>
+
+<p>ログを確認するために、lsyncd をフォアグランドで起動。</p>
+
+<pre><code>$ ./lsyncd --no-daemon /tmp/lsyncd localhost:/var/tmp/lsyncd
+Fri Jan 15 17:46:59 2010: command line options: syncing /tmp/lsyncd/ -&gt; localhost:/var/tmp/lsyncd
+
+Fri Jan 15 17:46:59 2010: Starting up
+Fri Jan 15 17:46:59 2010: watching /tmp/lsyncd/
+
+Fri Jan 15 17:47:00 2010: --- Entering normal operation with [1] monitored directories ---
+</code></pre>
+
+<p>ディレクトリを作成してみる。</p>
+
+<pre><code>$ mkdir /tmp/lsyncd/0
+</code></pre>
+
+<p>ログから、同期対象となってるのが、/tmp/lsyncd と、今作成した /tmp/lsyncd/0 であることがわかる。</p>
+
+<pre><code>Fri Jan 15 17:47:06 2010: event CREATE:0 triggered.
+Fri Jan 15 17:47:06 2010: rsyncing /tmp/lsyncd/ --&gt; localhost:/var/tmp/lsyncd/
+Fri Jan 15 17:47:06 2010: rsyncing /tmp/lsyncd/0/ --&gt; localhost:/var/tmp/lsyncd/0/
+</code></pre>
+
+<p>さらにその下にディレクトリを作成。</p>
+
+<pre><code>$ mkdir /tmp/lsyncd/0/1
+</code></pre>
+
+<p>同期対象となってるのが、/tmp/lsyncd/0 と、今作成した /tmp/lsyncd/0/1 であることがわかる。</p>
+
+<pre><code>Fri Jan 15 17:47:48 2010: event CREATE:1 triggered.
+Fri Jan 15 17:47:48 2010: rsyncing /tmp/lsyncd/0/ --&gt; localhost:/var/tmp/lsyncd/0/
+Fri Jan 15 17:47:48 2010: rsyncing /tmp/lsyncd/0/1/ --&gt; localhost:/var/tmp/lsyncd/0/1/
+</code></pre>
+
+<p>さらにその下にディレクトリを作成。</p>
+
+<pre><code>$ mkdir /tmp/lsyncd/0/1/2
+</code></pre>
+
+<p>同期対象となってるのが、/tmp/lsyncd/0/1 と、今作成した /tmp/lsyncd/0/1/2 であることがわかる。</p>
+
+<pre><code>Fri Jan 15 17:48:26 2010: event CREATE:2 triggered.
+Fri Jan 15 17:48:26 2010: rsyncing /tmp/lsyncd/0/1/ --&gt; localhost:/var/tmp/lsyncd/0/1/
+Fri Jan 15 17:48:26 2010: rsyncing /tmp/lsyncd/0/1/2/ --&gt; localhost:/var/tmp/lsyncd/0/1/2/
+</code></pre>
+
+<p>/tmp/lsyncd/0/1/2 の下にファイルを作ってみる。</p>
+
+<pre><code>$ touch /tmp/lsyncd/0/1/2/3.txt
+</code></pre>
+
+<p>同期対象が /tmp/lsyncd/0/1/2 だけであることがわかる。（CREATE イベントと CLOSE_WRITE イベントで2回同期してる。）</p>
+
+<pre><code>Fri Jan 15 17:49:07 2010: event CREATE:3.txt triggered.
+Fri Jan 15 17:49:07 2010: rsyncing /tmp/lsyncd/0/1/2/ --&gt; localhost:/var/tmp/lsyncd/0/1/2/
+Fri Jan 15 17:49:07 2010: event CLOSE_WRITE:3.txt triggered.
+Fri Jan 15 17:49:07 2010: rsyncing /tmp/lsyncd/0/1/2/ --&gt; localhost:/var/tmp/lsyncd/0/1/2/
+</code></pre>
+
+<p>というわけで、やはり rsync による差分チェックはあるものの、対象ディレクトリを絞り込めるので、適切なディレクトリ構造にしていれば、rsync only よりはかなり負荷は抑えられそうな感じですね。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/31/PlackMiddlewareAuthLDAP/">PlackMiddlewareAuthLDAP</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-12-31T11:22:58+09:00" pubdate>Dec 31<span>st</span>, 2009</time>
+        
+         | <a href="/blog/2009/12/31/PlackMiddlewareAuthLDAP/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>追記</em></p>
+
+<p>miyagawa さんから助言があり、authenticator 追加するだけでサブクラスが増えると使いにくいというのと、<a href="http://search.cpan.org/~chansen/Authen-Simple-LDAP/">Authen::Simple::LDAP</a> を使えば、LDAP で認証するためにそれほどコード書くこともないので、わざわざモジュール化する必要もない、ということで、github からは削除することにしました。</p>
+
+<p>また、Plack::Middleware::Auth::Basic の authenticator に Authen::Simple オブジェクトがそのまま渡せるように miyagawa さんが修正してくださいました。</p>
+
+<p>http://github.com/miyagawa/Plack/commit/9f1ad6a3c2f33cd8f37c6cfcbb0993c55c84bbb9</p>
+
+<p>これで Plack::Middleware::Auth::Basic そのままで、以下のような感じで LDAP で認証できます。</p>
+
+<pre><code>#!perl
+use Authen::Simple::LDAP;
+enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
+</code></pre>
+
+<p>miyagawa さん、ありがとうございました。</p>
+
+<hr />
+
+<p>最近公私ともに、いちからウェブアプリ（ウェブ API 除く）書いてなくて、久々にウェブアプリを書こうかな−、と思いながらも、フレームワークに何を使おうか迷っていて、<a href="http://opensource.kayac.com/ja/projects/ark/advent/2009/">Ark Advent Calendar 2009</a> を読んだり、<a href="http://d.hatena.ne.jp/tokuhirom/20091230/1262133671">Amon</a> をウォッチしたりして、この年末を過ごしています。</p>
+
+<p>で、いずれのフレームワーク使うにしても、Plack はキーになりそうだな、ってことで、LDAP で認証するための Plack::Middleware を書いてみました。</p>
+
+<p>http://github.com/mizzy/p5-plack-middleware-auth-ldap</p>
+
+<p><a href="http://search.cpan.org/~miyagawa/Plack/lib/Plack/Middleware/Auth/Basic.pm">Plack::Middleware::Auth::Basic</a> を継承し、authorizer を追加する形で実装しています。</p>
+
+<p>ネームスペースは Plack::Middleware::Auth::Basic::LDAP の方がいいのかな、とか、ダイジェスト認証対応しようと思ったら、別モジュールにした方がいいのか、合わせてひとつのモジュールにした方がいいのか、その場合のネームスペースはどうすればいいのか、など、色々固まってない点があるので、まだ CPAN にはアップしない予定です。が、とりあえず自分で使う分には問題なく動いてるっぽいです。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/31/DizzyMizzLizzyCustomFeedScript/">DizzyMizzLizzyCustomFeedScript</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-12-31T03:11:40+09:00" pubdate>Dec 31<span>st</span>, 2009</time>
+        
+         | <a href="/blog/2009/12/31/DizzyMizzLizzyCustomFeedScript/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.clubcitta.co.jp/information.html#news13">Dizzy Mizz Lizzy が再結成ツアーで来日することが決定</a> したようで、チケット発売情報を漏らさないために、Plagger の CustomFeed::Script 用スクリプトを書きました。</p>
+
+<p>http://gist.github.com/266224</p>
+
+<p>彼らは95年、96年も来日していて、当時自分は学生で札幌在住だったわけですが、運良く2度とも札幌に来てくれ、ライブを見ることができました。（95年は Bad Moon Rising の前座だった。）</p>
+
+<p>4年ぶりの再結成、14年ぶりの来日、ってことで、2度と見られないかもしれないので、5/8, 9 の2日とも行く予定です。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/04/TecLifeLTPuppet/">TecLifeLTPuppet</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-12-04T07:43:35+09:00" pubdate>Dec 4<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/12/04/TecLifeLTPuppet/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>クックパッドさん主催の<a href="http://techlife.cookpad.com/2009/10/24/techlife_introduction/">techlife ライトにングトーク</a> で発表した資料をひとまず <a href="http://www.slideshare.net/mizzy/puppet-best-practices-at-cookpad">slideshare にアップしました</a>。動画が後日クックパッドさんから公開されると思います。気になる方は<a href="http://twitter.com/#search?q=%23tllt">#tllt</a> をチェックしてください。</p>
+
+<p>「Puppet Best Pracices?」と題して、実際に実践していることからいくつかピックアップして話してみました。? がついてる通り、ベストかどうかはわからないのですが、自分で実践しているネタを出すことで、より良い意見をもらえて、ベストに少しでも近づけていけるかな、と思い、こういったお題で話してみました。</p>
+
+<p>とはいうものの、話す時間の関係でボリューム不足ではあるので、スライド内容を更に肉付けする形で、最近更新をさぼっている<a href="http://trac.mizzy.org/puppet">パペウィキ</a> の方に書いていこうかな、と思ってます。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/15/CobblerAndPuppet/">CobblerAndPuppet</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-11-15T21:09:29+09:00" pubdate>Nov 15<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/11/15/CobblerAndPuppet/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>検証用に VM をつくったり消したり、ってことをよくやるんですが、毎回毎回同じような設定をするのがいやなので、うちでは Cobbler + Puppet でこんな風にやってるよ、という例を紹介します。最近 KVM に移行しましたが、ブリッジの設定以外は、Xen でもほぼそのまま適用できると思います。</p>
+
+<p>VM 作成のざっくりとした流れは次のような感じで、3 ステップで完了します。まず koan コマンドで以下のように VM インストールします。</p>
+
+<pre><code>$ sudo koan --server localhost --virt --system=template --virt-name=test-vm
+</code></pre>
+
+<p>インストールが終わったら、VM を起動して、コンソールにアクセスします。</p>
+
+<pre><code>$ sudo virsh start test-vm
+$ sudo virsh console test-vm
+</code></pre>
+
+<p>puppet をインストールして、実行します。</p>
+
+<pre><code># yum -y install puppet
+# puppetd --server puppet.hoge.com --verbose --no-daemonize --onetime
+</code></pre>
+
+<p>この時点で、毎回 VM を作成するたびに行っている、以下のような設定が既に完了している、という状態となります。</p>
+
+<ul>
+<li>yum リポジトリの設定
+
+<ul>
+<li>dag, epel に加えて、自前リポジトリを参照するように設定。</li>
+</ul>
+</li>
+<li>NIC の設定
+
+<ul>
+<li>複数 NIC の環境で検証したいこともあるので、自動的に eth0 と eth1 の NIC を設定。</li>
+</ul>
+</li>
+<li>iptables を off
+
+<ul>
+<li>検証環境ではとりあえず必要ないので。</li>
+</ul>
+</li>
+<li>selinux を off
+
+<ul>
+<li>これも検証環境では必要ないので。</li>
+</ul>
+</li>
+<li>ntp の設定
+
+<ul>
+<li>検証によっては VM 間で時刻が正確に同期してる必要があるので。</li>
+</ul>
+</li>
+<li>最低限必要なパッケージのインストール。
+
+<ul>
+<li>zsh</li>
+<li>screen</li>
+<li>vim-enhanced</li>
+<li>perl-ack</li>
+<li>subversion</li>
+<li>git</li>
+</ul>
+</li>
+<li>/etc/sudoers の設定
+
+<ul>
+<li>基本的には root ログインしないので、sudo できるようにしておく。</li>
+</ul>
+</li>
+<li>nss_ldap/pam_ldap まわりの設定
+
+<ul>
+<li>LDAP アカウントで SSH ログインできるようにするのが主な目的。</li>
+<li>アカウントを各 VM で管理するのがイヤなので、LDAP サーバで集中管理してます。</li>
+</ul>
+</li>
+<li>autofs の設定
+
+<ul>
+<li>/home はファイルサーバをマウント。これにより、どの VM からも、/home が同じ内容で参照できる。</li>
+<li>メインマシンである Mac からもファイルサーバをマウントしており、どの VM を使うことになっても、プログラム書いたりするのがすべて Mac 上の emacs で完結できるのでとても楽。</li>
+</ul>
+</li>
+</ul>
+
+
+<p>以下、このようなことを、具体的にどのような設定で実現しているのか、ざっくりとですが説明します。</p>
+
+<hr />
+
+<h1>Cobbler まわりの設定</h1>
+
+<h2>Cobbler のインストールと設定</h2>
+
+<p>Cobbler サーバを立てて、インストール、設定を行います。ここの手順については省略。<a href="http://trac.mizzy.org/public/wiki/Cobbler">この辺</a> を参照してください。（ただ若干情報古いです。）</p>
+
+<h2>CentOS 5.4 の Cobbler へのインポート</h2>
+
+<pre><code>$ sudo cobbler import \
+  --mirror=rsync://ftp.jaist.ac.jp/pub/Linux/CentOS/5.4/os/x86_64/ \
+  --name=CentOS5.4-x86_64
+</code></pre>
+
+<h2>yum リポジトリの追加</h2>
+
+<p>cobbler repo add で、参照すべき yum リポジトリを追加します。</p>
+
+<pre><code>$ sudo cobbler repo add \
+  --name=CentOS5-epel \
+  --mirror=http://download.fedoraproject.org/pub/epel/5/x86_64/ \
+  --mirror-locally=N
+$ sudo cobbler repo add \
+  --name=CentOS5-dag \
+  --mirror=http://ftp.riken.jp/Linux/dag/redhat/el5/en/x86_64/dag/ \
+  --mirror-locally=N
+$ sudo cobbler repo add \
+  --name=CentOS5-mizzy \
+  --mirror=http://hoge.mizzy.org/yum/centos/5/x86_64/ \
+  --mirror-locally=N
+$ sudo cobbler reposync
+</code></pre>
+
+<h2>profile にリポジトリ追加</h2>
+
+<pre><code>$ sudo cobbler profile edit \
+  --name=CentOS5.4-x86_64 \
+  --repos="CentOS5-epel CentOS5-dag CentOS5-mizzy"
+</code></pre>
+
+<h2>bridge の設定</h2>
+
+<p><a href="http://trac.mizzy.org/public/wiki/KvmOnCentOS54">ここ</a> を参考に、br0 というブリッジインターフェースをまず作成。こいつを VM 上の eth0 のブリッジとして利用するように、template という名前の system を登録する。</p>
+
+<pre><code>$ sudo cobbler system add \
+  --name=template \
+  --profile=CentOS5.4-x86_64 \
+$ sudo cobbler system edit \
+  --name=template \
+  --interface=eth0 \
+  --virt-bridge=br0
+</code></pre>
+
+<p>また、libvirt 標準の virbr0 を eth1 のブリッジとして利用するように、system edit する。（eth1 は外と通信する必要がなく、 VM 同士でだけ通信できればいいので、virbr0 がそのまま使える。）</p>
+
+<pre><code>$ sudo cobbler system edit \
+  --name=template \
+  --interface=eth1 \
+  --virt-bridge=virbr0
+</code></pre>
+
+<p>（本当は system じゃなくて profile でやりたいけど、profile では複数のブリッジの設定ができないっぽいので。）</p>
+
+<h2>iptables/selinux の設定</h2>
+
+<p>Cobbler で参照してる kickstart ファイルに、以下のように設定するだけ。</p>
+
+<pre><code>firewall --disabled
+selinux --disabled
+</code></pre>
+
+<hr />
+
+<h1>Puppet マニフェスト</h1>
+
+<p>Puppet サーバを用意し、以下のようなマニフェスト作成。Puppet のインストールや設定については省略。</p>
+
+<h2>ntpd の設定</h2>
+
+<p>ntp パッケージをインストールして、ntpd を起動。</p>
+
+<pre><code>package { 'ntp': ensure =&gt; present }
+
+service { 'ntpd':
+    enable =&gt; true,
+    ensure =&gt; running,
+}
+</code></pre>
+
+<h2>必要なパッケージのインストール</h2>
+
+<p>この辺は kickstart で設定しても構わない。</p>
+
+<pre><code>package {
+    'zsh':
+        ensure =&gt; present;
+    'screen':
+        ensure =&gt; present;
+    'vim-enhanced':
+        ensure =&gt; present;
+    'perl-ack':
+        ensure =&gt; present;
+    'subversion':
+        ensure =&gt; present;
+    'subversion':
+        ensure =&gt; present;
+    'git-all':
+        ensure =&gt; '1.6.5.2-1';
+}
+</code></pre>
+
+<h2>/etc/sudoers の設定</h2>
+
+<p>あらかじめ作成しておいた /etc/sudoers を Puppet で配布。</p>
+
+<pre><code>package { 'sudo': ensure =&gt; installed }
+
+file { '/etc/sudoers':
+    source =&gt; "puppet://$server/dist/base/etc/sudoers",
+    mode   =&gt; 440,
+}
+</code></pre>
+
+<h2>nss_ldap/pam_ldap の設定</h2>
+
+<p>必要なパッケージインストール、NSS や PAM まわりの設定、nscd の起動なんかを行う。</p>
+
+<pre><code>package {
+    'nss_ldap':
+        ensure =&gt; present;
+    'openldap':
+        ensure =&gt; present;
+    'nscd':
+        ensure =&gt; present;
+}
+
+service { 'nscd':
+    enable  =&gt; true,
+    ensure  =&gt; running,
+    require =&gt; Package['nscd'],
+}
+
+file { '/etc/pam.d/system-auth-ac':
+    source =&gt; "puppet://$server/dist/base/etc/pam.d/system-auth-ac",
+}
+
+file { '/etc/nsswitch.conf':
+    source =&gt; "puppet://$server/dist/base/etc/nsswitch.conf",
+}
+
+file { '/etc/ldap.conf':
+    source =&gt; "puppet://$server/dist/base/etc/ldap.conf",
+}
+</code></pre>
+
+<h2>autofs の設定</h2>
+
+<p>必要なパッケージのインストール、portmap や autofs の起動、/etc/auto.master, /etc/auto.home の設定を行う。</p>
+
+<pre><code>package {
+    'autofs':
+        ensure =&gt; present;
+    'portmap':
+        ensure =&gt; present;
+    'nfs-utils':
+        ensure =&gt; present;
+}
+
+service { 'portmap':
+    enable  =&gt; true,
+    ensure  =&gt; running,
+    require =&gt; Package['portmap'],
+    before  =&gt; Service['autofs'],
+}
+
+service { 'autofs':
+    enable    =&gt; true,
+    ensure    =&gt; running,
+    require   =&gt; Package['autofs'],
+    subscribe =&gt; [ File['/etc/auto.master'], File['/etc/auto.home'] ],
+}
+
+file { '/etc/auto.master':
+    content =&gt; '/home /etc/auto.home',
+}
+
+file { '/etc/auto.home':
+    content =&gt; '* -fstype=nfs,soft,int,rsize=32768,wsize=32768,nosuid,nocache fileserver.hoge.com:/home/&amp;',
+}
+</code></pre>
+
+<hr />
+
+<p>上記のような感じで Cobbler や Puppet の環境を構築しておくと、最初に書いたとおり、以下のようなステップで、必要な設定がなされた VM の作成がさくっと完了します。</p>
+
+<pre><code>;; VM インストール
+$ sudo koan --server localhost --virt --system=template --virt-name=test-vm
+
+;; インストール後、起動してコンソールアクセス
+$ sudo virsh start test-vm
+$ sudo virsh console test-vm
+
+;; puppet インストールし/実行
+# yum -y install puppet
+# puppetd --server puppet.hoge.com --verbose --no-daemonize --onetime
+</code></pre>
+
+<p><a href="https://fedorahosted.org/cobbler/wiki/SupportForOtherDistros">ここを参照すると</a>、Cobbler は RedHat 系だけではなく、Debian, Ubuntu, SuSE あたりにも利用できるみたいなので、他の Linux ディストリビューションでも、同じような手順でいけそうですね。</p>
+
+<p>他の OS だとどうなんだろう？</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/07/TheArtofApplicationPerformanceTesting/">TheArtofApplicationPerformanceTesting</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-11-07T00:28:31+09:00" pubdate>Nov 7<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/11/07/TheArtofApplicationPerformanceTesting/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ご献本いただきました、<a href="http://www.oreilly.co.jp/books/9784873114248/">アート・オブ・アプリケーション パフォーマンステスト</a> をようやく読了しました。オライリー・ジャパン様、<a href="http://d.hatena.ne.jp/stanaka/">id:stanaka</a> さん、ありがとうございます。</p>
+
+<p>アプリケーションのパフォーマンステストって、せいぜいウェブアプリに対して ab で負荷かけてみるとか、JMeter つかってみるとか、そんな程度のことしかやったことなくて、ツールそのものの使い方なんかは調べれば出てくるけど、こういったツールを使って、正しくパフォーマンスを測定するためには、どのように環境を整えればいいのか、とか、どういったテストプランを立てればいいのかとか、立てたプランをどのように実行すればいいのか、とか、結果をどのように分析すればいいのか、といったことは、ググってもまったく出てこないわけですが、本書はまさに、こういったことに対する系統だった知識を与えてくれます。</p>
+
+<p>逆に言うと、具体的なツールについてはほとんど触れられておらず、付録にツールの一覧が載っているのみ、となっています。</p>
+
+<p>というわけで、主に「考え方」にフォーカスしていて、すぐに実践で使える、という内容にはなっていません。また、出てくる事例なんかを見ても、著者はエンタープライズな Windows 環境での経験が豊富な方のようで、個人ユーザ向けに Linux サーバでサービス提供しているようなペパボのような会社には、本書の内容をそのまますぐに適用するのは難しそうな印象を受けました。</p>
+
+<p>とはいうものの、本書の「はじめに」で書かれている、「ほとんどのアプリケーションの多くは、スケーラビリティとパフォーマンスについてのテストが適切になされずに稼働している。」というのは、ペパボもまさにそうであり、パフォーマンステストが十分になされず、リリースしてみたらパフォーマンスが思ったように出ない、といったことも正直あったりして、反省させられました。本書をきっかけに、開発プランの中に適切なパフォーマンステストをどのように組み込み、どのように実践していけばいいのか、検討していきたいと思いました。そのための指針として、単なるツールの使い方を示すような上辺だけの方法論ではなく、ベースとなる考え方をしっかりと提示してくれている本書は、今後とても役立つのではないかと感じています。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/10/31/KvmOnCentOS54/">KvmOnCentOS54</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-10-31T11:40:59+09:00" pubdate>Oct 31<span>st</span>, 2009</time>
+        
+         | <a href="/blog/2009/10/31/KvmOnCentOS54/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>CentOS 5.4 から KVM が正式にサポートされたようなので、試してみた。</p>
+
+<h1>KVM が動く環境をつくる</h1>
+
+<p>まずは既存の 5.3 環境から 5.4 にアップグレード。</p>
+
+<pre><code>$ sudo yum -y upgrade
+</code></pre>
+
+<p>不要になった kernel-xen は削除。</p>
+
+<pre><code>$ sudo yum -y remove kernel-xen
+</code></pre>
+
+<p>kmod-kvm, kvm をインストール。</p>
+
+<pre><code>$ sudo yum -y install kmod-kvm kvm
+</code></pre>
+
+<p>/boot/grub/menu.lst 修正。</p>
+
+<pre><code>title CentOS (2.6.18-164.el5)
+    root (hd0,0)
+    kernel /vmlinuz-2.6.18-164.el5 ro root=/dev/vg00/lv_root vga=773
+    initrd /initrd-2.6.18-164.el5.img
+</code></pre>
+
+<p>再起動する。</p>
+
+<h1>Cobbler + Koan での VM 作成</h1>
+
+<p>今まで Xen をつかっていて、Cobbler + Koan で VM をつくっていたが、KVM でも同じ手順でできるはず、ってことで koan コマンド実行してみた。</p>
+
+<pre><code>$ sudo koan --server localhost --virt --profile=FC11-x86_64 --virt-name=fc11-kvm
+- looking for Cobbler at http://localhost/cobbler_api
+- reading URL: http://192.168.10.11/cblr/svc/op/ks/profile/FC11-x86_64
+install_tree: http://192.168.10.11:80/cblr/links/FC11-x86_64
+libvirtd (pid  3681) is running...
+- using qemu hypervisor, type=kvm
+Fri, 30 Oct 2009 17:37:07 DEBUG    No conn passed to Guest, opening URI 'qemu:///system'
+Fri, 30 Oct 2009 17:37:07 DEBUG    DistroInstaller location is a network source.
+libvir: QEMU error : Domain not found: no domain with matching name 'fc11-kvm'
+- adding disk: /opt/qemu//fc11-kvm-disk0 of size 5
+
+... 中略 ...
+
+libvir: QEMU error : internal error Failed to add tap interface 'vnet%d' to bridge 'xenbr0' : No such device
+
+... 以下略 ...
+</code></pre>
+
+<p>type=kvm と表示されているので、KVM が使われているようだが、エラーに。</p>
+
+<p>Xen ではないため、xenbr0 が存在しないが、Xen の時の設定が Cobbler に残っていた。</p>
+
+<p>libvirt が生成する virbr0 というブリッジインターフェースが存在するが、外部との接続ができないようなので、新たにブリッジインターフェースを作成することにした。</p>
+
+<p>まずは /etc/sysconfig/network-scripts/ifcfg-br0 を作成。</p>
+
+<pre><code>DEVICE=br0
+TYPE=Bridge
+BOOTPROTO=dhcp
+ONBOOT=yes
+</code></pre>
+
+<p>/etc/sysconfig/network-scripts/ifcfg-eth0 に以下を追加。</p>
+
+<pre><code>BRIDGE=br0
+</code></pre>
+
+<p>ネットワーク再起動する。</p>
+
+<pre><code>$ sudo /etc/init.d/network restart
+</code></pre>
+
+<p>これで br0 ができるので、br0 を使うように cobbler コマンドで設定する。</p>
+
+<pre><code>$ sudo cobbler profile edit --name=FC11-x86_64 --virt-bridge=br0
+</code></pre>
+
+<p>ついでに、CUI からコンソール接続できるように、この profile で利用している /var/lib/cobbler/kickstarts/sample.ks の bootloader 行を以下のように修正。</p>
+
+<pre><code>bootloader --location=mbr --append="console=tty0 console=ttyS0,115200"
+</code></pre>
+
+<p>再度 koan を実行して VM 作成。</p>
+
+<pre><code>$ sudo koan --server localhost --virt --profile=FC11-x86_64 --virt-name=fc11-kvm
+</code></pre>
+
+<p>状態確認。</p>
+
+<pre><code>$ sudo virsh list --all                                            
+ Id Name                 State
+----------------------------------
+ 10 fc11-kvm             running
+</code></pre>
+
+<p>インストールが終わると、shut off になる。</p>
+
+<pre><code>$ sudo virsh list --all
+ Id Name                 State
+----------------------------------
+  - fc11-kvm             shut off
+</code></pre>
+
+<p>起動する。</p>
+
+<pre><code>$ sudo virsh start fc11-kvm
+</code></pre>
+
+<p>コンソール接続してみる。</p>
+
+<pre><code>$ sudo virsh console fc11-kvm
+Connected to domain fc11-kvm
+Escape character is ^]
+?G      Welcome to Fedora 
+        Press 'I' to enter interactive startup.
+Starting udev: G[  OK  ]
+Setting hostname h029.southpark:  [  OK  ]
+mdadm: No arrays found in config file or automatically
+Setting up Logical Volume Management:   2 logical volume(s) in volume group "vg_h029" now active
+
+... 中略 ...
+
+Fedora release 11 (Leonidas)
+Kernel 2.6.29.4-167.fc11.x86_64 on an x86_64 (/dev/ttyS0)
+
+h029.southpark login: 
+</code></pre>
+
+<h1>ディスク追加してみる</h1>
+
+<p>イメージファイル作成。</p>
+
+<pre><code>$ sudo qemu-img create /opt/qemu/fc11-kvm-disk1 8G
+</code></pre>
+
+<p>disk.xml を以下の内容で作成。</p>
+
+<pre><code>&lt;disk type='file' device='disk'&gt;
+  &lt;source file='/opt/qemu/fc11-kvm-disk1'/&gt;
+  &lt;target dev='vdb' bus='virtio' /&gt;
+&lt;/disk&gt;
+</code></pre>
+
+<p>追加する。</p>
+
+<pre><code>$ sudo virsh attach-device fc11-kvm disk.xml
+Device attached successfully
+</code></pre>
+
+<p>これで /dev/vdb が VM から見えるようになる。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/10/18/ScalaObjectCloning/">ScalaObjectCloning</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-10-18T11:51:50+09:00" pubdate>Oct 18<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/10/18/ScalaObjectCloning/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.amazon.co.jp/dp/4797327030/">Java言語で学ぶデザインパターン入門</a> の第6章 Prototype を <a href="http://github.com/mizzy/scala-design-patterns/tree/master/Prototype/">Scala で書き直してみて</a>、オブジェクトのクローニングでちょっとつまづいたのでメモ。</p>
+
+<p>結論を先に言うと、オブジェクトのクローニングしたい場合には、クラスやトレイトの宣言時に、@cloneable アノテーションを入れると OK。</p>
+
+<pre><code>@cloneable class Hoge {
+  ...
+}
+</code></pre>
+
+<p>以下、つまづいて調べた経緯。元書籍での Product クラスは以下のように、Cloneable を継承している。</p>
+
+<pre><code>#!java
+package framework;
+
+public interface Product extends Cloneable {
+    public abstract void use(String s);
+    public abstract Product createClone(); 
+}
+</code></pre>
+
+<p>で、Scala でのクローニングについて、「Scala cloneable」でググると、一番上に出てきた http://www.scala-lang.org/node/110 では、以下のようなコードが載っていた。</p>
+
+<pre><code>trait Cloneable extends java.lang.Cloneable {
+  override def clone(): Cloneable = { super.clone(); this }
+}
+trait Resetable {
+  def reset: Unit
+}
+</code></pre>
+
+<p>これを参考にして、Product クラスを Scala で以下のように書き直してみた。</p>
+
+<pre><code>package framework
+
+trait Product extends java.lang.Cloneable {
+  def use(s: String): Unit
+  def createClone(): Product
+  override def clone(): Cloneable = { super.clone(); this }
+}
+</code></pre>
+
+<p>これでとりあえずは動いたんだけど、いまいちスッキリしない。そもそも Scala は Java だけではなく、.NET でも動くということなんだけど、java.lang.Cloneable を継承してると、Java でしか動かなくてイマイチ。（まあ、習作用コードでそこまで気にする必要もないんだけど。）</p>
+
+<p>というわけで調べてみたら、@cloneable アノテーションを使えばいいみたい。</p>
+
+<pre><code>package framework
+
+@cloneable trait Product {
+  def use(s: String): Unit
+  def createClone(): Product
+}
+</code></pre>
+
+<p>これで意図通りに動いた。</p>
+
+<p>@cloneable を頭に入れないと、実行時に CloneNotSupportedException が発生する。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/6/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/4/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

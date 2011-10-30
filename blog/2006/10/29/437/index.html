@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Text::Trac のバグフィックス・機能追加とテスト駆動開発 - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="rt.cpan.org でバグレポートと機能追加要望があがっていたので、久々に Text::Trac に手を入れました。 バグフィックスしたものは 0.05 としてアップしてあります。また、新機能として Trac Links と Wiki Macros をサポートしたものは、svn &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2006/10/29/437">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Text::Trac のバグフィックス・機能追加とテスト駆動開発</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-29T20:47:00+09:00" pubdate>Oct 29<span>th</span>, 2006</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>
+rt.cpan.org でバグレポートと機能追加要望があがっていたので、久々に <a class="ext-link" href="http://search.cpan.org/~mizzy/Text-Trac/lib/Text/Trac.pm"><span class="icon"></span>Text::Trac</a> に手を入れました。
+</p>
+
+
+<p>
+バグフィックスしたものは 0.05 としてアップしてあります。また、新機能として <a class="ext-link" href="http://trac.mizzy.org/public/wiki/TracLinks"><span class="icon"></span>Trac Links</a> と <a class="ext-link" href="http://trac.mizzy.org/public/wiki/WikiMacros"><span class="icon"></span>Wiki Macros</a> をサポートしたものは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Text-Trac/"><span class="icon"></span>svn リポジトリ</a>に置いてあります。リクエストしてくれた方の確認後、問題なければ CPAN にアップ予定です。
+</p>
+
+
+<p>
+今回のこのバグフィックスと機能追加で、TDD のありがたさを改めて実感しました。
+</p>
+
+
+<p>
+バグについては一度修正して、報告者に確認をお願いしたのですが、まだバグが残っている状態でした。すると今度は報告者の方が、テストを書いて送ってくれたのですが、これが大いに役に立ちました。テストがあると、どこにどういったバグがあるのか、make test （あるいは prove コマンド）一発でわかるので、言葉で説明してもらうよりも明確ですし、バグ確認後、fail したテスト（と他のテスト）全てが通るようにプログラムに修正を施していけばいいわけで、やることが明確になって作業がスムーズにできました。
+</p>
+
+
+<p>
+自分も今後バグレポートする際には、テストとセットでレポートするようにします。
+</p>
+
+
+<p>
+新機能の追加についても、ひとつの機能毎にテストを書く、実装する、テスト動かして確認、修正する、というサイクルで作業していたのですが、コマンド一発でテストができると、全体の流れを途切れさせることなく、集中力を保ったまま作業ができていいですね。
+</p>
+
+
+<p>
+これを機に Text::Trac のテストを Test::More から Test::Base へ移行したのですが、Test::Base で DRY にテストが書けると、更に全体の流れがよくなり、非常に気持ちよく作業ができます。Test::Base 最高。
+</p>
+
+
+<p>
+Test::Base をご存知ない方は、<a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200610.html"><span class="icon"></span>Shibuya.pm テクニカルトーク #7</a> の <a class="ext-link" href="http://blog.bulknews.net/mt/archives/Test-Base.pdf"><span class="icon"></span>宮川さんの発表資料（PDF）</a> を是非ご覧下さい。
+</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2006-10-29T20:47:00+09:00" pubdate>Oct 29<span>th</span>, 2006</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2006/10/29/437/" data-via="" data-counturl="http://mizzy.org/blog/2006/10/29/437/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2006/10/25/503/" title="Previous Post: HTML::Widget::Kwalify #2">&laquo; HTML::Widget::Kwalify #2</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2006/11/03/275/" title="next Post: 京都に行ってきます">京都に行ってきます &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2006/10/29/437';
+        var disqus_url = 'http://mizzy.org/blog/2006/10/29/437';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

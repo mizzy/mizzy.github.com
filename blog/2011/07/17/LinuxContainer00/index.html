@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>LinuxContainer00 - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="Make and install lxc rpm packages The spec file for lxc is included in lxc source code.So you can make rpm packages of lxc easily. # yum -y update &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2011/07/17/LinuxContainer00">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">LinuxContainer00</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-07-17T16:33:08+09:00" pubdate>Jul 17<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Make and install lxc rpm packages</h1>
+
+<p>The spec file for lxc is included in lxc source code.So you can make rpm packages of lxc easily.</p>
+
+<pre><code># yum -y update kernel
+# reboot
+# yum -y install rpm-build libcap-devel docbook-utils kernel-devel gcc make
+# wget http://lxc.sourceforge.net/download/lxc/lxc-0.7.4.2.tar.gz
+# tar zxvf lxc-0.7.4.2.tar.gz
+# mkdir -p ~/rpmbuild/SOURCES
+# cp lxc-0.7.4.2.tar.gz ~/rpmbuild/SOURCES
+# chown root:root lxc-0.7.4.2/lxc.spec
+# rpmbuild -ba lxc-0.7.4.2/lxc.spec --define 'ksrc /usr/src/kernels/`uname -r`'
+# rpm -Uvh ~/rpmbuild/RPMS/x86_64/lxc-0.7.4.2-1.x86_64.rpm
+</code></pre>
+
+<hr />
+
+<h1>Check whether this os is lxc ready or not</h1>
+
+<p>All statuses should be &#8220;enabled&#8221;.</p>
+
+<pre><code># lxc-checkconfig 
+Kernel config /proc/config.gz not found, looking in other places...
+Found kernel config file /boot/config-2.6.32-131.2.1.el6.x86_64
+--- Namespaces ---
+Namespaces: enabled
+Utsname namespace: enabled
+Ipc namespace: enabled
+Pid namespace: enabled
+User namespace: enabled
+Network namespace: enabled
+Multiple /dev/pts instances: enabled
+
+--- Control groups ---
+Cgroup: enabled
+Cgroup namespace: enabled
+Cgroup device: enabled
+Cgroup sched: enabled
+Cgroup cpu account: enabled
+Cgroup memory controller: enabled
+Cgroup cpuset: enabled
+
+--- Misc ---
+Veth pair device: enabled
+Macvlan: enabled
+Vlan: enabled
+File capabilities: enabled
+enabled
+</code></pre>
+
+<hr />
+
+<h1>Quick Start</h1>
+
+<p>In the man of lxc, you can get how to start lxc quickly.</p>
+
+<pre><code>QUICK START
+       You are in a hurry, and you don’t want to read this man page. Ok, with-
+       out warranty, here are the commands to launch a  shell  inside  a  con-
+       tainer   with   a  predefined  configuration  template,  it  may  work.
+       /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/
+       lxc-macvlan.conf /bin/bash
+</code></pre>
+
+<p>But before running lxc-execute, you should mount croup.</p>
+
+<pre><code># mount -t cgroup cgroup /cgroup
+# /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/lxc-macvlan.conf /bin/bash
+</code></pre>
+
+<p>In the container, processes are like this.</p>
+
+<pre><code># ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 10:54 ttyS0    00:00:00 /usr/lib64/lxc/lxc-init -- /bin/
+root         2     1  0 10:54 ttyS0    00:00:00 /bin/bash
+root        11     2  0 10:55 ttyS0    00:00:00 ps -ef
+</code></pre>
+
+<p>You can also see the processes in the container from the outside of the container.</p>
+
+<pre><code># lxc-ps --name=foo
+CONTAINER    PID TTY          TIME CMD
+foo         1654 ttyS0    00:00:00 lxc-init
+foo         1656 ttyS0    00:00:00 bash
+</code></pre>
+
+<p>The sample lxc conf is like this.</p>
+
+<pre><code># cat /usr/share/doc/lxc/examples/lxc-macvlan.conf 
+# Container with network virtualized using the macvlan device driver
+lxc.utsname = alpha
+lxc.network.type = macvlan
+lxc.network.flags = up
+lxc.network.link = eth0
+lxc.network.hwaddr = 4a:49:43:49:79:bd
+lxc.network.ipv4 = 1.2.3.4/24
+lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
+</code></pre>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2011-07-17T16:33:08+09:00" pubdate>Jul 17<span>th</span>, 2011</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2011/07/17/LinuxContainer00/" data-via="" data-counturl="http://mizzy.org/blog/2011/07/17/LinuxContainer00/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/07/12/DotCloudCliSourceCodeReading00/" title="Previous Post: DotCloudCliSourceCodeReading00">&laquo; DotCloudCliSourceCodeReading00</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/" title="next Post: HowDotCloudLazyCopyImplementsCopyOnWrite">HowDotCloudLazyCopyImplementsCopyOnWrite &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

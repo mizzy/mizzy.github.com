@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>デブサミ出張 Shibuya イベントの補足 - mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="デブサミ発表資料中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。 テストプラグインのコードはこの様になっています。 package Assurer::Plugin::Test::SMTP; use strict &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/2007/02/17/386">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">デブサミ出張 Shibuya イベントの補足</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-17T20:57:00+09:00" pubdate>Feb 17<span>th</span>, 2007</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/archives/assurer_devsumi.pdf"><span class="icon"></span>デブサミ発表資料</a>中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。
+</p>
+
+
+<p>
+テストプラグインのコードはこの様になっています。
+</p>
+
+
+<pre class="wiki">
+package Assurer::Plugin::Test::SMTP;
+
+use strict;
+use warnings;
+<span style="color: blue;">use base qw( Assurer::Plugin::Test ); #(A)</span>
+<span style="color: blue;">use Assurer::Test; #(B)</span>
+use Net::SMTP;
+<div style="color: blue;">
+sub register {
+    my $self = shift;
+    $self->register_tests( qw/ connect / );          #(C)
+}
+</div>
+sub connect {
+    my ( $self, $context, $args ) = @_;
+
+    my $conf = $self->conf;
+
+    my $host     = $conf->{host}     || $context->conf->{host};
+    my $timeout  = $conf->{timeout}  || 10;
+
+    my $smtp = Net::SMTP->new(Host => $host, Timeout => $timeout);
+    <span style="color: blue;">ok($smtp, "smtp ok $host"); #(D)</span>
+}
+
+1;
+</pre>
+
+
+<p>
+青字の部分が、プラグインを書く際のお約束というかポイントとなる部分なので、順に説明していきます。
+</p>
+
+
+<p>
+(A) では Assurer::Plugin::Test を継承しているわけですが、テストプラグイン共通の処理はすべて Assurer::Plugin::Test に記述することにより、各プラグインでのコード量を減らそうという目論見になってます。
+</p>
+
+
+<p>
+(B) で Assurer::Test を use することより、ok(), is(), like() といったテスト用メソッドをインポートしています。
+</p>
+
+
+<p>
+(C) ではテストを行うメソッドを登録しています。複数登録する場合には、
+</p>
+
+
+<pre class="wiki">
+$self->register_tests( qw/ test1 test2 test3 / ); 
+</pre>
+
+
+<p>
+といった記述をします。この場合、test1(), test2(), test3() の順で実行されます。
+</p>
+
+
+<p>
+(D) が実際にテストを行っているところで、Test::More の ok() と同じ動作をします。この ok() は上で書いたように、Assurer::Test からインポートしたメソッドです。このような組み込みのテストメソッドを使うことで、if 文で結果を判断して適切なステータスを返す、といった処理を書く必要がなくなります。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://blog.nomadscafe.jp/archives/000713.html"><span class="icon"></span>kazeburo さんの発表</a>にある、Nagios プラグインと対比してみると、Nagios は exit 時のステータスコードだけ気にすればいい、というのに対して、Assurer では、上のコード (A), (B), (C) の様に、Assurer 特有のお約束を守る必要があるものの、exit コードは気にしなくていい、といった特徴があります。また、お約束を守ることによってコード量も減らせます。（特に結果判定で if を書かなくていい。）
+</p>
+
+
+<p>
+Nagios の場合、ステータスコードだけ気にすればいい、とは言っても、ステータスが OK, Warning, Crtitical, Unknown とあるわけで、OK はまだしも、どういった場合が Warning でどういった場合が Critical なのか、ということを気にするのは、ちょっと面倒な気もします。
+</p>
+
+
+<p>
+また、結果を受け取る側も、Warning とか Unknown とか受け取ると、それって問題あるの？ないの？って迷ったりしないのかな、とか、Warning と Critical の解釈って、人によって違うんじゃないかな、って思ったりします。（Nagios使ったことないんで、変なこと言ってるかもしれませんが。）
+</p>
+
+
+<p>
+そういった曖昧さをなくしたくて、Assurer では OK か NOT OK かの2種類の結果しか返さない、というポリシーにしました。
+</p>
+
+
+<p>
+とは言っても、Nagios の様にステータスが何種類かある方が便利だという場面はあるんでしょうね。その辺りは Assurer では、エラーメッセージでフィルタリングできるようにして、「こういったエラーメッセージの場合は、問題ないから OK にする」といった設定ができるような形にして、結果の解釈を利用者に委ねられるようにしようと考えています。
+</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gosuke Miyashita</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2007-02-17T20:57:00+09:00" pubdate>Feb 17<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2007/02/17/386/" data-via="" data-counturl="http://mizzy.org/blog/2007/02/17/386/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2007/02/14/314/" title="Previous Post: デブサミ出張 Shibuya イベント">&laquo; デブサミ出張 Shibuya イベント</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2007/02/24/375/" title="next Post: Plagger で Yahoo!Booksのランキングをとってくる">Plagger で Yahoo!Booksのランキングをとってくる &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mizzy.org/blog/2007/02/17/386';
+        var disqus_url = 'http://mizzy.org/blog/2007/02/17/386';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

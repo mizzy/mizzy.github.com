@@ -1,0 +1,1014 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="うちでは 公開用 trac の他に、プライベートな trac もあって、Wiki をメモ代わりにしたり、Tickets で TODO 管理（プログラミングとか関係なく、日常のこととかも）してたりします。 で、TODO 管理は Milestone でおおざっぱにカテゴリつくっていて、View &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/21">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/03/285/">View Tickets のデフォルトを変える (Trac Tips #1)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-03T03:49:00+09:00" pubdate>Sep 3<span>rd</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/03/285/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+うちでは <a class="ext-link" href="http://trac.mizzy.org/public/"><span class="icon"></span>公開用 trac</a> の他に、プライベートな trac もあって、Wiki をメモ代わりにしたり、Tickets で TODO 管理（プログラミングとか関係なく、日常のこととかも）してたりします。
+</p>
+
+
+<p>
+で、TODO 管理は Milestone でおおざっぱにカテゴリつくっていて、View Tickets ではカテゴリ別に未消化チケットを見るために 『<a class="report" href="/report/3">{3}</a> All Tickets by Milestone』を見ることが多いので、このページをデフォルトにしようと思ったら、どこをカスタマイズしていいか分からずに意外と手間取ったので、ここにもメモしておきます。
+</p>
+
+
+<p>
+と言っても、わかってしまえば単純で、/usr/local/lib/python2.4/site-packages/trac/ticket/report.py をいじるだけです。（最初は /usr/local/share/trac/templates にあたりをつけてカスタマイズ法を探っていたので、結構時間かかりました…）
+</p>
+
+
+<p>
+70 行目付近に以下の様な記述があります。
+（ちなみにうちで使ってる trac のバージョンは 0.9.2 です。）
+</p>
+
+
+<pre class="wiki">
+    def get_navigation_items(self, req):
+        if not req.perm.has_permission('REPORT_VIEW'):
+            return
+        yield 'mainnav', 'tickets', '<a href="%s">View Tickets</a>' \
+              <strong>% util.escape(self.env.href.report())</strong>
+</pre>
+
+
+<p>
+この太字の行を次の様に変えてやれば OK です。
+</p>
+
+
+<pre class="wiki">
+              <strong>% util.escape(self.env.href.report(3))</strong>
+</pre>
+
+
+<p>
+『<a class="report" href="/report/1">{1}</a> Active Tickets』をデフォルトにしたい場合にはこんな感じで。
+</p>
+
+
+<pre class="wiki">
+              <strong>% util.escape(self.env.href.report(1))</strong>
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060816/1155663714"><span class="icon"></span>宮川さんの様に</a> Query をデフォルトにしたい場合にはこんな感じで。
+</p>
+
+
+<pre class="wiki">
+              <strong>% util.escape(self.env.href.query())</strong>
+</pre>
+
+
+<p>
+この辺りのカスタマイズ方法って、どこかにまとまってたりしないのかな？
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/31/454/">Plagger::Plugin::Filter::FFmpeg #4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-31T12:37:00+09:00" pubdate>Aug 31<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/31/454/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/ffmpeg03.html#comments"><span class="icon"></span>こちらのエントリのコメント</a> にて、sumikawa さんより Filter::FFmpeg の PSP での動作報告や、パッチなどを頂きました。ありがとうございます！
+</p>
+
+
+<p>
+早速頂いたパッチをとりこんで、rewrite_filename オプションでファイル名の書き換えができるようにしたのですが、Publish::Feed のような形でファイル名を指定できるほうがいいかな、と思い <a class="ext-link" href="http://trac.mizzy.org/public/changeset/253"><span class="icon"></span>修正してみました</a>。
+</p>
+
+
+<pre class="wiki">
+  - module: Filter::FFmpeg
+    config:
+      dir: /home/miya/mov
+      filename: %t.m4v
+</pre>
+
+
+<p>
+といった形で指定すると、ffmpeg を通した後のファイル名が &#8220;entry title.m4v&#8221; といった形になります。filename が指定されていると、ext オプションで指定した拡張子は無視しますので、filename オプションには拡張子も入れてください。
+</p>
+
+
+<p>
+<del> このオプションのための gen_filename() や safe_filename() などは、Publish::Feed からコピペしてるのですが、ファイルに Publish する系統の他のいくつかプラグインでも、同様にコピペされてて DRY じゃないので、Plagger::Util あたりで実装するといいんじゃないかな、と思いました。（irc#plagger-ja でも同様のことを書いたのですが、宮川さんが見てない可能性もあるので、ここでも書いときます。）</del>
+</p>
+
+
+<p>
+また、entry は enclosure を複数持てるのですが、そこを考慮していないつくりになっていたので、複数の enclosure に対応できるようにもしました。（enclosure 変換のための hook を追加予定らしいので、そうなるとプラグイン側はこの辺り考慮しなくてよくなると思いますが。）
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+gen_filename() ですが、Plagger::Util::filename_for() というものがある、と 33rpm さんより教えていただきました。ありがとうございます！というわけで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/254"><span class="icon"></span>対応させてみました</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/30/492/">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-30T02:39:00+09:00" pubdate>Aug 30<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/30/492/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://search.cpan.org/~mizzy/FFmpeg-Command-0.04/"><span class="icon"></span>FFmpeg-Command-0.04</a> を CPAN にアップしました。（これ書いてる時点ではまだ反映されてませんが。）
+</p>
+
+
+<p>
+デフォルトで ffmpeg に渡す -vcodec オプションの値は h264 にしてたのですが、これで変換すると iTunes には取り込めるけど iPod には取り込めない、という報告があったので、デフォルトを h264 から mpeg4 に変更しました。mpeg4 であれば問題なく取り込めた、とのことです。
+</p>
+
+
+<p>
+おそらく、携帯動画変換君付属の ffmpeg なら h264 でも大丈夫だと思うのですが、Linux 上で自前ビルドした ffmpeg ではだめなようです。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://lists.mplayerhq.hu/pipermail/ffmpeg-user/2006-January/001997.html"><span class="icon"></span>この辺りが関係あるのかな？</a>
+</p>
+
+
+<p>
+あと、PSP は再生できるのかどうかすらもわかりません。動作報告求む。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://www.konami.jp/kojima_pro/e3_2006/"><span class="icon"></span>METAL GEAR SOLID PORTABLE OPS</a> が出ることだし、PSP 買っちゃおうかなー…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/28/297/">Filter::Audio #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-28T23:49:00+09:00" pubdate>Aug 28<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/28/297/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+IRC #plagger-ja チャネルにて、音量や音質のノーマライズの話が出てて、「Filter::Audio で当然サポートするよね？」という声が聞こえた気がした（誰もそんなこと言ってない）ので、<a class="ext-link" href="http://sox.sourceforge.net/"><span class="icon"></span>SoX</a> で音量をノーマライズする様に <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> を修正してみた。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/247"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+利用には当然 SoX が必要で、環境変数 PATH 内にある必要があります。やってることは単純で、
+</p>
+
+
+<pre class="wiki">
+      normalize: 1
+</pre>
+
+
+<p>
+が設定されていると、
+</p>
+
+
+<pre class="wiki">
+my $vol = `sox $converted_file_before_move -e stat -v 2&lt;&amp;1`;
+</pre>
+
+
+<p>
+で Volume Adjustment を取得して、
+</p>
+
+
+<pre class="wiki">
+system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
+</pre>
+
+
+<p>
+で音量変更してます。
+</p>
+
+
+<p>
+動いてることは確認したけど、ちゃんとノーマライズされてるかどうかは確認してないす。（今変換中。結構時間かかる。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/28/474/">Filter::Audio #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-28T22:15:00+09:00" pubdate>Aug 28<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/28/474/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> を色々修正しました。機能追加ではなくあくまでも修正です。うまく動かないところとかあったので。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/246"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+<strong>#plagger-ja にて課せられた（と勝手に自分が思っている）宿題</strong>
+</p>
+
+
+<ul><li>音量/音質の均一化</li></ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/27/419/">Filter::Audio #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-27T17:38:00+09:00" pubdate>Aug 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/27/419/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060827/1156610704"><span class="icon"></span>Convert Apache index to Podcasts</a> とか <a class="ext-link" href="http://www.hsbt.org/diary/20060827.html#p03"><span class="icon"></span>RubyKaigi2006の音声ファイルをPlaggerで色々</a> を見て、音声ファイル変換用のプラグインがあれば便利かな、と思い、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> をつくってみました。
+</p>
+
+
+<p>
+宮川さんの設定に以下の様な内容を追加すれば、ローカルにダウンロード、mp3 へ変換して PodCasting できます。
+</p>
+
+
+<pre class="wiki">
+  - module: Filter::FetchEnclosure
+    config:
+      dir: /home/miya/audio
+  - module: Filter::Audio
+    config:
+      dir: /home/miya/audio
+      from: ogg
+      to: mp3
+  - module: Filter::RewriteEnclosureURL
+    config:
+      rewrite:
+        - local: /home/miya/audio/
+          url:   http://mizzy.org/audio/
+</pre>
+
+
+<p>
+Filter::Audio は <a class="ext-link" href="http://search.cpan.org/~mhooreman/Audio-ConvTools-0.06/lib/Audio/ConvTools.pm"><span class="icon"></span>Audio::ConvTools</a> に依存しているのですが、ogg -> mp3 への変換は oggenc と lame が必要です。oggenc はともかく、lame はライセンス的に微妙なんですよね。（詳しくはよく知らないのですが。）
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+ffmpeg が &#8211;enable-libogg と &#8211;ebale-mp3lame つきでコンパイルされていれば、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Filter::FFmpeg</a> でも ogg -> mp3 変換できそう。なのでわざわざ Filter::Audio つくらなくてもよかった。うちの環境では。
+</p>
+
+
+<p>
+<strong>TODO</strong><br />
+</p>
+
+
+<ul><li><a class="ext-link" href="http://search.cpan.org/~dbp/Ogg-Vorbis-Header-0.03/Header.pm"><span class="icon"></span>Ogg::Vorbis::Header</a> とか <a class="ext-link" href="http://search.cpan.org/~daniel/MP3-Info-1.20/Info.pm"><span class="icon"></span>MP3::Info</a> とか使って、メタ情報の取得やセットができるようになると更に良さそう。</li>
+<li>config: from は設定しなくても、拡張子とかから自動判断させるようにするといいかな。</li></ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/26/396/">Plagger::Rule::Ahead</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-26T23:47:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/26/396/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Plagger の Rule まわりの実装は今までちゃんと見たことなかったので、勉強も兼ねて <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Ahead.pm"><span class="icon"></span>Plagger::Rule::Ahead</a> を実装してみた。 前エントリの <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FutureEvents.pm"><span class="icon"></span>Filter::FutureEvents</a> と同様のことを、Rule ベースで実現します。現在時刻よりも<strong>後</strong>に発生するイベントを持つエントリを抽出、ということで Ahead という名前にしてみました。イベントを持っていないエントリの場合には、エントリの更新時刻をチェックします。
+</p>
+
+
+<p>
+Filter::FutureEvents も Rule::Ahead も <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Event.pm"><span class="icon"></span>Plagger::Event</a> があることを前提としてるので、そのままでは 本家 trunk では動作しません。ご注意を。
+</p>
+
+
+<p>
+ 
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/26/280/">Filter::FutureEvents</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-26T13:24:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/26/280/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/plagger_event.html"><span class="icon"></span>このエントリ</a> の様な感じで、iCal データに時刻も入れたところ、ちゃんと Google Calendar で通知メールが来るようになりました。が、Google Calendar では終日イベントは背景がキレイに色づけされるのに、時刻が指定されたイベントは背景が色づけされないんですよね。こんな感じで。 
+</p>
+
+
+<p>
+<img src="http://mizzy.org/img/events.jpg" alt="Google Calendar" />
+</p>
+
+
+<p>
+「歯医者」とあるのが時刻指定イベント。それ以外は終日イベントで青が本、緑が音楽、赤が休日。
+</p>
+
+
+<p>
+やっぱ見た目重要なので、iCal データに時刻を入れるのはやめることに。というわけで昨日の作業は無意味に終りました。（いや、収穫もありましたよ、たぶん…）
+</p>
+
+
+<p>
+そうなると、今度は Google Calendar が通知メール出してくれない、とふりだしに戻るわけですが、それ Pla(ry ってことで、Plagger でやることに。
+</p>
+
+
+<p>
+イベント通知となると、「今から1日以内に発生するイベントを通知する」といった感じになるわけですが、この「1日以内に発生するイベント」という条件でフィルタするためのプラグインが要るな、というわけで、 <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FutureEvents.pm"><span class="icon"></span>Filter::FutureEvents</a> というものを作ってみました。duration のパースなんかは Rule::Fresh を参考にしています。
+</p>
+
+
+<p>
+これを CustomFeed::AmazonWebService, Publish::Gmail と組み合わせて、深夜とか早朝に cron で動かしておけば、その日に発売される商品情報がメールで届く、ということが実現できます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/26/324/">Plagger::Event</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-26T01:32:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/26/324/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/?topic=/program/amazon2ical"><span class="icon"></span>Amazon2iCal</a> で、本やCDなんかの発売日に Google Calendar でメール通知してもらおうと思って設定したのだけど、Google Calendar が通知してくれない。
+</p>
+
+
+<p>
+これはもしかして、Publish::iCal で生成した iCalendar データに時刻が入ってないせいかな、と思い時刻も入れようと思ったんだけど、どうせなら Plagger::Event とか作って、イベントハンドリングしやすくしてしまえ、ってことで、Plagger::Enclosure の様な感じで作ってみた。たったこれだけだけど。
+</p>
+
+
+<pre class="wiki">
+package Plagger::Event;
+
+use strict;
+
+use base qw( Plagger::Thing );
+__PACKAGE__->mk_accessors(qw( dtstart dtend summary description location organizer ));
+
+1;
+</pre>
+
+
+<p>
+Event だと色んな意味があって曖昧な気がするから Plagger::iCal::Event とかの方がいいかな、と思ったけど、とりあえずの実装なのでまあいいか、と。
+</p>
+
+
+<p>
+でもってこれに合わせて Plagger::Entry も修正。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Entry.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Entry.pm (revision 238)
++++ plagger/trunk/lib/Plagger/Entry.pm (revision 241)
+@@ -19,4 +19,5 @@
+         meta    => {},
+         enclosures => [],
++        events     => [],
+     }, $class;
+ }
+@@ -102,4 +103,24 @@
+ }
+ 
++sub add_event {
++    my($self, $event) = @_;
++    push @{ $self->{events} }, $event;
++}
++
++sub event {
++    my $self = shift;
++    wantarray ? @{$self->{events}} : $self->{events}->[0];
++}
++
++sub events {
++    my $self = shift;
++    wantarray ? @{$self->{events}} : $self->{events};
++}
++
++sub has_event {
++    my $self = shift;
++    scalar @{$self->{events}} > 0;
++}
++
+ 1;
+</pre>
+
+
+<p>
+更にこれに合わせて、Publish::iCal と CustomFeed::AmazonWebService も修正。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm (revision 233)
++++ plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm (revision 241)
+@@ -35,17 +35,19 @@
+ 
+     for my $entry ($feed->entries) {
+-        my $address = ( Email::Address->parse($entry->author) )[0];
+-        my $mail = eval { $address->address } || 'nobody@example.com';
+-        my $name = eval { $address->name } || $entry->author;
++        my $ev = $entry->event;
++        my $organizer = $ev ? $ev->organizer : $entry->author;
++        my $address = ( Email::Address->parse($organizer) )[0];
++        my $mail = $address ? $address->address : 'nobody@example.com';
++        my $name = $address ? $address->name : $organizer;
++        my $dtstart = $ev ? $ev->dtstart : $entry->date;
++        my $dtend   = $ev ? $ev->dtend   : $entry->date;
+ 
+-        my $date = $entry->date;
+         my $event = Data::ICal::Entry::Event->new;
+         $event->add_properties(
+-            summary     => $entry->title . ' - ' . $entry->author,
+-            description => $entry->summary || $entry->body,
++            summary     => $ev ? $ev->summary : $entry->title,
++            description => $ev ? $ev->description : $entry->summary || $entry->body,
+             organizer   => [ "MAILTO:$mail", { cn => $name } ],
+-            url         => $entry->link,
+-            dtstart     => join('', split('-', $date->ymd)),
+-            dtend       => join('', split('-', Plagger::Date->from_epoch(epoch => $date->epoch + 60*60*24)->ymd)),
++            dtstart     => Date::ICal->new( epoch => $dtstart->epoch )->ical,
++            dtend       => Date::ICal->new( epoch => $dtend->epoch )->ical,
+         );
+         $ical->add_entry($event);
+</pre>
+
+
+<pre class="wiki">
+--- plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm (revision 232)
++++ plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm (revision 241)
+@@ -6,4 +6,5 @@
+ use Net::Amazon::Request::Keyword;
+ use Encode;
++use Plagger::Event;
+ 
+ sub register {
+@@ -59,4 +60,11 @@
+             $entry->date($date);
+ 
++            my $event = Plagger::Event->new;
++            $event->dtstart($date);
++            $event->dtend( $date->clone->add( hours => 1 ) );
++            $event->summary($entry->title . ' - ' . $entry->author);
++            $event->organizer($entry->author);
++            $entry->add_event($event);
++
+             $feed->add_entry($entry);
+         }
+@@ -91,5 +99,5 @@
+ 
+ *Net::Amazon::Property::Music::author = *Net::Amazon::Property::Music::artist;
+-*Net::Amazon::Property::DVD::author = sub { return ( $_[0]->starring() )[0] };
++*Net::Amazon::Property::DVD::author   = sub { return ( $_[0]->starring() )[0] };
+ 
+ 1;
+</pre>
+
+
+<p>
+あと、どうも意図したタイムゾーン通りの時刻にならないと思ったら、Plagger::Date::strptime で使われている DateTime::Format::Strptime は、time_zone を指定しないと、floating になってしまうみたい。なので、config.yaml で指定しているタイムゾーンを使うように修正してみました。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Date.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Date.pm (revision 240)
++++ plagger/trunk/lib/Plagger/Date.pm (revision 241)
+@@ -42,5 +42,8 @@
+     my($class, $pattern, $date) = @_;
+     Encode::_utf8_on($pattern);
+-    my $format = DateTime::Format::Strptime->new(pattern => $pattern);
++    my $format = DateTime::Format::Strptime->new(
++        pattern   => $pattern,
++        time_zone => Plagger->context->conf->{timezone} || 'local',
++    );
+     $class->parse($format, $date);
+ }
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/changeset/241"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+floating になってるのは <a class="ext-link" href="http://plagger.org/trac/ticket/211"><span class="icon"></span>こういう理由がある</a> ということで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/242"><span class="icon"></span>CustomFeed::AmazonWebService の方で global: timezone の値を見て、set_time_zone するように修正しました</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/24/500/">Plagger::Plugin::Filter::FFmpeg #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-24T20:56:00+09:00" pubdate>Aug 24<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/24/500/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/plagger_and_ffmpeg02.html#comments"><span class="icon"></span>このエントリのコメント</a> にて sumikawa さんより指摘があった点について修正しました。
+</p>
+
+
+<p>
+というか、気づいてはいたのですが以下の理由から放置してました。
+</p>
+
+
+<ol start="1"><li>今のところ特に実害がない。</li>
+<li>Plagger::Util::mime_type_of (というか MIME::Types::mimeTypeOf ) が mp4 という拡張子は video/vnd.objectvideo と返す。m4v だと何も返さない。video/mp4 が一般的っぽいので、これは何か気持ち悪い。</li>
+<li>$Plagger::Util::mimetypes->addType で mp4 と m4v を追加してやればいいんだけど、本来なら Plagger::Util 内でやる方が良さそう。既にいくつか Plagger::Util 内で追加されてるので。でも、Filter::FFmpeg は野良プラグインなので、Plagger::Util をいじるべきではない。かといって、Filter::FFmpeg 内でやるのも、分散してしまって良くない。</li></ol>
+
+
+<p>
+とは言うものの、指摘があったものを放置しておくのもなんなので、3番目については妥協することにしました。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 227)
++++ plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 234)
+@@ -3,7 +3,10 @@
+ use strict;
+ use base qw( Plagger::Plugin );
++use Plagger::Util;
+ use Encode;
+ use File::Spec;
+ use FFmpeg::Command;
++
++$Plagger::Util::mimetypes->addType( MIME::Type->new(type => 'video/mp4', extensions => [ qw(mp4 m4v) ]) );
+ 
+ sub register {
+@@ -54,4 +57,5 @@
+     $e->enclosure->local_path($output_file);
+     $e->enclosure->filename("$file.$ext");
++    $e->enclosure->type( Plagger::Util::mime_type_of($ext) );
+ }
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/changeset/234"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+宮川さんが <a class="ext-link" href="http://plagger.org/trac/changeset/1593"><span class="icon"></span>Changeset 1593</a> にて早速対応してくれました。はやっ。<br />
+というわけで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/235"><span class="icon"></span>Filter::FFmpeg もそれに合わせて修正しました</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/22/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/20/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

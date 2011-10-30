@@ -1,0 +1,1261 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="先日のエントリで、「HTML::Widget が文字化けする」とか書いたのですが、HTML::Element の _xml_escape メソッドの問題 でした。 チケットは切られているので、とりあえず修正されるのを待つしかないのですが、2ヶ月以上放置されていて、早い対応は期待できなさそうなので &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/19">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/25/503/">HTML::Widget::Kwalify #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-25T18:13:00+09:00" pubdate>Oct 25<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/25/503/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/html-widget-kwalify01.html"><span class="icon"></span>先日のエントリ</a>で、「HTML::Widget が文字化けする」とか書いたのですが、<a class="ext-link" href="http://rt.cpan.org/Public/Bug/Display.html?id=14260"><span class="icon"></span>HTML::Element の _xml_escape メソッドの問題</a> でした。
+</p>
+
+
+<p>
+チケットは切られているので、とりあえず修正されるのを待つしかないのですが、2ヶ月以上放置されていて、早い対応は期待できなさそうなので、<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify"><span class="icon"></span>HTML::Widget::Kwalify</a> に以下のコードを入れて強引に対処してます。
+</p>
+
+
+<pre class="wiki">
+{
+    no warnings 'redefine';
+    *HTML::Element::_xml_escape = sub {
+        foreach my $x (@_) {
+            $x =~ s!([&lt;&amp;&gt;])!'&amp;#'.(ord($1)).';'!seg;
+        }
+        return;
+    };
+}
+</pre>
+
+
+<p>
+あと、テスト追加したり、色々修正。ちょっとずつですが、形になってきてます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/21/379/">HTML::Widget::Kwalify #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-21T17:58:00+09:00" pubdate>Oct 21<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/21/379/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify"><span class="icon"></span>HTML::Widget::Kwalify</a> を修正しました。<a class="ext-link" href="http://mizzy.org/widget/index.cgi"><span class="icon"></span>動作サンプルはこちら</a>。
+</p>
+
+
+<p>
+サンプルを触ってもらうと分かると思いますが、ポストしたデータを YAML 形式でダンプできます。また、フォームバリデーションにも対応してます。例えば、user_agent-timeout は Kwalify スキーマでは「type: int」と設定されているのですが、それに合わせてバリデーションルールも設定してあり、数字以外の文字列を入力すると「Invalid Input」と表示されます。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/samples/widget_kwalify/"><span class="icon"></span>サンプルのソースはここに置いときます</a>。
+</p>
+
+
+<p>
+サンプルソースのメイン部分は、
+</p>
+
+
+<pre class="wiki">
+sub top {
+    my $self = shift;
+
+    my $q = $self->query;
+    my $w = HTML::Widget::Kwalify->new('schema.yaml');
+
+    my $result = $q->param ? $w->process($q) : $w->process;
+
+    if ( $result->have_errors or !$q->param ) {
+        return $self->tt_process( 'index.html', { widget => $result } );
+    }
+    else {
+        $self->header_props( -type => 'text/plain' );
+        return $w->dump;
+    }
+}
+</pre>
+
+
+<p>
+といった感じなのですが、たったこれだけでバリデーション、フィルイン対応のフォームを Kwalify スキーマから自動生成し、POST データを YAML にダンプ、ってなことができます。超ベンリ。
+</p>
+
+
+<p>
+YAML はネストされたデータ構造なのに対し、HTML フォームは平坦な構造なので、この部分をどう処理するかが実装にあたって一番面倒そうだな、と思っていたのですが、宮川さんから <a class="ext-link" href="http://search.cpan.org/~nuffin/Catalyst-Plugin-Params-Nested-0.02/lib/Catalyst/Plugin/Params/Nested.pm"><span class="icon"></span>Catalyst::Plugin::Params::Nested</a> というモジュールを教えてもらい、これのベースクラスである <a class="ext-link" href="http://search.cpan.org/~bowmanbs/CGI-Expand-2.02/Expand.pm"><span class="icon"></span>CGI::Expand</a> を使うことによって、簡単に実装できてしまいました。CGI::Expand++ 。
+</p>
+
+
+<p>
+これで最低限やりたいことはできるようになりましたが、Kwalify スキーマのパースのしかたが適当なので、テストを書いて色んなパターンで試して調整する必要があったり、ファイルにダンプできるようにしたりとか、完成まではまだまだかかりそうです。
+</p>
+
+
+<p>
+また、<a class="ext-link" href="http://d.hatena.ne.jp/charsbar/20060114/1137232891"><span class="icon"></span>id:charsbar 氏</a> がおっしゃっている通り、HTML::Widget 自体が日本語が化けたりとか微妙な感じなので、こちらも手を入れないといけないですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/21/277/">Shibuya.pm テクニカルトーク #7</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-21T01:59:00+09:00" pubdate>Oct 21<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/21/277/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+しゃべってきました。資料は後日 <a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200610.html"><span class="icon"></span>Shibuya.pm のサイト</a>にアップされると思いますが、とりあえず<a class="ext-link" href="http://mizzy.org/archives/using_svk_with_plagger.pdf"><span class="icon"></span>ここにも置いておきます</a>。
+</p>
+
+
+<p>
+CVS のことを CSV と書き間違えてて、後から指摘されて知ったのですが、実はしゃべってる最中に irc#shibuya.pm@freenode でいじられていたことを、帰宅してから知りました。アップした資料では修正してますが、ただ直すのもなんなので、ちょっと改変してあります。
+</p>
+
+
+<p>
+プレゼン中も IRC を見ることができて、ダイレクトにつっこまれながらプレゼン、ってのもおもしろいかも、とか思いました。2 画面で一方は IRC のログ流しておくとか。
+</p>
+
+
+<p>
+また、プレゼン資料中に出てきた Plagger プラグインは、話したとおり某 CTO が某ブクマのコメントで名前だけ出していたもので、実在はしません。期待された方、ごめんなさい。
+</p>
+
+
+<p>
+イベントの内容は色々な人がレビュー書くでしょうからそれに任せるとして、スピーカやってよかったな、と思ったのは、ブログのコメントや IRC なんかでやりとりしただけで、お会いしたことがなかった方に声をかけて頂けたことですね。スピーカやらないと、その場にいても気づいてもらえませんから。
+</p>
+
+
+<p>
+その後の飲み会でも、他社の開発や運用方法、内情などが聞けて楽しかったです。といっても、人数多かったので全然話せなかった方もいたり、家が遠いので一番最初に切り上げざるを得なかったのが残念でしたが、それはまた次の機会の楽しみに、ということで。
+</p>
+
+
+<p>
+動画は<a class="ext-link" href="http://stream.i-revo.jp/event/shibuya.pm/"><span class="icon"></span>こちらで後日アップされるようです</a>。ちょっと緊張してて、記憶が飛んでるところもあるので、あとで自分のしゃべりを確認してみようと思います。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/18/434/">HTML::Widget::Kwalify #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-18T00:55:00+09:00" pubdate>Oct 18<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/18/434/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify"><span class="icon"></span>HTML::Widget::Kwalify</a> というものをつくってます。まだプロトタイプにもなってない感じだけど。
+</p>
+
+
+<p>
+これで <a class="ext-link" href="http://www.kuwata-lab.com/kwalify/"><span class="icon"></span>Kwalify</a> スキーマから <a class="ext-link" href="http://search.cpan.org/~cfranks/HTML-Widget/lib/HTML/Widget.pm"><span class="icon"></span>HTML::Widget</a> オブジェクトを自動生成して、Plagger のウェブインターフェースを簡単につくっちゃおう、という目論見です。
+</p>
+
+
+<pre class="wiki">
+use HTML::Widget::Kwalify;
+
+my $w = HTML::Widget::Kwalify->create_from( file => 'schema.yaml' );
+print $w->process;
+</pre>
+
+
+<p>
+みたいな感じで、schema.yaml から HTML フォームを一発で生成できます。
+</p>
+
+
+<p>
+CGI::Application ベースでサンプルをつくると、こんな感じになります。
+</p>
+
+
+<p>
+まずはディスパッチする index.cgi 。
+</p>
+
+
+<pre class="wiki">
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use lib './lib';
+
+use WidgetKwalify;
+
+my $w = WidgetKwalify->new;
+$w->run;
+</pre>
+
+
+<p>
+本体の lib/WidgetKwalify.pm 。
+</p>
+
+
+<pre class="wiki">
+package WidgetKwalify;
+
+use strict;
+use warnings;
+use base qw( CGI::Application );
+use HTML::Widget::Kwalify;
+use CGI::Application::Plugin::TT;
+
+our $TEMPLATE_OPTIONS = {
+    INCLUDE_PATH => '/path/to/template',
+};
+
+sub setup {
+    my $self = shift;
+
+    $self->start_mode('top');
+    $self->run_modes(
+        top => 'top',
+    );
+
+    $self->tt_config( TEMPLATE_OPTIONS => $TEMPLATE_OPTIONS );
+}
+
+sub top {
+    my $self = shift;
+
+    my $q = $self->query;
+    my $w = HTML::Widget::Kwalify->create_from( file => 'schema.yaml' );
+    return $self->tt_process(
+        'index.html',
+        { widget => $q ? $w->process($q) : $w->process }
+    );
+}
+
+1;
+</pre>
+
+
+<p>
+HTML テンプレート template/index.html 。
+</p>
+
+
+<pre class="wiki">
+&lt;table&gt;
+&#91;% FOREACH element = widget.elements %&#93;
+  &lt;tr&gt;
+    &lt;td&gt;&#91;% element.label.content.0 %&#93;:&lt;/td&gt;
+    &lt;td&gt;&#91;% element.element.as_XML %&#93;&lt;/td&gt;
+  &lt;/tr&gt;
+&#91;% END %&#93;
+&lt;/table&gt;
+</pre>
+
+
+<p>
+Plagger の example にある <a class="ext-link" href="http://plagger.org/trac/browser/trunk/plagger/examples/schema.yaml"><span class="icon"></span>schema.yaml</a> の global セクションを使ってこのサンプルを動かすと、<a class="ext-link" href="http://mizzy.org/widget/index.cgi"><span class="icon"></span>こんな感じ</a>になります。まだ type:seq の処理をちゃんとしてないので、plugin_path が変ですが、他は良い感じ。log-level もちゃんと select になってるし。
+</p>
+
+
+<p>
+これで、Plagger ホスティングウェブアプリつくれば、bloglines2gmail とか youtube2podcast とか、目的別にスキーマファイルつくるだけで、設定用フォームが自動で生成できるし、プラグイン毎にスキーマファイル用意しておいて、利用したいプラグインを選択すると、そのプラグイン用の設定フォームが自動で生成できる、といったことが可能になりますね。
+</p>
+
+
+<p>
+あと、
+</p>
+
+
+<pre class="wiki">
+$widget->process($query)->save_to( file => 'config.yaml' );
+</pre>
+
+
+<p>
+な感じで POST したフォームの内容を YAML にしてファイルに保存、とかできるようにする予定です。（他にも type: seq の処理とか、フォームバリデーション対応とか、やること山積みですが。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/17/447/">Net::Amazon::ECS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-17T00:02:00+09:00" pubdate>Oct 17<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/17/447/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Plagger で Amazon Web Service をつかって、発売日を Publish::iCal して Google Calendar で表示したり、今日・明日発売する商品を Publish::Gmail してるのですが、なんか最近 Google Calendar に表示される商品数が少ないな、と思ったら、AWS3.0 で ReleaseDate が取得できていない模様。（そもそも結果の XML に ReleaseDate が存在しない。一部の商品は ReleaseDate 取得できるけど、取得できない方が圧倒的に多い。）しかも、以前には確かに ReleaseDate が取得できていた商品も、なぜか取得できなくなってます。でも同じ商品でも、ECS4.0 ならちゃんと日付が取得できるんですよね。
+</p>
+
+
+<p>
+で、問い合わせは<a class="ext-link" href="http://forums.prospero.com/am-assocdevxml"><span class="icon"></span>ディスカッションボード</a>に投稿しろ、と<a class="ext-link" href="http://www.amazon.co.jp/gp/feature.html?docId=451209"><span class="icon"></span>ここ</a>に書いてあったのでディスカッションボードを覗いてみても、どこから投稿していいのかさっぱり分からないし、あまり動きが活発でもなさそうで、素早い対応は期待できなさそう…そもそも AWS3.0 自体が古い API なわけだし、ということで、ECS4.0 対応の<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Net-Amazon-ECS"><span class="icon"></span>Net::Amazon::ECS</a> をつくってみました。検索してみても公開されているものはなさそうだったので。（あったら誰か教えてください。）
+</p>
+
+
+<p>
+といっても、とりあえず自分がやりたいこと（Plagger で発売日を iCal に Publish したり、今日・明日発売の商品情報をメールで飛ばしたり）に最低限必要な機能しか実装してないです。あと、今のところ CPAN にあげる予定はありません。
+</p>
+
+
+<p>
+ついでに野良プラグインの <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm"><span class="icon"></span>CustomFeed::AmazonWebService</a> を Net::Amazon::ECS に対応させた <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonECS.pm"><span class="icon"></span>CustomFeed::AmazonECS</a> もつくりました。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+なんかはてなの中の人が、ECS4.0 対応のモジュール作っていて、CPAN に up 予定らしい。なので近いうちにこれは必要なくなりそうですね。期待。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/01/364/">Net::Google::Calendar のパッチ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-01T14:26:00+09:00" pubdate>Oct 1<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/01/364/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<strong>2006/10/01 18:22 追記</strong><br />
+<a class="ext-link" href="http://rt.cpan.org/Public/Bug/Display.html?id=21797"><span class="icon"></span>早速対応してくれました</a>。「Domou Arigato」と書いてるのに笑った。<a class="ext-link" href="http://pause.perl.org/incoming/"><span class="icon"></span>http://pause.perl.org/incoming/</a> を見るとアップ済みのようなので、もうすぐ CPAN へ反映されると思います。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://search.cpan.org/~simonw/Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm"><span class="icon"></span>Net::Google::Calendar</a> がまともに動かないので、パッチ書いた。
+</p>
+
+
+<pre class="wiki">
+Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm
+===================================================================
+--- Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm (revision 285)
++++ Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm (revision 286)
+@@ -348,7 +348,9 @@
+     }
+ 
++    my $xml = $entry->as_xml;
++    _utf8_off($xml);
+     my %params = ( Content_Type => 'application/atom+xml; charset=UTF-8',
+                    Authorization => "GoogleLogin auth=".$self->{_auth},
+-                   Content => $entry->as_xml );
++                   Content => $xml );
+ 
+     $params{'X-HTTP-Method-Override'} = $method unless "POST" eq $method;
+@@ -381,4 +383,10 @@
+ }
+ 
++sub _utf8_off {
++    if ($] >= 5.008) {
++        require Encode;
++        return Encode::_utf8_off($_[0]);
++    }
++}
+ 
+ =head1 WARNING
+Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm
+===================================================================
+--- Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 285)
++++ Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 286)
+@@ -54,5 +54,5 @@
+     my $self = shift;                                                                               
+                                                                                                   
+-    $self->category('', { scheme => 'http://schemas.google.com/g/2005#kind', term => 'http://schemas.google.com/g/2005#event' } );
++    $self->category( { scheme => 'http://schemas.google.com/g/2005#kind', term => 'http://schemas.google.com/g/2005#event' } );
+                                                                                                   
+     $self->{_gd_ns} = XML::Atom::Namespace->new(gd => 'http://schemas.google.com/g/2005');          
+@@ -174,5 +174,5 @@
+    my($ns, $name, $attr) = @_;
+    my $ns_uri = ref($ns) eq 'XML::Atom::Namespace' ? $ns->{uri} : $ns;
+-   my $node = first($atom->{doc}, $ns_uri, $name);
++   my $node = first($atom->elem, $ns_uri, $name);
+    return $node unless defined $node &amp;&amp; defined $attr;
+    my $val;
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://rt.cpan.org/"><span class="icon"></span>rt.cpan.org</a> でレポートしておいた。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/29/415/">Using Svk With Plagger</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-29T22:55:00+09:00" pubdate>Sep 29<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/29/415/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+うちでは 普段実行している plagger は<a class="ext-link" href="http://svn.bulknews.net/repos/plagger/trunk/plagger"><span class="icon"></span>本家 trunk</a> から持ってきていて、自分で作ったプラグインは <a class="ext-link" href="http://svn.mizzy.org/public/plagger/trunk"><span class="icon"></span>svn.mizzy.org</a> に置いてあるのですが、以下の様なプロセスで開発してました。
+</p>
+
+
+<ol start="1"><li>svn.mizzy.org からチェックアウトしたディレクトリに、俺プラグインを書いて置く。</li>
+<li>plagger 本家 trunk からチェックアウトしたディレクトリに、上記ディレクトリからファイルをコピーして、俺プラグインの動作テスト。</li>
+<li>テストが問題なければ、svn.mizzy.org に俺プラグインをコミット。</li>
+<li>本家 trunk にコミットする場合は、svn co で コミットするファイルだけを指定。</li></ol>
+
+
+<p>
+2.のコピーがめんどくさくて、svk 使えばもっとエレガントになるんじゃないかな、と以前から思っていたのですが、使い方間違えると本家 trunk に余分なファイルまでコミットしてしまいそうで、怖くて使ってなかったのですが、色々試行錯誤してみて、こんな感じでいけそうだという感触がつかめたので、ここに整理しておきます。
+</p>
+
+
+<h3 id="準備">準備</h3>
+
+
+<p>
+本家 trunk のローカルミラーとローカルブランチの作成
+</p>
+
+
+<pre class="wiki">
+$ svk mirror //mirror/plagger-trunk http://svn.bulknews.net/repos/plagger/trunk/plagger
+$ svk sync //mirror/plagger-trunk --skipto HEAD  
+$ svk cp -p //mirror/plagger-trunk //local/plagger-trunk
+</pre>
+
+
+<p>
+svn.mizzy.org のローカルミラーとローカルブランチの作成
+</p>
+
+
+<pre class="wiki">
+$ svk mirror //mirror/plagger-mizzy http://svn.mizzy.org/public/plagger/trunk
+$ svk sync //mirror/plagger-mizzy
+$ svk cp //mirror/plagger-mizzy //local//plagger-mizzy
+</pre>
+
+
+<p>
+svk リポジトリの確認
+</p>
+
+
+<pre class="wiki">
+$ svk list -R -d 1 //
+local/
+ plagger-mizzy/
+ plagger-trunk/
+mirror/
+ plagger-mizzy/
+ plagger-trunk/   
+</pre>
+
+
+<p>
+ローカルディレクトリにチェックアウト
+</p>
+
+
+<pre class="wiki">
+$ mkdir svk                                                       [~]
+$ cd svk                                                          [~]
+$ svk co //local/plagger-trunk                                [~/svk]
+$ svk co //local/plagger-mizzy                                [~/svk]
+$ ls                                                          [~/svk]
+plagger-mizzy/  plagger-trunk/
+</pre>
+
+
+<h3 id="プラグインの作成や修正など">プラグインの作成や修正など</h3>
+
+
+<p>
+プラグインを作ったり、修正したりして plagger-mizzy ローカルブランチにコミット
+</p>
+
+
+<pre class="wiki">
+$ ./tools/plugin-start.pl Filter::Hoge          [~/svk/plagger-mizzy]
+... &lt;プラグインを書く&gt; ...
+$ svk commit                                    [~/svk/plagger-mizzy]
+</pre>
+
+
+<p>
+つくったプラグインを plagger-trunk ローカルブランチとマージしてテスト
+</p>
+
+
+<pre class="wiki">
+$ svk smerge -B //local/plagger-mizzy           [~/svk/plagger-trunk]
+$ ./plagger -c test.yaml                        [~/svk/plagger-trunk]
+</pre>
+
+
+<p>
+プラグインに問題がなければ、plagger-mizzy ブランチの変更を svn.mizzy.org にコミット。一度 plagger-trunk とマージしてしまうと、なぜか svk push では svn.mizzy.org まで反映されなくなってしまったので、svk smerge 。
+</p>
+
+
+<pre class="wiki">
+$ svk smerge //local/plagger-mizzy //mirror/plagger-mizzy
+</pre>
+
+
+<h3 id="plagger本家trunkへのコミット">plagger 本家 trunk へのコミット</h3>
+
+
+<p>
+まだ試してないけど、こんな感じでできるはず。
+</p>
+
+
+<pre class="wiki">
+$ svk commit files_to_commit                    [~/svk/plagger-trunk]
+$ svk push -C                                   [~/svk/plagger-trunk]
+$ svk push --verbatim                           [~/svk/plagger-trunk]
+</pre>
+
+
+<p>
+余計なファイルまでコミットしてしまうと迷惑をかけてしまうので、-C をつけて確認する。
+</p>
+
+
+<p>UPDATE: <a href="http://mizzy.org/archives/using_svk_with_plagger.pdf">Shibuya.pm テクニカルトーク #7の発表資料</a> も併せてご参照ください。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/25/482/">Plagger::Feed と Plagger::Entry と Plagger::Enclosure</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-25T22:11:00+09:00" pubdate>Sep 25<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/25/482/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Plagger::Feed, Plagger::Entry, Plagger::Enclosure の関係と、それぞれが持つメソッド、プロパティを図にしてみた。（メソッドとプロパティの区分けは適当。）
+</p>
+
+
+
+
+<p>
+<a href="http://mizzy.org/img/mashup/feed_entry_enclosure.jpg"><img src="http://mizzy.org/img/mashup/feed_entry_enclosure.jpg" width="397" height="433" alt="Plagger::Feed, Plagger::Entry, Plagger::Enclosure" /></a>
+</p>
+
+
+<p>各メソッドやプロパティの意味、役割はそのうち書く。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/24/358/">Plagger プラグインの実行フェーズ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-24T03:58:00+09:00" pubdate>Sep 24<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/24/358/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Plagger プラグインの実行フェーズについて整理してみたので、載せておきます。
+</p>
+
+
+
+
+<p>
+<strong>追記</strong><br />
+はてブで「argsもあるとうれしいとおもた」というコメントがありましたので、追加してみました。
+</p>
+
+
+
+
+<table>
+
+<tr>
+<th>実行フェーズ</th>
+<th>$args</th>
+<th>フェーズの役割</th>
+<th>実行例</th>
+</tr>
+
+<tr style="background-color: #bfefff">
+<td>plugin.init</td>
+<td>-</td>
+<td>プラグインの初期化処理</td>
+<td>Publish::Feedでのフィード出力用ディレクトリ作成</td>
+</tr>
+
+<tr style="background-color: #c1ffc1">
+<td>subscription.load</td>
+<td>-</td>
+<td>フィードをPlaggerの購読リストへ登録</td>
+<td>Subscription::Config でのyamlで指定されたフィードURL登録</td>
+</tr>
+
+<tr style="background-color: #c1ffc1">
+<td>customfeed.handle</td>
+<td>feed</td>
+<td>フィードのアグリゲーション（フィードデータの取得とパース）</td>
+<td>Aggregator::Simpleで RSS/Atomフィード取得とパース</td>
+</tr>
+
+<tr style="background-color: #c1ffc1">
+<td>aggreagator.filter.feed</td>
+<td>content</td>
+<td>アグリゲートフェーズでのフィード変換処理</td>
+<td>Filter::RSSTimeZoneStringでの不正なタイムゾーンの修正</td>
+</tr>
+
+<tr style="background-color: #c1ffc1">
+<td>aggregator.entry.fixup</td>
+<td>entry, feed, orig_entry, orig_feed</td>
+<td>アグリゲートフェーズでのエントリ変換処理</td>
+<td>Filter::FeedBurnerPermalinkでのpermalink修正</td>
+</tr>
+
+<tr style="background-color: #c1ffc1">
+<td>aggregator.finalize</td>
+<td>-</td>
+<td>アグリゲータの後処理</td>
+<td>Aggregator::Xangoでのフィード取得/パース処理の並列実行開始</td>
+</tr>
+
+<tr style="background-color: #FFD700">
+<td>update.entry.fixup</td>
+<td>feed, entry</td>
+<td>アグリゲート後のエントリ変換処理</td>
+<td>Filter::EntryFullTextでエントリの要約を全文へ変換する処理</td>
+</tr>
+
+<tr style="background-color: #FFD700">
+<td>update.feed.fixup</td>
+<td>feed</td>
+<td>アグリゲート後のフィード変換処理</td>
+<td>Filter::BlogPetによるBlogPetエントリのフィードからの除去</td>
+</tr>
+
+<tr style="background-color: #FFD700">
+<td>update.fixup</td>
+<td>-</td>
+<td>update.*.fixupの後処理</td>
+<td>Filter::POPFileでのPOPFileセッションのクローズ</td>
+</tr>
+
+<tr style="background-color: #FFB6C1">
+<td>smartfeed.init</td>
+<td>-</td>
+<td>スマートフィード初期化処理</td>
+<td>SmartFeedでのスマートフィードオブジェクトの生成</td>
+</tr>
+
+<tr style="background-color: #FFB6C1">
+<td>smartfeed.entry</td>
+<td>feed, entry</td>
+<td>エントリのスマートフィード処理</td>
+<td>SmartFeedでのエントリのコピー生成</td>
+</tr>
+
+<tr  style="background-color: #FFB6C1">
+<td>smartfeed.feed</td>
+<td>feed</td>
+<td>フィードのスマートフィード処理</td>
+<td>Filter::Ruleでの条件に一致しないエントリのフィードからの除去</td>
+</tr>
+
+<tr  style="background-color: #FFB6C1">
+<td>smartfeed.finalize</td>
+<td>-</td>
+<td>スマートフィード後処理</td>
+<td>SmartFeedでの生成されたスマートフィードをフィードリストへ追加</td>
+</tr>
+
+<tr style="background-color: #ddbbff">
+<td>publish.init</td>
+<td>-</td>
+<td>出力の初期化処理</td>
+<td>Publish::GmailでのPOP before SMTP処理</td>
+</tr>
+
+<tr style="background-color: #ddbbff">
+<td>publish.entry.fixup</td>
+<td>feed, entry</td>
+<td>出力前のエントリ変換処理</td>
+<td>Widget::HatenaBookmarkUsersCountでのエントリにはてなブックマークユーザ数を付加する処理</td>
+</tr>
+
+<tr style="background-color: #ddbbff">
+<td>publish.feed</td>
+<td>feed</td>
+<td>フィードの出力処理</td>
+<td>Publish::Gmailでのメール送信</td>
+</tr>
+
+<tr style="background-color: #ddbbff">
+<td>publish.entry</td>
+<td>feed, entry</td>
+<td>エントリの出力処理</td>
+<td>Publish::Deliciousでのdel.icio.usへのブックマーク登録</td>
+</tr>
+
+<tr style="background-color: #ddbbff">
+<td>publish.finalize</td>
+<td>-</td>
+<td>出力の後処理</td>
+<td>Publish::2chdatでのsubject.txtの書き出し</td>
+</tr>
+
+<tr style="background-color: #bfefff">
+<td>plugin.finalize</td>
+<td>-</td>
+<td>プラグインの後処理</td>
+<td>Search::KinoSearchでのインデックス作成完了処理</td>
+</tr>
+
+<tr style="background-color: #FFEC8B">
+<td>searcher.search</td>
+<td>query</td>
+<td>Search プラグインでの検索</td>
+<td>Search::Grep での検索処理</td>
+</tr>
+
+<tr style="background-color: #C1FFC1">
+<td>useragent.init</td>
+<td>ua</td>
+<td>Plagger::UserAgent の初期化処理</td>
+<td>UserAgent::AuthenRequest での認証情報設定</td>
+</tr>
+
+<tr style="background-color: #C1FFC1">
+<td>useragent.request</td>
+<td>ua, url, req</td>
+<td>Plagger::UserAgenet のリクエスト処理の変更</td>
+<td>UserAgent::RequestHeader でのヘッダ追加</td>
+</tr>
+
+</table>
+
+
+
+
+<p>
+各フェーズは上の表の順番どおりに実行されます。（searcher.search と useragent.* はちょっと特殊なので順番通りではないです。）
+</p>
+
+
+
+
+<p>
+間違いなどあればツッコミよろしくです。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/22/438/">Plagger::Plugin::Filter::FFmpeg #5</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-22T13:01:00+09:00" pubdate>Sep 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/22/438/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://d.hatena.ne.jp/shimibow/20060921/1158852346"><span class="icon"></span>id:shimibow さんが Filter::FFmpeg のパッチを書いてくださいました</a>。いつもありがとうございます。これを参考に、以下の様な修正を行いました。
+</p>
+
+
+<pre class="wiki">
+Index: lib/Plagger/Plugin/Filter/FFmpeg.pm
+===================================================================
+--- lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 254)
++++ lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 270)
+@@ -51,15 +51,29 @@
+         $ff->input_options({ file => encode($encoding, $enclosure->local_path) });
+
+         my $output_file = File::Spec->catfile($self->conf->{dir}, "$file");
+-        $ff->output_options({
++        my $output_options = {
+             file    => encode($encoding, $output_file),
+             device  => $self->conf->{device} || 'ipod',
+             title   => encode($encoding, $entry->title),
+             author  => encode($encoding, $entry->author),
+             comment => encode($encoding, $entry->summary),
+             %{ $self->conf->{options} || {} },
+-        });
++        };
+
++        if ( $self->conf->{extra_options} ) {
++            my %option_to_name = reverse %FFmpeg::Command::option;
++            my @extra_options =  split ' ', $self->conf->{extra_options};
++            for ( @extra_options ){
++                my $name = $option_to_name{$_};
++                delete $output_options->{$name} if defined $output_options->{$name} and $name;
++            }
++            $ff->output_options($output_options);
++            $ff->options( @extra_options, @{ $ff->options } );
++        }
++        else {
++            $ff->output_options($output_options);
++        }
++
+         unless( -e $output_file ){
+             $context->log( info => 'Converting ' . $enclosure->filename . ' ...' );
+             my $result = $ff->exec();
+</pre>
+
+
+<p>
+extra_options で ffmpeg に渡す追加オプションを指定することができます。
+</p>
+
+
+<p>
+それに合わせて、FFmpeg::Command に以下の修正を加えて 0.05 として CPAN にアップしてます。
+</p>
+
+
+<pre class="wiki">
+Index: library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
+===================================================================
+--- library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm (revision 248)
++++ library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm (revision 266)
+@@ -3,5 +3,5 @@
+ use warnings;
+ use strict;
+-our $VERSION = '0.04';
++our $VERSION = '0.05';
+ 
+ use base qw( Class::Accessor::Fast Class::ErrorHandler );
+@@ -11,5 +11,5 @@
+ use Carp qw( carp );
+ 
+-my %option = (
++our %option = (
+     format              => '-f',
+     video_codec         => '-vcodec',
+</pre>
+
+
+<p>
+%option を Filter::FFmpeg から参照するためなのですが、外部からオプション追加とかもできるようになって、便利なこともあるかな、と。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/20/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/18/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

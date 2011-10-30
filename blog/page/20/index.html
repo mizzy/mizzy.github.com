@@ -1,0 +1,1361 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mizzy.org</title>
+  <meta name="author" content="Gosuke Miyashita">
+
+  
+  <meta name="description" content="いまさら聞けない？ 初心者向けPlagger設定覚え書き その5 というエントリで、 - module: Filter::Rule rule: module: Deduped - module: SmartFeed::All といった設定（一部のみ抜粋）をしていて、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mizzy.org/blog/page/20">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="mizzy.org" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-53984-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">mizzy.org</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mizzy.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/17/401/">SmartFeed::All で生成されるフィードには Filter::Rule は適用できない</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-17T18:28:00+09:00" pubdate>Sep 17<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/17/401/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://d.hatena.ne.jp/toshi123/20060916#p1"><span class="icon"></span>いまさら聞けない？ 初心者向けPlagger設定覚え書き その5</a> というエントリで、
+</p>
+
+
+<pre class="wiki">
+  - module: Filter::Rule
+    rule:
+      module: Deduped
+
+  - module: SmartFeed::All
+</pre>
+
+
+<p>
+といった設定（一部のみ抜粋）をしていて、
+</p>
+
+
+<blockquote>
+<p>
+  過去に抽出したことのあるエントリも抽出してしまう（Dedupedによる削除がうまくできていない）という問題点がありました。
+</p>
+</blockquote>
+
+
+<p>
+と書かれているのですが、こうなる理由を理解するためには、 SmartFeed::All と Filter::Rule が動作するフェーズと、実際にどの様な流れで処理されているかを理解する必要があります。
+</p>
+
+
+<p>
+Filter::Rule も SmartFeed::All も、どちらも smartfeed.* フェーズで動作します。実際に Plagger.pm 中で smartfeed.* フェーズを実行している部分のコードは、以下の様になっています。
+</p>
+
+
+<pre class="wiki">
+    $self->run_hook('smartfeed.init');
+    for my $feed ($self->update->feeds) {
+        for my $entry ($feed->entries) {
+            $self->run_hook('smartfeed.entry', { feed => $feed, entry => $entry });
+        }
+        $self->run_hook('smartfeed.feed', { feed => $feed });
+    }
+    $self->run_hook('smartfeed.finalize');
+</pre>
+
+
+<p>
+SmartFeed::All と Filter::Rule に関わるこの部分の処理を言葉で説明すると、こんな感じです。
+</p>
+
+
+<ul><li>smartfeed.init が実行される。</li>
+<li>$self->update->feeds で現在持っているフィードをすべて抽出。ただし、<strong>この中にはまだ SmartFeed::All なフィードは存在しない</strong>。</li>
+<li>smartfeed.entry フェーズが実行され、このフェーズで SmartFeed::All なフィードが作られる。この時点では<strong>まだ Filter::Rule は実行されていないので、Deduped される前のエントリがすべて含まれることになる</strong>。</li>
+<li>smartfeed.feed フェーズが実行され、Filter::Rule による Deduped が行われる。<strong>ただし、SmartFeed::All なエントリは、$self->update->feeds で抽出したフィードの中にはないので、SmartFeed::All なエントリは Deduped の対象外</strong>。</li>
+<li>smartfeed.finalize フェーズで、SmartFeed::All なフィードが add される。（つまり、Plagger がハンドルするフィードの中に登録されることになる。）</li></ul>
+
+
+<p>
+これを要約すると、
+</p>
+
+
+<ul><li>SmartFeed::All なフィードは、各フィードが Deduped される前につくられる。</li>
+<li>SmartFeed::All なフィードは smartfeed.feed フェーズを通過しないので、Filter::Rule が適用されない。</li></ul>
+
+
+<p>
+といった理由で、SmatFeed:All なフィードに Filter::Rule が適用されない、ということになります。
+</p>
+
+
+<p>
+では、すべてのフィードをひとつにまとめた上で Rule を適用したい場合にどう書けばいいのか、ということになりますが、以下の様に書けば OK です。
+</p>
+
+
+<pre class="wiki">
+  - module: SmartFeed
+    rule:
+      module: Deduped
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/16/255/">Software Design 2006年10月号に寄稿しました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-16T20:14:00+09:00" pubdate>Sep 16<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/16/255/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+『特別企画 Plagger 3分 Hacking』の『Chapter 03: 俺流 Plagger 3分 Hacking』の中で、「Plagger で YouTube Casting」というお題で書かせて頂きました。
+</p>
+
+
+<p>
+他にも<a class="ext-link" href="http://labs.cybozu.co.jp/blog/takesako/"><span class="icon"></span>竹迫さん</a>によるとてもわかりやすい Plagger 解説やインストール方法、<a class="ext-link" href="http://blog.yappo.jp/"><span class="icon"></span>yappo さん</a>、<a class="ext-link" href="http://e8y.net/blog/"><span class="icon"></span>tomi-ru さん</a>、<a class="ext-link" href="http://d.hatena.ne.jp/t-akihito/"><span class="icon"></span>akihito さん</a>による小技集など、見所満載です。Plagger って何？という人や、これから Plagger やってみたい人は、ぜひ手にとってご覧下さい。
+</p>
+
+
+<p>
+参考URL
+</p>
+
+
+<ul><li><a class="ext-link" href="http://d.hatena.ne.jp/software_design/20060915#1155804140"><span class="icon"></span>&#91;Software Design本誌&#93;SD2006年10月号 ここに注目！</a></li>
+<li><a class="ext-link" href="http://labs.cybozu.co.jp/blog/takesako/2006/09/software_design_200610_plagger.html"><span class="icon"></span>TAKESAKO @ Yet another Cybozu Labs: 今月号のSoftware DesignでPlagger特集</a></li></ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/16/376/">Deduped::AnyDBM_File</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-16T00:11:00+09:00" pubdate>Sep 16<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/16/376/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/dedeuped.html"><span class="icon"></span>前回のエントリ</a>について、宮川さんから「AnyDBM_File をつかうといいかも」というアドバイスを頂いたので、Deduped::AnyDBM_File を書いてみた。
+</p>
+
+
+<pre class="wiki">
+package Plagger::Rule::Deduped::AnyDBM_File;
+use strict;
+use base qw( Plagger::Rule::Deduped::Base );
+use UNIVERSAL::require;
+use Fcntl;
+
+sub import {
+    my ( $class, @arguments ) = @_;
+
+    @AnyDBM_File::ISA = () if @arguments;
+    for ( @arguments ) {
+        push @AnyDBM_File::ISA, $_ . '_File';
+    }
+
+    AnyDBM_File->require;
+}
+
+sub init {
+    my($self, $rule) = @_;
+
+    $self->{path} = $rule->{path} || Plagger->context->cache->path_to('Deduped.db');
+    tie my %cache, 'AnyDBM_File', $self->{path}, O_RDWR|O_CREAT, 0666
+        or Plagger->context->error("Can't open DB_File $self->{path}: $!");
+    $self->{db} = \%cache;
+}
+
+sub find_entry {
+    my($self, $url) = @_;
+    my $value = $self->{db}->{$url};
+    return $value;
+}
+
+sub create_entry {
+    my($self, $url, $digest) = @_;
+    $self->{db}->{$url} = $digest;
+}
+
+sub DESTROY {
+    my $self = shift;
+    untie $self->{db};
+}
+
+1;
+</pre>
+
+
+<p>
+以下の様な感じで、利用するモジュールを NDBM_File, DB_File, GDBM_File, SDBM_File, ODBM_File の中から選べます。（何も指定しなければ DB_File が使われる。_File は省略する。）
+</p>
+
+
+<pre class="wiki">
+    rule:
+      module: Deduped
+      engine: GDBM
+</pre>
+
+
+<p>
+また、現在の Rule::Deduped では、Rule::Deduped::$self->{engine} を呼び出すようになっているけれど、上記 NDBM, DB, GDBM, SDBM, ODBM のいずれかが指定された場合には、Rule::Deduped::AnyDBM_File を呼び出す必要があるため、Rule::Deduped も少しいじってみた。
+</p>
+
+
+<pre class="wiki">
+Index: lib/Plagger/Rule/Deduped.pm
+===================================================================
+--- lib/Plagger/Rule/Deduped.pm (revision 1688)
++++ lib/Plagger/Rule/Deduped.pm (working copy)
+@@ -6,11 +6,19 @@
+ 
+ sub init {
+     my $self = shift;
++    my @dbms = qw( NDBM DB GDBM SDBM ODBM );
+ 
+-    $self->{engine} ||= 'DB_File';
++    $self->{engine} ||= 'DB';
+ 
+-    my $class = "Plagger::Rule::Deduped::$self->{engine}";
+-    $class->require or Plagger->context->error("Error loading $class: $@");
++    my $class;
++    if( grep { $_ eq $self->{engine} } @dbms ){
++        $class = 'Plagger::Rule::Deduped::AnyDBM_File';
++        $class->use($self->{engine}) or Plagger->context->error("Error loading $class: $@");
++    }
++    else {
++        $class = "Plagger::Rule::Deduped::$self->{engine}";
++        $class->require or Plagger->context->error("Error loading $class: $@");
++    }
+ 
+     my $deduper = $class->new($self);
+     $self->{deduper} = $deduper;
+</pre>
+
+
+<p>
+こうすると現在の Deduped::DB_File も、Deduped::AnyDBM_File で吸収できます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/15/410/">Deduped::SDBM_File と Deduped::GDBM_File</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-15T19:08:00+09:00" pubdate>Sep 15<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/15/410/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+CustomFeed::AmazonWebService で検索キーワードをたくさん指定すると、なぜか Deduped の部分でハングする。もう少し正確に言うと、新着エントリが多い場合にハングするようです。同じエントリ数でも、Deduped によって検知される重複エントリが多い場合にはハングしません。
+</p>
+
+
+<p>
+で、strace で追ってみても原因がわからないため、違う実装を試してみることに。
+</p>
+
+
+<p>
+まず試したのは <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Deduped/SDBM_File.pm"><span class="icon"></span>Deduped::SDBM_File</a> 。でもこれでもハングする。
+</p>
+
+
+<p>
+次に試したのは <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Deduped/GDBM_File.pm"><span class="icon"></span>Deduped::GDBM_File</a> 。これでもハング、と思いきや、strace で追うと断続的に write が出て、DB ファイルに書き込みが行われている。遅いけど。なので、しばらく待ってみると正常終了した。
+</p>
+
+
+<p>
+SDBM の方も、ハングしている様に見えて、DB ファイルのタイムスタンプは更新されていたので、GDBM と同じくしばらく待っていれば終わったかも。
+</p>
+
+
+<p>
+ただ、DB_File の方はファイルタイムスタンプは変わらないし、ファイルサイズもずっと 0 のままだった。
+</p>
+
+
+<p>
+しばらくは GDBM を使って様子を見てみます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/12/256/">CustomFeed::DAAP と Filter::FetchDAAP #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-12T23:11:00+09:00" pubdate>Sep 12<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/12/256/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+CustomFeed::DAAP と Filter::FetchDAAP を、enclosure サポートして他のプラグインとも連携できるように <a class="ext-link" href="http://trac.mizzy.org/public/changeset/262"><span class="icon"></span>修正してみた</a>。
+</p>
+
+
+<p>
+これで Filter::RewriteEnclosureURL + Publish::Feed で Podcasting したり、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Publish/iTunes.pm"><span class="icon"></span>Publish::iTunes</a> で直接 iTunes へ追加、とかできるはず。試してないけど。
+</p>
+
+
+<p>
+ますますクロい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/11/445/">CustomFeed::DAAP と Filter::FetchDAAP #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-11T11:59:00+09:00" pubdate>Sep 11<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/11/445/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+思いつきで YAPC::NA 2006 での宮川さんのプレゼン 『 <a class="ext-link" href="http://blog.bulknews.net/mt/archives/iTunesHacks-YAPCNA.pdf"><span class="icon"></span>Hacking iTunes from Perl(PDF)</a> 』の 「 Hack <a class="ticket" href="/ticket/5">#5</a> Download songs from iTunes share 」を Plagger プラグインとして実装してみた。
+</p>
+
+
+<ul><li><a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/DAAP.pm"><span class="icon"></span>CustomFeed::DAAP</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FetchDAAP.pm"><span class="icon"></span>Filter::FetchDAAP</a></li></ul>
+
+
+<p>
+黒い気がするので説明は省略。
+</p>
+
+
+<p>
+enclosure と絡めるべきなんだろうけど、url をどうしようか悩み、とりあえず後で考えることにしました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/09/380/">Apache での SSL クライアント証明書による認証</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-09T03:47:00+09:00" pubdate>Sep 9<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/09/380/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Apache 2.x で SSL クライアント証明書による認証を行うためのメモ。ssl.conf があるので、そいつに以下の様な設定を入れる。（コメントアウトされてるので、# を外して適当に書き換える。）
+</p>
+
+
+<pre class="wiki">
+SSLCACertificatePath /usr/local/apache/conf/ca
+SSLCACertificateFile /usr/local/apache/conf/ca/cacert.pem
+</pre>
+
+
+<p>
+cacert.pem は <a class="ext-link" href="http://mizzy.org/linux/ssl_client_certificate.html"><span class="icon"></span>このエントリ</a> で生成された cacert.pem を適当な場所にコピーするなり、ダイレクトにパスを指定するなりする。
+</p>
+
+
+<pre class="wiki">
+SSLVerifyClient require
+SSLVerifyDepth  10
+</pre>
+
+
+<p>
+これで Apache を再起動してやれば OK。cacert.pem を持つ CA から発行された証明書のみ、アクセスが許可されるようになる。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/09/480/">SSL クライアント証明書の発行</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-09T03:18:00+09:00" pubdate>Sep 9<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/09/480/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+OpenSSL で クライアント証明書を発行する手順メモ。
+</p>
+
+
+<h3 id="openssl.cnfの修正">openssl.cnf の修正</h3>
+
+
+<p>
+パスは環境によって違うでしょうが、うちの場合は /usr/local/ssl/openssl.cnf 。
+</p>
+
+
+<pre class="wiki">
+# For normal client use this is typical
+# nsCertType = client, email
+</pre>
+
+
+<p>
+を以下の様に変えとく。
+</p>
+
+
+<pre class="wiki">
+# For normal client use this is typical
+nsCertType = client, email
+</pre>
+
+
+<h3 id="CA用ファイルの作成">CA 用ファイルの作成</h3>
+
+
+<p>
+直接 openssl コマンド叩くよりも、OpenSSL 付属の CA.sh や CA.pl を使うほうが楽。どちらもやれることは一緒っぽいので、ここでは CA.pl の方を使ってみる。
+</p>
+
+
+<pre class="wiki">
+$ mkdir cert
+$ cd cert
+$ /usr/local/ssl/misc/CA.pl -newca
+CA certificate filename (or enter to create)
+
+Making CA certificate ...
+Generating a 1024 bit RSA private key
+...++++++
+.............++++++
+unable to write 'random state'
+writing new private key to './demoCA/private/cakey.pem'
+Enter PEM pass phrase:
+Verifying - Enter PEM pass phrase:
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:jp
+State or Province Name (full name) [Some-State]:kanagawa
+Locality Name (eg, city) []:sagamihara
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:mizzy.org
+Organizational Unit Name (eg, section) []:
+Common Name (eg, YOUR name) []:CA of mizzy.org
+Email Address []:
+$ ls
+demoCA/
+</pre>
+
+
+<p>
+CA のキーや証明書やらシリアル番号管理用ファイルやら、諸々作ってくれます。
+</p>
+
+
+<h3 id="リクエスト生成">リクエスト生成</h3>
+
+
+<p>
+クライアント証明書用リクエスト作成。
+</p>
+
+
+<pre class="wiki">
+$ /usr/local/ssl/misc/CA.pl -newreq
+Generating a 1024 bit RSA private key
+...............................++++++
+......++++++
+unable to write 'random state'
+writing new private key to 'newreq.pem'
+Enter PEM pass phrase:
+Verifying - Enter PEM pass phrase:
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:jp
+State or Province Name (full name) [Some-State]:kanagawa
+Locality Name (eg, city) []:sagamihara
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:mizzy.org
+Organizational Unit Name (eg, section) []:
+Common Name (eg, YOUR name) []:Gosuke Miyashita
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+Request (and private key) is in newreq.pem
+</pre>
+
+
+<p>
+以下の様な キーと CSR を含んだ newreq.pem ができあがる。
+</p>
+
+
+<pre class="wiki">
+-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,C27EDC6FD0152E96
+
+ki738nKH/tR2n2QWm9LmRrRJNGMOPpBwT+a3+HMeU/jGuXutW4qGdVA+OGTKES89
+FB11qih4Utb1fEasofdubvuQssSM3yHaPYD20rLkSlepHuoT0PiBYf7yrIJxntd4
+IwnFm4OepZ2wW9yzT6sicWLmPq/W+h7db0OCU/sls/5Je5awdY74/68VdurgKFpH
+Ev8qdo1Qr/azyIsCOCjEIHj1ZgDdJs2wNbg7iIyPkDscZYe0uL+E8B81SCx8UUWV
+iXRjJrrQZLgN0hFKQuYKb+RSQjv9gYQk47vgigAEQmBBpsrPB9nOb0+vuXCpY6o6
+AqvTCgk7/UYjDuSPEDT3VS+JD8EG9B+wZNIMXrT4WerX4ajiF/ylOd280YhZf+dC
+Dcw1nM2lulgJ+HKGdCLHXAIT4uEdRYJSsqZ23hmSmWmwjODN0kuqEQxAfRZC6tmJ
+UPdTRZBdXX8q+dT6pndHFdOG+kTkkoD/VwVtYShnGiAch+dbSRNyNQxslQX3QJJk
+oj+Q90pB8+EQ09tJJjUGwV2R/9O5Cdxc6JJ1nkrkUaRqDU2G9SjL2XUiQzYShbvV
+TAJkECe/6yYYpAOR2S2s0bxJKEq7cIyBEAbKf7HaNB7n+Qh/d4QK4kgbA+qgTY6D
+/l328ja/gbweljfX1gdOsS3OG8HvtDrbK3VKabf5hJrmmEOEpMejiCso8exTVluW
+uC4O8lijiZXCMlluR9JLjw5TUZ2bje3YEDxhNKrxmu8s2mMHKiWtl48d7fvWfLQP
+UsdqFM/mbTCFGXPMsAZ5NpFd1aTASW+JzlI5ivi7SmMNblgCasuuMA==
+-----END RSA PRIVATE KEY-----
+-----BEGIN CERTIFICATE REQUEST-----
+MIIBpDCCAQ0CAQAwZDELMAkGA1UEBhMCanAxETAPBgNVBAgTCGthbmFnYXdhMRMw
+EQYDVQQHEwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcxGTAXBgNVBAMT
+EEdvc3VrZSBNaXlhc2hpdGEwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANp9
+lhjHNQmMSH08ccj0C4+bKle4Prd0GglGMueKIUBCXGk5o6xS7o5U9JH9YfzVN4vC
+zdOLwzw9NNfeLALrymt8vyBTE9/RenxRcCRk4CMRvD6YMsrJ6+9b/z425FY/FU5q
+TAg0Gs30VgyjqBo81K7A9Zi63U2z5JkFtFOY2dyZAgMBAAGgADANBgkqhkiG9w0B
+AQQFAAOBgQBNo4ubHdThZOAQvB+jqRBG4pXQu4Go8sgzEY+hdOEvp+L7T3jxqh1W
+XXrA3FFBQtbzEnjXlias3g4jQcFtakdD1SIM7HoJbBQ9y4gsT/9q+ZyvyIkuCPnD
+SasVBdVklOC19BT6kw5V0sOv+Zt/4n4asrktjqSArFz6dF7ERXcjVg==
+-----END CERTIFICATE REQUEST-----
+</pre>
+
+
+<h3 id="CAによる署名">CA による署名</h3>
+
+
+<pre class="wiki">
+$ /usr/local/ssl/misc/CA.pl -sign
+Using configuration from /usr/local/ssl/openssl.cnf
+Enter pass phrase for ./demoCA/private/cakey.pem:
+Check that the request matches the signature
+Signature ok
+Certificate Details:
+        Serial Number: 1 (0x1)
+        Validity
+            Not Before: Sep  8 17:57:48 2006 GMT
+            Not After : Sep  8 17:57:48 2007 GMT
+        Subject:
+            countryName               = jp
+            stateOrProvinceName       = kanagawa
+            localityName              = sagamihara
+            organizationName          = mizzy.org
+            commonName                = Gosuke Miyashita
+        X509v3 extensions:
+            X509v3 Basic Constraints:
+            CA:FALSE
+            Netscape Cert Type:
+            SSL Client, S/MIME
+            Netscape Comment:
+            OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier:
+            EF:7F:AA:D8:9A:C2:83:BC:69:C0:55:C8:B6:11:3F:C1:DD:D2:A7:C9
+            X509v3 Authority Key Identifier:
+            keyid:27:4C:C9:4E:45:63:A8:62:1B:41:4D:14:2A:98:C9:EE:87:AE:1D:09
+            DirName:/C=jp/ST=kanagawa/L=sagamihara/O=mizzy.org/CN=CA of mizzy.org
+            serial:00
+
+Certificate is to be certified until Sep  8 17:57:48 2007 GMT (365 days)
+Sign the certificate? [y/n]:y
+
+
+1 out of 1 certificate requests certified, commit? [y/n]y
+Write out database with 1 new entries
+Data Base Updated
+Signed certificate is in newcert.pem
+</pre>
+
+
+<p>
+以下の様な newcert.pem ができる。
+</p>
+
+
+<pre class="wiki">
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: md5WithRSAEncryption
+        Issuer: C=jp, ST=kanagawa, L=sagamihara, O=mizzy.org, CN=CA of mizzy.org
+        Validity
+            Not Before: Sep  8 17:57:48 2006 GMT
+            Not After : Sep  8 17:57:48 2007 GMT
+        Subject: C=jp, ST=kanagawa, L=sagamihara, O=mizzy.org, CN=Gosuke Miyashita
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:da:7d:96:18:c7:35:09:8c:48:7d:3c:71:c8:f4:
+                    0b:8f:9b:2a:57:b8:3e:b7:74:1a:09:46:32:e7:8a:
+                    21:40:42:5c:69:39:a3:ac:52:ee:8e:54:f4:91:fd:
+                    61:fc:d5:37:8b:c2:cd:d3:8b:c3:3c:3d:34:d7:de:
+                    2c:02:eb:ca:6b:7c:bf:20:53:13:df:d1:7a:7c:51:
+                    70:24:64:e0:23:11:bc:3e:98:32:ca:c9:eb:ef:5b:
+                    ff:3e:36:e4:56:3f:15:4e:6a:4c:08:34:1a:cd:f4:
+                    56:0c:a3:a8:1a:3c:d4:ae:c0:f5:98:ba:dd:4d:b3:
+                    e4:99:05:b4:53:98:d9:dc:99
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints:
+            CA:FALSE
+            Netscape Cert Type:
+            SSL Client, S/MIME
+            Netscape Comment:
+            OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier:
+            EF:7F:AA:D8:9A:C2:83:BC:69:C0:55:C8:B6:11:3F:C1:DD:D2:A7:C9
+            X509v3 Authority Key Identifier:
+            keyid:27:4C:C9:4E:45:63:A8:62:1B:41:4D:14:2A:98:C9:EE:87:AE:1D:09
+            DirName:/C=jp/ST=kanagawa/L=sagamihara/O=mizzy.org/CN=CA of mizzy.org
+            serial:00
+
+    Signature Algorithm: md5WithRSAEncryption
+        96:0f:74:99:c1:b7:ce:62:08:df:d0:f8:f2:6b:ee:1e:90:43:
+        c7:8e:9c:4d:f2:de:2d:05:06:b9:25:49:d1:6e:d5:65:04:65:
+        71:52:44:1e:8f:87:9b:7b:e7:ed:d1:60:0a:6a:d1:fa:41:cc:
+        2a:82:b6:10:84:2a:7c:e3:8f:bf:32:a8:e0:01:d9:99:e6:ab:
+        dd:5e:a8:26:4d:85:cf:64:b7:62:de:74:5f:df:36:fe:ce:fd:
+        cd:b2:37:e1:a4:ce:6a:da:1e:3e:f7:89:24:cd:de:f3:9f:39:
+        5f:01:78:3c:30:ae:57:e1:94:07:fd:60:51:66:f8:9b:66:60:
+        1c:bb
+-----BEGIN CERTIFICATE-----
+MIIDPDCCAqWgAwIBAgIBATANBgkqhkiG9w0BAQQFADBjMQswCQYDVQQGEwJqcDER
+MA8GA1UECBMIa2FuYWdhd2ExEzARBgNVBAcTCnNhZ2FtaWhhcmExEjAQBgNVBAoT
+CW1penp5Lm9yZzEYMBYGA1UEAxMPQ0Egb2YgbWl6enkub3JnMB4XDTA2MDkwODE3
+NTc0OFoXDTA3MDkwODE3NTc0OFowZDELMAkGA1UEBhMCanAxETAPBgNVBAgTCGth
+bmFnYXdhMRMwEQYDVQQHEwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcx
+GTAXBgNVBAMTEEdvc3VrZSBNaXlhc2hpdGEwgZ8wDQYJKoZIhvcNAQEBBQADgY0A
+MIGJAoGBANp9lhjHNQmMSH08ccj0C4+bKle4Prd0GglGMueKIUBCXGk5o6xS7o5U
+9JH9YfzVN4vCzdOLwzw9NNfeLALrymt8vyBTE9/RenxRcCRk4CMRvD6YMsrJ6+9b
+/z425FY/FU5qTAg0Gs30VgyjqBo81K7A9Zi63U2z5JkFtFOY2dyZAgMBAAGjgf4w
+gfswCQYDVR0TBAIwADARBglghkgBhvhCAQEEBAMCBaAwLAYJYIZIAYb4QgENBB8W
+HU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBTvf6rYmsKD
+vGnAVci2ET/B3dKnyTCBjQYDVR0jBIGFMIGCgBQnTMlORWOoYhtBTRQqmMnuh64d
+CaFnpGUwYzELMAkGA1UEBhMCanAxETAPBgNVBAgTCGthbmFnYXdhMRMwEQYDVQQH
+EwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcxGDAWBgNVBAMTD0NBIG9m
+IG1penp5Lm9yZ4IBADANBgkqhkiG9w0BAQQFAAOBgQCWD3SZwbfOYgjf0Pjya+4e
+kEPHjpxN8t4tBQa5JUnRbtVlBGVxUkQej4ebe+ft0WAKatH6QcwqgrYQhCp844+/
+MqjgAdmZ5qvdXqgmTYXPZLdi3nRf3zb+zv3NsjfhpM5q2h4+94kkzd7znzlfAXg8
+MK5X4ZQH/WBRZvibZmAcuw==
+-----END CERTIFICATE-----
+</pre>
+
+
+<h3 id="PEMからPKCS12へ">PEM から PKCS12 へ</h3>
+
+
+<p>
+PEM のままではブラウザにインポートできないので、PKCS12 へ変換。
+</p>
+
+
+<pre class="wiki">
+$ openssl pkcs12 -export -in newcert.pem -inkey newreq.pem -certfile demoCA/cacert.pem -out newcert.p12
+Enter pass phrase for newreq.pem:
+Enter Export Password:
+Verifying - Enter Export Password:
+</pre>
+
+
+<h3 id="newcert.p12をブラウザにインポート">newcert.p12 をブラウザにインポート</h3>
+
+
+<p>
+手順は省略。Firefox だとこんな感じで入る。
+</p>
+
+
+<p>
+<img src="http://mizzy.org/img/client_certificate.jpg" alt="http://mizzy.org/img/client_certificate.jpg" />
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/06/329/">Plagger::Plugin::SmartFeed の使い方</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-06T00:55:00+09:00" pubdate>Sep 6<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/06/329/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/filter_rule_and_filter_clone_feed.html"><span class="icon"></span>前回のエントリ</a> について、それ SmartFeed でできるよ、と宮川さんに教えて頂きました。こんな感じで。
+</p>
+
+
+<pre class="wiki">
+  - module: CustomFeed::AmazonWebService
+    config:
+      title: Amazon - New Books
+      developer_token: XXXXXXXXXXXXXXXXXXXX
+      associate_id: xxxxxx-22
+      keywords:
+        - 川原正敏
+
+  - module: SmartFeed
+    rule:
+      module: Ahead
+    config:
+      title: Amazon - New Books
+
+  - module: Publish::iCal
+    config:
+      dir: /home/miya/ical
+      filename: %t.ics
+    rule:
+      expression: $args->{feed}->id ne 'smartfeed:ahead'
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: xxx@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+    rule:
+      expression: $args->{feed}->id eq 'smartfeed:ahead'
+</pre>
+
+
+<p>
+というわけで、Filter::Rule の改造も、Filter::CloneFeed の存在もまったく必要なし、でした。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/260"><span class="icon"></span>Rule::Ahead には若干手を加えました</a> 。
+</p>
+
+
+<p>
+今まで SmartFeed が全然理解できていなかったのですが、Filter::Rule の DESCRIPTION に以下の様な記述がある、ということも教えて頂きました。
+</p>
+
+
+<pre class="wiki">
+DESCRIPTION
+       This module strips entries and feeds using Rules. It's
+       sort of like SmartFeed, but while SmartFeed creates new
+       feed using Rule, Filter::Rule strips entries and feeds
+       that don't match with Rules.
+</pre>
+
+
+<p>
+「Filter::Rule は Rule に基づいてフィード/エントリをフィルタリングする（元フィード自体に手を加える）、SmartFeed は 指定された Rule に基づいて新しくフィードを生成する（元フィードには手を加えない）」ってことですね。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060906"><span class="icon"></span>宮川さんがこちらに書いてくださってましたね</a>。ありがとうございます！
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/05/397/">Filter::Rule と Filter::CloneFeed</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-05T20:53:00+09:00" pubdate>Sep 5<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/05/397/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+最近は Plagger いじりの記録と化してるこのブログですが、今日もまた Plagger ネタですよ。
+</p>
+
+
+<p>
+ちょっとやりたいことがあって、Filter::Rule の改造と、Filter::CloneFeed というものを作ってみました。やりたいことが何かというのは長くなるので、後回しにして、まずは Filter::Rule の修正内容と、Filter::CloneFeed の説明を。
+</p>
+
+
+<p>
+Filter::Rule の修正内容はこんな感じです。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Plugin/Filter/Rule.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Plugin/Filter/Rule.pm (revision 258)
++++ plagger/trunk/lib/Plagger/Plugin/Filter/Rule.pm (revision 259)
+@@ -19,4 +19,12 @@
+ sub feed {
+     my($self, $context, $args) = @_;
++
++    if ( defined ( my $expression = $self->conf->{expression} ) ){
++        my $status = eval $expression;
++        if ($@) {
++            Plagger->context->log(error => "Expression error: $@ with '$expression'");
++        }
++        return unless $status;
++    }
+ 
+     for my $entry ($args->{feed}->entries) {
+</pre>
+
+
+<p>
+これにより何ができるかというと、以下のような yaml を書くことで、フィルタを適用するためのルールを設定することができます。
+</p>
+
+
+<pre class="wiki">
+  - module: Filter::Rule
+    rule:
+      module: Fresh
+      duration: 60
+    config:
+      expression: $args->{feed}->type eq 'AmazonWebService'
+</pre>
+
+
+<p>
+この例だと、feed type が AmazonWebService であるフィードには Rule::Fresh を適用する、それ以外のフィードには何もフィルタをかけずにそのままにする、という動作になります。
+</p>
+
+
+<p>
+次に Filter::CloneFeed ですが、名前の通りフィードの複製をつくります。で、複製されたフィードは type が clone となります。ソースはこれだけです。
+</p>
+
+
+<pre class="wiki">
+package Plagger::Plugin::Filter::CloneFeed;
+use strict;
+use base qw( Plagger::Plugin );
+
+sub register {
+    my($self, $context) = @_;
+    $context->register_hook(
+        $self,
+        'update.feed.fixup' => \&amp;clone,
+    );
+}
+
+sub clone {
+    my($self, $context, $args) = @_;
+
+    my $feed = $args->{feed}->clone;
+    $feed->type('clone');
+    $context->update->add($feed);
+}
+
+1;
+</pre>
+
+
+<p>
+で、これで何がやりたかったかというと、以下のようなことがやりたかったんです。
+</p>
+
+
+<pre class="wiki">
+  - module: CustomFeed::AmazonWebService
+    config:
+      title: Amazon - New Books
+      developer_token: XXXXXXXXXXXXXXXXXXXX
+      associate_id: xxxxxx-22
+      keywords:
+        - 川原正敏
+
+  - module: Filter::CloneFeed
+
+  - module: Filter::Rule
+    rule:
+      module: Ahead
+    config:
+      expression: $args->{feed}->type eq 'clone'
+
+  - module: Publish::iCal 
+    config:
+      dir: /home/miya/ical
+      filename: %t.ics
+    rule:
+      module: FeedType
+      type: AmazonWebService
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: xxx@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+    rule:
+      module: FeedType
+      type: clone
+</pre>
+
+
+<p>
+言葉で説明すると、こんな感じです。
+</p>
+
+
+<ul><li>CustomFeed::AmazonWebService で Amazon 検索してフィードを生成。</li>
+<li>Filter::CloneFeed でフィードの複製をつくる。</li>
+<li>Filter::Rule で、複製されたフィード（type が clone）のみに <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Ahead.pm"><span class="icon"></span>Rule::Ahead</a> を適用し、今から1日以内に発売される商品情報だけを抽出。オリジナルのフィードにはフィルタをかけないので、検索された商品情報がすべて含まれている。</li>
+<li>Publish::iCal で商品情報を iCalendar 形式で吐き出す。Rule::FeedType を適用し、クローンではないオリジナルのフィード（type が AmazonWebService）だけを吐き出す。これで Amazon 検索の結果すべてが iCalendar 形式のデータになる。</li>
+<li>Publish::Gmail で商品情報をメールで送信。Rule::FeedType を適用し、クローンのフィード（type が clone）だけを送信。これで1日以内に発売される商品情報のみが送信される。</li></ul>
+
+
+<p>
+要するに、同じフィードでも、Publish プラグイン毎に異なる内容で Publish したかった、というわです。
+</p>
+
+
+<p>
+最初は以下のような yaml で、Publish::iCal では Rule を指定せずに全部吐き出す、Publish::Gmail では Rule::Ahead を適用して、1日以内に発売される商品情報だけ送信、とできるんじゃないかな、と思ったのですが、Publish::Gmail は publish.feed フックで動作していて、Rule でエントリレベルのフィルタリングができないんですよね。
+</p>
+
+
+<pre class="wiki">
+  - module: CustomFeed::AmazonWebService
+    config:
+      title: Amazon - New Books
+      developer_token: XXXXXXXXXXXXXXXXXXXX
+      associate_id: xxxxxx-22
+      keywords:
+        - 川原正敏
+
+  - module: Publish::iCal 
+    config:
+      dir: /home/miya/ical
+      filename: %t.ics
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: xxx@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+    rule:
+      module: Ahead
+</pre>
+
+
+<p>
+こういった事情で、Filter::Rule を改造し Filter::CloneFeed をつくってみました。もっとエレガントな方法があれば教えてください。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+<a class="ext-link" href="http://mizzy.org/program/smartfeed.html"><span class="icon"></span>もっとエレガントな方法教えてもらいました</a>。というか、上でやったことは全くの無駄でした。なので参考にしないでください。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/21/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/19/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/10/30/vimeo-tag-plugin/">vimeo tag plugin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2011 - Gosuke Miyashita -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mizzyorg';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
