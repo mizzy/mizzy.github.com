@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="リバースプロキシな環境では mod_rpaf 使ったりすることが多いと思いますが、バックエンドの apache でアクセス制限かける場合には、mod_extract_forwarded を使ったほうが良いよ、というお話。 バックエンドの apache 2.0 + mod_rpaf な環境で . &hellip;">
+  <meta name="description" content="このエントリ の様な経緯で、うちでは apache + tracd という構成で trac を動かしてるのですが、tracd がしょっちゅう落ちるんですよね。1日に2, 3回ぐらいは落ちる感じ。で、5分ごとに cron で tracd プロセスを監視して、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,115 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/17/417/">Trac を Lighttpd + FastCGI で動かす</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-17T23:40:00+09:00" pubdate>May 17<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/17/417/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/trac.html" target="_blank">このエントリ</a> の様な経緯で、うちでは apache + tracd という構成で trac を動かしてるのですが、tracd がしょっちゅう落ちるんですよね。1日に2, 3回ぐらいは落ちる感じ。で、5分ごとに cron で tracd プロセスを監視して、落ちてたら再起動ってなことをやってるんですが、<a href="http://unknownplace.org/memo/" target="_blank">typester さん</a> から「うちは lighttpd + FastCGI でやってるよ」というアドバイスを頂いたので、試してみました。
+</p>
+
+
+
+
+<p class="entryBody">
+やったことは以下の通り。
+</p>
+
+
+
+
+<ol class="entryBody">
+<li>FastCGI のインストール</li>
+<li>lighttpd のインストール</li>
+<li>lighttpd.conf を書く</li>
+<li>lighttpd の起動</li>
+</ol>
+
+
+
+
+<p class="entryBody">
+1, 2 については省略。ディストリビューションによって違うでしょうし、うちは Slackware だからあんまり参考にならないだろうし。3 については以下の様な内容の /usr/local/etc/lighttpd.conf を作成した。
+</p>
+
+
+
+
+<pre class="code">
+server.modules              = (
+                               "mod_fastcgi",
+                              )
+server.document-root        = "/home/miya/html"
+server.errorlog             = "/var/log/lighttpd.error.log"
+mimetype.assign             = (
+  ".png"          =>      "image/png",
+ )
+static-file.exclude-extensions = ( ".fcgi" )
+server.port                = 81
+server.bind                = "localhost"
+server.username            = "svn"
+server.groupname           = "svn"
+fastcgi.server = ("/public" =>
+                   ("public" =>
+                     ("socket" => "/tmp/trac-fastcgi.sock",
+                      "bin-path" => "/usr/local/share/trac/cgi-bin/trac.fcgi",
+                      "check-local" => "disable",
+                      "bin-environment" =>
+                        ("TRAC_ENV" => "/home/miya/trac/public")
+                     )
+                   )
+</pre>
+
+
+
+
+<p class="entryBody">
+たったこれだけの設定でちゃんと動きました。起動は以下のコマンドで。
+</p>
+
+
+
+
+<pre class="code">
+$ sudo /usr/local/sbin/lighttpd -f /usr/local/etc/lighttpd.conf
+</pre>
+
+
+
+
+<p class="entryBody">
+あとは apache の設定を変更してやれば OK。<a href="http://trac.mizzy.org/public/" target="_blank">こんな感じで</a> 動いてます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -725,63 +834,6 @@ IRC で宮川さんからアドバイス頂いたのでメモ。
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/04/02/315/">Plagger::Plugin::Filter::TinyURL</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-04-02T19:46:00+09:00" pubdate>Apr 2<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/04/02/315/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/TinyURL.pm" target="_blank">P::P::Filter::TinyURL</a> を意味もなくアップデート。
-</p>
-
-
-
-
-<p class="entryBody">
-feed の link, entry の link, entry の enclosure の中から、どの URL を変換するかを指定できるようにしてみた。
-</p>
-
-
-
-
-<p class="entryBody">
-けど、このプラグインって、CustomFeed::GoogleVideo の結果を iTunes に取り込むためにやむなく必要になって作ったものなので、これ以外の有効な使い方が思いつかない。なので、このプラグイン自体の実装の方向性もいまいち定まらない感じ。
-</p>
-
-
-
-
-<p class="entryBody">
-Tiny URL に変換するのに外部サービス使ってるのがキモイので、0.8 の Server and Database 対応が完了したら、Plagger 自前で処理するようにするといいのかな。でも、現状の使い途だけだったら、そこまでする必要もないか。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/27/">&larr; Older</a>
@@ -799,6 +851,10 @@ Tiny URL に変換するのに外部サービス使ってるのがキモイの�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -812,10 +868,6 @@ Tiny URL に変換するのに外部サービス使ってるのがキモイの�
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

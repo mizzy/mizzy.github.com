@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Blog Hackers Conference 2005から帰ってきました。3時間半ほど前に。家庭がある身なので、「打倒naoya！はてなTシャツ争奪ジャンケンバトル」（呼び捨てすんません）に2nd Roundで敗れて早々会場を後にしたわけですが、あの後も何かおもしろいことあったんですかね。 &hellip;">
+  <meta name="description" content="fladdict.net blogの中の人が書かれている、「ソーシャルブックマーク考　タギングの可視化について」というエントリを見て、自分も最近別方向からのタグの可視化について考えていたので、それについて書いてみる。 fladdict.net blogの中の人は、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,91 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/29/383/">タグの関連性の可視化 #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-29T15:26:00+09:00" pubdate>May 29<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/29/383/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.fladdict.net/blog-jp/" target="_blank">fladdict.net blog</a>の中の人が書かれている、<a href="http://www.fladdict.net/blog-jp/archives/2005/05/post_79.php" target="_blank">「ソーシャルブックマーク考　タギングの可視化について」</a>というエントリを見て、自分も最近別方向からのタグの可視化について考えていたので、それについて書いてみる。
+</p>
+
+
+
+
+<p class="entryBody">
+fladdict.net blogの中の人は、タグの出現頻度を可視化する手法が画一的なのに対して問題提起をしておられるのですが、自分が考えているのは、「頻度だけを可視化するのでは情報として不十分じゃないのか？」ということです。
+</p>
+
+
+
+
+<p class="entryBody">
+出現頻度の可視化により、タグづけしている人の趣味嗜好や関心事の傾向がひと目で把握できるのはおもしろいのですが、頻度だけから得られる情報には限りがあるなぁ、と。例えば、このブログでのタグの出現頻度をとると、「blosxom」が19で最多、次いで「plugin」が18といった感じなのですが、これだけを見ると「こいつはblosxomとpluginに関心があるのかぁ。で、pluginって何のplugin？」といった感じになるわけですが、実際にはblosxomというタグとpluginというタグはほとんどが同一のエントリにタグづけされているわけで、「blosxomのplugin」に関する話題が多いわけですよ。タグ間の関連性まで可視化できて、blosxomタグとpluginタグの関連性が強いということがひとめで分かれば、「こいつはblosxomのpluginラブなんだな」というところまで読み取れるわけで、なんとかうまく関連性を可視化できる方法はないものかなぁ、と考えていたりします。
+</p>
+
+
+
+
+<p class="entryBody">
+で、とりあえず頻度は今まで通り、フォントのサイズで表すとして、関連性は何で表そうということになるのですが、色がいいのではないかと。ここまではすぐに思いつくのですが、じゃあ、いったいどういう形で色づけしていくのか、というのがノーアイデアだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+関連性の計算については、昨日のBlog Hacks Conで知った相互情報量とやらでいけそうだし、ひとつのタグを取り出して、それに関連するタグを引っ張り出すことは容易だと思います。しかし、すべてのタグをならべた状態で、各タグ間の関連を可視化するのは容易ではなさそうです。
+</p>
+
+
+
+
+<p class="entryBody">
+たとえば、A, B, C3つのタグがあるとして、AとB、BとCが関連が強く、AとCは関連がない、といった場合、どういう色で表せばいいのだろう？AとBは関連があるので同系色、BとCも関連があるので同系色、としてしまうと、関係のないAとCまでもが同系色になってしまいます。
+</p>
+
+
+
+
+<p class="entryBody">
+こんな感じで、「関連性を可視化できるといいんじゃね？」ということは思いついても、具体的にどう実装するかがノーアイデアという情けない状態だったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+もっと整理できてからエントリあげようかと思ったのですが、ここを読んだ頭の良い方が、「こうすれば簡単じゃね？」と言ってくれるのを期待して、ここに記すことにしました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -768,56 +853,6 @@ prototypeでは、オブジェクトをnewすると同時に必要なパラメ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/05/08/282/">Blosxomでtagging #9</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-05-08T21:11:00+09:00" pubdate>May 8<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/05/08/282/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="/archives/tagging" target="_blank">taggingプラグイン</a>をアップデート。
-</p>
-
-
-
-
-<p class="entryBody">
-storyサブルーチンで、meta-tagsを抜き出すルーチンを自前で書いていたのですが、<a href="http://www.blosxom.com/plugins/meta/meta.htm" target="_blank">metaプラグイン</a>が$meta::tagsという変数に入れてくれてるので、それを利用するようにしました。なので、コードが少しすっきり。
-</p>
-
-
-
-
-<p class="entryBody">
-以前はtaggingプラグインがmetaプラグインより前に呼び出される必要があったのですが、この修正により、逆にmetaプラグインよりも後に呼び出されるようにしないと、正常に動作しなくなりました。ご利用頂いている方は、ご注意下さい。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/37/">&larr; Older</a>
@@ -835,6 +870,10 @@ storyサブルーチンで、meta-tagsを抜き出すルーチンを自前で書
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -848,10 +887,6 @@ storyサブルーチンで、meta-tagsを抜き出すルーチンを自前で書
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom/Entry.pm NAME XML::Atom::Entry - Atom entry SYNOPSIS use XML::Atom::Entry; my $entry = XML::Atom::Entry-&gt;new; $ &hellip;">
+  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom/Feed.pm NAME XML::Atom::Feed - Atom feed SYNOPSIS use XML::Atom::Feed; use XML::Atom::Entry; my $feed = XML::Atom:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,207 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Feed.pm/">XML-Atom-0.22/lib/XML/Atom/Feed.pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-30T23:41:45+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Feed.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Feed.pm</p>
+
+<h1>NAME</h1>
+
+<p>XML::Atom::Feed - Atom feed</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use XML::Atom::Feed;
+    use XML::Atom::Entry;
+    my $feed = XML::Atom::Feed-&gt;new;
+    $feed-&gt;title('My Weblog');
+    my $entry = XML::Atom::Entry-&gt;new;
+    $entry-&gt;title('First Post');
+    $entry-&gt;content('Post Body');
+    $feed-&gt;add_entry($entry);
+    $feed-&gt;add_entry($entry, { mode =&gt; 'insert' });
+
+    my @entries = $feed-&gt;entries;
+    my $xml = $feed-&gt;as_xml;
+
+    ## Get a list of the &lt;link rel="..." /&gt; tags in the feed.
+    my $links = $feed-&gt;link;
+
+    ## Find all of the Atom feeds on a given page, using auto-discovery.
+    my @uris = XML::Atom::Feed-&gt;find_feeds('http://www.example.com/');
+
+    ## Use auto-discovery to load the first Atom feed on a given page.
+    my $feed = XML::Atom::Feed-&gt;new(URI-&gt;new('http://www.example.com/'));
+</code></pre>
+
+<h1>USAGE</h1>
+
+<h2>XML::Atom::Feed->new([ $stream ])</h2>
+
+<p>Creates a new feed object, and if <em>$stream&#8221; is supplied, fills it with the data specified by &#8221;$stream</em>.</p>
+
+<p>Automatically handles autodiscovery if <em>$stream</em> is a URI (see below).</p>
+
+<p>Returns the new <em>XML::Atom::Feed</em> object. On failure, returns <code>undef</code>.</p>
+
+<p><em>$stream</em> can be any one of the following:</p>
+
+<ul>
+<li>Reference to a scalar</li>
+</ul>
+
+
+<p> This is treated as the XML body of the feed.</p>
+
+<ul>
+<li>Scalar</li>
+</ul>
+
+
+<p> This is treated as the name of a file containing the feed XML.</p>
+
+<ul>
+<li>Filehandle</li>
+</ul>
+
+
+<p> This is treated as an open filehandle from which the feed XML can be read.</p>
+
+<ul>
+<li>URI object</li>
+</ul>
+
+
+<p> This is treated as a URI, and the feed XML will be retrieved from the URI.</p>
+
+<p> If the content type returned from fetching the content at URI is <em>text/html&#8221;, this method will automatically try to perform auto-discovery by looking for a &#8221;<link></em> tag describing the feed URL. If such a URL is found, the feed XML will be automatically retrieved.</p>
+
+<p> If the URI is already of a feed, no auto-discovery is necessary, and the feed XML will be retrieved and parsed as normal.</p>
+
+<h2>XML::Atom::Feed->find_feeds($uri)</h2>
+
+<p>Given a URI <em>$uri&#8221;, use auto-discovery to find all of the Atom feeds linked from that page (using &#8221;<link></em> tags).</p>
+
+<p>Returns a list of feed URIs.</p>
+
+<h2>$feed->link</h2>
+
+<p>If called in scalar context, returns an <em>XML::Atom::Link&#8221; object corresponding to the first &#8221;<link></em> tag found in the feed.</p>
+
+<p>If called in list context, returns a list of <em>XML::Atom::Link&#8221; objects corresponding to all of the &#8221;<link></em> tags found in the feed.</p>
+
+<h2>$feed->add_link($link)</h2>
+
+<p>Adds the link <em>$link&#8221;, which must be an &#8221;XML::Atom::Link&#8221; object, to the feed as a new &#8221;<link></em> tag. For example:</p>
+
+<pre><code>    my $link = XML::Atom::Link-&gt;new;
+    $link-&gt;type('text/html');
+    $link-&gt;rel('alternate');
+    $link-&gt;href('http://www.example.com/');
+    $feed-&gt;add_link($link);
+</code></pre>
+
+<h2>$feed->add_entry($entry)</h2>
+
+<p>Adds the entry <em>$entry&#8221;, which must be an &#8221;XML::Atom::Entry</em> object, to the feed. If you want to add an entry before existent entries, you can pass optional hash reference containing <code>mode</code> value set to <code>insert</code>.</p>
+
+<pre><code>  $feed-&gt;add_entry($entry, { mode =&gt; 'insert' });
+</code></pre>
+
+<h2>$feed->entries</h2>
+
+<p>Returns list of XML::Atom::Entry objects contained in the feed.</p>
+
+<h2>$feed->language</h2>
+
+<p>Returns the language of the feed, from <em>xml:lang</em>.</p>
+
+<h2>$feed->author([ $author ])</h2>
+
+<p>Returns an <em>XML::Atom::Person</em> object representing the author of the entry, or <code>undef</code> if there is no author information present.</p>
+
+<p>If <em>$author&#8221; is supplied, it should be an &#8221;XML::Atom::Person</em> object representing the author. For example:</p>
+
+<pre><code>    my $author = XML::Atom::Person-&gt;new;
+    $author-&gt;name('Foo Bar');
+    $author-&gt;email('foo@bar.com');
+    $feed-&gt;author($author);
+</code></pre>
+
+<h1>UNICODE FLAGS</h1>
+
+<p>By default, XML::Atom takes off all the Unicode flag fro mthe feed content. For example,</p>
+
+<pre><code>  my $title = $feed-&gt;title;
+</code></pre>
+
+<p>the variable <code>$title</code> contains UTF-8 bytes without Unicode flag set, even if the feed title contains some multibyte chracters.</p>
+
+<p>If you don&#8217;t like this behaviour and wants to andle everything as Unicode characters (rather than UTF-8 bytes), set <code>$XML::Atom::ForceUnicode</code> flag to 1.</p>
+
+<pre><code>  $XML::Atom::ForceUnicode = 1;
+</code></pre>
+
+<p>then all the data returned from XML::Atom::Feed object and XML::Atom::Entry object etc., will have Unicode flag set.</p>
+
+<p>The only exception will be <code>$entry-&gt;content-&gt;body</code>, if content type is not text/* (e.g. image/gif). In that case, the content body is still binary data, without Unicode flag set.</p>
+
+<h1>CREATING ATOM 1.0 FEEDS</h1>
+
+<p>By default, XML::Atom::Feed and other classes (Entry, Link and Content) will create entities using Atom 0.3 namespaces. In order to create 1.0 feed and entry elements, you can set <em>Version</em> as a parameter, like:</p>
+
+<pre><code>  $feed &gt; 1.0);
+  $entry &gt; 1.0);
+</code></pre>
+
+<p>Setting those Version to every element would be sometimes painful. In that case, you can override the default version number by setting <code>$XML::Atom::DefaultVersion</code> global variable to &#8220;1.0&#8221;.</p>
+
+<pre><code>  use XML::Atom;
+
+  $XML::Atom::DefaultVersion = "1.0";
+
+  my $feed = XML::Atom::Feed-&gt;new;
+  $feed-&gt;title("blah");
+
+  my $entry = XML::Atom::Entry-&gt;new;
+  $feed-&gt;add_entry($entry);
+
+  $feed-&gt;version; # 1.0
+</code></pre>
+
+<h1>AUTHOR &amp; COPYRIGHT</h1>
+
+<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1753,39 +1954,6 @@ WikiPedia        http://en.wikipedia.org/wiki/
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/22/RecentChanges/">RecentChanges</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-22T19:46:21+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/22/RecentChanges/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>[[RecentChanges]]</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/15/">&larr; Older</a>
@@ -1803,6 +1971,10 @@ WikiPedia        http://en.wikipedia.org/wiki/
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -1816,10 +1988,6 @@ WikiPedia        http://en.wikipedia.org/wiki/
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

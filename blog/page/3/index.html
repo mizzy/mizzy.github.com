@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="!html &lt;a href="http://www.amazon.co.jp/dp/4774145823"&gt;&lt;img src="http://image.gihyo.co.jp/assets/images/cover/2011/9784774145822.jpg" /&gt;& &hellip;">
+  <meta name="description" content="node.js なサーバデーモン＆ログの管理をしようと思い、何を使おうか検討していたのですが、この手のデファクトスタンダードである daemontools は、特定のディレクトリ構造に従わないといけなかったり、run スクリプトや log/run スクリプトを置いたりしきゃいけなかったりで、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,176 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/04/27/SupervisorAProcessControlSystem/">SupervisorAProcessControlSystem</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-04-27T07:56:24+09:00" pubdate>Apr 27<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/04/27/SupervisorAProcessControlSystem/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>node.js なサーバデーモン＆ログの管理をしようと思い、何を使おうか検討していたのですが、この手のデファクトスタンダードである <a href="http://cr.yp.to/daemontools.html">daemontools</a> は、特定のディレクトリ構造に従わないといけなかったり、run スクリプトや log/run スクリプトを置いたりしきゃいけなかったりで、余計な作業が多くてお手軽じゃない、ってことで <a href="http://smarden.org/runit/">runit</a> を見てみたんですが、ぱっと見 daemontools との違いがよくわからなくて、daemontools とそれほど煩雑さは変わらないように見えたので、もっとお手軽なものがないかと探していたところ見つけたのが <a href="http://supervisord.org/">Supervisor</a> 。（といっても自分が知らなかっただけで以前からあるみたいですが。）</p>
+
+<p>Python 製で easy_install 一発でインストールできる。</p>
+
+<pre><code>$ sudo easy_install supervisor  
+</code></pre>
+
+<p>デフォルトの設定ファイルを以下のように生成。</p>
+
+<pre><code>$ sudo echo_supervisord_conf &gt; /etc/supervisord.conf
+</code></pre>
+
+<p>あとは実行。とりあえず試しなので、-n をつけてフォアグラウンド起動。</p>
+
+<pre><code>$ sudo supervisord -n
+2011-04-26 15:13:11,384 CRIT Supervisor running as root (no user in config file)
+2011-04-26 15:13:11,420 INFO RPC interface 'supervisor' initialized
+2011-04-26 15:13:11,421 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2011-04-26 15:13:11,421 INFO supervisord started with pid 25859
+</code></pre>
+
+<p>この状態ではデーモンを一切管理してない。で、/etc/supervisord.conf を覗くと、以下のような記述があって、どうやらこんな感じで管理するデーモンを設定するらしい。</p>
+
+<pre><code>;[program:theprogramname]
+;command=/bin/cat              ; the program (relative uses PATH, can take args)
+;process_name=%(program_name)s ; process_name expr (default %(program_name)s)
+;numprocs=1                    ; number of processes copies to start (def 1)
+;directory=/tmp                ; directory to cwd to before exec (def no cwd)
+;umask=022                     ; umask for process (default None)
+;priority=999                  ; the relative start priority (default 999)
+;autostart=true                ; start at supervisord start (default: true)
+;autorestart=true              ; retstart at unexpected quit (default: true)
+;startsecs=10                  ; number of secs prog must stay running (def. 1)
+;startretries=3                ; max # of serial start failures (default 3)
+;exitcodes=0,2                 ; 'expected' exit codes for process (default 0,2)
+;stopsignal=QUIT               ; signal used to kill process (default TERM)
+;stopwaitsecs=10               ; max num secs to wait b4 SIGKILL (default 10)
+;user=chrism                   ; setuid to this UNIX account to run the program
+;redirect_stderr=true          ; redirect proc stderr to stdout (default false)
+;stdout_logfile=/a/path        ; stdout log path, NONE for none; default AUTO
+;stdout_logfile_maxbytes=1MB   ; max # logfile bytes b4 rotation (default 50MB)
+;stdout_logfile_backups=10     ; # of stdout logfile backups (default 10)
+;stdout_capture_maxbytes=1MB   ; number of bytes in 'capturemode' (default 0)
+;stdout_events_enabled=false   ; emit events on stdout writes (default false)
+;stderr_logfile=/a/path        ; stderr log path, NONE for none; default AUTO
+;stderr_logfile_maxbytes=1MB   ; max # logfile bytes b4 rotation (default 50MB)
+;stderr_events_enabled=false   ; emit events on stderr writes (default false)
+;environment=A=1,B=2           ; process environment additions (def no adds)
+;serverurl=AUTO                ; override serverurl computation (childutils)
+</code></pre>
+
+<p>これを真似して、node.js な echo サーバをデーモン化してみた。最低限以下の設定を書けば OK。</p>
+
+<pre><code>[program:echo]
+command=/usr/local/bin/node /home/miya/echo.js
+stdout_logfile=/var/log/echo.log
+stderr_logfile=/var/log/echo.log
+</code></pre>
+
+<p>これで起動してみる。</p>
+
+<pre><code>$ sudo supervisord -n
+2011-04-26 15:22:05,577 CRIT Supervisor running as root (no user in config file)
+2011-04-26 15:22:05,612 INFO RPC interface 'supervisor' initialized
+2011-04-26 15:22:05,612 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2011-04-26 15:22:05,613 INFO supervisord started with pid 26078
+2011-04-26 15:22:06,621 INFO spawned: 'echo' with pid 26079
+2011-04-26 15:22:07,623 INFO success: echo entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)
+</code></pre>
+
+<p>echo サーバがちゃんと起動した。こんな感じで、特定のディレクトリ構造にしたり、run スクリプト置いたりしなくても、4行ほど設定書くだけでさくっとデーモン化できる。試しに kill してみたら、再起動してくれた。</p>
+
+<pre><code>2011-04-26 15:22:38,714 INFO exited: echo (exit status 1; not expected)
+2011-04-26 15:22:39,718 INFO spawned: 'echo' with pid 26122
+2011-04-26 15:22:40,720 INFO success: echo entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)
+</code></pre>
+
+<p>include が使えるので、実運用ではデーモン毎にファイルをわけてやると管理しやすそう。</p>
+
+<pre><code>;[include]
+;files = relative/directory/*.ini
+</code></pre>
+
+<p>supervisorctl というコマンドラインツールでステータス確認や起動/停止ができる。</p>
+
+<pre><code>$ sudo supervisorctl status echo
+echo                             RUNNING    pid 26256, uptime 0:05:41
+
+$ sudo supervisorctl stop echo
+echo: stopped
+
+$ sudo supervisorctl start echo
+echo: started
+</code></pre>
+
+<p>何も引数を指定しなければ、対話型のインターフェースが起動する。</p>
+
+<pre><code>$ sudo supervisorctl
+echo                             RUNNING    pid 26161, uptime 0:01:43
+supervisor&gt; 
+</code></pre>
+
+<p>? で利用できるコマンド表示。</p>
+
+<pre><code>supervisor&gt; ?
+
+default commands (type help &lt;topic&gt;):
+=====================================
+add    clear  fg        open  quit    remove  restart   start   stop  update 
+avail  exit   maintail  pid   reload  reread  shutdown  status  tail  version
+</code></pre>
+
+<p>help command で command の説明。</p>
+
+<pre><code>supervisor&gt; help stop
+stop &lt;name&gt;     Stop a process
+stop &lt;gname&gt;:*      Stop all processes in a group
+stop &lt;name&gt; &lt;name&gt;  Stop multiple processes or groups
+stop all        Stop all processes
+</code></pre>
+
+<p>それから、デフォルトではオフになってるけど、HTTP のインタフェースもある。こんな感じでオンにしてやる。（とりあえず検証目的なのでユーザ名やパスワードは設定しない。）</p>
+
+<pre><code>[inet_http_server]         ; inet (TCP) server disabled by default
+port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
+;username=user             ; (default is no username (open server))
+;password=123              ; (default is no password (open server))
+</code></pre>
+
+<p>ブラウザからアクセスするとこんな感じ。起動/停止やログの確認ができる。複数のデーモンを管理していれば、それらを一気に停止/起動もできるみたい。</p>
+
+<p>[[Image(http://mizzy.org/img/supervisor.png)]]</p>
+
+<p>supervisord 自体は、daemontools と同様、/etc/inittab とか、Upstart なら /etc/init/* とかで起動してやればいい。</p>
+
+<p>いまいちなところは、multilog と違ってログにタイムスタンプつけてくれなかったり、syslog に吐く機能もなかったりと、ログまわりはちょっと物足りない。</p>
+
+<p>他にも XML-RPC なインターフェースがあったり、色々機能はあるみたいなんだけど、とりあえず今日はこの辺で。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1005,77 +1175,6 @@ staprun:remove_module:205 Module simple removed.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/06/27/ZabbixBook/">ZabbixBook</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-06-27T01:43:55+09:00" pubdate>Jun 27<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/06/27/ZabbixBook/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>!html</h1>
-
-<pre><code>&lt;a href="http://www.amazon.co.jp/dp/4774142131"&gt;&lt;img src="http://ec2.images-amazon.com/images/I/51muk-EBA-L._SL500_AA300_.jpg" /&gt;&lt;/a&gt;
-</code></pre>
-
-<p>技術評論社様よりご献本頂いてたのですが、感想を書くのがすっかり遅くなってしまいました。</p>
-
-<p>タイトルの通り、統合監視ソフトウェア Zabbix について書かれた本です。和書では初の Zabbix 本ですね。（ですよね？）Software Design plus シリーズの第1弾ということで、今後のシリーズ展開がとても楽しみです。</p>
-
-<p>本書の目次は以下のようになっています。</p>
-
-<ul>
-<li>はじめに</li>
-<li>1章: 統合監視ソフトウェアZabbixとは</li>
-<li>2章: Zabbixのインストール</li>
-<li>3章: クイックスタートガイド</li>
-<li>4章: 監視対象と監視項目の設定</li>
-<li>5章: 障害検知と障害通知の設定</li>
-<li>6章: グラフィカル表示の設定</li>
-<li>7章: テンプレートの利用とエクスポート/インポート</li>
-<li>8章: 一般設定とユーザ設定</li>
-<li>9章: Zabbixによるシステム監視サーバ構築実践</li>
-<li>10章: 障害発生時のスクリプト実行機能の活用</li>
-<li>11章: アプリケーションの詳細監視</li>
-<li>12章: Zabbixサーバの運用とメンテナンス</li>
-<li>13章: 大規模システムの監視</li>
-<li>14章: Appendix</li>
-</ul>
-
-
-<p>そもそも監視とは何か、といった話から、Zabbix の概要、インストール、設定、運用、大規模システムの監視と、Zabbix を知り実際に利用するために必要な知識がほとんど網羅されているのではないかと思います。Zabbix は機能豊富で全体像がすぐには掴みにくいソフトウェアなので、こういった形で一冊の本にまとまっているのは非常にありがたいですね。</p>
-
-<p>Zabbix で特にいいなー、と思ったのは、リソースグラフの表示範囲や日時を自由に変更できるところ。自分が使ったことがあるリソースモニタリングツールだと、直近のデータ1時間分、といった表示はできても、過去のある時点の詳細を見たいと思った場合に、その時点のデータは1時間分ではなく、1日分や1週間分といった非常に大雑把なデータになってしまい、こちらが望む細かい粒度でのリソース動向を追うことができないという不満があるけれど、Zabbix であればこちらが望む形でリソースグラフを確認することができそうです。<a href="http://www.zabbix.jp/modules/bwiki/index.php?zabbixdemo">デモサイト</a> でもこの辺については確認できます。</p>
-
-<p>逆に Zabbix のあまり好きではない点は、機能が豊富すぎるところ。稼働監視、リソース監視、アプリケーション監視をすべて網羅していて、オールインワンなソフトウェアを求めている人にはとてもいいソリューションだけれども、既に Nagios のような稼働監視ソフトウェアを利用していて、そこにリソース監視ソフトウェアを導入したいとか、あるいはその逆パターンとか、そういった場合には、既存で導入しているソフトウェアと機能が被る面が多いので導入しづらいかな、という懸念があります。</p>
-
-<p>また、自分は目的特化した小さなソフトウェアを組み合わせて必要に応じてカスタマイズするのが好きなので、Zabbix のような大きなソフトウェアの導入はためらってしまいますね。</p>
-
-<p>とは言っても、本書を読んで Zabbix は非常によくできたソフトウェアだと思いましたので、統合監視ソフトウェアの導入を検討している方にはとても参考になると思います。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1093,6 +1192,10 @@ staprun:remove_module:205 Module simple removed.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -1106,10 +1209,6 @@ staprun:remove_module:205 Module simple removed.
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

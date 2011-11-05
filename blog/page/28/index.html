@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="PLAYLOG で遊んでいます。が、似たようなサービスである last.fm のクライアントソフトは、iPod で聴いた曲の情報もちゃんとアップしてくれてるのに、PLAYLOG のクライアントソフトは、リアルタイムに聴いてる曲しかアップしてくれないようです。 自分はほとんど iPod &hellip;">
+  <meta name="description" content="正確には svk ではなく、subversion の perl binding のインストールではまったのでメモ。svk をインストールしようとすると、「SVN::Core がねーよ、subversion の perl binding をちゃんと入れとけ」みたいなことを言われたので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,72 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/04/451/">Svk のインストールではまる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-04T23:53:00+09:00" pubdate>Mar 4<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/04/451/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+正確には svk ではなく、subversion の perl binding のインストールではまったのでメモ。svk をインストールしようとすると、「SVN::Core がねーよ、subversion の perl binding をちゃんと入れとけ」みたいなことを言われたので、subversion のソースディレクトリで make swig-pl; make check-swig-pl したところで、以下の様なエラーが大量に出る。
+
+</p>
+
+
+
+
+<p class="code">
+../../../../../subversion/bindings/swig/perl/native/t/4pool&#8230;&#8230;Can&#8217;t load &#8216;/home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so&#8217; for module SVN::_Core: /home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so: undefined symbol: svn_swig_pl_thunk_config_enumerator at /usr/local/lib/perl5/5.8.7/i686-linux/DynaLoader.pm line 230.
+</p>
+
+
+
+
+<p class="entryBody">
+「undefined symbol: svn_swig_pl_thunk_config_enumerator」と出てるので、こいつが含まれるライブラリがリンクされてないんだろうな、と思いまずはライブラリ探し。これは libsvn_swig_perl-1.so であることを発見。で、ldd _Core.so を実行してみると、案の定このライブラリがリンクされてない。
+</p>
+
+
+
+
+<p class="entryBody">
+というわけで、subversion/bindings/swig/perl/native/Makefile の LOADLIBS の行の最後に、-lsvn_swig_perl-1 を追加して make swig-pl; make check-swig-pl すると今度はエラーもなくチェック完了。このまま make install で無事インストールができた。
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>追記</strong><br />
+あとで最初からやりなおしてみたら、最初から Makefile に -lsvn_swig_perl-1 があった。なんだったんだろう？
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -563,56 +629,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/02/18/382/">Catalyst で Atom API テストツール #2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-02-18T11:24:00+09:00" pubdate>Feb 18<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/02/18/382/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-パッチを送って頂いたので、Atom API テストツール 「A2T2」 をアップデート。Thanks, Brian!
-</p>
-
-
-
-
-<p class="entryBody">
-自分、FeedURI と EditURI に対する GET の違いを理解してなかったので、その辺を直してくれちゃいました。Brian の環境では問題なく動作してるとのこと。テストの手間が省けた。
-</p>
-
-
-
-
-<p class="entryBody">
-例によってソースは <a href="http://trac.mizzy.org/public/browser/atom_client/trunk" target="_blank">trac</a> または svn://mizzy.org/public/atom_client/trunk からどぞ。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/29/">&larr; Older</a>
@@ -630,6 +646,10 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -643,10 +663,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="&#8220;mod_dosdetecter 0.2&#8221;:http://sourceforge.net/projects/moddosdetector/ を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、 /usr/local/apache/include/ &hellip;">
+  <meta name="description" content="&#8220;弊社&#8221;:http://www.paperboy.co.jp/ は東京と福岡にオフィスがあり、それぞれの拠点に Subversion + Trac 環境を構築し、&#8221;OpenVPN&#8221;:http://openvpn.net/ により VPN &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,124 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/08/03/520/">Pushmi つかってます & 技術者募集中 at 福岡</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-08-03T01:52:00+09:00" pubdate>Aug 3<span>rd</span>, 2007</time>
+        
+         | <a href="/blog/2007/08/03/520/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>&#8220;弊社&#8221;:http://www.paperboy.co.jp/ は東京と福岡にオフィスがあり、それぞれの拠点に Subversion + Trac 環境を構築し、&#8221;OpenVPN&#8221;:http://openvpn.net/ により VPN 接続してお互いの開発状況を公開しています。サービス絡みの開発は基本的に、東京は東京、福岡は福岡で完結しているので、この方式で問題はないのですが、サーバ管理関連のスクリプトなんかは、東京と福岡で共通するものが多いため、別々の SVN リポジトリで管理されてると不便なんですよね。かといって、どちらかの拠点だけしかリポジトリがないと、VPN の障害発生時に、リポジトリのない拠点からはまったくアクセスができない、という困ったことになってしまいます。</p>
+
+<p>そこで、SVN リポジトリレプリケーションツール &#8220;Pushmi&#8221;:http://search.cpan.org/dist/Pushmi/lib/Pushmi.pm を導入してみました。詳細は &#8220;YAPC::Asia での 作者 Cl Kao によるスピーチ動画&#8221;:http://video.google.com/videoplay?docid=-7181301487103062288&amp;q=yapc+asia+2007&amp;total=46&amp;start=0&amp;num=50&amp;so=1&amp;type=search&amp;plindex=13 を見て頂くとして、ここでは行った設定についてメモを残しておきます。ほとんど perldoc Pushmi の内容と同じですが。</p>
+
+<p>まず当然 Pushmi のインストールが必要です。これの手順は省略。また、より良いアトミックロック実現のために &#8220;memcached&#8221;:http://www.danga.com/memcached/ を利用している、ということなのでインストールしておきます。これも手順は省略。</p>
+
+<p>memcached を起動します。</p>
+
+<pre><code>$ sudo /usr/bin/memcached -p 8123 -dP /var/run/memcached.pid -u nobody
+</code></pre>
+
+
+<p>/etc/pushmi.conf を設定します。弊社の環境では memcached のポートのみ指定してます。</p>
+
+<pre><code>authproxy_port: 8123
+</code></pre>
+
+
+<p>ミラーリポジトリを作成します。</p>
+
+<pre><code>$ pushmi mirror /var/db/my-local-mirror http://master.repository/svn
+Mirror initialized.
+</code></pre>
+
+
+<p>ミラーリポジトリとマスターリポジトリを同期します。</p>
+
+<pre><code>$ pushmi sync /var/db/my-local-mirror
+Retrieving log information from 1 to 62
+</code></pre>
+
+
+<p>ミラーリポジトリは、svnadmin create で作成するのと同様なディレクトリ、ファイル構造になってますが、Pushmi 用の pre-commit スクリプトと post-commit スクリプトが置かれている、というところが異なります。</p>
+
+<p>pre-commit では以下の様なコマンドが実行され、ミラーリポジトリにコミットされた内容を、マスターリポジトリにコミットしに行きます。</p>
+
+<pre><code>/usr/bin/pushmi runhook $1 --txnname $2
+</code></pre>
+
+
+<p>post-commit では以下の様なコマンドが実行され、ミラーとマスターの整合性を確認しています。</p>
+
+<pre><code>/usr/bin/pushmi verify $1 --revision $2
+</code></pre>
+
+
+<p>Apache + WebDAV で SVN リポジトリにアクセスするために、以下の様な設定を Apache で行います。</p>
+
+<pre><code><Location /svn/server>
+  PerlSetVar SVNPath /var/db/my-local-mirror
+  PerlSetVar Pushmi /usr/bin/pushmi
+  PerlSetVar PushmiConfig /etc/pushmi.conf
+  <LimitExcept GET PROPFIND OPTIONS REPORT>
+    AuthName "mirrored private area"
+    AuthType Basic
+    Require valid-user
+    AuthLDAPURL ldap://localhost:389/ou=people,o=paperboy?uid?sub?(objectclass=*)
+    PerlAuthenHandler Pushmi::Apache::AuthCommit
+  </LimitExcept>
+</Location>
+</code></pre>
+
+
+<p>設定見て分かると思いますが、mod_perl を利用していて、Apche2 + mod_perl の環境が必要です。Apache は 2.0 系でも 2.2 系でも大丈夫なようです。弊社では 2.0 系を利用しています。</p>
+
+<p>特にポイントとなるのは、</p>
+
+<pre><code>PerlAuthenHandler Pushmi::Apache::AuthCommit
+</code></pre>
+
+
+<p>の部分で、認証で渡されたユーザ名、パスワードをこのモジュールで memcached にキャッシュしておき、マスタリポジトリへのコミット時の認証に利用します。Apache 2.2 系の場合には、以下の様に設定します。</p>
+
+<pre><code>AuthBasicProvider Pushmi::Apache::RelayProvider
+</code></pre>
+
+
+<p>この状態では、ミラーへのコミットは即マスターに反映されますが、マスターへのコミットはミラーに反映されませんので、以下の様な cron 設定を行い、5分おきにマスターとミラーを同期するようにします。</p>
+
+<pre><code>*/5 * * * * /usr/bin/pushmi sync --nowait /var/db/my-local-mirror
+</code></pre>
+
+
+<p>今のところこれで問題なく動いています。</p>
+
+<p>話変わりまして、弊社福岡支社では、&#8221;プログラマ&#8221;:http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=1&amp;ty=0&amp;rm=0 と &#8220;サーバエンジニア&#8221;:http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=2&amp;ty=0&amp;rm=0 を募集しています。Pushmi を実戦で使ってみたい！という方はぜひ。メガネ女子プログラマもいますよ。（東京本社にもいます。人妻ですが。）</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -702,172 +820,6 @@ Swap:      1052248
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/05/13/511/">FizzBuzz アセンブラ版 for x86/Linux</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-05-13T21:01:00+09:00" pubdate>May 13<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/05/13/511/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://labs.cybozu.co.jp/blog/takesako/2007/05/fizzbuzz_x86.html">竹迫さん</a>、<a href="http://subtech.g.hatena.ne.jp/yappo/20070511/1178907299">Yappo さん</a> に触発されて、FizzBuzz アセンブラ版 for x86/Linux をつくってみた。</p>
-
-<p>20年ほど前に Z80 でアセンブラをちょっとかじった程度の知識しかないので、ベストには程遠いコードだと思います。だれかもっといいコードを教えてください。</p>
-
-<p>最初竹迫さんのコードと同じように書けるかな、と思ったのですが、Windows とちがって、画面に表示するだけで EAX, EBX, ECX, EDX レジスタ使うので、竹迫さんのように BX レジスタを見張り役に、CX レジスタをカウンタに、ってことができませんでした。</p>
-
-<p>また、とりあえず書いただけで疲れたので、コードゴルフにチャレンジする気力はありません。</p>
-
-<pre><code>global  _start
-
-_start:
-        mov     si, 0
-
-mawasu: 
-        call    space
-        inc     si
-        mov     ax, si
-
-        mov     di, 3
-        xor     edx, edx
-        div     di
-        cmp     dx, 0
-        je      pfizz
-
-        mov     ax, si
-        mov     di, 5
-        xor     edx, edx
-        div     di
-        cmp     dx, 0
-        je      pbuzz
-
-        call    num
-        cmp     si, 100
-        jb      mawasu
-
-pfizz:
-        call    fizz
-
-        mov     ax, si
-        mov     di, 5
-        xor     edx, edx
-        div     di
-        cmp     dx, 0
-        je      pbuzz
-
-        jmp     mawasu
-
-pbuzz:
-        call    buzz
-        jmp     mawasu
-
-num:
-        mov     ax, si
-
-        mov     di, 100
-        cmp     ax, di
-        jnge    num2
-
-        jmp     end
-
-num2:
-        mov     di, 10
-        cmp     ax, di
-        jnge    num3
-
-        xor     edx, edx
-        div     di
-        add     ax, 48
-        call    print
-
-num3:   
-        mov     ax, si
-        mov     di, 10
-        xor     edx, edx
-        div     di
-        mov     al, dl
-        add     al, 48
-        call    print
-        ret
-
-fizz:
-        mov     al, 0x46
-        call    print
-        mov     al, 0x69
-        call    print
-        mov     al, 0x7a
-        call    print
-        call    print
-        ret
-
-buzz:
-        mov     al, 0x42
-        call    print
-        mov     al, 0x75
-        call    print
-        mov     al, 0x7a
-        call    print
-        call    print
-        ret
-
-space:
-        mov     al, 0x20
-        call    print
-        ret
-
-print:
-        push    eax
-        mov     eax, 4
-        mov     ebx, 1
-        mov     ecx, esp
-        mov     edx, 1
-        int     0x80
-        pop     eax
-        ret
-
-end:    
-        mov     al, 0x0a
-        call    print
-
-        mov     al, 1
-        mov     bl, 0
-        int     0x80
-</code></pre>
-
-<p>nasm を使ってこんな感じで動かすことができます。</p>
-
-<pre><code>$ nasm -f elf fizzbuzz.asm
-$ ld -s -o fizzbuzz fizzbuzz.o
-$ ./fizzbuzz 
-</code></pre>
-
-<p><img src="/files/fizzbuzz.jpg" alt="fizzbuzz.asm" /></p>
-
-<p>書いていてアセンブラの TMTOWTDI っぷりは Perl の比じゃないと思った。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -885,6 +837,10 @@ $ ./fizzbuzz
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -898,10 +854,6 @@ $ ./fizzbuzz
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

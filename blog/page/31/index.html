@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="最近、ウェブ業界の方々とお会いすることが多いのですが、いま自分が属している会社はウェブとはぜんぜん関係がないので、会社の名刺をお渡しするのって、なんか違和感があるんですよね。会社の人間としてではなく、個人として会ってる、というのもあるので。 かと言って、名刺をお渡ししないわけにもいかないので、 &hellip;">
+  <meta name="description" content="Agile Web Development With Rails の内容と、Rails 1.0 の違いメモ。 P178、profiler と benchmarker のパスが違う。まずは profiler 。 Rails 本
+depot> ruby script/profiler " &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,90 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/12/26/307/">Profiler と Benchmarker スクリプトのパスが違う（Rails 勉強中 #4）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-12-26T08:53:00+09:00" pubdate>Dec 26<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/12/26/307/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Agile Web Development With Rails</a> の内容と、Rails 1.0 の違いメモ。
+</p>
+
+
+
+
+<p class="entryBody">
+P178、profiler と benchmarker のパスが違う。まずは profiler 。
+</p>
+
+
+
+
+<pre class="code">
+<strong>Rails 本</strong>
+depot> ruby script/profiler "Product.search('version_control') 10
+</pre>
+
+
+
+
+<pre class="code">
+<strong>Rails 1.0</strong>
+depot> ruby script/<strong>performance</strong>/profiler "Product.search('version_control') 10
+</pre>
+
+
+
+
+<p class="entryBody">
+つづいて benchmarker 。
+</p>
+
+
+
+
+<pre class="code">
+<strong>Rails 本</strong>
+depot> ruby script/benchmarker 10 "Product.new_search('version_control')" \
+                                  "Product.search('version_control')"
+</pre>
+
+
+
+
+<pre class="code">
+<strong>Rails 1.0</strong>
+depot> ruby script/<strong>performance</strong>/benchmarker 10 "Product.new_search('version_control')" \
+                                              "Product.search('version_control')"
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -885,77 +970,6 @@ CNET Japan で <a href="http://japan.cnet.com/news/media/story/0,2000047715,2009
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/12/03/458/">Heteml ローンチパーティ いってきました</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-12-03T00:05:00+09:00" pubdate>Dec 3<span>rd</span>, 2005</time>
-        
-         | <a href="/blog/2005/12/03/458/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://heteml.jp" target="_blank">heteml</a> のローンチパーティ <a href="http://www.apmt.jp/" target="_blank">APMT SP</a> にお呼ばれしたので行ってきました。
-</p>
-
-
-
-
-<p class="entryBody">
-アートとかデザインになどには縁遠い自分にも、<a href="http://tokyoartbeat.com/" target="_blank">Tokyo Art Beat</a> さん、<a href="http://www.nwba-japan.com/">Public/Image.</a> さん、<a href="http://www.artless.gr.jp/null/">null</a> さんのプレゼンはたいへん興味深かったですし、イエイリさん、オオヒダさん、えふしんさん、ふうりさん、kengochiさん、ボンヌさん、などなど、いろいろな方とお話できて楽しかったです。
-</p>
-
-
-
-
-<p class="entryBody">
-あと、目の前にいたのが<a href="http://www.yasuhisa.com/could/" target="_blank">ヤスヒサ</a>さんだったということを次の日に知って驚きました。ちゃんと挨拶しておけばよかったと後悔しております。話しかけるきっかけがつかめなかったんですよねぇ…
-</p>
-
-
-
-
-<p class="entryBody">
-そして、オオヒダさん → ふうりさん経由で手に入れた heteml バッジ、null のペーパーを買ったときにもらった null バッジ、帰り際にもらった APMT バッジを、息子達の幼稚園帽につけてみました。ちょっとオサレなステキ幼稚園児のできあがりです。はい、オヤバカです。
-</p>
-
-
-
-
-<p class="entryBody">
-<img src="/img/tora_20051202.jpg" />
-</p>
-
-
-
-
-<p class="entryBody">
-<img src="/img/shogo_20051202.jpg" />
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/32/">&larr; Older</a>
@@ -973,6 +987,10 @@ CNET Japan で <a href="http://japan.cnet.com/news/media/story/0,2000047715,2009
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -986,10 +1004,6 @@ CNET Japan で <a href="http://japan.cnet.com/news/media/story/0,2000047715,2009
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

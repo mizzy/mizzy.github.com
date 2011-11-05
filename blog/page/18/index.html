@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="typester さん が del.icio.us で「開発参加したい！」とおっしゃってくださったので、#assurer@freenode チャネルつくりました。まだおおまかな仕様すら固まっていない段階なので、いろいろご助言頂けると大変うれしいです。ご興味のある方はぜひ！ で、本題。 &hellip;">
+  <meta name="description" content="Assurer (SVN) をまた修正。 プラグインの実行フェーズを、test, format, publish の3つにわけてみました。 test: - module: HTTP name: http://svn.mizzy.org/ #0 config: url: http://svn. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,103 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/08/361/">Assurer - サーバテスティングフレームワーク #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-08T01:19:00+09:00" pubdate>Jan 8<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/08/361/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) をまた修正。
+</p>
+
+
+<p>
+プラグインの実行フェーズを、test, format, publish の3つにわけてみました。
+</p>
+
+
+<pre class="wiki">
+test:
+  - module: HTTP
+    name: http://svn.mizzy.org/ #0
+    config:
+      url: http://svn.mizzy.org/
+      match: It works!
+
+format:
+  - module: HTML
+
+publish:
+  - module: Mail
+
+</pre>
+
+
+<p>
+こんな感じで config.yaml を書くと、テスト結果を HTML でフォーマットしてメールで飛ばす、みないな動作になることを意図しています。（まだ Format::HTML や Publish::Mail はつくってないですが。）
+</p>
+
+
+<pre class="wiki">
+format:
+  - module: Text
+
+publish:
+  - module: File
+</pre>
+
+
+<p>
+とかやると、テキスト形式でファイルに吐き出すとか、そんな感じで。
+</p>
+
+
+<p>
+単にターミナルに結果を表示するだけであれば、format と publish は必要ないです。
+</p>
+
+
+<p>
+これにともなって、プラグインのネームスペースも、Plugin::Test::*, Plugin::Format::*, Plugin::Publish::* の3つに分割しています。
+</p>
+
+
+<p>
+また、Assurer::Results というクラスも新たに追加しました。Plugin::Test::* によるテスト結果を保持しておいて、Plugin::Format::* に渡すためのクラスです。
+</p>
+
+
+<p>
+こんな感じで遅々としてますが、少しづつ前進しています。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1082,77 +1179,6 @@ cfrun は1ホストに対して1回実行というわけではなく、cfrun.hos
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/10/29/437/">Text::Trac のバグフィックス・機能追加とテスト駆動開発</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-10-29T20:47:00+09:00" pubdate>Oct 29<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/10/29/437/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-rt.cpan.org でバグレポートと機能追加要望があがっていたので、久々に <a class="ext-link" href="http://search.cpan.org/~mizzy/Text-Trac/lib/Text/Trac.pm"><span class="icon"></span>Text::Trac</a> に手を入れました。
-</p>
-
-
-<p>
-バグフィックスしたものは 0.05 としてアップしてあります。また、新機能として <a class="ext-link" href="http://trac.mizzy.org/public/wiki/TracLinks"><span class="icon"></span>Trac Links</a> と <a class="ext-link" href="http://trac.mizzy.org/public/wiki/WikiMacros"><span class="icon"></span>Wiki Macros</a> をサポートしたものは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Text-Trac/"><span class="icon"></span>svn リポジトリ</a>に置いてあります。リクエストしてくれた方の確認後、問題なければ CPAN にアップ予定です。
-</p>
-
-
-<p>
-今回のこのバグフィックスと機能追加で、TDD のありがたさを改めて実感しました。
-</p>
-
-
-<p>
-バグについては一度修正して、報告者に確認をお願いしたのですが、まだバグが残っている状態でした。すると今度は報告者の方が、テストを書いて送ってくれたのですが、これが大いに役に立ちました。テストがあると、どこにどういったバグがあるのか、make test （あるいは prove コマンド）一発でわかるので、言葉で説明してもらうよりも明確ですし、バグ確認後、fail したテスト（と他のテスト）全てが通るようにプログラムに修正を施していけばいいわけで、やることが明確になって作業がスムーズにできました。
-</p>
-
-
-<p>
-自分も今後バグレポートする際には、テストとセットでレポートするようにします。
-</p>
-
-
-<p>
-新機能の追加についても、ひとつの機能毎にテストを書く、実装する、テスト動かして確認、修正する、というサイクルで作業していたのですが、コマンド一発でテストができると、全体の流れを途切れさせることなく、集中力を保ったまま作業ができていいですね。
-</p>
-
-
-<p>
-これを機に Text::Trac のテストを Test::More から Test::Base へ移行したのですが、Test::Base で DRY にテストが書けると、更に全体の流れがよくなり、非常に気持ちよく作業ができます。Test::Base 最高。
-</p>
-
-
-<p>
-Test::Base をご存知ない方は、<a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200610.html"><span class="icon"></span>Shibuya.pm テクニカルトーク #7</a> の <a class="ext-link" href="http://blog.bulknews.net/mt/archives/Test-Base.pdf"><span class="icon"></span>宮川さんの発表資料（PDF）</a> を是非ご覧下さい。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -1170,6 +1196,10 @@ Test::Base をご存知ない方は、<a class="ext-link" href="http://shibuya.p
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -1183,10 +1213,6 @@ Test::Base をご存知ない方は、<a class="ext-link" href="http://shibuya.p
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

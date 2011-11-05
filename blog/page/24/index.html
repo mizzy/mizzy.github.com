@@ -9,7 +9,10 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="id:drawnboy さんがつくった Catlxom::Plugin::Format::Hatena を見て、「お、それいい！」と思ったんだけど、そもそも自分ははてダ使っていなくて、この手の記法で唯一使ってるのは Trac の Wiki 記法 なので、Catlxom::Plugin:: &hellip;">
+  <meta name="description" content="Text::Trac を blosxom から呼び出してみる テスト Text::Trac が形になってきたので、実際に文章を書いてテストしてみる。 もういっちょ見出しのテスト paragraph 1
+paragraph 1
+paragraph 1 paragraph 2
+paragraph 2 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +75,160 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/20/384/">Text::Trac - Trac Wiki 記法パーサ #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-20T00:26:00+09:00" pubdate>Jun 20<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/20/384/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3 id="Text::Tracをblosxomから呼び出してみるテスト">Text::Trac を blosxom から呼び出してみる テスト</h3>
+
+
+<p>
+Text::Trac が形になってきたので、実際に文章を書いてテストしてみる。
+</p>
+
+
+<h4 id="もういっちょ見出しのテスト">もういっちょ見出しのテスト</h4>
+
+
+<p>
+paragraph 1<br />
+paragraph 1<br />
+paragraph 1
+</p>
+
+
+<p>
+paragraph 2<br />
+paragraph 2<br />
+paragraph 2
+</p>
+
+
+<ul><li>リスト 1</li>
+<li>リスト 2</li>
+<li>リスト 3</li></ul>
+
+
+<ol start="1"><li>リスト 1</li>
+<li>リスト 2</li>
+<li>リスト 3</li></ol>
+
+
+<dl>
+<dt>定義リスト1</dt>
+<dd>
+内容その1
+</dd>
+<dt>定義リスト2</dt>
+<dd>
+内容その2
+</dd>
+</dl>
+
+
+<p>
+上の内容は実際にはこんな感じで書いてます。
+</p>
+
+
+<pre class="wiki">
+= Text::Trac を blosxom から呼び出してみる テスト =
+
+== もういっちょ見出しのテスト ==
+
+paragraph 1[[BR]]
+paragraph 1[[BR]]
+paragraph 1
+
+paragraph 2[[BR]]
+paragraph 2[[BR]]
+paragraph 2
+
+ * リスト 1
+ * リスト 2
+ * リスト 3
+
+ 1. リスト 1
+ 1. リスト 2
+ 1. リスト 3
+
+ 定義リスト1::
+   内容その1
+ 定義リスト2::
+   内容その2
+</pre>
+
+
+<p>
+blosxom からは以下の様なプラグインで Text::Trac を呼び出してます。
+</p>
+
+
+<pre class="wiki">
+# Blosxom Plugin: text_trac
+# Author: Gosuke Miyashita &lt;miya at mizzy.org&gt;
+# Version: 2006-06-20
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package text_trac;
+
+use strict;
+use Text::Trac;
+
+sub start {
+  1;
+}
+
+sub story {
+  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+
+  if ( $meta::syntax eq 'trac' ){
+      my $parser = Text::Trac-&gt;new( min_heading_level =&gt; 3 );
+      $parser-&gt;parse($$body_ref);
+      $$body_ref = $parser-&gt;html;
+  }
+
+  return 1;
+}
+
+1;
+
+__END__
+</pre>
+
+
+<p>
+Text::Trac 自体はもうちょいで CPAN にアップできると思います。ただし、Yappo さんご所望の機能はもう少し時間ください。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1735,125 +1892,6 @@ API の仕様決めや Perl ライブラリを作成するにあたって、は�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/28/428/">Catlxom メモ #3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-28T12:04:00+09:00" pubdate>May 28<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/05/28/428/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-$self->stash でセットした値を、$self->stashall で取り出すと、以下の様なハッシュリファレンスが返ってきます。
-</p>
-
-
-
-
-<pre class="code">
-{
-    'Catlxom::Plugin::Paginate::Simple' =&gt; {
-        'pager' =&gt; bless( {
-            'total_entries'    =&gt; 14,
-            'current_page'     =&gt; 2,
-            'entries_per_page' =&gt; '5'
-        }, 'Data::Page' )
-}
-</pre>
-
-
-
-
-<p class="entryBody">
-で、これをテンプレートで扱おうとして、
-</p>
-
-
-
-
-<pre class="code">
-&#x5b;% Catlxom::Plugin::Paginate::Simple.pager.current_page %&#x5d;
-</pre>
-
-
-
-
-<p class="entryBody">
-などと記述すると、
-</p>
-
-
-
-
-<pre class="code">
-unexpected token (Catlxom::Plugin::Paginate::Simple)
-</pre>
-
-
-
-
-<p class="entryBody">
-といったエラーになります。: が入ってるのがまずいのと、冗長で書くのがめんどくさいので、以下の様な patch を書いてみました。
-</p>
-
-
-
-
-<pre class="code">
-Index: lib/Catlxom/Context/Base.pm
-===================================================================
---- lib/Catlxom/Context/Base.pm (revision 23)
-+++ lib/Catlxom/Context/Base.pm (working copy)
-@@ -57,7 +57,8 @@
-
- sub stash {
-     my $self   = shift;
--    my $caller = caller(0);
-+    ( my $caller = lc caller(0) ) =~ s/Catlxom::Plugin:://i;
-+    $caller =~ s/::/_/g;
-
-     if (@_) {
-         my $stash = @_ &gt; 1 ? {@_} : $_[0];
-</pre>
-
-
-
-
-<p class="entryBody">
-これでテンプレートの中で以下の様に記述できます。
-</p>
-
-
-
-
-<pre class="code">
-&#x5b;% pagenate_simple.pager.current_page %&#x5d;
-</pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/25/">&larr; Older</a>
@@ -1871,6 +1909,10 @@ Index: lib/Catlxom/Context/Base.pm
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -1884,10 +1926,6 @@ Index: lib/Catlxom/Context/Base.pm
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>

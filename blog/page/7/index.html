@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="宣伝エントリです。 30days Album では 2009/3/10 から 2009/3/31 まで 卒業おめでとうキャンペーン やってます。フジフィルムモールでのプリント料金が 20% OFF になるクーポンをプレゼントしてます。クーポンは期間中何回でも利用できます。 また、 &hellip;">
+  <meta name="description" content="Puppet 作者 Luke Kanies 氏のブログエントリ にて、Puppet の競合となる Chef というソフトウェアについて触れられていた。 ソフトウェアのポジション的にも、使われている用語的にも、かなり Puppet を意識している模様。開発言語が Ruby という点も Puppet &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,322 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/05/05/ChefFirstImpression/">ChefFirstImpression</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-05-05T14:45:58+09:00" pubdate>May 5<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/05/05/ChefFirstImpression/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Puppet 作者 <a href="http://madstop.com/2009/01/16/opscode-announces-chef-a-puppet-competitor/">Luke Kanies 氏のブログエントリ</a> にて、Puppet の競合となる <a href="http://wiki.opscode.com/display/chef/Home">Chef</a> というソフトウェアについて触れられていた。</p>
+
+<p>ソフトウェアのポジション的にも、使われている用語的にも、かなり Puppet を意識している模様。開発言語が Ruby という点も Puppet と同じ。</p>
+
+<p>Luke 氏としては、Puppet を散々使っていながらあまりコードに貢献することなしに、新しいプロジェクトを立ち上げるってどうなのよ、とか、競合が存在するのはいいことなんだけど、 そんなたくさん競合がある分野じゃないんだから、もっと色々話してくれてもいいのに、といった不満があるみたい。</p>
+
+<p>また、名前が SEO 的にまずいよね、自分もそれで苦労した、といったことや、Puppet が外部 DSL なのに対し、Chef は内部 DSL なんだけどそれってどうなのよ、的なことも書いてますね。自分も外部 DSL の方が、制限があるけどわかりやすくていいんじゃないかとは思ってます。</p>
+
+<p>で、&#8221;I’m not afraid of competition.&#8221; と言っていて、Puppet の競合なんて笑わせるぜ、的なことを言ってる（実際にこういうニュアンスかはよくわからないけど）わけですが、やはり気にはなるので試してみました。</p>
+
+<p>最初は CentOS 5.2 で環境作ろうとしてたんですが、あまりにも面倒で挫折したので、<a href="http://wiki.opscode.com/display/chef/Installation">インストールガイド</a> で対象としてる Ubuntu で試してみました。</p>
+
+<h1>インストール手順</h1>
+
+<p>今回はひとつの Ubuntu 8.10 VM 上で、サーバ/クライアント両方を兼ねる形でセットアップしました。基本的には <a href="http://wiki.opscode.com/display/chef/Installation">インストールガイド</a> にある通りなんですが、いくつか説明通りではうまくいかなかった点があるので、その点をここで補足しておきます。</p>
+
+<p>「Install Ruby and Rubygems」では、libhttp-access2-ruby も合わせてインストールしておく必要があります。</p>
+
+<pre><code>$ sudo apt-get install ruby ruby1.8-dev rubygems build-essential libhttp-access2-ruby
+</code></pre>
+
+<p>また、「Bring up the Chef Server」にある、</p>
+
+<pre><code>$ sudo chef-solo -r http://wiki.opscode.com/download/attachments/1179839/chef-server-install-solo.tar.gz
+</code></pre>
+
+<p>ですが、これをそのまま実行しても、エラーが出て途中で止まってしまいました。この手順では、chef-solo というスタンドアローンな chef クライアントを使って、chef に必要となるパッケージをインストールし、初期化等を行っているのですが、runit パッケージと couchdb パッケージのインストール部分でこけてました。なので、まずは一度上記コマンドを実行してエラーが出た後に、この2つのパッケージを手動でインストールしておきます。</p>
+
+<pre><code>$ sudo apt-get install runit couchdb
+</code></pre>
+
+<p>それから、http://wiki.opscode.com/download/attachments/1179839/chef-server-install-solo.tar.gz の展開先にある二つのファイルを修正し、runit と couchdb をインストールしている部分をコメントアウトします。</p>
+
+<p>/tmp/chef-solo/cookbooks/runit/recipes/default.rb</p>
+
+<pre><code>#  package "runit" do
+#    action :install
+#    notifies :run, resources(:execute =&gt; "start-runsvdir")
+#  end
+</code></pre>
+
+<p>/tmp/chef-solo/cookbooks/chef/recipes/server.rb</p>
+
+<pre><code>#package "couchdb"
+</code></pre>
+
+<p>修正後、ファイルを tar.gz で固めます。</p>
+
+<pre><code>$ cd /tmp
+$ tar cvf chef-solo.tar chef-solo
+$ gzip chef-solo.tar
+</code></pre>
+
+<p>その後この tar.gz ファイルを指定して、chef-solo を走らせます。</p>
+
+<pre><code>$ sudo chef-solo -r /tmp/chef-solo.tar.gz
+</code></pre>
+
+<p>これでインストールは完了し、ウェブブラウザで 4000 番ポートにアクセスすることができるようになります。</p>
+
+<h1>Chef Repository の作成</h1>
+
+<p>インストールの次に行うのは、<a href="http://wiki.opscode.com/display/chef/Chef+Repository">Chef Repository の作成</a> です。Chef Repository とは、Chef でサーバ管理をするために必要な Cookbooks(Puppet でいうマニフェス）や設定ファイル等を管理するためのリポジトリです。</p>
+
+<p>ここも基本的には <a href="http://wiki.opscode.com/display/chef/Chef+Repository">Wiki の手順書</a> の通りなので、その通りに実行すればいいだけなんですが、いくつか補足を。</p>
+
+<p>リポジトリの雛形を作成するところは、git clone してますので、当然 git が必要となります。なので、あらかじめインストールしておきます。</p>
+
+<pre><code>$ sudo apt-get install git git-core
+</code></pre>
+
+<p>rake new_cookbook してる手順ですが、これは cookbook の雛形となるファイルを生成してくれます。</p>
+
+<pre><code>$ rake new_cookbook COOKBOOK=apache
+(in /home/mizzy/chef-repo)
+</code></pre>
+
+<p>** Creating cookbook apache</p>
+
+<p>を実行すると、以下のようなディレクトリ/ファイルが生成されます。</p>
+
+<pre><code>$ ls -FR cookbooks/apache/
+cookbooks/apache/:
+attributes/  definitions/  files/  libraries/  recipes/  templates/
+
+cookbooks/apache/attributes:
+
+cookbooks/apache/definitions:
+
+cookbooks/apache/files:
+default/
+
+cookbooks/apache/files/default:
+
+cookbooks/apache/libraries:
+
+cookbooks/apache/recipes:
+default.rb
+
+cookbooks/apache/templates:
+default/
+
+cookbooks/apache/templates/default: 
+</code></pre>
+
+<p>例えば、cookbooks/apache/recipes/default.rb の内容は以下のようになってます。</p>
+
+<pre><code>#
+# Cookbook Name:: apache
+# Recipe:: default
+#
+# Copyright 2009, Example Com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+</code></pre>
+
+<p>rake install を実行すると、作成/編集した cookbooks を /var/chef/cookbooks の下に配置してくれたり、cofig/server.rb, client.rb, solo.rb を /etc/chef の下に配置してくれたりします。なので、雛形を git clone したままだと、勝手に設定が書き換えられるので注意が必要です。</p>
+
+<p>実行時には、rake update (upstream リポジトリからの pull) と rake test も合わせて実行してくれ、sudo も自動的に実行してくれます。実行した結果は以下のようになります。</p>
+
+<pre><code>$ rake install
+(in /home/mizzy/chef-repo)
+</code></pre>
+
+<p>** Updating your repository</p>
+
+<pre><code>Already up-to-date.
+</code></pre>
+
+<p>** Testing your cookbooks for syntax errors</p>
+
+<pre><code>Testing recipe /home/mizzy/chef-repo/cookbooks/apache/recipes/default.rb: Syntax OK
+</code></pre>
+
+<p>** Installing your cookbooks
+* Creating Directories
+* Installing new Cookbooks</p>
+
+<pre><code>sending incremental file list
+README
+          54 100%    0.00kB/s    0:00:00 (xfer#1, to-check=10/12)
+apache/
+apache/attributes/
+apache/definitions/
+apache/files/
+apache/files/default/
+apache/libraries/
+apache/recipes/
+apache/recipes/default.rb
+         628 100%   18.04kB/s    0:00:00 (xfer#2, to-check=1/12)
+apache/templates/
+apache/templates/default/
+
+sent 1063 bytes  received 86 bytes  2298.00 bytes/sec
+total size is 682  speedup is 0.59
+</code></pre>
+
+<ul>
+<li>Installing new Site Cookbooks
+  sending incremental file list
+  README
+
+<pre><code>        96 100%    0.00kB/s    0:00:00 (xfer#1, to-check=0/2)
+</code></pre>
+
+<p>  sent 178 bytes  received 31 bytes  418.00 bytes/sec
+  total size is 96  speedup is 0.46</p></li>
+<li>Installing new Chef Server Config</li>
+<li>Installing new Chef Client Config</li>
+</ul>
+
+
+<h1>Chef クライアント のサーバへの登録</h1>
+
+<p>Chef クライアントを動作させるためには、まずは Chef サーバへのノード登録が必要となります。手順は http://wiki.opscode.com/display/chef/Nodes#Nodes-RegistrationviatheWebUI の通りで、サーバの 4000 番ポートにブラウザでアクセスし、</p>
+
+<ol>
+<li>右上の「Login」をクリックして、OpenID でログインする</li>
+<li>上部の「Registration」をクリックする</li>
+<li>対象となるノードの「Validation」をクリックする</li>
+</ol>
+
+
+<p>で完了です。</p>
+
+<p>ここで気になるのは、OpenID でログインするので、有効な OpenID アカウントさえ持っていれば、とりあえずログインできちゃうんですよね。なので、デフォルトで誰でもログインできちゃうような状態なんで、これはまずいだろ、と。</p>
+
+<p>それから、<a href="http://wiki.opscode.com/display/chef/Nodes#Nodes-NodeshaveOpenIDs">Nodes have OpenIDs</a> のところを読むと、内部的に Chef サーバがノードを認証するための仕組みとしても OpenID を使っているみたいなんだけど、そのメリットとか意図がさっぱりわからない。</p>
+
+<h1>cookbook を 作成して Chef クライアントに適用する</h1>
+
+<p>サンプル cookbook の作成の仕方は、<a href="http://wiki.opscode.com/display/chef/Quick+Start">Quick Start</a> を参照すれば OK です。ここでは特に補足しません。</p>
+
+<p>わかりにくいのが、作成した cookbook を特定のノードに適用する方法。Puppet だと以下のようなやつ。</p>
+
+<pre><code>node 'client.example.org' {
+    include apache
+}
+</code></pre>
+
+<p>これには <a href="http://wiki.opscode.com/display/chef/Nodes#Nodes-ManagingNodesviatheWebUI">ウェブ UI を利用する方法</a> と <a href="http://wiki.opscode.com/display/chef/Nodes#Nodes-ManagingNodesthroughJSONatthecommandline">chef-client コマンドを利用する方法</a> があります。</p>
+
+<p>ウェブ UI の方では、上部メニューの「Nodes」をクリックし、該当するノードを選択。するとノードに関する詳細情報が表示されるので、適当なところをクリック。すると、テキストエリアに以下のように JSON 形式で内容が表示されて編集可能に。</p>
+
+<pre><code>{
+  "name": "ubuntu",
+  "_rev": "4279229607",
+  "attributes": {
+    "kernel": {
+      "machine": "i686",
+      "name": "Linux",
+      "os": "GNU\/Linux",
+      "version": "#1 SMP Thu Nov 20 21:57:00 UTC 2008",
+      "release": "2.6.27-9-generic"
+    },
+
+    ... 中略 ...
+
+    "uptime": "4 hours 56 minutes 03 seconds",
+    "platform": "ubuntu",
+    "block_device": {
+      "ram13": {
+        "size": "131072",
+        "removable": "0"
+      },
+
+      ... 中略 ...
+
+      "ram9": {
+        "size": "131072",
+        "removable": "0"
+      }
+    },
+    "uptime_seconds": 17763
+  },
+  "json_class": "Chef::Node",
+  "recipes": [
+
+  ],
+  "chef_type": "node"
+}
+</code></pre>
+
+<p>この下のほうにある「recipes」ところに、適用したい cookbook を追加して、save すれば OK らしいのですが、うちの環境ではうまく save ができませんでした。</p>
+
+<p>chef-client コマンドを使う方法では、</p>
+
+<pre><code>$ sudo chef-client -j node.json
+</code></pre>
+
+<p>といった形で、JSON ファイルをロードできるようなのですが、この方法でもうまくいかず、結局試すことができませんでした。また後ほど環境作り直して再チャレンジの予定。</p>
+
+<h1>まとめ</h1>
+
+<p>ここまでざっと使ってみた感想をまとめてみます。</p>
+
+<ul>
+<li>セットアップがめんどくさい。Puppet は Ruby と Facter があれば OK なのに対し、Chef はいろいろなものが必要。特に CouchDB は、CentOS 5 用のパッケージがなく、パッケージ作るのも大変そうだったので、今回は諦めた。（誰かパッケージの在り処を知っていったら教えてください。）</li>
+<li>OpenID をつかってる意味がよくわからない。誰か教えて。</li>
+<li>ウェブ UI は必要ない。すべてコマンドラインで完結してくれるほうがうれしい。</li>
+<li>Chef Repository の考え方ははよさげ。
+
+<ul>
+<li>Rakefile を覗いてみると、git と subversion に対応してるみたい。</li>
+<li>rake コマンド で特定のタスクを実行できるのもいい。</li>
+<li>git に対応してるのは、外部の人たちと cookbooks を共有するのに良さげ。ただ、システム管理者に git 使わせるのは厳しいかも。</li>
+</ul>
+</li>
+<li>内部 DSL よりも外部 DSL の方が、制限がある分逆に誰が書いても同じような記述になるし、分かりやすいと思うので、特にメンテナンスや他メンバーとの共有を考えると、外部 DSL である Puppet の方が個人的には好き。</li>
+</ul>
+
+
+<p>今のところ、まだ Puppet からの乗換えを検討しようとは思わないけど、今後ウォッチしていこうと思います。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1474,229 +1790,6 @@ GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-bu
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/12/28/ScalableStorageWithOSS05/">ScalableStorageWithOSS05</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-12-28T17:20:40+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/12/28/ScalableStorageWithOSS05/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ずいぶん間があいちゃいましたが、[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4] のつづき。今回は DM-MP により束ねられた仮想的なブロックデバイス（/dev/mapper/mpath0 と /dev/mapper/mpath1）を、更に CLVM でひとつの論理ボリュームにし、GFS2 でフォーマットした後、実際にマウントしてみます。今回が最終回です。</p>
-
-<h1>CLVM のインストールと設定</h1>
-
-<p>client0, client1 双方でインストールと設定。</p>
-
-<pre><code>$ sudo yum -y install lvm2-cluster
-</code></pre>
-
-<p>/etc/lvm/lvm.conf を編集し、locking_type を 3 に設定。</p>
-
-<pre><code>locking_type = 3 
-</code></pre>
-
-<p>clvmd を起動。</p>
-
-<pre><code>$ sudo /etc/init.d/clvmd start
-</code></pre>
-
-<h1>物理ボリューム/ボリュームグループ/論理ボリュームの作成</h1>
-
-<p>通常の LVM と同様に、物理ボリューム/ボリュームグループ/論理ボリュームを作成。これは client0 上だけで行う。通常の LVM と異なるのは、vgcreate で &#8211;clustered y を指定すること。</p>
-
-<pre><code>$ sudo /usr/sbin/pvcreate /dev/mapper/mpath0
-$ sudo /usr/sbin/pvcreate /dev/mapper/mpath1
-$ sudo /usr/sbin/vgcreate --clustered y VG0 /dev/mapper/mpath0 /dev/mapper/mpath1
-$ sudo /usr/sbin/lvcreate --extent=510 --name=LV0 VG0 
-</code></pre>
-
-<p>pvdisplay, vgdisplay, lvdisplay で確認。</p>
-
-<pre><code># pvdisplay
-  --- Physical volume ---
-  PV Name               /dev/dm-0
-  VG Name               VG0
-  PV Size               1023.90 MB / not usable 3.90 MB
-  Allocatable           yes (but full)
-  PE Size (KByte)       4096
-  Total PE              255
-  Free PE               0
-  Allocated PE          255
-  PV UUID               8Whtgb-7jrP-4M24-AMmB-aqA3-VQ8G-iSvijF
-
-  --- Physical volume ---
-  PV Name               /dev/dm-1
-  VG Name               VG0
-  PV Size               1023.90 MB / not usable 3.90 MB
-  Allocatable           yes (but full)
-  PE Size (KByte)       4096
-  Total PE              255
-  Free PE               0
-  Allocated PE          255
-  PV UUID               RC8J4S-hCRI-IlmJ-DqKB-Lk06-6Pza-nke5f8
-
-
-
-# vgdisplay
-  --- Volume group ---
-  VG Name               VG0
-  System ID
-  Format                lvm2
-  Metadata Areas        2
-  Metadata Sequence No  2
-  VG Access             read/write
-  VG Status             resizable
-  Clustered             yes
-  Shared                no
-  MAX LV                0
-  Cur LV                1
-  Open LV               1
-  Max PV                0
-  Cur PV                2
-  Act PV                2
-  VG Size               1.99 GB
-  PE Size               4.00 MB
-  Total PE              510
-  Alloc PE / Size       510 / 1.99 GB
-  Free  PE / Size       0 / 0
-  VG UUID               XPwKeu-5lDP-9eCv-gUoC-HIB0-ItMV-4bxRHN 
-
-
-
-sudo /usr/sbin/lvdisplay
-  --- Logical volume ---
-  LV Name                /dev/VG0/LV0
-  VG Name                VG0
-  LV UUID                PYScA4-OeAf-Dndj-5hMW-4a0x-Yfaj-6zIYpE
-  LV Write Access        read/write
-  LV Status              available
-  # open                 0
-  LV Size                1.99 GB
-  Current LE             510
-  Segments               2
-  Allocation             inherit
-  Read ahead sectors     auto
-  - currently set to     256
-  Block device           253:2  
-</code></pre>
-
-<p>client1 でも lvdisplay で論理ボリュームが見えるかを確認。</p>
-
-<pre><code>sudo /usr/sbin/lvdisplay
-  --- Logical volume ---
-  LV Name                /dev/VG0/LV0
-  VG Name                VG0
-  LV UUID                PYScA4-OeAf-Dndj-5hMW-4a0x-Yfaj-6zIYpE
-  LV Write Access        read/write
-  LV Status              available
-  # open                 0
-  LV Size                1.99 GB
-  Current LE             510
-  Segments               2
-  Allocation             inherit
-  Read ahead sectors     auto
-  - currently set to     256
-  Block device           253:2  
-</code></pre>
-
-<h1>GFS2でフォーマットしてマウント</h1>
-
-<p>client0, client1 両方に gfs2-utils パッケージをインストール。</p>
-
-<pre><code>$ sudo yum -y install gfs2-utils
-</code></pre>
-
-<p>client0 上だけで、mkfs2.gfs2 を実行してフォーマットする。</p>
-
-<pre><code>$ sudo /sbin/mkfs.gfs2 -p lock_dlm -t client:gfs2 -j 4 /dev/VG0/LV0
-This will destroy any data on /dev/VG0/LV0.
-
-Are you sure you want to proceed? [y/n] y 
-
-Device:                    /dev/VG0/LV0
-Blocksize:                 4096
-Device Size                1.99 GB (522240 blocks)
-Filesystem Size:           1.99 GB (522240 blocks)
-Journals:                  4
-Resource Groups:           8
-Locking Protocol:          "lock_dlm"
-Lock Table:                "client:gfs2"
-</code></pre>
-
-<p>client0, client1 両方でマウント。</p>
-
-<pre><code>$ sudo mount /dev/VG0/LV0 /mnt  
-</code></pre>
-
-<p>client0 上でファイルをつくると、client1 でも見えることを確認。</p>
-
-<pre><code>client0$ sudo touch /mnt/ieiri
-
-
-
-client1$ ls /mnt
-ieiri
-</code></pre>
-
-<p>これで完了。現在の状態を図にすると、以下のような感じで、4台のサーバに分散されたブロックデバイスがひとつの論理ボリュームとして見え、更に複数のマシンから同時にマウントできている。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]]</p>
-
-<h1>最後に</h1>
-
-<p>本当はここから更に、ダイナミックにストレージサーバを追加して容量を拡張する手順なんかも書きたいところなんですが、[wiki:ScalableStorageWithOSS00 #0] でも書いたような、以下の懸念点があるため、今のところ実用で使おうとは考えていません。</p>
-
-<ul>
-<li>協調動作するコンポーネントが多くて、トラブルが起こりやすそう。
-
-<ul>
-<li>実際に各コンポーネントを起動/停止する順を間違えると、ハングアップしたりする。</li>
-<li>低レイヤーなだけに、トラブルが起きたときの対応がとても難しそう。</li>
-</ul>
-</li>
-<li>安定性。</li>
-<li>パフォーマンス。</li>
-<li>ストレージとなるサーバを追加して容量を増やした場合のオーバーヘッドの増加具合。</li>
-</ul>
-
-
-<p>というわけで、これ以上踏む込むことは今のところやめておきます。まずはこんな技術があるんだ、ということを知って、動くところまで試しただけでも、自分にとっては十分収穫があったな、と。</p>
-
-<h1>関連エントリ</h1>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
-<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
-<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
-<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
-<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -1714,6 +1807,10 @@ ieiri
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
@@ -1727,10 +1824,6 @@ ieiri
     
       <li class="post">
         <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/05/MyResume/">MyResume</a>
       </li>
     
   </ul>
