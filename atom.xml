@@ -4,7 +4,7 @@
   <title><![CDATA[mizzy.org]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2011-11-15T09:09:34+09:00</updated>
+  <updated>2011-11-15T23:30:24+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,51 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to deploy a blog made by Octopress to Heteml]]></title>
+    <link href="http://mizzy.org/blog/2011/11/15/octopress-on-heteml/"/>
+    <updated>2011-11-15T22:30:00+09:00</updated>
+    <id>http://mizzy.org/blog/2011/11/15/octopress-on-heteml</id>
+    <content type="html"><![CDATA[<div><script src='https://gist.github.com/1367192.js?file='></script>
+<noscript><pre><code>diff --git a/Rakefile b/Rakefile
+index 7d7f6d8..41868ab 100644
+--- a/Rakefile
++++ b/Rakefile
+@@ -4,10 +4,10 @@ require &quot;stringex&quot;
+ 
+ ## -- Rsync Deploy config -- ##
+ # Be sure your public key is listed in your server's ~/.ssh/authorized_keys file
+-ssh_user       = &quot;user@domain.com&quot;
+-ssh_port       = &quot;22&quot;
+-document_root  = &quot;~/website.com/&quot;
+-deploy_default = &quot;rsync&quot;
++ssh_user       = &quot;xxx@usersXX.heteml.jp&quot;
++ssh_port       = &quot;2222&quot;
++document_root  = &quot;~/web/octopress&quot;
++deploy_default = &quot;scp&quot;
+ 
+ # This will be configured for you when you run config_deploy
+ deploy_branch  = &quot;gh-pages&quot;
+@@ -224,6 +224,12 @@ task :rsync do
+   ok_failed system(&quot;rsync -avze 'ssh -p #{ssh_port}' --delete #{public_dir}/ #{ssh_user}:#{document_root}&quot;)
+ end
+ 
++desc &quot;Deploy website via scp&quot;
++task :scp do
++  puts &quot;## Deploying website via scp&quot;
++  ok_failed system(&quot;scp -r -P #{ssh_port} #{public_dir}/* #{ssh_user}:#{document_root}&quot;)
++end
++
+ desc &quot;deploy public directory to github pages&quot;
+ multitask :push do
+   puts &quot;## Deploying branch to Github Pages &quot;
+</code></pre></noscript></div>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Maglica Web]]></title>
@@ -2134,56 +2179,6 @@ target     prot opt source               destination
 </code></pre>
 
 <p>とりあえず CentOS5 でも動くようなんで、色々遊んでみようと思う。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[WebOperations]]></title>
-    <link href="http://mizzy.org/blog/2011/05/12/WebOperations/"/>
-    <updated>2011-05-12T02:35:41+09:00</updated>
-    <id>http://mizzy.org/blog/2011/05/12/WebOperations</id>
-    <content type="html"><![CDATA[<h1>!html</h1>
-
-<pre><code>&lt;a href="http://www.oreilly.co.jp/books/9784873114934/"&gt;&lt;img src="http://ec3.images-amazon.com/images/I/51-ThZ6FRfL._SS500_.jpg" /&gt;&lt;/a&gt;
-</code></pre>
-
-<p>献本頂きました。<a href="http://www.oreilly.co.jp/">O&#8217;Reilly Japan</a> 様、<a href="http://twitter.com/#!/kdmsnr">@kdmsnr</a> さん、<a href="http://twitter.com/#!/hmsk">@hmsk</a> さん、ありがとうございます！</p>
-
-<p>本書はタイトルにある通り、ウェブの運用に関わる本なんですが、僕が敬愛する John Allspaw 氏と、Chef で有名な Opscode の CEO、Jesse Robbins 氏の監修による、17 + 1 本のエッセイ集で、監修の両氏以外にも様々な方によって書かれています。（+1 は日本語版のみに収録されている、@hmsk さんによるクックパッドのインフラの話です。）</p>
-
-<p>目次は以下の通りとなっています。</p>
-
-<ul>
-<li>1章 ウェブオペレーション：キャリア</li>
-<li>2章 Picnikにおけるクラウドコンピューティングの利用とその教訓</li>
-<li>3章 インフラとアプリケーションのメトリクス</li>
-<li>4章 継続的デプロイ</li>
-<li>5章 コードとしてのインフラ</li>
-<li>6章 監視</li>
-<li>7章 いかにして複雑なシステムは失敗するか</li>
-<li>8章 コミュニティ管理とウェブオペレーション</li>
-<li>9章 予期しないトラフィック急増への対応</li>
-<li>10章 開発と運用の協力と連携</li>
-<li>11章 訪問者の気持ち：ユーザ対面メトリクス</li>
-<li>12章 ウェブにおけるリレーショナルデータベースの戦略と戦術</li>
-<li>13章 障害を活用する：ふりかえりの技芸と科学</li>
-<li>14章 ストレージ</li>
-<li>15章 非リレーショナルデータベース</li>
-<li>16章 アジャイルインフラストラクチャ</li>
-<li>17章 夜中に聞こえる奇妙な物音（と、ぐっすり眠る方法）</li>
-<li>18章 日本の料理のインフラ</li>
-</ul>
-
-
-<p>このように、運用や監視の話、運用者のキャリアに関する話、クラウドに関する話、DevOps に関する話、リレーショナルや非リレーショナルなデータベースの話、ストレージの話、障害対応に関する話、などなど、ウェブの運用に関して多岐にわたった話が掲載されています。</p>
-
-<p>どの話もとても興味深いのですが、特に興味深かったのは、「2章 Picnikにおけるクラウドコンピューティングの利用とその教訓」と「12章 ウェブにおけるリレーショナルデータベースの戦略と戦術」です。</p>
-
-<p>ペパボでは写真サービス <a href="http://30d.jp/">30days Album</a> を提供していて、一時的な高負荷に対応するために、クラウドをいかに活用するかを模索しているところなので、同じ写真サービスである <a href="http://www.picnik.com/">Picnik</a> におけるクラウドの活用に関する話は、とても参考になります。（といってもサービスの性質が違うため、そのまま真似できるわけではありませんが。）</p>
-
-<p>また、12章は、実践ハイパフォーマンスMySQL 第2版の著者の1人である、Baron Schwartz 氏によるもので、最適なデータベースアーキテクチャを選択するためにはどうすれば良いか、ということについて書いてるんですが、「GUID を（主キーに）使うのは、データベースが何であれ、最悪だ！」とか、「みんな平気な顔をしているようだが、もっとシャーディングを怖がるべきだ」「シャーディングはウェブアプリケーションに適したアーキテクチャではない」「まともなハードウェアを購入せずに大量の安いマシンでシャーディングアーキテクチャを構築し、スケーラビリティを確保しようとするのは、私に言わせれば、単なるバカだ」とか、「このプロダクトが、MySQL Cluster と呼ばれているのは残念」とか、小気味よい調子で良いアーキテクチャを選択するための指針を示してくれています。</p>
-
-<p>詳しくはぜひお手元にとって読んでみて下さい。ひとつひとつの章が独立した話でそれほど長くないので、好きなところからさくっと読めるのがいいですね。自分は英語版は一通り読んだので、日本語版ではまずは 18章 のクックパッドさんの話から読んでみようと思います。</p>
 ]]></content>
   </entry>
   

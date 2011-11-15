@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="パッチを送って頂いたので、Atom API テストツール 「A2T2」 をアップデート。Thanks, Brian! 自分、FeedURI と EditURI に対する GET の違いを理解してなかったので、その辺を直してくれちゃいました。Brian の環境では問題なく動作してるとのこと。 &hellip;">
+  <meta name="description" content="またもやパッチを送って頂いたので、Atom API テストツール 「A2T2」 をアップデート。Thanks agin, Brian! エラーハンドリングをちゃんとしていなくて、エラーが発生すると Catalyst のエラー画面が下の方にそのまま表示されてしまい、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/02/20/370/">Catalyst で Atom API テストツール #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-02-20T23:11:00+09:00" pubdate>Feb 20<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/02/20/370/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+またもやパッチを送って頂いたので、Atom API テストツール 「A2T2」 をアップデート。Thanks agin, Brian!
+</p>
+
+
+
+
+<p class="entryBody">
+エラーハンドリングをちゃんとしていなくて、エラーが発生すると Catalyst のエラー画面が下の方にそのまま表示されてしまい、画面がおかしなことになっていたのを修正してくれました。これはやらなきゃいけないな、と思っていたので、大助かり。
+</p>
+
+
+
+
+<p class="entryBody">
+例によってソースは <a href="http://trac.mizzy.org/public/browser/atom_client/trunk" target="_blank">trac</a> または svn://mizzy.org/public/atom_client/trunk からどぞ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -826,109 +876,6 @@ VobSub("&lt;%InputFilePath%&gt;&lt;%InputFileBase%&gt;.sub")
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/01/09/326/">Tt プラグイン（というか Template::Parser ）の謎の挙動</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-01-09T16:12:00+09:00" pubdate>Jan 9<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/01/09/326/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-bloxsom のフレーバを Template-Toolkit で処理するための<a href="http://mizzy.org/program/blosxomTT.html" target="_blank">プラグイン</a>が謎の挙動をしていて、昨日のエントリの permalink ページがエラーとなっていました。
-</p>
-
-
-
-
-<p class="entryBody">
-で、原因となる箇所は特定できたのですが、原因がさっぱり分からないので、どなたかご存知の方は教えてください。
-</p>
-
-
-
-
-<p class="entryBody">
-まず、プラグインの処理の概要ですが、tt プラグインの interpolate() の中で、$template にフレーバの内容をつっこんで、同じプラグイン内の parse() に渡しています。parse() では、Template::Parser を利用して、TT のディレクティブからパラメータをひろって配列につっこんでいます。その後も処理があるのですが、今回の問題とは関係がないので省略。問題のある部分を抜粋すると以下の様な感じです。
-</p>
-
-
-
-
-<pre class="code">
-sub interpolate {
-    return sub {
-        my $template = shift;
-
-        # 省略
-
-        my @params = parse($template);
-
-        # 省略
-    }
-}
-
-sub parse {
-    my $template = shift;
-    my $parser = Template::Parser->new;
-    my $tokens = $parser->tokenise_directive($template);
-
-    # 省略
-}
-</pre>
-
-
-
-
-<p class="entryBody">
-で、何が問題かというと、interpolate() 内の $template が、parse() の $parser->tokenise_directive($template) を実行すると空になってしまうのです。それも、$template がある程度長くなった場合のみ。（具体的に何byte 以上かは調べてないのですが。）
-</p>
-
-
-
-
-<p class="entryBody">
-parse() 内の $template は、 interpolate() 内の $template のコピーのはずなので、直接 interpolate() の $template はいじってないし、Template::Parser のソースを見ても、渡された $template をいじっているようには見えないんですよね。
-</p>
-
-
-
-
-<p class="entryBody">
-また、問題が発生する $template の内容と同一のデータを使って、blosxom のプラグインという形ではなく、単一のプログラムを書いて実行してみると、正常に処理できるんですよね。謎です。
-</p>
-
-
-
-
-<p class="entryBody">
-とりあえず長さが問題だということと、parse() には $template の中身をすべて渡す必要がなく、TT の ディレクティブだけ渡せばいいので、そういった処理をするように修正してしのいでいます。（それでも挙動がおかしいところがあるのですが。）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/30/">&larr; Older</a>
@@ -946,6 +893,10 @@ parse() 内の $template は、 interpolate() 内の $template のコピーの�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
       </li>
     
@@ -959,10 +910,6 @@ parse() 内の $template は、 interpolate() 内の $template のコピーの�
     
       <li class="post">
         <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
       </li>
     
   </ul>

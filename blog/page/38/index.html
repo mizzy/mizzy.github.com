@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="interpolate_fancyプラグインは便利なのですが、HTML::TemplateやTemplate Toolkitに慣れているとなんか物足りないし、やはり慣れた記法で記述したいですよね。 で、探してみるとblosxomでHTML::Templateを使うためのプラグインを見つけましたが &hellip;">
+  <meta name="description" content="概要 前回のエントリに関して、MM/Memoで、「うーん、便利なのかなー。perl（とかのサーバサイド）コード中にjavascriptが混ざるのって嫌な気がするけど。」と書いている方がいらっしゃったのですが、ちょっと勘違いをされているような気がします。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,182 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/30/362/">Catalystでajax - 実践編</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-30T22:28:00+09:00" pubdate>Apr 30<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/30/362/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>概要</h3>
+
+
+
+
+<p class="entryBody">
+<a href="/program/htmlPrototype.html" target="_blank">前回のエントリ</a>に関して、<a href="http://1470.net/mm/" target="_blank">MM/Memo</a>で、「うーん、便利なのかなー。perl（とかのサーバサイド）コード中にjavascriptが混ざるのって嫌な気がするけど。」と書いている方がいらっしゃったのですが、ちょっと勘違いをされているような気がします。自分でJavascriptのコードを一切書かずに済ませるための、HTML::PrototypeならびにCatalyst::Plugin::Prototypeですから。
+</p>
+
+
+
+
+<p class="entryBody">
+なので、今回は実践編っつーことで、Javascriptを一切書かずにajaxなウェブアプリ（ってほどのものではないけど）をCatalystで作ってみたいと思います。といっても、けんたろさんの<a href="http://antipop.zapto.org/mt/archives/001280.php">Catalyst で作る簡単 Web アプリケーション: Feed2JS 解説</a>で、既にCatalystでajaxで自分ではJavascriptを書いていないという、素晴らしいサンプルがあるのですが、ここではよりシンプルな（しょぼい）サンプルで、「こんなに簡単にajaxできるぜ」ってことを示したいと思います。
+</p>
+
+
+
+
+<h3>プロジェクト生成</h3>
+
+
+
+
+<pre class="code">
+$ catalyst.pl Ajax
+</pre>
+
+
+
+
+<h3>ビューの生成</h3>
+
+
+<pre class="code">
+$ cd Ajax
+$ ./script/ajax_create.pl view TT TT
+</pre>
+
+
+
+
+<h3>perlコード作成</h3>
+
+
+<p class="entryBody">
+lib/Ajax.pmを修正します。修正した部分だけ以下に示します。
+</p>
+
+
+
+
+<pre class="code">
+use Catalyst qw/Prototype/;
+
+sub default : Private {
+    my ( $self, $c ) = @_;
+    $c->stash->{template} = 'default';
+    $c->forward('Ajax::V::TT');
+}
+
+sub get : Global {
+    my ( $self, $c ) = @_;
+    $c->res->output('success.');
+}
+</pre>
+
+
+
+
+<h3>テンプレート作成</h3>
+
+
+<p class="entryBody">
+以下の内容のroot/default というファイルを作成します。
+</p>
+
+
+
+
+<pre class="code">
+&#x5b;% c.prototype.define_javascript_functions %&#x5d;
+&lt;p&gt;
+This is a sample of ajax web app using Catalyst.
+&lt;/p&gt;
+
+&lt;p&gt;
+&#x5b;% c.prototype.link_to_remote('click here and you will see the string "success."',
+                  {
+                update => 'container',
+                url => '/get',
+                }) %&#x5d;
+&lt;/p&gt;
+
+&lt;div id="container"&gt;
+&lt;/div&gt;
+</pre>
+
+
+
+
+<h3>アクセスしてみる</h3>
+
+
+
+
+<p class="entryBody">
+cgiで起動する場合には、以下の様なスクリプトを作成します。
+</p>
+
+
+
+
+<pre class="code">
+#!/usr/local/bin/perl -w
+
+use strict;
+use lib '/path/to/Ajax/lib';
+use Ajax;
+
+Ajax->run;
+</pre>
+
+
+
+
+<p class="entryBody">
+実際にアクセスしてみると<a href="/archives/Ajax/" target="_blank">こうなります</a>。リンクをクリックすると、画面遷移せずに「success.」という文字を表示します。
+</p>
+
+
+
+
+<p class="entryBody">
+以上で完了です。Javascriptを一切書かずにajaxなウェブアプリが作れる、ということがお分かり頂けたと思います。    
+</p>
+
+
+
+
+<p class="entryBody">
+xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ込むだけなので、サーバ側で生成したデータを、Javascript側で何らかの処理をしてからHTMLにはめ込むという用途には使えませんが、単純なajaxアプリであれば十分使えるかと。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -913,56 +1089,6 @@ taggingプラグインをアップデート。約束通り、ajax（もどき）
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/18/342/">Blosxomでtagging #4</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-18T23:12:00+09:00" pubdate>Apr 18<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/18/342/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-taggingプラグインをアップデート。現在自分がいるカテゴリ内のエントリにあるタグだけを表示できる様にしてみました。カテゴリ移動時に左のtagsメニューにご注目頂ければ、どんな動作かおわかりになるかと思います。download: <a href="/archives/tagging">taggingプラグイン</a>
-</p>
-
-
-
-
-<p class="entryBody">
-カテゴリ名の表示には、<a href="http://hail2u.net/archives/blugins.html#categories" target="_blank">hail2u.net kyoさんのcategoriesプラグイン</a>を更に改造したものを使わせて頂いております。
-</p>
-
-
-
-
-<p class="entryBody">
-次の目標。タグが増えてくると目的のタグを探すのがつらくなるので、タグの絞込みができるフォームをつける。もちろん、Javascript + xmlHttpRequest + DOMを利用して、文字入力するたびにダイナミックに候補が絞り込まれていく様にする。（前も違う言葉で同じようなこと言ってた気がするけど&#8230;）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/39/">&larr; Older</a>
@@ -980,6 +1106,10 @@ taggingプラグインをアップデート。現在自分がいるカテゴリ�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
       </li>
     
@@ -993,10 +1123,6 @@ taggingプラグインをアップデート。現在自分がいるカテゴリ�
     
       <li class="post">
         <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
       </li>
     
   </ul>

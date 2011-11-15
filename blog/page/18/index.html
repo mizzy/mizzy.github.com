@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Assurer (SVN) をまた修正。 プラグインの実行フェーズを、test, format, publish の3つにわけてみました。 test: - module: HTTP name: http://svn.mizzy.org/ #0 config: url: http://svn. &hellip;">
+  <meta name="description" content="Net::LDAP::Alterntive あらため Net::LDAP::Abstract ですが、この名前だと Net::LDAP の中のモジュールと区別がつかないし、パッと見何をやるモジュールなのか分からないので、Net::LDAPx::Simple (SVN) とまた名称を変更しました。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,82 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/12/394/">Net::LDAPx::Simple と Catalyst::Model::LDAPx::Simple</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-12T23:31:00+09:00" pubdate>Jan 12<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/12/394/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/net-ldap-abstract00.html"><span class="icon"></span>Net::LDAP::Alterntive あらため Net::LDAP::Abstract</a> ですが、この名前だと Net::LDAP の中のモジュールと区別がつかないし、パッと見何をやるモジュールなのか分からないので、<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Net-LDAPx-Simple"><span class="icon"></span>Net::LDAPx::Simple</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Net-LDAPx-Simple/"><span class="icon"></span>SVN</a>) とまた名称を変更しました。DBIx::Simple からの連想です。
+以下の様な感じで CRUD が一通りできるようになってます。
+</p>
+
+
+<pre class="wiki">
+# Create
+my $res = $ldap->create({
+    dn => 'uid=mizzy, ou=people, o=southpark',
+    objectclass => [ 'person', 'inetorgperson' ],
+    sn => 'Miyashita',
+    cn => 'Gosuke Miyashita',
+    uid => 'mizzy',
+});
+
+# Retrieve
+my $entries = $ldap->search({
+    -or => {
+        uid => 'miya',
+        cn  => 'miyashita*',
+        },
+    }
+});
+
+# Update
+my $entry = $entries->first;
+$entry->telephonenumber('00-0000-0000');
+$entry->update;
+
+# Delete
+$entry->delete;
+</pre>
+
+
+<p>
+ついでに <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Catalyst-Model-LDAPx-Simple"><span class="icon"></span>Catalyst::Model::LDAPx::Simple</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Catalyst-Model-LDAPx-Simple/"><span class="icon"></span>SVN</a>) もつくりました。Catalyst::Model::* つくるのはじめてなので、こんな感じでいいのかちょっと不安。もう少し他の Catalyst::Model::* のソースを読んでみる。
+</p>
+
+
+<p>
+もうちょいエラーハンドリングちゃんとして、POD 書いたり Helper つくったりした後に CPAN に up 予定。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1138,47 +1214,6 @@ cfrun は1ホストに対して1回実行というわけではなく、cfrun.hos
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/11/03/275/">京都に行ってきます</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-11-03T01:34:00+09:00" pubdate>Nov 3<span>rd</span>, 2006</time>
-        
-         | <a href="/blog/2006/11/03/275/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-今日の午後から、弟の結婚式のため2泊3日で京都に行ってきます。
-</p>
-
-
-<p>
-完全にオフラインになって、ネットでのコンタクトがとれなくなるので、念のためここでお知らせ。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -1196,6 +1231,10 @@ cfrun は1ホストに対して1回実行というわけではなく、cfrun.hos
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
       </li>
     
@@ -1209,10 +1248,6 @@ cfrun は1ホストに対して1回実行というわけではなく、cfrun.hos
     
       <li class="post">
         <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
       </li>
     
   </ul>

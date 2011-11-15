@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Puppet 作者 Luke Kanies 氏のブログエントリ にて、Puppet の競合となる Chef というソフトウェアについて触れられていた。 ソフトウェアのポジション的にも、使われている用語的にも、かなり Puppet を意識している模様。開発言語が Ruby という点も Puppet &hellip;">
+  <meta name="description" content="Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、RewriteMap での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,112 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/05/10/AddModRewriteInternalFunction/">AddModRewriteInternalFunction</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-05-10T13:58:43+09:00" pubdate>May 10<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/05/10/AddModRewriteInternalFunction/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html#rewritemap">RewriteMap</a> での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、という形なので、並列処理させることができません。これは rewrite 処理するときにデータベースへ問い合わせるなど、I/O ブロッキングが発生するような処理をさせたいときには致命的なパフォーマンス劣化を引き起こすことになります。</p>
+
+<p>これを解決するためには、Apache モジュールの中で望みの rewrite 処理をさせるようにすればいいのでは、と思い、RewriteMap にある int タイプに好きな internal function を追加できればいけるんじゃないないか、と考えたものの、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html">mod_rewrite のリファレンス</a> では、「you cannot create your own」とか書かれていて、追加できないっぽい。かと言って mod_rewrite.c に手を入れるのもやだなー、と思っていたところ、<a href="http://code.google.com/p/modicpquery/wiki/Internals">mod_icpquery のドキュメント</a> を見つけた。これを見ると、好きな internal function を独立したモジュールの形で追加できそう、ってことでやってみたらできた。</p>
+
+<p>以下が internal function を追加するためのモジュールテンプレ。rewrite_mapfunc_custom の中で、望みの処理を記述してあげるだけで OK。</p>
+
+<pre><code>#!c
+#include "httpd.h"
+#include "http_config.h"
+#include "apr_optional.h"
+
+/* rewrite map function prototype from mod_rewrite.h */
+typedef char *(rewrite_mapfunc_t)(request_rec *r, char *key);
+
+/* optional function declaration from mod_rewrite.h */
+APR_DECLARE_OPTIONAL_FN(void, ap_register_rewrite_mapfunc,
+                        (char *name, rewrite_mapfunc_t *func));
+
+static char *rewrite_mapfunc_custom(request_rec *req, char *key)
+{
+    /* key を元にごにょごにょして value を生成 */
+    return value;
+}
+
+/* from mod_rewrite.c */
+static int pre_config(apr_pool_t *pconf,
+                      apr_pool_t *plog,
+                      apr_pool_t *ptemp)
+{
+    APR_OPTIONAL_FN_TYPE(ap_register_rewrite_mapfunc) *map_pfn_register;
+
+    /* register int: rewritemap handlers */
+    map_pfn_register = APR_RETRIEVE_OPTIONAL_FN(ap_register_rewrite_mapfunc);
+    if (map_pfn_register) {
+        map_pfn_register("custom", rewrite_mapfunc_custom);
+    }
+    return OK;
+}
+
+static void register_hooks(apr_pool_t *p)
+{
+    ap_hook_pre_config(pre_config, NULL, NULL, APR_HOOK_MIDDLE);
+}
+
+module AP_MODULE_DECLARE_DATA rewrite_mapfunc_custom_module = {
+    STANDARD20_MODULE_STUFF,
+    NULL,                  /* create per-dir    config structures */
+    NULL,                  /* merge  per-dir    config structures */
+    NULL,                  /* create per-server config structures */
+    NULL,                  /* merge  per-server config structures */
+    NULL,                  /* table of config file commands       */
+    register_hooks         /* register hooks                      */
+};
+</code></pre>
+
+<p>追加した internal function を呼び出すための httpd.conf は以下のような感じ。</p>
+
+<pre><code>LoadModule rewrite_mapfunc_custom_module modules/mod_rewrite_mapfunc_custom.so
+
+RewriteEngine On
+ProxyPreserveHost On
+RewriteMap custom int:custom
+RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]
+</code></pre>
+
+<p>この例では、Host ヘッダの内容を custom function に渡して、ホスト名を変換して proxy するけど、Host ヘッダはオリジナルのままで変換しない、といった処理を想定してます。</p>
+
+<p>例の件はこんな感じで実現できそうだよ。＞<a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a></p>
+
+<p>*2009/05/10 13:57:00 追記 *</p>
+
+<p>github に Makefile 等も含めてコードアップしました。</p>
+
+<p>http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1662,134 +1768,6 @@ GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-bu
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/12/28/ScalableStorageWithOSS00/">ScalableStorageWithOSS00</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-12-28T17:21:10+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/12/28/ScalableStorageWithOSS00/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://trac.mizzy.org/public/wiki/HowToBuildAScalableStorageSystemWithOSS">TLUG Meeting 2008/09 で発表した How to build a scalable storage system with OSS</a> なんですが、発表では概要しか触れてなくて、じゃあいったいどうやって構築するのよ、という部分が全然ないので、ぼちぼちこのブログで書いていくことにします。</p>
-
-<p>で、スケーラブルというだけだと曖昧なので、以下のような要件を満たすものを、スケーラブルなストレージと想定することにします。</p>
-
-<ul>
-<li>特殊なソフトウェアを必要とせずに、OS からファイルシステムとしてマウントできるもの。なので MogileFS、Hadoop Distributed File System、Google File System 等は対象外。（FUSE 使えばやれないこともないけど…）</li>
-<li>容量をオンラインでダイナミックに追加できる。</li>
-<li>SPOF がない。</li>
-<li>複数のサーバから同時にマウントすることができる。</li>
-<li>物理的に I/O を柔軟に分散することができる。</li>
-<li>無駄な空きスペースができにくい。</li>
-</ul>
-
-
-<p>で、こういったストレージを、高価なハードウェアを買わずに、オープンソースソフトウェアだけで構築することができないか、と考えて、こんな感じで実現できそうだなあー、というのを発表したのが TLUG でのプレゼンの内容。このプレゼンで出てきたキーワードとその概要をおさらいすると、以下のような感じ。</p>
-
-<ul>
-<li><a href="http://sources.redhat.com/cluster/cman/">cman</a>
-
-<ul>
-<li>Cluster Manager</li>
-<li>Red Hat Cluster Suite の一コンポーネント</li>
-<li>クラスタのメンバーシップ管理とノード間のメッセージング</li>
-<li>以下に出てくる、CLVM や GFS2 を使うために必要</li>
-</ul>
-</li>
-<li><a href="http://sources.redhat.com/cluster/clvm/">CLVM</a>
-
-<ul>
-<li>Cluster Logical Volume Manager</li>
-<li>LVM2 のクラスタ版</li>
-<li>LVM2 のメタデータをクラスタノード間で自動的にシェアする</li>
-<li>CLVM で作成された論理ボリュームは、すべてのクラスタノードから参照できる</li>
-</ul>
-</li>
-<li><a href="http://sourceware.org/cluster/gnbd/">GNBD</a>
-
-<ul>
-<li>Global Network Block Device</li>
-<li>TCP/IP ネットワーク経由でのブロックデバイスアクセス</li>
-<li>iSCSI と同じようなもの</li>
-<li>iSCSI との違いは、フェンシング機能を持っていること（フェンシングについては機会があれば説明します）</li>
-</ul>
-</li>
-<li><a href="http://sources.redhat.com/cluster/gfs/">GFS2</a>
-
-<ul>
-<li>Global File System 2</li>
-<li>クラスタファイルシステム</li>
-<li>複数ノードから同時にマウントしてアクセスすることが可能</li>
-<li>cman の DLM(Distributed Lock Manager) を利用して排他制御し、ファイルの整合性を保つ</li>
-<li>OCFS(Oracle Cluster File System) なんかも同類</li>
-</ul>
-</li>
-<li><a href="http://www.drbd.org/">DRBD</a>
-
-<ul>
-<li>Ditributed Replicated Block Device</li>
-<li>要するにネットワーク越しの RAID1</li>
-</ul>
-</li>
-<li><a href="http://www.redhat.com/docs/manuals/csgfs/browse/4.6/DM_Multipath/index.html">DM-MP</a>
-
-<ul>
-<li>Device-Mapper Multipath</li>
-<li>複数の I/O 経路を仮想的にひとつに見せかけることができる</li>
-<li>Active/Passive、Active/Active どちらでも対応可</li>
-</ul>
-</li>
-</ul>
-
-
-<p><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">TLUG での発表資料</a> では、それぞれを図で説明していたり、これらをどう組み合わせて利用するのかを説明しているので、ご参照ください。</p>
-
-<p>で、これらを組み合わせて構築したストレージがとりあえず動くことは確認できたのだけど、実用に耐えうるかどうかは謎。特に以下の点が気になるところ。</p>
-
-<ul>
-<li>協調動作するコンポーネントが多くて、トラブルが起こりやすそう。</li>
-<li>安定性。</li>
-<li>パフォーマンス。</li>
-<li>ストレージとなるサーバを追加して容量を増やした場合のオーバーヘッドの増加具合。</li>
-</ul>
-
-
-<p>なので、今後実際に使うかどうかはまだ決めかねてるのですが、一通り動かせるところまでは試してみたので、次回から実際の構築手順を書いていこうと思います。</p>
-
-<h1>関連エントリ</h1>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
-<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
-<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
-<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
-<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -1807,6 +1785,10 @@ GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-bu
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
       </li>
     
@@ -1820,10 +1802,6 @@ GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-bu
     
       <li class="post">
         <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a>
       </li>
     
   </ul>
