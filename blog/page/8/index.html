@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="TLUG Meeting 2008/09 で発表した How to build a scalable storage system with OSS なんですが、発表では概要しか触れてなくて、じゃあいったいどうやって構築するのよ、という部分が全然ないので、ぼちぼちこのブログで書いていくことにします &hellip;">
+  <meta name="description" content="[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0] のつづき。 サーバ構成概要 TLUG 発表資料 で触れた、全体的な構成のおさらい。構成図は以下のような感じ。 [[Image(http://trac.mizzy.org &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,135 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/12/28/ScalableStorageWithOSS01/">ScalableStorageWithOSS01</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-12-28T17:21:40+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/12/28/ScalableStorageWithOSS01/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0] のつづき。</p>
+
+<h1>サーバ構成概要</h1>
+
+<p><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">TLUG 発表資料</a> で触れた、全体的な構成のおさらい。構成図は以下のような感じ。</p>
+
+<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]]</p>
+
+<p>この構成について説明すると、以下のようになります。</p>
+
+<ul>
+<li>DRBD により、2台一組でブロックデバイスをミラーリング
+
+<ul>
+<li>/dev/gnbd0 と /dev/gnbd1 がセット</li>
+<li>/dev/gnbd2 と /dev/gnbd3 がセット</li>
+</ul>
+</li>
+<li>GNBD でブロックデバイスをエクスポート
+
+<ul>
+<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 がネットワーク越しに見える</li>
+</ul>
+</li>
+<li>クライアント側で GNBD でエクスポートされたブロックデバイスをインポート
+
+<ul>
+<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 をすべてインポート</li>
+</ul>
+</li>
+<li>DM-MP により、2つのデバイスを1つに見せる
+
+<ul>
+<li>/dev/gnbd0 + /dev/gnbd1 が /dev/mapper/mpath0 として見える</li>
+<li>/dev/gnbd2 + /dev/gnbd3 が /dev/mapper/mpath1 として見える</li>
+</ul>
+</li>
+<li>CLVM により論理ボリュームを作成
+
+<ul>
+<li>/dev/mapper/mpath0 と /dev/mapper/mpath1 が物理ボリューム</li>
+<li>この2つの物理ボリュームから、ボリュームグループ VG0 を作成</li>
+<li>VG0 上に論理ボリューム LV0 を作成</li>
+<li>この論理ボリュームが、/dev/VG0/LV0 として見える</li>
+</ul>
+</li>
+<li>/dev/VG0/LV0 を GFS2 でフォーマット</li>
+<li>ストレージ全体が論理ボリューム /dev/VG0/LV0 として見えるので、こいつをマウントする</li>
+</ul>
+
+
+<h1>構築手順概要</h1>
+
+<p>構築手順はざっと以下のようになります。CentOS 5.2 + Xen で検証しています。</p>
+
+<ul>
+<li>Xen インスタンスをつくる
+
+<ul>
+<li>client0, client1</li>
+<li>storage0a, storage0b</li>
+<li>storage1a, storage1b</li>
+</ul>
+</li>
+<li>ストレージサーバで GNBD によりエクスポートするブロックデバイスを作成する</li>
+<li>2台セットで DRBD ミラーリング
+
+<ul>
+<li>storage0a と storage0b を同期</li>
+<li>storage1a と storage1b を同期</li>
+</ul>
+</li>
+<li>storage![01][ab] で GNBD によりブロックデバイスをエクスポート</li>
+<li>client![01]でブロックデバイスをインポート</li>
+<li>client![01]上で、DM-MP により複数のデバイスをまとめる
+
+<ul>
+<li>storage0[ab] からエクスポートしたデバイスをひとつに見せる</li>
+<li>storage1[ab] からエクスポートしたデバイスをひとつに見せる</li>
+</ul>
+</li>
+<li>DM-MP でまとめたデバイスを、CLVM によりひとつの論理ボリュームに見せる</li>
+<li>論理ボリュームを GFS2 でフォーマットする</li>
+<li>論理ボリュームをマウントする</li>
+</ul>
+
+
+<p>次回以降、それぞれについて解説していきます。</p>
+
+<ul>
+<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
+<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
+<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
+<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
+<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -727,41 +856,6 @@ ieiri
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/10/29/KansaiOpenSource2008/">KansaiOpenSource2008</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-10-29T00:51:41+09:00" pubdate>Oct 29<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/10/29/KansaiOpenSource2008/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://k-of.jp/2008/list.html">関西オープンソース 2008</a> で、<a href="http://30d.jp/">30days Album</a> の <a href="http://k-of.jp/2008/list_seminar.html#70">裏側についてお話します</a>。</p>
-
-<p><a href="http://30d.jp/">30days Album</a> で利用している OSS を思いつくままざっとあげてみると、Linux, Perl, Perlbal, lighttpd, MogileFS, Gearman, TheSchwartz, Catalyst, Ruby, Ruby On Rails, BackgrounDrb, MySQL, memcached, LVM, Subversion, Archer, Puppet, OpenLDAP, OpenSSH + lpk patch, Nagios, HotSanic といった感じになるわけですが、これらの OSS をどんな風に使ってるのか、という話を、サービスとしての観点と、運用まわりの観点からお話したいと思います。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/9/">&larr; Older</a>
@@ -779,6 +873,10 @@ ieiri
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -792,10 +890,6 @@ ieiri
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="昨日の時点では実装されていなかった autolink まわりを id:drawnboy さん が実装してくれて、最低限の機能は実装されたかな、という状態になりましたので、とりあえず CPAN に up しました。 id:drawnboy さんには autolink まわりだけではなく、 &hellip;">
+  <meta name="description" content="Perl Hacks に載ってた Hack #81 の PPerl を plagger で試してみよう、と思ったら 既に試していらっしゃる方 がおりました。 というわけで、PPerl が何なのかは id:odz さん の上記エントリを見てください。 と、これだけでも何なので、PPerl &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,175 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/25/309/">PPerl と Plagger</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-25T18:19:00+09:00" pubdate>Jun 25<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/25/309/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/0596526741/httshemizorg-22/ref=nosim"><span class="icon"></span>Perl Hacks</a> に載ってた Hack <a class="ticket" href="/ticket/81">#81</a> の <a class="ext-link" href="http://search.cpan.org/dist/PPerl/"><span class="icon"></span>PPerl</a> を plagger で試してみよう、と思ったら <a class="ext-link" href="http://d.hatena.ne.jp/odz/20060524/1148529647"><span class="icon"></span>既に試していらっしゃる方</a> がおりました。
+</p>
+
+
+<p>
+というわけで、PPerl が何なのかは <a class="ext-link" href="http://d.hatena.ne.jp/odz/"><span class="icon"></span>id:odz さん</a> の上記エントリを見てください。
+</p>
+
+
+<p>
+と、これだけでも何なので、PPerl について気になって調べたことをメモ。まず、global セクションだけ書いた config.yaml で plagger を起動して、ps コマンドで仮想メモリ容量を見てみると、こんな感じになってます。
+</p>
+
+
+<pre class="wiki">
+$ pperl plagger                                           [~/plagger]
+Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep           [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 <strong>18592</strong> plagger
+ 6472  6470 10772 plagger
+ 6473  6470 10772 plagger
+ 6474  6470 10772 plagger
+ 6475  6470 10772 plagger
+</pre>
+
+
+<p>
+さらにもう2回ほど pperl plagger を実行すると、
+</p>
+
+
+<pre class="wiki">
+$ pperl plagger                                           [~/plagger]
+Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
+$ pperl plagger                                           [~/plagger]
+Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep           [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 <strong>18592</strong> plagger
+ 6472  6470 <strong>18582</strong> plagger
+ 6473  6470 <strong>18582</strong> plagger
+ 6474  6470 10772 plagger
+ 6475  6470 10772 plagger
+</pre>
+
+
+<p>
+さらにもう何回か実行してみる。
+</p>
+
+
+<pre class="wiki">
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep      [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 <strong>18592</strong> plagger
+ 6472  6470 <strong>18592</strong> plagger
+ 6473  6470 <strong>18592</strong> plagger
+ 6474  6470 <strong>18592</strong> plagger
+ 6475  6470 <strong>18592</strong> plagger
+</pre>
+
+
+<p>
+こんな感じで、プロセス ID 6470 が大元の親プロセスになって、他の plagger プロセスをフォークしていて、 親プロセスの仮想メモリ容量が 10772KB、他の子プロセスの仮想メモリ容量との差分である 7820KB が plagger 関連モジュールが確保している仮想メモリ容量なんだろうなぁ、ということが分かります。
+</p>
+
+
+<p>
+で、今度は普段使っているコンフィグで起動してみます。
+</p>
+
+
+<pre class="wiki">
+$ pperl plagger --config=gmail.yaml
+Plagger [info] plugin Plagger::Plugin::Subscription::Bloglines loaded.
+Plagger [info] plugin Plagger::Plugin::Subscription::Config loaded.
+Plagger [info] plugin Plagger::Plugin::CustomFeed::Simple loaded.
+Plagger [info] plugin Plagger::Plugin::CustomFeed::YajiumaWatch loaded.
+Plagger [info] plugin Plagger::Plugin::CustomFeed::KotonohaInbox loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::EntryFullText loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::TruePermalink loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::StripRSSAd loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::BloglinesContentNormalize loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::HatenaDiaryKeywordUnlink loaded.
+Plagger [info] plugin Plagger::Plugin::Filter::Rule loaded.
+Plagger [info] plugin Plagger::Plugin::Widget::Delicious loaded.
+Plagger [info] plugin Plagger::Plugin::Widget::BloglinesSubscription loaded.
+Plagger [info] plugin Plagger::Plugin::Publish::Gmail loaded.
+... snip ...
+$ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep      [~/plagger]
+ 6470     1 10772 plagger
+ 6471  6470 18592 plagger
+ 6472  6470 18592 plagger
+ 6473  6470 18592 plagger
+ 6474  6470 18592 plagger
+ 6475  6470 <strong>37388</strong> plagger
+</pre>
+
+
+<p>
+と、こんな感じで、ID 6475 のプロセスが大きくなってます。これがこのコンフィグで増えた Plagger Plugin モジュールのメモリ容量みたいですね。
+</p>
+
+
+<p>
+といったように、pperl を最初に起動した時のモジュールだけをメモリ上に確保するだけではなく、その後新たに読み込まれたモジュールもちゃんとメモリ上に確保してくれているようです。当たり前っちゃ当たり前の気もしますが、何となく気になったので。 
+</p>
+
+
+<p>
+他に気になった点として、起動するプロセスの数を増やしたり、制限したりできるのかな、と思ったところ、以下の様なオプションがあるので、この辺りも制御できるようですね。
+</p>
+
+
+<pre class="wiki">
+$ pperl --help                                            [~/plagger]
+pperl version 0.25
+Usage: pperl [options] filename
+perl options are passed to your perl executable (see the perlrun man page).
+pperl options control the persistent perl behaviour
+
+PPerl Options:
+  -k  or --kill      Kill the currently running pperl for that script
+  -h  or --help      This page
+  --prefork          The number of child processes to prefork (default=5)
+  --maxclients       The number of client connections each child
+                       will process (default=100)
+  -z  or --anyuser   Allow any user (after the first) to access the socket
+                       WARNING: This has severe security implications. Use
+                       at your own risk
+  --no-cleanup       Skip the cleanup stage at the end of running your script
+                       this may make your code run faster, but if you forget
+                       to close files then they will remain unflushed and unclosed
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1794,70 +1963,6 @@ Catalyst::Plugin::AtomServer に含まれている C::P::Authentication::Credent
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/06/01/444/">Qooqle Video Clippers!</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-06-01T17:14:00+09:00" pubdate>Jun 1<span>st</span>, 2006</time>
-        
-         | <a href="/blog/2006/06/01/444/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-隣の席のオオヒダさんが、早速 JugemKey 認証 API を利用したステキサービスを作ってくれちゃいました。<a href="http://clippers.qooqle.jp/" target="_blank">Qooqle Video Clippers!</a> 
-</p>
-
-
-
-
-<p class="entryBody">
-YouTube のお気に入り動画をがんがんクリップしてタグづけたりコメントつけたり、人気の動画を一覧で見たり RSS で購読したりできちゃいます。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://clippers.qooqle.jp/tag/%E3%83%81%E3%83%A7%E3%82%B3%E3%83%9C%E3%83%BC%E3%82%A4" target="_blank">こんな風に特定のタグで見れば</a>、YouTube まとめサイトっぽくも使えるし。
-</p>
-
-
-
-
-<p class="entryBody">
-Clippers! は参加型で集合知な感じなのが、他の見るだけの YouTube 系サービスと一線を画してますね。今後どう発展していくのか楽しみです。
-</p>
-
-
-
-
-<p class="entryBody">
-認証は JugemKey だけではなく、はてな認証 API にも対応してるので、はてなユーザも登録なしで使えますよ。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/25/">&larr; Older</a>
@@ -1875,6 +1980,10 @@ Clippers! は参加型で集合知な感じなのが、他の見るだけの You
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -1888,10 +1997,6 @@ Clippers! は参加型で集合知な感じなのが、他の見るだけの You
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>

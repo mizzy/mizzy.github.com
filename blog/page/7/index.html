@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、RewriteMap での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、 &hellip;">
+  <meta name="description" content="source:library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm NAME Net::Amazon::ECS - [One line description of module&#8217;s purpose here] VERSION &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,114 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/07/21/library-perl-trunk-Net-Amazon-ECS-lib-Net-Amazon-ECS.pm/">library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-07-21T00:58:15+09:00" pubdate>Jul 21<span>st</span>, 2009</time>
+        
+         | <a href="/blog/2009/07/21/library-perl-trunk-Net-Amazon-ECS-lib-Net-Amazon-ECS.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm</p>
+
+<h1>NAME</h1>
+
+<p>Net::Amazon::ECS - [One line description of module&#8217;s purpose here]</p>
+
+<h1>VERSION</h1>
+
+<p>This document describes Net::Amazon::ECS version 0.0.1</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use Net::Amazon::ECS;
+
+    my $ua =  Net::Amazon::ECS-&gt;new(
+        access_key_id =&gt; 'YOUR_AWS_ACCESS_KEY_ID',
+        associate_tag =&gt; 'YOUR_AFFILIATE_ID',
+        locale        =&gt; 'jp',
+    );
+
+    my $req = Net::Amazon::Request::Keyword-&gt;new(
+        keywords     =&gt; 'SEARCH KEYWORDS',
+        search_index =&gt; 'books',
+        sort         =&gt; 'daterank',
+    );
+
+    my $res = $ua-&gt;request($req);
+
+    croak $res-&gt;message if $res-&gt;is_error;
+
+    my @items = $res-&gt;items;
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<h1>INTERFACE</h1>
+
+<h1>DIAGNOSTICS</h1>
+
+<p> <code>Error message here, perhaps with %s placeholders</code>:: [Description of error here]
+ <code>Another error message here</code>:: [Description of error here]
+[Et cetera, et cetera]</p>
+
+<h1>CONFIGURATION AND ENVIRONMENT</h1>
+
+<p>Net::Amazon::ECS requires no configuration files or environment variables.</p>
+
+<h1>DEPENDENCIES</h1>
+
+<p>None.</p>
+
+<h1>INCOMPATIBILITIES</h1>
+
+<p>None reported.</p>
+
+<h1>BUGS AND LIMITATIONS</h1>
+
+<p>No bugs have been reported.</p>
+
+<p>Please report any bugs or feature requests to <code>bug-net-amazon-ecs@rt.cpan.org</code>, or through the web interface at http://rt.cpan.org.</p>
+
+<h1>AUTHOR</h1>
+
+<p>Gosuke Miyashita <code>&lt;gosukenator@gmail.com&gt;</code></p>
+
+<h1>LICENCE AND COPYRIGHT</h1>
+
+<p>Copyright (c) 2006, Gosuke Miyashita <code>&lt;gosukenator@gmail.com&gt;</code>. All rights reserved.</p>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See perlartistic.</p>
+
+<h1>DISCLAIMER OF WARRANTY</h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &#8220;AS IS&#8221; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1639,135 +1747,6 @@ GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-bu
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/12/28/ScalableStorageWithOSS01/">ScalableStorageWithOSS01</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-12-28T17:21:40+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/12/28/ScalableStorageWithOSS01/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0] のつづき。</p>
-
-<h1>サーバ構成概要</h1>
-
-<p><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">TLUG 発表資料</a> で触れた、全体的な構成のおさらい。構成図は以下のような感じ。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]]</p>
-
-<p>この構成について説明すると、以下のようになります。</p>
-
-<ul>
-<li>DRBD により、2台一組でブロックデバイスをミラーリング
-
-<ul>
-<li>/dev/gnbd0 と /dev/gnbd1 がセット</li>
-<li>/dev/gnbd2 と /dev/gnbd3 がセット</li>
-</ul>
-</li>
-<li>GNBD でブロックデバイスをエクスポート
-
-<ul>
-<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 がネットワーク越しに見える</li>
-</ul>
-</li>
-<li>クライアント側で GNBD でエクスポートされたブロックデバイスをインポート
-
-<ul>
-<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 をすべてインポート</li>
-</ul>
-</li>
-<li>DM-MP により、2つのデバイスを1つに見せる
-
-<ul>
-<li>/dev/gnbd0 + /dev/gnbd1 が /dev/mapper/mpath0 として見える</li>
-<li>/dev/gnbd2 + /dev/gnbd3 が /dev/mapper/mpath1 として見える</li>
-</ul>
-</li>
-<li>CLVM により論理ボリュームを作成
-
-<ul>
-<li>/dev/mapper/mpath0 と /dev/mapper/mpath1 が物理ボリューム</li>
-<li>この2つの物理ボリュームから、ボリュームグループ VG0 を作成</li>
-<li>VG0 上に論理ボリューム LV0 を作成</li>
-<li>この論理ボリュームが、/dev/VG0/LV0 として見える</li>
-</ul>
-</li>
-<li>/dev/VG0/LV0 を GFS2 でフォーマット</li>
-<li>ストレージ全体が論理ボリューム /dev/VG0/LV0 として見えるので、こいつをマウントする</li>
-</ul>
-
-
-<h1>構築手順概要</h1>
-
-<p>構築手順はざっと以下のようになります。CentOS 5.2 + Xen で検証しています。</p>
-
-<ul>
-<li>Xen インスタンスをつくる
-
-<ul>
-<li>client0, client1</li>
-<li>storage0a, storage0b</li>
-<li>storage1a, storage1b</li>
-</ul>
-</li>
-<li>ストレージサーバで GNBD によりエクスポートするブロックデバイスを作成する</li>
-<li>2台セットで DRBD ミラーリング
-
-<ul>
-<li>storage0a と storage0b を同期</li>
-<li>storage1a と storage1b を同期</li>
-</ul>
-</li>
-<li>storage![01][ab] で GNBD によりブロックデバイスをエクスポート</li>
-<li>client![01]でブロックデバイスをインポート</li>
-<li>client![01]上で、DM-MP により複数のデバイスをまとめる
-
-<ul>
-<li>storage0[ab] からエクスポートしたデバイスをひとつに見せる</li>
-<li>storage1[ab] からエクスポートしたデバイスをひとつに見せる</li>
-</ul>
-</li>
-<li>DM-MP でまとめたデバイスを、CLVM によりひとつの論理ボリュームに見せる</li>
-<li>論理ボリュームを GFS2 でフォーマットする</li>
-<li>論理ボリュームをマウントする</li>
-</ul>
-
-
-<p>次回以降、それぞれについて解説していきます。</p>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
-<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
-<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
-<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
-<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -1785,6 +1764,10 @@ GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-bu
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -1798,10 +1781,6 @@ GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-bu
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>

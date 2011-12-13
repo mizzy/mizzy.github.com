@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="bloxsom のフレーバを Template-Toolkit で処理するためのプラグインが謎の挙動をしていて、昨日のエントリの permalink ページがエラーとなっていました。 で、原因となる箇所は特定できたのですが、原因がさっぱり分からないので、どなたかご存知の方は教えてください。 まず &hellip;">
+  <meta name="description" content="またもやはまっちゃった系エントリです。iPod で映画を持ち歩くために、DVDの中身を携帯しよう の「字幕とか音声とかを選んでエンコードしたい場合」にトライしてみたのですが、「用意するもの」にあるのと全く同じファイルがないために、かなりはまりました。 用意するものに、「DVD2AVI1.76、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,100 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/01/16/408/">iPod で映画を持ち歩く</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-01-16T01:35:00+09:00" pubdate>Jan 16<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/01/16/408/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+またもやはまっちゃった系エントリです。iPod で映画を持ち歩くために、<a href="http://www.geocities.jp/h264ipod/henkankundvd.html" target="_blank">DVDの中身を携帯しよう</a> の「字幕とか音声とかを選んでエンコードしたい場合」にトライしてみたのですが、「用意するもの」にあるのと全く同じファイルがないために、かなりはまりました。
+</p>
+
+
+
+
+<p class="entryBody">
+用意するものに、「DVD2AVI1.76、mpeg2dec3_25_dll_20030728 ←別の場所にあるらしい」とあるのですが、DVD2AVI は 1.77 が既にうちの PC に入っていて、mpeg2dec3_25_dll_20030728 はそのものずばりが見つからず、適当に検索して持ってきたら、最後の変換君でのエンコードで見事につまづきました。
+</p>
+
+
+
+
+<p class="entryBody">
+うまくいくやりかたは、<a href="" target="_blank">AviSynth Filter Collection</a> から DVD2AVI の代わりに dgmpgdec140_20050711 をダウンロード、mpeg2dec3.dll の代わりに、dgmpgdec140_20050711 に同梱されている DGDecode.dll を使う、です。
+</p>
+
+
+
+
+<p class="entryBody">
+そして、手順の中で「MPEG2Dec3.dll を C:\Program Files\AviSynth 2.5\plugins に移動」と書いているところは、「DGDecode.dll を C:\Program Files\AviSynth 2.5\plugins に移動」と読み替え、「DVD2AVI を起動」と書いているところは、dgmpgdec140_20050711 の DGIndex.exe を起動、と読み替えてください。
+</p>
+
+
+
+
+<p class="entryBody">
+うちはこれで、変換君がエラーを出さずに、エンコードをはじめるところまでいけました。現在エンコード中。
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>2006/01/16 追記</strong><br />
+他にもそのままではうまくいかないところがあったのに、書くのを忘れていました。通りすがりさん、コメントありがとうございます。
+</p>
+
+
+
+
+<p class="entryBody">
+他に手順の中で読み替える必要があるのは、AVS_Skelton2.avs の内容を、
+</p>
+
+
+
+
+<pre class="code">
+AudioDub(MPEG2Source("&lt;%InputFile%&gt;"),WavSource("&lt;%InputFilePath%&gt;&lt;%InputFileBase%&gt;.wav"))
+VobSub("&lt;%InputFilePath%&gt;&lt;%InputFileBase%&gt;.sub") 
+</pre>
+
+
+
+
+<p class="entryBody">
+とすることと、DGIndex（DVD2AVI） の操作で Audio → Output Method → Decode to WAV にチェックを入れる、ですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1082,91 +1176,6 @@ Sledge 次期バージョンでは、ActiveRecord の様な Validation、コー�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/12/29/363/">ネフ セラを買った</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-12-29T22:14:00+09:00" pubdate>Dec 29<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/12/29/363/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://www.beyes.jp/" target="_blank">BEYES</a> で <a href="http://www.beyes.jp/shop/fathersgarden/625384.php?no=23" target="_blank">ネフ セラ</a> を買った。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://zerobase.jp/">ZEROBASE</a> さんへ遊びに行ったときに、ajax や flash を使った面白いインターフェースのウェブサイトを色々見ながらお話していたのですが、BEYES を見ている時に、石橋さんが naef について教えてくださいました。それからずっと、どれかひとつでもいいので、naef のおもちゃが欲しいなぁ、と憧れていたのですが、ようやく手に入れました。
-</p>
-
-
-
-
-<p class="entryBody">
-本当は<a href="http://www.beyes.jp/shop/fathersgarden/627836.php?no=18" target="_blank">ペンデル</a>の方が欲しかったのですが、次男が積木遊びが好きなので、セラを選択。
-</p>
-
-
-
-
-<p class="entryBody">
-ひとつしか買ってないので、長男と次男でケンカになりそうだなぁ、と思っていたら、案の定揉める。そして次男がいじける。まあ、いつものことなのでほっといたら、割と早く機嫌がなおって、今度は仲良く順番に遊びはじめた。いい傾向だ。1歳4ヶ月の長女がせっかく積み上げたのを崩しにかかるのが難点だけど。
-</p>
-
-
-
-
-<p class="entryBody">
-これ、大人が遊んでも結構楽しいですよ。いろんな形が作れるので、パズル感覚の楽しさがありますし、うまくバランスをとらないと崩れてしまうような難易度の高いものを作って、親父の威厳を見せつけることも可能。
-</p>
-
-
-
-
-<p class="entryBody">
-子供達が寝たら、さっそく妻が遊んでるし。
-</p>
-
-
-
-
-<p class="entryBody">
-ネフの製品であれば、<a href="http://www.naefstyle.jp/" target="_blank">ネフスタイル</a>の方が品揃えが多そうです。BEYES には2色しかないセラも、ここには4色ありました。
-</p>
-
-
-
-
-<p class="entryBody">
-高いので子供のおもちゃとしては気軽には買えませんが、贈り物としてはすごく喜ばれそうですね。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/31/">&larr; Older</a>
@@ -1184,6 +1193,10 @@ Sledge 次期バージョンでは、ActiveRecord の様な Validation、コー�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -1197,10 +1210,6 @@ Sledge 次期バージョンでは、ActiveRecord の様な Validation、コー�
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="CentOS 5.4 から KVM が正式にサポートされたようなので、試してみた。 KVM が動く環境をつくる まずは既存の 5.3 環境から 5.4 にアップグレード。 $ sudo yum -y upgrade 不要になった kernel-xen は削除。 $ sudo yum -y &hellip;">
+  <meta name="description" content="ご献本いただきました、アート・オブ・アプリケーション パフォーマンステスト をようやく読了しました。オライリー・ジャパン様、id:stanaka さん、ありがとうございます。 アプリケーションのパフォーマンステストって、せいぜいウェブアプリに対して ab で負荷かけてみるとか、JMeter &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/07/TheArtofApplicationPerformanceTesting/">TheArtofApplicationPerformanceTesting</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-11-07T00:28:31+09:00" pubdate>Nov 7<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/11/07/TheArtofApplicationPerformanceTesting/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ご献本いただきました、<a href="http://www.oreilly.co.jp/books/9784873114248/">アート・オブ・アプリケーション パフォーマンステスト</a> をようやく読了しました。オライリー・ジャパン様、<a href="http://d.hatena.ne.jp/stanaka/">id:stanaka</a> さん、ありがとうございます。</p>
+
+<p>アプリケーションのパフォーマンステストって、せいぜいウェブアプリに対して ab で負荷かけてみるとか、JMeter つかってみるとか、そんな程度のことしかやったことなくて、ツールそのものの使い方なんかは調べれば出てくるけど、こういったツールを使って、正しくパフォーマンスを測定するためには、どのように環境を整えればいいのか、とか、どういったテストプランを立てればいいのかとか、立てたプランをどのように実行すればいいのか、とか、結果をどのように分析すればいいのか、といったことは、ググってもまったく出てこないわけですが、本書はまさに、こういったことに対する系統だった知識を与えてくれます。</p>
+
+<p>逆に言うと、具体的なツールについてはほとんど触れられておらず、付録にツールの一覧が載っているのみ、となっています。</p>
+
+<p>というわけで、主に「考え方」にフォーカスしていて、すぐに実践で使える、という内容にはなっていません。また、出てくる事例なんかを見ても、著者はエンタープライズな Windows 環境での経験が豊富な方のようで、個人ユーザ向けに Linux サーバでサービス提供しているようなペパボのような会社には、本書の内容をそのまますぐに適用するのは難しそうな印象を受けました。</p>
+
+<p>とはいうものの、本書の「はじめに」で書かれている、「ほとんどのアプリケーションの多くは、スケーラビリティとパフォーマンスについてのテストが適切になされずに稼働している。」というのは、ペパボもまさにそうであり、パフォーマンステストが十分になされず、リリースしてみたらパフォーマンスが思ったように出ない、といったことも正直あったりして、反省させられました。本書をきっかけに、開発プランの中に適切なパフォーマンステストをどのように組み込み、どのように実践していけばいいのか、検討していきたいと思いました。そのための指針として、単なるツールの使い方を示すような上辺だけの方法論ではなく、ベースとなる考え方をしっかりと提示してくれている本書は、今後とても役立つのではないかと感じています。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -687,114 +728,6 @@ exit;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/07/21/library-perl-trunk-Net-Amazon-ECS-lib-Net-Amazon-ECS.pm/">library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-07-21T00:58:15+09:00" pubdate>Jul 21<span>st</span>, 2009</time>
-        
-         | <a href="/blog/2009/07/21/library-perl-trunk-Net-Amazon-ECS-lib-Net-Amazon-ECS.pm/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>source:library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm</p>
-
-<h1>NAME</h1>
-
-<p>Net::Amazon::ECS - [One line description of module&#8217;s purpose here]</p>
-
-<h1>VERSION</h1>
-
-<p>This document describes Net::Amazon::ECS version 0.0.1</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    use Net::Amazon::ECS;
-
-    my $ua =  Net::Amazon::ECS-&gt;new(
-        access_key_id =&gt; 'YOUR_AWS_ACCESS_KEY_ID',
-        associate_tag =&gt; 'YOUR_AFFILIATE_ID',
-        locale        =&gt; 'jp',
-    );
-
-    my $req = Net::Amazon::Request::Keyword-&gt;new(
-        keywords     =&gt; 'SEARCH KEYWORDS',
-        search_index =&gt; 'books',
-        sort         =&gt; 'daterank',
-    );
-
-    my $res = $ua-&gt;request($req);
-
-    croak $res-&gt;message if $res-&gt;is_error;
-
-    my @items = $res-&gt;items;
-</code></pre>
-
-<h1>DESCRIPTION</h1>
-
-<h1>INTERFACE</h1>
-
-<h1>DIAGNOSTICS</h1>
-
-<p> <code>Error message here, perhaps with %s placeholders</code>:: [Description of error here]
- <code>Another error message here</code>:: [Description of error here]
-[Et cetera, et cetera]</p>
-
-<h1>CONFIGURATION AND ENVIRONMENT</h1>
-
-<p>Net::Amazon::ECS requires no configuration files or environment variables.</p>
-
-<h1>DEPENDENCIES</h1>
-
-<p>None.</p>
-
-<h1>INCOMPATIBILITIES</h1>
-
-<p>None reported.</p>
-
-<h1>BUGS AND LIMITATIONS</h1>
-
-<p>No bugs have been reported.</p>
-
-<p>Please report any bugs or feature requests to <code>bug-net-amazon-ecs@rt.cpan.org</code>, or through the web interface at http://rt.cpan.org.</p>
-
-<h1>AUTHOR</h1>
-
-<p>Gosuke Miyashita <code>&lt;gosukenator@gmail.com&gt;</code></p>
-
-<h1>LICENCE AND COPYRIGHT</h1>
-
-<p>Copyright (c) 2006, Gosuke Miyashita <code>&lt;gosukenator@gmail.com&gt;</code>. All rights reserved.</p>
-
-<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See perlartistic.</p>
-
-<h1>DISCLAIMER OF WARRANTY</h1>
-
-<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &#8220;AS IS&#8221; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
-
-<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -812,6 +745,10 @@ exit;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -825,10 +762,6 @@ exit;
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>

@@ -9,7 +9,10 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="&#8220;SearchHyperEstraierPlugin&#8221;:http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SearchHyperEstraierPlugin が、Trac 0.10.x というか、うちの環境で動かないので、 &hellip;">
+  <meta name="description" content="Puppet で同じタイプのリソースを大量に記述する時には、 package { sudo: ensure => latest
+} package { ntp: ensure => latest
+} package { ssh: ensure => latest
+} なんて書くのはだるいので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +75,107 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/08/30/524/">puppet-mode.el のパッチ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-08-30T00:30:00+09:00" pubdate>Aug 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/08/30/524/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Puppet で同じタイプのリソースを大量に記述する時には、</p>
+
+<pre><code>package { sudo:
+  ensure => latest
+}
+
+package { ntp:
+  ensure => latest
+}
+
+package { ssh:
+  ensure => latest
+}
+</code></pre>
+
+
+<p>なんて書くのはだるいので、</p>
+
+<pre><code>package {
+  sudo:
+    ensure => latest;
+  ntp:
+    ensure => latest;
+  ssh:
+    ensure => latest;
+}
+</code></pre>
+
+
+<p>と書きたいのですが、Emacs + &#8220;puppet-mode.el&#8221;:https://reductivelabs.com/svn/puppet/trunk/ext/emacs/puppet-mode.el では、後者みたいな書き方だと、インデントが意図した通りにならなくて、イラっときてパッチ書いた。</p>
+
+<pre><code>=== puppet-mode.el
+==================================================================
+--- puppet-mode.el      (revision 1800)
++++ puppet-mode.el      (local)
+@@ -106,7 +106,9 @@
+                  (progn
+                     (setq cur-indent (- (current-indentation) 2))
+                    (setq not-indented nil))
+-               (setq cur-indent (- (current-indentation) 2))))
++               (setq cur-indent (- (current-indentation) 2)))
++              (if (looking-at "^.*;")
++                  (setq cur-indent (- cur-indent 2))))
+            (if (< cur-indent 0)     ; We can't indent past the left margin
+                (setq cur-indent 0)))
+        (save-excursion
+@@ -125,6 +127,18 @@
+                    (setq cur-indent (+ (current-indentation) 2))
+                    (setq not-indented nil))
+                (if (bobp)
++                   (setq not-indented nil)))
++             (if (looking-at "^.*:\s*$")
++                 (progn
++                   (setq cur-indent (+ (current-indentation) 2))
++                   (setq not-indented nil))
++               (if (bobp)
++                   (setq not-indented nil)))
++             (if (looking-at "^.*;")
++                 (progn
++                    (setq cur-indent (- (current-indentation) 2))
++                   (setq not-indented nil))
++               (if (bobp)
+                    (setq not-indented nil)))))))
+       (if cur-indent
+          (indent-line-to cur-indent) 
+</code></pre>
+
+
+<p>他にもインデントまわりの動作で微妙なところはあるけど、ちょっとはましになった。インデントまわりの処理で参考になる emacs-lisp って何かないかな？</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -746,67 +850,6 @@ Retrieving log information from 1 to 62
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/05/25/513/">Write はユーザプロセスを待たせない？の答え</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-05-25T20:03:00+09:00" pubdate>May 25<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/05/25/513/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://blog.mizzy.org/articles/2007/05/23/linux-disk-io-00">前回のエントリ</a> について、naoya さんから<a href="http://d.hatena.ne.jp/naoya/20070523/1179938637">僕の期待以上の素晴らしい回答</a>を頂きました。感謝感謝です。</p>
-
-<p>詳細は上記エントリをじっくり読んで頂きたいのですが、僕の疑問への直接の答えとなるのが、まとめにある</p>
-
-<blockquote><ul>
-<li>write はプロセスを待たせない</li>
-<li>ただし明示的に sync する場合は待たせる</li>
-</ul>
-</blockquote>
-
-<p>ですね。「write はプロセスを待たせない」が正しい、というのは naoya さんの解説を読んで納得しました。プロセスが write するということと、それが実際にディスクに書き出されることを、区別しないで考えていたのが僕の敗因ですね。</p>
-
-<p>また、こちらの環境で kjournald や qmail-queue プロセスが待たされていたのは、sync してるから、ということでした。kjournald は確かめていないのですが、qmail-queue のソースの中では確かに fsync() が実行されていました。考えてみれば当然ですよね。ジャーナルのメタデータやメールキューなど、大事なデータを write して sync しないなんてことはあり得ないでしょうし。</p>
-
-<p>なので、<a href="http://d.hatena.ne.jp/hirose31/">id:hirose31</a>さんからのコメント「fsync(2)のせい？」がずばり回答になっていました。ありがとうございます。今度カレーおごらせてください。</p>
-
-<p>というわけで、「write はユーザプロセスを待たせない？」は「待たせない」が答え、ということで完結です。</p>
-
-<p>あと、</p>
-
-<blockquote><p>ということですが free の結果では、プロセスに割り当てるためのメモリが足りてるかどうかはわかりますが、ページキャッシュ用にメモリが足りてるかどうかはわかりません。</p>
-
-<p>実際そのサーバーが主な仕事で使っているデータは、合計でどのぐらいのサイズでしょう。おそらく、キューに溜まったメールその他 OS 上で必要なデータのサイズをあわせると 800MB を超えるんではないかなあと思います。外してたらごめん。</p></blockquote>
-
-<p>もおっしゃるとおりですね。プロセスに必要なメモリ容量と、キャッシュに必要なメモリ容量をちゃんと区別していませんでした。</p>
-
-<p>となると、メモリを増やせば書き込み性能が向上する可能性があるのでは、と思ったのですが、今回のケースではおそらく向上することはなさそうです。というのも、iostat の値を見てると、avgqu-sz が 1 日平均でおよそ 5、短時間で見ると 10 とか 20 あるいはそれ以上ということがざらにあります。avgqu-sz はキューに入っていて待ちとなっている I/O リクエストの数なので、常に処理待ちとなっている I/O リクエストが存在する、ということなります。なので、ページキャッシュの容量の問題ではなく、ディスクの性能がボトルネックになっている、と言えそうです。（これも自分の勘違いなら恥ずかしいなー…メモリを簡単に増やせるなら、試してみたいんですけどね。）</p>
-
-<p>naoya さん、詳細な解説ありがとうございました。大変勉強になりました。僕のために時間を割いて長文エントリ書いてくれた、と思うとちょっと萌えました。（べっ、別にあんたのために…、とか言われそうですが。）</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -824,6 +867,10 @@ Retrieving log information from 1 to 62
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -837,10 +884,6 @@ Retrieving log information from 1 to 62
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>

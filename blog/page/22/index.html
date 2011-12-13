@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Amazon2iCal で、本やCDなんかの発売日に Google Calendar でメール通知してもらおうと思って設定したのだけど、Google Calendar が通知してくれない。 これはもしかして、Publish::iCal で生成した iCalendar &hellip;">
+  <meta name="description" content="このエントリ の様な感じで、iCal データに時刻も入れたところ、ちゃんと Google Calendar で通知メールが来るようになりました。が、Google Calendar では終日イベントは背景がキレイに色づけされるのに、時刻が指定されたイベントは背景が色づけされないんですよね。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,72 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/26/280/">Filter::FutureEvents</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-26T13:24:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/26/280/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/plagger_event.html"><span class="icon"></span>このエントリ</a> の様な感じで、iCal データに時刻も入れたところ、ちゃんと Google Calendar で通知メールが来るようになりました。が、Google Calendar では終日イベントは背景がキレイに色づけされるのに、時刻が指定されたイベントは背景が色づけされないんですよね。こんな感じで。 
+</p>
+
+
+<p>
+<img src="http://mizzy.org/img/events.jpg" alt="Google Calendar" />
+</p>
+
+
+<p>
+「歯医者」とあるのが時刻指定イベント。それ以外は終日イベントで青が本、緑が音楽、赤が休日。
+</p>
+
+
+<p>
+やっぱ見た目重要なので、iCal データに時刻を入れるのはやめることに。というわけで昨日の作業は無意味に終りました。（いや、収穫もありましたよ、たぶん…）
+</p>
+
+
+<p>
+そうなると、今度は Google Calendar が通知メール出してくれない、とふりだしに戻るわけですが、それ Pla(ry ってことで、Plagger でやることに。
+</p>
+
+
+<p>
+イベント通知となると、「今から1日以内に発生するイベントを通知する」といった感じになるわけですが、この「1日以内に発生するイベント」という条件でフィルタするためのプラグインが要るな、というわけで、 <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FutureEvents.pm"><span class="icon"></span>Filter::FutureEvents</a> というものを作ってみました。duration のパースなんかは Rule::Fresh を参考にしています。
+</p>
+
+
+<p>
+これを CustomFeed::AmazonWebService, Publish::Gmail と組み合わせて、深夜とか早朝に cron で動かしておけば、その日に発売される商品情報がメールで届く、ということが実現できます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -922,98 +988,6 @@ start [ command, options ], \$in, undef, \$err;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/07/28/313/">Plagger::Plugin::Filter::FFmpeg #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-07-28T00:09:00+09:00" pubdate>Jul 28<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/07/28/313/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://mizzy.org/program/ffmpeg00.html"><span class="icon"></span>FFmpeg::Command</a> を修正したので、それに合わせて <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Plagger::Plugin::Filger::FFmpeg</a> を修正。（というか、Filter::FFmpeg のために FFmpeg::Command を修正、の方が正しいかも。）
-</p>
-
-
-<p>
-yaml に記述するオプションができるだけ少なく済むようにしてみました。iPod 用に変換するのであれば、
-</p>
-
-
-<pre class="wiki">
-  - module: Filter::FFmpeg
-    config:
-      dir: /home/miya/mov
-</pre>
-
-
-<p>
-だけで OK。
-</p>
-
-
-<p>
-PSP 用であればこんな感じで。
-</p>
-
-
-<pre class="wiki">
-  - module: Filter::FFmpeg
-    config:
-      dir: /home/miya/mov
-      device: psp
-</pre>
-
-
-<p>
-自分の好きなフォーマットに変換したい場合には、こんな感じで記述します。
-</p>
-
-
-<pre class="wiki">
-  - module: Filter::FFmpeg
-    config:
-      dir: /home/miya/mov
-      ext: mp4
-      options:
-        format:              psp
-        video_codec:         h264
-        bitrate:             600
-        size:                320x240
-        audio_codec:         aac
-        audio_sampling_rate: 48000
-        audio_bit_rate:      64
-</pre>
-
-
-<p>
-と言っても、PSP は持ってないのでテストができていません。試された方は結果お知らせ頂けると大変うれしいです。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -1031,6 +1005,10 @@ PSP 用であればこんな感じで。
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -1044,10 +1022,6 @@ PSP 用であればこんな感じで。
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>

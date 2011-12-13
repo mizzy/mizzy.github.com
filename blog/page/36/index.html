@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="prototype, Sack of Ajaxと、ajax関連のjavascriptライブラリをここでは取り上げて来ましたが、大本命と言えるものが登場してきました。ajax mlで話題の、川崎さん作JKL.ParseXMLです。 使い方は川崎さんのサイトに詳しくありますので、ここでは説明しません &hellip;">
+  <meta name="description" content="Extension3 - blosxomのカスタマイズ#10にて、same_topicプラグインのバグフィックス情報を頂きましたので、こちらのものに反映してみました。download: same_topicプラグイン Extension3のshelaさん、ありがとうございます! &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/04/504/">Same_topicプラグイン #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-04T22:18:00+09:00" pubdate>Jun 4<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/04/504/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://ext3.jp.land.to/blosxom/customize10.html" target="_blank">Extension3 - blosxomのカスタマイズ#10</a>にて、same_topicプラグインのバグフィックス情報を頂きましたので、こちらのものに反映してみました。download: <a href="/archives/same_topic" target="_blank">same_topicプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://ext3.jp.land.to/index.html" target="_blank">Extension3</a>のshelaさん、ありがとうございます!
+</p>
+
+
+
+
+<p class="entryBody">
+shelaさんのご指摘通り、pagingプラグインを併用していると、ソートがらみでおかしくなるので、デフォルトではsortサブルーチンでは何もしないようにしました。（自分の環境では複数ページになるトピックがなかったので、気づきませんでした。）
+</p>
+
+
+
+
+<p class="entryBody">
+ただ、プラグインをつくった目的が、「同一のトピックについて最初から順に追いたい時に使う」なので、古い順に並べたいんですよね。どうしよっかな。できれば各プラグインの独立性は保ちたいので、pagingプラグインはいじりたくないしなぁ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -812,78 +869,6 @@ Firefox 1.0.4(Win)でしか試していません。IE6はエラーが出ます�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/05/13/439/">Bloglines Mobile Gateway #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-05-13T21:55:00+09:00" pubdate>May 13<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/05/13/439/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://mizzy.org/web/bloglines.xhtml" target="_blank">bloglinesモバイルゲートウェイ</a>を久々にアップデート。
-</p>
-
-
-
-
-<ul class="entryBody">
-<li><a href="/web/MobileBloglines-0.04.tar.gz">マルチユーザ版</a></li>
-<li><a href="/web/MobileBloglinesSimple-0.03.tar.gz">シングルユーザ版</a></li>
-</ul>
-
-
-
-
-<p class="entryBody">
-<a href="http://d.hatena.ne.jp/satsumaimoko/20050512/1115851400" target="_blank">うたかた - scatterbrain - いつでもどこでもなんでも巡回</a>にて、「未読をクリアする機能があると更にスバラシイかも」というお言葉を頂きまして、俺自身もその機能があった方がいいかなぁ、と薄々感じてはいたので、実装してみました。
-</p>
-
-
-
-
-<p class="entryBody">
-記事表示画面の一番下に、「このフィードの記事を全て既読にする」というリンクを表示するようになってます。
-</p>
-
-
-
-
-<p class="entryBody">
-既読にした直後にも、既読にする前の記事が表示されてしまいますが、記事を読んでから既読にするまでの間に、更に新着記事があったりすると、その記事まで既読にされてしまうので、こういった仕様になってます。 
-</p>
-
-
-
-
-<p class="entryBody">
-記事を取得した時刻を記録して、それより以前の記事だけ既読にする、ってことができればいいのですが、<a href="http://www.bloglines.com/services/api/" target="_blank">Bloglinse API</a>ではその様な機能がないんですよね。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/37/">&larr; Older</a>
@@ -901,6 +886,10 @@ Firefox 1.0.4(Win)でしか試していません。IE6はエラーが出ます�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/13/maglica-presentation-on-hatena/">Maglica Presentation On Hatena</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
@@ -914,10 +903,6 @@ Firefox 1.0.4(Win)でしか試していません。IE6はエラーが出ます�
     
       <li class="post">
         <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/21/twan-tag-plugin/">TWAN tag plugin for Jekyll</a>
       </li>
     
   </ul>
