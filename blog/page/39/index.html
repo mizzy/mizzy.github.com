@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="taggingプラグイン、以下のバグ修正と仕様変更を行う。 個別エントリの表示の際に、タグの絞込み動作がおかしかったのを修正。
-個別エントリ表示時は、タグリストは全エントリに含まれるタグを表示していたのを、エントリが属するカテゴリのタグのみ表示する様に変更。 それに合わせて、 &hellip;">
+  <meta name="description" content="旧サイトから今のブログ形式に移行した理由のひとつは、ウェブサイトはどうあるべきか、という問いに対して、サイトスタイルを変えてみることにより、何か見えてくるものがあるんじゃないか、という実験的なものだったりします。 旧サイトの様に、トップページがあり、また各テーマ毎のページがあり、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,77 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/21/422/">ウェブサイトのスタイルというものについて考えてみる　#0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-21T11:15:00+09:00" pubdate>Apr 21<span>st</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/21/422/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/index.xhtml" target="_blank">旧サイト</a>から今のブログ形式に移行した理由のひとつは、ウェブサイトはどうあるべきか、という問いに対して、サイトスタイルを変えてみることにより、何か見えてくるものがあるんじゃないか、という実験的なものだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+旧サイトの様に、トップページがあり、また各テーマ毎のページがあり、トップにメニューを置いて各テーマに対してリンクする（または更にサブメニューがある）、というスタイルは俺がウェブサイトを作り始めた95年あたりでもごく普通のものだったし、今でも変わらずそうなんじゃないかと思う。
+</p>
+
+
+
+
+<p class="entryBody">
+これはこれでサイトのスタイルとしては一般的だし、一般的だからこそ分かりやすい、必要な情報にたどりつきやすいものだと思って、内容やデザインは違えど、今までずっとこのスタイルで通してきたわけですが、果たして本当に、このスタイルが一番いいものなのだろうか？と疑問を抱いたのが、ブログへの移行のきっかけのひとつだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+移行するのは別にブログでなくても、他のスタイルでもよかったのですが、画期的なスタイルをつくれるほどの創造性が俺にあるわけでもないので、とりあえずブログ形式を選択してみた、という感じです。要するに何でもいいからスタイルを変えてみて、そこから何かが見えるのか、あるいは見えないのか、とりあえずやってみようぜ、と。
+</p>
+
+
+
+
+<p class="entryBody">
+で、この２週間ほど、blosxomを導入して、既成のプラグインをつっこんでみたり改造してみたり、自分でプラグインをつくってみたり、ちょっとajax的なものを入れてみたり、という感じで自分なりのブログスタイルみたいなものをつくってきたわけですが、今までのスタイルと比較しての、ブログスタイルのメリット、デメリットみたいなものがちょっと見えてきた気がするので、まずはそれについて整理をしてみたいな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+続く。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -554,64 +624,6 @@ blosxom 3.0+3iのTag.pmを参考にしようかと思ったら、ファイル名
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/13/471/">shelf.mizzy.org</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-13T11:29:00+09:00" pubdate>Apr 13<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/13/471/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://pitecan.com/Bookshelf/">本棚.org</a>や<a href="http://booklog.jp/">ブクログ</a>を見て、「俺だったらこんな風につくるなぁ」という思いを形にしてみたのが<a href="http://shelf.mizzy.org/" target="_blank">これ</a>。
-</p>
-
-
-
-
-<p class="entryBody">
-一般公開は考えてはいるものの、今のマシンリソースでは厳しいので、要望があれば考える、という感じです。一般公開するにしても、知り合いだけの閉じた空間は大切にしたいので、今あるものとは別にすると思う。
-</p>
-
-
-
-
-<p class="entryBody">
-これを作るにあたって、はじめてフレームワークなるものを使いました。<a href="http://sl.edge.jp" target="_blank">sledge</a>です。今までオブジェクト指向には興味なかったのですが、フレームワーク自体がOOなため、OOを意識してプログラムを書く必要があるわけですが、実際使ってみるとすげー便利。俺のプログラミングスタイルががらっと変わりました。OO万歳。
-</p>
-
-
-
-
-<p class="entryBody">
-もちろんフレームワークも超便利。もうフレームワークなしではCGIプログラミングできません。ただ、sledgeはレンタルサーバ環境などではまず使えないので、<a href="http://search.cpan.org/~markstos/CGI-Application/" target="_blank">CGI::Application</a>もよく使ってます。
-
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/40/">&larr; Older</a>
@@ -629,6 +641,10 @@ blosxom 3.0+3iのTag.pmを参考にしようかと思ったら、ファイル名
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -642,10 +658,6 @@ blosxom 3.0+3iのTag.pmを参考にしようかと思ったら、ファイル名
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

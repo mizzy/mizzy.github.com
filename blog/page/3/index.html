@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="DevOps カンファレンス に参加してきたので、個人的なまとめ＆補足など。 といっても @kuwa_tw さん の togetter まとめ が既にあるので、まとめというよりは、自分が話した内容の補足なんかをしてみようかと。 プレゼンに利用したスライドは slideshare にアップ &hellip;">
+  <meta name="description" content="3,4年ぐらい前に、[wiki:ModSuid2AndModRuidAndLinuxCapability mod_suid2 とか mod_ruid とか Linux ケーパビリティとか] で、mod_ruid の setuid/setgid は、プロセス単位なのか、それともスレッド単位なのか、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,125 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/25/ModRuidTestAgain/">ModRuidTestAgain</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-06-25T12:30:43+09:00" pubdate>Jun 25<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/06/25/ModRuidTestAgain/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>3,4年ぐらい前に、[wiki:ModSuid2AndModRuidAndLinuxCapability  mod_suid2 とか mod_ruid とか Linux ケーパビリティとか] で、mod_ruid の setuid/setgid は、プロセス単位なのか、それともスレッド単位なのか、という実験をして、スレッド単位で setuid/setgid する、という結果が得られたんですが、Linux kernel 2.4 というだいぶ古い環境での実験だったので、比較的最近の環境で実験してみた。</p>
+
+<p>OS はこんな感じ。</p>
+
+<pre><code>$ uname -a
+Linux h026.southpark 2.6.18-164.el5 #1 SMP Thu Sep 3 03:28:30 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux
+$ cat /etc/redhat-release
+CentOS release 5.4 (Final)
+</code></pre>
+
+<p>httpd のバージョン。</p>
+
+<pre><code>$ rpm -q httpd
+httpd-2.2.3-45.el5.centos.1
+</code></pre>
+
+<p>ps でプロセス/スレッドが見やすいように /etc/httpd/conf/httpd.conf をいじる。</p>
+
+<pre><code>&lt;IfModule worker.c&gt;
+StartServers        1
+MaxClients          1
+MinSpareThreads     1
+MaxSpareThreads     1
+ThreadsPerChild     1
+MaxRequestsPerChild  0
+&lt;/IfModule&gt;
+</code></pre>
+
+<p>/etc/sysconfig/httpd の以下の行を有効にして worker mpm で動かす。</p>
+
+<pre><code>HTTPD=/usr/sbin/httpd.worker
+</code></pre>
+
+<p>mod_ruid は処理が終わるとすぐに元のユーザに戻してしまうので、戻らないようにコメントアウト。</p>
+
+<pre><code>#!diff
+diff --git a/mod_ruid.c b/mod_ruid.c
+index 5294d32..deed59b 100644
+--- a/mod_ruid.c
++++ b/mod_ruid.c
+@@ -269,9 +269,9 @@ static int ruid_suidback (request_rec * r)
+        }
+        cap_free(cap);
+
+-       setgroups(0,NULL);
+-       setgid(unixd_config.group_id);
+-       setuid(unixd_config.user_id);
++       //setgroups(0,NULL);
++       //setgid(unixd_config.group_id);
++       //setuid(unixd_config.user_id);
+
+        cap=cap_get_proc();
+        capval[0]=CAP_SETUID;
+</code></pre>
+
+<p>apxs でビルド＆インストール。</p>
+
+<pre><code>$ sudo /usr/sbin/apxs -a -i -l cap -c mod_ruid.c
+</code></pre>
+
+<p>/etc/init.d/httpd restart して、プロセスとスレッドの UID を確認。下3つは PID が同じなので、スレッドだと判断できる。UID はすべて apache。</p>
+
+<pre><code>$ ps -eLf
+UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
+root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+</code></pre>
+
+<p>ここで httpd へアクセスし、再度 ps で確認。</p>
+
+<pre><code>UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
+root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+100      13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+</code></pre>
+
+<p>スレッドのひとつだけ UID が 100 になってる。これは mod_ruid.c に以下のようにデフォルトが定義されているから。</p>
+
+<pre><code>#!c
+#define SUID_DEFAULT_UID        100
+#define SUID_DEFAULT_GID        100
+</code></pre>
+
+<p>というわけで、スレッド単位で setuid/setgid される、ということには変わりありませんでした、という結果に。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1088,49 +1207,6 @@ make install
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/12/14/InstagramForPC/">InstagramForPC</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-12-14T21:41:45+09:00" pubdate>Dec 14<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/12/14/InstagramForPC/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="https://instagrampc.appspot.com/">Instagram for PC</a> というものを <a href="http://daiskip.com/">daiskip さん</a> と一緒につくって、あまりおおっぴらにもせず、かといって制限かけるわけでもなく、主にペパボの人たちに使ってもらってたんですが、他の人たちにも捕捉されて tweet されたりなんかしてるので、これについて書いときます。</p>
-
-<p>Instagram for PC は、もちろん言うまでもなく <a href="http://instagr.am/">Instagram</a> の PC 版で、遅い3G回線や小さい iPhone のディスプレイで見るよりも、速い回線やPCの大きな画面で見たいな、ってことでつくりはじめました。画面こんな感じです。</p>
-
-<p>[[Image(http://distillery.s3.amazonaws.com/media/2010/10/23/879c0bd9444e4e00a60469d99b777f13_6.jpg)]]</p>
-
-<p>Google App Engine 上で動かしてるんですが、tweet されたことでアクセスが増え、Over Quota になってアクセスできない状態になってたので、とりあえずはアクセスできるアカウントを制限した形で現在は公開しています。ごめんなさい。</p>
-
-<p>とは言うものの、好意的な反応をしてくださってる tweet が多く、できれば制限なしで公開したいと思ってます。ただ、なにぶん非公開な API を叩いてるため、本家の許可無く公開するのはよろしくないため、まずは本家とコンタクトをとって許可を得たいと思います。</p>
-
-<p>パスワードについて懸念されてる方がいますが、こちらで保存はしてないと言っても、信じない人は信じないでしょうし、気になる人は使わないでください、としかこちらとしては言いようがないですね。Instagram が oAuth なんかに対応してくれるといいんですけどね。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1148,6 +1224,10 @@ make install
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -1161,10 +1241,6 @@ make install
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

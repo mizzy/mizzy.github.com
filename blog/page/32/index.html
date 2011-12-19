@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="jackass が MTV で放送されていたのは、3,4年前ぐらいでしょうか。番組冒頭に映しだされる以下の警告に引き込まれ、そのままどっぷりとはまり込んでしまいました。 WARNING 番組内で危ないことをしているのはスタントマンか、ただのバカです。
-よい子やクソガキ、 &hellip;">
+  <meta name="description" content="Agile Web Development With Rails を読みながら勉強中。 別に perl から ruby へ転向したというわけではなく、フレームワークの実装について勉強しようかな、と。 Rails に触れるのは、るびま 0004 号のRubyOnRails を使ってみる 【第 1 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,110 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/12/23/381/">Rails 勉強中 #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-12-23T21:51:00+09:00" pubdate>Dec 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/12/23/381/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Agile Web Development With Rails</a> を読みながら勉強中。
+</p>
+
+
+
+
+<p class="entryBody">
+別に perl から ruby へ転向したというわけではなく、フレームワークの実装について勉強しようかな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+</p>
+
+
+
+
+<p class="entryBody">
+Rails に触れるのは、るびま 0004 号の<a href="http://jp.rubyist.net/magazine/?0004-RubyOnRails" target="_blank">RubyOnRails を使ってみる 【第 1 回】</a>のチュートリアルを試して以来なので、およそ1年ぶりですね。この時は scaffold というものにはじめて触れて感動したものでした。
+</p>
+
+
+
+
+<p class="entryBody">
+まだ読み始めたばかりで、scaffold からちょっと先に進んだだけなのですが、Validation を Model クラスにやらせる、というのがすごく新鮮。以下の様に、product という商品テーブルに対応した Product クラスに Validation の処理を記述しておくと、フォーム submit した時に入力内容をチェックして、ブラウザにエラー表示してくれます。
+</p>
+
+
+
+
+<pre class="code">
+class Product &lt; ActiveRecord::Base
+  validates_presence_of :title, :description, :image_url
+  validates_numericality_of :price
+  validates_uniqueness_of :title
+  validates_format_of :image_url,
+    :with    => %r{^http:.+\.(gif|jpg|png)$}i,
+    :message => 'must be a URL for a GIF, JPG, or PNG image'
+  protected
+  def validate
+    errors.add(:price, 'should be positive') unless price.nil? || price >= 0.01
+  end
+end
+</pre>
+
+
+
+
+<p class="entryBody">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/0321127420/httshemizorg-22/ref=nosim" target="_blank">PofEAA 本</a>で、ActiveRecord パターンはモデルにドメインロジックを持つ、みたいなことが書かれていたけど、こういうことなのかな。
+</p>
+
+
+
+
+<p class="entryBody">
+なんでフレームワークの実装を勉強しようと思ったかというと、API によるデータ提供やフレームワークの整備によって、個人のアイデアを実現する敷居が低くなってきているな、と。そうなると、自分にしか思いつかないアイデアなんてそうそうあるわけではないので、アイデアをいかに素早く実装して公開するかが重要だなぁ、と。そのためにはフレームワーク重要となるわけですが、単に与えられたフレームワークを使うだけではなく、いかに自分の目的や開発手法になじんだフレームワークを作るかが重要になってくるんじゃないかな、とか思ってるわけです。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、ライブドアのテクノロジセミナーで、変なあだなで有名な人が次期 Sledge の話をしていて、その開発に貢献できるようになりたいな、と。Sledge によってウェブプログラミングの楽しさを知って、スキルも飛躍的に向上したので、恩返しがしたいですね。
+</p>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -672,86 +775,6 @@ feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.u
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/11/23/468/">コトノハ を Remixin&#8217;</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-11-23T18:31:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
-        
-         | <a href="/blog/2005/11/23/468/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-最近、<a href="http://kotonoha.cc" target="_blank">コトノハ</a> にはまってます。シンプルさとゆるさが心地いいっす。こいうのは知り合いのを見るのが楽しいので、知人にも声をかけてるところだったりします。<a href="http://kotonoha.cc/user/mizzy" target="_blank">俺のコトリスト</a>。
-</p>
-
-
-
-
-<p class="entryBody">
-俺は主にランダムにコトを表示させて楽しんでいるのですが、ランダムのリンク位置が、コトの長さによって変わってしまうので、ポインタを動かさなきゃいけないことがあるのが不満でした。
-</p>
-
-
-
-
-<p class="entryBody">
-で、不満があるなら、自分で出来る範囲でなんとかする、というのがポリシーなので、これを解消するための greasemonkey ユーザスクリプトを作成してみました。<a href="/js/kotonoha_hotkeys.user.js" target="_blank">kotonoha_hotkeys.user.js</a>
-</p>
-
-
-
-
-<p class="entryBody">
-このユーザスクリプトは、別にリンクの表示位置を変えるわけではなく、r キーを押したらランダムに飛ぶ、というホットキー機能を追加します。これでマウスポインタの位置を気にする必要なし。
-</p>
-
-
-
-
-<p class="entryBody">
-ついでに、p キーで前のコト、n キーで次のコトへも移動するようにもしてみました。満足。
-</p>
-
-
-
-
-<p class="entryBody">
-<strong>2005/11/15 07:00 追記</strong><br />
-たまたまタイミングが重なったのか、これを見て下さったのか、ホットキー機能がコトノハに組み込まれたようです。[f][b] で前後、[r] でランダムだけでなく、[y][n] で○×もつけられるようになってます。素敵です。実は、Firefox 1.5 の greasemonkey がうまく動かなくて、自分で作ったスクリプトが使えないというマヌケな状態だったので、大変ありがたいです。
-</p>
-
-
-
-
-<p class="entryBody">
-<strong>2005/11/18 01:23 追記</strong><br />
-オオヒダさんにお会いする機会があったのですが、全くの偶然だったようです。シンクロニシティってやつですかね。何か運命的なものを感じました（照）。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/33/">&larr; Older</a>
@@ -769,6 +792,10 @@ feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.u
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -782,10 +809,6 @@ feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.u
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

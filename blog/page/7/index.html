@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ファイルのミラーリングツールとしては rsync が最も使われていると思いますが、差分チェックの負荷が大きく、できればつかうのやめたいなー、と思っていたところ、Software Design 2009年8月号 に lsyncd というツールが載っていて、お、これはと思って見てみたのですが、 &hellip;">
+  <meta name="description" content="このところ、ほとんどエントリ更新してませんが、それは、ナウでヤングなレンタルサーバー ロリポップ！のインフラ再構築 で多忙だったからです。（それだけではないですが。） というわけで、ブログエントリをほとんど書いてないので細切れにもなりようがないのですが、ロリポ含めて、ペパボが提供するサービスの中で &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,59 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/08/13/YapcAsia2009/">YapcAsia2009</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-08-13T01:18:44+09:00" pubdate>Aug 13<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/08/13/YapcAsia2009/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>このところ、ほとんどエントリ更新してませんが、それは、<a href="http://japan.cnet.com/extra/paperboy_0907/story/0,3800098768,20394957,00.htm">ナウでヤングなレンタルサーバー ロリポップ！のインフラ再構築</a> で多忙だったからです。（それだけではないですが。）</p>
+
+<p>というわけで、ブログエントリをほとんど書いてないので細切れにもなりようがないのですが、ロリポ含めて、ペパボが提供するサービスの中で、Perl がどのように使われているのかという話を <a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a> と一緒に YAPC::Asia 2009 でさせていただくことにしました。</p>
+
+<p>また、それとは別に、以前からの関心事であった、Perlbal で非同期処理するプラグインを書く方法についても、ベースとなる Danga::Socket の説明も含めて、お話したいと思います。</p>
+
+<p>YAPC::Asia 2009 は9月10日(木)と11日(金)の2日間、東京工業大学大岡山キャンパスで開催されます。すでにチケット販売も始まったので、興味のある方はお越しいただければ、と思います。</p>
+
+<ul>
+<li><a href="http://conferences.yapcasia.org/ya2009/">YAPC::Asia 2009</a></li>
+<li><a href="http://conferences.yapcasia.org/ya2009/talk/2166">ペパボでの Perl のつかいかた</a></li>
+<li><a href="http://conferences.yapcasia.org/ya2009/talk/2220">Perlbalで非同期処理するプラグインを書く方法</a></li>
+</ul>
+
+
+<p>【参考文献】</p>
+
+<ul>
+<li>http://d.hatena.ne.jp/hirose31/20090807/1249611130</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1356,251 +1409,6 @@ mpath0 (0) dm-0 GNBD,GNBD
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/12/28/ScalableStorageWithOSS03/">ScalableStorageWithOSS03</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-12-28T17:22:39+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/12/28/ScalableStorageWithOSS03/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2] のつづき。今回はストレージサーバ側で GNBD によりブロックデバイスをエクスポートし、クライアント側でインポートするまでの手順を紹介します。</p>
-
-<h1>ストレージクラスタ</h1>
-
-<p>用途的にはクラスタリングする必要はないのですが、GNBD でエクスポートする際に、<a href="http://sources.redhat.com/cluster/cman/">cman(Cluster Manager)</a> を動かす必要があるため、まずは cman をインストール、設定、起動して、ストレージクラスタを構成します。</p>
-
-<p>といっても、クラスタリングは本来の趣旨とははずれるので、設定は適当。</p>
-
-<p>まずは storage0a と storage0b をクラスタリング。最初に storage0a で cman をインストール。</p>
-
-<pre><code>$ sudo yum -y install cman
-</code></pre>
-
-<p>storage0a で ccs_tool を実行し、/etc/cluster/cluster.conf のスケルトンを作成。</p>
-
-<pre><code>$ sudo /sbin/ccs_tool create storage0
-</code></pre>
-
-<p>/etc/cluster/cluster.conf を以下のように修正。</p>
-
-<pre><code>&lt;?xml version="1.0"?&gt;
-&lt;cluster name="storage0" config_version="1"&gt;
-    &lt;clusternodes&gt;
-        &lt;clusternode name="storage0a.example.org" nodeid="1" votes="1"/&gt;
-    &lt;/clusternodes&gt;
-  &lt;fencedevices/&gt;
-  &lt;rm&gt;
-    &lt;failoverdomains/&gt;
-    &lt;resources/&gt;
-  &lt;/rm&gt;
-&lt;/cluster&gt;
-</code></pre>
-
-<p>cman を起動。</p>
-
-<pre><code>$ sudo /etc/init.d/cman start
-</code></pre>
-
-<p>次に、sorage0b をクラスタに追加するべく、/etc/cluster/cluster.conf を、storage0a 上で修正。</p>
-
-<pre><code>&lt;?xml version="1.0"?&gt;
-&lt;cluster name="storage0" config_version="2"&gt;
-    &lt;clusternodes&gt;
-        &lt;clusternode name="storage0a.example.org" nodeid="1" votes="1"/&gt;
-        &lt;clusternode name="storage0b.example.org" nodeid="2" votes="1"/&gt;
-    &lt;/clusternodes&gt;
-  &lt;fencedevices/&gt;
-  &lt;rm&gt;
-    &lt;failoverdomains/&gt;
-    &lt;resources/&gt;
-  &lt;/rm&gt;
-&lt;/cluster&gt;
-</code></pre>
-
-<p>config_version の値をインクリメントしておくのがポイント。ccs_tool update を実行して、設定を反映。</p>
-
-<pre><code>$ sudo /sbin/ccs_tool update /etc/cluster/cluster.conf
-</code></pre>
-
-<p>次に storage0b 側で cman を起動。</p>
-
-<pre><code>$ sudo yum -y install cman
-$ sudo /sbin/ccs_tool create storage0
-$ sudo /etc/init.d/cman start
-</code></pre>
-
-<p>/etc/cluster/cluster.conf は、storage0a から自動的にコピーされる。cman_tool nodes を実行すると、クラスタメンバが表示される。</p>
-
-<pre><code>$ sudo /sbin/cman_tool nodes
-Node  Sts   Inc   Joined               Name
-   1   M     24   2008-10-25 04:29:59  storage0a.example.org
-   2   M      4   2008-10-25 04:23:50  storage0b.example.org
-</code></pre>
-
-<p>storage0a と storage0b のクラスタリングができたら、storage1a と storage1b を同様にクラスタリング。上記で storage0 と書かれているところを storage1 と読み替えて、同じ手順を実行。</p>
-
-<h1>GNBD エクスポート</h1>
-
-<p>次に、storage0a, storage0b で GNBD によりブロックデバイスをエクスポート。まずは gnbd をインストール。</p>
-
-<pre><code>$ sudo yum -y install gnbd
-</code></pre>
-
-<p>gnbd_serv を起動。</p>
-
-<pre><code>$ sudo /sbin/gnbd_serv
-gnbd_serv: startup succeeded
-</code></pre>
-
-<p>エクスポート。storage0a では以下のように。-d で指定するデバイス名は、DRBD デバイスを指定。-e では適当なエクスポート名をつける。</p>
-
-<pre><code>$ sudo /sbin/gnbd_export -d /dev/drbd0 -e gnbd0a -u0
-gnbd_export: created GNBD gnbd0a serving file /dev/drbd0
-</code></pre>
-
-<p>storage0b では以下のように、-e オプションで指定するエクスポート名を変える。-u で指定する UID は、storage0a と storage0b で同じにする必要がある。（Device-Mapper Multipath で同一デバイスと認識させるため。）</p>
-
-<pre><code>$ sudo /sbin/gnbd_export -d /dev/drbd0 -e gnbd0b -u0
-gnbd_export: created GNBD gnbd0b serving file /dev/drbd0
-</code></pre>
-
-<p>-l オプションで、エクスポート状態を確認できる。</p>
-
-<pre><code>$ sudo /sbin/gnbd_export -l
-Server[1] : gnbd0a
---------------------------
-      file : /dev/drbd0
-   sectors : 2096944
-  readonly : no
-    cached : no
-   timeout : 60
-       uid : 0
-</code></pre>
-
-<p>strage1a, storage1b でも同様にエクスポートする。</p>
-
-<h1>クライアントクラスタ</h1>
-
-<p>GNBD でインポートするクライアント側でも cman を動かす必要があるので、client0, client1 で cman を動かす。後に出てくる CLVM でも必要。注意点は、ccs_tool create で指定するクラスタ名を、ストレージクラスタで指定したものを別にすること。</p>
-
-<pre><code>$ sudo /sbin/ccs_tool create client  
-</code></pre>
-
-<p>あとの手順はストレージの時と一緒。</p>
-
-<h1>GNBD インポート</h1>
-
-<p>client0, client1 でストレージサーバからエクスポートされているデバイスをインポートする。以下の手順を、client0, client1 双方で実行。</p>
-
-<p>まずは GNBD カーネルモジュールと GNBD をインストール。</p>
-
-<pre><code>$ sudo yum -y install kmod-gnbd-xen gnbd
-</code></pre>
-
-<p>インポートする。</p>
-
-<pre><code>$ sudo /sbin/modprobe gnbd
-$ sudo /sbin/gnbd_import -i storage0a.example.org
-$ sudo /sbin/gnbd_import -i storage0b.example.org
-$ sudo /sbin/gnbd_import -i storage1a.example.org
-$ sudo /sbin/gnbd_import -i storage1b.example.org
-</code></pre>
-
-<p>-l オプションでインポート状況を確認。</p>
-
-<pre><code>$ sudo /sbin/gnbd_import -l
-Device name : gnbd0a
-----------------------
-    Minor # : 0
- sysfs name : /block/gnbd0
-     Server : storage0a.example.org
-       Port : 14567
-      State : Close Connected Clear
-   Readonly : No
-    Sectors : 2096944
-
-Device name : gnbd0b
-----------------------
-    Minor # : 1
- sysfs name : /block/gnbd1
-     Server : storage0b.example.org
-       Port : 14567
-      State : Close Connected Clear
-   Readonly : No
-    Sectors : 2096944
-
-Device name : gnbd1a
-----------------------
-    Minor # : 2
- sysfs name : /block/gnbd2
-     Server : storage1a.example.org
-       Port : 14567
-      State : Close Connected Clear
-   Readonly : No
-    Sectors : 2096944
-
-Device name : gnbd1b
-----------------------
-    Minor # : 3
- sysfs name : /block/gnbd3
-     Server : storage1b.example.org
-       Port : 14567
-      State : Close Connected Clear
-   Readonly : No
-    Sectors : 2096944
-</code></pre>
-
-<p>デバイスファイルを確認してみる。</p>
-
-<pre><code>$ ls /dev/gnbd/
-gnbd0a  gnbd0b  gnbd1a  gnbd1b 
-</code></pre>
-
-<p>/dev/gnbd/gnbd0a は、/dev/gnbd0 と同じデバイス。他も同様。</p>
-
-<h1>現在の状態</h1>
-
-<p>ここまでセットアップした状態を図にすると、以下のようになります。GNBD により、ネットワーク越しにブロックデバイスにアクセスできるようになっています。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS03/storages_with_gnbd.jpg?format=raw)]]</p>
-
-<p>次回は DM-MP あたりを解説予定。</p>
-
-<h1>関連エントリ</h1>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
-<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
-<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
-<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
-<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -1618,6 +1426,10 @@ gnbd0a  gnbd0b  gnbd1a  gnbd1b
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -1631,10 +1443,6 @@ gnbd0a  gnbd0b  gnbd1a  gnbd1b
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

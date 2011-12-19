@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="計算機科学を学んでいる人にとっては今更な話題らしいですが、経済学部出身の自分には目新しい話題なので書いてみます。（といっても、全然知らなかった、というわけでもないんですが。） id:amachang さんのエントリにある最終形のみを Perl で書くとこんな感じかな。 #!perl
-my $Y &hellip;">
+  <meta name="description" content="Puppet Dojo で知り合った方から、Virt-Factory はもうアクティブじゃなくなって、今はoVirt という新しいプロジェクトに移ってる、ということをお聞きして、Virt-Factory のサイトに行ってみたら本当にそう書いてある！Xen が動かせるマシンが調達できたら、本格的に &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,137 @@ my $Y &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/03/04/oVirt00/">oVirt00</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-03-04T01:20:28+09:00" pubdate>Mar 4<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/03/04/oVirt00/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Puppet Dojo で知り合った方から、<a href="http://virt-factory.et.redhat.com/">Virt-Factory</a> はもうアクティブじゃなくなって、今は<a href="http://ovirt.org/">oVirt</a> という新しいプロジェクトに移ってる、ということをお聞きして、Virt-Factory のサイトに行ってみたら本当にそう書いてある！Xen が動かせるマシンが調達できたら、本格的に Virt-Factory 検証しよう、と思ってしばらくアクセスしてなかったら、いつの間にやらこんなことに…</p>
+
+<p>つーわけで、Virt-Factory は捨てて oVirt の検証していくです。</p>
+
+<p><a href="http://ovirt.org/install-instructions.html">Installing Instructions</a> を見てみると、パッケージを配布してるわけじゃなく、QEMU/KVM の仮想マシンイメージとして配布されてる模様。まずはこのイメージを動かすところまでやってみる。</p>
+
+<p>検証環境は CentOS 5 x86_64 です。手順は上記サイトの「Installing the management appliance」の通りではあるのですが、説明があまり親切ではないし、その通りではうまくいかないところもあったので、試してみたい方は、以下の手順も合わせて参考にしてみてください。。</p>
+
+<p>まずは VM イメージを取得。場所はどこでもいいんですが、自分は ~/vm というディレクトリを作成して、その下に置いた。</p>
+
+<pre><code>$ mkdir ~/vm
+$ cd ~/vm
+$ wget http://ovirt.org/download/wui-appliance.dsk.bz2
+$ bzip2 -d wui-appliance.dsk.bz2
+</code></pre>
+
+<p>次に必要なパッケージのインストール。</p>
+
+<pre><code>$ sudo yum install libvirt qemu kvm
+</code></pre>
+
+<p>以下のような ~/vm/wui-appliance.xml を作成。</p>
+
+<pre><code>&lt;domain type="kvm"&gt;
+  &lt;name&gt;wui-appliance&lt;/name&gt;
+  &lt;memory&gt;768000&lt;/memory&gt;
+  &lt;currentMemory&gt;768000&lt;/currentMemory&gt;
+  &lt;vcpu&gt;1&lt;/vcpu&gt;
+  &lt;os&gt;
+    &lt;type&gt;hvm&lt;/type&gt;
+    &lt;boot dev="hd"/&gt;
+  &lt;/os&gt;
+  &lt;clock offset="utc"/&gt;
+  &lt;on_poweroff&gt;destroy&lt;/on_poweroff&gt;
+  &lt;on_reboot&gt;restart&lt;/on_reboot&gt;
+  &lt;on_crash&gt;destroy&lt;/on_crash&gt;
+  &lt;devices&gt;
+    &lt;emulator&gt;/usr/bin/qemu-kvm&lt;/emulator&gt;
+    &lt;disk type="file"&gt;
+      &lt;source file="/home/miya/vm/wui-appliance.dsk"/&gt;
+      &lt;target dev="hda"/&gt;
+    &lt;/disk&gt;
+    &lt;interface type="bridge"&gt;
+      &lt;mac address="00:16:3e:08:97:e7"/&gt;
+      &lt;source bridge="xenbr0"/&gt;
+    &lt;/interface&gt;
+    &lt;input type="mouse" bus="ps2"/&gt;
+    &lt;graphics type="vnc" port="-1" listen="0.0.0.0"/&gt;
+  &lt;/devices&gt;
+&lt;/domain&gt;
+</code></pre>
+
+<p>libvirtd を起動して、virsh で qemu に接続、create でさきほどの XML ファイルを指定して VM 作成。</p>
+
+<pre><code>$ sudo /sbin/chkconfig libvirtd on
+$ sudo /etc/init.d/libvirtd start
+$ sudo virsh --connect qemu:///system  
+virsh #  create wui-appliance.xml
+Domain wui-appliance created from wui-appliance.xml
+virsh # list
+ Id Name                 State
+----------------------------------
+  1 wui-appliance        running
+</code></pre>
+
+<p>以上で VM 起動まで完了。で、VM に SSH とかでアクセスしたいんだけど、IP アドレスがわからない！（VM の IP アドレスを外から知る方法をご存知な方は教えてください。）というわけで、virt-manager からつないでみることにする。</p>
+
+<pre><code>$ sudo yum install virt-manager
+</code></pre>
+
+<p>virt-manager 入れたのはいいけど、CentOS は X 使えるようにしていないことに気づく。とりあえず手元の PC の cygwin に X が入ってたので、cygwin のシェルで</p>
+
+<pre><code>$ startxwin.sh
+$ xhost +
+</code></pre>
+
+<p>でもって CentOS 上で</p>
+
+<pre><code>$ export DISPLAY=192.168.10.19:0.0
+$ virt-manager
+</code></pre>
+
+<p>で virt-manager 起動。</p>
+
+<p>[[Image(01.jpg)]]</p>
+
+<p>無事に画面が出たので、QEMU を選択して接続。</p>
+
+<p>[[Image(02.jpg)]]</p>
+
+<p>VM が見えるので選択して、右下の「Open」をクリック。</p>
+
+<p>[[Image(03.jpg)]]</p>
+
+<p>無事アクセスできた。root のパスワードは ovirtwui 。</p>
+
+<p>ここまでやってから、XML で MAC アドレス指定してるんだから、DHCP サーバのログから IP アドレス調べればいいだけだった、ということに気づく。</p>
+
+<p>今日はここまで。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1537,87 +1667,6 @@ on https://client1.example.org:51234 running service status (ntpd)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/12/07/PuppetDojo2/">PuppetDojo2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-12-07T15:50:13+09:00" pubdate>Dec 7<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/12/07/PuppetDojo2/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://trombik.mine.nu/~cherry/w/index.php/2007/07/07/1014/puppet-dojo">以前行われた Puppet セミナー</a>の第2回目が開催されます。第1回目に引き続き、またお手伝いさせて頂きます。</p>
-
-<p>今回は3日に渡って以下の様なスケジュールで行われます。</p>
-
-<ul>
-<li><p>2007/12/17(月) 19:00～20:30</p>
-
-<ul>
-<li><a href="http://www.pasonatech.co.jp/event/index.jsp?no=506">オープンソースでシステム管理の自動化を実現！ Puppetを使うこれだけの理由</a></li>
-</ul>
-</li>
-<li><p>2007/12/18(火)</p>
-
-<ul>
-<li>15:00～17:00
-
-<ul>
-<li><a href="http://www.pasonatech.co.jp/event/index.jsp?no=507">オープンソースでシステム管理の自動化を実現！ Puppet Dojo #1</a></li>
-</ul>
-</li>
-<li>19:00～21:00
-
-<ul>
-<li><a href="http://www.pasonatech.co.jp/event/index.jsp?no=508">オープンソースでシステム管理の自動化を実現！ Puppet Dojo #2</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>2007/12/19(水)</p>
-
-<ul>
-<li>15:00～17:00
-
-<ul>
-<li><a href="http://www.pasonatech.co.jp/event/index.jsp?no=509">オープンソースでシステム管理の自動化を実現！ Puppet Dojo #1</a></li>
-</ul>
-</li>
-<li>19:00～21:00
-
-<ul>
-<li><a href="http://www.pasonatech.co.jp/event/index.jsp?no=510">オープンソースでシステム管理の自動化を実現！ Puppet Dojo #2</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-
-<p>12/18 と 12/19 は同じ内容のものが実施されます。Puppet Dojo !#1 は前回のセミナーと同内容のものを少し簡略化した内容で、Puppet Dojo !#2 は新しい内容となります。詳細はリンク先をご参照ください。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -1635,6 +1684,10 @@ on https://client1.example.org:51234 running service status (ntpd)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -1648,10 +1701,6 @@ on https://client1.example.org:51234 running service status (ntpd)
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

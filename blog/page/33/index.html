@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="feedbringer用greasemonkeyユーザスクリプトから呼び出しているcssを若干変更。 今日のメンテナンスで、「このページのトップへ」というリンクが追加され、修正前のcssではこれが左上に表示されて邪魔なので、display: none; で消去。 たぶん、 &hellip;">
+  <meta name="description" content="最近、コトノハ にはまってます。シンプルさとゆるさが心地いいっす。こいうのは知り合いのを見るのが楽しいので、知人にも声をかけてるところだったりします。俺のコトリスト。 俺は主にランダムにコトを表示させて楽しんでいるのですが、ランダムのリンク位置が、コトの長さによって変わってしまうので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,86 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/23/468/">コトノハ を Remixin&#8217;</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-23T18:31:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/23/468/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+最近、<a href="http://kotonoha.cc" target="_blank">コトノハ</a> にはまってます。シンプルさとゆるさが心地いいっす。こいうのは知り合いのを見るのが楽しいので、知人にも声をかけてるところだったりします。<a href="http://kotonoha.cc/user/mizzy" target="_blank">俺のコトリスト</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+俺は主にランダムにコトを表示させて楽しんでいるのですが、ランダムのリンク位置が、コトの長さによって変わってしまうので、ポインタを動かさなきゃいけないことがあるのが不満でした。
+</p>
+
+
+
+
+<p class="entryBody">
+で、不満があるなら、自分で出来る範囲でなんとかする、というのがポリシーなので、これを解消するための greasemonkey ユーザスクリプトを作成してみました。<a href="/js/kotonoha_hotkeys.user.js" target="_blank">kotonoha_hotkeys.user.js</a>
+</p>
+
+
+
+
+<p class="entryBody">
+このユーザスクリプトは、別にリンクの表示位置を変えるわけではなく、r キーを押したらランダムに飛ぶ、というホットキー機能を追加します。これでマウスポインタの位置を気にする必要なし。
+</p>
+
+
+
+
+<p class="entryBody">
+ついでに、p キーで前のコト、n キーで次のコトへも移動するようにもしてみました。満足。
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>2005/11/15 07:00 追記</strong><br />
+たまたまタイミングが重なったのか、これを見て下さったのか、ホットキー機能がコトノハに組み込まれたようです。[f][b] で前後、[r] でランダムだけでなく、[y][n] で○×もつけられるようになってます。素敵です。実は、Firefox 1.5 の greasemonkey がうまく動かなくて、自分で作ったスクリプトが使えないというマヌケな状態だったので、大変ありがたいです。
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>2005/11/18 01:23 追記</strong><br />
+オオヒダさんにお会いする機会があったのですが、全くの偶然だったようです。シンクロニシティってやつですかね。何か運命的なものを感じました（照）。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -667,56 +747,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/11/01/270/">Blosxom + Text::Hatena #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-11-01T23:12:00+09:00" pubdate>Nov 1<span>st</span>, 2005</time>
-        
-         | <a href="/blog/2005/11/01/270/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-どこかで blosxom と Text::Hatena を組み合わせた、みたいなエントリを見かけたんだけど、具体的なやり方が何も書いてなかったので、自分で blosxom 用プラグイン作ってみた。 <a href="http://mizzy.org/archives/text_hatena" target="_blank">plugin: text_hatena</a>
-</p>
-
-
-
-
-<p class="entryBody">
-といっても、このままだと今まで手で書いてたエントリがおかしなことになるので、とりあえず使うのやめ。おいおい対応していこう。
-</p>
-
-
-
-
-<p class="entryBody">
-関係ないですが、明日 <a href="http://shibuya.pm.org/blosxom/techtalks/200511.html" target="_blank">Shibuya Perl Mongers テクニカルトーク #6</a> に行きます。見かけた方は声をかけてください。誰も俺の顔を知らないだろうけど。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/34/">&larr; Older</a>
@@ -734,6 +764,10 @@ meta プラグインと組み合わせて、meta-access: private と記述して
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -747,10 +781,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ブログのサイドバーは、ブログ内のエントリへのアクセシビリティを高める、というのが主目的だと思うのですが（それ以外の使われ方もしていますが）、サイドバー自体のアクセシビリティはあまり考えられていないような気がします。特にサイドバー内の項目が増えてくると、どこに何があるのかが見つけにくく、 &hellip;">
+  <meta name="description" content="technoratiはRSSフィード中のcategory要素をタグとして認識くれる、っつーことで、このブログではせっかくtaggingプラグインを作ってタグづけしてるので、RSSフィードにタグをカテゴリとしてつっこんでみることにした。 ここのRSSフィードは、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,65 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/18/360/">RSSフィードにタグをカテゴリとして埋め込む for Blosxom</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-18T00:32:00+09:00" pubdate>May 18<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/18/360/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.technorati.com/" target="_blank">technorati</a>はRSSフィード中のcategory要素をタグとして認識くれる、っつーことで、このブログではせっかく<a href="http://mizzy.org/?topic=/program/blosxomWithTagging09" target="_blank">taggingプラグイン</a>を作ってタグづけしてるので、RSSフィードにタグをカテゴリとしてつっこんでみることにした。
+</p>
+
+
+
+
+<p class="entryBody">
+ここのRSSフィードは、プラグインを使わずにフレーバだけで生成してるのと、<a href="http://mizzy.org/?topic=/program/blosxomTT" target="_blank">自作のttプラグイン</a>があるので、taggingプラグインをちょっといじってタグのリストへのリファレンスを返すようにして、あとはstory.rssでカテゴリを入れたい部分に、ttプラグインを利用して以下の様に記述してやるだけでOKだった。
+</p>
+
+
+
+
+<pre class="code">
+&#x5b;% FOREACH tag = tagging.tags_in_this_array %&#x5d;
+&lt;category&gt;&#x5b;% tag %&#x5d;&lt;/category&gt;
+&#x5b;% END %&#x5d;
+</pre>
+
+
+
+
+<p class="entryBody">
+で、この改造後にtechnoratiにupdate pingを打って、一晩たったらちゃんとタグで検索できてる。素晴らしい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -787,42 +846,6 @@ $entries = [
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/05/03/283/">Blosxomでtagging #7</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-05-03T13:54:00+09:00" pubdate>May 3<span>rd</span>, 2005</time>
-        
-         | <a href="/blog/2005/05/03/283/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="/archives/tagging" target="_blank">taggingプラグイン</a>を修正しました。タグでエントリを絞り込む部分のアルゴリズムを見直し。大量にエントリがある場合にはパフォーマンスが良くなるはず。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/38/">&larr; Older</a>
@@ -840,6 +863,10 @@ $entries = [
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -853,10 +880,6 @@ $entries = [
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

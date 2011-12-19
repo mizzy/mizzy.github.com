@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2011-12-20T00:30:25+09:00</updated>
+  <updated>2011-12-20T01:51:42+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -14,13 +14,28 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Lunar Eclipse]]></title>
+    <link href="http://mizzy.org/blog/2011/12/20/lunar-eclipse/"/>
+    <updated>2011-12-20T01:32:00+09:00</updated>
+    <id>http://mizzy.org/blog/2011/12/20/lunar-eclipse</id>
+    <content type="html"><![CDATA[<p>These are pictures of a lunar eclipse on Dec. 10, 2011.</p>
+
+<p><img src="http://mizzy.org/images/2011/12/red-moon.jpg" title="Red Moon" ></p>
+
+<p>Three red stars.(Moon, Betelgeuse and Aldebaran)</p>
+
+<p><img src="http://mizzy.org/images/2011/12/three-red-stars.jpg" title="Three Red Stars" ></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[A Picture of Geminids]]></title>
     <link href="http://mizzy.org/blog/2011/12/20/a-picture-of-geminids/"/>
     <updated>2011-12-20T00:12:00+09:00</updated>
     <id>http://mizzy.org/blog/2011/12/20/a-picture-of-geminids</id>
     <content type="html"><![CDATA[<p>This is a picture of a shooting star of Gemnids I took on Dec. 15, 2011.I took over 2,000 pictures and only 3 pictures got a shooting star.</p>
 
-<p><img src="http://mizzy.org/images/geminids-shooting-star.jpg" title="A shooting star of Geminids" ></p>
+<p><img src="http://mizzy.org/images/2011/12/geminids-shooting-star.jpg" title="A shooting star of Geminids" ></p>
 
 <p>A red bright star on left side is Aldebaran of Taurus and dense small stars on center are Pleiades.</p>
 
@@ -1805,101 +1820,6 @@ ProxyPassReverse / http://192.168.10.14:4040/
 </code></pre>
 
 <p>これでうまくいった。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ModRuidTestAgain]]></title>
-    <link href="http://mizzy.org/blog/2011/06/25/ModRuidTestAgain/"/>
-    <updated>2011-06-25T12:30:43+09:00</updated>
-    <id>http://mizzy.org/blog/2011/06/25/ModRuidTestAgain</id>
-    <content type="html"><![CDATA[<p>3,4年ぐらい前に、[wiki:ModSuid2AndModRuidAndLinuxCapability  mod_suid2 とか mod_ruid とか Linux ケーパビリティとか] で、mod_ruid の setuid/setgid は、プロセス単位なのか、それともスレッド単位なのか、という実験をして、スレッド単位で setuid/setgid する、という結果が得られたんですが、Linux kernel 2.4 というだいぶ古い環境での実験だったので、比較的最近の環境で実験してみた。</p>
-
-<p>OS はこんな感じ。</p>
-
-<pre><code>$ uname -a
-Linux h026.southpark 2.6.18-164.el5 #1 SMP Thu Sep 3 03:28:30 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux
-$ cat /etc/redhat-release
-CentOS release 5.4 (Final)
-</code></pre>
-
-<p>httpd のバージョン。</p>
-
-<pre><code>$ rpm -q httpd
-httpd-2.2.3-45.el5.centos.1
-</code></pre>
-
-<p>ps でプロセス/スレッドが見やすいように /etc/httpd/conf/httpd.conf をいじる。</p>
-
-<pre><code>&lt;IfModule worker.c&gt;
-StartServers        1
-MaxClients          1
-MinSpareThreads     1
-MaxSpareThreads     1
-ThreadsPerChild     1
-MaxRequestsPerChild  0
-&lt;/IfModule&gt;
-</code></pre>
-
-<p>/etc/sysconfig/httpd の以下の行を有効にして worker mpm で動かす。</p>
-
-<pre><code>HTTPD=/usr/sbin/httpd.worker
-</code></pre>
-
-<p>mod_ruid は処理が終わるとすぐに元のユーザに戻してしまうので、戻らないようにコメントアウト。</p>
-
-<pre><code>#!diff
-diff --git a/mod_ruid.c b/mod_ruid.c
-index 5294d32..deed59b 100644
---- a/mod_ruid.c
-+++ b/mod_ruid.c
-@@ -269,9 +269,9 @@ static int ruid_suidback (request_rec * r)
-        }
-        cap_free(cap);
-
--       setgroups(0,NULL);
--       setgid(unixd_config.group_id);
--       setuid(unixd_config.user_id);
-+       //setgroups(0,NULL);
-+       //setgid(unixd_config.group_id);
-+       //setuid(unixd_config.user_id);
-
-        cap=cap_get_proc();
-        capval[0]=CAP_SETUID;
-</code></pre>
-
-<p>apxs でビルド＆インストール。</p>
-
-<pre><code>$ sudo /usr/sbin/apxs -a -i -l cap -c mod_ruid.c
-</code></pre>
-
-<p>/etc/init.d/httpd restart して、プロセスとスレッドの UID を確認。下3つは PID が同じなので、スレッドだと判断できる。UID はすべて apache。</p>
-
-<pre><code>$ ps -eLf
-UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
-root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-apache   13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-</code></pre>
-
-<p>ここで httpd へアクセスし、再度 ps で確認。</p>
-
-<pre><code>UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
-root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-100      13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-</code></pre>
-
-<p>スレッドのひとつだけ UID が 100 になってる。これは mod_ruid.c に以下のようにデフォルトが定義されているから。</p>
-
-<pre><code>#!c
-#define SUID_DEFAULT_UID        100
-#define SUID_DEFAULT_GID        100
-</code></pre>
-
-<p>というわけで、スレッド単位で setuid/setgid される、ということには変わりありませんでした、という結果に。</p>
 ]]></content>
   </entry>
   

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Apache 2.x で SSL クライアント証明書による認証を行うためのメモ。ssl.conf があるので、そいつに以下の様な設定を入れる。（コメントアウトされてるので、# を外して適当に書き換える。） SSLCACertificatePath /usr/local/apache/conf/ &hellip;">
+  <meta name="description" content="思いつきで YAPC::NA 2006 での宮川さんのプレゼン 『 Hacking iTunes from Perl(PDF) 』の 「 Hack #5 Download songs from iTunes share 」を Plagger プラグインとして実装してみた。 CustomFeed &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/11/445/">CustomFeed::DAAP と Filter::FetchDAAP #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-11T11:59:00+09:00" pubdate>Sep 11<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/11/445/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+思いつきで YAPC::NA 2006 での宮川さんのプレゼン 『 <a class="ext-link" href="http://blog.bulknews.net/mt/archives/iTunesHacks-YAPCNA.pdf"><span class="icon"></span>Hacking iTunes from Perl(PDF)</a> 』の 「 Hack <a class="ticket" href="/ticket/5">#5</a> Download songs from iTunes share 」を Plagger プラグインとして実装してみた。
+</p>
+
+
+<ul><li><a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/DAAP.pm"><span class="icon"></span>CustomFeed::DAAP</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FetchDAAP.pm"><span class="icon"></span>Filter::FetchDAAP</a></li></ul>
+
+
+<p>
+黒い気がするので説明は省略。
+</p>
+
+
+<p>
+enclosure と絡めるべきなんだろうけど、url をどうしようか悩み、とりあえず後で考えることにしました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1134,84 +1184,6 @@ system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/27/419/">Filter::Audio #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-27T17:38:00+09:00" pubdate>Aug 27<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/27/419/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060827/1156610704"><span class="icon"></span>Convert Apache index to Podcasts</a> とか <a class="ext-link" href="http://www.hsbt.org/diary/20060827.html#p03"><span class="icon"></span>RubyKaigi2006の音声ファイルをPlaggerで色々</a> を見て、音声ファイル変換用のプラグインがあれば便利かな、と思い、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> をつくってみました。
-</p>
-
-
-<p>
-宮川さんの設定に以下の様な内容を追加すれば、ローカルにダウンロード、mp3 へ変換して PodCasting できます。
-</p>
-
-
-<pre class="wiki">
-  - module: Filter::FetchEnclosure
-    config:
-      dir: /home/miya/audio
-  - module: Filter::Audio
-    config:
-      dir: /home/miya/audio
-      from: ogg
-      to: mp3
-  - module: Filter::RewriteEnclosureURL
-    config:
-      rewrite:
-        - local: /home/miya/audio/
-          url:   http://mizzy.org/audio/
-</pre>
-
-
-<p>
-Filter::Audio は <a class="ext-link" href="http://search.cpan.org/~mhooreman/Audio-ConvTools-0.06/lib/Audio/ConvTools.pm"><span class="icon"></span>Audio::ConvTools</a> に依存しているのですが、ogg -> mp3 への変換は oggenc と lame が必要です。oggenc はともかく、lame はライセンス的に微妙なんですよね。（詳しくはよく知らないのですが。）
-</p>
-
-
-<p>
-<strong>追記</strong><br />
-ffmpeg が &#8211;enable-libogg と &#8211;ebale-mp3lame つきでコンパイルされていれば、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Filter::FFmpeg</a> でも ogg -> mp3 変換できそう。なのでわざわざ Filter::Audio つくらなくてもよかった。うちの環境では。
-</p>
-
-
-<p>
-<strong>TODO</strong><br />
-</p>
-
-
-<ul><li><a class="ext-link" href="http://search.cpan.org/~dbp/Ogg-Vorbis-Header-0.03/Header.pm"><span class="icon"></span>Ogg::Vorbis::Header</a> とか <a class="ext-link" href="http://search.cpan.org/~daniel/MP3-Info-1.20/Info.pm"><span class="icon"></span>MP3::Info</a> とか使って、メタ情報の取得やセットができるようになると更に良さそう。</li>
-<li>config: from は設定しなくても、拡張子とかから自動判断させるようにするといいかな。</li></ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/22/">&larr; Older</a>
@@ -1229,6 +1201,10 @@ ffmpeg が &#8211;enable-libogg と &#8211;ebale-mp3lame つきでコンパイ�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -1242,10 +1218,6 @@ ffmpeg が &#8211;enable-libogg と &#8211;ebale-mp3lame つきでコンパイ�
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

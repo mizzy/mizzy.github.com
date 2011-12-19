@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="うちでは 普段実行している plagger は本家 trunk から持ってきていて、自分で作ったプラグインは svn.mizzy.org に置いてあるのですが、以下の様なプロセスで開発してました。 svn.mizzy.org からチェックアウトしたディレクトリに、俺プラグインを書いて置く。 &hellip;">
+  <meta name="description" content="2006/10/01 18:22 追記
+早速対応してくれました。「Domou Arigato」と書いてるのに笑った。http://pause.perl.org/incoming/ を見るとアップ済みのようなので、もうすぐ CPAN へ反映されると思います。 Net::Google:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,101 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/01/364/">Net::Google::Calendar のパッチ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-01T14:26:00+09:00" pubdate>Oct 1<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/01/364/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<strong>2006/10/01 18:22 追記</strong><br />
+<a class="ext-link" href="http://rt.cpan.org/Public/Bug/Display.html?id=21797"><span class="icon"></span>早速対応してくれました</a>。「Domou Arigato」と書いてるのに笑った。<a class="ext-link" href="http://pause.perl.org/incoming/"><span class="icon"></span>http://pause.perl.org/incoming/</a> を見るとアップ済みのようなので、もうすぐ CPAN へ反映されると思います。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://search.cpan.org/~simonw/Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm"><span class="icon"></span>Net::Google::Calendar</a> がまともに動かないので、パッチ書いた。
+</p>
+
+
+<pre class="wiki">
+Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm
+===================================================================
+--- Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm (revision 285)
++++ Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm (revision 286)
+@@ -348,7 +348,9 @@
+     }
+ 
++    my $xml = $entry->as_xml;
++    _utf8_off($xml);
+     my %params = ( Content_Type => 'application/atom+xml; charset=UTF-8',
+                    Authorization => "GoogleLogin auth=".$self->{_auth},
+-                   Content => $entry->as_xml );
++                   Content => $xml );
+ 
+     $params{'X-HTTP-Method-Override'} = $method unless "POST" eq $method;
+@@ -381,4 +383,10 @@
+ }
+ 
++sub _utf8_off {
++    if ($] >= 5.008) {
++        require Encode;
++        return Encode::_utf8_off($_[0]);
++    }
++}
+ 
+ =head1 WARNING
+Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm
+===================================================================
+--- Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 285)
++++ Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 286)
+@@ -54,5 +54,5 @@
+     my $self = shift;                                                                               
+                                                                                                   
+-    $self->category('', { scheme => 'http://schemas.google.com/g/2005#kind', term => 'http://schemas.google.com/g/2005#event' } );
++    $self->category( { scheme => 'http://schemas.google.com/g/2005#kind', term => 'http://schemas.google.com/g/2005#event' } );
+                                                                                                   
+     $self->{_gd_ns} = XML::Atom::Namespace->new(gd => 'http://schemas.google.com/g/2005');          
+@@ -174,5 +174,5 @@
+    my($ns, $name, $attr) = @_;
+    my $ns_uri = ref($ns) eq 'XML::Atom::Namespace' ? $ns->{uri} : $ns;
+-   my $node = first($atom->{doc}, $ns_uri, $name);
++   my $node = first($atom->elem, $ns_uri, $name);
+    return $node unless defined $node &amp;&amp; defined $attr;
+    my $val;
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://rt.cpan.org/"><span class="icon"></span>rt.cpan.org</a> でレポートしておいた。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1035,56 +1131,6 @@ CustomFeed::DAAP と Filter::FetchDAAP を、enclosure サポートして他の�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/09/11/445/">CustomFeed::DAAP と Filter::FetchDAAP #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-09-11T11:59:00+09:00" pubdate>Sep 11<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/09/11/445/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-思いつきで YAPC::NA 2006 での宮川さんのプレゼン 『 <a class="ext-link" href="http://blog.bulknews.net/mt/archives/iTunesHacks-YAPCNA.pdf"><span class="icon"></span>Hacking iTunes from Perl(PDF)</a> 』の 「 Hack <a class="ticket" href="/ticket/5">#5</a> Download songs from iTunes share 」を Plagger プラグインとして実装してみた。
-</p>
-
-
-<ul><li><a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/DAAP.pm"><span class="icon"></span>CustomFeed::DAAP</a></li>
-<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FetchDAAP.pm"><span class="icon"></span>Filter::FetchDAAP</a></li></ul>
-
-
-<p>
-黒い気がするので説明は省略。
-</p>
-
-
-<p>
-enclosure と絡めるべきなんだろうけど、url をどうしようか悩み、とりあえず後で考えることにしました。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/21/">&larr; Older</a>
@@ -1102,6 +1148,10 @@ enclosure と絡めるべきなんだろうけど、url をどうしようか悩
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -1115,10 +1165,6 @@ enclosure と絡めるべきなんだろうけど、url をどうしようか悩
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="This is a picture of a shooting star of Gemnids I took on Dec. 15, 2011.I took over 2,000 pictures and only 3 pictures got a shooting star. A red &hellip;">
+  <meta name="description" content="These are pictures of a lunar eclipse on Dec. 10, 2011. Three red stars.(Moon, Betelgeuse and Aldebaran) ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,45 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-12-20T01:32:00+09:00" pubdate>Dec 20<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/20/lunar-eclipse/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>These are pictures of a lunar eclipse on Dec. 10, 2011.</p>
+
+<p><img src="/images/2011/12/red-moon.jpg" title="Red Moon" ></p>
+
+<p>Three red stars.(Moon, Betelgeuse and Aldebaran)</p>
+
+<p><img src="/images/2011/12/three-red-stars.jpg" title="Three Red Stars" ></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a></h1>
     
     
@@ -100,7 +139,7 @@
 
   <div class="entry-content"><p>This is a picture of a shooting star of Gemnids I took on Dec. 15, 2011.I took over 2,000 pictures and only 3 pictures got a shooting star.</p>
 
-<p><img src="/images/geminids-shooting-star.jpg" title="A shooting star of Geminids" ></p>
+<p><img src="/images/2011/12/geminids-shooting-star.jpg" title="A shooting star of Geminids" ></p>
 
 <p>A red bright star on left side is Aldebaran of Taurus and dense small stars on center are Pleiades.</p>
 
@@ -951,64 +990,6 @@ end
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/03/SSLCertOfLolipop/">SSLCertOfLolipop</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-09-03T01:41:19+09:00" pubdate>Sep 3<span>rd</span>, 2011</time>
-        
-         | <a href="/blog/2011/09/03/SSLCertOfLolipop/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://blog2.or6.jp/ftpisdead">FFFTP開発終了で大騒ぎしている人たちへ</a> にて、</p>
-
-<pre><code>SSL証明書がまともなものでないと接続時にエラーが出るのですが、ロリポップなんかだと
-このエラーを無視するように公式ドキュメントに書いてあるので、かなり悪質です。
-</code></pre>
-
-<p>と書かれていますので、これについて説明させて頂きます。</p>
-
-<p>この方が指摘されているのは、<del><a href="http://lolipop.jp/manual/hp/w-fz/">Win FileZillaの設定 / ホームページ / マニュアル - ロリポップ！</a> </del>(FileZilla非推奨のため現在は削除されています)の中の、</p>
-
-<pre><code> 証明書の確認を行います。『今後もこの証明書を常に信用する(A)』にチェックを入れて、『OK』をクリックします。
-</code></pre>
-
-<p>という部分だと思われるのですが、確かに、無条件で信用するにチェックを入れるようお客様に指示するのは大変良くないですね。</p>
-
-<p>ロリポップでは <a href="http://www.digicert.ne.jp/">DigiCert Inc社</a> によって発行されている証明書を利用しているのですが、Filezillaでは警告が出てしまうようです。</p>
-
-<p>調べてみたところ、FilezillaはルートCAの証明書を保持しておらず、どのような証明書であっても、ユーザが「信用する」にチェックを入れなければ警告が出る仕様となっているようです。</p>
-
-<p><a href="http://forum.filezilla-project.org/viewtopic.php?f=2&amp;t=20767">how to install root CA certificate on Filezilla</a></p>
-
-<p>OR6 blog 様のご指摘により、このような証明書の検証をきちんと行っていないソフトウェアをお客様に推奨すべきではないと判断いたしましたので、Windows/Mac版ともに存在し、証明書の検証をきちんと行っている <a href="http://cyberduck.ch/">Cyberduck</a> を推奨するよう、マニュアルを変更させて頂くことになりました。</p>
-
-<p>また、蛇足ですが、ロリポップの <a href="http://lolipop.jp/service/plan-chicappa/">チカッパプラン</a> では SSH サービスを提供していますので、FTPS の代わりに SCP/SFTP もご利用頂けます。</p>
-
-<p>OR6 blog 様、この度はご指摘誠にありがとうございました。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1024,6 +1005,10 @@ end
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
@@ -1037,10 +1022,6 @@ end
     
       <li class="post">
         <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
       </li>
     
   </ul>
