@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ご献本いただきました、アート・オブ・アプリケーション パフォーマンステスト をようやく読了しました。オライリー・ジャパン様、id:stanaka さん、ありがとうございます。 アプリケーションのパフォーマンステストって、せいぜいウェブアプリに対して ab で負荷かけてみるとか、JMeter &hellip;">
+  <meta name="description" content="検証用に VM をつくったり消したり、ってことをよくやるんですが、毎回毎回同じような設定をするのがいやなので、うちでは Cobbler + Puppet でこんな風にやってるよ、という例を紹介します。最近 KVM に移行しましたが、ブリッジの設定以外は、Xen でもほぼそのまま適用できると思います &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,337 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/15/CobblerAndPuppet/">CobblerAndPuppet</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-11-15T21:09:29+09:00" pubdate>Nov 15<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/11/15/CobblerAndPuppet/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>検証用に VM をつくったり消したり、ってことをよくやるんですが、毎回毎回同じような設定をするのがいやなので、うちでは Cobbler + Puppet でこんな風にやってるよ、という例を紹介します。最近 KVM に移行しましたが、ブリッジの設定以外は、Xen でもほぼそのまま適用できると思います。</p>
+
+<p>VM 作成のざっくりとした流れは次のような感じで、3 ステップで完了します。まず koan コマンドで以下のように VM インストールします。</p>
+
+<pre><code>$ sudo koan --server localhost --virt --system=template --virt-name=test-vm
+</code></pre>
+
+<p>インストールが終わったら、VM を起動して、コンソールにアクセスします。</p>
+
+<pre><code>$ sudo virsh start test-vm
+$ sudo virsh console test-vm
+</code></pre>
+
+<p>puppet をインストールして、実行します。</p>
+
+<pre><code># yum -y install puppet
+# puppetd --server puppet.hoge.com --verbose --no-daemonize --onetime
+</code></pre>
+
+<p>この時点で、毎回 VM を作成するたびに行っている、以下のような設定が既に完了している、という状態となります。</p>
+
+<ul>
+<li>yum リポジトリの設定
+
+<ul>
+<li>dag, epel に加えて、自前リポジトリを参照するように設定。</li>
+</ul>
+</li>
+<li>NIC の設定
+
+<ul>
+<li>複数 NIC の環境で検証したいこともあるので、自動的に eth0 と eth1 の NIC を設定。</li>
+</ul>
+</li>
+<li>iptables を off
+
+<ul>
+<li>検証環境ではとりあえず必要ないので。</li>
+</ul>
+</li>
+<li>selinux を off
+
+<ul>
+<li>これも検証環境では必要ないので。</li>
+</ul>
+</li>
+<li>ntp の設定
+
+<ul>
+<li>検証によっては VM 間で時刻が正確に同期してる必要があるので。</li>
+</ul>
+</li>
+<li>最低限必要なパッケージのインストール。
+
+<ul>
+<li>zsh</li>
+<li>screen</li>
+<li>vim-enhanced</li>
+<li>perl-ack</li>
+<li>subversion</li>
+<li>git</li>
+</ul>
+</li>
+<li>/etc/sudoers の設定
+
+<ul>
+<li>基本的には root ログインしないので、sudo できるようにしておく。</li>
+</ul>
+</li>
+<li>nss_ldap/pam_ldap まわりの設定
+
+<ul>
+<li>LDAP アカウントで SSH ログインできるようにするのが主な目的。</li>
+<li>アカウントを各 VM で管理するのがイヤなので、LDAP サーバで集中管理してます。</li>
+</ul>
+</li>
+<li>autofs の設定
+
+<ul>
+<li>/home はファイルサーバをマウント。これにより、どの VM からも、/home が同じ内容で参照できる。</li>
+<li>メインマシンである Mac からもファイルサーバをマウントしており、どの VM を使うことになっても、プログラム書いたりするのがすべて Mac 上の emacs で完結できるのでとても楽。</li>
+</ul>
+</li>
+</ul>
+
+
+<p>以下、このようなことを、具体的にどのような設定で実現しているのか、ざっくりとですが説明します。</p>
+
+<hr />
+
+<h1>Cobbler まわりの設定</h1>
+
+<h2>Cobbler のインストールと設定</h2>
+
+<p>Cobbler サーバを立てて、インストール、設定を行います。ここの手順については省略。<a href="http://trac.mizzy.org/public/wiki/Cobbler">この辺</a> を参照してください。（ただ若干情報古いです。）</p>
+
+<h2>CentOS 5.4 の Cobbler へのインポート</h2>
+
+<pre><code>$ sudo cobbler import \
+  --mirror=rsync://ftp.jaist.ac.jp/pub/Linux/CentOS/5.4/os/x86_64/ \
+  --name=CentOS5.4-x86_64
+</code></pre>
+
+<h2>yum リポジトリの追加</h2>
+
+<p>cobbler repo add で、参照すべき yum リポジトリを追加します。</p>
+
+<pre><code>$ sudo cobbler repo add \
+  --name=CentOS5-epel \
+  --mirror=http://download.fedoraproject.org/pub/epel/5/x86_64/ \
+  --mirror-locally=N
+$ sudo cobbler repo add \
+  --name=CentOS5-dag \
+  --mirror=http://ftp.riken.jp/Linux/dag/redhat/el5/en/x86_64/dag/ \
+  --mirror-locally=N
+$ sudo cobbler repo add \
+  --name=CentOS5-mizzy \
+  --mirror=http://hoge.mizzy.org/yum/centos/5/x86_64/ \
+  --mirror-locally=N
+$ sudo cobbler reposync
+</code></pre>
+
+<h2>profile にリポジトリ追加</h2>
+
+<pre><code>$ sudo cobbler profile edit \
+  --name=CentOS5.4-x86_64 \
+  --repos="CentOS5-epel CentOS5-dag CentOS5-mizzy"
+</code></pre>
+
+<h2>bridge の設定</h2>
+
+<p><a href="http://trac.mizzy.org/public/wiki/KvmOnCentOS54">ここ</a> を参考に、br0 というブリッジインターフェースをまず作成。こいつを VM 上の eth0 のブリッジとして利用するように、template という名前の system を登録する。</p>
+
+<pre><code>$ sudo cobbler system add \
+  --name=template \
+  --profile=CentOS5.4-x86_64 \
+$ sudo cobbler system edit \
+  --name=template \
+  --interface=eth0 \
+  --virt-bridge=br0
+</code></pre>
+
+<p>また、libvirt 標準の virbr0 を eth1 のブリッジとして利用するように、system edit する。（eth1 は外と通信する必要がなく、 VM 同士でだけ通信できればいいので、virbr0 がそのまま使える。）</p>
+
+<pre><code>$ sudo cobbler system edit \
+  --name=template \
+  --interface=eth1 \
+  --virt-bridge=virbr0
+</code></pre>
+
+<p>（本当は system じゃなくて profile でやりたいけど、profile では複数のブリッジの設定ができないっぽいので。）</p>
+
+<h2>iptables/selinux の設定</h2>
+
+<p>Cobbler で参照してる kickstart ファイルに、以下のように設定するだけ。</p>
+
+<pre><code>firewall --disabled
+selinux --disabled
+</code></pre>
+
+<hr />
+
+<h1>Puppet マニフェスト</h1>
+
+<p>Puppet サーバを用意し、以下のようなマニフェスト作成。Puppet のインストールや設定については省略。</p>
+
+<h2>ntpd の設定</h2>
+
+<p>ntp パッケージをインストールして、ntpd を起動。</p>
+
+<pre><code>package { 'ntp': ensure =&gt; present }
+
+service { 'ntpd':
+    enable =&gt; true,
+    ensure =&gt; running,
+}
+</code></pre>
+
+<h2>必要なパッケージのインストール</h2>
+
+<p>この辺は kickstart で設定しても構わない。</p>
+
+<pre><code>package {
+    'zsh':
+        ensure =&gt; present;
+    'screen':
+        ensure =&gt; present;
+    'vim-enhanced':
+        ensure =&gt; present;
+    'perl-ack':
+        ensure =&gt; present;
+    'subversion':
+        ensure =&gt; present;
+    'subversion':
+        ensure =&gt; present;
+    'git-all':
+        ensure =&gt; '1.6.5.2-1';
+}
+</code></pre>
+
+<h2>/etc/sudoers の設定</h2>
+
+<p>あらかじめ作成しておいた /etc/sudoers を Puppet で配布。</p>
+
+<pre><code>package { 'sudo': ensure =&gt; installed }
+
+file { '/etc/sudoers':
+    source =&gt; "puppet://$server/dist/base/etc/sudoers",
+    mode   =&gt; 440,
+}
+</code></pre>
+
+<h2>nss_ldap/pam_ldap の設定</h2>
+
+<p>必要なパッケージインストール、NSS や PAM まわりの設定、nscd の起動なんかを行う。</p>
+
+<pre><code>package {
+    'nss_ldap':
+        ensure =&gt; present;
+    'openldap':
+        ensure =&gt; present;
+    'nscd':
+        ensure =&gt; present;
+}
+
+service { 'nscd':
+    enable  =&gt; true,
+    ensure  =&gt; running,
+    require =&gt; Package['nscd'],
+}
+
+file { '/etc/pam.d/system-auth-ac':
+    source =&gt; "puppet://$server/dist/base/etc/pam.d/system-auth-ac",
+}
+
+file { '/etc/nsswitch.conf':
+    source =&gt; "puppet://$server/dist/base/etc/nsswitch.conf",
+}
+
+file { '/etc/ldap.conf':
+    source =&gt; "puppet://$server/dist/base/etc/ldap.conf",
+}
+</code></pre>
+
+<h2>autofs の設定</h2>
+
+<p>必要なパッケージのインストール、portmap や autofs の起動、/etc/auto.master, /etc/auto.home の設定を行う。</p>
+
+<pre><code>package {
+    'autofs':
+        ensure =&gt; present;
+    'portmap':
+        ensure =&gt; present;
+    'nfs-utils':
+        ensure =&gt; present;
+}
+
+service { 'portmap':
+    enable  =&gt; true,
+    ensure  =&gt; running,
+    require =&gt; Package['portmap'],
+    before  =&gt; Service['autofs'],
+}
+
+service { 'autofs':
+    enable    =&gt; true,
+    ensure    =&gt; running,
+    require   =&gt; Package['autofs'],
+    subscribe =&gt; [ File['/etc/auto.master'], File['/etc/auto.home'] ],
+}
+
+file { '/etc/auto.master':
+    content =&gt; '/home /etc/auto.home',
+}
+
+file { '/etc/auto.home':
+    content =&gt; '* -fstype=nfs,soft,int,rsize=32768,wsize=32768,nosuid,nocache fileserver.hoge.com:/home/&amp;',
+}
+</code></pre>
+
+<hr />
+
+<p>上記のような感じで Cobbler や Puppet の環境を構築しておくと、最初に書いたとおり、以下のようなステップで、必要な設定がなされた VM の作成がさくっと完了します。</p>
+
+<pre><code>;; VM インストール
+$ sudo koan --server localhost --virt --system=template --virt-name=test-vm
+
+;; インストール後、起動してコンソールアクセス
+$ sudo virsh start test-vm
+$ sudo virsh console test-vm
+
+;; puppet インストールし/実行
+# yum -y install puppet
+# puppetd --server puppet.hoge.com --verbose --no-daemonize --onetime
+</code></pre>
+
+<p><a href="https://fedorahosted.org/cobbler/wiki/SupportForOtherDistros">ここを参照すると</a>、Cobbler は RedHat 系だけではなく、Debian, Ubuntu, SuSE あたりにも利用できるみたいなので、他の Linux ディストリビューションでも、同じような手順でいけそうですね。</p>
+
+<p>他の OS だとどうなんだろう？</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -654,80 +985,6 @@ trait Product extends java.lang.Cloneable {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/08/06/InotifyAndMakuosan/">InotifyAndMakuosan</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-08-06T08:05:40+09:00" pubdate>Aug 6<span>th</span>, 2009</time>
-        
-         | <a href="/blog/2009/08/06/InotifyAndMakuosan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ファイルのミラーリングツールとしては rsync が最も使われていると思いますが、差分チェックの負荷が大きく、できればつかうのやめたいなー、と思っていたところ、<a href="http://gihyo.jp/magazine/SD/archive/2009/200908">Software Design 2009年8月号</a> に <a href="http://code.google.com/p/lsyncd/">lsyncd</a> というツールが載っていて、お、これはと思って見てみたのですが、仕組みとしては inotify + rsync なので、結局は rsync を裏で呼び出していて、差分チェックの呪縛からは逃れられません。</p>
-
-<p>inotify でファイルの更新イベント受け取ってるんだから、さらに rsync で差分チェックする必要はないじゃん、と思うわけですが、なんらかの理由でイベントが受け取れない可能性もあるため、二重チェックした方が安全なんでしょうね。</p>
-
-<p>でもやっぱり余分な負荷はかけたくない、ってことで思いついたのが、inotify で更新イベントを検知したファイルを、<a href="http://lab.klab.org/wiki/Makuosan">makuosan</a> の msync コマンドに渡してミラーリングする方法。（makusan の詳しい解説は、<a href="http://gihyo.jp/magazine/wdpress/archive/2009/vol51">WEB+DB PRESS Vol.51</a> に載ってます。）</p>
-
-<p>そこで以下のようなコードを書いて動かしてみたところ、いい感じでファイルが同期できることを確認しました。</p>
-
-<pre><code>#!perl
-#!/usr/bin/perl
-
-use strict;
-use warnings;
-use File::ChangeNotify;
-
-my $base = '/home/miya/work';
-my $watcher = File::ChangeNotify-&gt;instantiate_watcher(
-    directories =&gt; [ $base ],
-);
-
-while ( my @events = $watcher-&gt;wait_for_events() ) {
-    for my $event ( @events ) {
-        my $path = $event-&gt;path;
-        $path =~ s!$base/!!;
-        `msync --sync $path`;
-    }
-}
-
-exit;
-</code></pre>
-
-<p>とは言っても、実運用で使うためには、イベントをとりこぼさない、またはとりこぼしてもリカバーするような仕組みを考えたり、負荷テストをしてみたりとか、色々と考慮しなければいけないことはありますが、それはまあおいおいってことで。</p>
-
-<p>また、<a href="http://search.cpan.org/~drolsky/File-ChangeNotify/">File::ChangeNotify</a> がすべての inotify イベントに対応してるわけではなく、IN_CREATE, IN_MODIFY, IN_DELETE にしか対応してないため、パーミッション変更とかファイルの移動なんかは検知できない、という問題もあります。（パッチ書けばいけそうなので、書いてみるつもりです。）</p>
-
-<p>File::ChangeNotify 自体は inotify だけじゃなく、他の仕組みにも対応できるようになっていて、inotify が使える Linux kernel 2.6.13 以降であれば File::ChangeNotify::Watcher::Inotify が、それ以外であれば File::ChangeNotify::Watcher::Default が自動的に呼ばれるようになってます。なので、Mac OS X の FSEvents に対応した File::ChangeNotify::Watcher::FSEvents とか書けば、Mac では自動的に FSEvents で更新イベントを検知、ってこともできそうです。</p>
-
-<p>ともかく、rsync の負荷には困っているので、今後この辺の方法論は詰めていきたいな、と思っています。</p>
-
-<p><em>追記</em></p>
-
-<p><a href="http://github.com/miyagawa/File-ChangeNotify-Watcher-MacFSEvents/tree">miyagawa さんによる File::ChangeNotify::Watcher::MacFSEvents が github にありました</a>。ただし、FSEventsではファイル名とかイベントの種類はとれないそうです。Wikipedia 見てもそんな感じのことが書いてますね。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -745,6 +1002,10 @@ exit;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -758,10 +1019,6 @@ exit;
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>

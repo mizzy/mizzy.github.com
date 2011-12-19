@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアップデート。本家サイト にコミットしてますので、こちらをご参照ください。 宮川さんの助言にしたがって、CustomFeed::iTunesRecentPlay &hellip;">
+  <meta name="description" content="Plagger Plugin の CustomFeed::iTunesRecentPlay をアップデート。 前回廃止した reload_period ですが、ライブラリが大きいとメモリ食いまくるからあった方がいいかも、と宮川さんから助言があったため、復活しました。ただし、Rule::Fresh &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,65 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/07/496/">PLAYLOG HACKS With Plagger #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-07T22:57:00+09:00" pubdate>Mar 7<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/07/496/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Plagger Plugin の <a href="http://plagger.org/trac/browser/trunk/plagger/lib/Plagger/Plugin/CustomFeed/iTunesRecentPlay.pm" target="_blank">CustomFeed::iTunesRecentPlay</a> をアップデート。
+</p>
+
+
+
+
+<p class="entryBody">
+前回廃止した reload_period ですが、ライブラリが大きいとメモリ食いまくるからあった方がいいかも、と宮川さんから助言があったため、復活しました。ただし、Rule::Fresh と合わせてパラメータ名は duration とし、分単位で指定するようにしています。
+</p>
+
+
+
+
+<p class="entryBody">
+また、otsune さんからリクエストあがっていた、URL を指定しての iTunes Music Library.xml の取得処理の実装は見送ることにしました。というのも、iTunes を動かしていないどこかのサーバで plagger を動かす場合、直接 iTunes が動いているマシンから HTTP GET で iTunes Music Library.xml を取得することはないでしょうから、必ずどこかにファイルを移すことになると思います。であれば、plagger を動かすサーバに直接ファイルをアップして、 config.yaml の library_path でパスを指定すれば事足りるかな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、ローカルファイルの場合はファイルハンドルを while で回して処理、URL 指定の場合は一度変数にデータを格納してから処理、という違いがあり、この違いをエレガントに吸収する仕組みがすぐに思いつかなかった、という理由もあったりします。
+</p>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -619,56 +678,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/02/22/302/">Catalyst で Atom API テストツール #4</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-02-22T23:10:00+09:00" pubdate>Feb 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/02/22/302/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-無事 XML::LibXML の make が通った（パッチあてた）ので、<a href="http://mizzy.org/atom/" target="_blank">Atom API テストツール 「A2T2」のデモを公開します</a>。好きに使っちゃってください。
-</p>
-
-
-
-
-<p class="entryBody">
-それにともなって、見た目をほんのちょっとだけいじってみました。背景画像に gorouさん作 <a href="http://lab.rails2u.com/bgmaker/" target="_blank">Background Image Maker</a> で作った画像を使わせて頂いたり、アクセス中のインジケータとして、<a href="http://blog.nomadscafe.jp/archives/000610.html" target="_blank">かぜぶろさんのとこ</a>で知った <a href="http://www.sanbaldo.com/wordpress/1/ajax_gif/" target="_blank">SanBaldo &#187; Blog Archive &#187; Ajax loading animated gif</a> から GIF アニメ画像を頂いたり。感謝感謝。
-</p>
-
-
-
-
-<p class="entryBody">
-デモといっても、テストツールとしてガンガン使ってくださって構いません。ご要望などありましたら、コメントください。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/29/">&larr; Older</a>
@@ -686,6 +695,10 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -699,10 +712,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>

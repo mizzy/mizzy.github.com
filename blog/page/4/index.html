@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="SystemTap が以前から気になってたので、ちゃんと調べてみることに。 ざっとググってみた感じだと、SystemTap Beginners Guide がしっかりまとまっていてわかりやすそうなので、これをベースに調べたことをメモしていく。PDF 版もあるので Kindle に入れて持ち運べるし &hellip;">
+  <meta name="description" content="[wiki:SystemTap00 SystemTap メモ #0] の続き。今回は SystemTap Beginners Guide の 3.2. SystemTap Scripts から抜粋。 スクリプトのフォーマット SystemTap スクリプトのフォーマットはこんな感じ。 probe &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,141 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/07/13/SystemTap01/">SystemTap01</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-07-13T02:44:59+09:00" pubdate>Jul 13<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/07/13/SystemTap01/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[wiki:SystemTap00 SystemTap メモ #0] の続き。今回は <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">SystemTap Beginners Guide</a> の <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/scripts.html">3.2. SystemTap Scripts</a> から抜粋。</p>
+
+<hr />
+
+<h1>スクリプトのフォーマット</h1>
+
+<p>SystemTap スクリプトのフォーマットはこんな感じ。</p>
+
+<pre><code>probe event { statements }
+</code></pre>
+
+<p>なので、[wiki:SystemTap00 前回] 出てきた、</p>
+
+<pre><code>$ stap -v -e 'probe vfs.read { printf("read performed\n"); exit() }'
+</code></pre>
+
+<p>をフォーマットと照らし合わせて読み解くと、<em>「vfs.read イベントが発生したら read performed と表示して exit する」</em>といった意味になる。</p>
+
+<p><em>{ statements }<em>&#8217; の部分は &#8221;&#8217;handler&#8221;&#8217; と呼ばれ、&#8221;&#8217;event&#8221;&#8217; と それに対応した &#8221;&#8217;handler&#8221;&#8217; をあわせて &#8217;</em>probe</em> と呼ぶらしい。</p>
+
+<p>スクリプトの中では関数を定義して呼び出すこともできる。</p>
+
+<pre><code>function function_name(arguments) { statements }
+
+probe event { function_name(arguments) }
+</code></pre>
+
+<hr />
+
+<h1>イベント</h1>
+
+<p>イベントは同期イベントと非同期イベントに分かれる。</p>
+
+<h2>同期イベント</h2>
+
+<p>同期イベントはカーネルコード中の特定の場所で命令が実行された場合に発生するイベント。（非同期イベントは後で説明するが、命令実行とは関係なしに発生するイベント。）</p>
+
+<p>同期イベントには以下のようなものがある。</p>
+
+<p><em>syscall.<em>&#8221;&#8221;&#8221;system_call</em></em></p>
+
+<p><em>system_call&#8221; というシステムコールの呼び始めに発生するイベント。呼び終わりに発生するイベントは syscall.&#8221;system_call</em>.return 。close システムコールの呼び始めに発生するイベントは syscall.close、呼び終わりに発生するイベントは syscall.close.return 。</p>
+
+<p><em>vfs.<em>&#8221;&#8221;&#8221;file_operation</em></em></p>
+
+<p>VFS に対して <em>file_operation</em> の呼び始めに発生するイベント。syscall と同様、 .return を付加すると、呼び終わりイベントとなる。</p>
+
+<p><em>kernel.function(&#8221;<em>&#8221;&#8221;&#8221;function&#8221;&#8221;&#8221;</em>&#8221;)</em></p>
+
+<p>カーネルファンクション <em>function</em> の呼び始めに発生するイベント。例えば <em>kernel.function(&#8220;sys_open&#8221;)</em> は sys_open の呼び始めに発生するイベント。.return がつくと呼び終わりイベント。ワイルドカードとして * がつかえる。また、以下のように特定のソースファイル中のファンクションも指定できる。</p>
+
+<pre><code>probe kernel.function("*@net/socket.c") { }
+probe kernel.function("*@net/socket.c").return { }
+</code></pre>
+
+<p><em>kernel.trace(&#8221;<em>&#8221;&#8221;&#8221;tracepoint&#8221;&#8221;&#8221;</em>&#8221;)</em></p>
+
+<p>カーネル内の特定のトレースポイントで発生するイベント。例えば、<em>kernel.trace(&#8220;kfree_skb&#8221;)</em> だと、カーネル内のネットワークバッファが解放された時にイベントが発生する。</p>
+
+<p><em>module(&#8221;<em>&#8221;&#8221;&#8221;module&#8221;&#8221;&#8221;&#8221;&#8221;).function(&#8220;&#8221;&#8221;&#8221;&#8221;function&#8221;&#8221;&#8221;</em>&#8221;)</em></p>
+
+<p>モジュール内の特定のファンクションが呼ばれた場合に発生するイベント。</p>
+
+<pre><code>probe module("ext3").function("*") { }
+probe module("ext3").function("*").return { }
+</code></pre>
+
+<p>この例だと、前者は ext3 モジュール内のすべてのファンクションの呼び始めに発生するイベント、後者は呼び終わりに発生するイベント、となる。</p>
+
+<h2>非同期イベント</h2>
+
+<p>非同期イベントはカーネルコード内の命令実行とは無関係に発生するイベント。以下のようなイベントがある。</p>
+
+<p><em>begin</em></p>
+
+<p>SystemTap セッションの開始時（SystemTap スクリプトの実行開始時）に発生するイベント。</p>
+
+<p><em>end</em></p>
+
+<p>SystemTap セッションの終了時に発生するイベント。</p>
+
+<p><em>timer events</em></p>
+
+<p>タイマーイベント。以下の例では4秒ごとにイベントを発生させる。</p>
+
+<pre><code>probe timer.s(4)
+{
+  printf("hello world\n")
+}
+</code></pre>
+
+<p>時間単位は上の例の秒以外にも、以下のように指定できる。</p>
+
+<ul>
+<li>timer.ms(<em>milliseconds</em>)</li>
+<li>timer.us(<em>microseconds</em>)</li>
+<li>timer.ns(<em>nanoseconds</em>)</li>
+<li>timer.hz(<em>hertz</em>)</li>
+<li>timer.jiffies(<em>jiffies</em>)</li>
+</ul>
+
+
+<p>イベントは他にもたくさんあるので、詳しく知りたければ <em>man stapprobes</em> すべし。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1004,49 +1139,6 @@ staprun:remove_module:205 Module simple removed.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/02/17/OpenSocialAppDeveloperRecruiting/">OpenSocialAppDeveloperRecruiting</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-02-17T19:44:03+09:00" pubdate>Feb 17<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/02/17/OpenSocialAppDeveloperRecruiting/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ペパボではこれからOpenSocialアプリの分野にも力を入れていきますよ、ってことで、<a href="http://www.paperboy.co.jp/recruit/job/100212p.php">開発者を募集しています</a>。</p>
-
-<p>また、それ以外のサービス、職種でも募集していますので、興味のある方はぜひエントリしてください。</p>
-
-<p>http://www.paperboy.co.jp/recruit/</p>
-
-<p>例によって、採用された方にはドクターペッパーチェリーを差し上げます。最近追加購入したのでたっぷりあります。合い言葉は「ドクターペッパーチェリー飲みたい！」です。僕との面接時に必ず声に出して言ってください。</p>
-
-<p>[[Image(http://gyazo.com/37db61b8bd76e406987622d9863fbe5f.png)]]</p>
-
-<p>技術職じゃない方は僕との面接はありませんが、入社してお会いした時にでも声かけて下さい。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1064,6 +1156,10 @@ staprun:remove_module:205 Module simple removed.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -1077,10 +1173,6 @@ staprun:remove_module:205 Module simple removed.
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>

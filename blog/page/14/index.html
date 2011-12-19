@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom/Server.pm NAME XML::Atom::Server - A server for the Atom API SYNOPSIS package My::Server; use base qw( XML::Atom:: &hellip;">
+  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom/Util.pm NAME XML::Atom::Util - Utility functions SYNOPSIS use XML::Atom::Util qw( iso2dt ); my $dt = iso2dt($entry &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Util.pm/">XML-Atom-0.22/lib/XML/Atom/Util.pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-30T23:41:46+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Util.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Util.pm</p>
+
+<h1>NAME</h1>
+
+<p>XML::Atom::Util - Utility functions</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use XML::Atom::Util qw( iso2dt );
+    my $dt = iso2dt($entry-&gt;issued);
+</code></pre>
+
+<h1>USAGE</h1>
+
+<h2>iso2dt($iso)</h2>
+
+<p>Transforms the ISO-8601 date <em>$iso&#8221; into a &#8221;DateTime&#8221; object and returns the &#8221;DateTime</em> object.</p>
+
+<h2>encode_xml($str)</h2>
+
+<p>Encodes characters with special meaning in XML into entities and returns the encoded string.</p>
+
+<h1>AUTHOR &amp; COPYRIGHT</h1>
+
+<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2099,39 +2156,6 @@ route 192.168.10.0 255.255.255.0 172.16.0.1
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/22/TitleIndex/">TitleIndex</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-22T19:46:22+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/22/TitleIndex/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>[[TitleIndex]]</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/15/">&larr; Older</a>
@@ -2149,6 +2173,10 @@ route 192.168.10.0 255.255.255.0 172.16.0.1
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -2162,10 +2190,6 @@ route 192.168.10.0 255.255.255.0 172.16.0.1
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>

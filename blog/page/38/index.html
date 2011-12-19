@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="今回はCatalystはあんまり関係なくて、prototype.jsの使い方に関する補足、といった感じです。 前回のエントリの最後で、「xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ込むだけなので、サーバ側で生成したデータを、 &hellip;">
+  <meta name="description" content="ttプラグインを修正。 前回のエントリで「複雑なデータ構造のものをFOREACHでまわしたりするのは、正常に動作しないと思う」と書いていたのですが、複雑どころが単純なFOREACHでも動作しないというまぬけな状態だったので、修正しました。とりあえず、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/03/385/">Blosxom + Template Toolkit #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-03T13:51:00+09:00" pubdate>May 3<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/03/385/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/archives/tt" target="_blank">ttプラグイン</a>を修正。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/program/blosxomTT.html" target="_blank">前回のエントリ</a>で「複雑なデータ構造のものをFOREACHでまわしたりするのは、正常に動作しないと思う」と書いていたのですが、複雑どころが単純なFOREACHでも動作しないというまぬけな状態だったので、修正しました。とりあえず、単一のFOREACHであれば動作するようになりました。入れ子になってるとどうなるか分かりません。今のところ必要がないので、確認する気もなし。必要になってから考えます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1142,57 +1185,6 @@ extensionはここのサイトに行ってインストールします。
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/21/291/">Blosxomでtagging #6</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-21T08:17:00+09:00" pubdate>Apr 21<span>st</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/21/291/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="/archives/tagging">taggingプラグイン</a>、以下のバグ修正と仕様変更を行う。
-</p>
-
-
-
-
-<ul class="entryBody">
-<li>個別エントリの表示の際に、タグの絞込み動作がおかしかったのを修正。</li>
-<li>個別エントリ表示時は、タグリストは全エントリに含まれるタグを表示していたのを、エントリが属するカテゴリのタグのみ表示する様に変更。</li>
-</ul>
-
-
-
-
-<p class="entryBody">
-それに合わせて、Javascriptやフレーバも修正。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/39/">&larr; Older</a>
@@ -1210,6 +1202,10 @@ extensionはここのサイトに行ってインストールします。
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -1223,10 +1219,6 @@ extensionはここのサイトに行ってインストールします。
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="BEYES で ネフ セラ を買った。 ZEROBASE さんへ遊びに行ったときに、ajax や flash を使った面白いインターフェースのウェブサイトを色々見ながらお話していたのですが、BEYES を見ている時に、石橋さんが naef について教えてくださいました。それからずっと、 &hellip;">
+  <meta name="description" content="Rails の興味深い実装メモの続き。 ActiveRecord の主な仕事は、DB の読み書きとデータの Validation なわけですが、コールバックを利用すると、Validation の前後や DB 読み書きの前後の、任意のタイミングで好きな処理を割り込ませることができます。 例えば、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,167 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/12/30/388/">ActiveRecord のコールバックとオブザーバ（Rails勉強中 #6）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-12-30T00:36:00+09:00" pubdate>Dec 30<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/12/30/388/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Rails の興味深い実装メモの続き。
+</p>
+
+
+
+
+<p class="entryBody">
+ActiveRecord の主な仕事は、DB の読み書きとデータの Validation なわけですが、コールバックを利用すると、Validation の前後や DB 読み書きの前後の、任意のタイミングで好きな処理を割り込ませることができます。
+</p>
+
+
+
+
+<p class="entryBody">
+例えば、 <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Rails本</a>のサンプルでは、
+</p>
+
+
+
+
+<pre class="code">
+def before_create
+  self.hashed_password = User.hash_password(self.password)
+end
+</pre>
+
+
+
+
+<p class="entryBody">
+といった感じで、DBにユーザ情報をインサートする前にパスワードを SHA1 でハッシュしたり、
+</p>
+
+
+
+
+<pre class="code">
+after_create do |order|
+  logger.info "Order #{order.id} created"
+end
+</pre>
+
+
+
+
+<p class="entryBody">
+といった感じで、オーダー情報をDBに格納した後ログに記録する、といったことをモデルの中で実行できるようになっています。
+</p>
+
+
+
+
+<p class="entryBody">
+モデルで Validation するのと同様、これもコントローラの処理の簡略化につながり、より見通しの良いコードが書けていい感じですね。
+</p>
+
+
+
+
+<p class="entryBody">
+また、上記のようなロギング処理を、モデルにやらせるのは気持ち悪い、という場合には、オブザーバを使ってモデルから処理を追い出すことができます。こんな感じで。
+</p>
+
+
+
+
+<pre class="code">
+class OrderObserver &lt; ActiceRecord::Observer
+  def after_save(an_order)
+    an_order.logger.info("Order #{an_order.od} created")
+  end
+end
+</pre>
+
+
+
+
+<p class="entryBody">
+クラス名を OrderObserver としておくと、勝手に Order というモデルクラスのオブザーバとなってくれます。
+</p>
+
+
+
+
+<p class="entryBody">
+さらに、observe メソッドで監視対象のクラスを複数指定することもできます。
+</p>
+
+
+
+
+<pre class="code">
+class AuditObserver &lt; ActiveRecord::Observer
+  <strong>observe Order, Payment, Refund</strong>
+  def after_save(model)
+    model.logger.info("#{model.class.name} #{model.id} created")
+  end
+end
+</pre>
+
+
+
+
+<p class="entryBody">
+こんな感じで、複数のモデルクラスに共通する処理を、元のクラスをまったくいじることなく、ひとつのクラスに記述しておくことができます。アスペクト指向っぽいですね。
+</p>
+
+
+
+
+<p class="entryBody">
+Catalyst でこれと同じようなことができるのかな、と調べてみたところ、<a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Observe" target="_blank">Catalyst::Plugin::Observe</a> なるものが。といっても、ActiveRecord::Observer はモデルに特化しているのに対し、Catalyst::Plugin::Observe はフレームワーク全体で働くオブザーバなので、用途が異なるようです。
+</p>
+
+
+
+
+<p class="entryBody">
+特に端的に異なるのは、コールバックイベントの種類ですね。ActiveRecord::Observer は before_validation, after_create などの、Validation や DB読み書きの処理段階に応じたイベントですが、Catalyst::Plugin::Observe は dispatch, prepare_action など、フレームワークの処理段階に応じたイベントとなってます。
+</p>
+
+
+
+
+<p class="entryBody">
+Sledge 次期バージョンでは、ActiveRecord の様な Validation、コールバック、オブザーバはぜひ欲しいですね。お前が実装しろ、というのであれば、喜んでコード書きます。（あ、言っちゃった…）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -959,81 +1120,6 @@ end
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/12/17/405/">Jackass コレクターズセット</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-12-17T01:08:00+09:00" pubdate>Dec 17<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/12/17/405/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody" style="vertical-align: top;">
-jackass が MTV で放送されていたのは、3,4年前ぐらいでしょうか。番組冒頭に映しだされる以下の警告に引き込まれ、そのままどっぷりとはまり込んでしまいました。
-</p>
-
-
-
-
-<div class="entryBody" style="margin: 1em;color: #ffffff;text-align: center;background: #000000;padding: 0.5em;"><strong style="color: red;text-align">WARNING</strong>
-<br /><br />
-番組内で危ないことをしているのはスタントマンか、ただのバカです。<br />
-よい子やクソガキ、それから精神年齢の若い大人の皆さんは絶対にマネしないで下さいね。<br />
-自分たちで録ったバカなビデオをMTVに送らないでください。<br />
-送ってきても、こちらでは一切見ません。はっきり言って迷惑です。
-</div>
-
-
-
-
-<p class="entryBody">
-番組内容はまさにこの警告通り、バカども（誉め言葉）が危ない（痛い | 下品な | 汚い | 迷惑な）ことを全力でやってます。例を挙げると、ブリーフに大量の蜂をくっつけビキニパンツ（Bee-kini）を作る（もちろんブリーフ以外は何も身に着けていない）とか、Mianus という街（my anus と発音が一緒）に行って、会話の端々にいちいち「マイ・アヌス」とつけまくるとか、まあそんな感じ。
-</p>
-
-
-
-
-<p class="entryBody">
-この番組のコレクターズセット DVD が発売されました。分別ある大人の皆様、ぜひご覧ください。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://kotonoha.cc/no/11749" target="_blank">jackass のコトノハでの評価。</a>
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://www.amazon.co.jp/exec/obidos/ASIN/B000BEYC72/httshemizorg-22/ref=nosim" target="_blank"><img src="http://ec1.images-amazon.com/images/P/B000BEYC72.01._SCTHUMBZZZ_.jpg" alt="ジャッカス コレクターズ セット / TVバラエティ" title="ジャッカス コレクターズ セット / TVバラエティ" /></a>
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/32/">&larr; Older</a>
@@ -1051,6 +1137,10 @@ jackass が MTV で放送されていたのは、3,4年前ぐらいでしょう�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -1064,10 +1154,6 @@ jackass が MTV で放送されていたのは、3,4年前ぐらいでしょう�
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>

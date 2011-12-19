@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="このエントリ の様な感じで、iCal データに時刻も入れたところ、ちゃんと Google Calendar で通知メールが来るようになりました。が、Google Calendar では終日イベントは背景がキレイに色づけされるのに、時刻が指定されたイベントは背景が色づけされないんですよね。 &hellip;">
+  <meta name="description" content="Plagger の Rule まわりの実装は今までちゃんと見たことなかったので、勉強も兼ねて Plagger::Rule::Ahead を実装してみた。 前エントリの Filter::FutureEvents と同様のことを、Rule ベースで実現します。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,52 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/26/396/">Plagger::Rule::Ahead</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-26T23:47:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/26/396/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Plagger の Rule まわりの実装は今までちゃんと見たことなかったので、勉強も兼ねて <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Ahead.pm"><span class="icon"></span>Plagger::Rule::Ahead</a> を実装してみた。 前エントリの <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FutureEvents.pm"><span class="icon"></span>Filter::FutureEvents</a> と同様のことを、Rule ベースで実現します。現在時刻よりも<strong>後</strong>に発生するイベントを持つエントリを抽出、ということで Ahead という名前にしてみました。イベントを持っていないエントリの場合には、エントリの更新時刻をチェックします。
+</p>
+
+
+<p>
+Filter::FutureEvents も Rule::Ahead も <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Event.pm"><span class="icon"></span>Plagger::Event</a> があることを前提としてるので、そのままでは 本家 trunk では動作しません。ご注意を。
+</p>
+
+
+<p>
+ 
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -923,71 +969,6 @@ start [ command, options ], \$in, undef, \$err;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/07/30/431/">Plagger::Plugin::Publish::iTunes</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-07-30T05:08:00+09:00" pubdate>Jul 30<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/07/30/431/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><blockquote>
-<p>
-  待ってました〜！Filter::FFmpeg！<br />
-  Windows環境でもバッチリ動きました。<br />
-  <br />
-  &lt;&#8230; 中略 &#8230;&gt;<br />
-  <br />
-  エンコード後にダイレクトにiTunesに登録するようにするには、Publish系のプラグインで実装する形になるのかなぁ？
-  <cite>from: <a class="ext-link" href="http://d.hatena.ne.jp/shimibow/20060728"><span class="icon"></span>SHIMIBOW’S HATENA DIARY - plagger &amp; ffmpeg</a></cite>
-</p>
-</blockquote>
-
-
-<p>
-こういった反応を頂けると、つくった甲斐がありますね。開発者冥利に尽きます。
-というわけで、うれしいのでお礼として <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Publish/iTunes.pm"><span class="icon"></span>Publish::iTunes</a> つくりました。
-</p>
-
-
-<p>
-設定はこれだけです。
-</p>
-
-
-<pre class="wiki">
-  - module: Publish::iTunes
-</pre>
-
-
-<p>
-ただ、問題がひとつあって、iTunes で表示される動画のタイトルが、ファイル名になっちゃうんですよね。ffmpeg の -title オプションでタイトルつけても、iTunes では表示されないようです。携帯動画変換君では、付属の ATOMChanger.exe でタイトルつけているようなんですが、同じことが perl でできるのかどうか、調べてみる必要がありますね。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -1005,6 +986,10 @@ start [ command, options ], \$in, undef, \$err;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -1018,10 +1003,6 @@ start [ command, options ], \$in, undef, \$err;
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>

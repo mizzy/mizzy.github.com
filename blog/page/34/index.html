@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="今までフォームの validation は自前でモジュール書いていたのですが、 CatalystでSledge風Validation にある FormValidator::Simple がすごく良さげなので、さっそく使わせて頂くことにしました。 ついでに、 FormValidator:: &hellip;">
+  <meta name="description" content="「ブログのサイドバーをパーソナライズ」につづく、読者によるカスタマイズシリーズ第2弾。 ブログエントリの表示で、概要だけ表示して「続きを読む」で全文にリンクするようなやり方は、読む立場としては自分はあまり好きじゃなかったりします。が、書く立場としては、文章が長すぎるから、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,75 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/10/29/308/">ブログエントリの全文/要約表示を読者に委ねる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-10-29T12:31:00+09:00" pubdate>Oct 29<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/10/29/308/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+「<a href="http://mizzy.org/web/sideBarPersonalize.html" target="_blank">ブログのサイドバーをパーソナライズ</a>」につづく、読者によるカスタマイズシリーズ第2弾。
+</p>
+
+
+
+
+<p class="entryBody">
+ブログエントリの表示で、概要だけ表示して「続きを読む」で全文にリンクするようなやり方は、読む立場としては自分はあまり好きじゃなかったりします。が、書く立場としては、文章が長すぎるから、まずは概要だけ表示した方が親切だろう、とか、ネタバレがあるからいきなり表示しちゃまずいだろ、とか、色々と配慮して概要だけ表示しているものと思われます。
+</p>
+
+
+
+
+<p class="entryBody">
+この辺りは一長一短もあり、好みの問題もあるため、一概にどちらがいいとも言えませんよね。それならば、読む側が全文/要約表示を選択できるようになれば、どちらがいいとか悩む必要がなくなるよな、ってことでちょいと実装してみました。
+</p>
+
+
+
+
+<p class="entryBody">
+エントリ一覧が表示されるページのサイドバーに、「表示オプション」というのをつけて、ここで選択できるようにしています。（個別エントリページでこれをご覧の方は、<a href="/">トップ</a>へ移動してみてください。
+</p>
+
+
+
+
+<p class="entryBody">
+デフォルトでは全文表示になっていますが、「要約表示」を選択すると前半だけ表示して、（続きを読む）リンクが現れます。
+</p>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2005/10/29/308/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1221,78 +1290,6 @@ my @accounts = (
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/08/11/461/">blosxomをAccount Auto-Discoveryに対応させるプラグイン #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-08-11T16:37:00+09:00" pubdate>Aug 11<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/08/11/461/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-せっかくなので、このブログもAccount Auto-Discoveryに準拠した、はてなブックマークのポイント送信機能に対応させてみようと考え、「フレーバいじればいいんだろ。楽勝。」とか思っていたら、headフレーバでpermalinkを表示させる方法がわからない…
-</p>
-
-
-
-
-<p class="entryBody">
-で、permalinkじゃなくてもいいんだけど、それだと勝ち負けでいうと負けな気がするし、調べれば方法はあるかもしれないけど、プラグイン書いちゃった方が早い、というわけで、書いてみました。<a href="/archives/account_auto_discovery" target="_blank">account_auto_discoveryプラグイン</a>。
-</p>
-
-
-
-
-<p class="entryBody">
-完全オリジナルではなく、antipopのけんたろさん作 <a href="http://antipop.gs/mt/2005/08/09/201256" target="_blank">Movable Type を Account Auto-Discovery に対応させるプラグイン</a>をblosxom用に移植（パクリ）したものとなっています。
-</p>
-
-
-
-
-<p class="entryBody">
-使い方ですが、pluginsディレクトリに置いて、$account_name, $is_xhtmlを適宜修正、headフレーバの表示したい部分に、$account_auto_discovery::rdf と記述して下さい。
-</p>
-
-
-
-
-<p class="entryBody">
-blosxomの場合、permalinkのフォーマットは様々なため、環境変数HTTP_HOSTとREQUEST_URIを組み合わせてpermalinkを構成しています。（要はクライアントがアクセスしているURIをpermalinkとしている。）なので、permalinkとは呼べないようなURIがrdf:aboutに設定される可能性もありますが、特に実害はないと思いますので、とりあえずはこの実装にしておきます。
-</p>
-
-
-
-
-<p class="entryBody">
-<strong>2005/08/11 8:20追記</strong><br />
-<a href="http://niiyan.s8.xrea.com/blosxom/blosxom/20050811_hatenapoint_for_blosxom.htm" target="_blank">にーやんのブログ :: 「はてなポイント」の受け取りに対応しました</a> 経由 <a href="http://hail2u.net/blog/blosxom/hatena_point_getter_in_blosxom.html" target="_blank">hail2u.net - Weblog - blosxomではてなポイントゲッター</a>で知ったのですが、$urlと$path_infoの組み合わせででpermalinkを表現できるようです。覚えとこ。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/35/">&larr; Older</a>
@@ -1310,6 +1307,10 @@ blosxomの場合、permalinkのフォーマットは様々なため、環境変�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
@@ -1323,10 +1324,6 @@ blosxomの場合、permalinkのフォーマットは様々なため、環境変�
     
       <li class="post">
         <a href="/blog/2011/10/30/vimeo-tag-plugin/">Vimeo tag plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a>
       </li>
     
   </ul>
