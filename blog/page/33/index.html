@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="最近、コトノハ にはまってます。シンプルさとゆるさが心地いいっす。こいうのは知り合いのを見るのが楽しいので、知人にも声をかけてるところだったりします。俺のコトリスト。 俺は主にランダムにコトを表示させて楽しんでいるのですが、ランダムのリンク位置が、コトの長さによって変わってしまうので、 &hellip;">
+  <meta name="description" content="feedbringer用greasemonkeyユーザスクリプトの白黒バージョンを修正しました。俺はこっちの方を常用してるので、今後は白黒バージョンしかメンテナンスしないつもりです。 修正点のひとつは、コードを見直し、少しすっきりさせたことです。（ほんの少しですが。） それと、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/23/479/">Feedbringerをremixin&#8217; #5</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-23T18:31:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/23/479/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.user.js" target="_blank">白黒バージョン</a>を修正しました。俺はこっちの方を常用してるので、今後は白黒バージョンしかメンテナンスしないつもりです。
+</p>
+
+
+
+
+<p class="entryBody">
+修正点のひとつは、コードを見直し、少しすっきりさせたことです。（ほんの少しですが。）
+</p>
+
+
+
+
+<p class="entryBody">
+それと、もうひとつ大きな修正は、titleに未読数を表示するようにしました。こうすることによって、タブに未読数が表示されるので、Notifier代わりになるかな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+こんなことやってても、そのうち本家が改善されて意味がなくなるかもしれませんが、まあJavascriptの練習ってことで。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -696,57 +753,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/11/05/494/">perlでOpenID Consumerを実装してみる</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-11-05T21:02:00+09:00" pubdate>Nov 5<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/11/05/494/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://openid.net/" target="_blank">OpenID</a> を理解するために、OpenID Consumerをperlで実装してみることにした。といっても、 <a href="http://search.cpan.org/perldoc?Net::OpenID::Consumer" target="_blank">Net::OpenID::Consumer</a> モジュールを利用しているわけで、いちから自分で実装しているわけではないです。「モジュールがあるから楽勝」と思っていたら、意外とてこずってしまいました。<a href="/openid/" target="_blank">動作サンプル</a>。<a href="/archives/openid.tar.gz">ソース</a>。
-</p>
-
-
-
-
-<p class="entryBody">
-認証時の流れについては、「<a href="http://www.banana-fish.com/~piro/20051021.html" target="_blank">ぴろ日記 - OpenID: Specs , OpenID認証サーバ , OpenIDにおける認証って奴</a>」が詳しいです。今回実装しているのは、ぴろ日記さんで「とりあえずわかりやすい」と言われている、「dumb + setup モード」です。
-
-</p>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2005/11/05/494/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/34/">&larr; Older</a>
@@ -764,6 +770,10 @@ meta プラグインと組み合わせて、meta-access: private と記述して
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
       </li>
     
@@ -779,10 +789,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -795,7 +801,7 @@ meta プラグインと組み合わせて、meta-access: private と記述して
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2011 - Gosuke Miyashita -
+  Copyright &copy; 2012 - Gosuke Miyashita -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

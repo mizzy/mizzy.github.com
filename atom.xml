@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2011-12-20T05:29:10+09:00</updated>
+  <updated>2012-01-06T00:48:45+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,23 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[WeeChat script for pushing notification to im.kayac.com]]></title>
+    <link href="http://mizzy.org/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/"/>
+    <updated>2012-01-06T00:28:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve written <a href="http://www.weechat.org/scripts/source/stable/im_kayac_com_notify.py.html/">WeeChat script for pushing notification to im.kayac.com</a>.</p>
+
+<p>This script is based on <a href="http://www.weechat.org/scripts/source/stable/notifo_notify.py.html/">notifo_notify.py</a>.</p>
+
+<p>This is the image of pushing notification to iPhone by this script.</p>
+
+<p><img src="http://mizzy.org/images/2012/01/im_kayac_com_notify.png" width="320" title="Notification on iPhone" ></p>
+
+<p>This script is hosted on <a href="https://github.com/mizzy/weechat-plugins/blob/master/im_kayac_com_notify.py">GitHub</a>.Pull requests are welcome.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Lunar Eclipse]]></title>
@@ -1792,38 +1809,6 @@ $ mc-service --with-class apache2 --with-fact architecture=x86_64 apache2 restar
 <hr />
 
 <p>というわけで、<a href="http://oreilly.com/catalog/0636920020875">Managing Infrastructure with Puppet</a> について気になった点は以上。次は <a href="http://www.apress.com/9781430230571">Pro Puppet</a> について、気が向いたら書きます。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[SubsonicThroughApacheProxy]]></title>
-    <link href="http://mizzy.org/blog/2011/06/29/SubsonicThroughApacheProxy/"/>
-    <updated>2011-06-29T22:40:54+09:00</updated>
-    <id>http://mizzy.org/blog/2011/06/29/SubsonicThroughApacheProxy</id>
-    <content type="html"><![CDATA[<p><a href="http://twitter.com/#!/earlcyborg">@earlcyborg くん</a> に教えてもらった <a href="http://www.subsonic.org/pages/index.jsp">Subsonic</a> がよさげなので、家の中に環境作り、Apache mod_proxy 経由でアクセスしようとしたらはまったのでメモ。</p>
-
-<p>結論: ProxyPreserveHost On を入れないとはまる。</p>
-
-<p>最初、</p>
-
-<pre><code>&lt;VirtualHost *&gt;
-ServerName subsonic.mizzy.org
-ProxyPass / http://192.168.10.14:4040/
-ProxyPassReverse / http://192.168.10.14:4040/
-&lt;/VirtualHost&gt;
-</code></pre>
-
-<p>という設定で http://subsonic.mizzy.org/ にアクセスしたら、http://192.168.10.14:4040/login.view? にリダイレクトされてしまった。Subsonic にホスト名を設定するところもなさそう。そこで、おそらく Host ヘッダに設定されたホストがリダイレクト先になるんじゃなかろうか、と仮説を立てて、以下のように設定してみた。</p>
-
-<pre><code>&lt;VirtualHost *&gt;
-ServerName subsonic.mizzy.org
-ProxyPreserveHost On
-ProxyPass / http://192.168.10.14:4040/
-ProxyPassReverse / http://192.168.10.14:4040/
-&lt;/VirtualHost&gt;
-</code></pre>
-
-<p>これでうまくいった。</p>
 ]]></content>
   </entry>
   

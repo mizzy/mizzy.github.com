@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="今回はマルコフ連鎖を利用した文章の自動生成について考えてみます。 A → B → C → D という一連の事象が発生する場合に、ある事象の発生する確率が、直前の事象にのみ依存するような状態を、マルコフ連鎖といいます。つまり、Cという事象が発生する確率は、Bにのみ依存していて、 &hellip;">
+  <meta name="description" content="カエルチュウイホウさんのtaggingプラグインというエントリにて指摘されている問題を修正しました。こちらではカテゴリが1階層しかないため、全く気づいていませんでした。ご指摘感謝です。
+download: taggingプラグイン 「下の階層のタグが表示されない」という問題については、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,110 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/06/21/424/">Blosxomでtagging #11</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-06-21T21:19:00+09:00" pubdate>Jun 21<span>st</span>, 2005</time>
+        
+         | <a href="/blog/2005/06/21/424/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://kerolin.jspeed.jp/" target="blank">カエルチュウイホウ</a>さんの<a href="http://kerolin.jspeed.jp/Computer/blosxom/tagging050619.html" target="blank">taggingプラグイン</a>というエントリにて指摘されている問題を修正しました。こちらではカテゴリが1階層しかないため、全く気づいていませんでした。ご指摘感謝です。<br />
+download: <a href="/archives/tagging" target="_blank">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+「下の階層のタグが表示されない」という問題については、カエルチュウイホウさんの修正をそのまま反映させて頂いております。
+</p>
+
+
+
+
+<p class="entryBody">
+「同じタグが複数表示されてしまう場合がある」という問題については、以下の様にコードを修正しました。
+</p>
+
+
+
+
+<pre class="code">
+$ diff tagging tagging.20050508
+3c3
+&lt; # Version: 2005-06-21
+---
+&gt; # Version: 2005-05-08
+50d49
+&lt;       my %tags;
+52,53c51,52
+&lt;           if($category =~ /$path/){
+&lt;               foreach my $tag (keys %{$tags_list_per_category-&gt;{$category}}){
+---
+&gt;           if($path eq $category){
+&gt;               foreach my $tag (sort keys %{$tags_list_per_category-&gt;{$category
+}}){
+55c54,56
+&lt;                       $tags{$tag}++;
+---
+&gt;                       my $encoded_tag = $tag;
+&gt;                       $encoded_tag =~ s/(\W)/sprintf("%%%02X", ord($1))/ego;
+&gt;                       $list .= "&lt;li&gt;&lt;a href='$url?tag=$encoded_tag'&gt;$tag&lt;/a&gt; (
+$tags_list_per_category-&gt;{$category}-&gt;{$tag})&lt;/li&gt;\n";
+60,65d60
+&lt;
+&lt;       foreach my $tag (sort keys %tags){
+&lt;           my $encoded_tag = $tag;
+&lt;           $encoded_tag =~ s/(\W)/sprintf("%%%02X", ord($1))/ego;
+&lt;           $list .= "&lt;li&gt;&lt;a href='$url?tag=$encoded_tag'&gt;$tag&lt;/a&gt; ($tags{$tag})
+&lt;/li&gt;\n";
+&lt;       }
+93c88
+&lt;       foreach (sort keys %$files){
+---
+&gt;       foreach (keys %$files){
+</pre>
+
+
+
+
+<p class="entryBody">
+各カテゴリのタグの数の算出と、HTMLで表示するリストの生成を一緒のforeachループ内で行っていたのが問題の原因だったので、各カテゴリのタグの数を算出してタグ毎に積算するのと、HTMLリストの生成を分けるようにしました。
+</p>
+
+
+
+
+<p class="entryBody">
+こちらで試した限りは意図した通りに動いていますが、どんなもんでしょ？
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1353,78 +1458,6 @@ del.icio.usを使いやすくしようという目論見で開発中のツール
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/05/21/404/">ajaxでdel.icio.usを使いやすく #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-05-21T23:56:00+09:00" pubdate>May 21<span>st</span>, 2005</time>
-        
-         | <a href="/blog/2005/05/21/404/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://mizzy.org/program/deliciousBar00.html" target="_blank">前回</a>は、<a href="http://del.icio.us" target="_blank">del.icio.us</a>を使いやすくするための、Firefoxサイドバーを作ろうと試みたのですが、ものすごく中途半端な状態で放置するはめになりました。敗因は、「俺はブラウザの機能としてのサイドバーが嫌い」ということを忘れていたから、ですね。ブラウザのメイン画面が狭くなるのでいやなんですよ。自分で使う気がないものを作ったって、いいものになるわけがない。
-</p>
-
-
-
-
-<p class="entryBody">
-で、今回は自分で使いたくなるようなものをちゃんと作ろう、ってことで作ってみました。
-<a href="http://mizzy.org/md/" target="_blank">サンプルはこちら</a>。で、<a href="http://mizzy.org/archives/MyDelicious.tar.gz">ソースはこちら</a>。 
-</p>
-
-
-
-
-<p class="entryBody">
-サンプルを試してみよう、という方は、パスワードの取り扱いにご注意下さい。セッションとひもづけて、こちらのサーバに保存してますので。一応暗号化して保存してますし、ブラウザ経由では見えないようにしていますが、できれば捨てパスワードに変更してから試して頂いて、その後元のパスワードに戻す、というのがよろしいかと。またはソースをお持ち帰り頂いて、ご自身で設置して頂くとか。
-</p>
-
-
-
-
-<p class="entryBody">
-Firefox 1.0.4(Win)でしか試していません。IE6はエラーが出ます。あと、Firefoxでもエラーが出て、del.icio.usからデータを取得できていないことがあります。原因不明。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://www.spurl.net" target="_blank">Spurl</a>の方が自分用オンラインブックマークとして使いやすい、と前に書いた気がしますが、SpurlBarはレスポンスが悪いんですよね。特に、関連するタグを取得する時。それに、SpurlBarは俺が嫌いなFirefoxサイドバーだったりするし、My spurlの使い勝手はSpurlBarに及ばないし。それにSpurlはAPIがない。2月末ぐらいにAPIについて問い合わせたら、「あと3,4週間でフルAPI提供できるぜ」と返事が来たものの、いまだAPIは提供されていないし。
-</p>
-
-
-
-
-<p class="entryBody">
-なので、これを作ったのを機に、del.icio.usに復帰しようかな、と思ってます。今のままだと、登録データが増えてくると最初の待ち時間が長くなるので、そのあたりの解決策も考えないといけないですね。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/37/">&larr; Older</a>
@@ -1442,6 +1475,10 @@ Firefox 1.0.4(Win)でしか試していません。IE6はエラーが出ます�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
       </li>
     
@@ -1457,10 +1494,6 @@ Firefox 1.0.4(Win)でしか試していません。IE6はエラーが出ます�
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -1473,7 +1506,7 @@ Firefox 1.0.4(Win)でしか試していません。IE6はエラーが出ます�
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2011 - Gosuke Miyashita -
+  Copyright &copy; 2012 - Gosuke Miyashita -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

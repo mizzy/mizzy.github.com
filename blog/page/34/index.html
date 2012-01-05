@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="どこかで blosxom と Text::Hatena を組み合わせた、みたいなエントリを見かけたんだけど、具体的なやり方が何も書いてなかったので、自分で blosxom 用プラグイン作ってみた。 plugin: text_hatena といっても、 &hellip;">
+  <meta name="description" content="OpenID を理解するために、OpenID Consumerをperlで実装してみることにした。といっても、 Net::OpenID::Consumer モジュールを利用しているわけで、いちから自分で実装しているわけではないです。「モジュールがあるから楽勝」と思っていたら、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/05/494/">perlでOpenID Consumerを実装してみる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-05T21:02:00+09:00" pubdate>Nov 5<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/05/494/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://openid.net/" target="_blank">OpenID</a> を理解するために、OpenID Consumerをperlで実装してみることにした。といっても、 <a href="http://search.cpan.org/perldoc?Net::OpenID::Consumer" target="_blank">Net::OpenID::Consumer</a> モジュールを利用しているわけで、いちから自分で実装しているわけではないです。「モジュールがあるから楽勝」と思っていたら、意外とてこずってしまいました。<a href="/openid/" target="_blank">動作サンプル</a>。<a href="/archives/openid.tar.gz">ソース</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+認証時の流れについては、「<a href="http://www.banana-fish.com/~piro/20051021.html" target="_blank">ぴろ日記 - OpenID: Specs , OpenID認証サーバ , OpenIDにおける認証って奴</a>」が詳しいです。今回実装しているのは、ぴろ日記さんで「とりあえずわかりやすい」と言われている、「dumb + setup モード」です。
+
+</p>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2005/11/05/494/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1187,100 +1238,6 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/08/13/467/">Same_topicプラグイン</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-08-13T12:28:00+09:00" pubdate>Aug 13<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/08/13/467/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-ブログ形式でウェブサイトを作っていると、ひとつのトピックが複数のエントリに分かれてしまうケースがよくあると思います。この様なトピックは、最初から、逐一更新がある度に読んでいる人にとっては特に問題はないのですが、そのトピックの存在を途中から知った人にとっては、最初から読みたいと思っても、最初のエントリがどこにあるのかが見つけづらいのではないでしょうか。また、最初のエントリを見つけたとしても、関連する次のエントリへきちんと導いてあげないと、今度は続きがどこにあるのかがわからん、ということになってしまいます。
-</p>
-
-
-
-
-<p class="entryBody">
-「最初のエントリがどこにあるか分からん」という問題については、2回目以降のエントリは必ず最初のエントリへリンクするようにすればいいのですが、めんどくさいっすよね。「続きがどこにあるかわからん」という問題についても、次のエントリへリンクすればいいわけですが、エントリを書いてる時点では、まだ次のエントリは存在しないわけなので、次のエントリを書いた後に、ひとつ前のエントリを修正してリンクするという作業が発生するので、これもまためんどくさいです。
-</p>
-
-
-
-
-<p class="entryBody">
-めんどくさがりな俺はこんなことはしたくないので、<a href="/archives/same_topic" target="_blank">same_topicプラグイン</a>というものを作ってみました。
-これは、ひとつのトピックについて書かれた複数のエントリを抽出して、古い順に並べるというものです。
-</p>
-
-
-
-
-<p class="entryBody">
-同一トピックかどうかの判断は、エントリのパス名でおこなっています。例えば、あるエントリのパスがprogram/blosxomWithRast.txtだった場合、program/blosxomWithRast[0-9]*.txtというパスのエントリは、すべて同一トピックであるとみなします。
-</p>
-
-
-
-
-<p class="entryBody">
-各エントリの下部にある「同じトピックのエントリをすべて見る」というリンクは、このプラグインを利用したものです。
-</p>
-
-
-
-
-<p class="entryBody">
-実際にどんな風に見えるかは、<a href="http://mizzy.org/?topic=/program/blosxomWithRast" target="_blank">blosxom + Rastに関するエントリ一覧</a>をご覧下さい。
-</p>
-
-
-
-
-<p class="entryBody">
-<strong>2005/08/13追記</strong><br />
-使い方の記述を忘れてました…strotyフレーバ中で、
-</p>
-
-
-
-
-<pre class="code">
-&lt;a href="/?topic=$path/$fn"&gt;同じトピックのエントリをすべて見る&lt;/a&gt;
-</pre>
-
-
-
-
-<p class="entryBody">
-といった感じで記述して下さい。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/35/">&larr; Older</a>
@@ -1298,6 +1255,10 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
       </li>
     
@@ -1313,10 +1274,6 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
         <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/11/05/maglica-web/">Maglica Web</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -1329,7 +1286,7 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2011 - Gosuke Miyashita -
+  Copyright &copy; 2012 - Gosuke Miyashita -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
