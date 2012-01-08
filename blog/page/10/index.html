@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="source:library/perl/trunk/FormValidator-Simple-Plugin-Number-Phone-JP/lib/FormValidator/Simple/Plugin/Number/Phone/JP.pm NAME FormValidator::Simple:: &hellip;">
+  <meta name="description" content="KLab 勉強会 #4 で、Func についてしゃべってきました。その時の様子は Ustream でご覧いただけます。また資料は後日 DSAS 開発者の部屋にアップされると思います。 スピーカのために壇上に水が用意されていることはよくあると思いますが、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,47 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2008/03/30/KlabAndFuncAndPunc/">KlabAndFuncAndPunc</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-03-30T21:28:20+09:00" pubdate>Mar 30<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/03/30/KlabAndFuncAndPunc/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://dsas.blog.klab.org/archives/51199866.html">KLab 勉強会 #4</a> で、<a href="https://fedorahosted.org/func/">Func</a> についてしゃべってきました。その時の様子は <a href="http://www.ustream.tv/channel/KLab">Ustream</a> でご覧いただけます。また資料は後日 <a href="http://dsas.blog.klab.org">DSAS 開発者の部屋</a>にアップされると思います。</p>
+
+<p>スピーカのために壇上に水が用意されていることはよくあると思いますが、今回は僕のためにドクターペッパーが用意されているというスペシャルな待遇に感激しました。</p>
+
+<p>で、Func についてしゃべった中で、いくつかいけてない点をあげたのですが、特に RedHat 系 Linux にしか対応してない、というところに不満もあり、また、モジュールを Perl で書きたいという思いもあり、じゃあ Perl で実装しちゃえ、ってことで、<a href="http://coderepos.org/share/wiki/Punc">Punc - Perl Unified Network Controller</a> なるものをつくりはじめました。</p>
+
+<p>今のところプロトタイプでしかないため、まだまだ完成には程遠いですが、RedHat 系 Linux 上でサービスの起動状態を確認する、ということができるまでにはなっています。他の OS 用のモジュールを追加すれば、自動で判別して適切なモジュールを選択してくれる機能も実装しています。</p>
+
+<p>YAPC::Asia 2008 でお話しする予定の <a href="http://conferences.yapcasia.org/ya2008/talk/973">システム管理フレームワークのアーキテクチャと Perl による実装</a> では、この Punc について詳しく解説する予定です。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2008/03/09/library-perl-trunk-FormValidator-Simple-Plugin-Number-Phone-JP-lib-FormValidator-Simple-Plugin-Number-Phone-JP.pm/">library/perl/trunk/FormValidator-Simple-Plugin-Number-Phone-JP/lib/FormValidator/Simple/Plugin/Number/Phone/JP.pm</a></h1>
     
     
@@ -125,7 +166,7 @@
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#109;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x67;&#x6f;&#115;&#x75;&#107;&#x65;&#x6e;&#97;&#116;&#x6f;&#114;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#109;">&#x67;&#111;&#115;&#x75;&#107;&#x65;&#x6e;&#x61;&#116;&#x6f;&#114;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#109;</a></p>
+<p>Gosuke Miyashita, <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x67;&#x6f;&#x73;&#117;&#x6b;&#101;&#110;&#97;&#x74;&#111;&#114;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;">&#x67;&#x6f;&#x73;&#117;&#x6b;&#101;&#x6e;&#x61;&#116;&#x6f;&#x72;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
@@ -1434,272 +1475,6 @@ server          : &lt;&lt;inherit&gt;&gt;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/12/08/FuncIntro/">FuncIntro</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-12-08T01:58:14+09:00" pubdate>Dec 8<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/12/08/FuncIntro/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://opentechpress.jp/developer/07/12/06/0046247.shtml">Open Tech Press</a> で知った、<a href="https://hosted.fedoraproject.org/projects/func/">Func</a> がおもしろそうだ。</p>
-
-<p>とりあえずどんなツールかを要約すると、</p>
-
-<ul>
-<li>複数のサーバに対して、何らかの処理を一括でまとめて実行して結果が取得できる。たとえば、yum でパッケージをインストールとか。</li>
-<li>「何らかの処理」の部分は、モジュールで拡張できる。</li>
-<li>「何らかの処理」はコマンドラインから実行して単に結果を表示、ということもできるし、Python API でプログラマブルに処理することもできる。</li>
-<li>クライアント/サーバアーキテクチャ</li>
-</ul>
-
-
-<p>これだけだと何となくわかるようでわからない。触ってみるのが一番。というわけでまずはインストール。</p>
-
-<h1>インストール</h1>
-
-<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/InstallAndSetupGuide">InstallAndSetupGuide</a> を読むと、（おそらく最近の）Fedora であれば yum 一発でインストールできるみたいだけど、手元にある CentOS 5 用のパッケージがなさそうなので、ソース RPM からパッケージをつくる。（noarch なので FC7 用でもそのまま入りそうだけど、せっかくだからつくってみる。）</p>
-
-<p>まずは <a href="https://hosted.fedoraproject.org/projects/func/wiki/FuncReleases">FuncReleases</a> から func-0.13-3.fc7.src.rpm をゲット。</p>
-
-<p>次にソース RPM からリビルドするために必要なパッケージをインストール。</p>
-
-<pre><code>$ sudo yum -y install rpm-build python-devel python-setuptools 
-</code></pre>
-
-<p>リビルドしてインストール。依存パッケージの PyOpenSSL も忘れずに。</p>
-
-<pre><code>$ sudo rpmbuild --rebuild func-0.13-3.fc7.src.rpm
-$ sudo yum -y install pyOpenSSL
-$ sudo rpm -ivh /usr/src/redhat/RPMS/noarch/func-0.13-3.noarch.rpm
-</code></pre>
-
-<p>サーバを起動する。サーバは master と呼ばれるみたい。</p>
-
-<pre><code>$ sudo /etc/init.d/certmaster start
-</code></pre>
-
-<p>次にクライアント側。クライアントは minion と呼ばれているようだ。インストール手順は master と同じなので省略。</p>
-
-<p>クライアント側では設定ファイル /etc/func/minion.conf を修正する必要がある。といっても、certmaster で master を指定してあげるだけでとりあえず OK。</p>
-
-<pre><code># configuration for minions
-
-[main]
-log_level = DEBUG
-certmaster = server.example.org
-cert_dir = /etc/pki/func
-acl_dir = /etc/func/minion-acl.d 
-</code></pre>
-
-<p>クライアント側で常駐するデーモン funcd を起動。</p>
-
-<pre><code>$ sudo /etc/init.d/funcd start   
-</code></pre>
-
-<p>master と minion の通信は SSL 証明書での認証が必要なので、master 側で証明書リクエストに対して署名を行う。（この辺りはPuppetと一緒だ。）</p>
-
-<pre><code>$ sudo certmaster-ca --list
-client.example.org
-$ sudo certmaster-ca --sign client.example.org
-</code></pre>
-
-<p>これで使うための準備はできた。</p>
-
-<h1>コマンド実行</h1>
-
-<p>master 上で func コマンドを実行する。まずは minion の一覧を表示。</p>
-
-<pre><code>$ sudo func "*" list_minions
-['https://client0.example.org:51234', 'https://client1.example.org:51234']
-client0.example.org
-client1.example.org
-0
-</code></pre>
-
-<p>www ではじまる minion だけを表示。</p>
-
-<pre><code>$ sudo func "www*" list_minions
-['https://www0.example.org:51234', 'https://www1.example.org:51234']
-www0.example.org
-www1.example.org
-0
-</code></pre>
-
-<p>各 minion で利用できるモジュールの一覧を表示。</p>
-
-<pre><code>$ sudo func "*" call system list_modules
-on https://client0.example.org:51234 running system list_modules ()
-['command', 'copyfile', 'func_module', 'hardware', 'nagios-check', 'process', 'reboot', 'rpms', 'service', 'smart', 'snmp', 'test', 'yum']
-on https://client1.example.org:51234 running system list_modules ()
-['command', 'copyfile', 'func_module', 'hardware', 'nagios-check', 'process', 'reboot', 'rpms', 'service', 'smart', 'snmp', 'test', 'yum']
-{'client0.example.org': ['command',
-                        'copyfile',
-                        'func_module',
-                        'hardware',
-                        'nagios-check',
-                        'process',
-                        'reboot',
-                        'rpms',
-                        'service',
-                        'smart',
-                        'snmp',
-                        'test',
-                        'yum'],
- 'client1.example.org': ['command',
-                        'copyfile',
-                        'func_module',
-                        'hardware',
-                        'nagios-check',
-                        'process',
-                        'reboot',
-                        'rpms',
-                        'service',
-                        'smart',
-                        'snmp',
-                        'test',
-                        'yum']}   
-</code></pre>
-
-<p>service モジュールで使えるメソッド一覧を表示。</p>
-
-<pre><code>$ sudo func "client0.example.org" call service list_methods
-on https://client0.example.org:51234 running service list_methods ()
-['status', 'reload', 'get_running', 'stop', 'start', 'inventory', 'get_enabled', 'restart', 'module_description', 'module_version', 'module_api_version', 'list_methods']
-{'client0.example.org': ['status',
-                        'reload',
-                        'get_running',
-                        'stop',
-                        'start',
-                        'inventory',
-                        'get_enabled',
-                        'restart',
-                        'module_description',
-                        'module_version',
-                        'module_api_version',
-                        'list_methods']} 
-</code></pre>
-
-<p>service モジュールの status メソッドで ntpd の起動状態を確認。以下はすべての minion で ntpd が停止してる状態での実行結果。</p>
-
-<pre><code>$ sudo func "*" call service status ntpd
-on https://client0.example.org:51234 running service status (ntpd)
-3
-on https://client1.example.org:51234 running service status (ntpd)
-3
-{'client1.example.org': 3, 'client0.example.org': 3}
-</code></pre>
-
-<p>ntpd を起動。</p>
-
-<pre><code>$ sudo func "*" call service start ntpd
-on https://client0.example.org:51234 running service start (ntpd)
-0
-on https://client1.example.org:51234 running service start (ntpd)
-0
-{'client1.example.org': 0, 'client0.example.org': 0}   
-</code></pre>
-
-<p>ntpd の起動状態を確認。</p>
-
-<pre><code>$ sudo func "*" call service status ntpd
-on https://client0.example.org:51234 running service status (ntpd)
-0
-on https://client1.example.org:51234 running service status (ntpd)
-0
-{'client1.example.org': 0, 'client0.example.org': 0}   
-</code></pre>
-
-<p>*.example.org のみをターゲットにする。</p>
-
-<pre><code>$ sudo func "*.example.org" call service status ntpd
-on https://client0.example.org:51234 running service status (ntpd)
-0
-on https://client1.example.org:51234 running service status (ntpd)
-0
-{'client1.example.org': 0, 'client0.example.org': 0}   
-</code></pre>
-
-<p>client0.example.org と client1.example.org のみをターゲットにする。</p>
-
-<pre><code>$ sudo func "client0.example.org; client1.example.org" call service status ntpd
-on https://client0.example.org:51234 running service status (ntpd)
-0
-on https://client1.example.org:51234 running service status (ntpd)
-0
-{'client1.example.org': 0, 'client0.example.org': 0}   
-</code></pre>
-
-<p>ここまで実行してみれば、何となく感じは掴めると思う。</p>
-
-<h1>モジュール</h1>
-
-<p>デフォルトで付属しているモジュールには以下のものがある。</p>
-
-<ul>
-<li>command</li>
-<li>copyfile</li>
-<li>func_module</li>
-<li>hardware</li>
-<li>nagios-check</li>
-<li>process</li>
-<li>reboot</li>
-<li>rpms</li>
-<li>service</li>
-<li>smart</li>
-<li>snmp</li>
-<li>test</li>
-<li>yum</li>
-</ul>
-
-
-<p><a href="https://hosted.fedoraproject.org/projects/func/#ListofStockModules">使い方はこの辺参照。</a></p>
-
-<p>とりあえず</p>
-
-<pre><code>$ sudo func client0.example.org system list_modules
-</code></pre>
-
-<p>で利用できるモジュールを調べて、</p>
-
-<pre><code>$sudo func client0.example.org call module list_methods
-</code></pre>
-
-<p>でモジュールで使えるメソッド一覧を表示してみると、どんなモジュールがあるか、そのモジュールはどんなことができるのか、がおおよそわかるはず。</p>
-
-<h1>モジュールの書き方</h1>
-
-<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/HowToWriteAndDistributeNewModules">ここに書かれてる。</a>これで自分が好きなように機能拡張ができる。</p>
-
-<h1>Python プログラムから呼び出し</h1>
-
-<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/PythonApiExamples">ここにサンプルがある。</a></p>
-
-<p>今後は [wiki:Func こちらの Wiki ページ] に情報まとめていく予定。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -1717,6 +1492,10 @@ on https://client1.example.org:51234 running service status (ntpd)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1730,10 +1509,6 @@ on https://client1.example.org:51234 running service status (ntpd)
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

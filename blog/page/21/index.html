@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="CustomFeed::DAAP と Filter::FetchDAAP を、enclosure サポートして他のプラグインとも連携できるように 修正してみた。 これで Filter::RewriteEnclosureURL + Publish::Feed で Podcasting したり、 &hellip;">
+  <meta name="description" content="CustomFeed::AmazonWebService で検索キーワードをたくさん指定すると、なぜか Deduped の部分でハングする。もう少し正確に言うと、新着エントリが多い場合にハングするようです。同じエントリ数でも、Deduped &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,72 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/15/410/">Deduped::SDBM_File と Deduped::GDBM_File</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-15T19:08:00+09:00" pubdate>Sep 15<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/15/410/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+CustomFeed::AmazonWebService で検索キーワードをたくさん指定すると、なぜか Deduped の部分でハングする。もう少し正確に言うと、新着エントリが多い場合にハングするようです。同じエントリ数でも、Deduped によって検知される重複エントリが多い場合にはハングしません。
+</p>
+
+
+<p>
+で、strace で追ってみても原因がわからないため、違う実装を試してみることに。
+</p>
+
+
+<p>
+まず試したのは <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Deduped/SDBM_File.pm"><span class="icon"></span>Deduped::SDBM_File</a> 。でもこれでもハングする。
+</p>
+
+
+<p>
+次に試したのは <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Deduped/GDBM_File.pm"><span class="icon"></span>Deduped::GDBM_File</a> 。これでもハング、と思いきや、strace で追うと断続的に write が出て、DB ファイルに書き込みが行われている。遅いけど。なので、しばらく待ってみると正常終了した。
+</p>
+
+
+<p>
+SDBM の方も、ハングしている様に見えて、DB ファイルのタイムスタンプは更新されていたので、GDBM と同じくしばらく待っていれば終わったかも。
+</p>
+
+
+<p>
+ただ、DB_File の方はファイルタイムスタンプは変わらないし、ファイルサイズもずっと 0 のままだった。
+</p>
+
+
+<p>
+しばらくは GDBM を使って様子を見てみます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1110,82 +1176,6 @@ gen_filename() ですが、Plagger::Util::filename_for() というものがあ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/28/297/">Filter::Audio #2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-28T23:49:00+09:00" pubdate>Aug 28<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/28/297/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-IRC #plagger-ja チャネルにて、音量や音質のノーマライズの話が出てて、「Filter::Audio で当然サポートするよね？」という声が聞こえた気がした（誰もそんなこと言ってない）ので、<a class="ext-link" href="http://sox.sourceforge.net/"><span class="icon"></span>SoX</a> で音量をノーマライズする様に <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> を修正してみた。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/247"><span class="icon"></span>trac のチェンジセットはこちら</a>。
-</p>
-
-
-<p>
-利用には当然 SoX が必要で、環境変数 PATH 内にある必要があります。やってることは単純で、
-</p>
-
-
-<pre class="wiki">
-      normalize: 1
-</pre>
-
-
-<p>
-が設定されていると、
-</p>
-
-
-<pre class="wiki">
-my $vol = `sox $converted_file_before_move -e stat -v 2&lt;&amp;1`;
-</pre>
-
-
-<p>
-で Volume Adjustment を取得して、
-</p>
-
-
-<pre class="wiki">
-system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
-</pre>
-
-
-<p>
-で音量変更してます。
-</p>
-
-
-<p>
-動いてることは確認したけど、ちゃんとノーマライズされてるかどうかは確認してないす。（今変換中。結構時間かかる。）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/22/">&larr; Older</a>
@@ -1203,6 +1193,10 @@ system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1216,10 +1210,6 @@ system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

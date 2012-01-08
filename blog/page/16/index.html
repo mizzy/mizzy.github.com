@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="略して パペウィキ 。弊社 の社内ウィキはペパウィキですが、一切関係ありません。 やはりブログは情報整理に向いてないので、ウィキで整理してみることにしました。 このブログで書いたことも、順次移していきます。（元々このブログは Trac Wiki Formatting で書いてるので、移すのが楽 &hellip;">
+  <meta name="description" content="Clouder::Blogger: html-tt - emacsのTemplate Toolkit用のmode を html-helper-mode ではなく、sgml-mode のマイナーモードで動くようにしたパッチ。（置換しただけ。） 別に sgml-mode に思い入れはなく、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,131 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/09/411/">Html-tt-mode を Sgml-mode のマイナーモードで動くようにしてみた</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-09T17:36:00+09:00" pubdate>Apr 9<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/09/411/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://clouder.jp/yoshiki/mt/archives/000377.html"><span class="icon"></span>Clouder::Blogger: html-tt - emacsのTemplate Toolkit用のmode</a> を html-helper-mode ではなく、sgml-mode のマイナーモードで動くようにしたパッチ。（置換しただけ。）
+</p>
+
+
+<p>
+別に sgml-mode に思い入れはなく、Meadow でデフォルトで動いてるからそのまま使ってるだけなので、html-helper-mode にしてもいいんだけど、どうも Meadow でうまく色づけされないので、その原因追求するよりも、sgml-mode で動くようにした方がはやかったので。
+</p>
+
+
+<p>
+本当はどっちでも動くようにするのがいいんだろうけど、それはまた今度。
+</p>
+
+
+<pre class="wiki">
+=== html-tt.el
+==================================================================
+--- html-tt.el  (revision 193)
++++ html-tt.el  (local)
+@@ -66,7 +66,7 @@
+ ;; Code:
+ 
+ (provide 'html-tt)
+-(require 'html-helper-mode)
++(require 'sgml-mode)
+ (require 'tempo)
+ (require 'font-lock)
+ 
+@@ -217,38 +217,38 @@
+ (defun html-tt-load-hook ()
+   (interactive)
+   ;; define key bind
+-  ;(define-key html-helper-mode-map "\C-cs"
++  ;(define-key sgml-mode-map "\C-cs"
+   ;  'html-tt-insert-sequence)
+-  (define-key html-helper-mode-map "\C-cs"
++  (define-key sgml-mode-map "\C-cs"
+     'tempo-template-html-tt-insert-sequence)
+-  (define-key html-helper-mode-map "\C-cd"
++  (define-key sgml-mode-map "\C-cd"
+     'html-tt-insert-directive)
+-  (define-key html-helper-mode-map "\C-cn"
++  (define-key sgml-mode-map "\C-cn"
+     'tempo-template-html-tt-insert-directive)
+-  (define-key html-helper-mode-map "\C-ci"
++  (define-key sgml-mode-map "\C-ci"
+     'tempo-template-html-tt-insert-if)
+-  (define-key html-helper-mode-map "\C-cl"
++  (define-key sgml-mode-map "\C-cl"
+     'tempo-template-html-tt-insert-elsif)
+-  (define-key html-helper-mode-map "\C-ce"
++  (define-key sgml-mode-map "\C-ce"
+     'tempo-template-html-tt-insert-else)
+-  (define-key html-helper-mode-map "\C-cf"
++  (define-key sgml-mode-map "\C-cf"
+     'tempo-template-html-tt-insert-foreach)
+-  (define-key html-helper-mode-map "\C-cw"
++  (define-key sgml-mode-map "\C-cw"
+     'tempo-template-html-tt-insert-while)
+-  (define-key html-helper-mode-map "\C-cm"
++  (define-key sgml-mode-map "\C-cm"
+     'tempo-template-html-tt-insert-switch)
+-  (define-key html-helper-mode-map "\C-cn"
++  (define-key sgml-mode-map "\C-cn"
+     'tempo-template-html-tt-insert-include)
+
+   ;; add hilit-set-mode-pattern, if use hilit19.
+   (if (featurep 'hilit19)
+-      (hilit-add-pattern "\\&#x5b;%" "%\\&#x5d;" 'midnightblue 'html-helper-mode)
++      (hilit-add-pattern "\\&#x5b;%" "%\\&#x5d;" 'midnightblue 'sgml-mode)
+     )
+ 
+   ;; set font-lock
+   (make-local-variable 'font-lock-defaults)
+   (setq html-tt-font-lock-keywords
+-   (append html-helper-font-lock-keywords html-tt-font-lock-keywords))
++   (append sgml-font-lock-keywords html-tt-font-lock-keywords))
+   (setq font-lock-defaults '(html-tt-font-lock-keywords t t))
+   ) 
+</pre>
+
+
+<p>
+.emacs での設定はこんな感じで。
+</p>
+
+
+<pre class="wiki">
+(require 'html-tt)
+(add-hook 'sgml-mode-hook 'html-tt-load-hook)
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1375,96 +1500,6 @@ sh スタイルのコメントが利用可。
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/03/18/266/">Puppet の Node 設定ではまる</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-03-18T22:10:00+09:00" pubdate>Mar 18<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/03/18/266/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul><li><a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/InstallationGuide"><span class="icon"></span>http://reductivelabs.com/trac/puppet/wiki/InstallationGuide</a></li>
-<li><a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/TestingGuide"><span class="icon"></span>http://reductivelabs.com/trac/puppet/wiki/TestingGuide</a></li>
-<li><a class="ext-link" href="http://people.redhat.com/dlutter/puppet-app.html"><span class="icon"></span>http://people.redhat.com/dlutter/puppet-app.html</a></li></ul>
-
-
-<p>
-といったあたりを読みながら puppet を試していたのですが、node の設定ではまったのでメモ。
-</p>
-
-
-<p>
-pueppt では、
-</p>
-
-
-<pre class="wiki">
-node nag.example.com {
-  include yum-rawhide
-  include horde-db-pg
-  include horde-nag
-}
-</pre>
-
-
-<p>
-といった設定でターゲットとなるホストと、そのホストでどのようなタスクを実行するかを定義できるのですが、これで puppetmasterd を実行すると、
-</p>
-
-
-<pre class="wiki">
-Syntax error at '.' at /etc/puppet/manifests/site.pp:5 
-</pre>
-
-
-<p>
-と怒られます。そこで、
-</p>
-
-
-<pre class="wiki">
-node 'nag.example.com' {
-  include yum-rawhide
-  include horde-db-pg
-  include horde-nag
-}
-</pre>
-
-
-<p>
-とクォートしてあげると OK でした。最初に挙げた URL にあるチュートリアルの例ではクォートされておらず、そのままやるとはまりますのでご注意を。
-</p>
-
-
-<p>
-<strong>追記</strong><br />
-<a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/LanguageStructures"><span class="icon"></span>Language Structures</a> を読んだら、「You can specify fully-qualified node names, but you have to single-quote the names:」ってちゃんと書いてあった。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/17/">&larr; Older</a>
@@ -1482,6 +1517,10 @@ node 'nag.example.com' {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1495,10 +1534,6 @@ node 'nag.example.com' {
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="CustomFeed::iTMS は内部で LWP::UserAgent::iTMS_Client を利用しているのですが、コンストラクタで国名を指定してもちゃんとハンドリングしてくれないので、パッチ書いた。ついでにモジュール作者にパッチ送っておいた。 --- iTMS_Client.pm. &hellip;">
+  <meta name="description" content="Google Video は Media RSS を吐くので、Aggregator::Simple を Media RSS に対応させてみた。diff はこちら。 でも、つくってから気づいたんだけど、Google Video の RSS にはちゃんと enclosure も入ってるので、別に &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/23/288/">Plagger::Plugin::Aggregator::Simple の Media RSS サポート</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-23T22:31:00+09:00" pubdate>May 23<span>rd</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/23/288/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Aggregator/Simple.pm" target="_blank">Aggregator::Simple を Media RSS に対応させてみた</a>。<a href="http://trac.mizzy.org/public/changeset/124" target="_blank">diff はこちら</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+でも、つくってから気づいたんだけど、Google Video の RSS にはちゃんと enclosure も入ってるので、別に Media RSS 対応させる必要なかった…。といっても、enclosure に入っているのは iPod 用の mpeg4 だけで、media:content 要素には他に flv, wmv, PSP 用の mpeg4 も含まれてるので、対応しておいても損ではないかな、と。
+</p>
+
+
+
+
+<p class="entryBody">
+これで <a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/GoogleVideo.pm" target="_blank">CustomFeed::GoogleVideo</a> はもう必要ないですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -769,63 +819,6 @@ YouTube の HTML が変更されていたので、<a href="http://trac.mizzy.org
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/04/30/333/">Plagger と YouTube #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-04-30T00:25:00+09:00" pubdate>Apr 30<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/04/30/333/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-宣言どおり、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/YouTube.pm" target="_blank">Plagger::Plugin::CustomFeed::YouTube</a> を作成しました。野良プラグインとして転がしときます。Publish::Gmail との組み合わせで以下の様になります。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://mizzy.org/img/youtube_plagger.jpg" target="_blank"><img src="http://mizzy.org/img/youtube_plagger_t.jpg" /></a>
-</p>
-
-
-
-
-<p class="entryBody">
-YouTube はタグ別に RSS を吐いているのですが、検索結果は RSS にはなっていません。なので、config.yaml でタグか検索かを選べるようにして、処理を分けています。また、検索クエリは UTF-8 で指定すれば日本語でも OK です。
-</p>
-
-
-
-
-<p class="entryBody">
-特定のキーワードやタグで YouTube をウォッチしたい方は、これを使うと良いかもしれませんね。ふと思いついたキーワードで検索したり、他の人がどういったキーワードで検索しているか知りたいなど、偶然の出会いを求める場合には、<a href="http://solvalou.net/" target="_blank">オオヒダさん</a> 開発の <a href="http://video.qooqle.jp" target="_blank">Qooqle Video</a> が最高です。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/27/">&larr; Older</a>
@@ -843,6 +836,10 @@ YouTube はタグ別に RSS を吐いているのですが、検索結果は RSS
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -856,10 +853,6 @@ YouTube はタグ別に RSS を吐いているのですが、検索結果は RSS
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

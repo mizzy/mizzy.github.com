@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="/etc/sudoers を LDAP で一元管理とかできないのかなぁ、と思っていたら、ちゃんと対応してた。 利用方法はわりと簡単で、上記リンクの README.LDAP （ソースに同じものが同梱されてる）を見ればすぐわかるけど、一応ここにやったことをメモ。ほとんど README からの抜粋です &hellip;">
+  <meta name="description" content="perl-ldap (Net::LDAP) のインターフェースがわかりにくくて、たまにこいつでプログラムを書こうとすると、いつもど忘れして perldoc と睨めっこするはめになるので、違うインターフェースで LDAP アクセスできるラッパモジュールを書いてます。とりあえずプロトタイプ版の &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,160 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/01/372/">Net::LDAP::Alternative</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-01T04:10:00+09:00" pubdate>Jan 1<span>st</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/01/372/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://search.cpan.org/~gbarr/perl-ldap/lib/Net/LDAP.pod"><span class="icon"></span>perl-ldap (Net::LDAP)</a> のインターフェースがわかりにくくて、たまにこいつでプログラムを書こうとすると、いつもど忘れして perldoc と睨めっこするはめになるので、違うインターフェースで LDAP アクセスできるラッパモジュールを書いてます。とりあえずプロトタイプ版の <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Net-LDAP-Alternative"><span class="icon"></span>Net::LDAP::Alternative</a> を置いておきます。まだ未完成で pod すらちゃんと書いてないですが。
+</p>
+
+
+<p>
+インターフェースがどんな風に違うかを例で示してみます。「特定の検索条件にマッチするエントリの電話番号を書き換える」という操作を、Net::LDAP で書くとこんな感じになります。
+</p>
+
+
+<pre class="wiki">
+my $ldap = Net::LDAP->new(
+    'kenny',
+    port => 389,
+);
+
+$ldap->bind(
+    'cn=Directory Manager',
+    password => 'password',
+);
+
+my $msg = $ldap->search(
+    base   => 'o=southpark',
+    filter => '(&(uid=miya)(cn=gosuke*))',
+);
+
+for my $entry ( $msg->entries ) {
+    print $entry->get_value('telephonenumber');
+    $ldap->modify(
+        $entry->dn,
+        replace => { telephonenumber => '00-0000-0000' }
+    );
+}
+</pre>
+
+
+<p>
+これを Net::LDAP::Alternative で書くとこうなります。
+</p>
+
+
+<pre class="wiki">
+my $ldap = Net::LDAP::Alternative->new({
+    host    => 'kenny',
+    port    => '389',
+    bind_dn => 'cn=Directory Manager',
+    bind_pw => 'password',
+    base    => 'o=southpark',
+});
+
+my $entries = $ldap->search({
+    uid => 'miya',
+    cn  => 'gosuke*',
+});
+
+while ( my $entry = $entries->next ) {
+    print $entry->telephonenumber;
+    $entry->telephonenumber('00-0000-0000');
+    $entry->update;
+}
+</pre>
+
+
+<p>
+Net::LDAP と特に異なる点は、
+</p>
+
+
+<ul><li>bind は明示的にしない。（コンストラクタで bind してる。）</li>
+<li>search を簡略化。LDAP 特有のフィルタ記法で書かなくて良い。</li>
+<li>検索して得られるエントリをイテレータにしてみた。</li>
+<li>エントリの属性取得のアクセサメソッドを実装。（get_value をつかわなくてよい。）</li>
+<li>エントリの属性変更もアクセサメソッド経由でできるので直感的にわかりやすい。</li></ul>
+
+
+<p>
+ってとこですね。
+</p>
+
+
+<p>
+また、1件しか検索結果が返らないことがわかっている場合は、Net::LDAP であれば
+</p>
+
+
+<pre class="wiki">
+my $msg = $ldap->search(
+    base   => 'o=southpark',
+    filter => '(&(uid=miya)(cn=gosuke*))',
+);
+
+my $entry = ($msg->entries)[0];
+</pre>
+
+
+<p>
+といった感じでエントリを取得するわけですが、Net::LDAP::Alternative では
+</p>
+
+
+<pre class="wiki">
+my $entry = $ldap->search({
+    uid => 'miya',
+    cn  => 'gosuke*',
+})->first;
+</pre>
+
+
+<p>
+といった感じでエントリ取得ができます。
+</p>
+
+
+<p>
+こんな感じで、DBIx::Class のインターフェースを参考にして、直感的にわかりやすいようにしてます。
+</p>
+
+
+<p>
+とりあえずなんとなくつくってみただけなので、これを発展させるかどうかはまだ未定。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -965,170 +1119,6 @@ CVS のことを CSV と書き間違えてて、後から指摘されて知っ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/10/18/434/">HTML::Widget::Kwalify #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-10-18T00:55:00+09:00" pubdate>Oct 18<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/10/18/434/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify"><span class="icon"></span>HTML::Widget::Kwalify</a> というものをつくってます。まだプロトタイプにもなってない感じだけど。
-</p>
-
-
-<p>
-これで <a class="ext-link" href="http://www.kuwata-lab.com/kwalify/"><span class="icon"></span>Kwalify</a> スキーマから <a class="ext-link" href="http://search.cpan.org/~cfranks/HTML-Widget/lib/HTML/Widget.pm"><span class="icon"></span>HTML::Widget</a> オブジェクトを自動生成して、Plagger のウェブインターフェースを簡単につくっちゃおう、という目論見です。
-</p>
-
-
-<pre class="wiki">
-use HTML::Widget::Kwalify;
-
-my $w = HTML::Widget::Kwalify->create_from( file => 'schema.yaml' );
-print $w->process;
-</pre>
-
-
-<p>
-みたいな感じで、schema.yaml から HTML フォームを一発で生成できます。
-</p>
-
-
-<p>
-CGI::Application ベースでサンプルをつくると、こんな感じになります。
-</p>
-
-
-<p>
-まずはディスパッチする index.cgi 。
-</p>
-
-
-<pre class="wiki">
-#!/usr/local/bin/perl
-
-use strict;
-use warnings;
-use lib './lib';
-
-use WidgetKwalify;
-
-my $w = WidgetKwalify->new;
-$w->run;
-</pre>
-
-
-<p>
-本体の lib/WidgetKwalify.pm 。
-</p>
-
-
-<pre class="wiki">
-package WidgetKwalify;
-
-use strict;
-use warnings;
-use base qw( CGI::Application );
-use HTML::Widget::Kwalify;
-use CGI::Application::Plugin::TT;
-
-our $TEMPLATE_OPTIONS = {
-    INCLUDE_PATH => '/path/to/template',
-};
-
-sub setup {
-    my $self = shift;
-
-    $self->start_mode('top');
-    $self->run_modes(
-        top => 'top',
-    );
-
-    $self->tt_config( TEMPLATE_OPTIONS => $TEMPLATE_OPTIONS );
-}
-
-sub top {
-    my $self = shift;
-
-    my $q = $self->query;
-    my $w = HTML::Widget::Kwalify->create_from( file => 'schema.yaml' );
-    return $self->tt_process(
-        'index.html',
-        { widget => $q ? $w->process($q) : $w->process }
-    );
-}
-
-1;
-</pre>
-
-
-<p>
-HTML テンプレート template/index.html 。
-</p>
-
-
-<pre class="wiki">
-&lt;table&gt;
-&#91;% FOREACH element = widget.elements %&#93;
-  &lt;tr&gt;
-    &lt;td&gt;&#91;% element.label.content.0 %&#93;:&lt;/td&gt;
-    &lt;td&gt;&#91;% element.element.as_XML %&#93;&lt;/td&gt;
-  &lt;/tr&gt;
-&#91;% END %&#93;
-&lt;/table&gt;
-</pre>
-
-
-<p>
-Plagger の example にある <a class="ext-link" href="http://plagger.org/trac/browser/trunk/plagger/examples/schema.yaml"><span class="icon"></span>schema.yaml</a> の global セクションを使ってこのサンプルを動かすと、<a class="ext-link" href="http://mizzy.org/widget/index.cgi"><span class="icon"></span>こんな感じ</a>になります。まだ type:seq の処理をちゃんとしてないので、plugin_path が変ですが、他は良い感じ。log-level もちゃんと select になってるし。
-</p>
-
-
-<p>
-これで、Plagger ホスティングウェブアプリつくれば、bloglines2gmail とか youtube2podcast とか、目的別にスキーマファイルつくるだけで、設定用フォームが自動で生成できるし、プラグイン毎にスキーマファイル用意しておいて、利用したいプラグインを選択すると、そのプラグイン用の設定フォームが自動で生成できる、といったことが可能になりますね。
-</p>
-
-
-<p>
-あと、
-</p>
-
-
-<pre class="wiki">
-$widget->process($query)->save_to( file => 'config.yaml' );
-</pre>
-
-
-<p>
-な感じで POST したフォームの内容を YAML にしてファイルに保存、とかできるようにする予定です。（他にも type: seq の処理とか、フォームバリデーション対応とか、やること山積みですが。）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/20/">&larr; Older</a>
@@ -1146,6 +1136,10 @@ $widget->process($query)->save_to( file => 'config.yaml' );
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1159,10 +1153,6 @@ $widget->process($query)->save_to( file => 'config.yaml' );
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

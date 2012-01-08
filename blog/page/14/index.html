@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="source:SVN-TracWiki/lib/SVN/TracWiki.pm NAME SVN::TracWiki - [One line description of module&#8217;s purpose here] VERSION This document describes &hellip;">
+  <meta name="description" content="SVN::TracWiki (svn repos) をアップデート。以下の機能を実現するパッチを、Assurer の開発にも参加してくれている franck が送ってくれました。 Plugin::Extract::Pod で Perl プログラムのコミット時に、pod を自動で抽出して Wiki &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,66 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/05/01/332/">SVN::TracWiki #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-05-01T00:30:00+09:00" pubdate>May 1<span>st</span>, 2007</time>
+        
+         | <a href="/blog/2007/05/01/332/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/SVN-TracWiki"><span class="icon"></span>SVN::TracWiki</a> (<a class="ext-link" href="http://svn.mizzy.org/public/SVN-TracWiki/"><span class="icon"></span>svn repos</a>) をアップデート。以下の機能を実現するパッチを、Assurer の開発にも参加してくれている <a class="ext-link" href="http://search.cpan.org/~franckc/"><span class="icon"></span>franck</a> が送ってくれました。
+</p>
+
+
+<ul><li>Plugin::Extract::Pod で Perl プログラムのコミット時に、pod を自動で抽出して Wiki にアップ。</li>
+<li>xmlrpc プラグインがなくても Wiki ポストができる。</li></ul>
+
+
+<p>
+Trac はソースコード自体の検索ができないので、当然 pod の内容も検索することができないのですが、このプラグインにより、pod の検索ができるようになります。
+</p>
+
+
+<p>
+また、検索だけではなく、<a class="ext-link" href="http://trac.mizzy.org/public/wiki/SVN-TracWiki/lib/SVN/TracWiki.pm"><span class="icon"></span>こんな感じ</a> で pod を Trac の Wiki フォーマットに変換してキレイに表示してくれます。
+</p>
+
+
+<p>
+試しに手元にあった XML::Atom をつっこんでみると、<a class="ext-link" href="http://trac.mizzy.org/public/wiki/XML-Atom-0.22/lib/XML/Atom/Server.pm"><span class="icon"></span>こんな感じ</a> になります。
+</p>
+
+
+<p>
+あと、File::Extract 内部で利用している File::MMagic::XS が謎の Segmentation Fault で落ちるので、File::MMagic を使うように強引に書き換えたり。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -213,7 +273,7 @@
 
 <h1>CO-MAINTAINER</h1>
 
-<p>Tatsuhiko Miyagawa <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#x6d;&#105;&#121;&#97;&#103;&#97;&#x77;&#x61;&#x40;&#98;&#x75;&#108;&#107;&#x6e;&#x65;&#x77;&#115;&#46;&#x6e;&#101;&#116;">&#109;&#x69;&#x79;&#x61;&#x67;&#x61;&#119;&#97;&#x40;&#98;&#x75;&#x6c;&#107;&#x6e;&#x65;&#x77;&#x73;&#46;&#110;&#x65;&#x74;</a></p>
+<p>Tatsuhiko Miyagawa <a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6d;&#x69;&#x79;&#x61;&#x67;&#x61;&#x77;&#97;&#64;&#x62;&#117;&#x6c;&#107;&#110;&#x65;&#x77;&#115;&#x2e;&#x6e;&#x65;&#x74;">&#x6d;&#x69;&#x79;&#x61;&#x67;&#x61;&#119;&#97;&#64;&#x62;&#117;&#108;&#107;&#x6e;&#x65;&#x77;&#115;&#x2e;&#110;&#x65;&#x74;</a></p>
 </div>
   
   
@@ -1070,575 +1130,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/23/docs-YAPC-Assurer-ja-public.ppt/">docs/YAPC-Assurer-ja-public.ppt</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/23/docs-YAPC-Assurer-ja-public.ppt/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>source:docs/YAPC-Assurer-ja-public.ppt</p>
-
-<pre><code> Assurer – A server testing/monitoring framework
-Gosuke Miyashita
-http://mizzy.org/
-自己紹介
-(� �)paperboy&amp;co. 所属
-最近社内に Perl 仲間が増えて喜んでます
-ペパボサービスの表や裏で動いてるAPI周りの開発がメイン（Perl
-+ Catalyst）
-…のはずが、今は技術系何でも屋。最近は勤�� 管理用ウェブアプリとかつくってる
-Assurer とは？
-Plagger ライクなサーバテスト/監視用フレー�� ワーク
-プラグインメカニズ�� 
-YAMLで��定
-assetsの��在
-Test::Base によるテスト
-元々は想定通りにサーバが構築できているか、といった単発テスト用途で開発
-テストも監視も似たようなもの�� ろう、ってことで監視もカバーすることに
-
-Assurer 名前の由来
-��み方は「アシュラ」
-Plagger っぽいツールはみんな er で終わる
-Archer by tokuhirom
-Observer by はてな（非公開）
-Dishuber by Yappo
-Precure by ふしはらかん
-テストのことを「Quality Assurance」とも言うので
-
-Assurer 実行イメージ #0
-Assurer 実行イメージ #1
-Assurer の実行フェーズ
-Assurer の実行フェーズ
-Test フェーズ
-テストを実行
-Nofity フェーズ
-テスト結果を通知
-Format フェーズ
-テスト結果を整形
-Publish フェーズ
-整形されたテスト結果を出力
-各フェーズの関連
-各フェーズ詳細
-Test フェーズ
-Test フェーズ
-テストを実行するフェーズ
-以下の様なプラグインがある
-Test::HTTP
-Test::SMTP
-Test::DBI
-Test::Ping
-他
-Test フェーズのコンフィグ
-test:
-- module: HTTP
-config:
-host: www.mizzy.org
-content: It works!
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-MISS
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-Test
-Publish
-Format
-Nofity
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-publish:
-- module: Mail
-config:
-subject: Test results from Assurer
-to: someone@example.com
-from: root@example.com
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-test:
-- module: HTTP
-config:
-host: www0.mizzy.org
-
-- module: HTTP
-config:
-host: www1.mizzy.org
-
-------------------------------------------------------------------------
-
-
-test:
-- module: HTTP
-role: web
-
-hosts:
-web:
-- www0.mizzy.org
-- www1.mizzy.org
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-format:
-- module: Text
-filter:
-module: Status
-status: ok
-
-------------------------------------------------------------------------
-
-
-notify:
-- module: IRC
-filter:
-module: Status
-status: not ok
-
-------------------------------------------------------------------------
-
-
-format:
-- module: Text
-- module: HTML
-pusblish:
-- module: Term
-filter:
-module: Type
-type: text/plain
-- module: Mail
-filter:
-module: Type
-type: text/html
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-tests: # test is right
-- module: Test::HTTP
-$ ./assurer.pl -c config.yaml
-Assurer::ConfigLoader [fatal]
-- [/] Expected required key `test‘
-- [/tests] Unexpected key `tests' at line 46
-
-------------------------------------------------------------------------
-
-
-test:
-- module: HTTP
-config:
-contents: XXX # content is right
-$ ./assurer.pl -c config.yaml
-Assurer::ConfigLoader [fatal]
-Config error in Test::HTTP
-- [/contents] Unexpected key `contents' at line 66
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-$ ./assurer.pl --shell
-assurer&gt; uptime
-[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
-</code></pre>
-
-<p>1.16, 0.17</p>
-
-<pre><code>[svn.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
-</code></pre>
-
-<p>1.16, 0.17</p>
-
-<pre><code>[ftp.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
-</code></pre>
-
-<p>1.16, 0.17</p>
-
-<pre><code>------------------------------------------------------------------------
-
-
-$ ./assurer.pl --shell --role=web
-assurer&gt; uptime
-[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
-</code></pre>
-
-<p>1.16, 0.17</p>
-
-<pre><code>------------------------------------------------------------------------
-
-
-assurer&gt; !on app1.foo.com \
-app2.foo.com do uptime
-# app1.foo.com と app2.foo.com 上でのみ実行
-assurer&gt; !on /.*\.foo\.com/ do \
-uptime
-# .*\.foo\.com にマッチするホスト上でのみ実行
-
-------------------------------------------------------------------------
-
-
-assurer&gt; !with web db do uptime
-# web ��ールと db ��ールに属するホスト上でのみ実行
-
-assurer&gt; !with /web|mail/ do uptime
-# web または mail
-にマッチする��ールに属するホスト上でのみ実行
-
-------------------------------------------------------------------------
-
-
-assurer&gt; !test HTTP
-Assurer::Plugin::Test::HTTP [info] Testing HTTP on www0.mizzy.org...
-ok 1 - HTTP status code of http://mizzy.org:80 is 200
-not ok 2 – Content of http://mizzy.org:80 matches 'It works!‘
-assurer&gt;
-
-------------------------------------------------------------------------
-
-
-assurer&gt; !test HTTP on app1.foo.com
-# 特定のホストにのみテスト実行
-assurer&gt; !test HTTP on /.*.foo.com/
-# ��規表現も OK
-assurer&gt; !test HTTP with web
-# 特定の��ールにのみテスト実行
-assurer&gt; !test HTTP with /web|mail/
-# こちらも��規表現 OK
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-$ assurer.pl --para=20
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-localhost
-test0.mizzy.org
-www0.mizzy.org
-www1.mizzy.org
-www2.mizzy.org
-test1.mizzy.org
-test2.mizzy.org
-��  ssh assurer_test.pl
-③ 結果をリターン
-② テスト実行
-
-------------------------------------------------------------------------
-
-
-exec_on:
-- host: test0.mizzy.org
-priority: 3
-- host: test1.mizzy.org
-priority: 2
-- host: test2.mizzy.org
-priority: 1
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-# assurer.pl --discover -c template.yaml
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-# $host と $mechは Assure コアで実行時にプリセットされる
-$mech-&gt;get_ok("http://$host", "got htttp://$host");
-$mech-&gt;content_contains('It works!', "Content matches 'It works!'");
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-package Assurer::Plugin::Test::HTTP;
-use base qw( Assurer::Plugin::Test );
-use Assurer::Test;
-
-sub register {
-my $self = shift;
-$self-&gt;register_tests( qw/ status content server / );
-}
-
-sub status {
-my ( $self, $context, $args ) = @_;
-... ��略
-is( $res-&gt;code, '200',
-'HTTP status code of $self-&gt;{url} is 200' );
-}
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-assurer.pl
-Assurer::bootstrap()
-Assurer::Dispatch::run()
-呼び出し
-直接実行 or
-ssh でリモート実行
-テストを実行
-テスト結果
-を返す
-呼び出し
-assurer_test.pl
-assurer_test.pl
-assurer_test.pl
-assurer_test.pl
-assurer_test.pl
-Assurer::Result
-Assurer::Result
-Assurer::Result
-Assurer::Result
-Assurer::Result
-結果オブジェクト
-生成
-次のフェーズへ
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-assurer_test.pl -–config=LS0tCmNvbmZpZzoKICBjb250ZW50OiBJ
-dCB3b3JrcyEKICBob3N0OiB3d3cubWl6enkub3JnCm1vZHVsZTogSFRUUApuYW1lOiBIVFRQIHRlc3QKcm9sZTogd2ViCg==
---context=LS0tICEhcGVybC9oYXNoOkFzc3VyZXIKYmFzZV9kaXI6IC9
-ob21lL21peWEvc3ZrL0Fzc3VyZXIKY29uZmlnOgogIGZvcm1hdDoKICAgIC0gY29uZmlnOiAmMSB7fQogICAgICBtb2R1bGU6IFRleHQKICBnbG9iYWw6CiAgICBob3N0OiB+CiAgICBpbnRlcnZhbDogMwogICAgbG9nOgogICAgICBsZXZlbDogZGVidWcKICAgIG5vX2RpYWc6IDAKICAgIHJldHJ5OiAzCiAgaG9zdHM6CiAgICBmdHA6CiAgICAgIC0gZnRwLm1penp5Lm9yZwogICAgc3ZuOgogICAgICAtIHN2bi5taXp6eS5vcmcKICAgIHdlYjoKICAgICAgLSB3d3cubWl6enkub3JnCiAgICAgIC0gc3ZuLm1penp5Lm9yZwogICAgICAtIHRyYWMubWl6enkub3JnCiAgbm90aWZ5OgogICAgLSBjb25maWc6CiAgICAgICAgYW5ub3VuY2U6IG5vdGljZQogICAgICAgIGNoYXJzZXQ6IGlzby0yMDIyLWpwCiAgICAgICAgZGFlbW9uX3BvcnQ6IDk5OTEKICAgICAgICBuaWNrbmFtZTogYXNzdXJlcmJvdAog
-... ま�� 続く
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-------------------------------------------------------------------------
-
-
-------------------------------------------------------------------------
-
-Created with pptHtml
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/15/">&larr; Older</a>
@@ -1656,6 +1147,10 @@ Created with pptHtml
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1669,10 +1164,6 @@ Created with pptHtml
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

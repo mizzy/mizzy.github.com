@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="id:tokuhirom さん作のデプロイツール Archer を最近使い始めたのですが、これがすげーいいっす。 で、この週末は更に便利に使えるように、Archer 用のプラグイン書いたりしてました。 Archer::Plugin::SVN::Log
-Archer::Plugin::SVN:: &hellip;">
+  <meta name="description" content="Assurer についてその後あんまり書いてないですが、何もしてないわけではなく、リトライをハンドリングできるようにしたり、並列実行できるようにしたりと、ちょこちょこと開発は進めています。 で、前回のエントリ で、Archer にシェルモードをつけてみたわけなんですが、シェルモードってテスト/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,62 @@ Archer::Plugin::SVN:: &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/12/484/">Assurer にシェルモード</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-12T19:56:00+09:00" pubdate>Feb 12<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/12/484/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://assurer.jp/trac"><span class="icon"></span>Assurer</a> についてその後あんまり書いてないですが、何もしてないわけではなく、リトライをハンドリングできるようにしたり、並列実行できるようにしたりと、ちょこちょこと開発は進めています。
+</p>
+
+
+<p>
+で、<a class="ext-link" href="http://mizzy.org/program/archer00.html"><span class="icon"></span>前回のエントリ</a> で、<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> にシェルモードをつけてみたわけなんですが、シェルモードってテスト/監視ツールにこそふさわしい、と思ったので、Assurer にもつけてみました。こんな感じになります。
+</p>
+
+
+<pre class="wiki">
+$ assurer.pl --config=config.yaml --shell --role=app --para=3
+shell> uptime
+[www.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[svn.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[ftp.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+shell> 
+</pre>
+
+
+<p>
+&#8211;role がなければ、config.yaml で列挙されているホスト全部で実行します。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -920,160 +975,6 @@ my $entries = $ldap->search({
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/01/372/">Net::LDAP::Alternative</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-01-01T04:10:00+09:00" pubdate>Jan 1<span>st</span>, 2007</time>
-        
-         | <a href="/blog/2007/01/01/372/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://search.cpan.org/~gbarr/perl-ldap/lib/Net/LDAP.pod"><span class="icon"></span>perl-ldap (Net::LDAP)</a> のインターフェースがわかりにくくて、たまにこいつでプログラムを書こうとすると、いつもど忘れして perldoc と睨めっこするはめになるので、違うインターフェースで LDAP アクセスできるラッパモジュールを書いてます。とりあえずプロトタイプ版の <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Net-LDAP-Alternative"><span class="icon"></span>Net::LDAP::Alternative</a> を置いておきます。まだ未完成で pod すらちゃんと書いてないですが。
-</p>
-
-
-<p>
-インターフェースがどんな風に違うかを例で示してみます。「特定の検索条件にマッチするエントリの電話番号を書き換える」という操作を、Net::LDAP で書くとこんな感じになります。
-</p>
-
-
-<pre class="wiki">
-my $ldap = Net::LDAP->new(
-    'kenny',
-    port => 389,
-);
-
-$ldap->bind(
-    'cn=Directory Manager',
-    password => 'password',
-);
-
-my $msg = $ldap->search(
-    base   => 'o=southpark',
-    filter => '(&(uid=miya)(cn=gosuke*))',
-);
-
-for my $entry ( $msg->entries ) {
-    print $entry->get_value('telephonenumber');
-    $ldap->modify(
-        $entry->dn,
-        replace => { telephonenumber => '00-0000-0000' }
-    );
-}
-</pre>
-
-
-<p>
-これを Net::LDAP::Alternative で書くとこうなります。
-</p>
-
-
-<pre class="wiki">
-my $ldap = Net::LDAP::Alternative->new({
-    host    => 'kenny',
-    port    => '389',
-    bind_dn => 'cn=Directory Manager',
-    bind_pw => 'password',
-    base    => 'o=southpark',
-});
-
-my $entries = $ldap->search({
-    uid => 'miya',
-    cn  => 'gosuke*',
-});
-
-while ( my $entry = $entries->next ) {
-    print $entry->telephonenumber;
-    $entry->telephonenumber('00-0000-0000');
-    $entry->update;
-}
-</pre>
-
-
-<p>
-Net::LDAP と特に異なる点は、
-</p>
-
-
-<ul><li>bind は明示的にしない。（コンストラクタで bind してる。）</li>
-<li>search を簡略化。LDAP 特有のフィルタ記法で書かなくて良い。</li>
-<li>検索して得られるエントリをイテレータにしてみた。</li>
-<li>エントリの属性取得のアクセサメソッドを実装。（get_value をつかわなくてよい。）</li>
-<li>エントリの属性変更もアクセサメソッド経由でできるので直感的にわかりやすい。</li></ul>
-
-
-<p>
-ってとこですね。
-</p>
-
-
-<p>
-また、1件しか検索結果が返らないことがわかっている場合は、Net::LDAP であれば
-</p>
-
-
-<pre class="wiki">
-my $msg = $ldap->search(
-    base   => 'o=southpark',
-    filter => '(&(uid=miya)(cn=gosuke*))',
-);
-
-my $entry = ($msg->entries)[0];
-</pre>
-
-
-<p>
-といった感じでエントリを取得するわけですが、Net::LDAP::Alternative では
-</p>
-
-
-<pre class="wiki">
-my $entry = $ldap->search({
-    uid => 'miya',
-    cn  => 'gosuke*',
-})->first;
-</pre>
-
-
-<p>
-といった感じでエントリ取得ができます。
-</p>
-
-
-<p>
-こんな感じで、DBIx::Class のインターフェースを参考にして、直感的にわかりやすいようにしてます。
-</p>
-
-
-<p>
-とりあえずなんとなくつくってみただけなので、これを発展させるかどうかはまだ未定。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -1091,6 +992,10 @@ my $entry = $ldap->search({
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1104,10 +1009,6 @@ my $entry = $ldap->search({
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

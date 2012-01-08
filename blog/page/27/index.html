@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="既に誰かが作ってそうだと思ったけど、見つからなかったので作ってみた。Plagger::Plugin::CustomFeed::YajiumaWatch プログラム内の文字コードが UTF-8 だと、正規表現でうまくマッチしなかったので、無理やり euc-jp で。なので encode/ &hellip;">
+  <meta name="description" content="宣言どおり、Plagger::Plugin::CustomFeed::YouTube を作成しました。野良プラグインとして転がしときます。Publish::Gmail との組み合わせで以下の様になります。 YouTube はタグ別に RSS を吐いているのですが、検索結果は RSS &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/04/30/333/">Plagger と YouTube #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-04-30T00:25:00+09:00" pubdate>Apr 30<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/04/30/333/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+宣言どおり、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/YouTube.pm" target="_blank">Plagger::Plugin::CustomFeed::YouTube</a> を作成しました。野良プラグインとして転がしときます。Publish::Gmail との組み合わせで以下の様になります。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/img/youtube_plagger.jpg" target="_blank"><img src="http://mizzy.org/img/youtube_plagger_t.jpg" /></a>
+</p>
+
+
+
+
+<p class="entryBody">
+YouTube はタグ別に RSS を吐いているのですが、検索結果は RSS にはなっていません。なので、config.yaml でタグか検索かを選べるようにして、処理を分けています。また、検索クエリは UTF-8 で指定すれば日本語でも OK です。
+</p>
+
+
+
+
+<p class="entryBody">
+特定のキーワードやタグで YouTube をウォッチしたい方は、これを使うと良いかもしれませんね。ふと思いついたキーワードで検索したり、他の人がどういったキーワードで検索しているか知りたいなど、偶然の出会いを求める場合には、<a href="http://solvalou.net/" target="_blank">オオヒダさん</a> 開発の <a href="http://video.qooqle.jp" target="_blank">Qooqle Video</a> が最高です。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -693,72 +750,6 @@ Publish::MTWidget で MTのサイドバーに表示するとこんな感じ。�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/03/27/427/">DBIx::Class のカスタム JOIN ではまる</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-03-27T12:42:00+09:00" pubdate>Mar 27<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/03/27/427/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://search.cpan.org/~mstrout/DBIx-Class-0.06000/lib/DBIx/Class/ResultSet.pm#from" target="_blank">DBIx::Class::ResultSet の from メソッドの説明</a> にしたがって、カスタム JOIN を試みるものの、どうしても join type が指定できない、という現象にはまる。 
-</p>
-
-
-
-
-<p class="entryBody">
-ドキュメント上では -join-type => &#8216;inner|left|right&#8217; って書いてあって、この通りに記述してるのに、全然指定通りの JOIN ができない。で、色々ソース眺めてたら、DBIx::Class::ResultSource のソースにこんな記述が。
-</p>
-
-
-
-
-<pre class="code">
-return [ { $as => $self->related_source($join)->from,
-           <strong>-join_type => $type</strong> }
-         $self->resolve_condition($rel_info->{cond}, $as, $alias) ];
-</pre>
-
-
-
-
-<p class="entryBody">
--join-type じゃなくて -join_type かよ！これで 3,4 時間無駄にしました…。-join_type に変えたらうまくいきましたよ。
-</p>
-
-
-
-
-<p class="entryBody">
-自分の様な犠牲者をこれ以上出さないために、Matt S Trout にドキュメントなおしといてね、とメールしておきました。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/28/">&larr; Older</a>
@@ -776,6 +767,10 @@ return [ { $as => $self->related_source($join)->from,
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -789,10 +784,6 @@ return [ { $as => $self->related_source($join)->from,
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

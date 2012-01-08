@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="
-Filter::Audio を色々修正しました。機能追加ではなくあくまでも修正です。うまく動かないところとかあったので。trac のチェンジセットはこちら。 #plagger-ja にて課せられた（と勝手に自分が思っている）宿題 音量/音質の均一化 ">
+  <meta name="description" content="IRC #plagger-ja チャネルにて、音量や音質のノーマライズの話が出てて、「Filter::Audio で当然サポートするよね？」という声が聞こえた気がした（誰もそんなこと言ってない）ので、SoX で音量をノーマライズする様に Filter::Audio を修正してみた。trac &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,82 @@ Filter::Audio を色々修正しました。機能追加ではなくあくまで
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/28/297/">Filter::Audio #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-28T23:49:00+09:00" pubdate>Aug 28<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/28/297/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+IRC #plagger-ja チャネルにて、音量や音質のノーマライズの話が出てて、「Filter::Audio で当然サポートするよね？」という声が聞こえた気がした（誰もそんなこと言ってない）ので、<a class="ext-link" href="http://sox.sourceforge.net/"><span class="icon"></span>SoX</a> で音量をノーマライズする様に <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> を修正してみた。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/247"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+利用には当然 SoX が必要で、環境変数 PATH 内にある必要があります。やってることは単純で、
+</p>
+
+
+<pre class="wiki">
+      normalize: 1
+</pre>
+
+
+<p>
+が設定されていると、
+</p>
+
+
+<pre class="wiki">
+my $vol = `sox $converted_file_before_move -e stat -v 2&lt;&amp;1`;
+</pre>
+
+
+<p>
+で Volume Adjustment を取得して、
+</p>
+
+
+<pre class="wiki">
+system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
+</pre>
+
+
+<p>
+で音量変更してます。
+</p>
+
+
+<p>
+動いてることは確認したけど、ちゃんとノーマライズされてるかどうかは確認してないす。（今変換中。結構時間かかる。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -877,89 +952,6 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/22/258/">Plagger で Amazon2iCal の Patch</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-22T00:35:00+09:00" pubdate>Aug 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/22/258/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://d.hatena.ne.jp/wata_d/20060821/1156113214"><span class="icon"></span>ベイダー日記 - Amazon2iCal</a> を見て、そうそう、これやりたかったんだよねー、ということで、早速プラグインを頂いて試してみたのですが、いくつかこちらの環境でうまく動かなかったところがあったので、パッチを晒してみます。具体的な修正点は以下の通り。
-</p>
-
-
-<ul><li>プラグインのフェーズを customfeed.handle から subscription.load へ</li>
-<li>日本語の検索がうまく動かなかったので、 $keyword を encode するようにした</li>
-<li>日付がうまくとれなかった場合に next で次のループへ</li></ul>
-
-
-<p>
-<del>でも、日本語の混じった iCalデータ を Google Calendar へインポートしようとするとエラーが出るな…</del> 正確にはインポートではなくて、Other Calendars で iCal ファイルの URL を指定した場合、のことだったのですが、いま試したらちゃんと反映されてました。なんだったんだろう？
-</p>
-
-
-<pre class="wiki">
---- AmazonSearch.pm.org 2006-08-22 00:16:35.000000000 +0900
-+++ AmazonSearch.pm 2006-08-22 00:15:16.000000000 +0900
-@@ -3,12 +3,13 @@
- use base qw( Plagger::Plugin );
- use Net::Amazon;
- use Net::Amazon::Request::Keyword;
-+use Encode;
- 
- sub register {
-     my($self, $context) = @_;
-     $context->register_hook(
-         $self,
--        'customfeed.handle' => \&amp;aggregate,
-+        'subscription.load' => \&amp;aggregate,
-     );
- }
- 
-@@ -32,6 +33,7 @@
-         locale    => $self->conf->{locale},
-     );
- 
-+    $keyword = encode('UTF-8', $keyword);
-     my $req = Net::Amazon::Request::Keyword->new(
-         keyword => $keyword,
-         mode    => $self->conf->{mode},
-@@ -53,6 +55,7 @@
- 
-         my $date = Plagger::Date->strptime("%Y/%m/%d", $prop->ReleaseDate);
-            $date = Plagger::Date->strptime("%Y/%m", $prop->ReleaseDate) unless $date;
-+        next unless $date;
-         $e->date($date);
- 
-         my $d = $date - $dt;
-</pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -977,6 +969,10 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -990,10 +986,6 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

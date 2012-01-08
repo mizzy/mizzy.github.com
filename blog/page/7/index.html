@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ペパボでは以下の2つのサービスで開発者を募集中です。 Color Me Shop!pro
-30days Album 併せて開発アルバイトも募集中です。 詳しくは募集要項をご確認ください。 募集要項にはありませんが、採用された方にはドクターペッパーチェリーを差し上げます。合い言葉は「 &hellip;">
+  <meta name="description" content="ひとつ目は ペパボでの Perl のつかいかた 。id:hiboma と一緒にプレゼンしました。お兄さん、ネタに使わせてもらってすみません＆ありがとうございました。後半のロリポの話は、二人で休日も返上してがっつり取り組んだプロジェクトだったので、ぜひ二人で発表したい、と思い、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,54 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/09/11/YapcAsia2009TokyoPresentation/">YapcAsia2009TokyoPresentation</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-09-11T00:21:28+09:00" pubdate>Sep 11<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/09/11/YapcAsia2009TokyoPresentation/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ひとつ目は <a href="http://conferences.yapcasia.org/ya2009/talk/2166">ペパボでの Perl のつかいかた</a> 。<a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a> と一緒にプレゼンしました。<a href="http://d.hatena.ne.jp/naoya/">お兄さん</a>、ネタに使わせてもらってすみません＆ありがとうございました。後半のロリポの話は、二人で休日も返上してがっつり取り組んだプロジェクトだったので、ぜひ二人で発表したい、と思い、一緒にやらせてもらいました。資料の最新版は id:hiboma が持ってるので、そのうちアップしてくれると思います。</p>
+
+<p>ふたつ目は <a href="http://conferences.yapcasia.org/ya2009/talk/2220">Danga::Socketの非同期処理の仕組みとPerlbalで非同期処理するプラグインを書く方法</a> 。<a href="http://www.slideshare.net/mizzy/how-dangasocket-handles-asynchronous-processing-and-how-to-write-asynchronous-perlbal-plugins">英語版資料</a> と <a href="http://www.slideshare.net/mizzy/dangasocketperlbal">日本語版資料</a> を slideshare にアップしています。</p>
+
+<p>また、プラグインのコードは、プレゼン中は概要しか紹介できなかったので、実際に動くサンプルを <a href="http://github.com/mizzy/perlbal-async-plugin-example/tree/master">github にアップ</a>しています。Perlbal::ClientProxy のパッチと設定ファイルも合わせて置いてあります。</p>
+
+<p>ただ、プレゼンした手法は、以下の点でとても実用的とは言えません。</p>
+
+<ul>
+<li>本体に手を入れなければいけない</li>
+<li>特定の hook にしか対応してない</li>
+<li>同じフックで複数の非同期処理プラグインを動かすことができない</li>
+</ul>
+
+
+<p>本体に手を入れるのはしかたないとして、特定のフックに依存せずに、同じフックで複数の非同期処理プラグインを動かせるようするにはどうすればいいのか、今のところノーアイデアです。これがすっきりできるように実装できれば、ぜひパッチを送りたいところなのですが、今のところ必要に駆られてないので、たぶんやらないと思います。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1174,203 +1221,6 @@ total size is 682  speedup is 0.59
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/01/13/SetupRemedie/">SetupRemedie</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-01-13T14:05:45+09:00" pubdate>Jan 13<span>th</span>, 2009</time>
-        
-         | <a href="/blog/2009/01/13/SetupRemedie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>overlast さんの<a href="http://overlasting.dyndns.org/2009-01-07-1.html">これから15分で Remedie を始めるための資料</a> に触発されて書いてみました。こっちは CPAN モジュールをインストールする時間も入れて15分。ただし限定された環境のみ。</p>
-
-<p>Remedie 用に CPAN モジュールの RPM パッケージ作ったので、これプラス Puppet を利用します。ただし、RPM パッケージを CentOS 5 x86_64 でビルドしてるので、この環境限定。<a href="http://svn.mizzy.org/public/yum/SRPMS/">SRPM</a> はあるので、他の環境の方はこいつをビルドして使ってください。</p>
-
-<p>まずは Puppet をインストールするための yum リポジトリ設定。以下の内容で /etc/yum.repos.d/dlutter.repo を作成。</p>
-
-<pre><code>[dlutter]
-name=lutter
-baseurl=http://people.redhat.com/dlutter/yum/rhel/$releasever/$basearch/
-enabled=1
-gpgcheck=0
-</code></pre>
-
-<p>Puppet のインストール。</p>
-
-<pre><code># yum -y install puppet-server
-</code></pre>
-
-<p>Puppet で署名するのはだるいので、以下の内容で /etc/puppet/autosign.conf を作成。</p>
-
-<p>*</p>
-
-<p>/etc/puppet/manifests ディレクトリを作成。</p>
-
-<pre><code># mkdir /etc/puppet/manifests
-</code></pre>
-
-<p>以下の内容の /etc/puppet/manifests/site.pp を作成。</p>
-
-<pre><code>node default {
-
-  yumrepo {
-    'mizzy':
-      baseurl  =&gt; 'http://svn.mizzy.org/public/yum/RPMS/centos/$releasever/$basearch/',
-      enabled  =&gt; 1,
-      gpgcheck =&gt; 0;
-    'dag':
-      baseurl  =&gt; 'http://ftp.riken.jp/Linux/dag/redhat/el$releasever/en/$basearch/dag/',
-      enabled  =&gt; 1,
-      gpgcheck =&gt; 0;
-    'updates':
-      exclude =&gt; 'perl';
-    'extras':
-      exclude =&gt; 'perl';
-  }
-
-  Package {
-    require =&gt; [ Yumrepo['mizzy'], Yumrepo['dag'], Yumrepo['updates'], Yumrepo[extras] ],
-  }  
-
-  package {
-    'git':
-      ensure =&gt; present;
-    'perl':
-      ensure =&gt; '5.8.8-15.1';
-    'perl-Moose':
-      ensure =&gt; present;
-    'perl-Class-C3':
-      ensure =&gt; present;
-    'perl-Sub-Name':
-      ensure =&gt; present;
-    'perl-Devel-GlobalDestruction':
-      ensure =&gt; present;
-    'perl-Rose-DB':
-      ensure =&gt; present;
-    'perl-Rose-DB-Object':
-      ensure =&gt; present;
-    'perl-DateTime-TimeZone':
-      ensure =&gt; '0.8301-8';
-    'perl-MooseX-Types-Path-Class':
-      ensure =&gt; present;
-    'perl-DBD-SQLite':
-      ensure =&gt; present;
-    'perl-FindBin-libs':
-      ensure =&gt; present;
-    'perl-HTTP-Engine':
-      ensure =&gt; present;
-    'perl-MIME-Types':
-      ensure =&gt; present;
-    'perl-Path-Class-URI':
-      ensure =&gt; present;
-    'perl-String-CamelCase':
-      ensure =&gt; present;
-    'perl-Log-Dispatch':
-      ensure =&gt; present;
-    'perl-JSON-XS':
-      ensure =&gt; present;
-    'perl-MooseX-Getopt':
-      ensure =&gt; present;
-    'perl-MooseX-ConfigFromFile':
-      ensure =&gt; present;
-    'perl-File-Find-Rule':
-      ensure =&gt; present;
-    'perl-UNIVERSAL-require':
-      ensure =&gt; present;
-    'perl-Class-Accessor':
-      ensure =&gt; present;
-    'perl-DateTime-Format-Strptime':
-      ensure =&gt; present;
-    'perl-Feed-Find':
-      ensure =&gt; present;
-    'perl-Class-ErrorHandler':
-      ensure =&gt; present;
-    'perl-XML-Atom':
-      ensure =&gt; present;
-    'perl-XML-XPath':
-      ensure =&gt; present;
-    'perl-XML-Feed':
-      ensure =&gt; present;
-    'perl-Template-Toolkit':
-      ensure =&gt; present;
-    'perl-DateTime-Format-ISO8601':
-      ensure =&gt; present;
-    'perl-MooseX-ClassAttribute':
-      ensure =&gt; present;
-    'perl-XML-OPML-LibXML':
-      ensure =&gt; present;
-    'perl-File-Find-Rule-Filesys-Virtual':
-      ensure =&gt; present;
-    'perl-HTTP-Response-Encoding':
-      ensure =&gt; present;
-    'perl-HTML-ResolveLink':
-      ensure =&gt; present;
-    'perl-HTML-Selector-XPath':
-      ensure =&gt; present;
-    'perl-HTML-TreeBuilder-XPath':
-      ensure =&gt; present;
-    'perl-YAML':
-      ensure =&gt; present;
-    'perl-YAML-Syck':
-      ensure =&gt; present;
-    'perl-HTML-Scrubber':
-      ensure =&gt; present;
-    'perl-Image-Info':
-      ensure =&gt; present;
-    'perl-Text-Tags':
-      ensure =&gt; present;
-    'perl-XML-RSS-LibXML':
-      ensure =&gt; present;
-    'perl-Web-Scraper':
-      ensure =&gt; present;
-  }
-
-}
-</code></pre>
-
-<p>puppetmasterd を起動。</p>
-
-<pre><code># puppetmasterd --verbose --no-daemonize
-</code></pre>
-
-<p>puppetd を起動して、マニフェストを適用。注意点としては、localhost とかではなく、きちんと FQDN で指定すること。（puppetmasterd 初回起動時に自動作成される証明書中の CN と &#8211;server で指定するサーバ名が一致してないと怒られる。）</p>
-
-<pre><code># puppetd --server host.example.org --verbose --no-daemonize
-</code></pre>
-
-<p>このままログを見ながらしばらく待つ。完了したら Remedie を github.com から取得して起動。</p>
-
-<pre><code># git clone git://github.com/miyagawa/remedie.git
-# cd remedie
-# perl -Ilib -MRemedie::DB::Schema -e 'Remedie::DB::Schema-&gt;install'
-# ./bin/remedie-server.pl
-</code></pre>
-
-<p>自分でやったら10分ぐらいで終わった。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -1388,6 +1238,10 @@ gpgcheck=0
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1401,10 +1255,6 @@ gpgcheck=0
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

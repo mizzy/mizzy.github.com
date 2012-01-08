@@ -9,8 +9,9 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="現在のページに表示されているエントリのタイトルが一目で分かる様にしたいな、ってことで、
-entries_in_this_pageプラグインというものを作ってみました。左メニューの「entries in this page」の様に表示されます。 プラグインの中身自体は非常に単純で、 &hellip;">
+  <meta name="description" content="blosxomのエントリをRastで検索するためのプラグイン、rastプラグインを修正しました。修正点は以下の通りです。 検索インデックスを作る際、ファイルの内容からタグを消去するようにした。
+Rast->createでpreserve_text => 1を指定する様にした。
+検索結果表示の際、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +74,59 @@ entries_in_this_pageプラグインというものを作ってみました。左
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/03/501/">Blosxom + Rast #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-03T19:24:00+09:00" pubdate>May 3<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/03/501/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+blosxomのエントリを<a href="http://www.netlab.jp/rast/" target="_blank">Rast</a>で検索するためのプラグイン、<a href="/archives/rast" target="_blank">rastプラグイン</a>を修正しました。修正点は以下の通りです。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>検索インデックスを作る際、ファイルの内容からタグを消去するようにした。</li>
+<li>Rast->createでpreserve_text => 1を指定する様にした。</li>
+<li>検索結果表示の際、今まではヒットしたエントリの内容を全て表示していたが、検索語の周辺のテキストのみ表示する様にした。（これはRastが元々持っている機能を使ってます。）</li>
+<li>検索結果表示の際、検索語を強調表示するようにした。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+どんな感じで表示されるかご覧になりたい方は、左メニューの「search」から検索してみて下さい。これでだいぶ実用的になってきた気がする。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -955,91 +1009,6 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/23/264/">ソーシャルブックマークのRSSをブラウザのブックマークに取り込む #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-23T15:54:00+09:00" pubdate>Apr 23<span>rd</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/23/264/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://d.hatena.ne.jp/naoya/" target="_blank">はてなのnaoyaさん</a>が<a href="http://b.hatena.ne.jp/naoya/" target="_blank">naoyaのブックマーク</a>にて、「del.icio.us の RSS をブックマークのお気に入りに取り込めるようにしたいなあ。」と呟いていたのを見て、こんなものを作ってみた。（naoyaさんが考えているものと違うかもしれませんが。もしかしてはてなブックマークのお気に入りのこと？）
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://mizzy.org/rss2xbel/index.cgi" target="_blank">RSSをXBELに変換するゲートウェイ</a>と<a href="/archives/rss2xbel.tar.gz">そのソース</a>。
-</p>
-
-
-
-
-<p class="entryBody">
-使い方は簡単で、フォームにソーシャルブックマークのRSSフィードURLを入力してsubmitすると、XBELに変換されたものが表示されます。
-</p>
-
-
-
-
-<p class="entryBody">
-で、これをXBELに対応したインポートツールで取り込めばOK、って感じです。Mozilla Firefoxであれば、<a href="http://extensionroom.mozdev.org/more-info/booksync" target="_blank">Bookmarks Synchronizer</a>というextensionがあります。(FTPと書いてますが、HTTP/HTTPSも対応してます。）このextensionでsubmit後のURLを設定しておけば、ブラウザを起動するたびに、指定したRSSフィードをブックマークにインポートしてくれます。試しに<a href="http://del.icio.us/rss/popular/" target="_blank">del.icio.us/popular</a>をインポートしみると、以下の様になりました。
-</p>
-
-
-
-
-<p class="entryBody">
-<img src="/img/rss2xbel.jpg" alt="rss2xbel firefox sidebar" />
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://antipop.zapto.org/mt/" target="_blank">antipop2.0のけんたろさん</a>が作成された<a href="http://antipop.zapto.org/mt/archives/001278.php" target="_blank">Alpha Geek Tracker</a>も試しにインポートしてみたのですが、途中までは取り込めたものの、データ量が多すぎるためか、Bookmarks Synchronizerが途中でハングしてしまいました…
-</p>
-
-
-
-
-<p class="entryBody">
-試しに作ってみただけなので、現段階では単一のRSSフィードしか扱えませんが、次は複数のRSSフィードをフォルダ分けしてXBELに変換する、という機能の追加を考えてます。
-</p>
-
-
-
-
-<p class="entryBody">
-でも、FirefoxだとLive BookmarksでRSSを直接ブックマークに取り込めるから、XBELに変換する意味がないと今気づいた…
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/39/">&larr; Older</a>
@@ -1057,6 +1026,10 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1070,10 +1043,6 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ptexlive のビルドに必要なパッケージインストール用 Puppet マニフェスト package { 'xz': ensure =&gt; present; 'libXt-devel': ensure =&gt; present; 'libXaw-devel': ensure =&gt; &hellip;">
+  <meta name="description" content="構文解析をちゃんと学ばないとなー、と前々から思いつつしばらく放置だったけど、なんとなくやる気になったのでやってみる。 ZIGOROu さんの Parse::Yapp ヨチヨチ歩き で Parse::Yapp の使い方を学びつつ、Rubyソースコード完全解説 第9章 速習yacc &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,148 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/02/17/JSONParserWithParseYapp/">JSONParserWithParseYapp</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-02-17T00:28:16+09:00" pubdate>Feb 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/02/17/JSONParserWithParseYapp/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>構文解析をちゃんと学ばないとなー、と前々から思いつつしばらく放置だったけど、なんとなくやる気になったのでやってみる。</p>
+
+<p><a href="http://twitter.com/zigorou">ZIGOROu</a> さんの <a href="http://d.hatena.ne.jp/ZIGOROu/20080422/1208849930">Parse::Yapp ヨチヨチ歩き</a> で <a href="http://search.cpan.org/~fdesar/Parse-Yapp/lib/Parse/Yapp.pm">Parse::Yapp</a> の使い方を学びつつ、<a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> でパーサの書き方の基礎がなんとなくわかった気になり、でも実際は自分で書いてみなきゃわからん、ってことで、<a href="http://twitter.com/hakobe">hakobe</a> さんの <a href="http://d.hatena.ne.jp/hakobe932/20090130/1233327296">Parse::RecDescentでJSONをパース</a> を参考に、Parse::Yapp で JSON パーサを書いてみることにした。</p>
+
+<p>パーサ＋スキャナは以下のような感じ。</p>
+
+<pre><code>#!perl
+%{
+use strict;
+use warnings;
+%}
+%%
+JSON       : value
+           ;
+value      : atom
+           | number
+           | string
+           | '[' array             { return $_[2] }
+           | '{' object            { return $_[2] }
+           ;
+array      : ']'                   { return [] }
+           | ',' ']'               { return [] }
+           | element array_cdr     { unshift @{$_[2]}, $_[1];return $_[2] }
+           ;
+array_cdr  : ']'                   { return [] }
+           | ',' ']'               { return [] }
+           | ',' element array_cdr { unshift @{$_[3]}, $_[2];return $_[3] }
+           ;
+element    : value
+           ;
+object     : '}'                   { return {} }
+           | ',' '}'               { return {} }
+           | member object_cdr     { return { %{ $_[2] }, %{ $_[1] } } }
+           ;
+object_cdr : '}'                   { return {} }
+           | ',' '}'               { return {} }
+           | ',' member object_cdr { return { %{ $_[3] }, %{ $_[2] } } }
+           ;
+member     : key ':' value         { return { $_[1] =&gt; $_[3] } }
+           ;
+key        : string
+           | identifier
+           ;
+%%
+sub yyerror {}
+
+sub yylex {
+    my ( $self ) = @_;
+    my $number = qr/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]\d+)?/;
+    my $double_quoted_string = qr/
+            ^"([^\x00-\x1f\"\\]*
+            (?:\\(?:[\"\\\/bfnrt]|u[0-9a-fA-F]{4})
+            [^\x00-\x1f\"\\]*)*)"
+        /xms;
+    my $single_quoted_string = qr/
+            ^'([^\x00-\x1f\'\\]*
+            (?:\\(?:[\'\\\/bfnrt]|u[0-9a-fA-F]{4})
+            [^\x00-\x1f\'\\]*)*)'
+        /xms;
+
+    for ( $self-&gt;YYData-&gt;{INPUT} ) {
+        s|\s+||;
+        s|^($number)||                and return ('number', $1);
+        s/^(true|false|null)//        and return ('atom', $1);
+        s|^([_a-zA-Z][_a-zA-Z0-9]*)|| and return ('identifier', $1);
+        s|$double_quoted_string||     and return ('string', $1);
+        s|$single_quoted_string||     and return ('string', $1);
+        s|^(.)||                      and return ($1, $1);
+    }
+    return ('', undef);
+}
+
+sub run {
+    my $self = shift;
+    return $self-&gt;YYParse( yylex =&gt; \&amp;yylex, yyerror =&gt; \&amp;yyerror );
+}
+</code></pre>
+
+<p>こいつを yapp コマンドにかけるとパーサモジュールができる。</p>
+
+<pre><code>#!sh
+$ yapp -m JSONParser json.yp
+</code></pre>
+
+<p>このモジュールを使ってパースしてみる。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Test::More qw(no_plan);
+use JSONParser;
+
+my $parser = JSONParser-&gt;new;
+$parser-&gt;YYData-&gt;{INPUT} = q{[
+        'Mercury',
+        "Venus",
+        ["Earth", ['Moon']],
+        ['Mars', ["Phobos", 'Deimos']],
+        ['Jupiter',["Io", 'Europa', "Ganymede", 'Callisto']]
+]};
+my $result = $parser-&gt;run;
+
+is_deeply($result, ['Mercury', "Venus", ["Earth", ['Moon']], ['Mars', ["Phobos", 'Deimos']], ['Jupiter',["Io", 'Europa', "Ganymede", 'Callisto']]]);
+</code></pre>
+
+<p>うん、なんとなくわかってきた気がする。</p>
+
+<p><a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> の中で「客観的に見てもこの分野に関しては一番わかりやすい本」とオススメされていた<a href="http://www.amazon.co.jp/dp/4756137091">Rubyを256倍使うための本 無道編</a> も買ってみた。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -969,132 +1111,6 @@ staprun:remove_module:205 Module simple removed.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/03/25/DevOps/">DevOps</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-03-25T10:18:35+09:00" pubdate>Mar 25<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/03/25/DevOps/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/">DevOps: Why Silos Suck And How To Break Them</a> というエントリをたまたま目にして、「DevOps」という見なれない言葉が出てきたので、気になって調べてみたところ、自分が何となくやっていたことや、今までもやもやと考えていたことに一定の方向性が与えらえた気がしたので、整理してみることにします。</p>
-
-<hr />
-
-<h1>DevOps とは？</h1>
-
-<p>簡単に言ってしまうと<em>「開発者と運用者の間の壁を取り払うためのベストプラクティス」</em>と言えそうです。</p>
-
-<hr />
-
-<h1>開発者と運用者の間の壁？</h1>
-
-<p>Flickr の中の人による <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr">10+ Deploys Per Day: Dev and Ops Cooperation at Flickr</a> という Velocity 2009 でのプレゼンスライドには「Devs versus Ops」という章があり、以下のような言葉が載っていました。</p>
-
-<p>  &#8220;It&#8217;s not my machines, it&#8217;s your code!&#8221;</p>
-
-<p>「それは俺のマシンじゃないし、お前のコードだろ」って感じでしょうか。実際、開発者と運用者が明確に分かれている組織では、多かれ少なかれ、また、ニュアンスや詳細は違うでしょうが、こういった言葉が交わされることがあるのではないでしょうか。これは開発者と運用者だけではなく、ウェブ開発者とサーバエンジニア、フロントエンジニアとバックエンドエンジニア、といった形で、明確に役割分担されている組織では起こりうる問題であり、これにより開発がスケジュールから大幅に遅れたり、トラブルがなかなか解決しない、といったような事態を招くこともあるんじゃないかと思います。</p>
-
-<p>また、上記スライドでは以下のような考えを「伝統的な考え」と述べています。</p>
-
-<ul>
-<li>開発者の仕事は新しい機能を追加すること</li>
-<li>運用者の仕事はサイトを速くて安定した状態に保つこと</li>
-</ul>
-
-
-<p>そして、「運用者の仕事はサイトを速くて安定した状態に保つこと<em>ではない<em>&#8216;」とし、「ビジネスには変化が必要」であり、&#8221;&#8217;「安定性をとって変化を捨てる」&#8221;&#8217;か&#8217;</em>「必要に応じて変化が起こることを許容する」</em>か、といった選択肢を提示しています。</p>
-
-<hr />
-
-<h1>どうやってその壁を取り除くのか</h1>
-
-<p>では、このような開発者と運用者（あるいはウェブ開発者とサーバエンジニアなど、自身の置かれた状況に置き変えてみてください）の壁を取り払うためには、どうすればいいのでしょうか。上で見たように、壁の原因は<em>「運用者の仕事はサイトを速くて安定した状態に保つこと」<em>&#8216;という伝統的な考えにありそうです。（これは別に運用者が悪い、と言っているわけではありません。）そして、提示された選択肢のうちの後者&#8217;</em>「必要に応じて変化が起こることを許容する」</em>ことが容易に実現できるようにすることが大事なのではないかと考えられます。これを実現するために重要なことは、</p>
-
-<ul>
-<li>ツール</li>
-<li>文化</li>
-</ul>
-
-
-<p>の2つに分けることができそうです。</p>
-
-<hr />
-
-<h1>ツール</h1>
-
-<p>「10+ Deploys Per Day: Dev and Ops Cooperation at Flick」では、ツールとして以下のようなものをあげています。</p>
-
-<ul>
-<li>インフラの自動化</li>
-<li>共有されたバージョンコントロール</li>
-<li>ワンステップビルド＆デプロイ</li>
-<li>機能フラグ</li>
-<li>メトリックの共有</li>
-<li>IRC and IM robots</li>
-</ul>
-
-
-<p>ひとつひとつの解説は省略しますが、いずれも状態やその変化を記録、可視化し、変更しやすい、あるいは変更をコントロールしやすい環境をつくるためのツール、と言えそうです。</p>
-
-<hr />
-
-<h1>文化</h1>
-
-<p>また、文化としては以下のような項目を挙げています。</p>
-
-<ul>
-<li>尊敬</li>
-<li>信頼</li>
-<li>失敗を許容する</li>
-<li>責めない</li>
-</ul>
-
-
-<p>まあこれは、人と協調して仕事をスムーズに進めるためにはどれも重要なことですよね。</p>
-
-<hr />
-
-<p>以上が DevOps について、自分なりに得たことのまとめです。ツールについては、自分がペパボに入社してから導入や利用促進してきたもの、これから導入したいと思っているものなんかが、軒並み上のリストに含まれていて、DevOps の概念が頭にあったわけではないんですが、思いがけずそういう方向に行こうとしていたんだな、ということがこの言葉に出会うことによって確認できました。（それでエントリのタイトルがあんな感じになってます。）</p>
-
-<p>DevOps 自体まだ定義として固まっているものではないようですし、かなり端折った形でまとめましたので、興味がある方は自分が参考にした以下のURLや、更にそこからのリンクを辿ってみてください。</p>
-
-<ul>
-<li>参考URL
-
-<ul>
-<li>http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/</li>
-<li>http://dev2ops.org/blog/2010/2/22/what-is-devops.html</li>
-<li>http://code.google.com/p/devops-toolchain/</li>
-<li>http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr</li>
-</ul>
-</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1112,6 +1128,10 @@ staprun:remove_module:205 Module simple removed.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1125,10 +1145,6 @@ staprun:remove_module:205 Module simple removed.
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="I&#8217;ve written WeeChat script for pushing notification to im.kayac.com. This script is based on notifo_notify.py. This is the image of pushing &hellip;">
+  <meta name="description" content="I&#8217;ve written a script to convert Getting Real into mobipocket format. But the kindle edition of Getting Real is sold at amazon.com, publishing &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,74 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - a Script for Converting Web Sites to Mobipocket Format</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2012-01-09T03:46:00+09:00" pubdate>Jan 9<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve written a script to convert <a href="http://gettingreal.37signals.com/toc.php">Getting Real</a> into mobipocket format.</p>
+
+<p>But the kindle edition of Getting Real is sold at amazon.com, publishing this script may be illegal.</p>
+
+<p>So I&#8217;ve re-written this script like <a href="https://github.com/mizzy/web-to-mobi">this</a> following the advice from <a href="https://twitter.com/#!/otsune">@otsune</a>-san.</p>
+
+<p>This script gets JSON data about a web site from STDIN and converts web data to mobipcoket format.</p>
+
+<p>JSON data format is like this.</p>
+
+<pre><code>{
+     "title"    : "Getting Real",
+     "author"   : "37signals",
+     "chapters" : [
+         {
+             "title"     : "Introduction",
+              "sections" : [
+                  {
+                      "title" : "What is Getting Real?",
+                      "uri"   : "http://gettingreal.37signals.com/ch01_What_is_Getting_Real.php"
+                  },
+                  {
+                      "title" : "About 37signals",
+                      "uri"   : "http://gettingreal.37signals.com/ch01_About_37signals.php"
+                  },
+              ]
+        }
+     ],
+     "content_xpath" : "//div[@class=\"content\"]",
+     "exclude_xpath" : "//div[@class=\"next\"]"
+}
+</code></pre>
+
+<p>This is the image of showing the converted file on Kindle Previewer.</p>
+
+<p><img src="/images/2012/01/getting_real.png" title="Getting Real on Kindle" ></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -602,45 +670,6 @@ end
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/10/17/first-post/">自宅サーバが死にました</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-10-17T22:25:00+09:00" pubdate>Oct 17<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/10/17/first-post/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>10年ぐらい稼働していた mizzy.org の自宅サーバが死にました。（四男がコンセントぶち抜いたら起動してこなくなった。）</p>
-
-<p>メールの方は Google Apps に移行したんですが、ブログはどうしようかなー、できれば GitHub でファイル管理したいなー、と思ってたところに、<a href="http://mattn.kaoriya.net/software/lang/ruby/20111017205717.htm">@mattn_jp さんのタイムリーなエントリ</a> が。</p>
-
-<p>とても良さそうなので、しばらくこれで運用してみます。</p>
-
-<p>過去エントリについては、Trac に入ってた分ぐらいは移行しようかな、と考えてます。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -656,6 +685,10 @@ end
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -669,10 +702,6 @@ end
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="taggingプラグインをアップデート。タグで絞り込んで表示することができるようになりました。ファイルはここ。taggingプラグイン サイドメニューのタグリストで、各タグ毎のリンクを表示してます。 QUERY_STRINGやPOSTパラメータで、tag=tag1,tag2,&#8230; &hellip;">
+  <meta name="description" content="blosxomでtaggingに対応するプラグインを書いてみました。使い方とか全然書いてないし、まだ作りかけなのですが、置いておきます。taggingプラグイン タグづけはmeta pluginを利用して、entryファイルのタイトルの次の行に、「meta-tags: tag1, tag2, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/13/369/">Blosxomでtagging #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-13T22:32:00+09:00" pubdate>Apr 13<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/13/369/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+blosxomでtaggingに対応するプラグインを書いてみました。使い方とか全然書いてないし、まだ作りかけなのですが、置いておきます。<a href="/archives/tagging">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+タグづけは<a href="http://www.blosxom.com/plugins/meta/meta.htm" target="_blank">meta plugin</a>を利用して、entryファイルのタイトルの次の行に、「meta-tags: tag1, tag2, tag3, &#8230;」といった形で記述します。
+</p>
+
+
+
+
+<p class="entryBody">
+$tagging::listで、このサイトのサイドにあるように、タグの一覧と出現回数をリストします。今はこれだけです。今後、タグごとにエントリを表示したり検索したり、といったことができるようにしようと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+このプラグインを作ろうと思ったきっかけですが、流行に追随した、ってのもあるのですが、カテゴリによる分類だけだと、どうしても後からカテゴリを見直し/変更したくなり、変更してしまうとpermalinkが変わってしまって、全然permanentじゃなくなる、という問題があるので、カテゴリは後から見直す必要がない様におおざっぱな分類にして、細かな分類はタグで行うのがいいかな、と思ったからです。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -491,6 +548,10 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -504,10 +565,6 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

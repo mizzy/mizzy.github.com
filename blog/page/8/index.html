@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3] のつづき。今回は Device-Mapper Multipath をつかって、DRBD によりミラーされている2つのブロックデバイスを、 &hellip;">
+  <meta name="description" content="overlast さんのこれから15分で Remedie を始めるための資料 に触発されて書いてみました。こっちは CPAN モジュールをインストールする時間も入れて15分。ただし限定された環境のみ。 Remedie 用に CPAN モジュールの RPM パッケージ作ったので、これプラス &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,203 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/01/13/SetupRemedie/">SetupRemedie</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-01-13T14:05:45+09:00" pubdate>Jan 13<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/01/13/SetupRemedie/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>overlast さんの<a href="http://overlasting.dyndns.org/2009-01-07-1.html">これから15分で Remedie を始めるための資料</a> に触発されて書いてみました。こっちは CPAN モジュールをインストールする時間も入れて15分。ただし限定された環境のみ。</p>
+
+<p>Remedie 用に CPAN モジュールの RPM パッケージ作ったので、これプラス Puppet を利用します。ただし、RPM パッケージを CentOS 5 x86_64 でビルドしてるので、この環境限定。<a href="http://svn.mizzy.org/public/yum/SRPMS/">SRPM</a> はあるので、他の環境の方はこいつをビルドして使ってください。</p>
+
+<p>まずは Puppet をインストールするための yum リポジトリ設定。以下の内容で /etc/yum.repos.d/dlutter.repo を作成。</p>
+
+<pre><code>[dlutter]
+name=lutter
+baseurl=http://people.redhat.com/dlutter/yum/rhel/$releasever/$basearch/
+enabled=1
+gpgcheck=0
+</code></pre>
+
+<p>Puppet のインストール。</p>
+
+<pre><code># yum -y install puppet-server
+</code></pre>
+
+<p>Puppet で署名するのはだるいので、以下の内容で /etc/puppet/autosign.conf を作成。</p>
+
+<p>*</p>
+
+<p>/etc/puppet/manifests ディレクトリを作成。</p>
+
+<pre><code># mkdir /etc/puppet/manifests
+</code></pre>
+
+<p>以下の内容の /etc/puppet/manifests/site.pp を作成。</p>
+
+<pre><code>node default {
+
+  yumrepo {
+    'mizzy':
+      baseurl  =&gt; 'http://svn.mizzy.org/public/yum/RPMS/centos/$releasever/$basearch/',
+      enabled  =&gt; 1,
+      gpgcheck =&gt; 0;
+    'dag':
+      baseurl  =&gt; 'http://ftp.riken.jp/Linux/dag/redhat/el$releasever/en/$basearch/dag/',
+      enabled  =&gt; 1,
+      gpgcheck =&gt; 0;
+    'updates':
+      exclude =&gt; 'perl';
+    'extras':
+      exclude =&gt; 'perl';
+  }
+
+  Package {
+    require =&gt; [ Yumrepo['mizzy'], Yumrepo['dag'], Yumrepo['updates'], Yumrepo[extras] ],
+  }  
+
+  package {
+    'git':
+      ensure =&gt; present;
+    'perl':
+      ensure =&gt; '5.8.8-15.1';
+    'perl-Moose':
+      ensure =&gt; present;
+    'perl-Class-C3':
+      ensure =&gt; present;
+    'perl-Sub-Name':
+      ensure =&gt; present;
+    'perl-Devel-GlobalDestruction':
+      ensure =&gt; present;
+    'perl-Rose-DB':
+      ensure =&gt; present;
+    'perl-Rose-DB-Object':
+      ensure =&gt; present;
+    'perl-DateTime-TimeZone':
+      ensure =&gt; '0.8301-8';
+    'perl-MooseX-Types-Path-Class':
+      ensure =&gt; present;
+    'perl-DBD-SQLite':
+      ensure =&gt; present;
+    'perl-FindBin-libs':
+      ensure =&gt; present;
+    'perl-HTTP-Engine':
+      ensure =&gt; present;
+    'perl-MIME-Types':
+      ensure =&gt; present;
+    'perl-Path-Class-URI':
+      ensure =&gt; present;
+    'perl-String-CamelCase':
+      ensure =&gt; present;
+    'perl-Log-Dispatch':
+      ensure =&gt; present;
+    'perl-JSON-XS':
+      ensure =&gt; present;
+    'perl-MooseX-Getopt':
+      ensure =&gt; present;
+    'perl-MooseX-ConfigFromFile':
+      ensure =&gt; present;
+    'perl-File-Find-Rule':
+      ensure =&gt; present;
+    'perl-UNIVERSAL-require':
+      ensure =&gt; present;
+    'perl-Class-Accessor':
+      ensure =&gt; present;
+    'perl-DateTime-Format-Strptime':
+      ensure =&gt; present;
+    'perl-Feed-Find':
+      ensure =&gt; present;
+    'perl-Class-ErrorHandler':
+      ensure =&gt; present;
+    'perl-XML-Atom':
+      ensure =&gt; present;
+    'perl-XML-XPath':
+      ensure =&gt; present;
+    'perl-XML-Feed':
+      ensure =&gt; present;
+    'perl-Template-Toolkit':
+      ensure =&gt; present;
+    'perl-DateTime-Format-ISO8601':
+      ensure =&gt; present;
+    'perl-MooseX-ClassAttribute':
+      ensure =&gt; present;
+    'perl-XML-OPML-LibXML':
+      ensure =&gt; present;
+    'perl-File-Find-Rule-Filesys-Virtual':
+      ensure =&gt; present;
+    'perl-HTTP-Response-Encoding':
+      ensure =&gt; present;
+    'perl-HTML-ResolveLink':
+      ensure =&gt; present;
+    'perl-HTML-Selector-XPath':
+      ensure =&gt; present;
+    'perl-HTML-TreeBuilder-XPath':
+      ensure =&gt; present;
+    'perl-YAML':
+      ensure =&gt; present;
+    'perl-YAML-Syck':
+      ensure =&gt; present;
+    'perl-HTML-Scrubber':
+      ensure =&gt; present;
+    'perl-Image-Info':
+      ensure =&gt; present;
+    'perl-Text-Tags':
+      ensure =&gt; present;
+    'perl-XML-RSS-LibXML':
+      ensure =&gt; present;
+    'perl-Web-Scraper':
+      ensure =&gt; present;
+  }
+
+}
+</code></pre>
+
+<p>puppetmasterd を起動。</p>
+
+<pre><code># puppetmasterd --verbose --no-daemonize
+</code></pre>
+
+<p>puppetd を起動して、マニフェストを適用。注意点としては、localhost とかではなく、きちんと FQDN で指定すること。（puppetmasterd 初回起動時に自動作成される証明書中の CN と &#8211;server で指定するサーバ名が一致してないと怒られる。）</p>
+
+<pre><code># puppetd --server host.example.org --verbose --no-daemonize
+</code></pre>
+
+<p>このままログを見ながらしばらく待つ。完了したら Remedie を github.com から取得して起動。</p>
+
+<pre><code># git clone git://github.com/miyagawa/remedie.git
+# cd remedie
+# perl -Ilib -MRemedie::DB::Schema -e 'Remedie::DB::Schema-&gt;install'
+# ./bin/remedie-server.pl
+</code></pre>
+
+<p>自分でやったら10分ぐらいで終わった。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1232,76 +1429,6 @@ ieiri
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/11/22/DrPepperFromHirose/">DrPepperFromHirose</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-11-22T14:43:24+09:00" pubdate>Nov 22<span>nd</span>, 2008</time>
-        
-         | <a href="/blog/2008/11/22/DrPepperFromHirose/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ペパボの上場承認のお祝い、ということで、<a href="http://d.hatena.ne.jp/hirose31/">ひろせさん</a> よりドクターペッパーを頂きました。</p>
-
-<p>朝会社に来てみると、やけにでかい Amazon の段ボール箱が机の前にあり、空けてみたところこんな物体が入ってました。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/DrPepperFromHirose/00.jpg?format=raw)]]</p>
-
-<p>大きさを比較するために自分で持ってみたところ。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/DrPepperFromHirose/01.jpg?format=raw)]]</p>
-
-<p>ラッピングを外してみると。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/DrPepperFromHirose/02.jpg?format=raw)]]</p>
-
-<p>箱の中身。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/DrPepperFromHirose/03.jpg?format=raw)]]</p>
-
-<p>というわけで、僕へのドクターペッパープレゼント数ランキングでは、今までトップであった<a href="http://blog.hbkr.jp/">弊社代表取締役社長家入</a>（10本）を軽々と突破し、ひろせさんが25本でダントツの一位となりました。（今回の24本＋KLab勉強会での1本。）</p>
-
-<p>ちなみに、現在のドクターペッパープレゼントランキングは下記のとおり。</p>
-
-<p>|| 1 || ひろせさん || 25本 ||
-|| 2 || 弊社代表取締役社長   || 10本 ||
-|| 3 || Xen Summit 2008 Tokyo|| 3本（フリードリンクとして提供されたものからいただいた数） ||
-|| 4 || <a href="http://overlasting.dyndns.org/">overlastさん</a>|| 1本（たしか SoozyCon かな？いまはなきアジトでいただいた） ||
-|| 5 || <a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a> || 0.5本（YAPC::Asia Tokyo 2008 でプレゼン時のドリンクとして） ||
-|| 5 || <a href="http://kayano.jugem.cc/">みるくぜりーさん</a> || 0.5本（同じく YAPC::Asia Tokyo 2008 で、id:hiboma とともに持ってきてくれた）||
-|| 7 || 弊社サーバエンジニアのまーくん || 2本（ただしドクターペッパーではなくルートビア。あれ、ドクペももらったことあったっけ？）
-|| 8 || <a href="http://d.hatena.ne.jp/yappo/">Yappo さん</a> || 1本（ただしドクターペッパーではなくピンクペッパー） ||</p>
-
-<p>「あれ、俺プレゼントしたのにランキングに載ってないよ？」という方がいらっしゃいましたら、ご連絡ください。</p>
-
-<p>また、写真撮影してくれた pplog さんが、今回のひろせさんからのプレゼントを記念して、<a href="http://pplog.jugem.cc/?eid=885">素敵な画像を作成してくれました</a>。</p>
-
-<p>[[Image(http://pplog.img.jugem.jp/20081121_592213_t.jpg)]]</p>
-
-<p>ちなみに、中段の「飲みきれないドクペのために 今、何ができるか」は Yappo さんのアイデア。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/9/">&larr; Older</a>
@@ -1319,6 +1446,10 @@ ieiri
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1332,10 +1463,6 @@ ieiri
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

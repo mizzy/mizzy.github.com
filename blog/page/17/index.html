@@ -9,7 +9,9 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="I, newbie &raquo; Links Roundup 経由で puppet というシステム管理ツールを知って以来ずっと気になっていたのですが、このエントリの著者さんが OSC2007 の発表資料(PDF)で「Puppet is so sexy.」と書かれているのを見て、 &hellip;">
+  <meta name="description" content="http://reductivelabs.com/trac/puppet/wiki/InstallationGuide
+http://reductivelabs.com/trac/puppet/wiki/TestingGuide
+http://people.redhat.com/dlutter/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +74,96 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/03/18/266/">Puppet の Node 設定ではまる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-03-18T22:10:00+09:00" pubdate>Mar 18<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/03/18/266/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul><li><a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/InstallationGuide"><span class="icon"></span>http://reductivelabs.com/trac/puppet/wiki/InstallationGuide</a></li>
+<li><a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/TestingGuide"><span class="icon"></span>http://reductivelabs.com/trac/puppet/wiki/TestingGuide</a></li>
+<li><a class="ext-link" href="http://people.redhat.com/dlutter/puppet-app.html"><span class="icon"></span>http://people.redhat.com/dlutter/puppet-app.html</a></li></ul>
+
+
+<p>
+といったあたりを読みながら puppet を試していたのですが、node の設定ではまったのでメモ。
+</p>
+
+
+<p>
+pueppt では、
+</p>
+
+
+<pre class="wiki">
+node nag.example.com {
+  include yum-rawhide
+  include horde-db-pg
+  include horde-nag
+}
+</pre>
+
+
+<p>
+といった設定でターゲットとなるホストと、そのホストでどのようなタスクを実行するかを定義できるのですが、これで puppetmasterd を実行すると、
+</p>
+
+
+<pre class="wiki">
+Syntax error at '.' at /etc/puppet/manifests/site.pp:5 
+</pre>
+
+
+<p>
+と怒られます。そこで、
+</p>
+
+
+<pre class="wiki">
+node 'nag.example.com' {
+  include yum-rawhide
+  include horde-db-pg
+  include horde-nag
+}
+</pre>
+
+
+<p>
+とクォートしてあげると OK でした。最初に挙げた URL にあるチュートリアルの例ではクォートされておらず、そのままやるとはまりますのでご注意を。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+<a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/LanguageStructures"><span class="icon"></span>Language Structures</a> を読んだら、「You can specify fully-qualified node names, but you have to single-quote the names:」ってちゃんと書いてあった。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -975,62 +1067,6 @@ Nagios の場合、ステータスコードだけ気にすればいい、とは�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/02/12/484/">Assurer にシェルモード</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-02-12T19:56:00+09:00" pubdate>Feb 12<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/02/12/484/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://assurer.jp/trac"><span class="icon"></span>Assurer</a> についてその後あんまり書いてないですが、何もしてないわけではなく、リトライをハンドリングできるようにしたり、並列実行できるようにしたりと、ちょこちょこと開発は進めています。
-</p>
-
-
-<p>
-で、<a class="ext-link" href="http://mizzy.org/program/archer00.html"><span class="icon"></span>前回のエントリ</a> で、<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> にシェルモードをつけてみたわけなんですが、シェルモードってテスト/監視ツールにこそふさわしい、と思ったので、Assurer にもつけてみました。こんな感じになります。
-</p>
-
-
-<pre class="wiki">
-$ assurer.pl --config=config.yaml --shell --role=app --para=3
-shell> uptime
-[www.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
-[svn.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
-[ftp.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
-shell> 
-</pre>
-
-
-<p>
-&#8211;role がなければ、config.yaml で列挙されているホスト全部で実行します。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/18/">&larr; Older</a>
@@ -1048,6 +1084,10 @@ shell>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1061,10 +1101,6 @@ shell>
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

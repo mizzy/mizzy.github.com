@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="どうしようか悩んでいたのですが、Ben Trott が来ると聞いて、Six Apart ユーザーギャザリング vol.2 に行くことにしました。 彼の姿を拝めば、いい perl プログラムが書ける御利益とかありそうなので。それに、Ben とはちょっとした縁があるので。と言っても、 &hellip;">
+  <meta name="description" content="Ben と会話することができました！ちょうど今日は Catalyst::Plugin::AtomServer を使ったプログラムを書いていたので、会話のネタもばっちりでした。以下、会話の概要。（B: Ben, M: 自分） M:「今、Catalyst::Plugin::AtomServer &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,96 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/01/337/">Six Apart ユーザーギャザリングに行ってきました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-01T02:42:00+09:00" pubdate>Mar 1<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/01/337/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Ben と会話することができました！ちょうど今日は Catalyst::Plugin::AtomServer を使ったプログラムを書いていたので、会話のネタもばっちりでした。以下、会話の概要。（<span style="color: crimson;">B:</span> Ben, <span style="color: blue;">M:</span> 自分）
+</p>
+
+
+
+
+<p class="code">
+<span style="color: blue;">M:</span>「今、Catalyst::Plugin::AtomServer 使ったプログラム書いてるよ。WSSE と Basic Auth の両方に対応してるのがいいね。」<br />
+<span style="color: crimson;">B:</span>「ありがとう。ちゃんと動いてる？」<br />
+<span style="color: blue;">M:</span>「動いてるけど、Catalyst::Plugin::Authentication::Credential::Atom では MD5 で DB に格納されたパスワードが使えないよね？」<br />
+<span style="color: crimson;">B:</span>「そうなんだよね。」<br />
+<span style="color: blue;">M:</span>「だから今ハックしてるよ。」<br />
+<span style="color: crimson;">B:</span>「できたらパッチ送ってよ。」
+</p>
+
+
+
+
+<p class="entryBody">
+てな感じでした。話しかける時には全然緊張しなかったのに、会話が終ったあとに鼓動が早くなって、手が小刻みに震えるという軽い興奮状態になり、その余韻が今もまだあったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+それから、<a href="http://www.lares.dti.ne.jp/~cheebow/" target="_blank">CHEEBOW さん</a>、<a href="http://hinagata.biz/" target="_blank">上ノ郷谷さん</a>ともお話しできました！CHEEBOW さんは、はてブでブクマしてくれてたので、こちらのことは知ってくれているだろうとは思っていたのですが、上ノ郷谷さんまでもが「知ってますよ！」と言ってくれたのはメチャメチャうれしかったです。
+</p>
+
+
+
+
+<p class="entryBody">
+また、小飼弾さんにも軽くご挨拶。そして帰り際にもまた Ben と話す機会があったので、「Bloglines::WebService の Changes に一緒に名前載ってるよ。」「パッチはできたら明日送るよ。」みたいなことを言いました。
+</p>
+
+
+
+
+<p class="entryBody">
+今日は perl 界の天上人二人と接することができて、プログラミングに対するモチベーションあがりまくりです。帰りの電車でも Catalyst::Plugin::Authentication::Credential::Atom のコードを眺めながら、どうやってハックしようか考えてました。
+</p>
+
+
+
+
+<p class="entryBody">
+宮川さんや関村さんにもお会いできるとうれしいな、と思っていたのですが、残念ながらお会いできませんでした。YAPC までの楽しみにしたいと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+そして終了後は、会社の方々 + ヤスヒサさん + ふうりさん とでお食事。楽しかったっす。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -629,84 +719,6 @@ API を公開、ってのが今の流れになってるわけですが、API を
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/02/06/455/">coLinux をサービスとして動かすのにはまった</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-02-06T23:56:00+09:00" pubdate>Feb 6<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/02/06/455/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-coLinux をサービスとして登録する場合、
-</p>
-
-
-
-
-<pre class="code">
-C:\colinux&gt; colinux-daemon --install-service -c conf.xml
-</pre>
-
-
-
-
-<p class="entryBody">
-と実行すればいい、みたいな記述はあちこちで見るのですが、自分の環境ではサービス登録後、起動しようとすると以下のようなエラーが出て起動しませんでした。
-</p>
-
-
-
-
-<p class="entryBody">
-<img src="http://mizzy.org/img/colinux_event_log.jpg" />
-</p>
-
-
-
-
-<p class="entryBody">
-で、以下の様にサービスのログオンアカウントを明示的に指定することで、無事起動できるようになりました。
-</p>
-
-
-
-
-<p class="entryBody">
-<img src="http://mizzy.org/img/colinux_logon_setting.jpg" />
-</p>
-
-
-
-
-<p class="entryBody">
-ちなみに、自分用 Windows ログオンアカウントと同じものを指定しています。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/30/">&larr; Older</a>
@@ -724,6 +736,10 @@ C:\colinux&gt; colinux-daemon --install-service -c conf.xml
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -737,10 +753,6 @@ C:\colinux&gt; colinux-daemon --install-service -c conf.xml
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

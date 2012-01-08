@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="現在、オオヒダさん、ヤスヒサさん、purprin さん、モイモラさん、ボンヌさん、タロさんと伊東の温泉旅館で開発合宿中です。 何をやるかまったく考えないまま来てしまったのですが、プログラマだけでなくデザインや Flash などに詳しいクリエータも一緒なので、 &hellip;">
+  <meta name="description" content="DBIx::Class::ResultSet の from メソッドの説明 にしたがって、カスタム JOIN を試みるものの、どうしても join type が指定できない、という現象にはまる。 ドキュメント上では -join-type => &#8216;inner|left|right&# &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,72 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/27/427/">DBIx::Class のカスタム JOIN ではまる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-27T12:42:00+09:00" pubdate>Mar 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/27/427/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://search.cpan.org/~mstrout/DBIx-Class-0.06000/lib/DBIx/Class/ResultSet.pm#from" target="_blank">DBIx::Class::ResultSet の from メソッドの説明</a> にしたがって、カスタム JOIN を試みるものの、どうしても join type が指定できない、という現象にはまる。 
+</p>
+
+
+
+
+<p class="entryBody">
+ドキュメント上では -join-type => &#8216;inner|left|right&#8217; って書いてあって、この通りに記述してるのに、全然指定通りの JOIN ができない。で、色々ソース眺めてたら、DBIx::Class::ResultSource のソースにこんな記述が。
+</p>
+
+
+
+
+<pre class="code">
+return [ { $as => $self->related_source($join)->from,
+           <strong>-join_type => $type</strong> }
+         $self->resolve_condition($rel_info->{cond}, $as, $alias) ];
+</pre>
+
+
+
+
+<p class="entryBody">
+-join-type じゃなくて -join_type かよ！これで 3,4 時間無駄にしました…。-join_type に変えたらうまくいきましたよ。
+</p>
+
+
+
+
+<p class="entryBody">
+自分の様な犠牲者をこれ以上出さないために、Matt S Trout にドキュメントなおしといてね、とメールしておきました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -655,96 +721,6 @@ $ svnadmin recover svn_repos
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/03/01/337/">Six Apart ユーザーギャザリングに行ってきました</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-03-01T02:42:00+09:00" pubdate>Mar 1<span>st</span>, 2006</time>
-        
-         | <a href="/blog/2006/03/01/337/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-Ben と会話することができました！ちょうど今日は Catalyst::Plugin::AtomServer を使ったプログラムを書いていたので、会話のネタもばっちりでした。以下、会話の概要。（<span style="color: crimson;">B:</span> Ben, <span style="color: blue;">M:</span> 自分）
-</p>
-
-
-
-
-<p class="code">
-<span style="color: blue;">M:</span>「今、Catalyst::Plugin::AtomServer 使ったプログラム書いてるよ。WSSE と Basic Auth の両方に対応してるのがいいね。」<br />
-<span style="color: crimson;">B:</span>「ありがとう。ちゃんと動いてる？」<br />
-<span style="color: blue;">M:</span>「動いてるけど、Catalyst::Plugin::Authentication::Credential::Atom では MD5 で DB に格納されたパスワードが使えないよね？」<br />
-<span style="color: crimson;">B:</span>「そうなんだよね。」<br />
-<span style="color: blue;">M:</span>「だから今ハックしてるよ。」<br />
-<span style="color: crimson;">B:</span>「できたらパッチ送ってよ。」
-</p>
-
-
-
-
-<p class="entryBody">
-てな感じでした。話しかける時には全然緊張しなかったのに、会話が終ったあとに鼓動が早くなって、手が小刻みに震えるという軽い興奮状態になり、その余韻が今もまだあったりします。
-</p>
-
-
-
-
-<p class="entryBody">
-それから、<a href="http://www.lares.dti.ne.jp/~cheebow/" target="_blank">CHEEBOW さん</a>、<a href="http://hinagata.biz/" target="_blank">上ノ郷谷さん</a>ともお話しできました！CHEEBOW さんは、はてブでブクマしてくれてたので、こちらのことは知ってくれているだろうとは思っていたのですが、上ノ郷谷さんまでもが「知ってますよ！」と言ってくれたのはメチャメチャうれしかったです。
-</p>
-
-
-
-
-<p class="entryBody">
-また、小飼弾さんにも軽くご挨拶。そして帰り際にもまた Ben と話す機会があったので、「Bloglines::WebService の Changes に一緒に名前載ってるよ。」「パッチはできたら明日送るよ。」みたいなことを言いました。
-</p>
-
-
-
-
-<p class="entryBody">
-今日は perl 界の天上人二人と接することができて、プログラミングに対するモチベーションあがりまくりです。帰りの電車でも Catalyst::Plugin::Authentication::Credential::Atom のコードを眺めながら、どうやってハックしようか考えてました。
-</p>
-
-
-
-
-<p class="entryBody">
-宮川さんや関村さんにもお会いできるとうれしいな、と思っていたのですが、残念ながらお会いできませんでした。YAPC までの楽しみにしたいと思います。
-</p>
-
-
-
-
-<p class="entryBody">
-そして終了後は、会社の方々 + ヤスヒサさん + ふうりさん とでお食事。楽しかったっす。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/29/">&larr; Older</a>
@@ -762,6 +738,10 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -775,10 +755,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

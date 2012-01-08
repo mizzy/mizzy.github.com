@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-01-06T00:48:45+09:00</updated>
+  <updated>2012-01-09T04:04:05+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Web-to-mobi - A script for converting web sites to mobipocket format]]></title>
+    <link href="http://mizzy.org/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/"/>
+    <updated>2012-01-09T03:46:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve written a script to convert <a href="http://gettingreal.37signals.com/toc.php">Getting Real</a> into mobipocket format.</p>
+
+<p>But the kindle edition of Getting Real is sold at amazon.com, publishing this script may be illegal.</p>
+
+<p>So I&#8217;ve re-written this script like <a href="https://github.com/mizzy/web-to-mobi">this</a> following the advice from <a href="https://twitter.com/#!/otsune">@otsune</a>-san.</p>
+
+<p>This script gets JSON data about a web site from STDIN and converts web data to mobipcoket format.</p>
+
+<p>JSON data format is like this.</p>
+
+<pre><code>{
+     "title"    : "Getting Real",
+     "author"   : "37signals",
+     "chapters" : [
+         {
+             "title"     : "Introduction",
+              "sections" : [
+                  {
+                      "title" : "What is Getting Real?",
+                      "uri"   : "http://gettingreal.37signals.com/ch01_What_is_Getting_Real.php"
+                  },
+                  {
+                      "title" : "About 37signals",
+                      "uri"   : "http://gettingreal.37signals.com/ch01_About_37signals.php"
+                  },
+              ]
+        }
+     ],
+     "content_xpath" : "//div[@class=\"content\"]",
+     "exclude_xpath" : "//div[@class=\"next\"]"
+}
+</code></pre>
+
+<p>This is the image of showing the converted file on Kindle Previewer.</p>
+
+<p><img src="http://mizzy.org/images/2012/01/getting_real.png" title="Getting Real on Kindle" ></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[WeeChat script for pushing notification to im.kayac.com]]></title>
@@ -1586,229 +1630,6 @@ index 9745478..e82621c 100644
 </code></pre>
 
 <p>だけになり、postfix::service はまったく変更する必要がない。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ManagingInfrastructureWithPuppet]]></title>
-    <link href="http://mizzy.org/blog/2011/07/08/ManagingInfrastructureWithPuppet/"/>
-    <updated>2011-07-08T02:36:30+09:00</updated>
-    <id>http://mizzy.org/blog/2011/07/08/ManagingInfrastructureWithPuppet</id>
-    <content type="html"><![CDATA[<h1>!html</h1>
-
-<pre><code>&lt;img src="http://covers.oreilly.com/images/0636920020875/lrg.jpg" /&gt;
-</code></pre>
-
-<hr />
-
-<p><a href="http://twitter.com/#!/kdmsnr">@kdmsnr さん</a> の tweet で、<a href="http://oreilly.com/catalog/0636920020875">Managing Infrastructure with Puppet</a> と <a href="http://www.apress.com/9781430230571">Pro Puppet</a> が発売されている事を知ったので読んでみた。まずは Managing Infrastructure with Puppet について。</p>
-
-<p>この本はとても薄い。全体で40ページ強くらい。なので、Puppet をまったく知らない人には全体像を知るためには良い本だけど、既に知っている人には物足りないと思う。</p>
-
-<p>とは言っても、自分は最近の Puppet の動向を追えてないので、その辺の知識不足を補ってくれるような内容もあって、そこは良かった。</p>
-
-<p>また、<a href="http://www.puppetlabs.com/mcollective/introduction/">MCollective</a> についても書かれていて、元々は Puppet Labs とは別なところで開発されていたツールなんで、Puppet とは完全に独立したツールだと思ってたんだけど、Puppet Labs 配下になってから統合が進められたようで、その辺の情報が得られたのがよかった。</p>
-
-<p>以下、内容で気になったところなんかのメモ。</p>
-
-<hr />
-
-<h1>puppet コマンド</h1>
-
-<p>0.25 の次は 2.6 という風にバージョン体系が変わり、それまで puppetmasterd や puppetd といった形で独立していたコマンドが puppet コマンドに統一された、ってことは <a href="http://twitter.com/#!/tnmt">ペパボのイケメンインフラエンジニアの tnmt くん</a> が<a href="http://blog.tnmt.info/2010/11/23/puppet-2-6/">既にブログに書いてある</a> んだけど、それに伴い、コマンドオプションも増えて、やれることが増えてる模様。その中で特に気になったオプションを紹介。</p>
-
-<h2>puppet describe</h2>
-
-<p>リソースタイプのリストを表示してくれたり、指定したリソースタイプに関する説明を表示してくれる。</p>
-
-<p><em>リソースタイプのリスト</em></p>
-
-<pre><code>$ puppet describe --list
-These are the types known to puppet:
-augeas          - Apply the changes (single or array of changes ...
-computer        - Computer object management using DirectorySer ...
-cron            - Installs and manages cron jobs
-exec            - Executes external commands
-file            - Manages local files, including setting owners ...
-filebucket      - A repository for backing up files
-group           - Manage groups
-host            - Installs and manages host entries
-k5login         - Manage the `
-...
-</code></pre>
-
-<p><em>package リソースタイプの説明</em></p>
-
-<pre><code>$ puppet describe package
-
-package
-=======
-Manage packages.  There is a basic dichotomy in package
-support right now:  Some package types (e.g., yum and apt) can
-retrieve their own package files, while others (e.g., rpm and sun) cannot. 
-For those package formats that cannot retrieve
-their own files, you can use the `source` parameter to point to
-the correct file.
-
-Puppet will automatically guess the packaging format that you are
-using based on the platform you are on, but you can override it
-using the `provider` parameter; each provider defines what it
-requires in order to function, and you must meet those requirements
-to use a given provider.
-</code></pre>
-
-<p><strong>Autorequires:</strong> If Puppet is managing the files specified as a package&#8217;s</p>
-
-<pre><code>`adminfile`, `responsefile`, or `source`, the package resource will
-autorequire
-those files.
-
-
-Parameters
-----------
-
-- **adminfile**
-    A file containing package defaults for installing packages.
-    This is currently only used on Solaris.  The value will be
-    validated according to system rules, which in the case of
-    Solaris means that it should either be a fully qualified path
-    or it should be in `/var/sadm/install/admin`.
-
-...
-</code></pre>
-
-<p>詳しくは puppet describe &#8211;help を参照。</p>
-
-<h2>puppet resource</h2>
-
-<p>コマンドを実行してるマシンの指定されたリソースの状態を、Puppet マニフェストで表示してくれる。</p>
-
-<p><em>host リソースの表示</em></p>
-
-<p>/etc/hosts の内容を Puppet マニフェストで表示。</p>
-
-<pre><code>$ puppet resource host
-host { 'localhost.localdomain':
-  ensure       =&gt; 'present',
-  host_aliases =&gt; ['localhost'],
-  ip           =&gt; '127.0.0.1',
-  target       =&gt; '/etc/hosts',
-}
-host { 'localhost6.localdomain6':
-  ensure       =&gt; 'present',
-  host_aliases =&gt; ['localhost6'],
-  ip           =&gt; '::1',
-  target       =&gt; '/etc/hosts',
-}
-</code></pre>
-
-<p><em>service リソースの表示</em></p>
-
-<p>サービスの状態を Puppet マニフェストで表示。</p>
-
-<pre><code>$ puppet resource service
-service { 'NetworkManager':
-  ensure =&gt; 'stopped',
-  enable =&gt; 'false',
-}
-service { 'acpid':
-  ensure =&gt; 'stopped',
-  enable =&gt; 'true',
-}
-service { 'anacron':
-  ensure =&gt; 'stopped',
-  enable =&gt; 'true',
-}
-service { 'atd':
-  ensure =&gt; 'running',
-  enable =&gt; 'true',
-}
-service { 'autofs':
-  ensure =&gt; 'stopped',
-  enable =&gt; 'true',
-}
-
-...
-</code></pre>
-
-<p>既に環境構築されたマシンから Puppet マニフェストの雛形を生成する、とかいった目的に使えそう。</p>
-
-<h2>puppet apply</h2>
-
-<p>Puppet マニフェストを即座に適用できる。</p>
-
-<p><em>test.pp 内のマニフェストを適用する</em></p>
-
-<pre><code>$ puppet apply test.pp
-</code></pre>
-
-<p><em>直接マニフェストを文字列で指定するが &#8211;noop つけてるので実際には何もしない</em></p>
-
-<pre><code>$ puppet apply --noop -e 'file { "/etc/passwd": mode =&gt; 600 }'
-notice: /Stage[main]//File[/etc/passwd]/mode: current_value 644, should be 600 (noop)
-notice: Finished catalog run in 0.05 seconds
-</code></pre>
-
-<p>ちょっとした動作確認なんかするのに便利そう。</p>
-
-<hr />
-
-<h1>Parameterized Classes</h1>
-
-<p>define でリソース定義して、呼び出すときにパラメータを渡す、なんてことは以前からできてたけど、2.6 からは Class にパラメータを渡すことができるようになったらしい。</p>
-
-<p>クラス定義はこんな感じ。</p>
-
-<pre><code>class ruby ( $version = '1.8.7') {
-    package { 'ruby': ensure =&gt; $version }
-}
-</code></pre>
-
-<p>Parameterized Classes ではない、従来のクラスの呼び出し方。これだと、Ruby 1.8.7 がインストールされる。</p>
-
-<pre><code>node 'test.example.jp' {
-    include ruby
-}
-</code></pre>
-
-<p>パラメータを渡してやると、Ruby 1.9.2 がインストールされる。</p>
-
-<pre><code>node 'test.example.jp' {
-    class { 'ruby': version =&gt; '1.9.2' }
-}
-</code></pre>
-
-<p>便利そうだけど、従来の include とだいぶ書式が変わるので、混乱しそう。</p>
-
-<hr />
-
-<h1>Puppet Forge</h1>
-
-<p>Puppet モジュールを集めた <a href="http://forge.puppetlabs.com/">Puppet Forge</a> なんてサイトができてたんだね。Puppet 版 CPAN といった感じ。<a href="http://github.com/puppetlabs/puppet-module-tool">puppet-module-tool</a> というコマンドラインツールを使って、モジュールのインストールとかパッケージングとか色々できるようなんだけど、この本には詳しい説明がなかった。Pro Puppet には詳しい説明があったので、Pro Puppet についての感想を書くときに、この辺について少し詳しく書くつもり。</p>
-
-<hr />
-
-<h1>MCollective</h1>
-
-<p>MCollective は、複数のホストに対して同じ処理を並列実行するためのもの。<a href="https://fedorahosted.org/func/">Func</a> とか <a href="http://fabfile.org/">Fabric</a> とか <a href="http://www.capify.org/">Capistrano</a> みたいな位置づけ。</p>
-
-<p>こんな感じで実行できる。（apache2 を再起動する例。）</p>
-
-<pre><code>$ mc-service --with-class apache2 apache2 restart
-$ mc-service --with-class apache2 --with-fact architecture=x86_64 apache2 restart
-</code></pre>
-
-<p>Puppet の特定のクラスを include してるホストでのみ実行とか、特定の fact (facter によって得られる値) にマッチするホストでのみ実行、という感じで Puppet と連動できる。</p>
-
-<p><a href="http://projects.puppetlabs.com/projects/mcollective-plugins/wiki/AgentPuppetd">Puppetd Agent</a> というプラグインもあって、これを使うと、各ホストの puppet agent の操作を MCollective 経由でできる。つまり、puppet kick(古いバージョンだと puppetrun)の代わりに使える。これの何がうれしいのかというと、puppetrun では特定のクラスを include したホストだけを対象にする、ということをやろうと思うと、LDAP Nodes が必須だった（2.6 でもそうなのかは知らん）けど、このプラグインだとそれが不要になりそう、ってあたりかな。</p>
-
-<p>あと、<a href="http://projects.puppetlabs.com/projects/mcollective-plugins/wiki/ToolPuppetcommander">Puppet Commander</a> というプラグインを使うと、puppet agent の同時起動数を制御できて、puppet master へ同時アクセスが集中しないようにコントロールできるらしい。大量にホストがある環境では良さそうですね。</p>
-
-<p>それから、<a href="http://docs.puppetlabs.com/mcollective/simplerpc/agents.html">MCollective プラグインを書くためのドキュメントへのリンク</a> も載ってた。が本では詳しい説明はなし。</p>
-
-<hr />
-
-<p>というわけで、<a href="http://oreilly.com/catalog/0636920020875">Managing Infrastructure with Puppet</a> について気になった点は以上。次は <a href="http://www.apress.com/9781430230571">Pro Puppet</a> について、気が向いたら書きます。</p>
 ]]></content>
   </entry>
   

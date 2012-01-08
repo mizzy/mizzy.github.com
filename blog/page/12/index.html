@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="自分のブログを typo から Trac に移行しました。 どうも typo が不安定で、新規ポスト時とかにエラーが出まくってなかなかポストできず、イラつくことが多いので。（自分のマシンのメモリが少なかったり、といったところにも原因はありそうですが。）あと、typo がサポートしてる &hellip;">
+  <meta name="description" content="Apache の suEXEC では setuid/setgid を使って、httpd 実行ユーザとは異なるユーザ権限で CGI プログラムや SSI プログラムを実行できるわけですが、mod_php で処理される PHP プログラムのように、httpd 内で処理されるプログラムは、httpd &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,101 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/10/28/ModSuid2AndModRuidAndLinuxCapability/">ModSuid2AndModRuidAndLinuxCapability</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-10-28T01:45:53+09:00" pubdate>Oct 28<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/10/28/ModSuid2AndModRuidAndLinuxCapability/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Apache の suEXEC では setuid/setgid を使って、httpd 実行ユーザとは異なるユーザ権限で CGI プログラムや SSI プログラムを実行できるわけですが、mod_php で処理される PHP プログラムのように、httpd 内で処理されるプログラムは、httpd 実行ユーザの権限で実行されてしまいます。こういったものまで httpd とは異なるユーザ権限で実行するためのモジュールとして、<a href="http://bluecoara.net/download/mod_suid2/">mod_suid2</a> や <a href="http://websupport.sk/~stanojr/projects/mod_ruid/">mod_ruid</a> といったものがあります。</p>
+
+<p>mod_suid2 は、httpd を root で起動しておいて、リクエストに応じて（VirtualHost 単位等で）setuid/setgid して実行ユーザを切り替える、という動作をします。そのため、以下のような問題があります。</p>
+
+<ul>
+<li>-DBIG_SECURITY_HOLE つきで Apache をコンパイルする必要がある。</li>
+<li>root でプロセスを起動する危険性。</li>
+<li>MaxRequestsPerChild が 1 に設定されることによるパフォーマンスの劣化。（一度 setuid/setgid してしまうと、root ではなくなり setuid/setgid できなくなるので、リクエストを処理するたびにプロセス/スレッドを殺す必要があるため）</li>
+</ul>
+
+
+<p>これに対し、mod_ruid は Linux に実装されている POSIX 1003.1e で定義された<a href="http://opentechpress.jp/security/03/08/06/0941214.shtml">ケーパビリティ</a> を利用して、root で httpd を起動することなく、setuid/segid できる権限のみ与えて、プロセス/スレッドの実行ユーザを切り替えています。そのため、mod_suid2 が抱える問題点の多くを解消しています。（また、mod_suid2 と違い、参照するファイルやディレクトリのユーザ/グループに実行権限を切り替える機能もあります。）</p>
+
+<p>ここで気になったのは、「setuid/setgid って、プロセス単位じゃなくてスレッド単位でもできるの？」ということ。もしできないのであれば、worker ではなく prefork で動かす必要もある、ということになる。で、結論からいうと「できる」でした。<a href="http://d.hatena.ne.jp/naoya/20071010/1192040413">マルチスレッドのコンテキスト切り替えに伴うコスト - naoyaのはてなダイアリー</a> をご覧になると分かるように、スレッドを生成する毎に dup_task_struct(current) して、各スレッドが個別にプロセスディスクリプタを持つので、当然と言えば当然なのですが、mod_ruid を有効にした Apache のプロセス状態を表示することによって、スレッドごとに実行ユーザがちゃんと異なっていることを確認しました。（mod_ruid はリクエスト処理後に元のユーザに戻してしまうため、確認のため戻さないようにソースを少しいじってます。）</p>
+
+<pre><code>$ ps -efL
+UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD 
+daemon    4156  4153  4188  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start 
+miya      4156  4153  4189  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
+puppet    4156  4153  4225  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
+</code></pre>
+
+<p>ちなみに、Linux での setuid の処理は、kernel/sys.c で以下のようになっています。</p>
+
+<pre><code>#!c
+asmlinkage long sys_setuid(uid_t uid)
+{
+    int old_euid = current-&gt;euid;
+    int old_ruid, old_suid, new_suid;
+    int retval;
+
+    retval = security_task_setuid(uid, (uid_t)-1, (uid_t)-1, LSM_SETID_ID);
+    if (retval)
+        return retval;
+
+    old_ruid = current-&gt;uid;
+    old_suid = current-&gt;suid;
+    new_suid = old_suid;
+
+    if (capable(CAP_SETUID)) {
+        if (uid != old_ruid &amp;&amp; set_user(uid, old_euid != uid) &lt; 0)
+            return -EAGAIN;
+        new_suid = uid;
+    } else if ((uid != current-&gt;uid) &amp;&amp; (uid != new_suid))
+        return -EPERM;
+
+    if (old_euid != uid) {
+        set_dumpable(current-&gt;mm, suid_dumpable);
+        smp_wmb();
+    }
+    current-&gt;fsuid uid;
+    current-&gt;suid = new_suid;
+
+    key_fsuid_changed(current);
+    proc_id_connector(current, PROC_EVENT_UID);
+
+    return security_task_post_setuid(old_ruid, old_euid, old_suid, LSM_SETID_ID);
+}
+</code></pre>
+
+<p>task_struct 構造体の、fsuid, euid, suid あたりを書き換えているようですね。</p>
+
+<p>まとまりのないエントリになってしまいましたが、ケーパビリティとか、スレッド単位で setuid/setgid できるとか、はじめて知ることが多かったのでとりあえずメモ。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1031,43 +1126,6 @@ Retrieving log information from 1 to 62
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/06/14/517/">紫色の何かを口に押し付けている…</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-06-14T13:02:00+09:00" pubdate>Jun 14<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/06/14/517/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>会社に紫色のブツがあったので。</p>
-
-<p><img src="http://blog.mizzy.org/files/something_purple.jpg" title="紫" alt="紫" /></p>
-
-<p>この写真は DPL(Dr.Pepper License) により保護されています。ドクターペッパー1本おごってくれれば、自由に使ってもらって構いません。（ライセンス発案者は <a href="http://d.hatena.ne.jp/tokuhirom/">id:tokuhirom</a> さんと <a href="http://d.hatena.ne.jp/hirose31/">id:hirose31</a>  さん）</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -1085,6 +1143,10 @@ Retrieving log information from 1 to 62
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1098,10 +1160,6 @@ Retrieving log information from 1 to 62
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

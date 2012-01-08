@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Kindle Store で樋口一葉、芥川龍之介、夏目漱石らの日本語書籍が出てたのは以前から知っていたのですが、最近 Amazon Kindleで日本語のコンテンツが読める！ 日本語電子書籍「想隆社文庫」創刊！一般向けおよび図書館向けに提供を開始 といったプレスリリースが出てたので、 &hellip;">
+  <meta name="description" content="DevOps: Why Silos Suck And How To Break Them というエントリをたまたま目にして、「DevOps」という見なれない言葉が出てきたので、気になって調べてみたところ、自分が何となくやっていたことや、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,132 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/25/DevOps/">DevOps</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-03-25T10:18:35+09:00" pubdate>Mar 25<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/03/25/DevOps/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/">DevOps: Why Silos Suck And How To Break Them</a> というエントリをたまたま目にして、「DevOps」という見なれない言葉が出てきたので、気になって調べてみたところ、自分が何となくやっていたことや、今までもやもやと考えていたことに一定の方向性が与えらえた気がしたので、整理してみることにします。</p>
+
+<hr />
+
+<h1>DevOps とは？</h1>
+
+<p>簡単に言ってしまうと<em>「開発者と運用者の間の壁を取り払うためのベストプラクティス」</em>と言えそうです。</p>
+
+<hr />
+
+<h1>開発者と運用者の間の壁？</h1>
+
+<p>Flickr の中の人による <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr">10+ Deploys Per Day: Dev and Ops Cooperation at Flickr</a> という Velocity 2009 でのプレゼンスライドには「Devs versus Ops」という章があり、以下のような言葉が載っていました。</p>
+
+<p>  &#8220;It&#8217;s not my machines, it&#8217;s your code!&#8221;</p>
+
+<p>「それは俺のマシンじゃないし、お前のコードだろ」って感じでしょうか。実際、開発者と運用者が明確に分かれている組織では、多かれ少なかれ、また、ニュアンスや詳細は違うでしょうが、こういった言葉が交わされることがあるのではないでしょうか。これは開発者と運用者だけではなく、ウェブ開発者とサーバエンジニア、フロントエンジニアとバックエンドエンジニア、といった形で、明確に役割分担されている組織では起こりうる問題であり、これにより開発がスケジュールから大幅に遅れたり、トラブルがなかなか解決しない、といったような事態を招くこともあるんじゃないかと思います。</p>
+
+<p>また、上記スライドでは以下のような考えを「伝統的な考え」と述べています。</p>
+
+<ul>
+<li>開発者の仕事は新しい機能を追加すること</li>
+<li>運用者の仕事はサイトを速くて安定した状態に保つこと</li>
+</ul>
+
+
+<p>そして、「運用者の仕事はサイトを速くて安定した状態に保つこと<em>ではない<em>&#8216;」とし、「ビジネスには変化が必要」であり、&#8221;&#8217;「安定性をとって変化を捨てる」&#8221;&#8217;か&#8217;</em>「必要に応じて変化が起こることを許容する」</em>か、といった選択肢を提示しています。</p>
+
+<hr />
+
+<h1>どうやってその壁を取り除くのか</h1>
+
+<p>では、このような開発者と運用者（あるいはウェブ開発者とサーバエンジニアなど、自身の置かれた状況に置き変えてみてください）の壁を取り払うためには、どうすればいいのでしょうか。上で見たように、壁の原因は<em>「運用者の仕事はサイトを速くて安定した状態に保つこと」<em>&#8216;という伝統的な考えにありそうです。（これは別に運用者が悪い、と言っているわけではありません。）そして、提示された選択肢のうちの後者&#8217;</em>「必要に応じて変化が起こることを許容する」</em>ことが容易に実現できるようにすることが大事なのではないかと考えられます。これを実現するために重要なことは、</p>
+
+<ul>
+<li>ツール</li>
+<li>文化</li>
+</ul>
+
+
+<p>の2つに分けることができそうです。</p>
+
+<hr />
+
+<h1>ツール</h1>
+
+<p>「10+ Deploys Per Day: Dev and Ops Cooperation at Flick」では、ツールとして以下のようなものをあげています。</p>
+
+<ul>
+<li>インフラの自動化</li>
+<li>共有されたバージョンコントロール</li>
+<li>ワンステップビルド＆デプロイ</li>
+<li>機能フラグ</li>
+<li>メトリックの共有</li>
+<li>IRC and IM robots</li>
+</ul>
+
+
+<p>ひとつひとつの解説は省略しますが、いずれも状態やその変化を記録、可視化し、変更しやすい、あるいは変更をコントロールしやすい環境をつくるためのツール、と言えそうです。</p>
+
+<hr />
+
+<h1>文化</h1>
+
+<p>また、文化としては以下のような項目を挙げています。</p>
+
+<ul>
+<li>尊敬</li>
+<li>信頼</li>
+<li>失敗を許容する</li>
+<li>責めない</li>
+</ul>
+
+
+<p>まあこれは、人と協調して仕事をスムーズに進めるためにはどれも重要なことですよね。</p>
+
+<hr />
+
+<p>以上が DevOps について、自分なりに得たことのまとめです。ツールについては、自分がペパボに入社してから導入や利用促進してきたもの、これから導入したいと思っているものなんかが、軒並み上のリストに含まれていて、DevOps の概念が頭にあったわけではないんですが、思いがけずそういう方向に行こうとしていたんだな、ということがこの言葉に出会うことによって確認できました。（それでエントリのタイトルがあんな感じになってます。）</p>
+
+<p>DevOps 自体まだ定義として固まっているものではないようですし、かなり端折った形でまとめましたので、興味がある方は自分が参考にした以下のURLや、更にそこからのリンクを辿ってみてください。</p>
+
+<ul>
+<li>参考URL
+
+<ul>
+<li>http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/</li>
+<li>http://dev2ops.org/blog/2010/2/22/what-is-devops.html</li>
+<li>http://code.google.com/p/devops-toolchain/</li>
+<li>http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr</li>
+</ul>
+</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1429,66 +1555,6 @@ Fri Jan 15 17:49:07 2010: rsyncing /tmp/lsyncd/0/1/2/ --&gt; localhost:/var/tmp/
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/12/31/PlackMiddlewareAuthLDAP/">PlackMiddlewareAuthLDAP</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-12-31T11:22:58+09:00" pubdate>Dec 31<span>st</span>, 2009</time>
-        
-         | <a href="/blog/2009/12/31/PlackMiddlewareAuthLDAP/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><em>追記</em></p>
-
-<p>miyagawa さんから助言があり、authenticator 追加するだけでサブクラスが増えると使いにくいというのと、<a href="http://search.cpan.org/~chansen/Authen-Simple-LDAP/">Authen::Simple::LDAP</a> を使えば、LDAP で認証するためにそれほどコード書くこともないので、わざわざモジュール化する必要もない、ということで、github からは削除することにしました。</p>
-
-<p>また、Plack::Middleware::Auth::Basic の authenticator に Authen::Simple オブジェクトがそのまま渡せるように miyagawa さんが修正してくださいました。</p>
-
-<p>http://github.com/miyagawa/Plack/commit/9f1ad6a3c2f33cd8f37c6cfcbb0993c55c84bbb9</p>
-
-<p>これで Plack::Middleware::Auth::Basic そのままで、以下のような感じで LDAP で認証できます。</p>
-
-<pre><code>#!perl
-use Authen::Simple::LDAP;
-enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
-</code></pre>
-
-<p>miyagawa さん、ありがとうございました。</p>
-
-<hr />
-
-<p>最近公私ともに、いちからウェブアプリ（ウェブ API 除く）書いてなくて、久々にウェブアプリを書こうかな−、と思いながらも、フレームワークに何を使おうか迷っていて、<a href="http://opensource.kayac.com/ja/projects/ark/advent/2009/">Ark Advent Calendar 2009</a> を読んだり、<a href="http://d.hatena.ne.jp/tokuhirom/20091230/1262133671">Amon</a> をウォッチしたりして、この年末を過ごしています。</p>
-
-<p>で、いずれのフレームワーク使うにしても、Plack はキーになりそうだな、ってことで、LDAP で認証するための Plack::Middleware を書いてみました。</p>
-
-<p>http://github.com/mizzy/p5-plack-middleware-auth-ldap</p>
-
-<p><a href="http://search.cpan.org/~miyagawa/Plack/lib/Plack/Middleware/Auth/Basic.pm">Plack::Middleware::Auth::Basic</a> を継承し、authorizer を追加する形で実装しています。</p>
-
-<p>ネームスペースは Plack::Middleware::Auth::Basic::LDAP の方がいいのかな、とか、ダイジェスト認証対応しようと思ったら、別モジュールにした方がいいのか、合わせてひとつのモジュールにした方がいいのか、その場合のネームスペースはどうすればいいのか、など、色々固まってない点があるので、まだ CPAN にはアップしない予定です。が、とりあえず自分で使う分には問題なく動いてるっぽいです。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -1506,6 +1572,10 @@ enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -1519,10 +1589,6 @@ enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>

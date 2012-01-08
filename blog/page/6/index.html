@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Dizzy Mizz Lizzy が再結成ツアーで来日することが決定 したようで、チケット発売情報を漏らさないために、Plagger の CustomFeed::Script 用スクリプトを書きました。 http://gist.github.com/266224 彼らは95年、96年も来日していて &hellip;">
+  <meta name="description" content="追記 miyagawa さんから助言があり、authenticator 追加するだけでサブクラスが増えると使いにくいというのと、Authen::Simple::LDAP を使えば、LDAP で認証するためにそれほどコード書くこともないので、わざわざモジュール化する必要もない、ということで、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,66 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/31/PlackMiddlewareAuthLDAP/">PlackMiddlewareAuthLDAP</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-12-31T11:22:58+09:00" pubdate>Dec 31<span>st</span>, 2009</time>
+        
+         | <a href="/blog/2009/12/31/PlackMiddlewareAuthLDAP/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>追記</em></p>
+
+<p>miyagawa さんから助言があり、authenticator 追加するだけでサブクラスが増えると使いにくいというのと、<a href="http://search.cpan.org/~chansen/Authen-Simple-LDAP/">Authen::Simple::LDAP</a> を使えば、LDAP で認証するためにそれほどコード書くこともないので、わざわざモジュール化する必要もない、ということで、github からは削除することにしました。</p>
+
+<p>また、Plack::Middleware::Auth::Basic の authenticator に Authen::Simple オブジェクトがそのまま渡せるように miyagawa さんが修正してくださいました。</p>
+
+<p>http://github.com/miyagawa/Plack/commit/9f1ad6a3c2f33cd8f37c6cfcbb0993c55c84bbb9</p>
+
+<p>これで Plack::Middleware::Auth::Basic そのままで、以下のような感じで LDAP で認証できます。</p>
+
+<pre><code>#!perl
+use Authen::Simple::LDAP;
+enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
+</code></pre>
+
+<p>miyagawa さん、ありがとうございました。</p>
+
+<hr />
+
+<p>最近公私ともに、いちからウェブアプリ（ウェブ API 除く）書いてなくて、久々にウェブアプリを書こうかな−、と思いながらも、フレームワークに何を使おうか迷っていて、<a href="http://opensource.kayac.com/ja/projects/ark/advent/2009/">Ark Advent Calendar 2009</a> を読んだり、<a href="http://d.hatena.ne.jp/tokuhirom/20091230/1262133671">Amon</a> をウォッチしたりして、この年末を過ごしています。</p>
+
+<p>で、いずれのフレームワーク使うにしても、Plack はキーになりそうだな、ってことで、LDAP で認証するための Plack::Middleware を書いてみました。</p>
+
+<p>http://github.com/mizzy/p5-plack-middleware-auth-ldap</p>
+
+<p><a href="http://search.cpan.org/~miyagawa/Plack/lib/Plack/Middleware/Auth/Basic.pm">Plack::Middleware::Auth::Basic</a> を継承し、authorizer を追加する形で実装しています。</p>
+
+<p>ネームスペースは Plack::Middleware::Auth::Basic::LDAP の方がいいのかな、とか、ダイジェスト認証対応しようと思ったら、別モジュールにした方がいいのか、合わせてひとつのモジュールにした方がいいのか、その場合のネームスペースはどうすればいいのか、など、色々固まってない点があるので、まだ CPAN にはアップしない予定です。が、とりあえず自分で使う分には問題なく動いてるっぽいです。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -913,54 +973,6 @@ trait Product extends java.lang.Cloneable {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/09/11/YapcAsia2009TokyoPresentation/">YapcAsia2009TokyoPresentation</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-09-11T00:21:28+09:00" pubdate>Sep 11<span>th</span>, 2009</time>
-        
-         | <a href="/blog/2009/09/11/YapcAsia2009TokyoPresentation/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ひとつ目は <a href="http://conferences.yapcasia.org/ya2009/talk/2166">ペパボでの Perl のつかいかた</a> 。<a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a> と一緒にプレゼンしました。<a href="http://d.hatena.ne.jp/naoya/">お兄さん</a>、ネタに使わせてもらってすみません＆ありがとうございました。後半のロリポの話は、二人で休日も返上してがっつり取り組んだプロジェクトだったので、ぜひ二人で発表したい、と思い、一緒にやらせてもらいました。資料の最新版は id:hiboma が持ってるので、そのうちアップしてくれると思います。</p>
-
-<p>ふたつ目は <a href="http://conferences.yapcasia.org/ya2009/talk/2220">Danga::Socketの非同期処理の仕組みとPerlbalで非同期処理するプラグインを書く方法</a> 。<a href="http://www.slideshare.net/mizzy/how-dangasocket-handles-asynchronous-processing-and-how-to-write-asynchronous-perlbal-plugins">英語版資料</a> と <a href="http://www.slideshare.net/mizzy/dangasocketperlbal">日本語版資料</a> を slideshare にアップしています。</p>
-
-<p>また、プラグインのコードは、プレゼン中は概要しか紹介できなかったので、実際に動くサンプルを <a href="http://github.com/mizzy/perlbal-async-plugin-example/tree/master">github にアップ</a>しています。Perlbal::ClientProxy のパッチと設定ファイルも合わせて置いてあります。</p>
-
-<p>ただ、プレゼンした手法は、以下の点でとても実用的とは言えません。</p>
-
-<ul>
-<li>本体に手を入れなければいけない</li>
-<li>特定の hook にしか対応してない</li>
-<li>同じフックで複数の非同期処理プラグインを動かすことができない</li>
-</ul>
-
-
-<p>本体に手を入れるのはしかたないとして、特定のフックに依存せずに、同じフックで複数の非同期処理プラグインを動かせるようするにはどうすればいいのか、今のところノーアイデアです。これがすっきりできるように実装できれば、ぜひパッチを送りたいところなのですが、今のところ必要に駆られてないので、たぶんやらないと思います。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -978,6 +990,10 @@ trait Product extends java.lang.Cloneable {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
@@ -991,10 +1007,6 @@ trait Product extends java.lang.Cloneable {
     
       <li class="post">
         <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/11/15/octopress-on-heteml/">How to deploy a blog made by Octopress to Heteml</a>
       </li>
     
   </ul>
