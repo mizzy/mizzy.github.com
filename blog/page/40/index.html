@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="blosxomでtaggingに対応するプラグインを書いてみました。使い方とか全然書いてないし、まだ作りかけなのですが、置いておきます。taggingプラグイン タグづけはmeta pluginを利用して、entryファイルのタイトルの次の行に、「meta-tags: tag1, tag2, &hellip;">
+  <meta name="description" content="taggingプラグインをアップデート。タグとファイルを関連付けるキャッシュを生成するようにして、パフォーマンスを向上。download: taggingプラグイン QUERY_STRINGやPOSTパラメータで、recache_tags=1を指定すれば、キャッシュを再作成します。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/14/495/">Blosxomでtagging #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-14T15:50:00+09:00" pubdate>Apr 14<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/14/495/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+taggingプラグインをアップデート。タグとファイルを関連付けるキャッシュを生成するようにして、パフォーマンスを向上。download: <a href="/archives/tagging">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+QUERY_STRINGやPOSTパラメータで、recache_tags=1を指定すれば、キャッシュを再作成します。
+</p>
+
+
+
+
+<p class="entryBody">
+手を抜くためにStorableモジュールを使ってます。なので、使える環境が限られてしまいます。ごめんなさい。（って、使ってくれる人がいれば、だけど。）
+</p>
+
+
+
+
+<p class="entryBody">
+次の目標は、タグの検索インターフェースにajaxを利用して、使いやすいものを目指してみる。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -548,6 +605,10 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -561,10 +622,6 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

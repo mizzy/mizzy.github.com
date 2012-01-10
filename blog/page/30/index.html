@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="coLinux をサービスとして登録する場合、 C:\colinux&gt; colinux-daemon --install-service -c conf.xml と実行すればいい、みたいな記述はあちこちで見るのですが、自分の環境ではサービス登録後、 &hellip;">
+  <meta name="description" content="本職ウェブプログラマになった弊害として、ブログがちょっと書きにくくなってしまいました。今までのウェブ関連エントリは完全に趣味でやってたことなので、誰に憚ることもなかったわけですが、これからは仕事と絡む内容も多くなってしまうため、どこまで書いていいのかの線引きに悩んでしまいます。 ですが、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,98 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/02/11/443/">Build on Your Own API</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-02-11T20:39:00+09:00" pubdate>Feb 11<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/02/11/443/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+本職ウェブプログラマになった弊害として、ブログがちょっと書きにくくなってしまいました。今までのウェブ関連エントリは完全に趣味でやってたことなので、誰に憚ることもなかったわけですが、これからは仕事と絡む内容も多くなってしまうため、どこまで書いていいのかの線引きに悩んでしまいます。
+</p>
+
+
+
+
+<p class="entryBody">
+ですが、なるべくオープンなスタンスは貫きたいと思っているので、自社ビジネスに影響を与えない範囲で、うまく書いていけたらな、と思ってます。
+</p>
+
+
+
+
+<p class="entryBody">
+というわけで今日は、<a href="http://radar.oreilly.com/archives/2006/02/web_development_20.html" target="_blank">O&#8217;Reilly Radar &gt; Web Development 2.0</a> から。
+</p>
+
+
+
+
+<p class="entryBody">
+海外ブログ紹介エントリは書くつもりはないため、内容は詳しく説明しませんが、Web 2.0 について開発の観点から整理したもの、という感じです。
+</p>
+
+
+
+
+<p class="entryBody">
+この中で特に目を引いたのが、「Buidl on your own API」 の項。これはまさに、自分が転職して最初にやりたかったこととまったく同じだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+API を公開、ってのが今の流れになってるわけですが、API を第三者へ公開することを主目的とせずに、自社のサービスの基盤となるデータ上に API を被せ、ライブラリを整備することによって、自社内でのサービス開発の効率化と各サービスの連携が容易にできるようにしよう、という狙いですね。第三者への API やライブラリの公開はその副産物、といった感じで。
+</p>
+
+
+
+
+<p class="entryBody">
+転職してからのここ1週間ちょいの間に、既存のサービスの改良をしつつ、以前から考えていた上の様なアイデアを整理して上司に提出、他の方々とディスカッションして意見を頂き、ある程度方向性が固まったところで、これから具体的な仕様決めと実装に着手といった感じです。
+</p>
+
+
+
+
+<p class="entryBody">
+この考えについては、社内での反応も悪くはなかったので、イケるという確信はあるものの、やはり今までは日曜プログラマにしかすぎなかったわけで、自社内でやるんなら API でラップせずに直接データベース叩かせた方がパフォーマンスはいいんじゃね、とか、他社はこんなまわりくどいことをやってるんだろうか、とか若干の不安はあったのですが、O&#8217;Reilly Radar のエントリによりそういう流れが実際にあるということを知って、大変勇気づけられました。
+</p>
+
+
+
+
+<p class="entryBody">
+といった形で、しばらくは API やライブラリ整備といったサービス基盤作りに注力、その後おもしろいサービスをがんがん作っていけたらなぁ、と思ってたりします。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -870,84 +962,6 @@ RSS からタイトルと permalink url をひろって投稿しています。�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/01/06/347/">lighttpdをテスト用のwebサーバとして利用する（Rails 勉強中 #8）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-01-06T09:05:00+09:00" pubdate>Jan 6<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/01/06/347/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-どこかで見たことあるようなエントリタイトルだと思ったあなた、正解です。
-<a href="http://wiki.rails2u.com/lighttpd%E3%82%92%E3%83%86%E3%82%B9%E3%83%88%E7%94%A8%E3%81%AEweb%E3%82%B5%E3%83%BC%E3%83%90%E3%81%A8%E3%81%97%E3%81%A6%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B" target="_blank">lighttpdをテスト用のwebサーバとして利用する :: wiki.rails2u.com</a> からとっています。
-</p>
-
-
-
-
-<p class="entryBody">
-ここに書いてあることを試そうと思って、lighttpd や fcgi のセットアップから色々調べていたのですが、Rails 1.0 ではもっと簡単に、以下のようにコマンド一発で lighttpd をテスト用ウェブサーバとして起動できることに気づきました。
-</p>
-
-
-
-
-<pre class="code">
-$ ./scripr/server lighttpd
-=> Booting lighttpd (use 'script/server webrick' to force WEBrick)
-=> script/../config/../config/lighttpd.conf not found, copying from /usr/local/l
-ib/ruby/gems/1.8/gems/rails-1.0.0/configs/lighttpd.conf
-=> Rails application started on http://0.0.0.0:3000
-=> Call with -d to detach (requires absolute paths in config/lighttpd.conf)
-=> Ctrl-C to shutdown server (see config/lighttpd.conf for options)
-</pre>
-
-
-
-
-<p class="entryBody">
-もちろん、lighttpd と fcgi が利用できる環境になっていて、ruby の fcgi モジュールがインストールされている必要がありますが。
-</p>
-
-
-
-
-<p class="entryBody">
-それにしても、ここの rails に関するエントリでは、必ず gorou さんのサイトを引き合いに出していますね。頭が下がる思いです、ほんと。
-</p>
-
-
-<p></p>
-
-<p class="entryBody">
-gorou さん、面識はありませんが、はてなへの転職おめでとうございます。今後の一層のご活躍を楽しみにしております。gorou さんのような方が perl 陣営に加わるのは、同じ perl 使いとして大変うれしいです。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/31/">&larr; Older</a>
@@ -965,6 +979,10 @@ gorou さん、面識はありませんが、はてなへの転職おめでと�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -978,10 +996,6 @@ gorou さん、面識はありませんが、はてなへの転職おめでと�
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="昨日のエントリの続き。filter もちゃんと実装して、ついでにプラグインも全て新しいプラグイン機構に対応させてみた。 本家 の Rev.23 との全差分です。 Index: plugins/Entry/Blosxom.pm &hellip;">
+  <meta name="description" content="前回のエントリで、catlxom のプラグイン機構を plagger っぽくしてみたのですが、 sub register { my ($class, $c) = @_; $c-&gt;catlxom-&gt;register_hook( $class, 'setup' =&gt; 'setup &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,104 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/14/371/">Catlxom の プラグイン機構を Plagger ライクに #2 (Catlxom メモ #7)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-14T23:15:00+09:00" pubdate>Jun 14<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/14/371/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/catlxom_memo_06.html" target="_blank">前回のエントリ</a>で、catlxom のプラグイン機構を plagger っぽくしてみたのですが、
+</p>
+
+
+
+
+<pre class="code">
+sub register {
+    my ($class, $c) = @_;
+    $c-&gt;catlxom-&gt;register_hook(
+        $class,
+        'setup'       =&gt; 'setup',
+        'interpolate' =&gt; 'interpolate',
+    );
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+といった感じで、各プラグイン毎にいちいちプラグインを実行する hook ポイントと、その hook ポイントで実行するメソッドを記述するのもちょっと冗長だなぁ、と。
+</p>
+
+
+
+
+<p class="entryBody">
+なので、hook ポイント名とメソッド名は同じ、という規約を作ってしまって、Catalxom::Plugins でプラグインロードする際に register_hook してやれば、いちいち register を書く必要がなくなってハッピーだと思ったのでコード書いてみた。
+</p>
+
+
+
+
+<pre class="code">
+Index: lib/Catlxom/Plugins.pm
+===================================================================
+--- lib/Catlxom/Plugins.pm      (revision 23)
++++ lib/Catlxom/Plugins.pm      (working copy)
+@@ -51,7 +51,15 @@
+         ( my $plugin = 'Catlxom::Plugin::' . join( '::', @path ) . $file-&gt;basename )
+             =~ s/\.pm$//;
+
+-        unshift @Catlxom::Context::ISA, $plugin;
++        for ( qw(setup initialize start update filter sort paginate fixedup
++                 interpolate end) ){
++            if ( $plugin-&gt;can($_) ){
++                $c-&gt;catlxom-&gt;register_hook(
++                    $plugin,
++                    $_ =&gt; $_,
++                );
++            }
++        }
+     }
+
+     if ( $c-&gt;debug ) {
+</pre>
+
+
+
+
+<p class="entryBody">
+これでプラグインのコードがちょっとだけすっきりする。<a href="http://mizzy.org/archives/catlxom.patch" target="_blank">本家からの全差分はこちら。</a>
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1624,93 +1722,6 @@ Index: plugins/Template/TT.pm
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/27/456/">Catlxom メモ #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-27T20:05:00+09:00" pubdate>May 27<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/05/27/456/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-今イタリアにいるらしい <a href="http://unknownplace.org/memo/" target="_blank">typester さん</a> 作の Catalyst meets Blosxom な <a href="http://catlxom.org/trac" target="_blank">catlxom</a> を最近触り始めました。（<a href="http://unknownplace.org/slides/catlxom/start.html" target="_blank">説明はこちら。</a>キャットルームと読むらしいです。）
-</p>
-
-
-
-
-<p class="entryBody">
-で、Catalyst::Plugin::Flavour でいくつかはまったのでメモです。
-</p>
-
-
-
-
-<p class="entryBody">
-まず、cpan コマンドで Catalyst::Plugin::Flavour をインストールすると、バージョン 0.02 が入るのですが、これだと catlxom は動きません。DEVELOPER RELEASE の 0.029_01 のソースをもってきてインストールする必要があります。
-</p>
-
-
-
-
-<p class="entryBody">
-次に、個別エントリのパーマリンクページを表示させようとしても、全エントリが表示されてしまうので、調べてみたところ $c-&gt;flavour-&gt;fn の返り値が undef でした。というわけで Catalyst::Plugin::Flavour に一行追加してみた。
-</p>
-
-
-
-
-<pre class="code">
---- Flavour.pm.org      2006-05-27 19:31:19.000000000 +0900
-+++ Flavour.pm  2006-05-27 19:57:43.000000000 +0900
-@@ -79,6 +79,7 @@
-     }
-     elsif ( my ( $fn, $flavour ) = $path[-1] =~ /(.*)\.(.*?)$/ ) {
-
-+        $c-&gt;flavour-&gt;fn($fn);
-         $c-&gt;flavour-&gt;flavour($flavour);
-         if ( $fn eq 'index' ) {
-             pop @path;
-</pre>
-
-
-
-
-<p class="entryBody">
-これで個別パーマリンクページがちゃんと表示されました。
-</p>
-
-
-
-
-<p class="entryBody">
-いずれこのブログは、blosxom から catlxom へ移行しようと思います。まずは必要な blosxom プラグインの移植からですね。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/26/">&larr; Older</a>
@@ -1728,6 +1739,10 @@ Index: plugins/Template/TT.pm
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1741,10 +1756,6 @@ Index: plugins/Template/TT.pm
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

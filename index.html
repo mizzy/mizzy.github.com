@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="I&#8217;ve written a script to convert Getting Real into mobipocket format. But the kindle edition of Getting Real is sold at amazon.com, publishing &hellip;">
+  <meta name="description" content="久々に日本語で書きます。（後で英語でも書く。） Web-to-mobi を焼き直して、Webiblo というプロジェクトを立ち上げてみました。 基本的には GitHub の README に書いてある通りなんですが、ウェブサイトについて記述された JSON を喰わせることによって、Kindle &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,149 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - Web to Ebook Project</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2012-01-10T19:02:00+09:00" pubdate>Jan 10<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>久々に日本語で書きます。（後で英語でも書く。）</p>
+
+<p><a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi</a> を焼き直して、<a href="https://github.com/mizzy/webiblo">Webiblo</a> というプロジェクトを立ち上げてみました。</p>
+
+<p>基本的には GitHub の README に書いてある通りなんですが、ウェブサイトについて記述された JSON を喰わせることによって、Kindle で読める mobipocket フォーマットの電子書籍データを作ろう、また、様々なサイト対応の JSON データを集めたい、というのがこのプロジェクトの趣旨です。</p>
+
+<p>現在は、</p>
+
+<pre><code>$ webiblo.pl http://mizzy.org/webiblo/data/Getting_Real.json
+</code></pre>
+
+<p>といった感じで、JSON が記述された URL を指定するか、｀</p>
+
+<pre><code>$ cat data.json | webiblo.pl
+</code></pre>
+
+<p>といった形で JSON を標準入力から渡してやれば、与えられたデータにしたがって、mobipocket 形式のデータを生成します。（<a href="http://www.amazon.com/gp/feature.html?docId=1000234621">KindleGen</a> が必要です。）</p>
+
+<p>JSON データは以下のようになっています。</p>
+
+<pre><code>{
+    "title"       : "Structure and Interpretation of Computer Programs",
+    "authors"     : [
+        "Harold Abelson",
+        "Gerald Jay Sussman",
+        "Julie Sussman"
+    ],
+    "cover_image"   : "http://mitpress.mit.edu/sicp/full-text/book/cover.jpg",
+    "content_xpath" : "//div[@class=\"content\"]", # Optional
+    "exclude_xpath" : "//div[@class=\"navigation\"]", # Optional
+    "chapters" : [
+        {
+            "title" : "Foreword",
+            "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-5.html#%_chap_Temp_2"
+        },
+        {
+            "title" : "1  Building Abstractions with Procedures",
+            "uri"  : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-9.html#%_chap_1",
+            "sections" : [
+                "title" : "1.1  The Elements of Programming",
+                "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1"
+                "subsections" : [
+                    {
+                        "title" : "1.1.1  Expressions",
+                        "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1.1"
+                    },
+                ]
+            ]
+        }
+    ]
+}
+</code></pre>
+
+<p>ざっくり構造としては、以下のようになっています。</p>
+
+<ul>
+<li>書籍データ
+
+<ul>
+<li>本のタイトル</li>
+<li>著者</li>
+<li>表紙画像</li>
+<li>コンテンツとして抜き出す部分の XPath（オプショナル）</li>
+<li>コンテンツから除外したい部分の XPath（オプショナル）</li>
+<li>章
+
+<ul>
+<li>章タイトル</li>
+<li>章ページの URI</li>
+<li>セクション
+
+<ul>
+<li>セクションタイトル</li>
+<li>セクションページの URI</li>
+<li>サブセクション
+
+<ul>
+<li>サブセクションタイトル</li>
+<li>サブセクションページの URI</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<p>JSON データは現在のところ、<a href="http://gettingreal.37signals.com/toc.php">Getting Real</a>用のものと <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">SICP</a> 用のものを <a href="http://mizzy.org/webiblo/">こちら</a> で公開しています。</p>
+
+<p>JSON データは GitHub リポジトリの gh-pages ブランチに置いてあるので、独自の JSON データを作成した方は pull request 送ってもらえるとうれしいです。</p>
+
+<p>webiblo で生成したデータを Kindle Previewer で見ると、こういった感じになります。</p>
+
+<p><img src="/images/2012/01/sicp_cover.png" width="250" title="SICP Cover" >
+<img src="/images/2012/01/sicp_toc.png" width="250" title="SICP TOC" >
+<img src="/images/2012/01/sicp_content.png" width="250" title="SICP Content" ></p>
+
+<p>元々は、単に Getting Real 英語版のデータを mobipocket 形式に変換したかっただけなんですが、Facebook での otsune さんのアドバイスにより、こういった形で、書籍固有のデータを分離する形でつくってみました。</p>
+
+<p>また、<a href="http://twitter.com/hotchpotch">@hotchpotch</a> さんから、<a href="http://subtech.g.hatena.ne.jp/motemen/20110915/1316088362">Autopagerize の SITEINFO を活用したアプローチ</a> もあるよ、と教えて頂き、うおー、これはエレガントだ、と思ったんですが、こちらは目次ページを作成する機能がなさそうだったので、とりあえず当初の JSON を利用するというコンセプトのまま開発を進めました。</p>
+
+<p>今後の TODO としては、以下のものを考えてます。</p>
+
+<ul>
+<li>EPUB3 など、mobipocket 以外のフォーマット対応</li>
+<li>CLI から JSON カタログを検索して、簡単にデータ生成できるようにする</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -627,49 +770,6 @@ end
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/10/21/twan-tag-plugin/">TWAN Tag Plugin for Jekyll</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-10-21T00:04:00+09:00" pubdate>Oct 21<span>st</span>, 2011</time>
-        
-         | <a href="/blog/2011/10/21/twan-tag-plugin/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I&#8217;ve written <a href="https://github.com/mizzy/jekyll-plugins/blob/master/twan_tag.rb">TWAN tag plugin</a> for <a href="https://github.com/mojombo/jekyll">Jekyll</a> which shows the image of <a href="http://www.twanight.org/newTWAN/index.asp">The World At Night</a>.</p>
-
-<p>If you call this plugin in a post like this:</p>
-
-<pre><code>{% twan 3003406 %}
-</code></pre>
-
-<p>The image shows up like this.</p>
-
-<p><a href="http://www.twanight.org/newTWAN/photos.asp?ID=3003406"><img src="/images/twan/3003406.jpg" /></a></br />
-<a href="http://www.twanight.org/newTWAN/photos.asp?ID=3003406">Draconid Meteors Composite by Juan Carlos Casado</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -685,6 +785,10 @@ end
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -698,10 +802,6 @@ end
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

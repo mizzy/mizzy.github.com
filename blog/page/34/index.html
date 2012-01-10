@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="単なるテスト目的の実装ではおもしろくないので、OpenID の応用例として、blosxom のエントリに OpenID でアクセス制限をかけるプラグインを作ってみました。auth_openid プラグイン これが見えているということは、認証成功ですね。おめでとうございます。 meta &hellip;">
+  <meta name="description" content="feedbringer 使うのやめた、とか言っておきながら、feedbringer remix ネタ。別に feedbringer じゃなくても良かったのですが、 ONJava.com: AJAX: How to Handle Bookmarks and Back Buttons &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,155 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/23/330/">Ajaxで「戻る」「進む」（feedbringerをremixin&#8217; #7）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-23T18:28:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/23/330/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+feedbringer 使うのやめた、とか言っておきながら、feedbringer remix ネタ。別に feedbringer じゃなくても良かったのですが、 <a href="http://www.onjava.com/pub/a/onjava/2005/10/26/ajax-handling-bookmarks-and-back-button.html" target="_blank">ONJava.com: AJAX: How to Handle Bookmarks and Back Buttons</a> を見てたら実験したくなったのと、そういや feedbringer 使うのやめた理由のひとつは、「戻る」「進む」ボタンが使えないからだったなぁ、ということを思い出したので、上記 URL にあるテクニックを feedbringer に適用してみることにした。
+</p>
+
+
+
+
+<p class="entryBody">
+いつものごとく、greasemonkey で remix です。 <a href="http://mizzy.org/js/feedbringer_enable_back_and_forth.user.js" target="_blank">feedbringer_enable_back_and_forth.user.js</a>
+</p>
+
+
+
+
+<p class="entryBody">
+実験ということもあり、自分のスキル不足もあってかなりいいかげんなスクリプトですが、簡単に解説を。
+</p>
+
+
+
+
+<pre class="code">
+<strong>// feedbringer_enable_back_and_forth.user.js から抜粋</strong>
+
+var js = document.createElement("script");
+js.language = "javascript";
+js.src = "http://mizzy.org/js/dhtmlHistory.js";
+document.body.appendChild(js);
+</pre>
+
+
+
+
+<p class="entryBody">
+まずこの部分では、上記 ONJava.com サイトで紹介されている、 <a href="http://codinginparadise.org/projects/dhtml_history/latest.zip" target="_blank">Really Simply History framework</a> のdhtmlHistory.js を読み込んでいます。
+</p>
+
+
+
+
+<pre class="code">
+<strong>// dhtmlHistory.js から抜粋</strong>
+
+dhtmlHistory.initialize();
+dhtmlHistory.addListener(historyChange);
+
+function historyChange(newLocation, historyData) {
+    $('main').innerHTML = historyData;
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+dhtmlHistory.js の最後に、上の6行を追加しています。本来であればユーザスクリプト側に書くべきなんでしょうが、dhtmlHistory.js を読み込み終わってから実行しないエラーとなるため、面倒なのでこっちに書いちゃいました。読み込み完了してから実行する方法がよくわからんし。
+</p>
+
+
+
+
+<p class="entryBody">
+ここは dhtmlHistorty オブジェクトの初期化処理ですね。 dhtmlHisotry.addListener が重要なとこで、「戻る」「進む」ボタンを押した時に、どういった処理を実行するのか定義します。ここでやっていることは、後ほど出てくる dhtmlHistory.add によって記録された historyData を、 id が main であるコンテナに書き戻す、ということをやっています。
+</p>
+
+
+
+
+<pre class="code">
+<strong>// feedbringer_enable_back_and_forth.user.js から抜粋</strong>
+
+Ajax.Updater.prototype.extend(Ajax.Request.prototype).extend({
+  ...
+  updateContent: function() {
+     ...
+     if (receiver) {
+       if (this.options.insertion) {
+         new this.options.insertion(receiver, response);
+       } else {
+         receiver.innerHTML = response;
+         <strong>
+         var date = new Date();
+         dhtmlHistory.add('key' + date.getTime() , response);
+         </strong>
+       }
+     }
+  ...
+</pre>
+
+
+
+
+<p class="entryBody">
+ユーザスクリプトで prototype.js の Ajax.Updater を上書きしています。太字の部分を追加しただけですね。xhtmlHttpRequest のロードが完了した時点で、dhtmlHistory.add を実行して、 location.hash の値と、それにひもづくデータを historyStorage オブジェクトに格納、でもって location.hash をここで指定された値に書き換える、ということをやってます。
+</p>
+
+
+
+
+<p class="entryBody">
+スクリプトの解説は以上です。これで「戻る」「進む」ボタンを押すと、最初の方に出てきた dhtmlHistory.addListener で指定された historyChange が実行されて、変更された location.hash にひもづく historyData を historyStorage オブジェクトから引っ張り出して、id が main であるコンテナに書き戻す、という具合になります。
+</p>
+
+
+
+
+<p class="entryBody">
+今回の例では id=main コンテナ決めうちで書き換えしてますが、 dhtmlHistory.add で格納できる historyData は、 文字列だけじゃなくオブジェクトも指定できるので、 やろうと思えばもっと複雑なこともできますね。
+</p>
+
+
+
+
+<p class="entryBody">
+上記 ONJava.com サイトによると、<a href="http://www.backbase.com/" target="_blank">Backbase</a> や <a href="http://www.dojotoolkit.org/" target="_blank">Dojo</a> なんかは、こういったヒストリフレームワークが実装されているようです。prototype.js にも実装してほしいっすね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1058,142 +1207,6 @@ S席, A席, B席すべてチケットには余裕があるようです。みな�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/08/28/373/">フィードアグリゲータに求めること</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-08-28T02:56:00+09:00" pubdate>Aug 28<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/08/28/373/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-feedbringer、使うのをやめることにしました。bloglines に戻ります。理由は、UI の改良により、HTML も修正されたため、自作の greasemonkey 用ユーザスクリプトならびに css ファイルがそのままでは使えなくなったから。修正するのも面倒だし、修正してまで feedbringer を使い続けるほどの魅力を感じなくなった。かといって、素の UI は改良されたとはいえ、正直あまり使いやすくはない。自分がカスタマイズしたものに似てはいるけど、微妙に使いづらいと感じるのは、他の誰かが言っているように、上下の幅が広くて圧迫感を感じるからだろう。それから逆スクロールは Shift + Space というのも嫌。Backspace に慣れてしまっているので。
-</p>
-
-
-
-
-<p class="entryBody">
-そして、一番大きな理由は上の様な些末なことではなく、今回の改良で「feedbringer は俺が求めているものとは違う」と感じてしまったから。じゃあ、俺が求めるフィードアグリゲータって何だろう、ということになると、実はきちんと整理しているわけではないので、これを機会に整理してみることにした。以下、順番に挙げていきます。
-</p>
-
-
-
-
-<h3>サーバ集約型</h3>
-
-
-
-
-<p class="entryBody">
-家でも複数のPCを利用するし、会社からも携帯からも利用するので、サーバ集約型がいいっすね。集約されていないと、購読しているフィードの同期がめんどうだし、未読/既読が統一できないから。（これは、フィードアグリゲータだけでなく、どんなサービスにも言えるんですけどね。）
-</p>
-
-
-
-
-<p class="entryBody">
-サーバに集約されていれば、ウェブ型じゃなくてもいいのか、という話もありますが、それについては後ほど触れます。
-</p>
-
-
-
-
-<h3>フィードのクロールと蓄積</h3>
-
-
-
-
-<p class="entryBody">
-これは言うまでもないですね。これをやってくれないとフィードアグリゲータではない。
-</p>
-
-
-
-
-<h3>検索</h3>
-
-
-
-
-<p class="entryBody">
-蓄積したら、当然検索は必要でしょう。自分が購読しているフィードのみ検索対象にできれば、「あれ、誰かが書いてたんだけど、何だったっけ？」という時に探しやすい。
-</p>
-
-
-
-
-<h3>言語フィルタリング</h3>
-
-
-
-
-<p class="entryBody">
-最近、del.icio.us のフィードに、中国語がやたら目立つ様になってきたので、言語フィルタリングで除外できればありがたいな、と。別に中国語に限らず、自分が読めない言語のエントリがあっても、ただのノイズにしかならないし、辞書引いたり自動翻訳使ったリまでして読もうとは思わない。ただでさえエントリ数が多いんだから、こういったノイズはできる限り排除したい。
-</p>
-
-
-
-
-<h3>カテゴリフィルタリング</h3>
-
-
-
-
-<p class="entryBody">
-フィード中にカテゴリが記述されていることが多いと思うので、特定のフィードの中でも、除外したいカテゴリを指定したり、逆に読みたいカテゴリを指定する、ってことができればいいなぁ、と。フィードに含まれるすべてのエントリが読みたい、ってことの方がまれだと思うんですよね。
-</p>
-
-
-
-
-<h3>充実したREST API</h3>
-
-
-
-
-<p class="entryBody">
-極端な話、充実した REST API を持っていて、きれいな XML フォーマットでデータを吐いてくれれば、フィードアグリゲータは UI を持っていなくていいです。XSLT で XHTML へ変換して、css　と　javascript　でリッチなUIにしたり、携帯用の HTML に変換したり、そこは好きなように作り込んでいけるので。自分で作らなくても、もっとセンスのある人がいいモノを作ってくれたりもするでしょうしね。
-</p>
-
-
-
-
-<p class="entryBody">
-ここで REST API と言ってしまっているので、さきほどの「サーバに集約されていれば、ウェブ型じゃなくてもいいのか」という点については、やはりウェブ型がいい、ということに必然的になりますね。
-</p>
-
-
-
-
-<p class="entryBody">
-だれかこんなフィードアグリゲータ作ってくれないかなぁ…自分で作れって言われそうだな。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/35/">&larr; Older</a>
@@ -1211,6 +1224,10 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1224,10 +1241,6 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

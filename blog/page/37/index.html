@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="del.icio.usを使いやすくしようという目論見で開発中のツールですが、セッションまわりで意図した動作になっていなかったので微修正。サンプルとソース。 「使いやすく」とは言っても、何が不満で、どうしたいのかを整理していなかったので、ちょっと整理してみます。その方が、 &hellip;">
+  <meta name="description" content="このブログではタグづけなんかをしてるわけですが、ひとりでタグづけしてても、なんか虚しいんですよね。 なので、タグをdel.icio.usやtechnorati.comと繋げてみることにしました。各エントリの下の方で、タグごとにdel.icio.usやtechnorati.comにリンクしてます。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/25/298/">Blosxomでtagging #10</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-25T22:49:00+09:00" pubdate>May 25<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/25/298/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+このブログではタグづけなんかをしてるわけですが、ひとりでタグづけしてても、なんか虚しいんですよね。
+</p>
+
+
+
+
+<p class="entryBody">
+なので、タグをdel.icio.usやtechnorati.comと繋げてみることにしました。各エントリの下の方で、タグごとにdel.icio.usやtechnorati.comにリンクしてます。なんか見づらい気がするけど、あとで考えよう。
+</p>
+
+
+
+
+<p class="entryBody">
+ここを見てくださっている方が、更に関連情報を辿りたい、って時には便利になるような気がしないでもないです。
+</p>
+
+
+
+
+<p class="entryBody">
+それから、Blog Hackers Conference 2005に行きます。このエントリとは関係ないですが、独立したエントリ立てるほどでもないので。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -814,84 +871,6 @@ permalinkが変わるといっても、どんな場合でも対応できるわ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/05/04/490/">Ajaxなウェブメールを作る #2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-05-04T14:42:00+09:00" pubdate>May 4<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/05/04/490/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://mizzy.org/program/ajaxWebMail01.html" target="_blank">前回触れて以来</a>放置していたajaxなウェブメールですが、約束どおり<a href="http://mizzy.org/webmail/index.cgi" target="_blank">サンプルを公開します</a>。guest/guestでログインして下さい。
-</p>
-
-
-
-
-<p class="entryBody">
-といっても、まだ全然完成ではないです。現状どんな感じかを箇条書きにしてみます。</p>
-
-
-
-
-<ul class="entryBody">
-<li>IMAPでメールサーバと通信します。</li>
-<li>画面左はフォルダ表示。フォルダをクリックすることで開いたり閉じたりできます。</li>
-<li>画面右上サマリのページ切り替えは← →キーで行います。→で次へ、←で前へ。2ページ分先読みしていますので、先読みが完了していれば、瞬時に切り替わりますが、先読みが追いついていないと、ちょっと待たされます。</li>
-<li>subjectクリックでメッセージ表示。単にIMAPで取得したものをそのまま表示してるだけですので、Base64エンコードされているものは、エンコードされたまま表示されます。日本語以外のマルチバイト文字はたぶん表示されないでしょう。</li>
-<li>ajaxなのでメッセージも先読みすべきなんでしょうが、まだ未実装です。これから。</li>
-<li>フォルダペインとサマリペインの適当なところをクリックすると、各ペインがフォーカスされます。（枠がグレーでハイライトされます。）といっても、現状は何も意味がありません。今後すべてキーボードで操作できる様にしたいと思っているのですが、そのためには操作対象がフォルダなのかサマリなのかを明確にする必要があるため、そのための布石です。</li>
-<li>emacsと同様にCtrl + x, oでフォーカスの移動ができます。Wanderlustライクな操作性目指してます。</li>
-<li>spaceキーでメッセージをスクロール、backspaceで逆スクロールします。</li>
-<li>まともなエラーハンドリングをしてませんので、Server Errorが出ることがよくあります。</li>
-</ul>
-
-
-
-
-<p class="entryBody">
-基本的にウェブメールに感じるストレスは、「レスポンス」と「操作性」に大別できるかと思うのですが、俺が目指すのは「操作性」に関するストレスの軽減です。レスポンスはウェブメールである以上、ある程度はしかたないかな、と。といっても、レスポンスを全く考慮していないわけじゃなく、サマリやメッセージの先読みでレスポンス向上も目指してますが、「どこまで先読みすべきか」という判断が難しいと思います。IMAPサーバ上にあるメールを全部先読みしてしまえば、レスポンスは最速になりますが、現実的ではないですしね。ですので、レスポンスについてはあまり追求せずに、ある程度のところで妥協する様な感じになるかと。
-</p>
-
-
-
-
-<p class="entryBody">
-Javascriptがローカルファイルのread/writeに対応していれば、サマリ情報をすべてローカルにキャッシュすることで、かなりのレスポンス向上が見込めるんですけどねぇ。
-</p>
-
-
-
-
-<p class="entryBody">
-あと、IMAPなので、CGIベースだとアクセスするたびにIMAPコネクションを張りなおすので、このあたりも何とかしたいですね。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/38/">&larr; Older</a>
@@ -909,6 +888,10 @@ Javascriptがローカルファイルのread/writeに対応していれば、サ
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -922,10 +905,6 @@ Javascriptがローカルファイルのread/writeに対応していれば、サ
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

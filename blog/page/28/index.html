@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="DBIx::Class::ResultSet の from メソッドの説明 にしたがって、カスタム JOIN を試みるものの、どうしても join type が指定できない、という現象にはまる。 ドキュメント上では -join-type => &#8216;inner|left|right&# &hellip;">
+  <meta name="description" content="CustomFeed::GoogleVideo をアップデートしてみた。 LWP::Simple ではなく Plagger::UserAgent を使うようにしてみた。
+pod 書いた。 本当は enclosure に length を入れるために、HEAD でファイルサイズ取得しようと思って、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,85 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/30/345/">Plagger と Google Video #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-30T23:36:00+09:00" pubdate>Mar 30<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/30/345/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/GoogleVideo.pm" target="_blank">CustomFeed::GoogleVideo</a> をアップデートしてみた。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>LWP::Simple ではなく Plagger::UserAgent を使うようにしてみた。</li>
+<li>pod 書いた。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+本当は enclosure に length を入れるために、HEAD でファイルサイズ取得しようと思って、Plagger::UserAgent 使ってみたんだけど、HEAD だと Content-length に 0 が返ってきてしまうので、意味がなかった…
+</p>
+
+
+
+
+<p class="entryBody">
+あと、Google Video が返す RSS の item には、media:content が 4つ含まれます。type が video/x-flv, video/x-msvideo, video/mp4 が 2つ、という感じで。で、video/mp4 のものは、どっちが PSP 用でどっちが iPod 用かが、RSS 見ただけでは区別がつかないので、最初のものが iPod 用、2番目のものが PSP 用と決めうちにしてます。
+</p>
+
+
+
+
+<p class="entryBody">
+0.7 で enclosure や MediaRSS に対応するとのことなので、それまでは 本家の方には取り込まずに野良プラグインとして転がしておきます。（そうしてくれ、と宮川さんから言われましたので。）
+</p>
+
+
+
+
+<p class="entryBody">
+プラグイン名も、Google Video は最初から RSSを吐いてるので CustomFeed ではなく Subscription なのかなぁ、とか思ったりしてるのですが、その辺りは 0.7 で取り込まれるときに、宮川さんが良きにはからってくれるでしょう。
+</p>
+
+
+
+
+<p class="entryBody">
+これで GoogleVideo の方はほぼ完成ということで、次は YouTube 行きます。あ、iTunesRecentPlay もまだ中途半端だった…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -657,70 +737,6 @@ subversion を WebDAV と合わせて使おうと思い、apache2 をインス�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/03/02/262/">Trac で Browse Source 時にハングする現象の解決法(trac Tips #0)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-03-02T11:00:00+09:00" pubdate>Mar 2<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/03/02/262/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-trac で Browse Source しようとするとハングしてしまう現象が発生していました。strace で tracd の状態を見てみると、
-</p>
-
-
-
-
-<pre class="code">
-select(0, NULL, NULL, NULL, {0, 25000}) = 0 (Timeout)
-</pre>
-
-
-
-
-<p class="entryBody">
-というエラーが大量に出てきます。もしかすると HDD がやばいのかなー、と syslog などを見てみるも、その様な痕跡は見つからず。で、上のエラーの内容でググってみたら、あっさり解決方法が見つかりました。
-</p>
-
-
-
-
-<pre class="code">
-$ svnadmin recover svn_repos
-</pre>
-
-
-
-
-<p class="entryBody">
-で OK でした。svn checkout とか commit とかは普通にできてたので、subversion の問題だとは全然思わなかった。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/29/">&larr; Older</a>
@@ -738,6 +754,10 @@ $ svnadmin recover svn_repos
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -751,10 +771,6 @@ $ svnadmin recover svn_repos
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

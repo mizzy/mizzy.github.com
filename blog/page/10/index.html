@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="KLab 勉強会 #4 で、Func についてしゃべってきました。その時の様子は Ustream でご覧いただけます。また資料は後日 DSAS 開発者の部屋にアップされると思います。 スピーカのために壇上に水が用意されていることはよくあると思いますが、 &hellip;">
+  <meta name="description" content="流行に乗って Punc にも Moose を取り入れようと思って、MooseX::ClassAttribute でクラス属性をハンドリングできるようにしてみたのですが、子クラスのクラス属性をセットすると、親クラスのクラス属性まで変わってしまう。 #!perl
+#!/usr/bin/perl &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/06/MooseXClassAttribute/">MooseXClassAttribute</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-05-06T13:05:43+09:00" pubdate>May 6<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/05/06/MooseXClassAttribute/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>流行に乗って <a href="http://coderepos.org/share/wiki/Punc">Punc</a> にも Moose を取り入れようと思って、MooseX::ClassAttribute でクラス属性をハンドリングできるようにしてみたのですが、子クラスのクラス属性をセットすると、親クラスのクラス属性まで変わってしまう。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+package Parent;
+use Moose;
+use MooseX::ClassAttribute;
+
+class_has 'x' =&gt; ( is =&gt; 'rw' );
+
+package Child;
+use Moose;
+extends 'Parent';
+
+package main;
+
+Parent-&gt;x('Parent');
+warn Parent-&gt;x; # Parent が表示される
+
+Child-&gt;x('Child');
+warn Parent-&gt;x; # Child が表示されてしまう
+</code></pre>
+
+<p>これが一般的に望ましい動作なのかどうかわからないので、とりあえず Class::Data::Inheritable 使うように書き直した。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -166,7 +224,7 @@
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x67;&#x6f;&#x73;&#117;&#x6b;&#101;&#110;&#97;&#x74;&#111;&#114;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;">&#x67;&#x6f;&#x73;&#117;&#x6b;&#101;&#x6e;&#x61;&#116;&#x6f;&#x72;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>Gosuke Miyashita, <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#x67;&#111;&#115;&#117;&#x6b;&#x65;&#110;&#x61;&#x74;&#x6f;&#x72;&#64;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#x6d;">&#103;&#111;&#115;&#x75;&#107;&#101;&#110;&#x61;&#116;&#x6f;&#x72;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#109;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
@@ -1247,234 +1305,6 @@ $ sudo setsebool httpd_can_network_connect true
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/12/29/Cobbler/">Cobbler</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-12-29T00:19:56+09:00" pubdate>Dec 29<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/12/29/Cobbler/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ネットワークインストール環境がさくっと構築できる <a href="http://cobbler.et.redhat.com/">Cobbler</a> がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。</p>
-
-<ul>
-<li><a href="http://www.cafechantant.com/blog/2007/08/09/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae5/">サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）</a></li>
-<li><a href="http://www.cafechantant.com/blog/2007/09/05/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae6/">サーバの構築を簡単にするためのステップ （その6：Cobber編 Part2 ）</a></li>
-<li><a href="http://www.asahi-net.or.jp/~aa4t-nngk/pxeinstall.html">PXEネットワークインストール(Cobbler)</a></li>
-<li><a href="http://www.cafechantant.com/trac/wiki/cobbler_top">cobbler_top - Cafe Chantant Info Repositry - Trac</a></li>
-</ul>
-
-
-<p>以下、Fedora 7 で Cobbler を動かしてみたメモ。</p>
-
-<h1>インストール</h1>
-
-<p>yum で一発インストール。</p>
-
-<pre><code>$ sudo yum install cobbler
-</code></pre>
-
-<h1>設定</h1>
-
-<p>cobbler check コマンドを実行すると、見直すべき設定ポイントを教えてくれる。親切。</p>
-
-<pre><code>$ sudo cobbler check
-The following potential problems were detected:
-#0: The 'server' field in /var/lib/cobbler/settings must be set to something other than localhost, or kickstarting features will not work.  This should be a resolvable hostname or IP for the boot server as reachable by all machines that will use it.
-#1: For PXE to be functional, the 'next_server' field in /var/lib/cobbler/settings must be set to something other than 127.0.0.1, and should match the IP of the boot server on the PXE network.
-#2: service cobblerd is not running
-#3: syslinux should be installed but is not, expecting to find something at /usr/lib/syslinux/pxelinux.0
-#4: service xinetd is not running
-#5: change 'disable' to 'no' in /etc/xinetd.d/tftp
-#6: service httpd is not running
-#7: since iptables may be running, ensure 69, 80, 25150, and 25151 are unblocked#8: reposync is not installed, need for cobbler reposync, install/upgrade yum-utils?
-#9: yumdownloader is not installed, needed for cobbler repo add with --rpm-list
-parameter, install/upgrade yum-utils? 
-</code></pre>
-
-<p>これを元に設定変更を行っていく。まずは /var/lib/cobbler/settings を以下のように修正。</p>
-
-<pre><code>manage_dhcp: 1
-next_server: '192.168.10.12'
-server: 192.168.10.12
-</code></pre>
-
-<p>192.168.10.12 は Cobbler が動いているマシンの IP アドレス。</p>
-
-<p>cobblerd を起動。</p>
-
-<pre><code>$ sudo /sbin/chkconfig cobblerd on 
-$ sudo /etc/init.d/cobblerd start 
-</code></pre>
-
-<p>syslinux をインストール。</p>
-
-<pre><code>$ sudo yum install syslinux
-</code></pre>
-
-<p>tftpd と xinetd を起動。</p>
-
-<pre><code>$ sudo /sbin/chkconfig tftp on
-$ sudo /sbin/chkconfig xinetd on 
-$ sudo /etc/init.d/xinetd start 
-</code></pre>
-
-<p>httpd を起動。</p>
-
-<pre><code>$ sudo /sbin/chkconfig httpd on
-$ sudo /etc/init.d/httpd start 
-</code></pre>
-
-<p>iptables はとりあえずオフにしとく。</p>
-
-<pre><code>$ sudo /sbin/chkconfig iptables off
-$ sudo /etc/init.d/iptables stop 
-</code></pre>
-
-<p>yum-utils のインストール。</p>
-
-<pre><code>$ sudo yum install yum-utils
-</code></pre>
-
-<p>/etc/cobbler/dhcp.template を以下のような感じで修正。</p>
-
-<pre><code># ******************************************************************
-# Cobbler managed dhcpd.conf file
-#
-# generated from cobbler dhcp.conf template ($date)
-#
-# ******************************************************************
-
-ddns-update-style interim;
-
-allow booting;
-allow bootp;
-
-ignore client-updates;
-set vendorclass = option vendor-class-identifier;
-
-subnet 192.168.10.0 netmask 255.255.255.0 {
-     option routers          192.168.10.1;
-     option subnet-mask      255.255.255.0;
-     range dynamic-bootp     192.168.10.100 192.168.10.254;
-     filename                "/pxelinux.0";
-     default-lease-time      21600;
-     max-lease-time          43200;
-     next-server             $next_server;
-}
-
-$insert_cobbler_system_definitions
-</code></pre>
-
-<p>dhcp をインストールしておく。dhcpd はこの段階では起動しなくていい。（起動してもエラーになる。）</p>
-
-<pre><code>$ sudo yum install dhcp
-$ sudo /sbin/chkconfig dhcpd on
-</code></pre>
-
-<h1>ネットワークインストールに必要なファイルの用意</h1>
-
-<p>インストールイメージとか、キックスタートファイルとかを作成。</p>
-
-<pre><code>$ sudo cobbler import --path=rsync://ftp.jaist.ac.jp/pub/Linux/Fedora/releases/7/Fedora/i386/os --name=f7
-</code></pre>
-
-<p>このコマンド一発で必要なものを全部つくってくれる。超簡単。時間はかかるけど。</p>
-
-<p>cobbler report を実行すると、どこにどんなファイルがあるかとかを表示してくれる。</p>
-
-<pre><code>$ sudo cobbler report
-distro          : f7-i386
-kernel          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/vmlinuz
-initrd          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/initrd.img
-kernel options  : {}
-architecture    : x86
-ks metadata     : {'tree': 'http://@@server@@/cblr/links/f7-i386'}
-breed           : redhat
-
-distro          : f7-xen-i386
-kernel          : /var/www/cobbler/ks_mirror/f7/images/xen/vmlinuz
-initrd          : /var/www/cobbler/ks_mirror/f7/images/xen/initrd.img
-kernel options  : {}
-architecture    : x86
-ks metadata     : {'tree': 'http://@@server@@/cblr/links/f7-xen-i386'}
-breed           : redhat
-
-profile         : f7-i386
-distro          : f7-i386
-kickstart       : /etc/cobbler/kickstart_fc6.ks
-kernel options  : {}
-ks metadata     : {}
-virt file size  : 5
-virt ram        : 512
-virt type       : auto
-virt path       :
-virt bridge     : xenbr0
-virt cpus       : 1
-repos           : []
-dhcp tag        : default
-server          : &lt;&lt;inherit&gt;&gt;
-
-profile         : f7-xen-i386
-distro          : f7-xen-i386
-kickstart       : /etc/cobbler/kickstart_fc6.ks
-kernel options  : {}
-ks metadata     : {}
-virt file size  : 5
-virt ram        : 512
-virt type       : auto
-virt path       :
-virt bridge     : xenbr0
-virt cpus       : 1
-repos           : []
-dhcp tag        : default
-server          : &lt;&lt;inherit&gt;&gt;
-</code></pre>
-
-<p>これを見て分かるとおり、Xen 用のイメージなんかも勝手に作ってくれる。</p>
-
-<p>あとは必要に応じてキックスタートファイル（/etc/cobbler/kickstart_fc6.ks）なんかをいじる。何かファイルを修正したりしたら、cobbler sync を忘れずに実行。</p>
-
-<pre><code>$ sudo cobbler sync
-</code></pre>
-
-<h1>ネットワークインストールを実行する</h1>
-
-<p>ここまできたら、別のマシンを PXE ブートで起動して、boot プロンプトで cobbler import で作成したイメージの名前を入力。</p>
-
-<pre><code>boot: f7-i386
-</code></pre>
-
-<p>あとは勝手にインストールが始まる。</p>
-
-<p>以下のように system 登録しておくと、PXE ブート時にイメージ名を入力しなくても、勝手に割り当てられたイメージでブートしてくれる。</p>
-
-<pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -1492,6 +1322,10 @@ server          : &lt;&lt;inherit&gt;&gt;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1505,10 +1339,6 @@ server          : &lt;&lt;inherit&gt;&gt;
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

@@ -9,9 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="blosxomのエントリをRastで検索するためのプラグイン、rastプラグインを修正しました。修正点は以下の通りです。 検索インデックスを作る際、ファイルの内容からタグを消去するようにした。
-Rast->createでpreserve_text => 1を指定する様にした。
-検索結果表示の際、 &hellip;">
+  <meta name="description" content="前回触れて以来放置していたajaxなウェブメールですが、約束どおりサンプルを公開します。guest/guestでログインして下さい。 といっても、まだ全然完成ではないです。現状どんな感じかを箇条書きにしてみます。 IMAPでメールサーバと通信します。
+画面左はフォルダ表示。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +73,84 @@ Rast->createでpreserve_text => 1を指定する様にした。
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/04/490/">Ajaxなウェブメールを作る #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-04T14:42:00+09:00" pubdate>May 4<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/04/490/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/ajaxWebMail01.html" target="_blank">前回触れて以来</a>放置していたajaxなウェブメールですが、約束どおり<a href="http://mizzy.org/webmail/index.cgi" target="_blank">サンプルを公開します</a>。guest/guestでログインして下さい。
+</p>
+
+
+
+
+<p class="entryBody">
+といっても、まだ全然完成ではないです。現状どんな感じかを箇条書きにしてみます。</p>
+
+
+
+
+<ul class="entryBody">
+<li>IMAPでメールサーバと通信します。</li>
+<li>画面左はフォルダ表示。フォルダをクリックすることで開いたり閉じたりできます。</li>
+<li>画面右上サマリのページ切り替えは← →キーで行います。→で次へ、←で前へ。2ページ分先読みしていますので、先読みが完了していれば、瞬時に切り替わりますが、先読みが追いついていないと、ちょっと待たされます。</li>
+<li>subjectクリックでメッセージ表示。単にIMAPで取得したものをそのまま表示してるだけですので、Base64エンコードされているものは、エンコードされたまま表示されます。日本語以外のマルチバイト文字はたぶん表示されないでしょう。</li>
+<li>ajaxなのでメッセージも先読みすべきなんでしょうが、まだ未実装です。これから。</li>
+<li>フォルダペインとサマリペインの適当なところをクリックすると、各ペインがフォーカスされます。（枠がグレーでハイライトされます。）といっても、現状は何も意味がありません。今後すべてキーボードで操作できる様にしたいと思っているのですが、そのためには操作対象がフォルダなのかサマリなのかを明確にする必要があるため、そのための布石です。</li>
+<li>emacsと同様にCtrl + x, oでフォーカスの移動ができます。Wanderlustライクな操作性目指してます。</li>
+<li>spaceキーでメッセージをスクロール、backspaceで逆スクロールします。</li>
+<li>まともなエラーハンドリングをしてませんので、Server Errorが出ることがよくあります。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+基本的にウェブメールに感じるストレスは、「レスポンス」と「操作性」に大別できるかと思うのですが、俺が目指すのは「操作性」に関するストレスの軽減です。レスポンスはウェブメールである以上、ある程度はしかたないかな、と。といっても、レスポンスを全く考慮していないわけじゃなく、サマリやメッセージの先読みでレスポンス向上も目指してますが、「どこまで先読みすべきか」という判断が難しいと思います。IMAPサーバ上にあるメールを全部先読みしてしまえば、レスポンスは最速になりますが、現実的ではないですしね。ですので、レスポンスについてはあまり追求せずに、ある程度のところで妥協する様な感じになるかと。
+</p>
+
+
+
+
+<p class="entryBody">
+Javascriptがローカルファイルのread/writeに対応していれば、サマリ情報をすべてローカルにキャッシュすることで、かなりのレスポンス向上が見込めるんですけどねぇ。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、IMAPなので、CGIベースだとアクセスするたびにIMAPコネクションを張りなおすので、このあたりも何とかしたいですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -936,79 +1013,6 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/24/287/">ソーシャルブックマークのRSSをブラウザのブックマークに取り込む #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-24T01:44:00+09:00" pubdate>Apr 24<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/24/287/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="/program/rss2xbel00.html">前回のエントリ</a>で、RSSをXBELに変換するゲートウェイについて触れましたが、Firefoxを使う限りにおいてはLive Bookmarks機能を使えばそれで済むので、せっかっく作ったゲートウェイがあまり意味がないことに気づきました。
-</p>
-
-
-
-
-<p class="entryBody">
-それもなんだか悔しいので、今度は<a href="http://del.icio.us/" target="_blank">del.icio.us</a>の<a href="http://del.icio.us/doc/api" target="_blank">API</a>を利用して、自分がpostしたブックマークをすべて、XBELに変換するためのゲートウェイを作りました。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="/del2xbel/index.cgi" target="_blank">サンプル</a>と<a href="/archives/del2xbel.tar.gz">ソース</a>
-</p>
-
-
-
-
-<p class="entryBody">
-前回と違って、タグ毎にフォルダを分けるようにしています。Firefoxの<a href="http://extensionroom.mozdev.org/more-info/booksync" target="_blank">Bookmarks Synchronizer extension</a>で取り込んで、サイドバーに表示すると、こんな感じでタグ別にフォルダ分けして表示されます。
-</p>
-
-
-
-
-<p class="entryBody">
-<img src="/img/del2xbel.jpg" />
-</p>
-
-
-
-
-<p class="entryBody">
-これはLive Bookmarksではできないことなので、ちょっと満足しました。まあ、色々と足りないところはあるのですが、自分は<a href="http://www.spurl.net" target="_blank">Spurl</a>サイドバーで満足してるので、これを使うことはないですね。なので、要望があれば改良していきますが、なければこのままほっときます。
-</p>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/39/">&larr; Older</a>
@@ -1026,6 +1030,10 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1039,10 +1047,6 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

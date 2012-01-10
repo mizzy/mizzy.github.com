@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="宣言どおり、Plagger::Plugin::CustomFeed::YouTube を作成しました。野良プラグインとして転がしときます。Publish::Gmail との組み合わせで以下の様になります。 YouTube はタグ別に RSS を吐いているのですが、検索結果は RSS &hellip;">
+  <meta name="description" content="YouTube の HTML が変更されていたので、Plagger::Plugin::CustomFeed::YouTube を修正。ついでに以下の機能もつけました。 取得する検索結果ページ数を指定できるようにした。（デフォルトは1ページ。）
+ソート条件を指定できるようにした。（ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/04/30/259/">Plagger と YouTube #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-04-30T00:41:00+09:00" pubdate>Apr 30<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/04/30/259/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+YouTube の HTML が変更されていたので、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/YouTube.pm" target="_blank">Plagger::Plugin::CustomFeed::YouTube</a> を修正。ついでに以下の機能もつけました。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>取得する検索結果ページ数を指定できるようにした。（デフォルトは1ページ。）</li>
+<li>ソート条件を指定できるようにした。（デフォルトはアップロード日時。）</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+<a href="http://wiki.shibuya.pl/?PlaggerConference" target="_blank">Plagger Conference</a> のライトニングトークで、「Plagger &amp; YouTube（仮）」というお題でしゃべります。もちろん、CustomFeed::YouTube のことだけ話してもおもしろくないので、これ以上のことを考えてます。お楽しみに。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -671,85 +723,6 @@ Publish::MTWidget で MTのサイドバーに表示するとこんな感じ。�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/03/30/345/">Plagger と Google Video #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-03-30T23:36:00+09:00" pubdate>Mar 30<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/03/30/345/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/GoogleVideo.pm" target="_blank">CustomFeed::GoogleVideo</a> をアップデートしてみた。
-</p>
-
-
-
-
-<ul class="entryBody">
-<li>LWP::Simple ではなく Plagger::UserAgent を使うようにしてみた。</li>
-<li>pod 書いた。</li>
-</ul>
-
-
-
-
-<p class="entryBody">
-本当は enclosure に length を入れるために、HEAD でファイルサイズ取得しようと思って、Plagger::UserAgent 使ってみたんだけど、HEAD だと Content-length に 0 が返ってきてしまうので、意味がなかった…
-</p>
-
-
-
-
-<p class="entryBody">
-あと、Google Video が返す RSS の item には、media:content が 4つ含まれます。type が video/x-flv, video/x-msvideo, video/mp4 が 2つ、という感じで。で、video/mp4 のものは、どっちが PSP 用でどっちが iPod 用かが、RSS 見ただけでは区別がつかないので、最初のものが iPod 用、2番目のものが PSP 用と決めうちにしてます。
-</p>
-
-
-
-
-<p class="entryBody">
-0.7 で enclosure や MediaRSS に対応するとのことなので、それまでは 本家の方には取り込まずに野良プラグインとして転がしておきます。（そうしてくれ、と宮川さんから言われましたので。）
-</p>
-
-
-
-
-<p class="entryBody">
-プラグイン名も、Google Video は最初から RSSを吐いてるので CustomFeed ではなく Subscription なのかなぁ、とか思ったりしてるのですが、その辺りは 0.7 で取り込まれるときに、宮川さんが良きにはからってくれるでしょう。
-</p>
-
-
-
-
-<p class="entryBody">
-これで GoogleVideo の方はほぼ完成ということで、次は YouTube 行きます。あ、iTunesRecentPlay もまだ中途半端だった…
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/28/">&larr; Older</a>
@@ -767,6 +740,10 @@ Publish::MTWidget で MTのサイドバーに表示するとこんな感じ。�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -780,10 +757,6 @@ Publish::MTWidget で MTのサイドバーに表示するとこんな感じ。�
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

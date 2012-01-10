@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Assurer についてその後あんまり書いてないですが、何もしてないわけではなく、リトライをハンドリングできるようにしたり、並列実行できるようにしたりと、ちょこちょこと開発は進めています。 で、前回のエントリ で、Archer にシェルモードをつけてみたわけなんですが、シェルモードってテスト/ &hellip;">
+  <meta name="description" content="
+デブサミ出張 Shibuya イベントで、Assurer についてしゃべってきました。発表資料をここに置いておきます。 感想とか書きたいのですが、嘔吐下痢性の風邪にやれられて、一日何も食べることができず、打ち上げにも参加できないぐらい体調悪いので、今日はこの辺で。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/14/314/">デブサミ出張 Shibuya イベント</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-14T21:58:00+09:00" pubdate>Feb 14<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/14/314/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200702.html"><span class="icon"></span>デブサミ出張 Shibuya イベント</a>で、Assurer についてしゃべってきました。発表資料を<a class="ext-link" href="http://mizzy.org/archives/assurer_devsumi.pdf"><span class="icon"></span>ここに置いておきます</a>。
+</p>
+
+
+<p>
+感想とか書きたいのですが、嘔吐下痢性の風邪にやれられて、一日何も食べることができず、打ち上げにも参加できないぐらい体調悪いので、今日はこの辺で。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -888,93 +930,6 @@ plugins:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/03/341/">Net::LDAP::Abstract #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-01-03T03:55:00+09:00" pubdate>Jan 3<span>rd</span>, 2007</time>
-        
-         | <a href="/blog/2007/01/03/341/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-Net::LDAP のラッパモジュール <a class="ext-link" href="http://mizzy.org/program/net-ldap-alternative.html"><span class="icon"></span>Net::LDAP::Alternative</a> を <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Net-LDAP-Abstract"><span class="icon"></span>Net::LDAP::Abstract</a> に変えて、少し修正しました。svn で取得するには以下のように実行して下さい。
-</p>
-
-
-<pre class="wiki">
-svn co http://svn.mizzy.org/public/library/perl/trunk/Net-LDAP-Abstract/
-</pre>
-
-
-<p>
-名称を Alternative から Abstract に変えたのは、LDAP アクセスの処理を Net::LDAP の実装よりも更に抽象化しているから、というのと、検索フィルタを <a class="ext-link" href="http://search.cpan.org/~nwiger/SQL-Abstract/lib/SQL/Abstract.pm"><span class="icon"></span>SQL::Abstract</a> ライクに書けるから、という理由からです。
-</p>
-
-
-<p>
-たとえば、Net::LDAP では
-</p>
-
-
-<pre class="wiki">
-my $msg = $ldap->search(
-    base   => 'o=southpark',
-    filter => '(|(&(!(cn=*gosuke))(sn=miyashita))(uid=miya))',
-);
-</pre>
-
-
-<p>
-とやたらと括弧の多いフィルタを自分で書かなければいけないところを、Net::LDAP::Abstract では
-</p>
-
-
-<pre class="wiki">
-my $entries = $ldap->search({
-    -or => {
-        uid => 'miya',
-        -and => {
-            sn => 'miyashita',
-            cn => { '!=' => '*gosuke' },
-        }
-    }
-});
-</pre>
-
-
-<p>
-といった感じで書けます。これは超便利。
-</p>
-
-
-<p>
-フィルタを組み立てるコードは、SQL::Abstract からそのまんまぱくってます。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -992,6 +947,10 @@ my $entries = $ldap->search({
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1005,10 +964,6 @@ my $entries = $ldap->search({
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

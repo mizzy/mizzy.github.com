@@ -9,7 +9,9 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="CustomFeed::AmazonWebService で検索キーワードをたくさん指定すると、なぜか Deduped の部分でハングする。もう少し正確に言うと、新着エントリが多い場合にハングするようです。同じエントリ数でも、Deduped &hellip;">
+  <meta name="description" content="前回のエントリについて、宮川さんから「AnyDBM_File をつかうといいかも」というアドバイスを頂いたので、Deduped::AnyDBM_File を書いてみた。 package Plagger::Rule::Deduped::AnyDBM_File;
+use strict;
+use &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +74,142 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/16/376/">Deduped::AnyDBM_File</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-16T00:11:00+09:00" pubdate>Sep 16<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/16/376/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/dedeuped.html"><span class="icon"></span>前回のエントリ</a>について、宮川さんから「AnyDBM_File をつかうといいかも」というアドバイスを頂いたので、Deduped::AnyDBM_File を書いてみた。
+</p>
+
+
+<pre class="wiki">
+package Plagger::Rule::Deduped::AnyDBM_File;
+use strict;
+use base qw( Plagger::Rule::Deduped::Base );
+use UNIVERSAL::require;
+use Fcntl;
+
+sub import {
+    my ( $class, @arguments ) = @_;
+
+    @AnyDBM_File::ISA = () if @arguments;
+    for ( @arguments ) {
+        push @AnyDBM_File::ISA, $_ . '_File';
+    }
+
+    AnyDBM_File->require;
+}
+
+sub init {
+    my($self, $rule) = @_;
+
+    $self->{path} = $rule->{path} || Plagger->context->cache->path_to('Deduped.db');
+    tie my %cache, 'AnyDBM_File', $self->{path}, O_RDWR|O_CREAT, 0666
+        or Plagger->context->error("Can't open DB_File $self->{path}: $!");
+    $self->{db} = \%cache;
+}
+
+sub find_entry {
+    my($self, $url) = @_;
+    my $value = $self->{db}->{$url};
+    return $value;
+}
+
+sub create_entry {
+    my($self, $url, $digest) = @_;
+    $self->{db}->{$url} = $digest;
+}
+
+sub DESTROY {
+    my $self = shift;
+    untie $self->{db};
+}
+
+1;
+</pre>
+
+
+<p>
+以下の様な感じで、利用するモジュールを NDBM_File, DB_File, GDBM_File, SDBM_File, ODBM_File の中から選べます。（何も指定しなければ DB_File が使われる。_File は省略する。）
+</p>
+
+
+<pre class="wiki">
+    rule:
+      module: Deduped
+      engine: GDBM
+</pre>
+
+
+<p>
+また、現在の Rule::Deduped では、Rule::Deduped::$self->{engine} を呼び出すようになっているけれど、上記 NDBM, DB, GDBM, SDBM, ODBM のいずれかが指定された場合には、Rule::Deduped::AnyDBM_File を呼び出す必要があるため、Rule::Deduped も少しいじってみた。
+</p>
+
+
+<pre class="wiki">
+Index: lib/Plagger/Rule/Deduped.pm
+===================================================================
+--- lib/Plagger/Rule/Deduped.pm (revision 1688)
++++ lib/Plagger/Rule/Deduped.pm (working copy)
+@@ -6,11 +6,19 @@
+ 
+ sub init {
+     my $self = shift;
++    my @dbms = qw( NDBM DB GDBM SDBM ODBM );
+ 
+-    $self->{engine} ||= 'DB_File';
++    $self->{engine} ||= 'DB';
+ 
+-    my $class = "Plagger::Rule::Deduped::$self->{engine}";
+-    $class->require or Plagger->context->error("Error loading $class: $@");
++    my $class;
++    if( grep { $_ eq $self->{engine} } @dbms ){
++        $class = 'Plagger::Rule::Deduped::AnyDBM_File';
++        $class->use($self->{engine}) or Plagger->context->error("Error loading $class: $@");
++    }
++    else {
++        $class = "Plagger::Rule::Deduped::$self->{engine}";
++        $class->require or Plagger->context->error("Error loading $class: $@");
++    }
+ 
+     my $deduper = $class->new($self);
+     $self->{deduper} = $deduper;
+</pre>
+
+
+<p>
+こうすると現在の Deduped::DB_File も、Deduped::AnyDBM_File で吸収できます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1115,67 +1253,6 @@ gen_filename() ですが、Plagger::Util::filename_for() というものがあ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/30/492/">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-30T02:39:00+09:00" pubdate>Aug 30<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/30/492/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://search.cpan.org/~mizzy/FFmpeg-Command-0.04/"><span class="icon"></span>FFmpeg-Command-0.04</a> を CPAN にアップしました。（これ書いてる時点ではまだ反映されてませんが。）
-</p>
-
-
-<p>
-デフォルトで ffmpeg に渡す -vcodec オプションの値は h264 にしてたのですが、これで変換すると iTunes には取り込めるけど iPod には取り込めない、という報告があったので、デフォルトを h264 から mpeg4 に変更しました。mpeg4 であれば問題なく取り込めた、とのことです。
-</p>
-
-
-<p>
-おそらく、携帯動画変換君付属の ffmpeg なら h264 でも大丈夫だと思うのですが、Linux 上で自前ビルドした ffmpeg ではだめなようです。
-</p>
-
-
-<p>
-<a class="ext-link" href="http://lists.mplayerhq.hu/pipermail/ffmpeg-user/2006-January/001997.html"><span class="icon"></span>この辺りが関係あるのかな？</a>
-</p>
-
-
-<p>
-あと、PSP は再生できるのかどうかすらもわかりません。動作報告求む。
-</p>
-
-
-<p>
-<a class="ext-link" href="http://www.konami.jp/kojima_pro/e3_2006/"><span class="icon"></span>METAL GEAR SOLID PORTABLE OPS</a> が出ることだし、PSP 買っちゃおうかなー…
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/22/">&larr; Older</a>
@@ -1193,6 +1270,10 @@ gen_filename() ですが、Plagger::Util::filename_for() というものがあ�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1206,10 +1287,6 @@ gen_filename() ですが、Plagger::Util::filename_for() というものがあ�
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

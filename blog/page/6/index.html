@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="追記 miyagawa さんから助言があり、authenticator 追加するだけでサブクラスが増えると使いにくいというのと、Authen::Simple::LDAP を使えば、LDAP で認証するためにそれほどコード書くこともないので、わざわざモジュール化する必要もない、ということで、 &hellip;">
+  <meta name="description" content="[wiki:InotifyAndMakuosan inotify + makuosan でいい感じのリアルタイムミラーリング] で、lsyncd は結局は rsync を裏で呼び出してるので、差分チェックの呪縛からは逃れられない、的なことを書いてたんですが、ふと、「もしかして、inotify から &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,101 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/01/15/LsyncdRsyncTargetDirectory/">LsyncdRsyncTargetDirectory</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-01-15T18:12:39+09:00" pubdate>Jan 15<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/01/15/LsyncdRsyncTargetDirectory/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[wiki:InotifyAndMakuosan inotify + makuosan でいい感じのリアルタイムミラーリング] で、lsyncd は結局は rsync を裏で呼び出してるので、差分チェックの呪縛からは逃れられない、的なことを書いてたんですが、ふと、「もしかして、inotify から rsyncを呼び出すときに、同期対象となるファイルは、指定したディレクトリ以下のもの全部ではなく、変更があったファイルがあるディレクト以下のものだけ、なんて動きをしてくれるのかな？」と気になったので、実際に試してみました。結果から先に言うと、想定通りの動きとなってます。これって常識なんですかね？以下、試した時のログ。</p>
+
+<p>ログを確認するために、lsyncd をフォアグランドで起動。</p>
+
+<pre><code>$ ./lsyncd --no-daemon /tmp/lsyncd localhost:/var/tmp/lsyncd
+Fri Jan 15 17:46:59 2010: command line options: syncing /tmp/lsyncd/ -&gt; localhost:/var/tmp/lsyncd
+
+Fri Jan 15 17:46:59 2010: Starting up
+Fri Jan 15 17:46:59 2010: watching /tmp/lsyncd/
+
+Fri Jan 15 17:47:00 2010: --- Entering normal operation with [1] monitored directories ---
+</code></pre>
+
+<p>ディレクトリを作成してみる。</p>
+
+<pre><code>$ mkdir /tmp/lsyncd/0
+</code></pre>
+
+<p>ログから、同期対象となってるのが、/tmp/lsyncd と、今作成した /tmp/lsyncd/0 であることがわかる。</p>
+
+<pre><code>Fri Jan 15 17:47:06 2010: event CREATE:0 triggered.
+Fri Jan 15 17:47:06 2010: rsyncing /tmp/lsyncd/ --&gt; localhost:/var/tmp/lsyncd/
+Fri Jan 15 17:47:06 2010: rsyncing /tmp/lsyncd/0/ --&gt; localhost:/var/tmp/lsyncd/0/
+</code></pre>
+
+<p>さらにその下にディレクトリを作成。</p>
+
+<pre><code>$ mkdir /tmp/lsyncd/0/1
+</code></pre>
+
+<p>同期対象となってるのが、/tmp/lsyncd/0 と、今作成した /tmp/lsyncd/0/1 であることがわかる。</p>
+
+<pre><code>Fri Jan 15 17:47:48 2010: event CREATE:1 triggered.
+Fri Jan 15 17:47:48 2010: rsyncing /tmp/lsyncd/0/ --&gt; localhost:/var/tmp/lsyncd/0/
+Fri Jan 15 17:47:48 2010: rsyncing /tmp/lsyncd/0/1/ --&gt; localhost:/var/tmp/lsyncd/0/1/
+</code></pre>
+
+<p>さらにその下にディレクトリを作成。</p>
+
+<pre><code>$ mkdir /tmp/lsyncd/0/1/2
+</code></pre>
+
+<p>同期対象となってるのが、/tmp/lsyncd/0/1 と、今作成した /tmp/lsyncd/0/1/2 であることがわかる。</p>
+
+<pre><code>Fri Jan 15 17:48:26 2010: event CREATE:2 triggered.
+Fri Jan 15 17:48:26 2010: rsyncing /tmp/lsyncd/0/1/ --&gt; localhost:/var/tmp/lsyncd/0/1/
+Fri Jan 15 17:48:26 2010: rsyncing /tmp/lsyncd/0/1/2/ --&gt; localhost:/var/tmp/lsyncd/0/1/2/
+</code></pre>
+
+<p>/tmp/lsyncd/0/1/2 の下にファイルを作ってみる。</p>
+
+<pre><code>$ touch /tmp/lsyncd/0/1/2/3.txt
+</code></pre>
+
+<p>同期対象が /tmp/lsyncd/0/1/2 だけであることがわかる。（CREATE イベントと CLOSE_WRITE イベントで2回同期してる。）</p>
+
+<pre><code>Fri Jan 15 17:49:07 2010: event CREATE:3.txt triggered.
+Fri Jan 15 17:49:07 2010: rsyncing /tmp/lsyncd/0/1/2/ --&gt; localhost:/var/tmp/lsyncd/0/1/2/
+Fri Jan 15 17:49:07 2010: event CLOSE_WRITE:3.txt triggered.
+Fri Jan 15 17:49:07 2010: rsyncing /tmp/lsyncd/0/1/2/ --&gt; localhost:/var/tmp/lsyncd/0/1/2/
+</code></pre>
+
+<p>というわけで、やはり rsync による差分チェックはあるものの、対象ディレクトリを絞り込めるので、適切なディレクトリ構造にしていれば、rsync only よりはかなり負荷は抑えられそうな感じですね。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -936,43 +1031,6 @@ trait Product extends java.lang.Cloneable {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/09/15/CanBadge/">CanBadge</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-09-15T00:05:20+09:00" pubdate>Sep 15<span>th</span>, 2009</time>
-        
-         | <a href="/blog/2009/09/15/CanBadge/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>5歳になる娘の幼稚園帽子。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/CanBadge/canbadge.jpg?format=raw)]]</p>
-
-<p>ちなみに小3の長男はPerl Best Practicesの布製バッグを体育用具入れとして使ってる。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -990,6 +1048,10 @@ trait Product extends java.lang.Cloneable {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1003,10 +1065,6 @@ trait Product extends java.lang.Cloneable {
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

@@ -9,7 +9,10 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="構文解析をちゃんと学ばないとなー、と前々から思いつつしばらく放置だったけど、なんとなくやる気になったのでやってみる。 ZIGOROu さんの Parse::Yapp ヨチヨチ歩き で Parse::Yapp の使い方を学びつつ、Rubyソースコード完全解説 第9章 速習yacc &hellip;">
+  <meta name="description" content="TeX で表紙画像的なものが作りたくて色々調べてたら、Google グループで見つけた のでメモ。 #!tex
+\documentclass[a4paper]{jsbook}
+\usepackage[dvipdfmx,hiresbb]{graphicx}
+\begin{document} \ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +75,77 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/02/23/TeXPageFilledWithImage/">TeXPageFilledWithImage</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-02-23T23:45:53+09:00" pubdate>Feb 23<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/02/23/TeXPageFilledWithImage/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>TeX で表紙画像的なものが作りたくて色々調べてたら、<a href="https://groups.google.com/group/fj.comp.texhax/browse_thread/thread/0be2662c944adf8f/6a4fdf56cfaeecaa?hl=ja&amp;pli=1">Google グループで見つけた</a> のでメモ。</p>
+
+<pre><code>#!tex
+\documentclass[a4paper]{jsbook}
+\usepackage[dvipdfmx,hiresbb]{graphicx}
+\begin{document}
+
+\enlargethispage{\paperwidth}
+\thispagestyle{empty}
+\vspace*{-1truein}
+\vspace*{-\topmargin}
+\vspace*{-\headheight}
+\vspace*{-\headsep}
+\vspace*{-\topskip}
+\noindent\hspace*{-1in}\hspace*{-\oddsidemargin}
+\includegraphics[width=\paperwidth,height=\paperheight]{cover_image.png}
+
+\end{document}
+</code></pre>
+
+<p>いくつか注意が必要で、</p>
+
+<pre><code>#!tex
+\enlargethispage{\paperwidth}
+</code></pre>
+
+<p>は、これがないと、1ページ目を画像いっぱいのページにしようと思っても空白ページになってしまい、画像いっぱいのページは2ページ目になってしまう。また、</p>
+
+<pre><code>#!tex
+\noindent\hspace*{-1in}\hspace*{-\oddsidemargin}
+</code></pre>
+
+<p>は奇数ページの場合なので、偶数ページの場合は、</p>
+
+<pre><code>#!tex
+\noindent\hspace*{-1in}\hspace*{-\evensidemargin}
+</code></pre>
+
+<p>とする。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -995,122 +1069,6 @@ staprun:remove_module:205 Module simple removed.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/03/26/OpenSourceProvisioningToolchain/">OpenSourceProvisioningToolchain</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-03-26T00:40:19+09:00" pubdate>Mar 26<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/03/26/OpenSourceProvisioningToolchain/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>DevOps に関する理解を深めるために、資料にあたってまとめてみるシリーズ。</p>
-
-<p>今回は <a href="http://en.oreilly.com/velocity-mar2010">Velocity Online Conference - March 17, 2010</a> でのプレゼン <a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Provisioning Toolchain</a> から。スライドのタイトルは「OpenSource Provisioning Toolchain」となっている。</p>
-
-<p>[wiki:DevOps 昨日のエントリ]でいうと、「インフラの自動化」や「ワンステップビルド＆デプロイ」に関連する話。</p>
-
-<p>Toolchain というのは何らかの目的を達成するためのソフトウェアの集まり、ってことなので、Provisioning Toolchain は、プロビジョニングを行うためのソフトウェアの集まり、ってことですね。つまり OpenSource Provisioning Toolchain は、プロビジョニングを行うためのオープンソースソフトウェアの集まり、ということ。</p>
-
-<p>ここでわざわざ Toolchain といってるのは、ひとつの大きなソフトウェアで全部やるんじゃなくて、小さなソフトウェアを組み合わせることで、プロビジョニング全体をカバーしよう、という考えから。</p>
-
-<p>小さなツールを組み合わせることによるメリットを、UNIX哲学的な話と絡めて説明してるけど、この辺はよくある話なので省略。</p>
-
-<p>また、なぜこのような Toolchain が必要なのか、って話を、クラウドや仮想化の波が押し寄せてきて DevOps 問題が発生する云々、的なスライドがあるんだけど、それ以上の詳しい説明が特にないのでこれも省略。</p>
-
-<p>個人的に参考になったのは、プロビジョニングを3つの領域にわけて、それぞれの領域に対応するオープンソースソフトウェアを挙げているところ。（オープンソースじゃないモノも混じってるけど。）</p>
-
-<p>3つの領域とは以下の通り。</p>
-
-<ul>
-<li>Orchestration
-
-<ul>
-<li>Application Service Deployment</li>
-</ul>
-</li>
-<li>Configuration
-
-<ul>
-<li>System Configuration</li>
-</ul>
-</li>
-<li>Bootstrapping
-
-<ul>
-<li>OS install</li>
-<li>Cloud or VM Image Launch</li>
-</ul>
-</li>
-</ul>
-
-
-<p>下の方がプロビジョニングの初期段階で、上に行くほどレイヤーが上がるイメージ。</p>
-
-<p>で、それぞれに対応するソフトウェアは以下の通り。</p>
-
-<ul>
-<li>Orchestration
-
-<ul>
-<li><a href="http://www.capify.org/index.php/Capistrano">Capistrano</a></li>
-<li><a href="http://controltier.org/wiki/Main_Page">ControlTier</a></li>
-<li><a href="http://docs.fabfile.org/">Fabric</a></li>
-<li><a href="https://fedorahosted.org/func/">Func</a></li>
-</ul>
-</li>
-<li>Configuration
-
-<ul>
-<li><a href="http://trac.mcs.anl.gov/projects/bcfg2">BCFG</a></li>
-<li><a href="http://www.cfengine.org/">Cfengine</a></li>
-<li><a href="http://www.opscode.com/chef">Chef</a></li>
-<li><a href="http://www.puppetlabs.com/">Puppet</a></li>
-<li><a href="http://wiki.smartfrog.org/wiki/display/sf/SmartFrog+Home">SmartFrog</a></li>
-</ul>
-</li>
-<li>Bootstrapping
-
-<ul>
-<li><a href="http://aws.amazon.com/">AWS</a></li>
-<li><a href="https://fedorahosted.org/cobbler/">Cobbler</a></li>
-<li><a href="http://www.eucalyptus.com/">Eucalyptus</a></li>
-<li><a href="http://en.wikipedia.org/wiki/Jumpstart_%28Solaris%29">Jumpstart</a></li>
-<li><a href="http://fedoraproject.org/wiki/Anaconda/Kickstart">Kickstart</a></li>
-<li><a href="http://www.opennebula.org/start">OpenNebula</a></li>
-<li><a href="http://www.openqrm.com/">OpenQRM</a></li>
-<li><a href="http://www.vmware.com/">VMWare</a></li>
-</ul>
-</li>
-</ul>
-
-
-<p>ペパボの場合だと、全部のサービスがそうというわけではないけど、Bootstrapping レイヤーで Cobbler、Configuration レイヤーで Puppet、Orchestration レイヤーで Capistrano(Webistrano) や Func、といった感じ。ここにないものだと、Orchestration レイヤーで Archer なんかも使ってる。</p>
-
-<p>今日は手抜きだけどこれでお終い。これから <a href="http://www.jp.playstation.com/scej/title/mag/">MAG</a> やるので。DLC第1弾トルーパーパックが配信されたしね。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1128,6 +1086,10 @@ staprun:remove_module:205 Module simple removed.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -1141,10 +1103,6 @@ staprun:remove_module:205 Module simple removed.
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

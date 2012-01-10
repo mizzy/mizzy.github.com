@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="IRC #plagger-ja チャネルにて、音量や音質のノーマライズの話が出てて、「Filter::Audio で当然サポートするよね？」という声が聞こえた気がした（誰もそんなこと言ってない）ので、SoX で音量をノーマライズする様に Filter::Audio を修正してみた。trac &hellip;">
+  <meta name="description" content="FFmpeg-Command-0.04 を CPAN にアップしました。（これ書いてる時点ではまだ反映されてませんが。） デフォルトで ffmpeg に渡す -vcodec オプションの値は h264 にしてたのですが、これで変換すると iTunes には取り込めるけど iPod &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,67 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/30/492/">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-30T02:39:00+09:00" pubdate>Aug 30<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/30/492/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://search.cpan.org/~mizzy/FFmpeg-Command-0.04/"><span class="icon"></span>FFmpeg-Command-0.04</a> を CPAN にアップしました。（これ書いてる時点ではまだ反映されてませんが。）
+</p>
+
+
+<p>
+デフォルトで ffmpeg に渡す -vcodec オプションの値は h264 にしてたのですが、これで変換すると iTunes には取り込めるけど iPod には取り込めない、という報告があったので、デフォルトを h264 から mpeg4 に変更しました。mpeg4 であれば問題なく取り込めた、とのことです。
+</p>
+
+
+<p>
+おそらく、携帯動画変換君付属の ffmpeg なら h264 でも大丈夫だと思うのですが、Linux 上で自前ビルドした ffmpeg ではだめなようです。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://lists.mplayerhq.hu/pipermail/ffmpeg-user/2006-January/001997.html"><span class="icon"></span>この辺りが関係あるのかな？</a>
+</p>
+
+
+<p>
+あと、PSP は再生できるのかどうかすらもわかりません。動作報告求む。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://www.konami.jp/kojima_pro/e3_2006/"><span class="icon"></span>METAL GEAR SOLID PORTABLE OPS</a> が出ることだし、PSP 買っちゃおうかなー…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -870,88 +931,6 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/22/465/">Plagger::Plugin::CustomFeed::AmazonWebService</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-22T05:54:00+09:00" pubdate>Aug 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/22/465/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://d.hatena.ne.jp/wata_d/20060821/1156113214"><span class="icon"></span>ベイダー日記 - Amazon2iCal</a> の CustomFeed::AmazonSearch を、他の用途でも使えるように、もう少し汎用的に書き換えてみました。
-</p>
-
-
-<p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm"><span class="icon"></span>CustomFeed::AmazonWebService</a>
-</p>
-
-
-<p>
-オリジナルからの変更ポイントは、
-</p>
-
-
-<ul><li>link や icon もセットするようにした。</li>
-<li>link には アソシエイト ID を含めることができるようにした。</li>
-<li>ソート条件を yaml で指定できるようにした。</li>
-<li>「発売日が今日の日付から一ヶ月以上前のものは省く」という条件廃止。これは Rule でやるべきなので。</li></ul>
-
-
-<p>
-といったあたりですかね。
-</p>
-
-
-<p>
-名前は以前に <a class="ext-link" href="http://mizzy.org/program/plagger_and_aws.html"><span class="icon"></span>Filter::AmazonWebService</a> というものを作っていたので、それに合わせてます。（Plagger が media API 対応してから色々手を加えようと思い、しばらく放置中ですが…）
-</p>
-
-
-<p>
-例によって Publish::Gmail と組み合わせるとこんな感じ。
-</p>
-
-
-<p>
-<img src="http://mizzy.org/img/aws.jpg" alt="CustomFeed::AmazonWebService + Publish::Gmail" />
-</p>
-
-
-<p>
-でもって、Publish::iCal + Google Calendar ではこんな感じ。
-</p>
-
-
-<p>
-<img src="http://mizzy.org/img/gcal.jpg" alt="CustomFeed::AmazonWebService + Publish::iCal + Google Calendar" />
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -969,6 +948,10 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -982,10 +965,6 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>

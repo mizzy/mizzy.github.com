@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="はてなのnaoyaさんがnaoyaのブックマークにて、「del.icio.us の RSS をブックマークのお気に入りに取り込めるようにしたいなあ。」と呟いていたのを見て、こんなものを作ってみた。（naoyaさんが考えているものと違うかもしれませんが。 &hellip;">
+  <meta name="description" content="前回のエントリで、RSSをXBELに変換するゲートウェイについて触れましたが、Firefoxを使う限りにおいてはLive Bookmarks機能を使えばそれで済むので、せっかっく作ったゲートウェイがあまり意味がないことに気づきました。 それもなんだか悔しいので、今度はdel.icio. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,79 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/24/287/">ソーシャルブックマークのRSSをブラウザのブックマークに取り込む #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-24T01:44:00+09:00" pubdate>Apr 24<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/24/287/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/program/rss2xbel00.html">前回のエントリ</a>で、RSSをXBELに変換するゲートウェイについて触れましたが、Firefoxを使う限りにおいてはLive Bookmarks機能を使えばそれで済むので、せっかっく作ったゲートウェイがあまり意味がないことに気づきました。
+</p>
+
+
+
+
+<p class="entryBody">
+それもなんだか悔しいので、今度は<a href="http://del.icio.us/" target="_blank">del.icio.us</a>の<a href="http://del.icio.us/doc/api" target="_blank">API</a>を利用して、自分がpostしたブックマークをすべて、XBELに変換するためのゲートウェイを作りました。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="/del2xbel/index.cgi" target="_blank">サンプル</a>と<a href="/archives/del2xbel.tar.gz">ソース</a>
+</p>
+
+
+
+
+<p class="entryBody">
+前回と違って、タグ毎にフォルダを分けるようにしています。Firefoxの<a href="http://extensionroom.mozdev.org/more-info/booksync" target="_blank">Bookmarks Synchronizer extension</a>で取り込んで、サイドバーに表示すると、こんな感じでタグ別にフォルダ分けして表示されます。
+</p>
+
+
+
+
+<p class="entryBody">
+<img src="/img/del2xbel.jpg" />
+</p>
+
+
+
+
+<p class="entryBody">
+これはLive Bookmarksではできないことなので、ちょっと満足しました。まあ、色々と足りないところはあるのですが、自分は<a href="http://www.spurl.net" target="_blank">Spurl</a>サイドバーで満足してるので、これを使うことはないですね。なので、要望があれば改良していきますが、なければこのままほっときます。
+</p>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -727,63 +800,6 @@ blosxomのエントリを<a href="http://www.netlab.jp/rast/" target="_blank">Ra
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/14/495/">Blosxomでtagging #3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-14T15:50:00+09:00" pubdate>Apr 14<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/14/495/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-taggingプラグインをアップデート。タグとファイルを関連付けるキャッシュを生成するようにして、パフォーマンスを向上。download: <a href="/archives/tagging">taggingプラグイン</a>
-</p>
-
-
-
-
-<p class="entryBody">
-QUERY_STRINGやPOSTパラメータで、recache_tags=1を指定すれば、キャッシュを再作成します。
-</p>
-
-
-
-
-<p class="entryBody">
-手を抜くためにStorableモジュールを使ってます。なので、使える環境が限られてしまいます。ごめんなさい。（って、使ってくれる人がいれば、だけど。）
-</p>
-
-
-
-
-<p class="entryBody">
-次の目標は、タグの検索インターフェースにajaxを利用して、使いやすいものを目指してみる。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/40/">&larr; Older</a>
@@ -801,6 +817,10 @@ QUERY_STRINGやPOSTパラメータで、recache_tags=1を指定すれば、キ�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
@@ -814,10 +834,6 @@ QUERY_STRINGやPOSTパラメータで、recache_tags=1を指定すれば、キ�
     
       <li class="post">
         <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a>
       </li>
     
   </ul>
