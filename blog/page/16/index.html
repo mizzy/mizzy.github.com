@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="SVN::TracWiki というツールをつくってみました。svn repos はこちら。 何をするものかというと、Subversion の post-commit スクリプトとして動作して、コミットされたファイルからテキストを抽出、そのファイルの実体へのリンクを付加して、Trac の Wiki &hellip;">
+  <meta name="description" content="SVN::TracWiki (svn repos) について、ブクマコメントで miyagawa さんから「File::Extract?」というアドバイス？を頂きましたので、テキスト抽出部分を File::Extract ベースに書き換えてみました。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/22/310/">SVN::TracWiki #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-22T15:07:00+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/22/310/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/SVN-TracWiki"><span class="icon"></span>SVN::TracWiki</a> (<a class="ext-link" href="http://svn.mizzy.org/public/SVN-TracWiki/"><span class="icon"></span>svn repos</a>) について、ブクマコメントで miyagawa さんから「File::Extract?」というアドバイス？を頂きましたので、テキスト抽出部分を File::Extract ベースに書き換えてみました。
+</p>
+
+
+<p>
+おかげでプラグインまわりの処理が少しすっきりした上に、File::Extract で対応しているファイルフォーマットであれば、SVN::TracWiki 用のプラグインを書かなくてもテキスト抽出ができるようになりました。（Excel で試しましたが、ばっちり動作しました。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1088,112 +1129,6 @@ notice: Finished configuration run in 6.80 second
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/03/19/319/">Puppet File Server</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-03-19T19:22:00+09:00" pubdate>Mar 19<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/03/19/319/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-puppet サーバ上のファイルをクライアントに配布するには、file server 機能を利用するらしい。というわけで、ドキュメント <a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/FileServingConfiguration"><span class="icon"></span>File Serving Configuration</a> から要点を抜き出してみる。
-</p>
-
-
-<h3 id="/etc/puppet/fileserver.confの設定">/etc/puppet/fileserver.conf の設定</h3>
-
-
-<pre class="wiki">
-[module]
-    path /path/to/files
-    allow *.domain.com
-    deny *.wireless.domain.com
-</pre>
-
-
-<p>
-こう設定すると、
-</p>
-
-
-<pre class="wiki">
-/path/to/files/sudoers
-</pre>
-
-
-<p>
-というファイルを
-</p>
-
-
-<pre class="wiki">
-puppet://server/module/sudoers
-</pre>
-
-
-<p>
-で取得できるようになる。
-</p>
-
-
-<h3 id="manifestの設定">manifest の設定</h3>
-
-
-<p>
-&#8220;the Puppet language&#8221; が記述される設定ファイルを manifest と呼ぶらしい。要は puppet クライアントをどう管理するか、が記述された設定ファイルですね。（上の /etc/puppet/fileserver.conf は manifest ではない。）
-</p>
-
-
-<p>
-puppet file server 上のファイルを配布するには、以下の様な設定を manifest に記述。
-</p>
-
-
-<pre class="wiki">
-# copy a remote file to /etc/sudoers
-file { "/etc/sudoers":
-    mode   => 440,
-    owner  => root,
-    group  => root,
-    source => "puppet://server/module/sudoers"
-}
-</pre>
-
-
-<p>
-source がポイント。
-</p>
-
-
-<p>
-詳細は <a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/FileServingConfiguration"><span class="icon"></span>File Serving Configuration</a> を参照。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/17/">&larr; Older</a>
@@ -1211,6 +1146,10 @@ source がポイント。
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1224,10 +1163,6 @@ source がポイント。
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

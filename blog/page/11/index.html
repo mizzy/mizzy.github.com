@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ネットワークインストール環境がさくっと構築できる Cobbler がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。 サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）
-サーバの構築を簡単にするためのステップ （その6：Cobber編 Part2 ） &hellip;">
+  <meta name="description" content="前回のエントリで書いた Cobbler にはウェブ UI がある。その設定方法のメモ。設定方法はここを参照した。Cobbler のバージョンが 0.7 以降の場合はこっちを参照。 まずは /var/lib/cobbler/settings の xmlrpc_rw_enabled を 1 に設定。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,79 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/12/29/CobblerWebUi/">CobblerWebUi</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-12-29T00:47:43+09:00" pubdate>Dec 29<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/12/29/CobblerWebUi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://trac.mizzy.org/public/wiki/Cobbler">前回のエントリで書いた</a> Cobbler にはウェブ UI がある。その設定方法のメモ。設定方法は<a href="https://hosted.fedoraproject.org/cobbler/wiki/OldCobblerWebUi">ここ</a>を参照した。Cobbler のバージョンが 0.7 以降の場合は<a href="https://hosted.fedoraproject.org/cobbler/wiki/CobblerWebInterface">こっちを参照</a>。</p>
+
+<p>まずは /var/lib/cobbler/settings の xmlrpc_rw_enabled を 1 に設定。</p>
+
+<pre><code>xmlrpc_rw_enabled:  1
+</code></pre>
+
+<p>これを見て想像がつくと思うけど、cobblerd が XMLRPC リクエストを受け付けるようになる。</p>
+
+<p>次に /etc/cobbler/auth.conf で、cobblerd の XMLRPC へのアクセスを許可するユーザ ID とパスワードを設定する。</p>
+
+<pre><code>[xmlrpc_service_users]
+admin = password
+</code></pre>
+
+<p>/etc/cobbler/auth.conf が httpd ユーザから読めるようにする。</p>
+
+<pre><code>$ sudo chown apache /etc/cobbler/auth.conf
+</code></pre>
+
+<p>SELinux を利用している場合はこの設定も必要らしい。（自分は SELinux は disabled にしてる。）</p>
+
+<pre><code>$ sudo chcon -t httpd_sys_content_t /etc/cobbler/auth.conf
+$ sudo setsebool httpd_can_network_connect true
+</code></pre>
+
+<p>httpd で認証するユーザ名とパスワードを設定する。これは /etc/cobbler/auth.conf で設定したものと同じにする。</p>
+
+<pre><code>$ sudo htdigest /var/www/cgi-bin/cobbler/.htpasswd "Cobbler WebUI Authentication" admin
+</code></pre>
+
+<p>あとは http://cobbler.example.org/cgi-bin/cobbler/webui.cgi にアクセスすれば OK。以下のスクリーンショットは Profile を表示させたところ。</p>
+
+<p>[[Image(cobbler_web_ui.jpg)]]</p>
+
+<p>この画面見てて気づいたんだけど、Cobbler では system の登録ができて、MAC アドレスを登録して Profile を指定しておけば、PXE ブート時にイメージ名を入力しなくても、勝手に指定された Profile のイメージでブートしてくれる。</p>
+
+<p>system の登録はコマンドラインでもできる。</p>
+
+<pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1248,147 +1320,6 @@ def BulkByteTransferRate(adapter):
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/11/12/PerlbalPluginProxyPass/">PerlbalPluginProxyPass</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-11-12T00:15:48+09:00" pubdate>Nov 12<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/11/12/PerlbalPluginProxyPass/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Perlbal で Vpaths プラグインをつかって、</p>
-
-<pre><code>LOAD vpaths
-
-CREATE POOL apache
-  POOL apache ADD 127.0.0.1
-
-CREATE SERVICE apache_proxy
-  SET role = reverse_proxy
-  SET pool = apache
-ENABLE apache_proxy
-
-CREATE SERVICE selector
-  SET   listen  = 0.0.0.0:8080
-  SET   role    = selector
-  SET   plugins = vpaths
-  VPATH /apache = apache_proxy
-ENABLE selector
-</code></pre>
-
-<p>みたいな設定をすると、</p>
-
-<pre><code>http://localhost:8080/apache -&gt; http://localhost:80/apache
-</code></pre>
-
-<p>といった形でプロキシしてくれるんだけど、これを</p>
-
-<pre><code>http://localhost:8080/apache -&gt; http://localhost:80/
-</code></pre>
-
-<p>としたくてプラグイン書いてみた。もしかしてプラグイン書かなくてもできるかもしれないけど、やり方がわからなかったのと、プラグインを書く練習ってことで。プラグイン名は Apache mod_proxy の ProxyPass ディレクティブにちなんでます。</p>
-
-<pre><code>#!perl
-package Perlbal::Plugin::ProxyPass;
-
-use strict;
-use warnings;
-
-sub load {
-    my $class = shift;
-
-    Perlbal::register_global_hook('manage_command.proxypass', sub {
-        my $mc = shift-&gt;parse(qr/proxypass\s+(?:(\w+)\s+)?(\S+)\s*=\s*(\S+)$/,
-                              "usage: ProxyPass [&lt;service&gt;] &lt;source path&gt; = &lt;dest path&gt;");
-        my ($selname, $source, $target) = $mc-&gt;args;
-        unless ($selname ||= $mc-&gt;{ctx}{last_created}) {
-            return $mc-&gt;err("omitted service name not implied from context");
-        }
-
-        my $ss = Perlbal-&gt;service($selname);
-        return $mc-&gt;err("Service '$selname' is not a reverse_proxy service")
-            unless $ss &amp;&amp; $ss-&gt;{role} eq "reverse_proxy";
-
-        $ss-&gt;{extra_config}-&gt;{_proxypass} ||= [];
-        push @{$ss-&gt;{extra_config}-&gt;{_proxypass}}, [ $source, $target ];
-
-        return $mc-&gt;ok;
-    });
-
-    return 1;
-}
-
-sub register {
-    my ($class, $svc) = @_;
-    unless ($svc &amp;&amp; $svc-&gt;{role} eq "reverse_proxy") {
-        die "You can't load the proxypass plugin on a service not of role reverse_proxy.\n";
-    }
-
-    $svc-&gt;register_hook(
-        'ProxyPass' =&gt; 'start_proxy_request', sub {
-            my Perlbal::ClientProxy $client = shift;
-            for my $proxypass ( @{ $svc-&gt;{extra_config}-&gt;{_proxypass} } ) {
-                my $source = $proxypass-&gt;[0];
-                my $target = $proxypass-&gt;[1];
-                $client-&gt;{req_headers}-&gt;{uri} =~ s/$source/$target/;
-                $client-&gt;{req_headers}-&gt;{uri} =~ s!//!/!;
-            }
-            return 0;
-        }
-    );
-
-    return 1;
-}
-
-1;
-</code></pre>
-
-<p>設定はこんな感じ。</p>
-
-<pre><code>LOAD vpaths
-LOAD ProxyPass
-
-CREATE POOL apache
-  POOL apache ADD 127.0.0.1
-
-CREATE SERVICE apache_proxy
-  SET       role    = reverse_proxy
-  SET       pool    = apache
-  SET       plugins = ProxyPass
-  ProxyPass /apache = /   
-ENABLE apache_proxy
-
-CREATE SERVICE selector
-  SET   listen  = 0.0.0.0:8080
-  SET   role    = selector
-  SET   plugins = vpaths
-  VPATH /apache = apache_proxy
-ENABLE selector
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/12/">&larr; Older</a>
@@ -1406,6 +1337,10 @@ ENABLE selector
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1419,10 +1354,6 @@ ENABLE selector
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

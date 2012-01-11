@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="色々あって、typo へ移行してみた。
-">
+  <meta name="description" content="ブログが続かないわけ | DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い にて、 とはいえ、僕の稼働中のアプリはすでに手動型のSchema で動いている。スキーマを作り直したら、リレーションの設定を全てしなおさなければならないので、それは現実的じゃない。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,137 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/05/06/508/">Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-05-06T19:11:00+09:00" pubdate>May 6<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/05/06/508/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://en.yummy.stripper.jp/?eid=550053">ブログが続かないわけ | DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い</a> にて、</p>
+
+<blockquote><p>とはいえ、僕の稼働中のアプリはすでに手動型のSchema で動いている。スキーマを作り直したら、リレーションの設定を全てしなおさなければならないので、それは現実的じゃない。inflate, deflate の指定は、やっぱりすべてのSchema にかかなきゃだめそうだ。</p></blockquote>
+
+<p>とあったので、これに関して少し楽ができる方法をコメントしようと思ったけれど、コメント欄ではうまく伝えられる自信がないので、こちらで書いてみることにしました。</p>
+
+<h3>load_components で 読み込む方法</h3>
+
+<p>DBIx::Class::Schema::Loader ではなく DBIx::Class::Schema を継承したスキーマの場合には、各スキーマファイルに以下の様に書いてあげれば OK です。（既にご存知かもしれませんが。）</p>
+
+<pre><code>package My::Schema::Table;
+
+__PACKAGE__-&gt;load_components(
+  "InflateColumn::DateTime",
+  "PK::Auto",
+  "Core",
+);
+</code></pre>
+
+<p>すべてのスキーマファイルに書かなきゃいけないことには変わりありませんが、各カラムに inflate/deflate を設定するよりははるかに楽だと思います。</p>
+
+<h3>make_schema_at を使う方法</h3>
+
+<p>make_schema_at でスキーマファイルを生成しているのであれば、こんな感じでリレーションだけ定義した ./tmp/lib/My/Schema/Table.pm をまず用意します。</p>
+
+<pre><code>package My::Schema::Table;
+
+__PACKAGE__-&gt;belongs_to(
+    realation =&gt; 'My::Schema::OtherTable
+    { 'foreign.id' =&gt; 'self.other_table_id' },
+);
+
+1;
+</code></pre>
+
+<p>でもって、こんなスクリプトを実行します。</p>
+
+<pre><code>#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib qw( ./tmp/lib );
+use Carp;
+use DBIx::Class::Schema::Loader qw( make_schema_at dump_to_dir:lib dump_overwrite );
+
+make_schema_at(
+    'My::Schema::Table',
+    {
+        components     =&gt; [qw/ ResultSetManager UTF8Columns InflateColumn::DateTime /],
+        dump_overwrite =&gt; 1,
+    },
+    ['dbi:mysql:dbname' ,'user', 'password'],
+);
+</code></pre>
+
+<p>そうすると、lib/My/Schema/Table.pm に以下の内容を吐き出してくれます。</p>
+
+<pre><code>package My::Schema::Table;
+
+# Created by DBIx::Class::Schema::Loader v0.03009 @ 2007-04-26 18:21:23
+
+use strict;
+use warnings;
+
+use base 'DBIx::Class';
+
+__PACKAGE__-&gt;load_components(
+  "ResultSetManager",
+  "UTF8Columns",
+  "InflateColumn::DateTime",
+  "PK::Auto",
+  "Core",
+);
+__PACKAGE__-&gt;table("table");
+__PACKAGE__-&gt;add_columns(
+  "id",
+  { data_type =&gt; "INT", default_value =&gt; undef, is_nullable =&gt; 0, size =&gt; 11 },
+  "other_table_id",
+  { data_type =&gt; "INT", default_value =&gt; 0, is_nullable =&gt; 0, size =&gt; 11 },
+  "date",
+  { data_type =&gt; "DATE", default_value =&gt; undef, is_nullable =&gt; 1, size =&gt; 10 },
+
+__PACKAGE__-&gt;set_primary_key("id");
+# These lines loaded from user-supplied external file:
+package My::Schema::Table;
+
+__PACKAGE__-&gt;belongs_to(
+    employees =&gt; 'My::Schema::Table',
+    { 'foreign.id' =&gt; 'self.other_table_id' },
+);
+
+1;
+# End of lines loaded from user-supplied external file
+</code></pre>
+
+<p>この方法を使うと、スキーマを作り直しても、リレーションの再設定をしなくて済みます。</p>
+
+<p>手動でやるのが楽なのか、上の方法のいずれかを使うのが楽なのかは、状況にもよると思いますが、こんな方法もありますよ、ということで、ご参考になれば幸いです。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -307,7 +437,7 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
 <h1>CO-MAINTAINER</h1>
 
-<p>Tatsuhiko Miyagawa <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#x3a;&#x6d;&#105;&#x79;&#x61;&#103;&#x61;&#x77;&#97;&#x40;&#98;&#x75;&#x6c;&#107;&#110;&#101;&#119;&#115;&#46;&#110;&#101;&#x74;">&#109;&#105;&#121;&#x61;&#103;&#97;&#119;&#x61;&#64;&#98;&#x75;&#108;&#x6b;&#110;&#101;&#119;&#x73;&#46;&#x6e;&#101;&#x74;</a></p>
+<p>Tatsuhiko Miyagawa <a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#58;&#109;&#x69;&#121;&#97;&#x67;&#x61;&#x77;&#97;&#x40;&#x62;&#x75;&#108;&#x6b;&#x6e;&#x65;&#x77;&#x73;&#x2e;&#110;&#101;&#116;">&#109;&#x69;&#121;&#97;&#103;&#97;&#119;&#97;&#x40;&#98;&#117;&#108;&#107;&#110;&#x65;&#x77;&#x73;&#46;&#x6e;&#101;&#x74;</a></p>
 </div>
   
   
@@ -1009,128 +1139,6 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Client.pm/">XML-Atom-0.22/lib/XML/Atom/Client.pm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-30T23:41:44+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Client.pm/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Client.pm</p>
-
-<h1>NAME</h1>
-
-<p>XML::Atom::Client - A client for the Atom API</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    use XML::Atom::Client;
-    use XML::Atom::Entry;
-    my $api = XML::Atom::Client-&gt;new;
-    $api-&gt;username('Melody');
-    $api-&gt;password('Nelson');
-
-    my $entry = XML::Atom::Entry-&gt;new;
-    $entry-&gt;title('New Post');
-    $entry-&gt;content('Content of my post.');
-    my $EditURI = $api-&gt;createEntry($PostURI, $entry);
-
-    my $feed = $api-&gt;getFeed($FeedURI);
-    my @entries = $feed-&gt;entries;
-
-    my $entry = $api-&gt;getEntry($EditURI);
-</code></pre>
-
-<h1>DESCRIPTION</h1>
-
-<p><em>XML::Atom::Client&#8221; implements a client for the Atom API described at &#8221;http://bitworking.org/projects/atom/draft-gregorio-09.html&#8221;, with the authentication scheme described at &#8221;http://www.intertwingly.net/wiki/pie/DifferentlyAbledClients</em>.
-<em>NOTE:</em> the API, and particularly the authentication scheme, are still in flux.</p>
-
-<h1>USAGE</h1>
-
-<h2>XML::Atom::Client->new(%param)</h2>
-
-<h2>$api->use_soap([ 0 | 1 ])</h2>
-
-<p><em>XML::Atom::Client&#8221; supports both the REST and SOAP-wrapper versions of the Atom API. By default, the REST version of the API will be used, but you can turn on the SOAP wrapper&#8211;for example, if you need to connect to a server that supports only the SOAP wrapper&#8211;by calling &#8221;use_soap</em> with a value of <code>1</code>:</p>
-
-<pre><code>    $api-&gt;use_soap(1);
-</code></pre>
-
-<p>If called without arguments, returns the current value of the flag.</p>
-
-<h2>$api->username([ $username ])</h2>
-
-<p>If called with an argument, sets the username for login to <em>$username</em>.</p>
-
-<p>Returns the current username that will be used when logging in to the Atom server.</p>
-
-<h2>$api->password([ $password ])</h2>
-
-<p>If called with an argument, sets the password for login to <em>$password</em>.</p>
-
-<p>Returns the current password that will be used when logging in to the Atom server.</p>
-
-<h2>$api->createEntry($PostURI, $entry)</h2>
-
-<p>Creates a new entry.</p>
-
-<p><em>$entry&#8221; must be an &#8221;XML::Atom::Entry</em> object.</p>
-
-<h2>$api->getEntry($EditURI)</h2>
-
-<p>Retrieves the entry with the given URL <em>$EditURI</em>.</p>
-
-<p>Returns an <em>XML::Atom::Entry</em> object.</p>
-
-<h2>$api->updateEntry($EditURI, $entry)</h2>
-
-<p>Updates the entry at URL <em>$EditURI&#8221; with the entry &#8221;$entry&#8221;, which must be an &#8221;XML::Atom::Entry</em> object.</p>
-
-<p>Returns true on success, false otherwise.</p>
-
-<h2>$api->deleteEntry($EditURI)</h2>
-
-<p>Deletes the entry at URL <em>$EditURI</em>.</p>
-
-<h2>$api->getFeed($FeedURI)</h2>
-
-<p>Retrieves the feed at <em>$FeedURI</em>.</p>
-
-<p>Returns an <em>XML::Atom::Feed</em> object representing the feed returned from the server.</p>
-
-<h2>ERROR HANDLING</h2>
-
-<p>Methods return <code>undef</code> on error, and the error message can be retrieved using the <em>errstr</em> method.</p>
-
-<h1>AUTHOR &amp; COPYRIGHT</h1>
-
-<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/15/">&larr; Older</a>
@@ -1148,6 +1156,10 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1161,10 +1173,6 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

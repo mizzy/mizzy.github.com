@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="前回のエントリで、catlxom のプラグイン機構を plagger っぽくしてみたのですが、 sub register { my ($class, $c) = @_; $c-&gt;catlxom-&gt;register_hook( $class, 'setup' =&gt; 'setup &hellip;">
+  <meta name="description" content="catlxom 本家の svn リポジトリ に、mizzy ブランチ ができました。trac から見る場合はこちら。 trac トップページ の Authors にも名前いれてもらっちゃいました。typester さん、ありがとうございます！ 今までこのブログで書いてきた catlxom &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/15/413/">Catlxom 本家に Mizzy ブランチができたよ (Catlxom メモ #8)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-15T22:12:00+09:00" pubdate>Jun 15<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/15/413/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://catlxom.org/repos/" target="_blank">catlxom 本家の svn リポジトリ</a> に、<a href="http://catlxom.org/repos/branches/mizzy/catlxom/" target="_blank">mizzy ブランチ</a> ができました。<a href="http://catlxom.org/trac/browser/branches/mizzy/catlxom" target="_blank">trac から見る場合はこちら。</a> <a href="http://catlxom.org/trac" target="_blank">trac トップページ</a> の Authors にも名前いれてもらっちゃいました。typester さん、ありがとうございます！
+</p>
+
+
+
+
+<p class="entryBody">
+今までこのブログで書いてきた catlxom の修正は、このブランチに反映させてありますので、ご興味のある方は今後こちらからご参照/ご取得ください。
+</p>
+
+
+
+
+<p class="entryBody">
+微力ながら、catlxom の発展に貢献させてもらえればなぁと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+次はプラグインづくりに入ろうかと思います。まずは今 blosxom で利用しているプラグインの移植から。本家本元 catlxom のプラグイン機構が今後どうなるかは分かりませんが、そんなに大きく修正しなくても対応できると思うので、今からちまちま作っていきます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1656,72 +1713,6 @@ Index: plugins/Template/TT.pm
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/27/290/">Catlxom メモ #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-27T21:10:00+09:00" pubdate>May 27<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/05/27/290/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-catlxom の Template::TT プラグインで、INCLUDE_PATH を指定するための patch 。
-</p>
-
-
-
-
-<pre class="code">
-Index: plugins/Template/TT.pm
-===================================================================
---- plugins/Template/TT.pm      (revision 23)
-+++ plugins/Template/TT.pm      (working copy)
-@@ -10,15 +10,15 @@
-
- our $VERSION = '0.01';
-
-+my $template_dir = Catlxom::Util::load_dir('template');
-+my $path_root    = join '/', $template_dir->dir_list;
-+
- __PACKAGE__->classdata->{templates} = {};
--__PACKAGE__->classdata->{tt}        = Template->new;
-+__PACKAGE__->classdata->{tt}        = Template->new( INCLUDE_PATH => $path_root );
-
- sub setup {
-     my ( $self, $c ) = @_;
-
--    my $template_dir = Catlxom::Util::load_dir('template');
--    my $path_root    = join '/', $template_dir->dir_list;
--
-     $template_dir->recurse(
-         callback => sub {
-             my $file = shift;
-</pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/26/">&larr; Older</a>
@@ -1739,6 +1730,10 @@ Index: plugins/Template/TT.pm
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1752,10 +1747,6 @@ Index: plugins/Template/TT.pm
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

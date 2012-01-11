@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="FFmpeg-Command-0.04 を CPAN にアップしました。（これ書いてる時点ではまだ反映されてませんが。） デフォルトで ffmpeg に渡す -vcodec オプションの値は h264 にしてたのですが、これで変換すると iTunes には取り込めるけど iPod &hellip;">
+  <meta name="description" content="こちらのエントリのコメント にて、sumikawa さんより Filter::FFmpeg の PSP での動作報告や、パッチなどを頂きました。ありがとうございます！ 早速頂いたパッチをとりこんで、rewrite_filename オプションでファイル名の書き換えができるようにしたのですが、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,76 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/31/454/">Plagger::Plugin::Filter::FFmpeg #4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-31T12:37:00+09:00" pubdate>Aug 31<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/31/454/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/ffmpeg03.html#comments"><span class="icon"></span>こちらのエントリのコメント</a> にて、sumikawa さんより Filter::FFmpeg の PSP での動作報告や、パッチなどを頂きました。ありがとうございます！
+</p>
+
+
+<p>
+早速頂いたパッチをとりこんで、rewrite_filename オプションでファイル名の書き換えができるようにしたのですが、Publish::Feed のような形でファイル名を指定できるほうがいいかな、と思い <a class="ext-link" href="http://trac.mizzy.org/public/changeset/253"><span class="icon"></span>修正してみました</a>。
+</p>
+
+
+<pre class="wiki">
+  - module: Filter::FFmpeg
+    config:
+      dir: /home/miya/mov
+      filename: %t.m4v
+</pre>
+
+
+<p>
+といった形で指定すると、ffmpeg を通した後のファイル名が &#8220;entry title.m4v&#8221; といった形になります。filename が指定されていると、ext オプションで指定した拡張子は無視しますので、filename オプションには拡張子も入れてください。
+</p>
+
+
+<p>
+<del> このオプションのための gen_filename() や safe_filename() などは、Publish::Feed からコピペしてるのですが、ファイルに Publish する系統の他のいくつかプラグインでも、同様にコピペされてて DRY じゃないので、Plagger::Util あたりで実装するといいんじゃないかな、と思いました。（irc#plagger-ja でも同様のことを書いたのですが、宮川さんが見てない可能性もあるので、ここでも書いときます。）</del>
+</p>
+
+
+<p>
+また、entry は enclosure を複数持てるのですが、そこを考慮していないつくりになっていたので、複数の enclosure に対応できるようにもしました。（enclosure 変換のための hook を追加予定らしいので、そうなるとプラグイン側はこの辺り考慮しなくてよくなると思いますが。）
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+gen_filename() ですが、Plagger::Util::filename_for() というものがある、と 33rpm さんより教えていただきました。ありがとうございます！というわけで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/254"><span class="icon"></span>対応させてみました</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -827,110 +897,6 @@ Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/22/436/">Plagger で Amazon2iCal 改良</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-22T16:40:00+09:00" pubdate>Aug 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/22/436/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-自分好みに使いやすくするために、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/230"><span class="icon"></span>CustomFeed::AmazonWebService と Publish::iCal を修正してみました</a>。
-</p>
-
-
-<p>
-CustomFeed::AmazonWebService は、$entry->author に 著者名やアーティスト名などをセットするようにしました。
-</p>
-
-
-<p>
-Publish::iCal は $event->add_properties で、summary に title だけではなく、author も含めるようにしました。これで Google Calendar で見た場合に、誰の作品なのかが一目で分かります。
-</p>
-
-
-<p>
-最初は organizer に author を含めておけば、Google Calendar で適切に表示してくれるんじゃないかと思ったのですが、こちらのやり方が悪いのか、organizer がどこに表示されるのかさっぱり分かりません。
-</p>
-
-
-<p>
-また、RFC では organizer は、
-</p>
-
-
-<pre class="wiki">
-ORGANIZER;CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
-</pre>
-
-
-<p>
-といったフォーマットになるのですが、Data::ICal でこの様なフォーマットにする方法が分かりません。
-</p>
-
-
-<pre class="wiki">
-$event->add_properties(
-    organizer   => 'CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com',
-);
-</pre>
-
-
-<p>
-としても、
-</p>
-
-
-<pre class="wiki">
-ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
-</pre>
-
-
-<p>
-となっちゃいます。（ORGANIZER 直後がセミコロンではなくコロンになってしまう。）
-</p>
-
-
-<p>
-とりあえず、Google Calendar で表示させてみるとこんな感じになりました。
-</p>
-
-
-<p>
-<img src="http://mizzy.org/img/gcal2.jpg" alt="Publish::iCal + Google Calendar" />
-</p>
-
-
-<p>
-あと、リンクも含めておけば amazon のページに飛べて便利かも、と思って、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/231"><span class="icon"></span>こんな感じで url property をセットするようにした</a> のですが、これもまた Google Calendar 上ではどこに表示されるのかがさっぱり分かりません。
- 
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -948,6 +914,10 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -961,10 +931,6 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

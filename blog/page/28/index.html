@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="CustomFeed::GoogleVideo をアップデートしてみた。 LWP::Simple ではなく Plagger::UserAgent を使うようにしてみた。
-pod 書いた。 本当は enclosure に length を入れるために、HEAD でファイルサイズ取得しようと思って、 &hellip;">
+  <meta name="description" content="Pe7 さんのリクエスト により、 tagging プラグイン をアップデート。タグでエントリを絞り込むと、関連するタグリストを表示できるようにしました。そこから更にタグで絞り込む、ということが可能です。 使い方ですが、関連タグを表示したいところに、$tagging::related_tags &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,63 @@ pod 書いた。 本当は enclosure に length を入れるために、HEAD で
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/04/02/343/">Blosxom で Tagging #13</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-04-02T13:59:00+09:00" pubdate>Apr 2<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/04/02/343/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/blosxomWithTagging12.html#comments" target="_blank">Pe7 さんのリクエスト</a> により、 <a href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/tagging" target="_blank">tagging プラグイン</a> をアップデート。タグでエントリを絞り込むと、関連するタグリストを表示できるようにしました。そこから更にタグで絞り込む、ということが可能です。
+</p>
+
+
+
+
+<p class="entryBody">
+使い方ですが、関連タグを表示したいところに、$tagging::related_tags と入れてください。左サイドバーの「related tags」の様な感じになります。
+</p>
+
+
+
+
+<p class="entryBody">
+表示フォーマットが気に入らない場合には、169 行目から 176 行目を適当にいじってください。
+</p>
+
+
+
+
+<p class="entryBody">
+もっとこうして欲しいとか、ご要望があればお気軽にどうぞ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -694,49 +750,6 @@ XML のパースは宮川さんのブログにあったものを参考にさせ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/03/04/485/">Apache2 って最初から LDAP 認証用モジュールが含まれてるのね</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-03-04T18:14:00+09:00" pubdate>Mar 4<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/03/04/485/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-subversion を WebDAV と合わせて使おうと思い、apache2 をインストールして、認証は LDAP でやりたいので、apache1 と同じ感覚で modules.apache.org で見つけた mod_auth_ldap とか modXLdapAuth とかを入れてみようと思っても、make が通らない。
-</p>
-
-
-
-
-<p class="entryBody">
-で、いくら頑張っても make が通らないので諦めかけていたところ、なんとなく apache2 のソースディレクトリ以下を find してみたら、mod_authnz_ldap.c とかいうものを発見。ドキュメントを読んでみたらまさにこれが LDAP 認証のためのモジュールでした。これで2時間無駄にした…
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/29/">&larr; Older</a>
@@ -754,6 +767,10 @@ subversion を WebDAV と合わせて使おうと思い、apache2 をインス�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -767,10 +784,6 @@ subversion を WebDAV と合わせて使おうと思い、apache2 をインス�
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

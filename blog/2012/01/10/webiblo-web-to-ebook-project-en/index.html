@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>FFmpeg::Command - A wrapper class for ffmpeg command line utility #0 - Gosuke Miyashita</title>
+  <title>Webiblo - web to ebook project - Gosuke Miyashita</title>
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="perl で ffmpeg を扱うモジュールには、FFmpeg というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、 &hellip;">
+  <meta name="description" content="I&#8217;ve started the project webiblo.This is the improved fork of web-to-mobi. This project includes the script to convert web sites into ebook &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://mizzy.org/blog/2006/07/27/340">
+  <link rel="canonical" href="http://mizzy.org/blog/2012/01/10/webiblo-web-to-ebook-project-en">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -75,7 +75,7 @@
   
   <header>
     
-      <h1 class="entry-title">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #0</h1>
+      <h1 class="entry-title">Webiblo - Web to Ebook Project</h1>
     
     
       <p class="meta">
@@ -86,7 +86,7 @@
 
   
 
-<time datetime="2006-07-27T01:17:00+09:00" pubdate>Jul 27<span>th</span>, 2006</time>
+<time datetime="2012-01-10T20:17:00+09:00" pubdate>Jan 10<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -95,98 +95,97 @@
   </header>
 
 
-<div class="entry-content"><p>
-perl で ffmpeg を扱うモジュールには、<a class="ext-link" href="http://search.cpan.org/~allenday/FFmpeg-5704/FFmpeg.pm"><span class="icon"></span>FFmpeg</a> というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、じゃあラッパー作ろうと思ったら、ボンヌさんも作っているということで待っていたのですが、音沙汰がないのと、早急に必要なのもあって、とりあえず作ってみました。
-</p>
+<div class="entry-content"><p>I&#8217;ve started the project <a href="https://github.com/mizzy/webiblo">webiblo</a>.This is the improved fork of <a href="https://github.com/mizzy/web-to-mobi">web-to-mobi</a>.</p>
+
+<p>This project includes the script to convert web sites into  ebook format(currently mobipocket only) data from given JSON data and gathering the JSON data for web sites.</p>
+
+<p>Currently, you can generate mobipocket format data with the URI of JSON data like this:</p>
+
+<pre><code>$ webiblo.pl http://mizzy.org/webiblo/data/Getting_Real.json
+</code></pre>
+
+<p>Or with JSON data through STDIN.</p>
+
+<pre><code>$ cat data.json | webiblo.pl
+</code></pre>
+
+<p>This script needs <a href="http://www.amazon.com/gp/feature.html?docId=1000234621">KindleGen</a>.</p>
+
+<p>JSON data is like this:</p>
+
+<pre><code>{
+    "title"       : "Structure and Interpretation of Computer Programs",
+    "authors"     : [
+        "Harold Abelson",
+        "Gerald Jay Sussman",
+        "Julie Sussman"
+    ],
+    "cover_image"   : "http://mitpress.mit.edu/sicp/full-text/book/cover.jpg",
+    "content_xpath" : "//div[@class=\"content\"]", # Optional
+    "exclude_xpath" : "//div[@class=\"navigation\"]", # Optional
+    "chapters" : [
+        {
+            "title" : "Foreword",
+            "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-5.html#%_chap_Temp_2"
+        },
+        {
+            "title" : "1  Building Abstractions with Procedures",
+            "uri"  : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-9.html#%_chap_1",
+            "sections" : [
+                "title" : "1.1  The Elements of Programming",
+                "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1"
+                "subsections" : [
+                    {
+                        "title" : "1.1.1  Expressions",
+                        "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1.1"
+                    },
+                ]
+            ]
+        }
+    ]
+}
+</code></pre>
+
+<p>Overview of the JSON data is following:</p>
+
+<ul>
+<li>Book data
+
+<ul>
+<li>Title</li>
+<li>Authors</li>
+<li>Cover Image</li>
+<li>XPath that represents the content part (Optional)</li>
+<li>XPath that represents the uneeded part of the content (Optional)</li>
+<li>Chapters
+
+<ul>
+<li>Title of the chapter</li>
+<li>URI of the chapter page</li>
+<li>Sections
+
+<ul>
+<li>Title of the secion</li>
+<li>URI of the section page</li>
+<li>Subsections
+
+<ul>
+<li>Title of the subsection</li>
+<li>URI of the subsection page</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
 
-<p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"><span class="icon"></span>FFmpeg::Command</a>
-</p>
+<p>There are two JSON data for <a href="http://gettingreal.37signals.com/toc.php">Getting Real</a>  and <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">SICP</a> on [my web site(http://mizzy.org/webiblo/) .</p>
 
-
-<p>
-まだ pod が不完全ですが、とりあえず YouTube から拾った flv 動画を mpeg4 に変換して iTunes で観たり、サムネイルを JPEG で切り出したり、といったことができることを確認しました。
-</p>
-
-
-<p>
-使い方は SYNOPSYS にも書いてますが、動画の変換であればこんな感じで。
-</p>
-
-
-<pre class="wiki">
-my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
-
-$ffmpeg->input_options({
-    file => 'nba.flv',
-});
-
-$ffmpeg->output_options({
-    file                => 'nba.mp4',
-    format              => 'mp4',
-    video_codec         => 'mpeg4',
-    bitrate             => '640',
-    size                => '320x240',
-    audio_codec         => 'aac',
-    audio_sampling_rate => '44100',
-    audio_bit_rate      => '128',
-});
-
-$ffmpeg->exec();
-</pre>
-
-
-<p>
-サムネイルの切り出しはこんな感じ。（任意のオプションで実行する機能。）
-</p>
-
-
-<pre class="wiki">
-my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
-
-$ffmpeg->input_file('nba.flv');
-$ffmpeg->output_file('nba.mp4');
-
-$ffmpeg->options(
-    '-y',
-    '-f'       => 'image2',
-    '-pix_fmt' => 'jpg',
-    '-vframes' => 1,
-    '-ss'      => 30,
-    '-s'       => '320x240',
-    '-an',
-);
-
-$ffmpeg->exec();
-</pre>
-
-
-<p>
-これから実装したいと思っている機能は、以下の様な指定をすれば、iPod や PSP に適切なパラメータを勝手に設定して変換してくれる、というもの。もちろん、自分の好きな値でパラメータを上書きすることも可能な感じで。
-</p>
-
-
-<pre class="wiki">
-my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
-
-$ffmpeg->input_options({
-    file => 'nba.flv',
-});
-
-$ffmpeg->output_options({
-    file   => 'nba.mp4',
-    <strong>device => 'ipod' or 'psp',</strong>
-});
-
-$ffmpeg->exec();
-</pre>
-
-
-<p>
-ボンヌさんが作られているものと統合して、いいものになるといいな。
-</p>
-
+<p>JSON data are put on the <a href="https://github.com/mizzy/webiblo/tree/gh-pages">gh-pages branch</a>.Pull requests are welcome.</p>
 </div>
 
 
@@ -204,7 +203,7 @@ $ffmpeg->exec();
 
   
 
-<time datetime="2006-07-27T01:17:00+09:00" pubdate>Jul 27<span>th</span>, 2006</time>
+<time datetime="2012-01-10T20:17:00+09:00" pubdate>Jan 10<span>th</span>, 2012</time>
       
 
 
@@ -212,7 +211,7 @@ $ffmpeg->exec();
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2006/07/27/340/" data-via="" data-counturl="http://mizzy.org/blog/2006/07/27/340/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mizzy.org/blog/2012/01/10/webiblo-web-to-ebook-project-en/" data-via="" data-counturl="http://mizzy.org/blog/2012/01/10/webiblo-web-to-ebook-project-en/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -225,10 +224,8 @@ $ffmpeg->exec();
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2006/07/22/448/" title="Previous Post: catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)">&laquo; catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)</a>
+        <a class="basic-alignment left" href="/blog/2012/01/10/webiblo-web-to-ebook-project/" title="Previous Post: Webiblo - web to ebook project">&laquo; Webiblo - web to ebook project</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2006/07/27/268/" title="next Post: Plagger::Plugin::Filter::FFmpeg #0">Plagger::Plugin::Filter::FFmpeg #0 &raquo;</a>
       
     </p>
   </footer>
@@ -293,8 +290,8 @@ $ffmpeg->exec();
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://mizzy.org/blog/2006/07/27/340';
-        var disqus_url = 'http://mizzy.org/blog/2006/07/27/340';
+        var disqus_identifier = 'http://mizzy.org/blog/2012/01/10/webiblo-web-to-ebook-project-en';
+        var disqus_url = 'http://mizzy.org/blog/2012/01/10/webiblo-web-to-ebook-project-en';
         var disqus_script = 'embed.js';
       
     (function () {

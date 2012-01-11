@@ -9,10 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="TeX で表紙画像的なものが作りたくて色々調べてたら、Google グループで見つけた のでメモ。 #!tex
-\documentclass[a4paper]{jsbook}
-\usepackage[dvipdfmx,hiresbb]{graphicx}
-\begin{document} \ &hellip;">
+  <meta name="description" content="[[Image(http://distillery.s3.amazonaws.com/media/2011/02/27/719cf326faad469c8a46d4e0148091f1_6.jpg)]] [wiki:InstagramForPC Instagram for PC について] &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +72,45 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/03/02/I4PC/">I4PC</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-03-02T08:47:20+09:00" pubdate>Mar 2<span>nd</span>, 2011</time>
+        
+         | <a href="/blog/2011/03/02/I4PC/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[[Image(http://distillery.s3.amazonaws.com/media/2011/02/27/719cf326faad469c8a46d4e0148091f1_6.jpg)]]</p>
+
+<p>[wiki:InstagramForPC Instagram for PC について] で書いていたウェブアプリですが、Instagram 公式 API が使えるようになったためようやく公開できるようになりました。（上の画像はデザインしてくださった <a href="http://daiskip.com">daiskip 先生</a> が撮影したもの。）名前を I4PC にあらためて公開しています。</p>
+
+<p><a href="http://www.i4pc.jp/">I4PC</a></p>
+
+<p>つくった人については、 <a href="http://www.i4pc.jp/about">About ページ</a> をご参照ください。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1004,71 +1040,6 @@ staprun:remove_module:205 Module simple removed.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/">HadoopAndScalaPackagesForCentOS</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-04-14T14:53:27+09:00" pubdate>Apr 14<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><em>2010/04/14 追記</em></p>
-
-<p>太田さんから twitter で<a href="http://twitter.com/kzk_mover/status/12147992526">Hadoopは基本的にSun JDKのみでテストされているので、OpenJDKでの使用は危険らしいです。</a> とご指摘いただきました。ありがとうございます。</p>
-
-<p>となると、Hadoop 以外にも Java 関連パッケージを利用したい場合には、Hadoop を OpenJDK 用にビルドするんじゃなくて、他の Java 関連パッケージを Sun JDK 用にビルドしなおすか、気持ち悪いけど併用するか、のどちらかになってしまうんですかね。</p>
-
-<hr />
-
-<p>Hadoop を CentOS5 で利用する場合、<a href="http://www.cloudera.com/hadoop/">Cloudera’s Distribution for Hadoop (CDH)</a> を <a href="http://archive.cloudera.com/docs/_yum.html">yum でインストール</a> するのが簡単なんですが、http://java.sun.com/ から入手できる JDK パッケージに依存してるので、CentOS5で yum install できる OpenJDK パッケージ が使えません。</p>
-
-<p>Hadoop 使うだけならそれでもいいんですが、他の yum で入る ant 等の Java 製ソフトウェアを利用しようと思うと、Sun から入手した JDK パッケージと yum で入る OpenJDK パッケージが同居して、気持ちが悪いです。</p>
-
-<p>幸い、<a href="http://archive.cloudera.com/redhat/cdh/3/SRPMS/">CDH の SRPM</a> も入手できるので、こいつを OpenJDK パッケージを利用する形でパッケージングしなおしました。</p>
-
-<ul>
-<li>http://svn.mizzy.org/public/yum/SRPMS/hadoop-0.20-0.20.2+228-1.centos.src.rpm</li>
-</ul>
-
-
-<p>こいつをビルドするために ant 1.7 以降が必要なのだけど、CentOS で yum で入るのは 1.6 なので、ant 1.7 のパッケージもつくった。</p>
-
-<ul>
-<li>http://svn.mizzy.org/public/yum/SRPMS/ant-1.7.1-11.1.src.rpm</li>
-</ul>
-
-
-<p>また、Hadoop + Scala を試してみたいので、Scala のパッケージと、Scala に必要な jline のパッケージもつくった。</p>
-
-<ul>
-<li>http://svn.mizzy.org/public/yum/SRPMS/scala-2.7.7-1.centos.src.rpm</li>
-<li>http://svn.mizzy.org/public/yum/SRPMS/jline-0.9.94-0.6.src.rpm</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1086,6 +1057,10 @@ staprun:remove_module:205 Module simple removed.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1099,10 +1074,6 @@ staprun:remove_module:205 Module simple removed.
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="流行に乗って Punc にも Moose を取り入れようと思って、MooseX::ClassAttribute でクラス属性をハンドリングできるようにしてみたのですが、子クラスのクラス属性をセットすると、親クラスのクラス属性まで変わってしまう。 #!perl
-#!/usr/bin/perl &hellip;">
+  <meta name="description" content="昨日のYAPC::Asia 2008 Tokyo 初日のセッションで発表した、「Easy system administration programming with a framework - フレームワークでシステム管理プログラミングをもっと簡単に」の資料を Slide Share &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,41 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/16/YapcAsia2008TokyoPunc/">YapcAsia2008TokyoPunc</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-05-16T10:46:16+09:00" pubdate>May 16<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/05/16/YapcAsia2008TokyoPunc/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>昨日のYAPC::Asia 2008 Tokyo 初日のセッションで発表した、「Easy system administration programming with a framework - フレームワークでシステム管理プログラミングをもっと簡単に」の資料を <a href="http://www.slideshare.net/mizzy/yapcasia-2008-tokyo-easy-system-administration-programming-with-a-framework-by-gosuke-miyashita">Slide Share にアップ</a>しました。</p>
+
+<p>今日はどうしても外せないミーティングのため、午後から YAPC 会場に向かいます。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -224,7 +258,7 @@ warn Parent-&gt;x; # Child が表示されてしまう
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#109;&#97;&#x69;&#108;&#116;&#111;&#58;&#x67;&#111;&#x73;&#x75;&#107;&#101;&#x6e;&#x61;&#116;&#x6f;&#114;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;">&#x67;&#x6f;&#115;&#x75;&#107;&#x65;&#x6e;&#97;&#x74;&#111;&#x72;&#64;&#x67;&#x6d;&#97;&#x69;&#108;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>Gosuke Miyashita, <a href="&#x6d;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#103;&#x6f;&#x73;&#117;&#107;&#x65;&#110;&#97;&#116;&#111;&#x72;&#x40;&#103;&#x6d;&#97;&#105;&#108;&#x2e;&#99;&#x6f;&#x6d;">&#x67;&#111;&#115;&#117;&#107;&#x65;&#110;&#x61;&#116;&#x6f;&#x72;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
@@ -1232,79 +1266,6 @@ done
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/12/29/CobblerWebUi/">CobblerWebUi</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-12-29T00:47:43+09:00" pubdate>Dec 29<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/12/29/CobblerWebUi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://trac.mizzy.org/public/wiki/Cobbler">前回のエントリで書いた</a> Cobbler にはウェブ UI がある。その設定方法のメモ。設定方法は<a href="https://hosted.fedoraproject.org/cobbler/wiki/OldCobblerWebUi">ここ</a>を参照した。Cobbler のバージョンが 0.7 以降の場合は<a href="https://hosted.fedoraproject.org/cobbler/wiki/CobblerWebInterface">こっちを参照</a>。</p>
-
-<p>まずは /var/lib/cobbler/settings の xmlrpc_rw_enabled を 1 に設定。</p>
-
-<pre><code>xmlrpc_rw_enabled:  1
-</code></pre>
-
-<p>これを見て想像がつくと思うけど、cobblerd が XMLRPC リクエストを受け付けるようになる。</p>
-
-<p>次に /etc/cobbler/auth.conf で、cobblerd の XMLRPC へのアクセスを許可するユーザ ID とパスワードを設定する。</p>
-
-<pre><code>[xmlrpc_service_users]
-admin = password
-</code></pre>
-
-<p>/etc/cobbler/auth.conf が httpd ユーザから読めるようにする。</p>
-
-<pre><code>$ sudo chown apache /etc/cobbler/auth.conf
-</code></pre>
-
-<p>SELinux を利用している場合はこの設定も必要らしい。（自分は SELinux は disabled にしてる。）</p>
-
-<pre><code>$ sudo chcon -t httpd_sys_content_t /etc/cobbler/auth.conf
-$ sudo setsebool httpd_can_network_connect true
-</code></pre>
-
-<p>httpd で認証するユーザ名とパスワードを設定する。これは /etc/cobbler/auth.conf で設定したものと同じにする。</p>
-
-<pre><code>$ sudo htdigest /var/www/cgi-bin/cobbler/.htpasswd "Cobbler WebUI Authentication" admin
-</code></pre>
-
-<p>あとは http://cobbler.example.org/cgi-bin/cobbler/webui.cgi にアクセスすれば OK。以下のスクリーンショットは Profile を表示させたところ。</p>
-
-<p>[[Image(cobbler_web_ui.jpg)]]</p>
-
-<p>この画面見てて気づいたんだけど、Cobbler では system の登録ができて、MAC アドレスを登録して Profile を指定しておけば、PXE ブート時にイメージ名を入力しなくても、勝手に指定された Profile のイメージでブートしてくれる。</p>
-
-<p>system の登録はコマンドラインでもできる。</p>
-
-<pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -1322,6 +1283,10 @@ $ sudo setsebool httpd_can_network_connect true
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1335,10 +1300,6 @@ $ sudo setsebool httpd_can_network_connect true
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

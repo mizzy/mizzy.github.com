@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="しゃべってきました。資料は後日 Shibuya.pm のサイトにアップされると思いますが、とりあえずここにも置いておきます。 CVS のことを CSV と書き間違えてて、後から指摘されて知ったのですが、実はしゃべってる最中に irc#shibuya.pm@freenode でいじられていたことを &hellip;">
+  <meta name="description" content="HTML::Widget::Kwalify を修正しました。動作サンプルはこちら。 サンプルを触ってもらうと分かると思いますが、ポストしたデータを YAML 形式でダンプできます。また、フォームバリデーションにも対応してます。例えば、user_agent-timeout は Kwalify &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,97 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/21/379/">HTML::Widget::Kwalify #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-21T17:58:00+09:00" pubdate>Oct 21<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/21/379/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify"><span class="icon"></span>HTML::Widget::Kwalify</a> を修正しました。<a class="ext-link" href="http://mizzy.org/widget/index.cgi"><span class="icon"></span>動作サンプルはこちら</a>。
+</p>
+
+
+<p>
+サンプルを触ってもらうと分かると思いますが、ポストしたデータを YAML 形式でダンプできます。また、フォームバリデーションにも対応してます。例えば、user_agent-timeout は Kwalify スキーマでは「type: int」と設定されているのですが、それに合わせてバリデーションルールも設定してあり、数字以外の文字列を入力すると「Invalid Input」と表示されます。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/samples/widget_kwalify/"><span class="icon"></span>サンプルのソースはここに置いときます</a>。
+</p>
+
+
+<p>
+サンプルソースのメイン部分は、
+</p>
+
+
+<pre class="wiki">
+sub top {
+    my $self = shift;
+
+    my $q = $self->query;
+    my $w = HTML::Widget::Kwalify->new('schema.yaml');
+
+    my $result = $q->param ? $w->process($q) : $w->process;
+
+    if ( $result->have_errors or !$q->param ) {
+        return $self->tt_process( 'index.html', { widget => $result } );
+    }
+    else {
+        $self->header_props( -type => 'text/plain' );
+        return $w->dump;
+    }
+}
+</pre>
+
+
+<p>
+といった感じなのですが、たったこれだけでバリデーション、フィルイン対応のフォームを Kwalify スキーマから自動生成し、POST データを YAML にダンプ、ってなことができます。超ベンリ。
+</p>
+
+
+<p>
+YAML はネストされたデータ構造なのに対し、HTML フォームは平坦な構造なので、この部分をどう処理するかが実装にあたって一番面倒そうだな、と思っていたのですが、宮川さんから <a class="ext-link" href="http://search.cpan.org/~nuffin/Catalyst-Plugin-Params-Nested-0.02/lib/Catalyst/Plugin/Params/Nested.pm"><span class="icon"></span>Catalyst::Plugin::Params::Nested</a> というモジュールを教えてもらい、これのベースクラスである <a class="ext-link" href="http://search.cpan.org/~bowmanbs/CGI-Expand-2.02/Expand.pm"><span class="icon"></span>CGI::Expand</a> を使うことによって、簡単に実装できてしまいました。CGI::Expand++ 。
+</p>
+
+
+<p>
+これで最低限やりたいことはできるようになりましたが、Kwalify スキーマのパースのしかたが適当なので、テストを書いて色んなパターンで試して調整する必要があったり、ファイルにダンプできるようにしたりとか、完成まではまだまだかかりそうです。
+</p>
+
+
+<p>
+また、<a class="ext-link" href="http://d.hatena.ne.jp/charsbar/20060114/1137232891"><span class="icon"></span>id:charsbar 氏</a> がおっしゃっている通り、HTML::Widget 自体が日本語が化けたりとか微妙な感じなので、こちらも手を入れないといけないですね。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1119,56 +1210,6 @@ SmartFeed::All と Filter::Rule に関わるこの部分の処理を言葉で説
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/09/16/255/">Software Design 2006年10月号に寄稿しました</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-09-16T20:14:00+09:00" pubdate>Sep 16<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/09/16/255/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-『特別企画 Plagger 3分 Hacking』の『Chapter 03: 俺流 Plagger 3分 Hacking』の中で、「Plagger で YouTube Casting」というお題で書かせて頂きました。
-</p>
-
-
-<p>
-他にも<a class="ext-link" href="http://labs.cybozu.co.jp/blog/takesako/"><span class="icon"></span>竹迫さん</a>によるとてもわかりやすい Plagger 解説やインストール方法、<a class="ext-link" href="http://blog.yappo.jp/"><span class="icon"></span>yappo さん</a>、<a class="ext-link" href="http://e8y.net/blog/"><span class="icon"></span>tomi-ru さん</a>、<a class="ext-link" href="http://d.hatena.ne.jp/t-akihito/"><span class="icon"></span>akihito さん</a>による小技集など、見所満載です。Plagger って何？という人や、これから Plagger やってみたい人は、ぜひ手にとってご覧下さい。
-</p>
-
-
-<p>
-参考URL
-</p>
-
-
-<ul><li><a class="ext-link" href="http://d.hatena.ne.jp/software_design/20060915#1155804140"><span class="icon"></span>&#91;Software Design本誌&#93;SD2006年10月号 ここに注目！</a></li>
-<li><a class="ext-link" href="http://labs.cybozu.co.jp/blog/takesako/2006/09/software_design_200610_plagger.html"><span class="icon"></span>TAKESAKO @ Yet another Cybozu Labs: 今月号のSoftware DesignでPlagger特集</a></li></ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/21/">&larr; Older</a>
@@ -1186,6 +1227,10 @@ SmartFeed::All と Filter::Rule に関わるこの部分の処理を言葉で説
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1199,10 +1244,6 @@ SmartFeed::All と Filter::Rule に関わるこの部分の処理を言葉で説
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

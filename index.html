@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="久々に日本語で書きます。（後で英語でも書く。） Web-to-mobi を焼き直して、Webiblo というプロジェクトを立ち上げてみました。 基本的には GitHub の README に書いてある通りなんですが、ウェブサイトについて記述された JSON を喰わせることによって、Kindle &hellip;">
+  <meta name="description" content="I&#8217;ve started the project webiblo.This is the improved fork of web-to-mobi. This project includes the script to convert web sites into ebook &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,129 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - Web to Ebook Project</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2012-01-10T20:17:00+09:00" pubdate>Jan 10<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve started the project <a href="https://github.com/mizzy/webiblo">webiblo</a>.This is the improved fork of <a href="https://github.com/mizzy/web-to-mobi">web-to-mobi</a>.</p>
+
+<p>This project includes the script to convert web sites into  ebook format(currently mobipocket only) data from given JSON data and gathering the JSON data for web sites.</p>
+
+<p>Currently, you can generate mobipocket format data with the URI of JSON data like this:</p>
+
+<pre><code>$ webiblo.pl http://mizzy.org/webiblo/data/Getting_Real.json
+</code></pre>
+
+<p>Or with JSON data through STDIN.</p>
+
+<pre><code>$ cat data.json | webiblo.pl
+</code></pre>
+
+<p>This script needs <a href="http://www.amazon.com/gp/feature.html?docId=1000234621">KindleGen</a>.</p>
+
+<p>JSON data is like this:</p>
+
+<pre><code>{
+    "title"       : "Structure and Interpretation of Computer Programs",
+    "authors"     : [
+        "Harold Abelson",
+        "Gerald Jay Sussman",
+        "Julie Sussman"
+    ],
+    "cover_image"   : "http://mitpress.mit.edu/sicp/full-text/book/cover.jpg",
+    "content_xpath" : "//div[@class=\"content\"]", # Optional
+    "exclude_xpath" : "//div[@class=\"navigation\"]", # Optional
+    "chapters" : [
+        {
+            "title" : "Foreword",
+            "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-5.html#%_chap_Temp_2"
+        },
+        {
+            "title" : "1  Building Abstractions with Procedures",
+            "uri"  : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-9.html#%_chap_1",
+            "sections" : [
+                "title" : "1.1  The Elements of Programming",
+                "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1"
+                "subsections" : [
+                    {
+                        "title" : "1.1.1  Expressions",
+                        "uri"   : "http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1.1"
+                    },
+                ]
+            ]
+        }
+    ]
+}
+</code></pre>
+
+<p>Overview of the JSON data is following:</p>
+
+<ul>
+<li>Book data
+
+<ul>
+<li>Title</li>
+<li>Authors</li>
+<li>Cover Image</li>
+<li>XPath that represents the content part (Optional)</li>
+<li>XPath that represents the uneeded part of the content (Optional)</li>
+<li>Chapters
+
+<ul>
+<li>Title of the chapter</li>
+<li>URI of the chapter page</li>
+<li>Sections
+
+<ul>
+<li>Title of the secion</li>
+<li>URI of the section page</li>
+<li>Subsections
+
+<ul>
+<li>Title of the subsection</li>
+<li>URI of the subsection page</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<p>There are two JSON data for <a href="http://gettingreal.37signals.com/toc.php">Getting Real</a>  and <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">SICP</a> on [my web site(http://mizzy.org/webiblo/) .</p>
+
+<p>JSON data are put on the <a href="https://github.com/mizzy/webiblo/tree/gh-pages">gh-pages branch</a>.Pull requests are welcome.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -690,86 +813,6 @@ index 7d7f6d8..41868ab 100644
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-10-29T21:34:00+09:00" pubdate>Oct 29<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/10/29/typo-to-octopress/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I&#8217;ve moved my <a href="http://fdv.github.com/typo/">Typo</a> blog contents to this octopress blog.</p>
-
-<p>For this purpose I made this tiny script.</p>
-
-<div><script src='https://gist.github.com/1324352.js?file='></script>
-<noscript><pre><code>require &quot;rubygems&quot;
-require &quot;active_record&quot;
-
-ActiveRecord::Base.establish_connection(
-    :adapter  =&gt; &quot;mysql2&quot;,
-    :host     =&gt; &quot;192.168.10.12&quot;,
-    :user     =&gt; &quot;root&quot;,
-    :password =&gt; &quot;root&quot;,
-    :database =&gt; &quot;typo&quot;,
-    :encoding =&gt; &quot;utf8&quot;
-)
-
-class Content &lt; ActiveRecord::Base
-  Content.inheritance_column = 'foo'
-end
-
-contents = Content.all
-
-contents.each do |content|
-  dt = content.published_at
-  date = sprintf(&quot;%04s-%02d-%02d&quot;, dt.year, dt.month, dt.day)
-  datetime = date + sprintf(&quot; %02d:%02d&quot;, dt.hour, dt.min)
-  file = date + &quot;-&quot; + content.id.to_s + &quot;.markdown&quot;
-
-  body = &lt;&lt;BODY
----
-layout: post
-title: &quot;#{content.title}&quot;
-date: #{datetime}
-comments: true
-categories:
----
-#{content.body}
-BODY
-
-  File.open(file, 'w') do |file|
-    file.write(body)
-  end
-end
-</code></pre></noscript></div>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -785,6 +828,10 @@ end
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -798,10 +845,6 @@ end
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

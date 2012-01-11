@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="訳あって Fedora Core 4 上でメールサーバを構築する必要があったので、Courier-IMAP を導入しました。mizzy.org のサーバでも使っていて慣れているし、今のところトラブルもないので安心して利用できるので。 RPM は嫌いなんですが、Fedora Core &hellip;">
+  <meta name="description" content="catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは Account Auto-Discovery データを追加するプラグインを書いてみた。 blosxom でも 同様のプラグイン を書いているのですが、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,144 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/22/448/">Catlxom の Account Auto-Discovery プラグイン (Catlxom メモ #9)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-22T23:16:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/22/448/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは <a class="ext-link" href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery"><span class="icon"></span>Account Auto-Discovery</a> データを追加するプラグインを書いてみた。
+</p>
+
+
+<p>
+blosxom でも <a class="ext-link" href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/account_auto_discovery"><span class="icon"></span>同様のプラグイン</a> を書いているのですが、一番大きな違いは、blosxom プラグインはテンプレートの修正が必要なのに対し、catlxom プラグインはテンプレートの修正が一切必要ありません。XML::TreeBuilder を利用して、HTML ヘッダにデータを追加するような作りにしています。
+</p>
+
+
+<p>
+利用上の注意点として、Template::TT よりも後にこのプラグインをロードしなければいけいのですが、自動ロードを有効にしてると先にロードされちゃうので、自動ロードをオフにして yaml で明示的に利用プラグインを指定する必要があります。
+</p>
+
+
+<pre class="wiki">
+package Catlxom::Plugin::Format::AccountAutoDiscovery;
+use strict;
+use warnings;
+use base qw/Catlxom::Plugin/;
+
+use NEXT;
+use XML::TreeBuilder;
+
+sub interpolate {
+    my ( $self, $c ) = @_;
+
+    my $accounts = $c-&gt;config-&gt;{account_auto_discovery};
+
+    my $tree = XML::TreeBuilder-&gt;new();
+    $tree-&gt;parse($c-&gt;res-&gt;body);
+
+    my $head = $tree-&gt;find('head');
+
+    for ( @$accounts ){
+        my $rdf = XML::Element-&gt;new(
+            'rdf:RDF',
+            'xmlns:rdf'  =&gt; 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            'xmlns:foaf' =&gt; 'http://xmlns.com/foaf/0.1/',
+        );
+
+        my $rdf_description = XML::Element-&gt;new(
+            'rdf:Description',
+            'rdf:about' =&gt; $c-&gt;req-&gt;uri,
+        );
+
+        my $foaf_maker = XML::Element-&gt;new(
+            'foaf:maker',
+            'rdf:parseType' =&gt; 'Resource',
+        );
+
+        my $foaf_holds_acount = XML::Element-&gt;new( 'foaf:holdsAccount' );
+
+        my $foaf_online_account = XML::Element-&gt;new(
+            'foaf:OnlineAccount',
+            'foaf:accountName' =&gt; $_-&gt;{account_name},
+        );
+
+        my $foaf_account_service_homepage = XML::Element-&gt;new(
+            'foaf:accountServiceHomepage',
+            'rdf:resource' =&gt; $_-&gt;{account_service_homepage},
+        );
+
+        $head-&gt;push_content($rdf);
+        $rdf-&gt;push_content($rdf_description);
+        $rdf_description-&gt;push_content($foaf_maker);
+        $foaf_maker-&gt;push_content($foaf_holds_acount);
+        $foaf_holds_acount-&gt;push_content($foaf_online_account);
+        $foaf_online_account-&gt;push_content($foaf_account_service_homepage);
+    }
+
+    $c-&gt;res-&gt;{body} = $tree-&gt;as_HTML;
+    $self-&gt;NEXT::interpolate($c);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Catlxom::Plugin::Format::AccountAutoDiscovery
+
+=head1 SYNOPSIS
+
+account_auto_discovery:
+  - account_name: gosukenator
+    account_service_homepage: http://www.hatena.ne.jp/
+  - account_name: xxxx
+    account_service_homepage: http://xxx.ne.jp/
+
+=head1 DESCRIPTION
+
+This plugin inserts Account Auto-Discovery data into HTML header.
+
+=head1 AUTHOR
+
+Gosuke Miyashita
+
+=head1 SEE ALSO
+
+L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;
+
+=cut
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1289,63 +1427,6 @@ my $p = Text::Trac-&gt;new(
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/06/15/413/">Catlxom 本家に Mizzy ブランチができたよ (Catlxom メモ #8)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-06-15T22:12:00+09:00" pubdate>Jun 15<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/06/15/413/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://catlxom.org/repos/" target="_blank">catlxom 本家の svn リポジトリ</a> に、<a href="http://catlxom.org/repos/branches/mizzy/catlxom/" target="_blank">mizzy ブランチ</a> ができました。<a href="http://catlxom.org/trac/browser/branches/mizzy/catlxom" target="_blank">trac から見る場合はこちら。</a> <a href="http://catlxom.org/trac" target="_blank">trac トップページ</a> の Authors にも名前いれてもらっちゃいました。typester さん、ありがとうございます！
-</p>
-
-
-
-
-<p class="entryBody">
-今までこのブログで書いてきた catlxom の修正は、このブランチに反映させてありますので、ご興味のある方は今後こちらからご参照/ご取得ください。
-</p>
-
-
-
-
-<p class="entryBody">
-微力ながら、catlxom の発展に貢献させてもらえればなぁと思います。
-</p>
-
-
-
-
-<p class="entryBody">
-次はプラグインづくりに入ろうかと思います。まずは今 blosxom で利用しているプラグインの移植から。本家本元 catlxom のプラグイン機構が今後どうなるかは分かりませんが、そんなに大きく修正しなくても対応できると思うので、今からちまちま作っていきます。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/25/">&larr; Older</a>
@@ -1363,6 +1444,10 @@ my $p = Text::Trac-&gt;new(
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1376,10 +1461,6 @@ my $p = Text::Trac-&gt;new(
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

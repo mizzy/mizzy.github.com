@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="5歳になる娘の幼稚園帽子。 [[Image(http://trac.mizzy.org/public/attachment/wiki/CanBadge/canbadge.jpg?format=raw)]] ちなみに小3の長男はPerl Best &hellip;">
+  <meta name="description" content="Scalaスケーラブルプログラミング をコードを書き写しながらざーっと読んだんだけど、全然身になってない気がするので、結城先生の Java言語で学ぶデザインパターン入門 のサンプルコードを Scala で実装して github にアップ してみることにした。 とりあえず飽きるまでやります。
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,41 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/10/06/ScalaDesignPatterns/">ScalaDesignPatterns</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-10-06T00:10:45+09:00" pubdate>Oct 6<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/10/06/ScalaDesignPatterns/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.amazon.co.jp/dp/4844327453">Scalaスケーラブルプログラミング</a> をコードを書き写しながらざーっと読んだんだけど、全然身になってない気がするので、結城先生の <a href="http://www.amazon.co.jp/dp/4797327030/">Java言語で学ぶデザインパターン入門</a> のサンプルコードを <a href="http://github.com/mizzy/scala-design-patterns">Scala で実装して github にアップ</a> してみることにした。</p>
+
+<p>とりあえず飽きるまでやります。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -903,240 +939,6 @@ total size is 682  speedup is 0.59
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/03/03/library-perl-trunk-FFmpeg-Command-lib-FFmpeg-Command.pm/">library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-03-03T22:58:20+09:00" pubdate>Mar 3<span>rd</span>, 2009</time>
-        
-         | <a href="/blog/2009/03/03/library-perl-trunk-FFmpeg-Command-lib-FFmpeg-Command.pm/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>source:library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm</p>
-
-<h1>NAME</h1>
-
-<p>FFmpeg::Command - A wrapper class for ffmpeg command line utility.</p>
-
-<h1>DESCRIPTION</h1>
-
-<p>A simple interface for using ffmpeg command line utility.</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    use FFmpeg::Command;
-
-    my $ffmpeg = FFmpeg::Command-&gt;new('/usr/local/bin/ffmpeg');
-
-    $ffmpeg-&gt;input_options({
-        file =&gt; $input_file,
-    });
-
-    # Set timeout
-    $ffmpeg-&gt;timeout(300);
-
-    # Convert a video file into iPod playable format.
-    $ffmpeg-&gt;output_options({
-        file   =&gt; $output_file,
-        device =&gt; 'ipod',
-    });
-
-    my $result = $ffmpeg-&gt;exec();
-
-    croak $ffmpeg-&gt;errstr unless $result;
-
-    # This is same as above.
-    $ffmpeg-&gt;output_options({
-        file                =&gt; $output_file,
-        format              =&gt; 'mp4',
-        video_codec         =&gt; 'mpeg4',
-        bitrate             =&gt; 600,
-        frame_size          =&gt; '320x240',
-        audio_codec         =&gt; 'libaac',
-        audio_sampling_rate =&gt; 48000,
-        audio_bit_rate      =&gt; 64,
-    });
-
-    $ffmpeg-&gt;exec();
-
-
-    # Convert a video file into PSP playable format.
-    $ffmpeg-&gt;output_options({
-        file  =&gt; $output_file,
-        device =&gt; 'psp',
-    });
-
-    $ffmpeg-&gt;exec();
-
-    # This is same as above.
-    $ffmpeg-&gt;output_options({
-        file                =&gt; $output_file,
-        format              =&gt; 'psp',
-        video_codec         =&gt; 'mpeg4',
-        bitrate             =&gt; 600,
-        frame_size          =&gt; '320x240',
-        audio_codec         =&gt; 'libaac',
-        audio_sampling_rate =&gt; 48000,
-        audio_bit_rate      =&gt; 64,
-    });
-
-    $ffmpeg-&gt;exec();
-
-    # Execute ffmpeg with any options you like.
-    # This sample code takes a screnn shot.
-    $ffmpeg-&gt;input_file($input_file);
-    $ffmpeg-&gt;output_file($output_file);
-
-    $ffmpeg-&gt;options(
-        '-y',
-        '-f'       =&gt; 'image2',
-        '-pix_fmt' =&gt; 'jpg',
-        '-vframes' =&gt; 1,
-        '-ss'      =&gt; 30,
-        '-s'       =&gt; '320x240',
-        '-an',
-    );
-
-    $ffmpeg-&gt;exec();
-</code></pre>
-
-<h1>METHODS</h1>
-
-<h2>new(&#8216;/usr/bin/ffmpeg&#8217;)</h2>
-
-<p>Contructs FFmpeg::Command object.It takes a path of ffmpeg command. You can omit this argument and this module searches ffmpeg command within PATH environment variable.</p>
-
-<h2>timeout()</h2>
-
-<p>Set command timeout.Default is 0.</p>
-
-<h2>input_options({ %options })</h2>
-
-<p>Specify input file name and input options.(Now no options are available.)</p>
-
-<p> file:: a file name of input file.</p>
-
-<h2>output_options({ %options })</h2>
-
-<p>Specify output file name and output options.</p>
-
-<p>Avaiable options are:</p>
-
-<p> file:: a file name of output file.
- format:: Output video format.
- video_codec:: Output video codec.
- bitrate:: Output video bitrate.
- frame_size:: Output video screen size.
- audio_codec:: Output audio code.
- audio_sampling_rate:: Output audio sampling rate.
- audio_bit_rate:: Output audio bit rate.
- title:: Set the title.
- author:: Set the author.
- comment:: Set the comment.</p>
-
-<h2>input_file(&#8216;/path/to/inpuf_file&#8217;)</h2>
-
-<p>Specify input file name using with options() method.</p>
-
-<h2>output_file(&#8216;/path/to/output_file&#8217;)</h2>
-
-<p>Specify output file name using with options() method.</p>
-
-<h2>options( @options )</h2>
-
-<p>Specify ffmpeg command options directly.</p>
-
-<h2>execute()</h2>
-
-<p>Executes ffmpeg comman with specified options.</p>
-
-<h2>exec()</h2>
-
-<p>An alias of execute()</p>
-
-<h2>stdout()</h2>
-
-<p>Get ffmpeg command output to stdout.</p>
-
-<h2>stderr()</h2>
-
-<p>Get ffmpeg command output to stderr.</p>
-
-<h1>AUTHOR</h1>
-
-<p>Gosuke Miyashita, <code>&lt;gosukenator at gmail.com&gt;</code></p>
-
-<h1>BUGS</h1>
-
-<p>Please report any bugs or feature requests to <code>bug-ffmpeg-command at rt.cpan.org</code>, or through the web interface at http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FFmpeg-Command. I will be notified, and then you&#8217;ll automatically be notified of progress on your bug as I make changes.</p>
-
-<h1>SUPPORT</h1>
-
-<p>You can find documentation for this module with the perldoc command.</p>
-
-<pre><code>    perldoc FFmpeg::Command
-</code></pre>
-
-<p>You can also look for information at:</p>
-
-<ul>
-<li>AnnoCPAN: Annotated CPAN documentation</li>
-</ul>
-
-
-<p> http://annocpan.org/dist/FFmpeg-Command</p>
-
-<ul>
-<li>CPAN Ratings</li>
-</ul>
-
-
-<p> http://cpanratings.perl.org/d/FFmpeg-Command</p>
-
-<ul>
-<li>RT: CPAN&#8217;s request tracker</li>
-</ul>
-
-
-<p> http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Command</p>
-
-<ul>
-<li>Search CPAN</li>
-</ul>
-
-
-<p> http://search.cpan.org/dist/FFmpeg-Command</p>
-
-<h1>ACKNOWLEDGEMENTS</h1>
-
-<h1>COPYRIGHT &amp; LICENSE</h1>
-
-<p>Copyright 2006 Gosuke Miyashita, all rights reserved.</p>
-
-<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -1154,6 +956,10 @@ total size is 682  speedup is 0.59
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1167,10 +973,6 @@ total size is 682  speedup is 0.59
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

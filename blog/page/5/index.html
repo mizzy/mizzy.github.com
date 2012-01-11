@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="DevOps に関する理解を深めるために、資料にあたってまとめてみるシリーズ。 今回は Velocity Online Conference - March 17, 2010 でのプレゼン Provisioning Toolchain から。スライドのタイトルは「OpenSource &hellip;">
+  <meta name="description" content="2010/04/14 追記 太田さんから twitter でHadoopは基本的にSun JDKのみでテストされているので、OpenJDKでの使用は危険らしいです。 とご指摘いただきました。ありがとうございます。 となると、Hadoop 以外にも Java 関連パッケージを利用したい場合には、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,71 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/">HadoopAndScalaPackagesForCentOS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-04-14T14:53:27+09:00" pubdate>Apr 14<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>2010/04/14 追記</em></p>
+
+<p>太田さんから twitter で<a href="http://twitter.com/kzk_mover/status/12147992526">Hadoopは基本的にSun JDKのみでテストされているので、OpenJDKでの使用は危険らしいです。</a> とご指摘いただきました。ありがとうございます。</p>
+
+<p>となると、Hadoop 以外にも Java 関連パッケージを利用したい場合には、Hadoop を OpenJDK 用にビルドするんじゃなくて、他の Java 関連パッケージを Sun JDK 用にビルドしなおすか、気持ち悪いけど併用するか、のどちらかになってしまうんですかね。</p>
+
+<hr />
+
+<p>Hadoop を CentOS5 で利用する場合、<a href="http://www.cloudera.com/hadoop/">Cloudera’s Distribution for Hadoop (CDH)</a> を <a href="http://archive.cloudera.com/docs/_yum.html">yum でインストール</a> するのが簡単なんですが、http://java.sun.com/ から入手できる JDK パッケージに依存してるので、CentOS5で yum install できる OpenJDK パッケージ が使えません。</p>
+
+<p>Hadoop 使うだけならそれでもいいんですが、他の yum で入る ant 等の Java 製ソフトウェアを利用しようと思うと、Sun から入手した JDK パッケージと yum で入る OpenJDK パッケージが同居して、気持ちが悪いです。</p>
+
+<p>幸い、<a href="http://archive.cloudera.com/redhat/cdh/3/SRPMS/">CDH の SRPM</a> も入手できるので、こいつを OpenJDK パッケージを利用する形でパッケージングしなおしました。</p>
+
+<ul>
+<li>http://svn.mizzy.org/public/yum/SRPMS/hadoop-0.20-0.20.2+228-1.centos.src.rpm</li>
+</ul>
+
+
+<p>こいつをビルドするために ant 1.7 以降が必要なのだけど、CentOS で yum で入るのは 1.6 なので、ant 1.7 のパッケージもつくった。</p>
+
+<ul>
+<li>http://svn.mizzy.org/public/yum/SRPMS/ant-1.7.1-11.1.src.rpm</li>
+</ul>
+
+
+<p>また、Hadoop + Scala を試してみたいので、Scala のパッケージと、Scala に必要な jline のパッケージもつくった。</p>
+
+<ul>
+<li>http://svn.mizzy.org/public/yum/SRPMS/scala-2.7.7-1.centos.src.rpm</li>
+<li>http://svn.mizzy.org/public/yum/SRPMS/jline-0.9.94-0.6.src.rpm</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1533,49 +1598,6 @@ Statistics:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/01/20/GoopeRecruiting/">GoopeRecruiting</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-01-20T17:50:11+09:00" pubdate>Jan 20<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/01/20/GoopeRecruiting/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://goope.jp/info/information/?id=35">インフォーメーションがアレだったり</a>、<a href="http://blog.goope.jp/">チュートリアルブログがアレだったり</a> する <a href="http://www.paperboy.co.jp/">ペパボ</a> のサービス <a href="http://goope.jp/">グーペ</a> では <a href="http://www.paperboy.co.jp/recruit/job/091110p.php">開発者を募集してます</a>。</p>
-
-<p>以下の応募条件をしっかりと守ってご応募ください。</p>
-
-<p> ※応募フォーム『自己PR』の最後に、自分が過去にやらかした経験を、さも他人事のように教えてください。</p>
-
-<p> 例：昔の彼女の誕生日に趣味の悪い紫色のオルゴールを送り、翌日交換日記経由でフラれたことがある知り合いがいます。あと、噛んでいたガムを妹のズボンのポケットに捨てていて母親に死ぬほど怒られたことがあるって、この間友達が言ってました。</p>
-
-<p>関連サイト
-* <a href="http://blog.livedoor.jp/kensuu/archives/50948984.html">グーペの細かすぎる機能こそがPaperboy&amp;co.の強み : ロケスタ社長日記</a>
-* <a href="http://www.japan-manganews.jp/?p=1587">日本漫画新聞 >> paperboy&amp;co.が「グーペ」のプレスリリース失敗をお知らせ</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -1593,6 +1615,10 @@ Statistics:
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1606,10 +1632,6 @@ Statistics:
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

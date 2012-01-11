@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="I&#8217;ve written TWAN tag plugin for Jekyll which shows the image of The World At Night. If you call this plugin in a post like this: {% twan &hellip;">
+  <meta name="description" content="I&#8217;ve moved my Typo blog contents to this octopress blog. For this purpose I made this tiny script. require &quot;rubygems&quot;
+require &quot; &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,86 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-10-29T21:34:00+09:00" pubdate>Oct 29<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/10/29/typo-to-octopress/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve moved my <a href="http://fdv.github.com/typo/">Typo</a> blog contents to this octopress blog.</p>
+
+<p>For this purpose I made this tiny script.</p>
+
+<div><script src='https://gist.github.com/1324352.js?file='></script>
+<noscript><pre><code>require &quot;rubygems&quot;
+require &quot;active_record&quot;
+
+ActiveRecord::Base.establish_connection(
+    :adapter  =&gt; &quot;mysql2&quot;,
+    :host     =&gt; &quot;192.168.10.12&quot;,
+    :user     =&gt; &quot;root&quot;,
+    :password =&gt; &quot;root&quot;,
+    :database =&gt; &quot;typo&quot;,
+    :encoding =&gt; &quot;utf8&quot;
+)
+
+class Content &lt; ActiveRecord::Base
+  Content.inheritance_column = 'foo'
+end
+
+contents = Content.all
+
+contents.each do |content|
+  dt = content.published_at
+  date = sprintf(&quot;%04s-%02d-%02d&quot;, dt.year, dt.month, dt.day)
+  datetime = date + sprintf(&quot; %02d:%02d&quot;, dt.hour, dt.min)
+  file = date + &quot;-&quot; + content.id.to_s + &quot;.markdown&quot;
+
+  body = &lt;&lt;BODY
+---
+layout: post
+title: &quot;#{content.title}&quot;
+date: #{datetime}
+comments: true
+categories:
+---
+#{content.body}
+BODY
+
+  File.open(file, 'w') do |file|
+    file.write(body)
+  end
+end
+</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1234,127 +1315,6 @@ lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/10/DotCloudCliBehaviorOverView/">DotCloudCliBehaviorOverView</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-07-10T20:20:07+09:00" pubdate>Jul 10<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/07/10/DotCloudCliBehaviorOverView/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Now I&#8217;m investigating the behavior of <a href="http://pypi.python.org/pypi/dotcloud.cli">dotcloud.cli</a>.I will write down the things I found.</p>
-
-<p>With &#8211;export option, you can see the raw response of dotcloud API.</p>
-
-<p>For example, if you execute dotcloud command for the first time with &#8211;export option, you will see the result like this.</p>
-
-<pre><code>$ dotcloud --export
-Warning: /Users/miya/.dotcloud/dotcloud.conf does not exist.
-Enter your api key (You can find it at http://www.dotcloud.com/account/settings): XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-{
-    "data": [
-        [
-            "key", 
-            "-----BEGIN DSA PRIVATE KEY-----\nXXXXXXXXXX...\n-----END DSA PRIVATE KEY-----\n"
-        ]
-    ], 
-    "type": "cmd"
-}
-</code></pre>
-
-<p>If &#8216;&#8220;type&#8221;: &#8220;cmd&#8221;&#8217; is given, dotcloud command call the appropriate method.In this case, key() method of Remote class in dotcloud/cli/remote.py will be called and SSH key string will be written to ~/.dotcloud/dotcloud.key.</p>
-
-<p>Which method is called are defined in dotcloud/cli/cli.py like this.</p>
-
-<pre><code>#!python
-def run_remote(cmd):
-    r = remote.Remote()
-    handlers = {
-            'set_url': r.set_url,
-            'run': r.run,
-            'script': r.run_script,
-            'sftp': r.sftp,
-            'pull': r.pull,
-            'push': r.push,
-            'rsync': r.rsync,
-            'git': r.git,
-            'hg': r.hg,
-            'upload': r.upload,
-            'loop': lambda *x: run_loop(*x),
-            'confirm': local.confirm,
-            'call': lambda x: run_command(x, True),
-            'echo': lambda x: sys.stdout.write('{0}\n'.format(x)),
-            'echo_error': lambda x: sys.stderr.write('{0}\n'.format(x)),
-            'set_verbose': r.set_verbose,
-            'key': r.key
-            }
-</code></pre>
-
-<p>Let&#8217;s see another command option.</p>
-
-<pre><code>$ dotcloud --export create helloworldapp
-{
-    "data": "Created repos \"helloworldapp\"", 
-    "type": "success"
-}
-</code></pre>
-
-<p>In this case, type is not cmd, so dotcloud command will do nothing anymore.</p>
-
-<p>In the case of option push, API response is like this.</p>
-
-<pre><code>$ dotcloud --export push helloworldapp
-{
-    "data": [
-        [
-            "upload", 
-            ".", 
-            "ssh://dotcloud@uploader.dotcloud.com:21122/helloworldapp", 
-            {
-                "rsync": {
-                    "excludes": [
-                        "*.pyc", 
-                        ".git", 
-                        ".hg"
-                    ]
-                }, 
-                "check": true
-            }
-        ], 
-        [
-            "call", 
-            "deploy helloworldapp.default"
-        ]
-    ], 
-    "type": "cmd"
-}
-</code></pre>
-
-<p>&#8220;type&#8221; is &#8220;cmd&#8221;, so Remote.upload() will be called and run_command(&#8216;deploy helloworldapp.default&#8217;, True) will be called.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -1372,6 +1332,10 @@ def run_remote(cmd):
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1385,10 +1349,6 @@ def run_remote(cmd):
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

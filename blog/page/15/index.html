@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="source:XML-Atom-0.22/inc/ExtUtils/AutoInstall.pm
-">
+  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom/Client.pm NAME XML::Atom::Client - A client for the Atom API SYNOPSIS use XML::Atom::Client; use XML::Atom::Entry; &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,128 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Client.pm/">XML-Atom-0.22/lib/XML/Atom/Client.pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-30T23:41:44+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Client.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Client.pm</p>
+
+<h1>NAME</h1>
+
+<p>XML::Atom::Client - A client for the Atom API</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use XML::Atom::Client;
+    use XML::Atom::Entry;
+    my $api = XML::Atom::Client-&gt;new;
+    $api-&gt;username('Melody');
+    $api-&gt;password('Nelson');
+
+    my $entry = XML::Atom::Entry-&gt;new;
+    $entry-&gt;title('New Post');
+    $entry-&gt;content('Content of my post.');
+    my $EditURI = $api-&gt;createEntry($PostURI, $entry);
+
+    my $feed = $api-&gt;getFeed($FeedURI);
+    my @entries = $feed-&gt;entries;
+
+    my $entry = $api-&gt;getEntry($EditURI);
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p><em>XML::Atom::Client&#8221; implements a client for the Atom API described at &#8221;http://bitworking.org/projects/atom/draft-gregorio-09.html&#8221;, with the authentication scheme described at &#8221;http://www.intertwingly.net/wiki/pie/DifferentlyAbledClients</em>.
+<em>NOTE:</em> the API, and particularly the authentication scheme, are still in flux.</p>
+
+<h1>USAGE</h1>
+
+<h2>XML::Atom::Client->new(%param)</h2>
+
+<h2>$api->use_soap([ 0 | 1 ])</h2>
+
+<p><em>XML::Atom::Client&#8221; supports both the REST and SOAP-wrapper versions of the Atom API. By default, the REST version of the API will be used, but you can turn on the SOAP wrapper&#8211;for example, if you need to connect to a server that supports only the SOAP wrapper&#8211;by calling &#8221;use_soap</em> with a value of <code>1</code>:</p>
+
+<pre><code>    $api-&gt;use_soap(1);
+</code></pre>
+
+<p>If called without arguments, returns the current value of the flag.</p>
+
+<h2>$api->username([ $username ])</h2>
+
+<p>If called with an argument, sets the username for login to <em>$username</em>.</p>
+
+<p>Returns the current username that will be used when logging in to the Atom server.</p>
+
+<h2>$api->password([ $password ])</h2>
+
+<p>If called with an argument, sets the password for login to <em>$password</em>.</p>
+
+<p>Returns the current password that will be used when logging in to the Atom server.</p>
+
+<h2>$api->createEntry($PostURI, $entry)</h2>
+
+<p>Creates a new entry.</p>
+
+<p><em>$entry&#8221; must be an &#8221;XML::Atom::Entry</em> object.</p>
+
+<h2>$api->getEntry($EditURI)</h2>
+
+<p>Retrieves the entry with the given URL <em>$EditURI</em>.</p>
+
+<p>Returns an <em>XML::Atom::Entry</em> object.</p>
+
+<h2>$api->updateEntry($EditURI, $entry)</h2>
+
+<p>Updates the entry at URL <em>$EditURI&#8221; with the entry &#8221;$entry&#8221;, which must be an &#8221;XML::Atom::Entry</em> object.</p>
+
+<p>Returns true on success, false otherwise.</p>
+
+<h2>$api->deleteEntry($EditURI)</h2>
+
+<p>Deletes the entry at URL <em>$EditURI</em>.</p>
+
+<h2>$api->getFeed($FeedURI)</h2>
+
+<p>Retrieves the feed at <em>$FeedURI</em>.</p>
+
+<p>Returns an <em>XML::Atom::Feed</em> object representing the feed returned from the server.</p>
+
+<h2>ERROR HANDLING</h2>
+
+<p>Methods return <code>undef</code> on error, and the error message can be retrieved using the <em>errstr</em> method.</p>
+
+<h1>AUTHOR &amp; COPYRIGHT</h1>
+
+<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1580,47 +1701,6 @@ WikiPedia        http://en.wikipedia.org/wiki/
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/22/310/">SVN::TracWiki #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-22T15:07:00+09:00" pubdate>Apr 22<span>nd</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/22/310/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/SVN-TracWiki"><span class="icon"></span>SVN::TracWiki</a> (<a class="ext-link" href="http://svn.mizzy.org/public/SVN-TracWiki/"><span class="icon"></span>svn repos</a>) について、ブクマコメントで miyagawa さんから「File::Extract?」というアドバイス？を頂きましたので、テキスト抽出部分を File::Extract ベースに書き換えてみました。
-</p>
-
-
-<p>
-おかげでプラグインまわりの処理が少しすっきりした上に、File::Extract で対応しているファイルフォーマットであれば、SVN::TracWiki 用のプラグインを書かなくてもテキスト抽出ができるようになりました。（Excel で試しましたが、ばっちり動作しました。）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/16/">&larr; Older</a>
@@ -1638,6 +1718,10 @@ WikiPedia        http://en.wikipedia.org/wiki/
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1651,10 +1735,6 @@ WikiPedia        http://en.wikipedia.org/wiki/
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

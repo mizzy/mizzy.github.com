@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="
-デブサミ出張 Shibuya イベントで、Assurer についてしゃべってきました。発表資料をここに置いておきます。 感想とか書きたいのですが、嘔吐下痢性の風邪にやれられて、一日何も食べることができず、打ち上げにも参加できないぐらい体調悪いので、今日はこの辺で。 ">
+  <meta name="description" content="デブサミ発表資料中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。 テストプラグインのコードはこの様になっています。 package Assurer::Plugin::Test::SMTP; use strict &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,137 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/17/386/">デブサミ出張 Shibuya イベントの補足</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-17T20:57:00+09:00" pubdate>Feb 17<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/17/386/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/archives/assurer_devsumi.pdf"><span class="icon"></span>デブサミ発表資料</a>中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。
+</p>
+
+
+<p>
+テストプラグインのコードはこの様になっています。
+</p>
+
+
+<pre class="wiki">
+package Assurer::Plugin::Test::SMTP;
+
+use strict;
+use warnings;
+<span style="color: blue;">use base qw( Assurer::Plugin::Test ); #(A)</span>
+<span style="color: blue;">use Assurer::Test; #(B)</span>
+use Net::SMTP;
+<div style="color: blue;">
+sub register {
+    my $self = shift;
+    $self->register_tests( qw/ connect / );          #(C)
+}
+</div>
+sub connect {
+    my ( $self, $context, $args ) = @_;
+
+    my $conf = $self->conf;
+
+    my $host     = $conf->{host}     || $context->conf->{host};
+    my $timeout  = $conf->{timeout}  || 10;
+
+    my $smtp = Net::SMTP->new(Host => $host, Timeout => $timeout);
+    <span style="color: blue;">ok($smtp, "smtp ok $host"); #(D)</span>
+}
+
+1;
+</pre>
+
+
+<p>
+青字の部分が、プラグインを書く際のお約束というかポイントとなる部分なので、順に説明していきます。
+</p>
+
+
+<p>
+(A) では Assurer::Plugin::Test を継承しているわけですが、テストプラグイン共通の処理はすべて Assurer::Plugin::Test に記述することにより、各プラグインでのコード量を減らそうという目論見になってます。
+</p>
+
+
+<p>
+(B) で Assurer::Test を use することより、ok(), is(), like() といったテスト用メソッドをインポートしています。
+</p>
+
+
+<p>
+(C) ではテストを行うメソッドを登録しています。複数登録する場合には、
+</p>
+
+
+<pre class="wiki">
+$self->register_tests( qw/ test1 test2 test3 / ); 
+</pre>
+
+
+<p>
+といった記述をします。この場合、test1(), test2(), test3() の順で実行されます。
+</p>
+
+
+<p>
+(D) が実際にテストを行っているところで、Test::More の ok() と同じ動作をします。この ok() は上で書いたように、Assurer::Test からインポートしたメソッドです。このような組み込みのテストメソッドを使うことで、if 文で結果を判断して適切なステータスを返す、といった処理を書く必要がなくなります。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://blog.nomadscafe.jp/archives/000713.html"><span class="icon"></span>kazeburo さんの発表</a>にある、Nagios プラグインと対比してみると、Nagios は exit 時のステータスコードだけ気にすればいい、というのに対して、Assurer では、上のコード (A), (B), (C) の様に、Assurer 特有のお約束を守る必要があるものの、exit コードは気にしなくていい、といった特徴があります。また、お約束を守ることによってコード量も減らせます。（特に結果判定で if を書かなくていい。）
+</p>
+
+
+<p>
+Nagios の場合、ステータスコードだけ気にすればいい、とは言っても、ステータスが OK, Warning, Crtitical, Unknown とあるわけで、OK はまだしも、どういった場合が Warning でどういった場合が Critical なのか、ということを気にするのは、ちょっと面倒な気もします。
+</p>
+
+
+<p>
+また、結果を受け取る側も、Warning とか Unknown とか受け取ると、それって問題あるの？ないの？って迷ったりしないのかな、とか、Warning と Critical の解釈って、人によって違うんじゃないかな、って思ったりします。（Nagios使ったことないんで、変なこと言ってるかもしれませんが。）
+</p>
+
+
+<p>
+そういった曖昧さをなくしたくて、Assurer では OK か NOT OK かの2種類の結果しか返さない、というポリシーにしました。
+</p>
+
+
+<p>
+とは言っても、Nagios の様にステータスが何種類かある方が便利だという場面はあるんでしょうね。その辺りは Assurer では、エラーメッセージでフィルタリングできるようにして、「こういったエラーメッセージの場合は、問題ないから OK にする」といった設定ができるような形にして、結果の解釈を利用者に委ねられるようにしようと考えています。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -865,71 +995,6 @@ Assurer::Test は今後、 Assurer::Test::More とか Assurer::Test::Class と�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/06/432/">Assurer - サーバテスティングフレームワーク #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-01-06T00:44:00+09:00" pubdate>Jan 6<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/01/06/432/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-構築したサーバがちゃんと動作するかどうかのテストを自動化したいなー、とスクリプトを書こうと思ったのですが、Perler としてはここはやはり、<a class="ext-link" href="http://plagger.org/trac"><span class="icon"></span>Plagger</a> とか <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> みたく、プラガブルで YAML で設定書けば OK みたいのを作るべきだろう、ってことで、<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) というサーバテスティングフレームワークをでっちあげてみました。
-</p>
-
-
-<p>
-テストのことを Quality Assurance とか言ったりするし、Plagger や Archer が er で終わってるので、それに倣って命名してます。
-</p>
-
-
-<p>
-今のところ Plagger や Archer からコピペして、ごく簡単な HTTP テストプラグインをつくっただけでまだまだ未完成ですが、以下のような config.yaml で実行すると、HTTP GET して取得したコンテンツに「It works!」が含まれているかどうかテストする、といった感じで動作します。
-</p>
-
-
-<pre class="wiki">
-plugins:
-  - module: HTTP
-    config:
-      url: http://svn.mizzy.org/
-      match: It works!
-</pre>
-
-
-<p>
-これって、サーバのテストだけでなく、監視にも使えるよなー、と思ったところで、<a class="ext-link" href="http://d.hatena.ne.jp/naoya/20061214/1166063145"><span class="icon"></span>ライブドアテクノロジーセミナーで naoya さんが触れていた</a>、Observer というはてな製監視フレームワークとかぶるんじゃないか、という気がしてきました。Plagger ライクって言っていたし。
-</p>
-
-
-<p>
-ということは、はてなが Overver を公開してくれれば、自分で開発する必要がなくなって楽ができそう、ってことで、公開希望とここでつぶやいておきます。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -947,6 +1012,10 @@ plugins:
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -960,10 +1029,6 @@ plugins:
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>

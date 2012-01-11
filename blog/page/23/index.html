@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ベイダー日記 - Amazon2iCal の CustomFeed::AmazonSearch を、他の用途でも使えるように、もう少し汎用的に書き換えてみました。 CustomFeed::AmazonWebService オリジナルからの変更ポイントは、 link や icon &hellip;">
+  <meta name="description" content="自分好みに使いやすくするために、CustomFeed::AmazonWebService と Publish::iCal を修正してみました。 CustomFeed::AmazonWebService は、$entry->author に 著者名やアーティスト名などをセットするようにしました。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,110 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/22/436/">Plagger で Amazon2iCal 改良</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-22T16:40:00+09:00" pubdate>Aug 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/22/436/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+自分好みに使いやすくするために、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/230"><span class="icon"></span>CustomFeed::AmazonWebService と Publish::iCal を修正してみました</a>。
+</p>
+
+
+<p>
+CustomFeed::AmazonWebService は、$entry->author に 著者名やアーティスト名などをセットするようにしました。
+</p>
+
+
+<p>
+Publish::iCal は $event->add_properties で、summary に title だけではなく、author も含めるようにしました。これで Google Calendar で見た場合に、誰の作品なのかが一目で分かります。
+</p>
+
+
+<p>
+最初は organizer に author を含めておけば、Google Calendar で適切に表示してくれるんじゃないかと思ったのですが、こちらのやり方が悪いのか、organizer がどこに表示されるのかさっぱり分かりません。
+</p>
+
+
+<p>
+また、RFC では organizer は、
+</p>
+
+
+<pre class="wiki">
+ORGANIZER;CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
+</pre>
+
+
+<p>
+といったフォーマットになるのですが、Data::ICal でこの様なフォーマットにする方法が分かりません。
+</p>
+
+
+<pre class="wiki">
+$event->add_properties(
+    organizer   => 'CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com',
+);
+</pre>
+
+
+<p>
+としても、
+</p>
+
+
+<pre class="wiki">
+ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
+</pre>
+
+
+<p>
+となっちゃいます。（ORGANIZER 直後がセミコロンではなくコロンになってしまう。）
+</p>
+
+
+<p>
+とりあえず、Google Calendar で表示させてみるとこんな感じになりました。
+</p>
+
+
+<p>
+<img src="http://mizzy.org/img/gcal2.jpg" alt="Publish::iCal + Google Calendar" />
+</p>
+
+
+<p>
+あと、リンクも含めておけば amazon のページに飛べて便利かも、と思って、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/231"><span class="icon"></span>こんな感じで url property をセットするようにした</a> のですが、これもまた Google Calendar 上ではどこに表示されるのかがさっぱり分かりません。
+ 
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -890,144 +994,6 @@ $ffmpeg->exec();
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/07/22/448/">Catlxom の Account Auto-Discovery プラグイン (Catlxom メモ #9)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-07-22T23:16:00+09:00" pubdate>Jul 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/07/22/448/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは <a class="ext-link" href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery"><span class="icon"></span>Account Auto-Discovery</a> データを追加するプラグインを書いてみた。
-</p>
-
-
-<p>
-blosxom でも <a class="ext-link" href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/account_auto_discovery"><span class="icon"></span>同様のプラグイン</a> を書いているのですが、一番大きな違いは、blosxom プラグインはテンプレートの修正が必要なのに対し、catlxom プラグインはテンプレートの修正が一切必要ありません。XML::TreeBuilder を利用して、HTML ヘッダにデータを追加するような作りにしています。
-</p>
-
-
-<p>
-利用上の注意点として、Template::TT よりも後にこのプラグインをロードしなければいけいのですが、自動ロードを有効にしてると先にロードされちゃうので、自動ロードをオフにして yaml で明示的に利用プラグインを指定する必要があります。
-</p>
-
-
-<pre class="wiki">
-package Catlxom::Plugin::Format::AccountAutoDiscovery;
-use strict;
-use warnings;
-use base qw/Catlxom::Plugin/;
-
-use NEXT;
-use XML::TreeBuilder;
-
-sub interpolate {
-    my ( $self, $c ) = @_;
-
-    my $accounts = $c-&gt;config-&gt;{account_auto_discovery};
-
-    my $tree = XML::TreeBuilder-&gt;new();
-    $tree-&gt;parse($c-&gt;res-&gt;body);
-
-    my $head = $tree-&gt;find('head');
-
-    for ( @$accounts ){
-        my $rdf = XML::Element-&gt;new(
-            'rdf:RDF',
-            'xmlns:rdf'  =&gt; 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-            'xmlns:foaf' =&gt; 'http://xmlns.com/foaf/0.1/',
-        );
-
-        my $rdf_description = XML::Element-&gt;new(
-            'rdf:Description',
-            'rdf:about' =&gt; $c-&gt;req-&gt;uri,
-        );
-
-        my $foaf_maker = XML::Element-&gt;new(
-            'foaf:maker',
-            'rdf:parseType' =&gt; 'Resource',
-        );
-
-        my $foaf_holds_acount = XML::Element-&gt;new( 'foaf:holdsAccount' );
-
-        my $foaf_online_account = XML::Element-&gt;new(
-            'foaf:OnlineAccount',
-            'foaf:accountName' =&gt; $_-&gt;{account_name},
-        );
-
-        my $foaf_account_service_homepage = XML::Element-&gt;new(
-            'foaf:accountServiceHomepage',
-            'rdf:resource' =&gt; $_-&gt;{account_service_homepage},
-        );
-
-        $head-&gt;push_content($rdf);
-        $rdf-&gt;push_content($rdf_description);
-        $rdf_description-&gt;push_content($foaf_maker);
-        $foaf_maker-&gt;push_content($foaf_holds_acount);
-        $foaf_holds_acount-&gt;push_content($foaf_online_account);
-        $foaf_online_account-&gt;push_content($foaf_account_service_homepage);
-    }
-
-    $c-&gt;res-&gt;{body} = $tree-&gt;as_HTML;
-    $self-&gt;NEXT::interpolate($c);
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-Catlxom::Plugin::Format::AccountAutoDiscovery
-
-=head1 SYNOPSIS
-
-account_auto_discovery:
-  - account_name: gosukenator
-    account_service_homepage: http://www.hatena.ne.jp/
-  - account_name: xxxx
-    account_service_homepage: http://xxx.ne.jp/
-
-=head1 DESCRIPTION
-
-This plugin inserts Account Auto-Discovery data into HTML header.
-
-=head1 AUTHOR
-
-Gosuke Miyashita
-
-=head1 SEE ALSO
-
-L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;
-
-=cut
-</pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/24/">&larr; Older</a>
@@ -1045,6 +1011,10 @@ L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1058,10 +1028,6 @@ L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;
     
       <li class="post">
         <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture of Geminids</a>
       </li>
     
   </ul>
