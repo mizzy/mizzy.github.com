@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="デブサミ発表資料中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。 テストプラグインのコードはこの様になっています。 package Assurer::Plugin::Test::SMTP; use strict &hellip;">
+  <meta name="description" content="さすがにPlaggerでもこれは無理だと思いたい。PythonでYahoo!Booksのランキングをとってくる。 というエントリを見て、なんか釣りっぽいタイトルだけど敢えて釣られてみた。 ちょっとアウトプット違うけど、Plagger なら 10 分でできた。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,105 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/24/375/">Plagger で Yahoo!Booksのランキングをとってくる</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-24T00:44:00+09:00" pubdate>Feb 24<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/24/375/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://pythonbeginner.blog78.fc2.com/blog-entry-213.html"><span class="icon"></span>さすがにPlaggerでもこれは無理だと思いたい。PythonでYahoo!Booksのランキングをとってくる。</a> というエントリを見て、なんか釣りっぽいタイトルだけど敢えて釣られてみた。
+</p>
+
+
+<p>
+ちょっとアウトプット違うけど、Plagger なら 10 分でできた。
+</p>
+
+
+<p>
+<img src="http://mizzy.org/img/plagger-ybooks-s.jpg" alt="http://mizzy.org/img/plagger-ybooks-s.jpg" />
+</p>
+
+
+<p>
+以下の2つのファイルを用意してやるだけ。
+</p>
+
+
+<p>
+config.yaml
+</p>
+
+
+<pre class="wiki">
+plugins:
+  - module: Subscription::Config
+    config:
+      feed:
+        - url: http://books.yahoo.co.jp/ranking/general/all/all/weekly/index.html
+          meta:
+            follow_link: /book_detail/.*
+
+  - module: CustomFeed::Simple
+
+  - module: Filter::EntryFullText
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: plagger@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+        attach_enclosures: 1
+
+</pre>
+
+
+<p>
+EntryFullText 用 yaml
+</p>
+
+
+<pre class="wiki">
+author: Gosuke Miyashita
+handle: http:\/\/books\.yahoo\.co\.jp\/book_detail\/\d+
+extract: &lt;!-- 書籍紹介 --&gt;.+&lt;small&gt;(.*?)&lt;/small&gt;.+&lt;!-- //書籍紹介 --&gt;
+extract_capture: body
+</pre>
+
+
+<p>
+既存の設定からほぼコピペなので、10 分のうち7割ぐらいは、EFT 用 yaml の文字コードが UTF-8 じゃないといけないのに、euc-jp にしてて「なんかうまくいかねー」とかやってた時間。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -897,104 +996,6 @@ publish:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/06/300/">Assurer - サーバテスティングフレームワーク #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-01-06T21:22:00+09:00" pubdate>Jan 6<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/01/06/300/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://unknownplace.org/memo/"><span class="icon"></span>typester さん</a> が del.icio.us で「開発参加したい！」とおっしゃってくださったので、#assurer@freenode チャネルつくりました。まだおおまかな仕様すら固まっていない段階なので、いろいろご助言頂けると大変うれしいです。ご興味のある方はぜひ！
-</p>
-
-
-<p>
-で、本題。<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) をちょっと修正しました。修正点は以下の通りです。
-</p>
-
-
-<ul><li>assurer.pl に Plagger の文字が残っていたので、修正しました。（はてブでコメント頂きました。ありがとうございます。）</li>
-<li>Assurer::Test というクラスをつくりました。Assurer::Plugin::HTTP では最初、Test::More を使っていたのですが、代わりにこちらを使うようにしてます。</li>
-<li>他微修正。</li></ul>
-
-
-<p>
-今回追加した Assurer::Test というクラスは Test::Builder を利用していて、 Test::More の代わりとしてテスト用プラグインから利用することを想定しています。
-</p>
-
-
-<p>
-なぜわざわざこのクラスを作ったかというと、テスト結果出力を色分けしたかったからです。実行するとこんな感じの出力になります。（RSS リーダだと色が見えないと思いますが…）
-</p>
-
-
-<pre class="wiki">
-$ ./assurer.pl -c examples/config.yaml
-[info] Testing http://svn.mizzy.org/ #0
-<span style="color: blue;">ok 1 - Content of http://svn.mizzy.org/ matches 'It works!'</span>
-[info] Testing http://svn.mizzy.org/ #1
-<span style="color: red;">not ok 2 - Content of http://svn.mizzy.org/ matches 'It not works!'</span>
-#                   '&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;'
-#     doesn't match '(?-xism:It not works!)'
-</pre>
-
-
-<p>
-また、
-</p>
-
-
-<pre class="wiki">
-global:
-  config:
-    no_diag: 1
-</pre>
-
-
-<p>
-といった設定をすると、以下のように diag message を表示しなくなります。
-</p>
-
-
-<pre class="wiki">
-$ ./assurer.pl -c examples/config.yaml
-[info] Testing http://svn.mizzy.org/ #0
-<span style="color: blue;">ok 1 - Content of http://svn.mizzy.org/ matches 'It works!'</span>
-[info] Testing http://svn.mizzy.org/ #1
-<span style="color: red;">not ok 2 - Content of http://svn.mizzy.org/ matches 'It not works!'</span>
-</pre>
-
-
-<p>
-Assurer::Test は今後、 Assurer::Test::More とか Assurer::Test::Class といった感じでベースとなる Test::* に応じて細分化するかもしれません。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -1012,6 +1013,10 @@ Assurer::Test は今後、 Assurer::Test::More とか Assurer::Test::Class と�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1027,11 +1032,53 @@ Assurer::Test は今後、 Assurer::Test::More とか Assurer::Test::Class と�
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="俺はbloglinesを常用しているのですが、動作が重かったり、bloglinesおじさんがしばしば登場したりしても、他に魅力的なウェブベースのフィードアグリゲータがなかったので、特に乗り換えは考えていませんでした。 そんな俺が、はじめて乗り換えてもいいかな、と思えるアグリゲータに出会いました &hellip;">
+  <meta name="description" content="
+feedbringer用greasemonkeyユーザスクリプトを修正。コンテンツ表示領域をスペース/バックスペースキーで順/逆スクロールできるようにした。 まだまだ調整すべきところはあるけど、これでbloglinesから完全に乗り換えできるかな。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/23/276/">Feedbringerをremixin&#8217; #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-23T18:30:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/23/276/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/js/feedbringer.user.js" target="_blank">feedbringer用greasemonkeyユーザスクリプト</a>を修正。コンテンツ表示領域をスペース/バックスペースキーで順/逆スクロールできるようにした。
+</p>
+
+
+
+
+<p class="entryBody">
+まだまだ調整すべきところはあるけど、これでbloglinesから完全に乗り換えできるかな。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1181,68 +1225,6 @@ HTML::Prototypeのメソッドを、Catalystのビューから呼び出すため
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/09/08/320/">Catalyst Tips #0 Catalystでファイルのアップロード</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-09-08T22:05:00+09:00" pubdate>Sep 8<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/09/08/320/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-業務で使うウェブアプをCatalystで作っているのですが、ファイルのアップロード処理でちょっとだけはまったのでメモ。
-</p>
-
-
-
-
-<p class="entryBody">
-最初、 <a href="http://search.cpan.org/~mramberg/Catalyst-5.33/lib/Catalyst/Request/Upload.pm" target="_blank">Catalyst::Request::Upload</a> の説明を読んだのですが、これだけだとさっぱり使い方が分からない。で、 <a href="http://search.cpan.org/~mramberg/Catalyst-5.33/lib/Catalyst/Request.pm" target="_blank">Catalyst::Request</a> を併せて読むことで、ようやくわかりました。こんな感じです。
-</p>
-
-
-
-
-<pre class="code">
-for my $upload (values $c->request->uploads){
-    if($upload->filename){
-        $upload->copy_to('/path/to/' . $upload->filename);
-    }
-    unlink $upload->tempname;
-}
-</pre>
-
-
-
-
-<p class="entryBody">
-注意点としては、&lt;input type=&#8221;file&#8221; /&gt; の入力フォームが空の状態でpostしても、$c->request->uploadsは空にはならないので、 $upload->filename が空かどうかチェックすること。それと、 $upload->tempname で示されるパスにテンポラリファイルが作られる（しかもファイル入力フォームが空の状態でも）ので、ちゃんと消しておかないとうざい、といったあたりでしょうか。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/35/">&larr; Older</a>
@@ -1260,6 +1242,10 @@ for my $upload (values $c->request->uploads){
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1275,11 +1261,53 @@ for my $upload (values $c->request->uploads){
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

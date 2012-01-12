@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは Account Auto-Discovery データを追加するプラグインを書いてみた。 blosxom でも 同様のプラグイン を書いているのですが、 &hellip;">
+  <meta name="description" content="perl で ffmpeg を扱うモジュールには、FFmpeg というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,130 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/27/340/">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-27T01:17:00+09:00" pubdate>Jul 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/27/340/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+perl で ffmpeg を扱うモジュールには、<a class="ext-link" href="http://search.cpan.org/~allenday/FFmpeg-5704/FFmpeg.pm"><span class="icon"></span>FFmpeg</a> というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、じゃあラッパー作ろうと思ったら、ボンヌさんも作っているということで待っていたのですが、音沙汰がないのと、早急に必要なのもあって、とりあえず作ってみました。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"><span class="icon"></span>FFmpeg::Command</a>
+</p>
+
+
+<p>
+まだ pod が不完全ですが、とりあえず YouTube から拾った flv 動画を mpeg4 に変換して iTunes で観たり、サムネイルを JPEG で切り出したり、といったことができることを確認しました。
+</p>
+
+
+<p>
+使い方は SYNOPSYS にも書いてますが、動画の変換であればこんな感じで。
+</p>
+
+
+<pre class="wiki">
+my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
+
+$ffmpeg->input_options({
+    file => 'nba.flv',
+});
+
+$ffmpeg->output_options({
+    file                => 'nba.mp4',
+    format              => 'mp4',
+    video_codec         => 'mpeg4',
+    bitrate             => '640',
+    size                => '320x240',
+    audio_codec         => 'aac',
+    audio_sampling_rate => '44100',
+    audio_bit_rate      => '128',
+});
+
+$ffmpeg->exec();
+</pre>
+
+
+<p>
+サムネイルの切り出しはこんな感じ。（任意のオプションで実行する機能。）
+</p>
+
+
+<pre class="wiki">
+my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
+
+$ffmpeg->input_file('nba.flv');
+$ffmpeg->output_file('nba.mp4');
+
+$ffmpeg->options(
+    '-y',
+    '-f'       => 'image2',
+    '-pix_fmt' => 'jpg',
+    '-vframes' => 1,
+    '-ss'      => 30,
+    '-s'       => '320x240',
+    '-an',
+);
+
+$ffmpeg->exec();
+</pre>
+
+
+<p>
+これから実装したいと思っている機能は、以下の様な指定をすれば、iPod や PSP に適切なパラメータを勝手に設定して変換してくれる、というもの。もちろん、自分の好きな値でパラメータを上書きすることも可能な感じで。
+</p>
+
+
+<pre class="wiki">
+my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
+
+$ffmpeg->input_options({
+    file => 'nba.flv',
+});
+
+$ffmpeg->output_options({
+    file   => 'nba.mp4',
+    <strong>device => 'ipod' or 'psp',</strong>
+});
+
+$ffmpeg->exec();
+</pre>
+
+
+<p>
+ボンヌさんが作られているものと統合して、いいものになるといいな。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1231,202 +1355,6 @@ Text::Trac 自体はもうちょいで CPAN にアップできると思います
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/06/17/412/">Text::Trac - Trac Wiki 記法パーサ #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-06-17T01:11:00+09:00" pubdate>Jun 17<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/06/17/412/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://d.hatena.ne.jp/drawnboy/" target="_blank">id:drawnboy</a> さんがつくった <a href="http://d.hatena.ne.jp/drawnboy/20060616/1150384749">Catlxom::Plugin::Format::Hatena</a> を見て、「お、それいい！」と思ったんだけど、そもそも自分ははてダ使っていなくて、この手の記法で唯一使ってるのは <a href="http://projects.edgewall.com/trac/wiki/WikiFormatting" target="_blank">Trac の Wiki 記法</a> なので、Catlxom::Plugin::Format::Trac が欲しいな、と思ったわけですが、Perl のパーサがないんですよね。
-</p>
-
-
-
-
-<p class="entryBody">
-で、IRC の #catlxom での会話の流れで、自分が <a href="http://trac.mizzy.org/public/browser/library/perl/trunk/Text-Trac" target="_balnk">Text::Trac</a> をつくることになりました。といってもまだつくりかけなので、CPAN にアップするのはまだ先になりそう。とりあえず興味ある方は以下の要領で取得してみてください。
-</p>
-
-
-
-
-<pre class="code">
-svn co http://svn.mizzy.org/public/library/perl/trunk/Text-Trac
-</pre>
-
-
-
-
-<p class="entryBody">
-もうほとんど <a href="http://search.cpan.org/~jkondo/Text-Hatena/" target="_blank">Text::Hatena</a> のコードそのまんまです。<a href="http://d.hatena.ne.jp/jkondo/" target="_blank">id:jkondo さん</a> と <a href="http://d.hatena.ne.jp/tociyuki/" target="_blank">id:tociyuki さん</a> に感謝感謝です。 
-</p>
-
-
-
-
-<p class="entryBody">
-とりあえず
-</p>
-
-
-
-
-<pre class="code">
-= heading1 =
-</pre>
-
-
-
-
-<p class="entryBody">
-から
-</p>
-
-
-
-
-<pre class="code">
-&lt;h1 id="heading1"&gt;heading1&lt;/h1&gt;
-</pre>
-
-
-
-
-<p class="entryBody">
-への変換のみ実装済み。
-</p>
-
-
-
-
-<p class="entryBody">
-Text::Hatena と異なる点は、
-</p>
-
-
-
-
-<pre class="code">
-my $p = Text::Trac-&gt;new(
-    custom_notation =&gt; {
-        h1node =&gt; '&lt;p&gt;$1&lt;/p&gt;',
-    },
-);
-</pre>
-
-
-
-
-<p class="entryBody">
-などと指定すると、
-</p>
-
-
-
-
-<pre class="code">
-= heading1 =
-</pre>
-
-
-
-
-<p class="entryBody">
-を
-</p>
-
-
-
-
-<pre class="code">
-&lt;p&gt;heading1&lt;/p&gt;
-</pre>
-
-
-
-
-<p class="entryBody">
-と変換する、といった感じで、記法をカスタマイズすることができます。また、
-</p>
-
-
-
-
-<pre class="code">
-my $p = Text::Trac-&gt;new(
-    min_heading_level =&gt; 2,
-);
-</pre>
-
-
-
-
-<p class="entryBody">
-と指定すると、
-</p>
-
-
-
-
-<pre class="code">
-= heading1 =
-</pre>
-
-
-
-
-<p class="entryBody">
-が
-</p>
-
-
-
-
-<pre class="code">
-&lt;h2 id="heading1"&gt;heading1&lt;/h2&gt;
-</pre>
-
-
-
-
-<p class="entryBody">
-と変換されます。なぜこんな機能をつけたかというと、catlxom プラグインとして使うことを考えた場合、通常 h1 はブログのトップ見出し、h2 はエントリのタイトルに使われるので、エントリの中では h3 以降を使うことになるかと思います。
-</p>
-
-
-
-
-<p class="entryBody">
-だからといってエントリを書くときにいちいち、「えーと、h3 にしないといけないから、 === hogehoge === だな」とかやるのもうざいので、こんな機能をつけてみました。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/25/">&larr; Older</a>
@@ -1444,6 +1372,10 @@ my $p = Text::Trac-&gt;new(
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1459,11 +1391,53 @@ my $p = Text::Trac-&gt;new(
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

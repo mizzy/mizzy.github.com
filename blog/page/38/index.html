@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="permalinkは変わらないからこそpermalinkなわけですが、事情があってpermalinkを変更せざるを得ないこともあると思います。 そこで、permalink変更後に古いpermalinkにアクセスがあった場合、 &hellip;">
+  <meta name="description" content="taggingプラグインをアップデート。させざきさんのご要望により、storyフレーバでtag毎のリンクを表示できるようにしました。 リンクを表示したい位置に、$tagging::tags_in_this と入れてください。各エントリの右下にある、「tags: &#8230;」 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/05/472/">Blosxomでtagging #8</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-05T16:42:00+09:00" pubdate>May 5<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/05/472/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/archives/tagging" target="_blank">taggingプラグイン</a>をアップデート。させざきさんのご要望により、storyフレーバでtag毎のリンクを表示できるようにしました。
+</p>
+
+
+
+
+<p class="entryBody">
+リンクを表示したい位置に、$tagging::tags_in_this と入れてください。各エントリの右下にある、「tags: &#8230;」の様な感じで表示されます。（「tags:」という文字はプラグインは出力しないので、自分で好きな文字を入れてください。）
+</p>
+
+
+
+
+<p class="entryBody">
+おそらく、metaプラグインよりも前に読み込まれないと、うまく動作しないと思いますので、「01tagging」みたいなファイル名にして、metaよりも先に読み込まれるようにして下さい。
+</p>
+
+
+
+
+<p class="entryBody">
+させざきさん、ご要望どおりのものになってますでしょうか？「思ってたのと違う」とか「ここはこうしてほしい」とかありましたら、お知らせ下さい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -985,63 +1042,6 @@ HTML::Templateであれば、paramメソッドを利用して、テンプレー�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/25/292/">このサイトについて</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-25T23:28:00+09:00" pubdate>Apr 25<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/25/292/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-特にコンセプトとか目的とかはないです。なんとく「俺」が滲み出てる、そんなサイトであればいいな、と。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://www.blosxom.com/">blosxom</a>つかってます。カスタマイズしやすいのが魅力的。まだカスタマイズ不十分なところがあるので、ちょくちょくいじることになるかと。そのせいで、エラーで見られなくことがあるかもしれませんが、そんな時は「ああ、あいつカスタマイズ失敗してやがんの。」と笑ってやってください。
-</p>
-
-
-
-
-<p class="entryBody">
-インデックスページではajax使って、ページ遷移なしにコメントとトラックバックを表示したり、コメントの投稿ができるようになっています。（asynchronousじゃないけど。）Javascriptオフの場合や、xmlHttpRequestに対応していないブラウザでは、ページ遷移する様にしています。
-</p>
-
-
-
-
-<p class="entryBody">
-Win IE6, Win Mozilla Firefox, Mac Camino, Mac Safariで表示確認してます。Mac IEお断り。表示が崩れます。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/39/">&larr; Older</a>
@@ -1059,6 +1059,10 @@ Win IE6, Win Mozilla Firefox, Mac Camino, Mac Safariで表示確認してます�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1074,11 +1078,53 @@ Win IE6, Win Mozilla Firefox, Mac Camino, Mac Safariで表示確認してます�
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

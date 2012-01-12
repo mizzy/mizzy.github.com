@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="del.icio.us direc.torを見て、「APIが提供するXMLに、JavascriptでUIを被せるのはアリだな。」と思った方は多いのではないでしょうか。この辺りについては、ma.laさんが「XMLはメタデータというより&#8230;」というエントリでご指摘されている通りで、 &hellip;">
+  <meta name="description" content="前回のエントリについて、nektixeさんから、「Greasemonkey限定であれば、GM_xmlhttpRequest という関数を使うことで、外部ドメインのデータも受信可能みたいです」というコメントを頂きました。ありがとうございます。確かに、「GM_xmlhttpRequest is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,150 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/07/02/269/">Javascriptの皮を被ったXML #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-07-02T15:17:00+09:00" pubdate>Jul 2<span>nd</span>, 2005</time>
+        
+         | <a href="/blog/2005/07/02/269/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/javaScriptOverXml.html" target="_blank">前回のエントリ</a>について、<a href="http://amazie.jp/" target="_blank">nektixe</a>さんから、「Greasemonkey限定であれば、GM_xmlhttpRequest という関数を使うことで、外部ドメインのデータも受信可能みたいです」というコメントを頂きました。ありがとうございます。確かに、<a href="http://diveintogreasemonkey.org/api/gm_xmlhttprequest.html" target="_blank">「GM_xmlhttpRequest is not restricted to the current domain」</a>って書いてありますね。これは強力。
+</p>
+
+
+
+
+<p class="entryBody">
+というわけで、「Javascriptの皮を被ったXML構想」は、Greasemonkeyであれば実現できそうな感じです。この構想の要点をおさらいとして整理すると、
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>Javascriptから直接APIにアクセスしてXMLを取得して、UIを被せる。</li>
+<li>UIとなるHTMLはJavasciptから分離する。</li>
+<li>各サービスに合わせて外部XSLTファイルを用意し、JavascriptでXSLT変換する。これにより様々なサービスに統一的なUIを適用する。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+といった感じです。
+</p>
+
+
+
+
+<p class="entryBody">
+構想の実現に向けて、まずはGM_xmlhttpRequest関数で遊んでみようかと思ったのですが、その前にdel.icio.us direc.torをGreasemonkeyで動かしてみることにしました。といっても、やってみるとものすごく簡単で、del.icio.us direc.torのおおもとのJavascriptである、<a href="http://johnvey.com/features/deliciousdirector/dboot.js" target="_blank">dboot.js</a>の先頭に、以下の様にGreasemonkey用の記述を数行加えてあげるだけです。
+</p>
+
+
+
+
+<pre class="code">
+// ==UserScript==
+// @name            del.icio.us direc.tor greasemonkey user script
+// @namespace       http://mizzy.org/
+// @description     When open a folder in bloglines, close other folders.
+// @include         http://del.icio.us/mizzy/director
+// ==/UserScript==
+
+var d = '&lt;form&gt;&lt;img src="http://johnvey.com/features/deliciousdirector/director-logo.gif" width="206" height="18" alt="Delicious Director" style="float:left;padding:2px 10px 0 0" /&gt;';
+d += '&lt;input id="q" name="q" type="text" size="60" onkeyup="rd.filter(this.value)" autocomplete="off" /&gt;';
+d += '&lt;input type="checkbox" id="h" checked="checked" onchange="rd.th()" /&gt;&lt;label for="h"&gt;Highlight Terms&lt;/label&gt;&lt;/form&gt;';
+d += '&lt;h2&gt;Tag Browser&lt;/h2&gt;';
+d += '&lt;div id="browser"&gt;';
+d += '  &lt;div id="br1" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br2" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br3" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br4" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br5" class="browserPane"&gt;&lt;/div&gt;';
+d += '  &lt;div id="br6" class="browserPane"&gt;&lt;/div&gt;';
+d += '&lt;/div&gt;';
+d += '&lt;h2 id="summary"&gt;Bookmarks&lt;/h2&gt;';
+d += '&lt;div id="ps"&gt;&lt;p&gt;Loading your del.icio.us bookmarks...&lt;/p&gt;&lt;/div&gt;';
+d += '&lt;p id="ft"&gt;&#169; 2005 Johnvey Hwang. &lt;a href="http://johnvey.com/features/deliciousdirector/" target="_blank"&gt;del.icio.us direc.tor project page&lt;/a&gt;. Released under the &lt;a href="http://www.gnu.org/copyleft/gpl.html" target="_blank"&gt;GPL&lt;/a&gt;.&lt;/p&gt;';
+
+function init() {
+
+    var i, a, main;
+
+    document.body.innerHTML = "";
+    document.body.innerHTML = d;
+    
+    for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
+      if(a.getAttribute("rel").indexOf("style") != -1) {
+        a.disabled = true;
+      }
+    }
+    
+    var ns = document.createElement("link");
+    ns.rel = "stylesheet";
+    ns.type = "text/css";
+    ns.href = "http://johnvey.com/features/deliciousdirector/d.css";
+    document.body.appendChild(ns);
+    
+    var js = document.createElement("script");
+    js.language = "javascript";
+    js.src = "http://johnvey.com/features/deliciousdirector/d.js";
+    document.body.appendChild(js);
+    
+    document.title += " (Direc.tor)";
+}
+
+init();
+</pre>
+
+
+
+
+<p class="entryBody">
+実際に試してみたい方は、<a href="http://mizzy.org/js/dboot.user.js" target="_blank">こちらからどうぞ</a>。
+</p>
+
+
+
+
+<p class="entryBody">
+@includeで指定されるページは、適宜変更してください。自分は、http://del.icio.us/mizzy/director にアクセスした時にお猿さんが発動するようにしていますが、そこは各自のお好みで。
+</p>
+
+
+
+
+<p class="entryBody">
+次回は実際にGM_xmlhttpRequest関数を利用して、外部HTMLテンプレートを読み込むのに挑戦したいと思います。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1443,77 +1587,6 @@ fladdict.net blogの中の人は、タグの出現頻度を可視化する手法
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/05/28/491/">Blog Hackers Conference 2005に行ってきました</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-05-28T01:57:00+09:00" pubdate>May 28<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/05/28/491/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://hacks.bloghackers.net/archives/2005/05/blog_hackers_co_1.html" target="_blank">Blog Hackers Conference 2005</a>から帰ってきました。3時間半ほど前に。家庭がある身なので、「打倒naoya！はてなTシャツ争奪ジャンケンバトル」（呼び捨てすんません）に2nd Roundで敗れて早々会場を後にしたわけですが、あの後も何かおもしろいことあったんですかね。
-</p>
-
-
-
-
-<p class="entryBody">
-どんな内容だったとか、どんな感じだったとかは、誰かが書いてくれるでしょうから、ここでは書きません。（めんどくさい。）
-</p>
-
-
-
-
-<p class="entryBody">
-ブログ暦が2ヶ月弱と浅いので、前回は出ておらず初めての参加なのですが、いつもブログやブックマークを拝見させて頂いている方々が目の前にいて、しかも中には、こんな俺のブログをsubscribeしてくれていたり、ブックマークしてくれている方もいらっしゃるので、「どうも！mizzy.orgの宮下です。いつもお世話になってます！」と挨拶してまわりたいぐらいでした。うざがれること必至なのでやめましたが。
-</p>
-
-
-
-
-<p class="entryBody">
-あと、<a href="http://blog.yappo.jp/yappo/" target="_blank">Yappoさん</a>がRastの利用例で、拙作の<a href="http://mizzy.org/?topic=/program/blosxomWithRast" target="_blank">blosxom+Rast</a>をちらりと書いてくださっていたのがすげーうれしかったです。実は、Yappoさんの3つ後ろの席に座っていたのですよ。
-</p>
-
-
-
-
-<p class="entryBody">
-俺はこの会場に来て、顔を拝見させて頂いているのに、向こうは俺のことをこのブログで知っていても、近くにいることは気づいてないんだよなぁ、という感覚が、なんだか妙でおかしかったです。同様に、俺がいつもブログを拝見してるけど、顔を知らない方々がこの会場に結構いるんだろうなぁ、というのも。
-</p>
-
-
-
-
-<p class="entryBody">
-内容も素晴らしかったですが、上に書いた様な、なんとも言えない雰囲気というか感覚も味わえた、そんなカンファレンスでした。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/37/">&larr; Older</a>
@@ -1531,6 +1604,10 @@ fladdict.net blogの中の人は、タグの出現頻度を可視化する手法
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1546,11 +1623,53 @@ fladdict.net blogの中の人は、タグの出現頻度を可視化する手法
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

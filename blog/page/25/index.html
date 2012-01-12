@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="catlxom 本家の svn リポジトリ に、mizzy ブランチ ができました。trac から見る場合はこちら。 trac トップページ の Authors にも名前いれてもらっちゃいました。typester さん、ありがとうございます！ 今までこのブログで書いてきた catlxom &hellip;">
+  <meta name="description" content="id:drawnboy さんがつくった Catlxom::Plugin::Format::Hatena を見て、「お、それいい！」と思ったんだけど、そもそも自分ははてダ使っていなくて、この手の記法で唯一使ってるのは Trac の Wiki 記法 なので、Catlxom::Plugin:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,202 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/17/412/">Text::Trac - Trac Wiki 記法パーサ #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-17T01:11:00+09:00" pubdate>Jun 17<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/17/412/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://d.hatena.ne.jp/drawnboy/" target="_blank">id:drawnboy</a> さんがつくった <a href="http://d.hatena.ne.jp/drawnboy/20060616/1150384749">Catlxom::Plugin::Format::Hatena</a> を見て、「お、それいい！」と思ったんだけど、そもそも自分ははてダ使っていなくて、この手の記法で唯一使ってるのは <a href="http://projects.edgewall.com/trac/wiki/WikiFormatting" target="_blank">Trac の Wiki 記法</a> なので、Catlxom::Plugin::Format::Trac が欲しいな、と思ったわけですが、Perl のパーサがないんですよね。
+</p>
+
+
+
+
+<p class="entryBody">
+で、IRC の #catlxom での会話の流れで、自分が <a href="http://trac.mizzy.org/public/browser/library/perl/trunk/Text-Trac" target="_balnk">Text::Trac</a> をつくることになりました。といってもまだつくりかけなので、CPAN にアップするのはまだ先になりそう。とりあえず興味ある方は以下の要領で取得してみてください。
+</p>
+
+
+
+
+<pre class="code">
+svn co http://svn.mizzy.org/public/library/perl/trunk/Text-Trac
+</pre>
+
+
+
+
+<p class="entryBody">
+もうほとんど <a href="http://search.cpan.org/~jkondo/Text-Hatena/" target="_blank">Text::Hatena</a> のコードそのまんまです。<a href="http://d.hatena.ne.jp/jkondo/" target="_blank">id:jkondo さん</a> と <a href="http://d.hatena.ne.jp/tociyuki/" target="_blank">id:tociyuki さん</a> に感謝感謝です。 
+</p>
+
+
+
+
+<p class="entryBody">
+とりあえず
+</p>
+
+
+
+
+<pre class="code">
+= heading1 =
+</pre>
+
+
+
+
+<p class="entryBody">
+から
+</p>
+
+
+
+
+<pre class="code">
+&lt;h1 id="heading1"&gt;heading1&lt;/h1&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+への変換のみ実装済み。
+</p>
+
+
+
+
+<p class="entryBody">
+Text::Hatena と異なる点は、
+</p>
+
+
+
+
+<pre class="code">
+my $p = Text::Trac-&gt;new(
+    custom_notation =&gt; {
+        h1node =&gt; '&lt;p&gt;$1&lt;/p&gt;',
+    },
+);
+</pre>
+
+
+
+
+<p class="entryBody">
+などと指定すると、
+</p>
+
+
+
+
+<pre class="code">
+= heading1 =
+</pre>
+
+
+
+
+<p class="entryBody">
+を
+</p>
+
+
+
+
+<pre class="code">
+&lt;p&gt;heading1&lt;/p&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+と変換する、といった感じで、記法をカスタマイズすることができます。また、
+</p>
+
+
+
+
+<pre class="code">
+my $p = Text::Trac-&gt;new(
+    min_heading_level =&gt; 2,
+);
+</pre>
+
+
+
+
+<p class="entryBody">
+と指定すると、
+</p>
+
+
+
+
+<pre class="code">
+= heading1 =
+</pre>
+
+
+
+
+<p class="entryBody">
+が
+</p>
+
+
+
+
+<pre class="code">
+&lt;h2 id="heading1"&gt;heading1&lt;/h2&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+と変換されます。なぜこんな機能をつけたかというと、catlxom プラグインとして使うことを考えた場合、通常 h1 はブログのトップ見出し、h2 はエントリのタイトルに使われるので、エントリの中では h3 以降を使うことになるかと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+だからといってエントリを書くときにいちいち、「えーと、h3 にしないといけないから、 === hogehoge === だな」とかやるのもうざいので、こんな機能をつけてみました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1658,61 +1854,6 @@ Index: lib/Catlxom/Context/Base.pm
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/28/409/">Catlxom メモ #2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-28T02:11:00+09:00" pubdate>May 28<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/05/28/409/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-catlxom の Template::TT プラグイン で、$self-&gt;classdata-&gt;{tt}-&gt;process() がエラーになっても、真っ白な画面が表示されるだけで、エラーログにも何も出なくてかなり悩む羽目になったので patch 。
-</p>
-
-
-
-
-<pre class="code">
-Index: plugins/Template/TT.pm
-===================================================================
---- plugins/Template/TT.pm      (revision 23)
-+++ plugins/Template/TT.pm      (working copy)
-@@ -84,7 +84,7 @@
-                 c =&gt; $c,
-             },
-             \$c-&gt;res-&gt;{body},
--        );
-+        ) or $c-&gt;error( $self-&gt;classdata-&gt;{tt}-&gt;error );
-     }
-
-     $self-&gt;NEXT::interpolate($c);
-</pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/26/">&larr; Older</a>
@@ -1730,6 +1871,10 @@ Index: plugins/Template/TT.pm
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1745,11 +1890,53 @@ Index: plugins/Template/TT.pm
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

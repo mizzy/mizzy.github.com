@@ -9,10 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="lopnor さん からランキング漏れを指摘されたので、naoya さんの分も合わせて更新。 || 1 || naoya さん || 240本 ||
-|| 2 || ひろせさん || 25本 ||
-|| 3 || 弊社代表取締役社長 || 10本 ||
-|| 4 || Xen Summit &hellip;">
+  <meta name="description" content="パソナテック10周年記念　PTカンファレンスVol.6 インフラエンジニア討論会2008 ～インフラエンジニア進化論～ でパネリストとして登壇してきました。 ドクターペッパーは出ませんでした。（と lopnor さん から指摘されて、そういえば、と思った。） 思ったこととかは後で書く。（ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +72,43 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/12/07/InfraEngineerPanelDiscussionFinished/">InfraEngineerPanelDiscussionFinished</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-12-07T21:59:33+09:00" pubdate>Dec 7<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/12/07/InfraEngineerPanelDiscussionFinished/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.pasonatech.co.jp/event/index.jsp?no=1137">パソナテック10周年記念　PTカンファレンスVol.6 インフラエンジニア討論会2008 ～インフラエンジニア進化論～</a> でパネリストとして登壇してきました。</p>
+
+<p>ドクターペッパーは出ませんでした。（と <a href="http://journal.soffritto.org/">lopnor さん</a> から指摘されて、そういえば、と思った。）</p>
+
+<p>思ったこととかは後で書く。（と言っておいて書かないと思う、たぶん。）</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -463,41 +497,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/06/05/Inside30daysAlbumsBackEnd/">Inside30daysAlbumsBackEnd</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-06-05T10:52:38+09:00" pubdate>Jun 5<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/06/05/Inside30daysAlbumsBackEnd/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://30d.jp/">30days Album</a> の <a href="http://30d.jugem.jp/">インフォメーションブログ</a> に、<a href="http://30d.jugem.jp/?eid=13">30days Album を支える技術 #0 ～ サーバ構成概要</a> というエントリをポストしました。</p>
-
-<p>今回は全体的なサーバ構成の概要について書いています。今後、各コンポーネント毎に、実際に担当した技術スタッフとともに、詳細掘り下げて解説していく予定です。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/10/">&larr; Older</a>
@@ -515,6 +514,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -530,11 +533,53 @@
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

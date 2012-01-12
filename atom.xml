@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-01-12T00:37:36+09:00</updated>
+  <updated>2012-01-13T02:29:43+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,19 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[coderwall badges on the sidebar]]></title>
+    <link href="http://mizzy.org/blog/2012/01/13/coderwall-badges-on-the-sidebar/"/>
+    <updated>2012-01-13T02:22:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/01/13/coderwall-badges-on-the-sidebar</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve hacked Octopress quickly for displaying <a href="http://coderwall.com/">coderwall</a> badges on the sidebar.</p>
+
+<p><img src="http://mizzy.org/images/2012/01/sidebar.png"></p>
+
+<p>This is the <a href="https://github.com/mizzy/octopress/commit/d564e8d468c29e9ef51858a40ab2f414b94540e7">changeset</a> for this hack.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Webiblo - web to ebook project]]></title>
@@ -1400,116 +1413,6 @@ lxc.network.link = eth0
 lxc.network.hwaddr = 4a:49:43:49:79:bd
 lxc.network.ipv4 = 1.2.3.4/24
 lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[DotCloudCliSourceCodeReading00]]></title>
-    <link href="http://mizzy.org/blog/2011/07/12/DotCloudCliSourceCodeReading00/"/>
-    <updated>2011-07-12T01:43:32+09:00</updated>
-    <id>http://mizzy.org/blog/2011/07/12/DotCloudCliSourceCodeReading00</id>
-    <content type="html"><![CDATA[<p>I wonder how &#8220;dotcloud push&#8221; acts, especially on uploading files, so I read the <a href="http://pypi.python.org/pypi/dotcloud.cli">dotcloud.cli source code</a>.</p>
-
-<p>If you execute &#8220;dotcloud push&#8221; with &#8211;export option, you&#8217;ll get the response like this.</p>
-
-<pre><code>$ dotcloud --export push helloworldapp
-{
-    "data": [
-        [
-            "upload", 
-            ".", 
-            "ssh://dotcloud@uploader.dotcloud.com:21122/helloworldapp", 
-            {
-                "rsync": {
-                    "excludes": [
-                        "*.pyc", 
-                        ".git", 
-                        ".hg"
-                    ]
-                }, 
-                "check": true
-            }
-        ], 
-        [
-            "call", 
-            "deploy helloworldapp.default"
-        ]
-    ], 
-    "type": "cmd"
-}
-</code></pre>
-
-<p>So you know that dotcloud command will run Remote.upload() method.(See DotCloudCliBehaviorOverView.)</p>
-
-<p>You can see the upload() method in dotcloud/cli/remote.py.</p>
-
-<pre><code>#!python
-    def upload(self, local_dir, destination, args):
-        if args.get('check'):
-            local_dir = self.check_pushdir(local_dir)
-        self.info('# upload {0} {1}'.format(local_dir, destination))
-        if os.path.isdir(os.path.join(local_dir, '.hg')):
-            return self.hg(local_dir, destination, args.get('hg', {}))
-        if os.path.isdir(os.path.join(local_dir, '.git')):
-            return self.git(local_dir, destination, args.get('git', {}))
-        return self.rsync(local_dir, destination, args.get('rsync', {}))
-</code></pre>
-
-<p>If you have .hg directory, dotcloud command runs self.hg().If you have .git directory, dotcloud command runs self.git().Otherwise dotcloud command runs self.rsync().</p>
-
-<p>You can see these methods in the same file.</p>
-
-<pre><code>#!python
-    def rsync(self, local_dir, destination, args):
-        self.info('# rsync')
-        excludes = args.get('excludes')
-        url = utils.parse_url(destination)
-        ssh = ' '.join(self._ssh_options)
-        ssh += ' -p {0}'.format(url['port'])
-        if not os.path.isfile(local_dir) and not local_dir.endswith('/'):
-            local_dir += '/'
-        rsync = (
-                    'rsync', '-lpthrvz', '--delete', '--safe-links',
-                ) + tuple('--exclude={0}'.format(e) for e in excludes) + (
-                    '-e', ssh, local_dir,
-                    '{user}@{host}:{dest}/'.format(user=url['user'],
-                        host=url['host'], dest=url['path'])
-                )
-        try:
-            ret = subprocess.call(rsync, close_fds=True)
-            if ret != 0:
-                self.warning_ssh()
-            return ret
-        except OSError:
-            self.die('rsync')
-
-    def hg(self, local_dir, destination, args):
-        self.info('# hg')
-        with utils.cd(local_dir):
-            try:
-                ssh = ' '.join(self._ssh_options)
-                args = ('hg', 'push', '--ssh', ssh, '-f', destination)
-                ret = subprocess.call(args, close_fds=True)
-                if ret != 0:
-                    self.warning_ssh()
-                return ret
-            except OSError:
-                self.die('hg')
-
-    def git(self, local_dir, destination, args):
-        self.info('# git')
-        with utils.cd(local_dir):
-            try:
-                os.environ['GIT_SSH'] = '__dotcloud_git_ssh'
-                os.environ['DOTCLOUD_SSH_KEY'] = config.CONFIG_KEY
-                ret = subprocess.call(('git', 'push', '-f', '--all',
-                    destination), close_fds=True)
-                if ret != 0:
-                    self.warning_ssh()
-                return ret
-            except OSError:
-                self.die('git')
 </code></pre>
 ]]></content>
   </entry>

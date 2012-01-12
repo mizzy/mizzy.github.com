@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="自分好みに使いやすくするために、CustomFeed::AmazonWebService と Publish::iCal を修正してみました。 CustomFeed::AmazonWebService は、$entry->author に 著者名やアーティスト名などをセットするようにしました。 &hellip;">
+  <meta name="description" content="『Plagger で Amazon2iCal 改良』 にて、Data::ICal で ORGANIZER をちゃんとしたフォーマットにする方法がわからん、と言っていたのですが、やりかたわかりました。 $event->add_properties( organizer => [ 'MAILTO: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,94 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/23/293/">Publish::iCal Patch</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-23T20:54:00+09:00" pubdate>Aug 23<span>rd</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/23/293/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/amazon2ical01.html"><span class="icon"></span>『Plagger で Amazon2iCal 改良』</a> にて、Data::ICal で ORGANIZER をちゃんとしたフォーマットにする方法がわからん、と言っていたのですが、やりかたわかりました。
+</p>
+
+
+<pre class="wiki">
+$event->add_properties(
+    organizer   => [ 'MAILTO:gosukenator@gmail.com', { CN => 'Gosuke Miyashita' } ],
+);
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://search.cpan.org/~jesse/Data-ICal-0.07/lib/Data/ICal/Entry.pm#add_property_%24propname_%3D%3E_%24propval"><span class="icon"></span>Data::ICal::Entry の pod</a> にちゃんと書いてありましたね。
+</p>
+
+
+<p>
+というわけで、organizer をちゃんとセットするように、Publish::iCal を書き換えてみました。Email::Address は <a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060815"><span class="icon"></span>Filter::ExtractAuthorName</a> から拝借してます。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm (revision 231)
++++ plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm (revision 233)
+@@ -6,4 +6,5 @@
+ use Data::ICal;
+ use Data::ICal::Entry::Event;
++use Email::Address;
+ 
+ sub register {
+@@ -34,4 +35,8 @@
+ 
+     for my $entry ($feed->entries) {
++        my $address = ( Email::Address->parse($entry->author) )[0];
++        my $mail = eval { $address->address } || 'nobody@example.com';
++        my $name = eval { $address->name } || $entry->author;
++
+         my $date = $entry->date;
+         my $event = Data::ICal::Entry::Event->new;
+@@ -39,5 +44,5 @@
+             summary     => $entry->title . ' - ' . $entry->author,
+             description => $entry->summary || $entry->body,
+-            organizer   => $entry->author,
++            organizer   => [ "MAILTO:$mail", { cn => $name } ],
+             url         => $entry->link,
+             dtstart     => join('', split('-', $date->ymd)),
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/changeset/233"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -870,130 +958,6 @@ plugins:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/07/27/340/">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-07-27T01:17:00+09:00" pubdate>Jul 27<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/07/27/340/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-perl で ffmpeg を扱うモジュールには、<a class="ext-link" href="http://search.cpan.org/~allenday/FFmpeg-5704/FFmpeg.pm"><span class="icon"></span>FFmpeg</a> というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、じゃあラッパー作ろうと思ったら、ボンヌさんも作っているということで待っていたのですが、音沙汰がないのと、早急に必要なのもあって、とりあえず作ってみました。
-</p>
-
-
-<p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"><span class="icon"></span>FFmpeg::Command</a>
-</p>
-
-
-<p>
-まだ pod が不完全ですが、とりあえず YouTube から拾った flv 動画を mpeg4 に変換して iTunes で観たり、サムネイルを JPEG で切り出したり、といったことができることを確認しました。
-</p>
-
-
-<p>
-使い方は SYNOPSYS にも書いてますが、動画の変換であればこんな感じで。
-</p>
-
-
-<pre class="wiki">
-my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
-
-$ffmpeg->input_options({
-    file => 'nba.flv',
-});
-
-$ffmpeg->output_options({
-    file                => 'nba.mp4',
-    format              => 'mp4',
-    video_codec         => 'mpeg4',
-    bitrate             => '640',
-    size                => '320x240',
-    audio_codec         => 'aac',
-    audio_sampling_rate => '44100',
-    audio_bit_rate      => '128',
-});
-
-$ffmpeg->exec();
-</pre>
-
-
-<p>
-サムネイルの切り出しはこんな感じ。（任意のオプションで実行する機能。）
-</p>
-
-
-<pre class="wiki">
-my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
-
-$ffmpeg->input_file('nba.flv');
-$ffmpeg->output_file('nba.mp4');
-
-$ffmpeg->options(
-    '-y',
-    '-f'       => 'image2',
-    '-pix_fmt' => 'jpg',
-    '-vframes' => 1,
-    '-ss'      => 30,
-    '-s'       => '320x240',
-    '-an',
-);
-
-$ffmpeg->exec();
-</pre>
-
-
-<p>
-これから実装したいと思っている機能は、以下の様な指定をすれば、iPod や PSP に適切なパラメータを勝手に設定して変換してくれる、というもの。もちろん、自分の好きな値でパラメータを上書きすることも可能な感じで。
-</p>
-
-
-<pre class="wiki">
-my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
-
-$ffmpeg->input_options({
-    file => 'nba.flv',
-});
-
-$ffmpeg->output_options({
-    file   => 'nba.mp4',
-    <strong>device => 'ipod' or 'psp',</strong>
-});
-
-$ffmpeg->exec();
-</pre>
-
-
-<p>
-ボンヌさんが作られているものと統合して、いいものになるといいな。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/24/">&larr; Older</a>
@@ -1011,6 +975,10 @@ $ffmpeg->exec();
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1026,11 +994,53 @@ $ffmpeg->exec();
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

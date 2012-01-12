@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="いまさらながら、ブログなるものをはじめることにしました。いや、正確には、今まで作ってきたコンテンツを、ブログ形式に移行していこう、といった感じです。CMSとしてブログを使う、といったところか。他にも色々思うところもあるわけですが。 旧来のコンテンツは残してますが、気分一新するため、 &hellip;">
+  <meta name="description" content="blosxomのエントリをRastで検索できるようなプラグインを作ろうと思い、Rastのperlバインディングを書かなきゃいけないなぁ、めんどくさいなぁ、と思っていたところ、既にYappoさんが作成されていました。非常にありがたいです。XSモジュール書いたことないし、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,42 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/17/350/">Blosxom + Rast #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-17T14:10:00+09:00" pubdate>Apr 17<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/17/350/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+blosxomのエントリを<a href="http://www.netlab.jp/rast/" target="_blank">Rast</a>で検索できるようなプラグインを作ろうと思い、Rastのperlバインディングを書かなきゃいけないなぁ、めんどくさいなぁ、と思っていたところ、<a href="http://blog.yappo.jp/yappo/archives/000225.html" target="_blank">既にYappoさんが作成されていました。</a>非常にありがたいです。XSモジュール書いたことないし、Cもしばらく触っていなかったので、自分でちゃんとしたモジュール作る自信がなかったので。ありがたく使わせて頂きます。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -583,57 +619,9 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/13/260/">Bloglines Mobile Gateway</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-13T11:29:00+09:00" pubdate>Apr 13<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/13/260/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-こちらもちらほらとアクセスがあるので、リンクしておく。<a href="http://mizzy.org/web/bloglines.xhtml">http://mizzy.org/web/bloglines.xhtml</a>
-</p>
-
-
-
-
-<p class="entryBody">
-バージョンが0.02とか0.03で止まってますが、自分で使う分には十分なので、これ以上の更新はないかも。もちろん、ご要望があればできる限りの対応はさせて頂きます。
-</p>
-
-
-
-
-<p class="entryBody">
-ついでに、<a href="http://blog.cy-vogue.biz/blog/bloglines_mobile_gateway.htm" target="_blank">Ck2 Blogger</a>のきゃーさんがこのgatewayを「素敵」とおっしゃってくださったので、トラックバックしてみる。blosxomのカスタマイズにあたって有用な情報がたくさんあり、かなり参考になったので感謝の意も込めて。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/41/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -646,6 +634,10 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
@@ -663,11 +655,53 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

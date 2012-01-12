@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="『特別企画 Plagger 3分 Hacking』の『Chapter 03: 俺流 Plagger 3分 Hacking』の中で、「Plagger で YouTube Casting」というお題で書かせて頂きました。 他にも竹迫さんによるとてもわかりやすい Plagger 解説やインストール方法 &hellip;">
+  <meta name="description" content="いまさら聞けない？ 初心者向けPlagger設定覚え書き その5 というエントリで、 - module: Filter::Rule rule: module: Deduped - module: SmartFeed::All といった設定（一部のみ抜粋）をしていて、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,123 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/17/401/">SmartFeed::All で生成されるフィードには Filter::Rule は適用できない</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-17T18:28:00+09:00" pubdate>Sep 17<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/17/401/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://d.hatena.ne.jp/toshi123/20060916#p1"><span class="icon"></span>いまさら聞けない？ 初心者向けPlagger設定覚え書き その5</a> というエントリで、
+</p>
+
+
+<pre class="wiki">
+  - module: Filter::Rule
+    rule:
+      module: Deduped
+
+  - module: SmartFeed::All
+</pre>
+
+
+<p>
+といった設定（一部のみ抜粋）をしていて、
+</p>
+
+
+<blockquote>
+<p>
+  過去に抽出したことのあるエントリも抽出してしまう（Dedupedによる削除がうまくできていない）という問題点がありました。
+</p>
+</blockquote>
+
+
+<p>
+と書かれているのですが、こうなる理由を理解するためには、 SmartFeed::All と Filter::Rule が動作するフェーズと、実際にどの様な流れで処理されているかを理解する必要があります。
+</p>
+
+
+<p>
+Filter::Rule も SmartFeed::All も、どちらも smartfeed.* フェーズで動作します。実際に Plagger.pm 中で smartfeed.* フェーズを実行している部分のコードは、以下の様になっています。
+</p>
+
+
+<pre class="wiki">
+    $self->run_hook('smartfeed.init');
+    for my $feed ($self->update->feeds) {
+        for my $entry ($feed->entries) {
+            $self->run_hook('smartfeed.entry', { feed => $feed, entry => $entry });
+        }
+        $self->run_hook('smartfeed.feed', { feed => $feed });
+    }
+    $self->run_hook('smartfeed.finalize');
+</pre>
+
+
+<p>
+SmartFeed::All と Filter::Rule に関わるこの部分の処理を言葉で説明すると、こんな感じです。
+</p>
+
+
+<ul><li>smartfeed.init が実行される。</li>
+<li>$self->update->feeds で現在持っているフィードをすべて抽出。ただし、<strong>この中にはまだ SmartFeed::All なフィードは存在しない</strong>。</li>
+<li>smartfeed.entry フェーズが実行され、このフェーズで SmartFeed::All なフィードが作られる。この時点では<strong>まだ Filter::Rule は実行されていないので、Deduped される前のエントリがすべて含まれることになる</strong>。</li>
+<li>smartfeed.feed フェーズが実行され、Filter::Rule による Deduped が行われる。<strong>ただし、SmartFeed::All なエントリは、$self->update->feeds で抽出したフィードの中にはないので、SmartFeed::All なエントリは Deduped の対象外</strong>。</li>
+<li>smartfeed.finalize フェーズで、SmartFeed::All なフィードが add される。（つまり、Plagger がハンドルするフィードの中に登録されることになる。）</li></ul>
+
+
+<p>
+これを要約すると、
+</p>
+
+
+<ul><li>SmartFeed::All なフィードは、各フィードが Deduped される前につくられる。</li>
+<li>SmartFeed::All なフィードは smartfeed.feed フェーズを通過しないので、Filter::Rule が適用されない。</li></ul>
+
+
+<p>
+といった理由で、SmatFeed:All なフィードに Filter::Rule が適用されない、ということになります。
+</p>
+
+
+<p>
+では、すべてのフィードをひとつにまとめた上で Rule を適用したい場合にどう書けばいいのか、ということになりますが、以下の様に書けば OK です。
+</p>
+
+
+<pre class="wiki">
+  - module: SmartFeed
+    rule:
+      module: Deduped
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1135,102 +1252,6 @@ sub clone {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/09/03/285/">View Tickets のデフォルトを変える (Trac Tips #1)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-09-03T03:49:00+09:00" pubdate>Sep 3<span>rd</span>, 2006</time>
-        
-         | <a href="/blog/2006/09/03/285/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-うちでは <a class="ext-link" href="http://trac.mizzy.org/public/"><span class="icon"></span>公開用 trac</a> の他に、プライベートな trac もあって、Wiki をメモ代わりにしたり、Tickets で TODO 管理（プログラミングとか関係なく、日常のこととかも）してたりします。
-</p>
-
-
-<p>
-で、TODO 管理は Milestone でおおざっぱにカテゴリつくっていて、View Tickets ではカテゴリ別に未消化チケットを見るために 『<a class="report" href="/report/3">{3}</a> All Tickets by Milestone』を見ることが多いので、このページをデフォルトにしようと思ったら、どこをカスタマイズしていいか分からずに意外と手間取ったので、ここにもメモしておきます。
-</p>
-
-
-<p>
-と言っても、わかってしまえば単純で、/usr/local/lib/python2.4/site-packages/trac/ticket/report.py をいじるだけです。（最初は /usr/local/share/trac/templates にあたりをつけてカスタマイズ法を探っていたので、結構時間かかりました…）
-</p>
-
-
-<p>
-70 行目付近に以下の様な記述があります。
-（ちなみにうちで使ってる trac のバージョンは 0.9.2 です。）
-</p>
-
-
-<pre class="wiki">
-    def get_navigation_items(self, req):
-        if not req.perm.has_permission('REPORT_VIEW'):
-            return
-        yield 'mainnav', 'tickets', '<a href="%s">View Tickets</a>' \
-              <strong>% util.escape(self.env.href.report())</strong>
-</pre>
-
-
-<p>
-この太字の行を次の様に変えてやれば OK です。
-</p>
-
-
-<pre class="wiki">
-              <strong>% util.escape(self.env.href.report(3))</strong>
-</pre>
-
-
-<p>
-『<a class="report" href="/report/1">{1}</a> Active Tickets』をデフォルトにしたい場合にはこんな感じで。
-</p>
-
-
-<pre class="wiki">
-              <strong>% util.escape(self.env.href.report(1))</strong>
-</pre>
-
-
-<p>
-<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060816/1155663714"><span class="icon"></span>宮川さんの様に</a> Query をデフォルトにしたい場合にはこんな感じで。
-</p>
-
-
-<pre class="wiki">
-              <strong>% util.escape(self.env.href.query())</strong>
-</pre>
-
-
-<p>
-この辺りのカスタマイズ方法って、どこかにまとまってたりしないのかな？
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/22/">&larr; Older</a>
@@ -1248,6 +1269,10 @@ sub clone {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1263,11 +1288,53 @@ sub clone {
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

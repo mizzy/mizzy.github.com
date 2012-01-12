@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ブログが続かないわけ | DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い にて、 とはいえ、僕の稼働中のアプリはすでに手動型のSchema で動いている。スキーマを作り直したら、リレーションの設定を全てしなおさなければならないので、それは現実的じゃない。 &hellip;">
+  <meta name="description" content="Linux の iostat が出している数値が、正確には何なのか、ということを知る必要があり、調べてみたのでメモ。 知りたいのは、とりあえずは以下の様に実行した場合の、rrqm/s, wrqm/s, r/s, w/s の 4 つ。 $ iostat -d -x
+Device: rrqm/s &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,79 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/05/11/510/">Linux の Iostat は何を見てるのか</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-05-11T01:54:00+09:00" pubdate>May 11<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/05/11/510/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Linux の iostat が出している数値が、正確には何なのか、ということを知る必要があり、調べてみたのでメモ。</p>
+
+<p>知りたいのは、とりあえずは以下の様に実行した場合の、rrqm/s, wrqm/s, r/s, w/s の 4 つ。</p>
+
+<pre><code>$ iostat -d -x
+Device:    rrqm/s wrqm/s   r/s   w/s  rsec/s  wsec/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
+sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40     0.77   22.15   3.26  11.39
+</code></pre>
+
+<p>特に rrqm/s, wrqm/s が man を読んでもよく分からない。</p>
+
+<pre><code>          rrqm/s
+                 The  number  of read requests merged per second that
+                 were issued to the device.
+
+          wrqm/s
+                 The number of write requests merged per second  that
+                 were issued to the device.
+</code></pre>
+
+<p>r/s, w/s が実際にデバイスにリクエストされた I/O 数で、rrqm/s, wrqm/s が、プロセスからリクエストされたものの、デバイスに渡される前にマージされたリクエスト数ではないか、推測。それが正しいかどうか確かめる。</p>
+
+<p>また、このリクエスト数というのが正確には何なのか、ということも確かめる。read/write 系のシステムコールの数？</p>
+
+<p>まずはおそらく /proc/diskstat から値を取得しているのだろう、ということで、中身を見てみると、こんな行がある。</p>
+
+<pre><code>8    0 sda 4506815 26232 69968005 66785384 37727406 87380973 1002794888 868225876 125 137597988 935021144
+</code></pre>
+
+<p>でもって、sysstat-5.0.5 の iostat.c を見てみると、544行目あたりにこんな記述があった。</p>
+
+<pre><code>if (dev_type == DT_DEVICE)
+   i = (fscanf(sysfp, "%lu %lu %llu %lu %lu %lu %llu %lu %lu %lu %lu",
+       &amp;sdev.rd_ios, &amp;sdev.rd_merges,
+       &amp;sdev.rd_sectors, &amp;sdev.rd_ticks,
+       &amp;sdev.wr_ios, &amp;sdev.wr_merges,
+       &amp;sdev.wr_sectors, &amp;sdev.wr_ticks,
+       &amp;sdev.ios_pgr, &amp;sdev.tot_ticks, &amp;sdev.rq_ticks) == 11);
+</code></pre>
+
+<p>/proc/diskstat 内の sda 右横にあるカラム数とも一致してるので、ここと考えて良さそう。そうなると、r/s, rrqm/s が 1, 2番目のカラム、w/s と wrqm/s が 5,6 番目のカラム、ってことになる。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -437,7 +511,7 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
 <h1>CO-MAINTAINER</h1>
 
-<p>Tatsuhiko Miyagawa <a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#58;&#109;&#x69;&#121;&#97;&#x67;&#x61;&#x77;&#97;&#x40;&#x62;&#x75;&#108;&#x6b;&#x6e;&#x65;&#x77;&#x73;&#x2e;&#110;&#101;&#116;">&#109;&#x69;&#121;&#97;&#103;&#97;&#119;&#97;&#x40;&#98;&#117;&#108;&#107;&#110;&#x65;&#x77;&#x73;&#46;&#x6e;&#101;&#x74;</a></p>
+<p>Tatsuhiko Miyagawa <a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#x6d;&#x69;&#121;&#97;&#x67;&#97;&#119;&#x61;&#x40;&#x62;&#117;&#108;&#x6b;&#110;&#x65;&#x77;&#x73;&#x2e;&#x6e;&#x65;&#116;">&#x6d;&#x69;&#121;&#x61;&#103;&#x61;&#x77;&#97;&#x40;&#x62;&#x75;&#x6c;&#x6b;&#110;&#101;&#x77;&#115;&#x2e;&#110;&#x65;&#x74;</a></p>
 </div>
   
   
@@ -1007,138 +1081,6 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Entry.pm/">XML-Atom-0.22/lib/XML/Atom/Entry.pm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-30T23:41:44+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Entry.pm/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Entry.pm</p>
-
-<h1>NAME</h1>
-
-<p>XML::Atom::Entry - Atom entry</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    use XML::Atom::Entry;
-    my $entry = XML::Atom::Entry-&gt;new;
-    $entry-&gt;title('My Post');
-    $entry-&gt;content('The content of my post.');
-    my $xml = $entry-&gt;as_xml;
-    my $dc &gt; 'http://purl.org/dc/elements/1.1/');
-    $entry-&gt;set($dc, 'subject', 'Food &amp; Drink');
-</code></pre>
-
-<h1>USAGE</h1>
-
-<h2>XML::Atom::Entry->new([ $stream ])</h2>
-
-<p>Creates a new entry object, and if <em>$stream&#8221; is supplied, fills it with the data specified by &#8221;$stream</em>.</p>
-
-<p>Automatically handles autodiscovery if <em>$stream</em> is a URI (see below).</p>
-
-<p>Returns the new <em>XML::Atom::Entry</em> object. On failure, returns <code>undef</code>.</p>
-
-<p><em>$stream</em> can be any one of the following:</p>
-
-<ul>
-<li>Reference to a scalar</li>
-</ul>
-
-
-<p> This is treated as the XML body of the entry.</p>
-
-<ul>
-<li>Scalar</li>
-</ul>
-
-
-<p> This is treated as the name of a file containing the entry XML.</p>
-
-<ul>
-<li>Filehandle</li>
-</ul>
-
-
-<p> This is treated as an open filehandle from which the entry XML can be read.</p>
-
-<h2>$entry->content([ $content ])</h2>
-
-<p>Returns the content of the entry. If <em>$content</em> is given, sets the content of the entry. Automatically handles all necessary escaping.</p>
-
-<h2>$entry->author([ $author ])</h2>
-
-<p>Returns an <em>XML::Atom::Person</em> object representing the author of the entry, or <code>undef</code> if there is no author information present.</p>
-
-<p>If <em>$author&#8221; is supplied, it should be an &#8221;XML::Atom::Person</em> object representing the author. For example:</p>
-
-<pre><code>    my $author = XML::Atom::Person-&gt;new;
-    $author-&gt;name('Foo Bar');
-    $author-&gt;email('foo@bar.com');
-    $entry-&gt;author($author);
-</code></pre>
-
-<h2>$entry->link</h2>
-
-<p>If called in scalar context, returns an <em>XML::Atom::Link&#8221; object corresponding to the first &#8221;<link></em> tag found in the entry.</p>
-
-<p>If called in list context, returns a list of <em>XML::Atom::Link&#8221; objects corresponding to all of the &#8221;<link></em> tags found in the entry.</p>
-
-<h2>$entry->add_link($link)</h2>
-
-<p>Adds the link <em>$link&#8221;, which must be an &#8221;XML::Atom::Link&#8221; object, to the entry as a new &#8221;<link></em> tag. For example:</p>
-
-<pre><code>    my $link = XML::Atom::Link-&gt;new;
-    $link-&gt;type('text/html');
-    $link-&gt;rel('alternate');
-    $link-&gt;href('http://www.example.com/2003/12/post.html');
-    $entry-&gt;add_link($link);
-</code></pre>
-
-<h2>$entry->get($ns, $element)</h2>
-
-<p>Given an <em>XML::Atom::Namespace&#8221; element &#8221;$ns&#8221; and an element name &#8221;$element</em>, retrieves the value for the element in that namespace.</p>
-
-<p>This is useful for retrieving the value of elements not in the main Atom namespace, like categories. For example:</p>
-
-<pre><code>    my $dc &gt; 'http://purl.org/dc/elements/1.1/');
-    my $subj = $entry-&gt;get($dc, 'subject');
-</code></pre>
-
-<h2>$entry->getlist($ns, $element)</h2>
-
-<p>Just like <em>$entry->get&#8221;, but if there are multiple instances of the element &#8221;$element&#8221; in the namespace &#8221;$ns&#8221;, returns all of them. &#8221;get</em> will return only the first.</p>
-
-<h1>AUTHOR &amp; COPYRIGHT</h1>
-
-<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/15/">&larr; Older</a>
@@ -1156,6 +1098,10 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1171,11 +1117,53 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

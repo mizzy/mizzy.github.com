@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="source:library/perl/trunk/Parse-Apache-ServerStatus-Extended/lib/Parse/Apache/ServerStatus/Extended.pm NAME Parse::Apache::ServerStatus::Extended - &hellip;">
+  <meta name="description" content="&#8220;mod_dosdetecter 0.2&#8221;:http://sourceforge.net/projects/moddosdetector/ を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、 /usr/local/apache/include/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,196 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/07/26/519/">Mod_dosdetector を Apache 2.0 系で動かすパッチ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-07-26T22:32:00+09:00" pubdate>Jul 26<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/07/26/519/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>&#8220;mod_dosdetecter 0.2&#8221;:http://sourceforge.net/projects/moddosdetector/ を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、</p>
+
+<ul>
+<li>/usr/local/apache/include/pcreposix.h:41: error: redeclaration of enumerator `REG_BADBR&#8217; といったエラーが大量に出てくるが、これは /usr/include/regex.h と宣言が重複しているため。なので、#include &lt;regex.h&gt; は削除。</li>
+<li>ap_regmatch_t 構造体と ap_regex_t 構造体は 2.2 系にのみ存在し、2.0 系には存在しない。なのでそれぞれ、regmatch_t, regex_t に置き換える。</li>
+<li>apr_shm_remove は 2.2系 でしか使えないので、そのための修正を &#8220;mod_fcgid のソース&#8221;:http://mod-fcgid.cvs.sourceforge.net/mod-fcgid/mod_fcgid/arch/unix/fcgid_proctbl_unix.c?r1=1.7&amp;r2=1.8 からパクる。</li>
+<li>set_ignore_contenttype_config() がセグフォるので修正</li>
+</ul>
+
+
+<pre><code>=== mod_dosdetector.c
+==================================================================
+--- mod_dosdetector.c   (revision 804)
++++ mod_dosdetector.c   (local)
+@@ -28,7 +28,6 @@
+ #include <arpa/inet.h>
+ //#include <netinet/in.h>
+ #include <time.h>
+-#include <regex.h>
+ #include "httpd.h"
+ #include "http_config.h"
+ #include "http_request.h"
+@@ -41,6 +40,7 @@
+ #include "apr_strings.h"
+ #include "apr_shm.h"
+ #include "apr_thread_mutex.h"
++#include "apr_version.h"
+ 
+ //#define _DEBUG
+ 
+@@ -102,7 +102,90 @@
+ static apr_global_mutex_t *lock = NULL;
+ static apr_shm_t *shm = NULL;
+ 
++/* apr version 0.x not support apr_shm_remove, I have to copy it from apr version 1.x */
++#if (APR_MAJOR_VERSION < 1)
++#ifdef HAVE_SYS_MMAN_H
++#include <sys/mman.h>
++#endif
++#ifdef HAVE_SYS_IPC_H
++#include <sys/ipc.h>
++#endif
++#ifdef HAVE_SYS_MUTEX_H
++#include <sys/mutex.h>
++#endif
++#ifdef HAVE_SYS_SHM_H
++#include <sys/shm.h>
++#endif
++#if !defined(SHM_R)
++#define SHM_R 0400
++#endif
++#if !defined(SHM_W)
++#define SHM_W 0200
++#endif
++#ifdef HAVE_SYS_FILE_H
++#include <sys/file.h>
++#endif
+ 
++static apr_status_t apr_shm_remove(const char *filename, apr_pool_t * pool)
++{
++#if APR_USE_SHMEM_SHMGET
++   apr_status_t status;
++   apr_file_t *file;
++   key_t shmkey;
++   int shmid;
++#endif
++
++#if APR_USE_SHMEM_MMAP_TMP
++   return apr_file_remove(filename, pool);
++#endif
++#if APR_USE_SHMEM_MMAP_SHM
++   if (shm_unlink(filename) == -1) {
++       return errno;
++   }
++   return APR_SUCCESS;
++#endif
++#if APR_USE_SHMEM_SHMGET
++   /* Presume that the file already exists; just open for writing */
++   status = apr_file_open(&file, filename, APR_WRITE,
++                          APR_OS_DEFAULT, pool);
++   if (status) {
++       return status;
++   }
++
++   /* ftok() (on solaris at least) requires that the file actually
++    * exist before calling ftok(). */
++   shmkey = ftok(filename, 1);
++   if (shmkey == (key_t) - 1) {
++       goto shm_remove_failed;
++   }
++
++   apr_file_close(file);
++
++   if ((shmid = shmget(shmkey, 0, SHM_R | SHM_W)) < 0) {
++       goto shm_remove_failed;
++   }
++
++   /* Indicate that the segment is to be destroyed as soon
++    * as all processes have detached. This also disallows any
++    * new attachments to the segment. */
++   if (shmctl(shmid, IPC_RMID, NULL) == -1) {
++       goto shm_remove_failed;
++   }
++   return apr_file_remove(filename, pool);
++
++  shm_remove_failed:
++   status = errno;
++   /* ensure the file has been removed anyway. */
++   apr_file_remove(filename, pool);
++   return status;
++#endif
++
++   /* No support for anonymous shm */
++   return APR_ENOTIMPL;
++}
++#endif                         /* APR_MAJOR_VERSION<1 */
++
++
+ static apr_status_t cleanup_shm(void *not_used)
+ {
+     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, "Notice: cleaning up shared memory");
+@@ -261,8 +344,8 @@
+ 
+    address = r->connection->remote_ip;
+ 
+-    ap_regmatch_t regmatch[AP_MAX_REG_MATCH];
+-    ap_regex_t **contenttype_regexp = (ap_regex_t **) cfg->contenttype_regexp->elts;
++    regmatch_t regmatch[AP_MAX_REG_MATCH];
++    regex_t **contenttype_regexp = (regex_t **) cfg->contenttype_regexp->elts;
+    for (i = 0; i < cfg->contenttype_regexp->nelts; i++) {
+        if(!ap_regexec(contenttype_regexp[i], content_type, AP_MAX_REG_MATCH, regmatch, 0)){
+            //ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, 0, "ignoring content-type: %s", content_type);
+@@ -390,15 +473,13 @@
+                     const char *arg)
+ {
+     dosdetector_dir_config *cfg = (dosdetector_dir_config *) mconfig;
+-    char **ignore_contenttype = (char **) cfg->ignore_contenttype->elts;
++    regex_t *regexp;
++    char *type;
+ 
+-    *(char **) apr_array_push(cfg->ignore_contenttype) = apr_pstrdup(parms->pool, arg);
+-
+-   int i;
+-   regex_t *regexp;
+-   for (i = 0; i < cfg->ignore_contenttype->nelts; i++) {
+-        regexp = (regex_t *)ap_pregcomp(parms->pool, (char *)ignore_contenttype[i], REG_EXTENDED|REG_ICASE);
+-       *(regex_t **)apr_array_push(cfg->contenttype_regexp) = regexp;
++    while (*arg) {
++      type = ap_getword_conf(parms->pool, &arg);
++      regexp = ap_pregcomp(parms->pool, type, REG_EXTENDED|REG_ICASE);
++      *(regex_t **)apr_array_push(cfg->contenttype_regexp) = regexp;
+     }
+ 
+     return NULL;
+</code></pre>
+
+
+<p>2.0 系でも 2.2 系でもどっちでも動くように修正した方がいいんだろうけど、それはまた今度。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -678,79 +868,6 @@ $ ./fizzbuzz
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/05/11/510/">Linux の Iostat は何を見てるのか</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-05-11T01:54:00+09:00" pubdate>May 11<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/05/11/510/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Linux の iostat が出している数値が、正確には何なのか、ということを知る必要があり、調べてみたのでメモ。</p>
-
-<p>知りたいのは、とりあえずは以下の様に実行した場合の、rrqm/s, wrqm/s, r/s, w/s の 4 つ。</p>
-
-<pre><code>$ iostat -d -x
-Device:    rrqm/s wrqm/s   r/s   w/s  rsec/s  wsec/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
-sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40     0.77   22.15   3.26  11.39
-</code></pre>
-
-<p>特に rrqm/s, wrqm/s が man を読んでもよく分からない。</p>
-
-<pre><code>          rrqm/s
-                 The  number  of read requests merged per second that
-                 were issued to the device.
-
-          wrqm/s
-                 The number of write requests merged per second  that
-                 were issued to the device.
-</code></pre>
-
-<p>r/s, w/s が実際にデバイスにリクエストされた I/O 数で、rrqm/s, wrqm/s が、プロセスからリクエストされたものの、デバイスに渡される前にマージされたリクエスト数ではないか、推測。それが正しいかどうか確かめる。</p>
-
-<p>また、このリクエスト数というのが正確には何なのか、ということも確かめる。read/write 系のシステムコールの数？</p>
-
-<p>まずはおそらく /proc/diskstat から値を取得しているのだろう、ということで、中身を見てみると、こんな行がある。</p>
-
-<pre><code>8    0 sda 4506815 26232 69968005 66785384 37727406 87380973 1002794888 868225876 125 137597988 935021144
-</code></pre>
-
-<p>でもって、sysstat-5.0.5 の iostat.c を見てみると、544行目あたりにこんな記述があった。</p>
-
-<pre><code>if (dev_type == DT_DEVICE)
-   i = (fscanf(sysfp, "%lu %lu %llu %lu %lu %lu %llu %lu %lu %lu %lu",
-       &amp;sdev.rd_ios, &amp;sdev.rd_merges,
-       &amp;sdev.rd_sectors, &amp;sdev.rd_ticks,
-       &amp;sdev.wr_ios, &amp;sdev.wr_merges,
-       &amp;sdev.wr_sectors, &amp;sdev.wr_ticks,
-       &amp;sdev.ios_pgr, &amp;sdev.tot_ticks, &amp;sdev.rq_ticks) == 11);
-</code></pre>
-
-<p>/proc/diskstat 内の sda 右横にあるカラム数とも一致してるので、ここと考えて良さそう。そうなると、r/s, rrqm/s が 1, 2番目のカラム、w/s と wrqm/s が 5,6 番目のカラム、ってことになる。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/14/">&larr; Older</a>
@@ -768,6 +885,10 @@ sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -783,11 +904,53 @@ sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40 
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

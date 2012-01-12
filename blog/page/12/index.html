@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Perlbal で Vpaths プラグインをつかって、 LOAD vpaths CREATE POOL apache POOL apache ADD 127.0.0.1 CREATE SERVICE apache_proxy SET role = reverse_proxy SET pool &hellip;">
+  <meta name="description" content="現在、LISA という大規模システム管理者向けカンファレンスへの参加のため、ダラスに来ています。自分は 11/14 - 11/16 に開催されるテクニカルセッションのみに参加していて、本日はテクニカルセッションの初日でした。今日聞いた中で気になったテーマについて、さらっとご紹介、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,104 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/16/LISA07TechSessionFirstDay/">LISA07TechSessionFirstDay</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-11-16T07:09:21+09:00" pubdate>Nov 16<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/11/16/LISA07TechSessionFirstDay/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>現在、<a href="http://www.usenix.org/events/lisa07/">LISA</a> という大規模システム管理者向けカンファレンスへの参加のため、ダラスに来ています。自分は 11/14 - 11/16 に開催されるテクニカルセッションのみに参加していて、本日はテクニカルセッションの初日でした。今日聞いた中で気になったテーマについて、さらっとご紹介、というか自分用にまとめてみます。</p>
+
+<h1>CAMP: A Common API for Measuring Performance</h1>
+
+<p>名前の通り、パフォーマンス計測のための API。異なる OS が混在する分散システムでのパフォーマンステストを正確に行うために、共通な API を定義しよう、という試み。</p>
+
+<p><a href="http://www.usenix.org/events/lisa07/tech/gabel.html">概要はこちら</a>。ここから論文すべて（HTML or PDF）を参照できる。（2008年11月までは、USENIX メンバーじゃないとアクセスできない、と書いてあるけど、アクセス制限はかかってないみたい。いいのかな？）</p>
+
+<p>CAMP は Python で実装されていて、以下のようなコードでパフォーマンスデータが取得できる。</p>
+
+<pre><code>#!python
+# Calculate the current transfer rate (Both
+# in and out) for the given network adapter.
+def BulkByteTransferRate(adapter):
+    # Query CAMP for the initial state.
+    initial = GetNetBytesSent(adapter)
+    initial += GetNetBytesRecvd(adapter)
+    time.sleep(SAMPLE_INTERVAL)
+    # Query CAMP for the final state.
+    final = GetNetBytesSent(adapter)
+    final += GetNetBytesRecvd(adapter)
+    return (final - initial)/SAMPLE_INTERVAL
+</code></pre>
+
+<p>GetNetBytesSent や GetNetBytesRecvd が CAMP によって提供されているメソッド。</p>
+
+<p>現在対応している OS は、</p>
+
+<ul>
+<li>Linux 2.6</li>
+<li>Win32 (Windows NT/2000/XP)</li>
+<li>Solaris (SunOS kernel 5.x)</li>
+</ul>
+
+
+<p>の3種類。パフォーマンスデータの取得は、Linux では proc、Windows では Microsoft&#8217;s performance data handler (PDH) interface、Solaris では proc と kstat を利用しているとのこと。</p>
+
+<p>論文の中では、CAMP によって取得できるパフォーマンスデータの妥当性に関する検証や、CAMP 自体のパフォーマンス、オーバーヘッドに関する検証データも載っている。</p>
+
+<p>proc ファイルシステムへのアクセスオーバヘッドの低さから、特に Linux でのパフォーマンスは高いみたい。</p>
+
+<p>パフォーマンスデータを取得するのであれば、SNMP でもできるのでは、と思ったけど、これについても論文でちゃんと触れられていて、SNMP は UDP によるアプリケーションプロトコルであり、CAMP を利用することで OS に依存しない SNMP エージェントを実装する、といった形での住み分けができる、といったことが書かれていた。</p>
+
+<p><a href="http://wiki.csc.calpoly.edu/camp">CAMP の Trac サイト</a>が存在するけど、内容はまだ何もない。「<strong> Download coming soon! </strong>」ということなので、ソースが公開されたら要チェック。</p>
+
+<h1>Application Buffer-Cache Management for Performance: Running the World’s Largest MRTG</h1>
+
+<p>OS のディスク I/O 先読みとバッファキャッシュは通常、アプリケーションのパフォーマンスを高めるものであるが、大規模ネットワークで MRTG を運用していると、逆にパフォーマンスを低下させてしまう、ということについて、何がボトルネックになっているのか、どうやってそのボトルネックを解消するのか、といったことに関する考察。<a href="http://www.usenix.org/events/lisa07/tech/plonka.html">概要はこちら</a>。</p>
+
+<p>まず、大規模ネットワークサイトでの MRTG の処理時間がグラフで示されている。これによると、5分おきに MRTG を実行しているにも関わらず、半分ほどの処理が5分以内に完了していない、という結果に。そして、MRTG のボトルネックはディスク I/O であり、特に read の比率が高い、ということが示されている。</p>
+
+<p>MRTG は RRDtool を利用しているが、RRD ファイルは特性として、一度の操作で読み書きするブロックがシーケンシャルになっていない。そのため、OS がシーケンシャルにファイルを先読みすることによって、読み込む必要のないブロックまで読み込んでしまい、余分な I/O が発生する、ということがボトルネックの一因。いわゆる余計なお世話。</p>
+
+<p>また、必要のないブロックを読み込んでバッファキャッシュに載せるため、キャッシュに本当に載せてほしいブロックが載らずに、ページフォルトが発生する、というのもボトルネックの一因。</p>
+
+<p>この調査のために、<a href="http://net.doit.wisc.edu/~plonka/fincore/">fincore</a> という、指定したファイルのどのページがバッファキャッシュに載っているのかを表示するツールを作っている。</p>
+
+<p>ボトルネックを解消するアプローチのひとつは、独自のキャッシュライブラリを作成して、MRTG にこのライブラリ経由でファイル操作をさせる、というもの。これにより、ほとんどの処理が1分以内で完了するようになった。（ただし、キャッシュの処理は図を見るとちょっと複雑。）</p>
+
+<p>もうひとつのアプローチは、アプリケーションのファイルアクセス特性を OS に伝えることによって、OS のディスクI/O に関する挙動を変えたり、キャッシュアルゴリズムを変えたり、といったことが可能な、<a href="http://docs.hp.com/ja/B2355-60129/fadvise.2.html">POSIX fadvise システムコール</a>を利用して MRTG を動かす、というもの。</p>
+
+<p><a href="http://net.doit.wisc.edu/~plonka/fadvise/">fadvise を実行する Perl スクリプト</a> も作成している。</p>
+
+<p>論文では FADV_RANDOM を指定することによって、OS に対してアプリケーションが、シーケンシャルではなくランダムにファイルアクセスすることを伝えている。これにより OS は先読みをしなくなり余計なI/Oが発生しないし、余分なデータを読み込まないのでバッファキャッシュも無駄なく利用できる。（FADV_RANDOM という言葉は出てないけど、たぶんそうだと思う。）</p>
+
+<p>このアプローチでもほとんどの処理が1分以内に完了する、という結果に。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -966,196 +1064,6 @@ Retrieving log information from 1 to 62
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/07/26/519/">Mod_dosdetector を Apache 2.0 系で動かすパッチ</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-07-26T22:32:00+09:00" pubdate>Jul 26<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/07/26/519/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>&#8220;mod_dosdetecter 0.2&#8221;:http://sourceforge.net/projects/moddosdetector/ を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、</p>
-
-<ul>
-<li>/usr/local/apache/include/pcreposix.h:41: error: redeclaration of enumerator `REG_BADBR&#8217; といったエラーが大量に出てくるが、これは /usr/include/regex.h と宣言が重複しているため。なので、#include &lt;regex.h&gt; は削除。</li>
-<li>ap_regmatch_t 構造体と ap_regex_t 構造体は 2.2 系にのみ存在し、2.0 系には存在しない。なのでそれぞれ、regmatch_t, regex_t に置き換える。</li>
-<li>apr_shm_remove は 2.2系 でしか使えないので、そのための修正を &#8220;mod_fcgid のソース&#8221;:http://mod-fcgid.cvs.sourceforge.net/mod-fcgid/mod_fcgid/arch/unix/fcgid_proctbl_unix.c?r1=1.7&amp;r2=1.8 からパクる。</li>
-<li>set_ignore_contenttype_config() がセグフォるので修正</li>
-</ul>
-
-
-<pre><code>=== mod_dosdetector.c
-==================================================================
---- mod_dosdetector.c   (revision 804)
-+++ mod_dosdetector.c   (local)
-@@ -28,7 +28,6 @@
- #include <arpa/inet.h>
- //#include <netinet/in.h>
- #include <time.h>
--#include <regex.h>
- #include "httpd.h"
- #include "http_config.h"
- #include "http_request.h"
-@@ -41,6 +40,7 @@
- #include "apr_strings.h"
- #include "apr_shm.h"
- #include "apr_thread_mutex.h"
-+#include "apr_version.h"
- 
- //#define _DEBUG
- 
-@@ -102,7 +102,90 @@
- static apr_global_mutex_t *lock = NULL;
- static apr_shm_t *shm = NULL;
- 
-+/* apr version 0.x not support apr_shm_remove, I have to copy it from apr version 1.x */
-+#if (APR_MAJOR_VERSION < 1)
-+#ifdef HAVE_SYS_MMAN_H
-+#include <sys/mman.h>
-+#endif
-+#ifdef HAVE_SYS_IPC_H
-+#include <sys/ipc.h>
-+#endif
-+#ifdef HAVE_SYS_MUTEX_H
-+#include <sys/mutex.h>
-+#endif
-+#ifdef HAVE_SYS_SHM_H
-+#include <sys/shm.h>
-+#endif
-+#if !defined(SHM_R)
-+#define SHM_R 0400
-+#endif
-+#if !defined(SHM_W)
-+#define SHM_W 0200
-+#endif
-+#ifdef HAVE_SYS_FILE_H
-+#include <sys/file.h>
-+#endif
- 
-+static apr_status_t apr_shm_remove(const char *filename, apr_pool_t * pool)
-+{
-+#if APR_USE_SHMEM_SHMGET
-+   apr_status_t status;
-+   apr_file_t *file;
-+   key_t shmkey;
-+   int shmid;
-+#endif
-+
-+#if APR_USE_SHMEM_MMAP_TMP
-+   return apr_file_remove(filename, pool);
-+#endif
-+#if APR_USE_SHMEM_MMAP_SHM
-+   if (shm_unlink(filename) == -1) {
-+       return errno;
-+   }
-+   return APR_SUCCESS;
-+#endif
-+#if APR_USE_SHMEM_SHMGET
-+   /* Presume that the file already exists; just open for writing */
-+   status = apr_file_open(&file, filename, APR_WRITE,
-+                          APR_OS_DEFAULT, pool);
-+   if (status) {
-+       return status;
-+   }
-+
-+   /* ftok() (on solaris at least) requires that the file actually
-+    * exist before calling ftok(). */
-+   shmkey = ftok(filename, 1);
-+   if (shmkey == (key_t) - 1) {
-+       goto shm_remove_failed;
-+   }
-+
-+   apr_file_close(file);
-+
-+   if ((shmid = shmget(shmkey, 0, SHM_R | SHM_W)) < 0) {
-+       goto shm_remove_failed;
-+   }
-+
-+   /* Indicate that the segment is to be destroyed as soon
-+    * as all processes have detached. This also disallows any
-+    * new attachments to the segment. */
-+   if (shmctl(shmid, IPC_RMID, NULL) == -1) {
-+       goto shm_remove_failed;
-+   }
-+   return apr_file_remove(filename, pool);
-+
-+  shm_remove_failed:
-+   status = errno;
-+   /* ensure the file has been removed anyway. */
-+   apr_file_remove(filename, pool);
-+   return status;
-+#endif
-+
-+   /* No support for anonymous shm */
-+   return APR_ENOTIMPL;
-+}
-+#endif                         /* APR_MAJOR_VERSION<1 */
-+
-+
- static apr_status_t cleanup_shm(void *not_used)
- {
-     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, "Notice: cleaning up shared memory");
-@@ -261,8 +344,8 @@
- 
-    address = r->connection->remote_ip;
- 
--    ap_regmatch_t regmatch[AP_MAX_REG_MATCH];
--    ap_regex_t **contenttype_regexp = (ap_regex_t **) cfg->contenttype_regexp->elts;
-+    regmatch_t regmatch[AP_MAX_REG_MATCH];
-+    regex_t **contenttype_regexp = (regex_t **) cfg->contenttype_regexp->elts;
-    for (i = 0; i < cfg->contenttype_regexp->nelts; i++) {
-        if(!ap_regexec(contenttype_regexp[i], content_type, AP_MAX_REG_MATCH, regmatch, 0)){
-            //ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, 0, "ignoring content-type: %s", content_type);
-@@ -390,15 +473,13 @@
-                     const char *arg)
- {
-     dosdetector_dir_config *cfg = (dosdetector_dir_config *) mconfig;
--    char **ignore_contenttype = (char **) cfg->ignore_contenttype->elts;
-+    regex_t *regexp;
-+    char *type;
- 
--    *(char **) apr_array_push(cfg->ignore_contenttype) = apr_pstrdup(parms->pool, arg);
--
--   int i;
--   regex_t *regexp;
--   for (i = 0; i < cfg->ignore_contenttype->nelts; i++) {
--        regexp = (regex_t *)ap_pregcomp(parms->pool, (char *)ignore_contenttype[i], REG_EXTENDED|REG_ICASE);
--       *(regex_t **)apr_array_push(cfg->contenttype_regexp) = regexp;
-+    while (*arg) {
-+      type = ap_getword_conf(parms->pool, &arg);
-+      regexp = ap_pregcomp(parms->pool, type, REG_EXTENDED|REG_ICASE);
-+      *(regex_t **)apr_array_push(cfg->contenttype_regexp) = regexp;
-     }
- 
-     return NULL;
-</code></pre>
-
-
-<p>2.0 系でも 2.2 系でもどっちでも動くように修正した方がいいんだろうけど、それはまた今度。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -1173,6 +1081,10 @@ Retrieving log information from 1 to 62
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1188,11 +1100,53 @@ Retrieving log information from 1 to 62
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

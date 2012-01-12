@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Now I&#8217;m investigating the behavior of dotcloud.cli.I will write down the things I found. With &#8211;export option, you can see the raw &hellip;">
+  <meta name="description" content="I wonder how &#8220;dotcloud push&#8221; acts, especially on uploading files, so I read the dotcloud.cli source code. If you execute &#8220;dotcloud &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,140 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/12/DotCloudCliSourceCodeReading00/">DotCloudCliSourceCodeReading00</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-07-12T01:43:32+09:00" pubdate>Jul 12<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/12/DotCloudCliSourceCodeReading00/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I wonder how &#8220;dotcloud push&#8221; acts, especially on uploading files, so I read the <a href="http://pypi.python.org/pypi/dotcloud.cli">dotcloud.cli source code</a>.</p>
+
+<p>If you execute &#8220;dotcloud push&#8221; with &#8211;export option, you&#8217;ll get the response like this.</p>
+
+<pre><code>$ dotcloud --export push helloworldapp
+{
+    "data": [
+        [
+            "upload", 
+            ".", 
+            "ssh://dotcloud@uploader.dotcloud.com:21122/helloworldapp", 
+            {
+                "rsync": {
+                    "excludes": [
+                        "*.pyc", 
+                        ".git", 
+                        ".hg"
+                    ]
+                }, 
+                "check": true
+            }
+        ], 
+        [
+            "call", 
+            "deploy helloworldapp.default"
+        ]
+    ], 
+    "type": "cmd"
+}
+</code></pre>
+
+<p>So you know that dotcloud command will run Remote.upload() method.(See DotCloudCliBehaviorOverView.)</p>
+
+<p>You can see the upload() method in dotcloud/cli/remote.py.</p>
+
+<pre><code>#!python
+    def upload(self, local_dir, destination, args):
+        if args.get('check'):
+            local_dir = self.check_pushdir(local_dir)
+        self.info('# upload {0} {1}'.format(local_dir, destination))
+        if os.path.isdir(os.path.join(local_dir, '.hg')):
+            return self.hg(local_dir, destination, args.get('hg', {}))
+        if os.path.isdir(os.path.join(local_dir, '.git')):
+            return self.git(local_dir, destination, args.get('git', {}))
+        return self.rsync(local_dir, destination, args.get('rsync', {}))
+</code></pre>
+
+<p>If you have .hg directory, dotcloud command runs self.hg().If you have .git directory, dotcloud command runs self.git().Otherwise dotcloud command runs self.rsync().</p>
+
+<p>You can see these methods in the same file.</p>
+
+<pre><code>#!python
+    def rsync(self, local_dir, destination, args):
+        self.info('# rsync')
+        excludes = args.get('excludes')
+        url = utils.parse_url(destination)
+        ssh = ' '.join(self._ssh_options)
+        ssh += ' -p {0}'.format(url['port'])
+        if not os.path.isfile(local_dir) and not local_dir.endswith('/'):
+            local_dir += '/'
+        rsync = (
+                    'rsync', '-lpthrvz', '--delete', '--safe-links',
+                ) + tuple('--exclude={0}'.format(e) for e in excludes) + (
+                    '-e', ssh, local_dir,
+                    '{user}@{host}:{dest}/'.format(user=url['user'],
+                        host=url['host'], dest=url['path'])
+                )
+        try:
+            ret = subprocess.call(rsync, close_fds=True)
+            if ret != 0:
+                self.warning_ssh()
+            return ret
+        except OSError:
+            self.die('rsync')
+
+    def hg(self, local_dir, destination, args):
+        self.info('# hg')
+        with utils.cd(local_dir):
+            try:
+                ssh = ' '.join(self._ssh_options)
+                args = ('hg', 'push', '--ssh', ssh, '-f', destination)
+                ret = subprocess.call(args, close_fds=True)
+                if ret != 0:
+                    self.warning_ssh()
+                return ret
+            except OSError:
+                self.die('hg')
+
+    def git(self, local_dir, destination, args):
+        self.info('# git')
+        with utils.cd(local_dir):
+            try:
+                os.environ['GIT_SSH'] = '__dotcloud_git_ssh'
+                os.environ['DOTCLOUD_SSH_KEY'] = config.CONFIG_KEY
+                ret = subprocess.call(('git', 'push', '-f', '--all',
+                    destination), close_fds=True)
+                if ret != 0:
+                    self.warning_ssh()
+                return ret
+            except OSError:
+                self.die('git')
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1484,77 +1618,6 @@ port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/04/05/NagiosBook/">NagiosBook</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-04-05T01:03:02+09:00" pubdate>Apr 5<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/04/05/NagiosBook/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>!html</h1>
-
-<pre><code>&lt;a href="http://www.amazon.co.jp/dp/4774145823"&gt;&lt;img src="http://image.gihyo.co.jp/assets/images/cover/2011/9784774145822.jpg" /&gt;&lt;/a&gt;
-</code></pre>
-
-<p>技術評論社様よりご献本頂きました。</p>
-
-<p>タイトルの通り、監視ソフトウェア <a href="http://www.nagios.org/">Nagios</a> のリファレンス本です。日本語の Nagios に関する書籍としては、<a href="http://www.amazon.co.jp/dp/4839920168">Nagios 2.0オープンソースではじめるシステム&amp;ネットワーク監視</a> につづいて2冊目ですかね。（著者は同じ方のようです。）</p>
-
-<p>本書の目次は以下のようになっています。</p>
-
-<ul>
-<li>第1章 Nagiosクイックスタート</li>
-<li>第2章 Nagios標準プラグイン</li>
-<li>第3章 メイン設定ファイル</li>
-<li>第4章 CGI設定ファイル</li>
-<li>第5章 オブジェクト設定ファイル</li>
-<li>Appendix A Nagiosと周辺ツールの導入</li>
-<li>Appendix B リソース設定ファイルとNagios標準マクロの概要</li>
-</ul>
-
-
-<p>同じ Software Design plus シリーズの監視ソフトウェアを扱った書籍である [wiki:ZabbixBook Zabbix統合監視「実践」入門 〜障害通知、傾向分析、可視化による省力運用〜] は、タイトルの通り入門書という感じで、はじめて Zabbix に触れる人を対象に、インストールから設定まで丁寧に書かれてるのに対し、こちらは「リファレンス」の名の通り、どちらかというと既に Nagios を利用している人向けのリファレンスとなっています。</p>
-
-<p>第1章ではざっくりと Nagios とは何かの説明がされてますが、第2章以降はすべてプラグインや設定ファイル、設定項目ひとつひとつに関する説明がひたすら続いていきます。（Appendix A でインストールに関する説明があります。）</p>
-
-<p>実際にサービス運用監視で Nagios を利用している人が手元に置いておいて、あれ、このプラグインのパラメータって何をどういう風に渡すんだっけ、とか、この設定項目いじると何がどうなるんだっけ、などといった時にパラパラめくったりするのに良さそうですね。</p>
-
-<p>とは言うものの、<a href="http://www.paperboy.co.jp/">ペパボ</a> では Nagios 使ってるんですが、自分はサービスの運用監視には直接関わっていないため、Nagios にほとんど触れることがないんで、宝の持ち腐れですね。（監視シフトに合わせてウェブ上で timeperiods.cfg を設定するようなツールを作ったことがあるぐらいですね。） 良い機会なので、自宅サーバに Nagios 導入してみようかな。</p>
-
-<p>あとこの本とは関係ないですが、Nagios といえば度々話題になるのは、どう発音するのか、ですよね。FAQ へのリンク貼っておきます。</p>
-
-<ul>
-<li><a href="http://support.nagios.com/knowledgebase/faqs/index.php?option=com_content&amp;view=article&amp;id=52&amp;catid=35&amp;faq_id=3&amp;expand=false&amp;showdesc=true">How do you pronounce Nagios?</a></li>
-<li><a href="http://community.nagios.org/2007/02/20/nagios-pronunciation/">Nagios pronunciation</a></li>
-</ul>
-
-
-<p>2番目のエントリには以前音声ファイルがあった気がするんですが、今はないみたいですね。（たしか「<em>ナ</em>ギオス」と発音してました。「ナ」にアクセント。）</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1572,6 +1635,10 @@ port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1587,11 +1654,53 @@ port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

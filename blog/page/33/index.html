@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="俺はBloglinesを愛用しているのですが、フォルダが一階層しか作れないので、登録フィード数が増えてくると、ひとつのフォルダ開くだけで、縦にスクロールする量が大きくてなって、うざいんですよね。なので、一度に開くフォルダはひとつだけにしたいのですが、いちいち閉じて開いてするのもまたうざいです。 &hellip;">
+  <meta name="description" content="7ヶ月近く完全放置の ajax なウェブメールですが、そもそもネイティブアプリ（この場合は Wanderlust ）と同じような操作性のものを作ろうと考えたのが敗因のような気がします。（ウェブメールに限らず、ajax でネイティブアプリと同じようなものを作る、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,77 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/30/488/">The Inbox Makeover With Ajax 構想</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-30T02:33:00+09:00" pubdate>Nov 30<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/30/488/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+7ヶ月近く完全放置の <a href="http://mizzy.org/?topic=/program/ajaxWebMail" target="_blank">ajax なウェブメール</a>ですが、そもそもネイティブアプリ（この場合は Wanderlust ）と同じような操作性のものを作ろうと考えたのが敗因のような気がします。（ウェブメールに限らず、ajax でネイティブアプリと同じようなものを作る、という発想は何か間違っているのではないかと最近思う。）
+</p>
+
+
+
+
+<p class="entryBody">
+で、どうせなら Wanderlust とは全然違う操作性で、もっと使い勝手が良くなるようなウェブメールを作ればいいんじゃね、と。そのためには現在の自分自身のメール処理のスタイルを変えないとだめなんだろうな、という考えに至り、そういや <a href="http://www.rubyist.net/~matz/" target="_blank">Matz にっき</a>で <a href="http://www.rubyist.net/~matz/20050903.html" target="_blank">The Inbox Makeover</a> というエントリがあったな、と思い出しました。
+</p>
+
+
+
+
+<p class="entryBody">
+これがなんだか非常に良さげな感じがするので、このメール処理メソッドに特化した操作性のウェブメールを作るといいんじゃないだろうか、と思い至ったわけです。
+</p>
+
+
+
+
+<p class="entryBody">
+さらに、このメール処理メソッドを実行するには、分類ベースのメールボックスから検索ベースのメールボックスへの移行も必要だろうな、ということで、<a href="http://projects.netlab.jp/ximapd/" target="_blank">ximapd</a> と組み合わせるととてもいいものができあがるんじゃないだろうか、とまだ何もしていないくせに、ちょっとワクワクしていたりします。
+</p>
+
+
+
+
+<p class="entryBody">
+さらにさらに、ximapd は Ruby ベースなので、ウェブメールも Ruby on Rails なんかで実装してみるとおもしろそうだな、と妄想が広がるばかりです。（別にサーバとクライアントを同じ言語にする必然性はまったくないんだけど…）
+</p>
+
+
+
+
+<p class="entryBody">
+…というわけで、　まだ思いついただけでなんにもしていないのですが、本気で作ってみようかな、と思いはじめている自分がいます。といってもすぐには時間がとれないので、正月休みあたりに、Rails の勉強も兼ねてやってみようかな、と。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -611,49 +682,6 @@ feedbringer用greasemonkeyユーザスクリプトの色違いバージョンを
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/11/23/276/">Feedbringerをremixin&#8217; #2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-11-23T18:30:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
-        
-         | <a href="/blog/2005/11/23/276/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="/js/feedbringer.user.js" target="_blank">feedbringer用greasemonkeyユーザスクリプト</a>を修正。コンテンツ表示領域をスペース/バックスペースキーで順/逆スクロールできるようにした。
-</p>
-
-
-
-
-<p class="entryBody">
-まだまだ調整すべきところはあるけど、これでbloglinesから完全に乗り換えできるかな。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/34/">&larr; Older</a>
@@ -671,6 +699,10 @@ feedbringer用greasemonkeyユーザスクリプトの色違いバージョンを
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -686,11 +718,53 @@ feedbringer用greasemonkeyユーザスクリプトの色違いバージョンを
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="昨日のYAPC::Asia 2008 Tokyo 初日のセッションで発表した、「Easy system administration programming with a framework - フレームワークでシステム管理プログラミングをもっと簡単に」の資料を Slide Share &hellip;">
+  <meta name="description" content="30days Album の インフォメーションブログ に、30days Album を支える技術 #0 ～ サーバ構成概要 というエントリをポストしました。 今回は全体的なサーバ構成の概要について書いています。今後、各コンポーネント毎に、実際に担当した技術スタッフとともに、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,41 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/06/05/Inside30daysAlbumsBackEnd/">Inside30daysAlbumsBackEnd</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-06-05T10:52:38+09:00" pubdate>Jun 5<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/06/05/Inside30daysAlbumsBackEnd/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://30d.jp/">30days Album</a> の <a href="http://30d.jugem.jp/">インフォメーションブログ</a> に、<a href="http://30d.jugem.jp/?eid=13">30days Album を支える技術 #0 ～ サーバ構成概要</a> というエントリをポストしました。</p>
+
+<p>今回は全体的なサーバ構成の概要について書いています。今後、各コンポーネント毎に、実際に担当した技術スタッフとともに、詳細掘り下げて解説していく予定です。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -258,7 +293,7 @@ warn Parent-&gt;x; # Child が表示されてしまう
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#x6d;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#103;&#x6f;&#x73;&#117;&#107;&#x65;&#110;&#97;&#116;&#111;&#x72;&#x40;&#103;&#x6d;&#97;&#105;&#108;&#x2e;&#99;&#x6f;&#x6d;">&#x67;&#111;&#115;&#117;&#107;&#x65;&#110;&#x61;&#116;&#x6f;&#x72;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#109;</a></p>
+<p>Gosuke Miyashita, <a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#x67;&#x6f;&#x73;&#x75;&#107;&#101;&#110;&#97;&#x74;&#111;&#114;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#x6d;">&#x67;&#x6f;&#115;&#117;&#107;&#101;&#110;&#x61;&#116;&#x6f;&#114;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#x6d;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
@@ -1159,113 +1194,6 @@ $ sudo /etc/init.d/virt-factory-node-server start
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/12/31/Koan/">Koan</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-12-31T20:33:54+09:00" pubdate>Dec 31<span>st</span>, 2007</time>
-        
-         | <a href="/blog/2007/12/31/Koan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://cobbler.et.redhat.com/docs/koan.html">Koan (Kickstart over a network)</a> を使うと、Cobbler と連携して、PXE ブートを使わずに OS を再インストールしたり、Xen または QEMU のゲスト OS をコマンド一発でインストールすることができます。</p>
-
-<p>以下、Fedora 7 で Koan を試してみたメモ。</p>
-
-<h1>Koan のインストール</h1>
-
-<pre><code>$ sudo yum install koan
-</code></pre>
-
-<h1>プロファイルやシステムの一覧を表示</h1>
-
-<p>プロファイル一覧を表示する。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --list-profile
-fc7-i386
-fc7-xen-i386 
-</code></pre>
-
-<p>システム一覧を表示する。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --list-system
-test-server.example.org
-</code></pre>
-
-<p>cobbler.example.org は cobbler が動いてるサーバ。koan による OS インストールを行うときには、プロファイルかシステムのどちらかを指定する。</p>
-
-<h1>OS の再インストール</h1>
-
-<p>OS を再インストールする時には、&#8211;replace-self オプション と &#8211;profile または &#8211;system を指定して koan を実行。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --replace-self --profile=f7-i386
-- using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
-downloading initrd initrd.img to /boot/initrd.img
-url=http://cobbler.example.org/cobbler/images/f7-i386/initrd.img
-- using kickstart from cobbler: http://cobbler.example.org/cobbler/images/f7-i386/initrd.img
-downloading kernel vmlinuz to /boot/vmlinuz
-url=http://cobbler.example.org/cobbler/images/f7-i386/vmlinuz
-- using kickstart from cobbler: http://cobbler.example.org/cobbler/images/f7-i386/vmlinuz
-- kickstart: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
-- downloading http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
-- using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
-- ['/bin/bash', '/var/spool/koan/insert.sh']
-cpio
-14535 blocks
-14538 blocks
-done
-- ['/sbin/grubby', '--grub', '--add-kernel', '/boot/vmlinuz', '--initrd', '/boot/initrd.img', '--make-default', '--title', 'kick1199098439', '--args', 'ksdevice=eth0 lang=  kssendmac syslog=cobbler.example.org:25150 text  ks=file:ks.cfg', '--copy-default']
-- reboot to apply changes 
-</code></pre>
-
-<p>ネットワークインストール用の /boot/initrd.img とか /boot/vmlinuz とかを cobbler サーバからダウンロードして、/boot/grub/menu.lst を書き換えてくれる。</p>
-
-<p>あとは再起動すれば、OS の再インストールが勝手にはじまる。</p>
-
-<h1>Xen ゲスト OS のインストール</h1>
-
-<h2>Xen のインストールと Xen カーネルの起動</h2>
-
-<p>当然 Xen 環境が必要になるので、Xen をインストール。</p>
-
-<pre><code>$ sudo yum install kernel-xen xen
-</code></pre>
-
-<p>インストール後、/boot/grub/menu.lst を書き換えて、デフォルトで Xen カーネルが起動するようにして再起動する。</p>
-
-<h2>koan コマンドでの Xen ゲスト OS インストール</h2>
-
-<p>&#8211;replace-self ではなく &#8211;virt を指定する。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --virt --profile=f7-xen-i386
-</code></pre>
-
-<p>これで Xen ゲスト OS のインストールがはじまる、はずなんだけど、うちの環境では Segmentation Fault になってしまった。VMWare 上で Xen を動かすというのは無理があるのかもしれない。</p>
-
-<p>実機で試したいところだけど、試せるサーバがないので保留。Yappo さんあたりが試してレポートしてくれるに違いない、きっと。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -1283,6 +1211,10 @@ done
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
@@ -1298,11 +1230,53 @@ done
         <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a>
-      </li>
-    
   </ul>
+</section>
+
+<section>
+  <h1>Coderwall</h1>
+  <p>
+  <script type="text/javascript">
+    function display_coderwall(args) {
+        var badges = args["data"]["badges"];
+        for ( var i = 0; i < badges.length; i++ ) {
+            document.write('<img src="'+ badges[i]["badge"] + '" width="48" height="48" />');
+        }
+    }
+  </script>
+  <script src="http://coderwall.com/mizzy.json?callback=display_coderwall"></script>
+  </p>
+  <p style="text-align: right;"><a href="http://coderwall.com/mizzy">Powered by coderwall.com</a></p>
+</section>
+
+
+<section>
+  <h1>Github Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/mizzy">@mizzy</a> on Github
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mizzy',
+            count: 10,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 
