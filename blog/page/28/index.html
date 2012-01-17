@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Plagger::Plugin::CustomFeed::iTunesRecentPlay をアップデートして本家に commit しました。修正点は以下の通り。 $entry->title をセットするようにした。フォーマットは config.yaml で変更可能。 $entry-> &hellip;">
+  <meta name="description" content="P::P::Filter::TinyURL を意味もなくアップデート。 feed の link, entry の link, entry の enclosure の中から、どの URL を変換するかを指定できるようにしてみた。 けど、このプラグインって、CustomFeed:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/04/02/315/">Plagger::Plugin::Filter::TinyURL</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-04-02T19:46:00+09:00" pubdate>Apr 2<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/04/02/315/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/TinyURL.pm" target="_blank">P::P::Filter::TinyURL</a> を意味もなくアップデート。
+</p>
+
+
+
+
+<p class="entryBody">
+feed の link, entry の link, entry の enclosure の中から、どの URL を変換するかを指定できるようにしてみた。
+</p>
+
+
+
+
+<p class="entryBody">
+けど、このプラグインって、CustomFeed::GoogleVideo の結果を iTunes に取り込むためにやむなく必要になって作ったものなので、これ以外の有効な使い方が思いつかない。なので、このプラグイン自体の実装の方向性もいまいち定まらない感じ。
+</p>
+
+
+
+
+<p class="entryBody">
+Tiny URL に変換するのに外部サービス使ってるのがキモイので、0.8 の Server and Database 対応が完了したら、Plagger 自前で処理するようにするといいのかな。でも、現状の使い途だけだったら、そこまでする必要もないか。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -714,72 +771,6 @@ Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアッ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/03/04/451/">Svk のインストールではまる</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-03-04T23:53:00+09:00" pubdate>Mar 4<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/03/04/451/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-正確には svk ではなく、subversion の perl binding のインストールではまったのでメモ。svk をインストールしようとすると、「SVN::Core がねーよ、subversion の perl binding をちゃんと入れとけ」みたいなことを言われたので、subversion のソースディレクトリで make swig-pl; make check-swig-pl したところで、以下の様なエラーが大量に出る。
-
-</p>
-
-
-
-
-<p class="code">
-../../../../../subversion/bindings/swig/perl/native/t/4pool&#8230;&#8230;Can&#8217;t load &#8216;/home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so&#8217; for module SVN::_Core: /home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so: undefined symbol: svn_swig_pl_thunk_config_enumerator at /usr/local/lib/perl5/5.8.7/i686-linux/DynaLoader.pm line 230.
-</p>
-
-
-
-
-<p class="entryBody">
-「undefined symbol: svn_swig_pl_thunk_config_enumerator」と出てるので、こいつが含まれるライブラリがリンクされてないんだろうな、と思いまずはライブラリ探し。これは libsvn_swig_perl-1.so であることを発見。で、ldd _Core.so を実行してみると、案の定このライブラリがリンクされてない。
-</p>
-
-
-
-
-<p class="entryBody">
-というわけで、subversion/bindings/swig/perl/native/Makefile の LOADLIBS の行の最後に、-lsvn_swig_perl-1 を追加して make swig-pl; make check-swig-pl すると今度はエラーもなくチェック完了。このまま make install で無事インストールができた。
-</p>
-
-
-
-
-<p class="entryBody">
-<strong>追記</strong><br />
-あとで最初からやりなおしてみたら、最初から Makefile に -lsvn_swig_perl-1 があった。なんだったんだろう？
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/29/">&larr; Older</a>
@@ -797,6 +788,10 @@ Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアッ�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -810,10 +805,6 @@ Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアッ�
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

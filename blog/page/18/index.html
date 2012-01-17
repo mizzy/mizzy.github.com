@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="さすがにPlaggerでもこれは無理だと思いたい。PythonでYahoo!Booksのランキングをとってくる。 というエントリを見て、なんか釣りっぽいタイトルだけど敢えて釣られてみた。 ちょっとアウトプット違うけど、Plagger なら 10 分でできた。 &hellip;">
+  <meta name="description" content="前回のエントリ で取り上げた方のブログに、Plagger になくてYahoo!pipesにあるもの というエントリがあったので、それについても釣られて言及してみます。 基本的に Plagger の処理は一本道であり、複数の基本データを扱うことができなかったはず それ Plagger でもできるよ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,81 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/24/418/">Plagger にあって Yahoo!pipes にあるもの</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-24T12:06:00+09:00" pubdate>Feb 24<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/24/418/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/plagger-ybooks.html"><span class="icon"></span>前回のエントリ</a> で取り上げた方のブログに、<a class="ext-link" href="http://pythonbeginner.blog78.fc2.com/blog-entry-209.html"><span class="icon"></span>Plagger になくてYahoo!pipesにあるもの</a> というエントリがあったので、それについても釣られて言及してみます。
+</p>
+
+
+<blockquote>
+<p>
+  基本的に Plagger の処理は一本道であり、複数の基本データを扱うことができなかったはず
+</p>
+</blockquote>
+
+
+<p>
+それ Plagger でもできるよ。複数の入力から一つの出力もできるし、一つの入力から複数の出力もできるし、複数の入力から複数の出力もできる。
+</p>
+
+
+<blockquote>
+<p>
+  いってみればPlaggerは一つの入力に一つの出力が対応している直線的な処理しかできない。それに対しYahoo!pipesは複数の入力に一つの出力が対応するという、逆ピラミッド的な処理もできる。これがPlagger になくてYahoo!pipesにあるものだ。（もしかして今はできるのかもしれない。） 
+</p>
+</blockquote>
+
+
+<p>
+id:otsune さんも<a class="ext-link" href="http://b.hatena.ne.jp/entry/http://pythonbeginner.blog78.fc2.com/blog-entry-209.html"><span class="icon"></span>指摘してる</a>けど、それ smartfeed で。
+</p>
+
+
+<p>
+「Plagger の発展をフォローしてないので不正確かもしれない」とか「もしかして今はできるのかもしれない」などと書かれてますが、少なくとも SmartFeed::All は 2006/05/03 には作られているので、複数の入力に対して一つの出力は、かなり前からできます。
+</p>
+
+
+<p>
+また、一つの入力から複数の出力、複数の入力から複数の出力は最初からできます。なので、「基本的に Plagger の処理は一本道」というのは完全に間違い。Plagger の発展をフォローしてない、というのは言い訳にならない。「少なくとも自分が使っていた頃のPlagger になくて」と書いてるけど、本当に使ってたの？ 
+</p>
+
+
+<p>
+まあ、Yahoo!Books のエントリを見てもわかるように、Plagger が何かをまったくわかっていない人間のたわごとなので、適当に流しておくのが大人の対応なんでしょうが、Plagger ラブな人間としては、間違った情報広められるのは嫌な気分になるので。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -899,103 +974,6 @@ $entry->delete;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/08/361/">Assurer - サーバテスティングフレームワーク #2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-01-08T01:19:00+09:00" pubdate>Jan 8<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/01/08/361/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) をまた修正。
-</p>
-
-
-<p>
-プラグインの実行フェーズを、test, format, publish の3つにわけてみました。
-</p>
-
-
-<pre class="wiki">
-test:
-  - module: HTTP
-    name: http://svn.mizzy.org/ #0
-    config:
-      url: http://svn.mizzy.org/
-      match: It works!
-
-format:
-  - module: HTML
-
-publish:
-  - module: Mail
-
-</pre>
-
-
-<p>
-こんな感じで config.yaml を書くと、テスト結果を HTML でフォーマットしてメールで飛ばす、みないな動作になることを意図しています。（まだ Format::HTML や Publish::Mail はつくってないですが。）
-</p>
-
-
-<pre class="wiki">
-format:
-  - module: Text
-
-publish:
-  - module: File
-</pre>
-
-
-<p>
-とかやると、テキスト形式でファイルに吐き出すとか、そんな感じで。
-</p>
-
-
-<p>
-単にターミナルに結果を表示するだけであれば、format と publish は必要ないです。
-</p>
-
-
-<p>
-これにともなって、プラグインのネームスペースも、Plugin::Test::*, Plugin::Format::*, Plugin::Publish::* の3つに分割しています。
-</p>
-
-
-<p>
-また、Assurer::Results というクラスも新たに追加しました。Plugin::Test::* によるテスト結果を保持しておいて、Plugin::Format::* に渡すためのクラスです。
-</p>
-
-
-<p>
-こんな感じで遅々としてますが、少しづつ前進しています。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -1013,6 +991,10 @@ publish:
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -1026,10 +1008,6 @@ publish:
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

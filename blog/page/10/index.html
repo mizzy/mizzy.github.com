@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="30days Album の インフォメーションブログ に、30days Album を支える技術 #0 ～ サーバ構成概要 というエントリをポストしました。 今回は全体的なサーバ構成の概要について書いています。今後、各コンポーネント毎に、実際に担当した技術スタッフとともに、 &hellip;">
+  <meta name="description" content="TLUG Meeting 2008/09 で、高価なハードウェアを使わずに OSS のみで、スケーラブルなストレージをどうやって構成するのか、といった話をします。人生初の英語でのプレゼンにチャレンジ。 最初は桜井さんから、「ModSecurity の話をするのですが、興味ないですか？」 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/09/12/TlugMeeting200809/">TlugMeeting200809</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-09-12T16:48:42+09:00" pubdate>Sep 12<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/09/12/TlugMeeting200809/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.tlug.jp/wiki/Meetings:2008:09">TLUG Meeting 2008/09</a> で、高価なハードウェアを使わずに OSS のみで、スケーラブルなストレージをどうやって構成するのか、といった話をします。人生初の英語でのプレゼンにチャレンジ。</p>
+
+<p>最初は<a href="http://trombik.mine.nu/~cherry/w/">桜井さん</a>から、「ModSecurity の話をするのですが、興味ないですか？」とお誘い頂いて、「興味あります！」と聞きに行くことにしたんですが、いつの間にか自分もしゃべることになってしまいました。</p>
+
+<p>ストレージについては、実際に構築した、という話ではなく、最近この辺りについて調べていて、こんな風にやればできそうだなー、という情報がある程度まとまってきて、ちょうど良い機会を頂いたので話してみようかな、という感じです。</p>
+
+<p>発表の中では、cman, CLVM, GNBD, GFS2, DRBD, DM-MP といった技術について説明し、これらをどう組み合わせて、スケーラブルなストレージを構成するのか、といった話をする予定です。</p>
+
+<p>発表資料は後ほどアップしますし、詳細な技術情報はおいおいここのブログでも書いていこうと思っています。</p>
+
+<p>TLUG Meeting は事前申し込みが不要で、直接現地に行けば良いようですので、お時間があって興味のあるかたはぜひ。（エンジニアの未来サミットとかぶってますが…）</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -293,7 +336,7 @@ warn Parent-&gt;x; # Child が表示されてしまう
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#x6d;&#x61;&#x69;&#108;&#x74;&#111;&#x3a;&#103;&#111;&#x73;&#117;&#107;&#101;&#x6e;&#x61;&#x74;&#111;&#114;&#64;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;">&#103;&#111;&#x73;&#x75;&#107;&#x65;&#110;&#x61;&#x74;&#x6f;&#x72;&#x40;&#103;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>Gosuke Miyashita, <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#111;&#x3a;&#x67;&#111;&#x73;&#117;&#x6b;&#101;&#110;&#x61;&#116;&#x6f;&#114;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#111;&#109;">&#x67;&#111;&#115;&#x75;&#x6b;&#x65;&#110;&#97;&#x74;&#x6f;&#114;&#x40;&#x67;&#109;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#109;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
@@ -1136,64 +1179,6 @@ $ sudo /etc/init.d/virt-factory-node-server start
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/01/05/VirtFactory/">VirtFactory</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-01-05T20:17:06+09:00" pubdate>Jan 5<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/01/05/VirtFactory/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://trac.mizzy.org/public/wiki/Cobbler">Cobbler</a> や <a href="http://trac.mizzy.org/public/wiki/Koan">Koan</a> について触れたところで、次は <a href="http://virt-factory.et.redhat.com/">Virt-Factory</a> です。</p>
-
-<p><a href="http://blog.yappo.jp/yappo/archives/000555.html">Yappo さんが Xen 環境で Cobbler/Koan が動くことを検証してくださった</a>ので、心置きなく Virt-Factory の紹介ができます。こちらの身勝手なお願いに応じてくれた Yappo さん、ありがとうございます。</p>
-
-<p>Virt-Factory は、大量の仮想サーバの管理を楽に行うためのツールで、Cobbler/Koan + Puppet + これらをラップするサーバ/クライアントデーモンとコマンドラインツール + Web UI + XMLRPC API、といった感じです。具体的には、以下のような感じ。</p>
-
-<ul>
-<li>Cobbler/Koan、Puppet の統合
-
-<ul>
-<li>Cobbler による PXE ブート + ネットワークインストール環境の構築。単に Cobbler を利用する場合とは違い、キックスタートファイルに、Virt-Factory に必要なパッケージのインストールや、インストール後に必要な処理の実行を含めてくれる。</li>
-<li>Koan によるホスト OS や Xen/QEMU ゲスト OS のコマンド一発インストール。Koan を使う場合は、ホスト OS 上で実行する必要があるが、Virt-Factory を使うと中央のサーバからリモートで実行できる。</li>
-<li>リモートのホスト OS 上にある仮想サーバの状況を、中央のサーバで一元管理できる。</li>
-<li>Cobbler でのキックスタートファイル作成時に、Puppet パッケージのインストール処理を含めてくれたり、プロファイル属性として Puppet クラスを指定できたりとか。おそらく Puppet サーバのノード管理とも連携するんじゃないだろうか。（ここはまだちゃんと検証できてない。）</li>
-</ul>
-</li>
-<li>Web UI でプロファイルやシステムの登録、管理などができる</li>
-<li>Web UI やコマンドラインツールは XMLRPC API と連携してる</li>
-</ul>
-
-
-<p>とてもよさげなツールではあるのですが、色んなツールを統合してるだけあって、できることが多すぎてわけがわからないし、<a href="http://virt-factory.et.redhat.com/vf-install-setup.php">本家サイトのインストール/セットアップドキュメント</a>の通りにやっても動かないし、ドキュメントも不十分で、これから触ってみようと思う方は苦労するかと思いますので、インストール手順から使い方まで、自分が理解できた範囲で、今後数回にわけてご紹介していこうと思います。</p>
-
-<p>ただしプロダクトとしてはまだ発展途上という感じで、すぐに実践投入できるものではなさそうです。</p>
-
-<p><del>とりあえず次回は Virt-Factory サーバのインストールと設定について解説予定です。</del><a href="http://trac.mizzy.org/public/wiki/VirtFactoryServerSetup">解説をアップしました</a>。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -1211,6 +1196,10 @@ $ sudo /etc/init.d/virt-factory-node-server start
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -1224,10 +1213,6 @@ $ sudo /etc/init.d/virt-factory-node-server start
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

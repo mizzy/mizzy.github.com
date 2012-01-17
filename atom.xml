@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-01-13T02:33:21+09:00</updated>
+  <updated>2012-01-17T22:00:22+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,58 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[paperboy is hiring]]></title>
+    <link href="http://mizzy.org/blog/2012/01/17/paperboy-is-hiring/"/>
+    <updated>2012-01-17T20:56:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/01/17/paperboy-is-hiring</id>
+    <content type="html"><![CDATA[<p>今まで<a href="http://www.paperboy.co.jp/">ペパボ</a>の人事評価制度では、管理職のキャリアプランしか想定されていかったのですが、今年から導入された制度では、管理職とは別に、技術職用の等級が設けられ、能力に応じて待遇が向上する仕組みが導入されました。</p>
+
+<p>具体的には、シニア、アドバンスド・シニア、という2つの役職が設けられ、以下のような待遇となっています。</p>
+
+<ul>
+<li>シニアは年俸500万円〜。フレックスタイム。</li>
+<li>アドバンスド・シニアは年俸600万円〜。裁量労働。</li>
+</ul>
+
+
+<p>実運用に入るのはまだこれからなのですが、今までペパボでは技術者がステップアップしていく道がなかったので、これはペパボの技術者にとって、とても大きな一歩です。</p>
+
+<p>で、本題。</p>
+
+<p>新しい技術者の評価制度をベースに、今までペパボにはなかったポジションの技術者を、<a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml?job_code=23">東京</a>と<a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml?job_code=24">福岡</a>、両方で募集しています。</p>
+
+<p>「技術基盤整備エンジニア」という言葉でピンと来る方もいるかと思いますが、<a href="http://cookpad.com/">クックパッド</a> さんの開発基盤グループが、役割として近いと思い、名前を拝借させていただきました。</p>
+
+<p>職務内容としては、</p>
+
+<ul>
+<li>ペパボ全サービスに関わる技術基盤の整備
+
+<ul>
+<li>新しい方法論や技術の導入</li>
+<li>開発手法の整備</li>
+<li>大規模なリファクタリング、リプレース</li>
+<li>モニタリング、キャパシティプランニングの強化</li>
+<li>データ解析/ログ解析</li>
+<li>セキュリティ関連</li>
+</ul>
+</li>
+</ul>
+
+
+<p>と書かれていますが、これだけに留まらず、これは絶対にやるべき、という技術的課題があれば、どんどんお任せしたいと考えています。</p>
+
+<p>待遇は新評価制度の元での、アドバンスド・シニア待遇となります。（年俸600万円はあくまでも最低ラインなので、応相談です。）</p>
+
+<p>また、自分が就いてる役職はテクニカル・マネージャーなのですが、この役職は人数制限があるわけではないので、場合によってはテクニカル・マネージャー待遇も検討させて頂きます。（特に福岡の場合。）</p>
+
+<p>興味のある方、もっと具体的な話が聞いてみたい、という方は、<a href="http://twitter.com/gosukenator">twitter</a> や <a href="http://www.facebook.com/gosukenator">facebook</a> などで、お気軽にお声掛けください。</p>
+
+<p>他にも、東京、福岡で<a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml">様々な職種で人材募集中です</a>。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[coderwall badges on the sidebar]]></title>
@@ -1306,114 +1358,6 @@ none on /tmp/dest type aufs (rw,br:/tmp/dest/.aufs/0=rw:/tmp/source0=ro:/tmp/sou
 </code></pre>
 
 <p>So if you unmount /tmp/dest directory and run lazycopy with same options again, you can see the changed files and created files again.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[LinuxContainer00]]></title>
-    <link href="http://mizzy.org/blog/2011/07/17/LinuxContainer00/"/>
-    <updated>2011-07-17T16:33:08+09:00</updated>
-    <id>http://mizzy.org/blog/2011/07/17/LinuxContainer00</id>
-    <content type="html"><![CDATA[<h1>Make and install lxc rpm packages</h1>
-
-<p>The spec file for lxc is included in lxc source code.So you can make rpm packages of lxc easily.</p>
-
-<pre><code># yum -y update kernel
-# reboot
-# yum -y install rpm-build libcap-devel docbook-utils kernel-devel gcc make
-# wget http://lxc.sourceforge.net/download/lxc/lxc-0.7.4.2.tar.gz
-# tar zxvf lxc-0.7.4.2.tar.gz
-# mkdir -p ~/rpmbuild/SOURCES
-# cp lxc-0.7.4.2.tar.gz ~/rpmbuild/SOURCES
-# chown root:root lxc-0.7.4.2/lxc.spec
-# rpmbuild -ba lxc-0.7.4.2/lxc.spec --define 'ksrc /usr/src/kernels/`uname -r`'
-# rpm -Uvh ~/rpmbuild/RPMS/x86_64/lxc-0.7.4.2-1.x86_64.rpm
-</code></pre>
-
-<hr />
-
-<h1>Check whether this os is lxc ready or not</h1>
-
-<p>All statuses should be &#8220;enabled&#8221;.</p>
-
-<pre><code># lxc-checkconfig 
-Kernel config /proc/config.gz not found, looking in other places...
-Found kernel config file /boot/config-2.6.32-131.2.1.el6.x86_64
---- Namespaces ---
-Namespaces: enabled
-Utsname namespace: enabled
-Ipc namespace: enabled
-Pid namespace: enabled
-User namespace: enabled
-Network namespace: enabled
-Multiple /dev/pts instances: enabled
-
---- Control groups ---
-Cgroup: enabled
-Cgroup namespace: enabled
-Cgroup device: enabled
-Cgroup sched: enabled
-Cgroup cpu account: enabled
-Cgroup memory controller: enabled
-Cgroup cpuset: enabled
-
---- Misc ---
-Veth pair device: enabled
-Macvlan: enabled
-Vlan: enabled
-File capabilities: enabled
-enabled
-</code></pre>
-
-<hr />
-
-<h1>Quick Start</h1>
-
-<p>In the man of lxc, you can get how to start lxc quickly.</p>
-
-<pre><code>QUICK START
-       You are in a hurry, and you don’t want to read this man page. Ok, with-
-       out warranty, here are the commands to launch a  shell  inside  a  con-
-       tainer   with   a  predefined  configuration  template,  it  may  work.
-       /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/
-       lxc-macvlan.conf /bin/bash
-</code></pre>
-
-<p>But before running lxc-execute, you should mount croup.</p>
-
-<pre><code># mount -t cgroup cgroup /cgroup
-# /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/lxc-macvlan.conf /bin/bash
-</code></pre>
-
-<p>In the container, processes are like this.</p>
-
-<pre><code># ps -ef
-UID        PID  PPID  C STIME TTY          TIME CMD
-root         1     0  0 10:54 ttyS0    00:00:00 /usr/lib64/lxc/lxc-init -- /bin/
-root         2     1  0 10:54 ttyS0    00:00:00 /bin/bash
-root        11     2  0 10:55 ttyS0    00:00:00 ps -ef
-</code></pre>
-
-<p>You can also see the processes in the container from the outside of the container.</p>
-
-<pre><code># lxc-ps --name=foo
-CONTAINER    PID TTY          TIME CMD
-foo         1654 ttyS0    00:00:00 lxc-init
-foo         1656 ttyS0    00:00:00 bash
-</code></pre>
-
-<p>The sample lxc conf is like this.</p>
-
-<pre><code># cat /usr/share/doc/lxc/examples/lxc-macvlan.conf 
-# Container with network virtualized using the macvlan device driver
-lxc.utsname = alpha
-lxc.network.type = macvlan
-lxc.network.flags = up
-lxc.network.link = eth0
-lxc.network.hwaddr = 4a:49:43:49:79:bd
-lxc.network.ipv4 = 1.2.3.4/24
-lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
-</code></pre>
 ]]></content>
   </entry>
   

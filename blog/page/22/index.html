@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="うちでは 公開用 trac の他に、プライベートな trac もあって、Wiki をメモ代わりにしたり、Tickets で TODO 管理（プログラミングとか関係なく、日常のこととかも）してたりします。 で、TODO 管理は Milestone でおおざっぱにカテゴリつくっていて、View &hellip;">
+  <meta name="description" content="最近は Plagger いじりの記録と化してるこのブログですが、今日もまた Plagger ネタですよ。 ちょっとやりたいことがあって、Filter::Rule の改造と、Filter::CloneFeed というものを作ってみました。やりたいことが何かというのは長くなるので、後回しにして、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,225 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/05/397/">Filter::Rule と Filter::CloneFeed</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-05T20:53:00+09:00" pubdate>Sep 5<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/05/397/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+最近は Plagger いじりの記録と化してるこのブログですが、今日もまた Plagger ネタですよ。
+</p>
+
+
+<p>
+ちょっとやりたいことがあって、Filter::Rule の改造と、Filter::CloneFeed というものを作ってみました。やりたいことが何かというのは長くなるので、後回しにして、まずは Filter::Rule の修正内容と、Filter::CloneFeed の説明を。
+</p>
+
+
+<p>
+Filter::Rule の修正内容はこんな感じです。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Plugin/Filter/Rule.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Plugin/Filter/Rule.pm (revision 258)
++++ plagger/trunk/lib/Plagger/Plugin/Filter/Rule.pm (revision 259)
+@@ -19,4 +19,12 @@
+ sub feed {
+     my($self, $context, $args) = @_;
++
++    if ( defined ( my $expression = $self->conf->{expression} ) ){
++        my $status = eval $expression;
++        if ($@) {
++            Plagger->context->log(error => "Expression error: $@ with '$expression'");
++        }
++        return unless $status;
++    }
+ 
+     for my $entry ($args->{feed}->entries) {
+</pre>
+
+
+<p>
+これにより何ができるかというと、以下のような yaml を書くことで、フィルタを適用するためのルールを設定することができます。
+</p>
+
+
+<pre class="wiki">
+  - module: Filter::Rule
+    rule:
+      module: Fresh
+      duration: 60
+    config:
+      expression: $args->{feed}->type eq 'AmazonWebService'
+</pre>
+
+
+<p>
+この例だと、feed type が AmazonWebService であるフィードには Rule::Fresh を適用する、それ以外のフィードには何もフィルタをかけずにそのままにする、という動作になります。
+</p>
+
+
+<p>
+次に Filter::CloneFeed ですが、名前の通りフィードの複製をつくります。で、複製されたフィードは type が clone となります。ソースはこれだけです。
+</p>
+
+
+<pre class="wiki">
+package Plagger::Plugin::Filter::CloneFeed;
+use strict;
+use base qw( Plagger::Plugin );
+
+sub register {
+    my($self, $context) = @_;
+    $context->register_hook(
+        $self,
+        'update.feed.fixup' => \&amp;clone,
+    );
+}
+
+sub clone {
+    my($self, $context, $args) = @_;
+
+    my $feed = $args->{feed}->clone;
+    $feed->type('clone');
+    $context->update->add($feed);
+}
+
+1;
+</pre>
+
+
+<p>
+で、これで何がやりたかったかというと、以下のようなことがやりたかったんです。
+</p>
+
+
+<pre class="wiki">
+  - module: CustomFeed::AmazonWebService
+    config:
+      title: Amazon - New Books
+      developer_token: XXXXXXXXXXXXXXXXXXXX
+      associate_id: xxxxxx-22
+      keywords:
+        - 川原正敏
+
+  - module: Filter::CloneFeed
+
+  - module: Filter::Rule
+    rule:
+      module: Ahead
+    config:
+      expression: $args->{feed}->type eq 'clone'
+
+  - module: Publish::iCal 
+    config:
+      dir: /home/miya/ical
+      filename: %t.ics
+    rule:
+      module: FeedType
+      type: AmazonWebService
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: xxx@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+    rule:
+      module: FeedType
+      type: clone
+</pre>
+
+
+<p>
+言葉で説明すると、こんな感じです。
+</p>
+
+
+<ul><li>CustomFeed::AmazonWebService で Amazon 検索してフィードを生成。</li>
+<li>Filter::CloneFeed でフィードの複製をつくる。</li>
+<li>Filter::Rule で、複製されたフィード（type が clone）のみに <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Ahead.pm"><span class="icon"></span>Rule::Ahead</a> を適用し、今から1日以内に発売される商品情報だけを抽出。オリジナルのフィードにはフィルタをかけないので、検索された商品情報がすべて含まれている。</li>
+<li>Publish::iCal で商品情報を iCalendar 形式で吐き出す。Rule::FeedType を適用し、クローンではないオリジナルのフィード（type が AmazonWebService）だけを吐き出す。これで Amazon 検索の結果すべてが iCalendar 形式のデータになる。</li>
+<li>Publish::Gmail で商品情報をメールで送信。Rule::FeedType を適用し、クローンのフィード（type が clone）だけを送信。これで1日以内に発売される商品情報のみが送信される。</li></ul>
+
+
+<p>
+要するに、同じフィードでも、Publish プラグイン毎に異なる内容で Publish したかった、というわです。
+</p>
+
+
+<p>
+最初は以下のような yaml で、Publish::iCal では Rule を指定せずに全部吐き出す、Publish::Gmail では Rule::Ahead を適用して、1日以内に発売される商品情報だけ送信、とできるんじゃないかな、と思ったのですが、Publish::Gmail は publish.feed フックで動作していて、Rule でエントリレベルのフィルタリングができないんですよね。
+</p>
+
+
+<pre class="wiki">
+  - module: CustomFeed::AmazonWebService
+    config:
+      title: Amazon - New Books
+      developer_token: XXXXXXXXXXXXXXXXXXXX
+      associate_id: xxxxxx-22
+      keywords:
+        - 川原正敏
+
+  - module: Publish::iCal 
+    config:
+      dir: /home/miya/ical
+      filename: %t.ics
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: xxx@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+    rule:
+      module: Ahead
+</pre>
+
+
+<p>
+こういった事情で、Filter::Rule を改造し Filter::CloneFeed をつくってみました。もっとエレガントな方法があれば教えてください。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+<a class="ext-link" href="http://mizzy.org/program/smartfeed.html"><span class="icon"></span>もっとエレガントな方法教えてもらいました</a>。というか、上でやったことは全くの無駄でした。なので参考にしないでください。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -818,93 +1037,6 @@ floating になってるのは <a class="ext-link" href="http://plagger.org/trac
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/24/500/">Plagger::Plugin::Filter::FFmpeg #3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-24T20:56:00+09:00" pubdate>Aug 24<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/24/500/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://mizzy.org/program/plagger_and_ffmpeg02.html#comments"><span class="icon"></span>このエントリのコメント</a> にて sumikawa さんより指摘があった点について修正しました。
-</p>
-
-
-<p>
-というか、気づいてはいたのですが以下の理由から放置してました。
-</p>
-
-
-<ol start="1"><li>今のところ特に実害がない。</li>
-<li>Plagger::Util::mime_type_of (というか MIME::Types::mimeTypeOf ) が mp4 という拡張子は video/vnd.objectvideo と返す。m4v だと何も返さない。video/mp4 が一般的っぽいので、これは何か気持ち悪い。</li>
-<li>$Plagger::Util::mimetypes->addType で mp4 と m4v を追加してやればいいんだけど、本来なら Plagger::Util 内でやる方が良さそう。既にいくつか Plagger::Util 内で追加されてるので。でも、Filter::FFmpeg は野良プラグインなので、Plagger::Util をいじるべきではない。かといって、Filter::FFmpeg 内でやるのも、分散してしまって良くない。</li></ol>
-
-
-<p>
-とは言うものの、指摘があったものを放置しておくのもなんなので、3番目については妥協することにしました。
-</p>
-
-
-<pre class="wiki">
-Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
-===================================================================
---- plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 227)
-+++ plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 234)
-@@ -3,7 +3,10 @@
- use strict;
- use base qw( Plagger::Plugin );
-+use Plagger::Util;
- use Encode;
- use File::Spec;
- use FFmpeg::Command;
-+
-+$Plagger::Util::mimetypes->addType( MIME::Type->new(type => 'video/mp4', extensions => [ qw(mp4 m4v) ]) );
- 
- sub register {
-@@ -54,4 +57,5 @@
-     $e->enclosure->local_path($output_file);
-     $e->enclosure->filename("$file.$ext");
-+    $e->enclosure->type( Plagger::Util::mime_type_of($ext) );
- }
-</pre>
-
-
-<p>
-<a class="ext-link" href="http://trac.mizzy.org/public/changeset/234"><span class="icon"></span>trac のチェンジセットはこちら</a>。
-</p>
-
-
-<p>
-<strong>追記</strong><br />
-宮川さんが <a class="ext-link" href="http://plagger.org/trac/changeset/1593"><span class="icon"></span>Changeset 1593</a> にて早速対応してくれました。はやっ。<br />
-というわけで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/235"><span class="icon"></span>Filter::FFmpeg もそれに合わせて修正しました</a>。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -922,6 +1054,10 @@ Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -935,10 +1071,6 @@ Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

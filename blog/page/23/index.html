@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="『Plagger で Amazon2iCal 改良』 にて、Data::ICal で ORGANIZER をちゃんとしたフォーマットにする方法がわからん、と言っていたのですが、やりかたわかりました。 $event->add_properties( organizer => [ 'MAILTO: &hellip;">
+  <meta name="description" content="このエントリのコメント にて sumikawa さんより指摘があった点について修正しました。 というか、気づいてはいたのですが以下の理由から放置してました。 今のところ特に実害がない。
+Plagger::Util::mime_type_of (というか MIME::Types:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,93 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/24/500/">Plagger::Plugin::Filter::FFmpeg #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-24T20:56:00+09:00" pubdate>Aug 24<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/08/24/500/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://mizzy.org/program/plagger_and_ffmpeg02.html#comments"><span class="icon"></span>このエントリのコメント</a> にて sumikawa さんより指摘があった点について修正しました。
+</p>
+
+
+<p>
+というか、気づいてはいたのですが以下の理由から放置してました。
+</p>
+
+
+<ol start="1"><li>今のところ特に実害がない。</li>
+<li>Plagger::Util::mime_type_of (というか MIME::Types::mimeTypeOf ) が mp4 という拡張子は video/vnd.objectvideo と返す。m4v だと何も返さない。video/mp4 が一般的っぽいので、これは何か気持ち悪い。</li>
+<li>$Plagger::Util::mimetypes->addType で mp4 と m4v を追加してやればいいんだけど、本来なら Plagger::Util 内でやる方が良さそう。既にいくつか Plagger::Util 内で追加されてるので。でも、Filter::FFmpeg は野良プラグインなので、Plagger::Util をいじるべきではない。かといって、Filter::FFmpeg 内でやるのも、分散してしまって良くない。</li></ol>
+
+
+<p>
+とは言うものの、指摘があったものを放置しておくのもなんなので、3番目については妥協することにしました。
+</p>
+
+
+<pre class="wiki">
+Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
+===================================================================
+--- plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 227)
++++ plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 234)
+@@ -3,7 +3,10 @@
+ use strict;
+ use base qw( Plagger::Plugin );
++use Plagger::Util;
+ use Encode;
+ use File::Spec;
+ use FFmpeg::Command;
++
++$Plagger::Util::mimetypes->addType( MIME::Type->new(type => 'video/mp4', extensions => [ qw(mp4 m4v) ]) );
+ 
+ sub register {
+@@ -54,4 +57,5 @@
+     $e->enclosure->local_path($output_file);
+     $e->enclosure->filename("$file.$ext");
++    $e->enclosure->type( Plagger::Util::mime_type_of($ext) );
+ }
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://trac.mizzy.org/public/changeset/234"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+<strong>追記</strong><br />
+宮川さんが <a class="ext-link" href="http://plagger.org/trac/changeset/1593"><span class="icon"></span>Changeset 1593</a> にて早速対応してくれました。はやっ。<br />
+というわけで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/235"><span class="icon"></span>Filter::FFmpeg もそれに合わせて修正しました</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -861,103 +949,6 @@ $ffmpeg->output_options({
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/07/27/268/">Plagger::Plugin::Filter::FFmpeg #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-07-27T02:35:00+09:00" pubdate>Jul 27<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/07/27/268/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-前のエントリの <a class="ext-link" href="http://mizzy.org/program/ffmpeg00.html"><span class="icon"></span>FFmpeg::Command</a> を利用して、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Plagger::Plugin::Filger::FFmpeg</a> 書いてみた。（っていうか、このために FFmpeg::Command つくったわけですが。）
-</p>
-
-
-<p>
-とりあえず形にして動くことを確認したかったので、変換パラメータが固定だったり、適当すぎるつくりになってますが、おいおい改善していくということで。
-</p>
-
-
-<p>
-以下の様な設定で、YouTube の My Favorite 動画をダウンロード ⇒ mpeg4 へ変換 ⇒ enclosure url を rewrite ⇒ Publish::Feed で podcast、ってところまで確認済み。 
-</p>
-
-
-<p>
-<strong> 2006/07/27 03:23:30 追記</strong><br />
-miyagawa さんからの指摘で、URL の書き換えは Filter::RewriteEnclosureURL を使うようにしました。このプラグインの存在をすっかり見落としてました…
-</p>
-
-
-<pre class="wiki">
-global:
-  user_agent:
-    cookies: /home/miya/plagger/cookies.txt
-  log:
-    level: info
-
-plugins:
-  - module: Subscription::Config
-    config:
-      feed:
-        - http://www.youtube.com/my_favorites
-
-  - module: Filter::TruePermalink
-  - module: Filter::FindEnclosures
-  - module: Filter::EntryFullText
-  - module: Filter::HEADEnclosureMetadata
-  - module: Filter::FetchEnclosure
-    config:
-      dir: /home/miya/mov
-
-  - module: Filter::FFmpeg
-    config:
-      output_dir: /home/miya/mov
-      ext: mp4
-
-  - module: Filter::RewriteEnclosureURL
-    config:
-      rewrite:
-        - local: /home/miya/mov/
-          url:   http://mizzy.org/mov/
-
-  - module: Publish::Feed
-    config:
-      format: RSS
-      dir: /home/miya/plagger
-      filename: %t.rss
-</pre>
-
-
-<p>
-これに合わせて、FFmpeg::Command で ffmpeg を exec で呼び出してたのを、system に変更しました。exec だと Publish::Feed が動いてくれなかったので。おそらく exec はプロセスをフォークした後 wait しないのが原因かな、と。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/24/">&larr; Older</a>
@@ -975,6 +966,10 @@ plugins:
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -988,10 +983,6 @@ plugins:
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

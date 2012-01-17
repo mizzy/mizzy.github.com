@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="先日のエントリで、「HTML::Widget が文字化けする」とか書いたのですが、HTML::Element の _xml_escape メソッドの問題 でした。 チケットは切られているので、とりあえず修正されるのを待つしかないのですが、2ヶ月以上放置されていて、早い対応は期待できなさそうなので &hellip;">
+  <meta name="description" content="rt.cpan.org でバグレポートと機能追加要望があがっていたので、久々に Text::Trac に手を入れました。 バグフィックスしたものは 0.05 としてアップしてあります。また、新機能として Trac Links と Wiki Macros をサポートしたものは、svn &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,77 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/10/29/437/">Text::Trac のバグフィックス・機能追加とテスト駆動開発</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-10-29T20:47:00+09:00" pubdate>Oct 29<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/10/29/437/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+rt.cpan.org でバグレポートと機能追加要望があがっていたので、久々に <a class="ext-link" href="http://search.cpan.org/~mizzy/Text-Trac/lib/Text/Trac.pm"><span class="icon"></span>Text::Trac</a> に手を入れました。
+</p>
+
+
+<p>
+バグフィックスしたものは 0.05 としてアップしてあります。また、新機能として <a class="ext-link" href="http://trac.mizzy.org/public/wiki/TracLinks"><span class="icon"></span>Trac Links</a> と <a class="ext-link" href="http://trac.mizzy.org/public/wiki/WikiMacros"><span class="icon"></span>Wiki Macros</a> をサポートしたものは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Text-Trac/"><span class="icon"></span>svn リポジトリ</a>に置いてあります。リクエストしてくれた方の確認後、問題なければ CPAN にアップ予定です。
+</p>
+
+
+<p>
+今回のこのバグフィックスと機能追加で、TDD のありがたさを改めて実感しました。
+</p>
+
+
+<p>
+バグについては一度修正して、報告者に確認をお願いしたのですが、まだバグが残っている状態でした。すると今度は報告者の方が、テストを書いて送ってくれたのですが、これが大いに役に立ちました。テストがあると、どこにどういったバグがあるのか、make test （あるいは prove コマンド）一発でわかるので、言葉で説明してもらうよりも明確ですし、バグ確認後、fail したテスト（と他のテスト）全てが通るようにプログラムに修正を施していけばいいわけで、やることが明確になって作業がスムーズにできました。
+</p>
+
+
+<p>
+自分も今後バグレポートする際には、テストとセットでレポートするようにします。
+</p>
+
+
+<p>
+新機能の追加についても、ひとつの機能毎にテストを書く、実装する、テスト動かして確認、修正する、というサイクルで作業していたのですが、コマンド一発でテストができると、全体の流れを途切れさせることなく、集中力を保ったまま作業ができていいですね。
+</p>
+
+
+<p>
+これを機に Text::Trac のテストを Test::More から Test::Base へ移行したのですが、Test::Base で DRY にテストが書けると、更に全体の流れがよくなり、非常に気持ちよく作業ができます。Test::Base 最高。
+</p>
+
+
+<p>
+Test::Base をご存知ない方は、<a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200610.html"><span class="icon"></span>Shibuya.pm テクニカルトーク #7</a> の <a class="ext-link" href="http://blog.bulknews.net/mt/archives/Test-Base.pdf"><span class="icon"></span>宮川さんの発表資料（PDF）</a> を是非ご覧下さい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1039,119 +1110,6 @@ Plagger プラグインの実行フェーズについて整理してみたので
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/09/22/438/">Plagger::Plugin::Filter::FFmpeg #5</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-09-22T13:01:00+09:00" pubdate>Sep 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/09/22/438/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://d.hatena.ne.jp/shimibow/20060921/1158852346"><span class="icon"></span>id:shimibow さんが Filter::FFmpeg のパッチを書いてくださいました</a>。いつもありがとうございます。これを参考に、以下の様な修正を行いました。
-</p>
-
-
-<pre class="wiki">
-Index: lib/Plagger/Plugin/Filter/FFmpeg.pm
-===================================================================
---- lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 254)
-+++ lib/Plagger/Plugin/Filter/FFmpeg.pm (revision 270)
-@@ -51,15 +51,29 @@
-         $ff->input_options({ file => encode($encoding, $enclosure->local_path) });
-
-         my $output_file = File::Spec->catfile($self->conf->{dir}, "$file");
--        $ff->output_options({
-+        my $output_options = {
-             file    => encode($encoding, $output_file),
-             device  => $self->conf->{device} || 'ipod',
-             title   => encode($encoding, $entry->title),
-             author  => encode($encoding, $entry->author),
-             comment => encode($encoding, $entry->summary),
-             %{ $self->conf->{options} || {} },
--        });
-+        };
-
-+        if ( $self->conf->{extra_options} ) {
-+            my %option_to_name = reverse %FFmpeg::Command::option;
-+            my @extra_options =  split ' ', $self->conf->{extra_options};
-+            for ( @extra_options ){
-+                my $name = $option_to_name{$_};
-+                delete $output_options->{$name} if defined $output_options->{$name} and $name;
-+            }
-+            $ff->output_options($output_options);
-+            $ff->options( @extra_options, @{ $ff->options } );
-+        }
-+        else {
-+            $ff->output_options($output_options);
-+        }
-+
-         unless( -e $output_file ){
-             $context->log( info => 'Converting ' . $enclosure->filename . ' ...' );
-             my $result = $ff->exec();
-</pre>
-
-
-<p>
-extra_options で ffmpeg に渡す追加オプションを指定することができます。
-</p>
-
-
-<p>
-それに合わせて、FFmpeg::Command に以下の修正を加えて 0.05 として CPAN にアップしてます。
-</p>
-
-
-<pre class="wiki">
-Index: library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
-===================================================================
---- library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm (revision 248)
-+++ library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm (revision 266)
-@@ -3,5 +3,5 @@
- use warnings;
- use strict;
--our $VERSION = '0.04';
-+our $VERSION = '0.05';
- 
- use base qw( Class::Accessor::Fast Class::ErrorHandler );
-@@ -11,5 +11,5 @@
- use Carp qw( carp );
- 
--my %option = (
-+our %option = (
-     format              => '-f',
-     video_codec         => '-vcodec',
-</pre>
-
-
-<p>
-%option を Filter::FFmpeg から参照するためなのですが、外部からオプション追加とかもできるようになって、便利なこともあるかな、と。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/21/">&larr; Older</a>
@@ -1169,6 +1127,10 @@ Index: library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -1182,10 +1144,6 @@ Index: library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

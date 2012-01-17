@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="catlxom の Template::TT プラグイン で、$self-&gt;classdata-&gt;{tt}-&gt;process() がエラーになっても、真っ白な画面が表示されるだけで、エラーログにも何も出なくてかなり悩む羽目になったので patch 。 Index: &hellip;">
+  <meta name="description" content="$self->stash でセットした値を、$self->stashall で取り出すと、以下の様なハッシュリファレンスが返ってきます。 { 'Catlxom::Plugin::Paginate::Simple' =&gt; { 'pager' =&gt; bless( { ' &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,125 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/28/428/">Catlxom メモ #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-28T12:04:00+09:00" pubdate>May 28<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/28/428/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+$self->stash でセットした値を、$self->stashall で取り出すと、以下の様なハッシュリファレンスが返ってきます。
+</p>
+
+
+
+
+<pre class="code">
+{
+    'Catlxom::Plugin::Paginate::Simple' =&gt; {
+        'pager' =&gt; bless( {
+            'total_entries'    =&gt; 14,
+            'current_page'     =&gt; 2,
+            'entries_per_page' =&gt; '5'
+        }, 'Data::Page' )
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+で、これをテンプレートで扱おうとして、
+</p>
+
+
+
+
+<pre class="code">
+&#x5b;% Catlxom::Plugin::Paginate::Simple.pager.current_page %&#x5d;
+</pre>
+
+
+
+
+<p class="entryBody">
+などと記述すると、
+</p>
+
+
+
+
+<pre class="code">
+unexpected token (Catlxom::Plugin::Paginate::Simple)
+</pre>
+
+
+
+
+<p class="entryBody">
+といったエラーになります。: が入ってるのがまずいのと、冗長で書くのがめんどくさいので、以下の様な patch を書いてみました。
+</p>
+
+
+
+
+<pre class="code">
+Index: lib/Catlxom/Context/Base.pm
+===================================================================
+--- lib/Catlxom/Context/Base.pm (revision 23)
++++ lib/Catlxom/Context/Base.pm (working copy)
+@@ -57,7 +57,8 @@
+
+ sub stash {
+     my $self   = shift;
+-    my $caller = caller(0);
++    ( my $caller = lc caller(0) ) =~ s/Catlxom::Plugin:://i;
++    $caller =~ s/::/_/g;
+
+     if (@_) {
+         my $stash = @_ &gt; 1 ? {@_} : $_[0];
+</pre>
+
+
+
+
+<p class="entryBody">
+これでテンプレートの中で以下の様に記述できます。
+</p>
+
+
+
+
+<pre class="code">
+&#x5b;% pagenate_simple.pager.current_page %&#x5d;
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -670,115 +789,6 @@ export LD_PRELOAD="/path/libhoard.so:/lib/libdl.so"
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/17/417/">Trac を Lighttpd + FastCGI で動かす</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-17T23:40:00+09:00" pubdate>May 17<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/05/17/417/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://mizzy.org/program/trac.html" target="_blank">このエントリ</a> の様な経緯で、うちでは apache + tracd という構成で trac を動かしてるのですが、tracd がしょっちゅう落ちるんですよね。1日に2, 3回ぐらいは落ちる感じ。で、5分ごとに cron で tracd プロセスを監視して、落ちてたら再起動ってなことをやってるんですが、<a href="http://unknownplace.org/memo/" target="_blank">typester さん</a> から「うちは lighttpd + FastCGI でやってるよ」というアドバイスを頂いたので、試してみました。
-</p>
-
-
-
-
-<p class="entryBody">
-やったことは以下の通り。
-</p>
-
-
-
-
-<ol class="entryBody">
-<li>FastCGI のインストール</li>
-<li>lighttpd のインストール</li>
-<li>lighttpd.conf を書く</li>
-<li>lighttpd の起動</li>
-</ol>
-
-
-
-
-<p class="entryBody">
-1, 2 については省略。ディストリビューションによって違うでしょうし、うちは Slackware だからあんまり参考にならないだろうし。3 については以下の様な内容の /usr/local/etc/lighttpd.conf を作成した。
-</p>
-
-
-
-
-<pre class="code">
-server.modules              = (
-                               "mod_fastcgi",
-                              )
-server.document-root        = "/home/miya/html"
-server.errorlog             = "/var/log/lighttpd.error.log"
-mimetype.assign             = (
-  ".png"          =>      "image/png",
- )
-static-file.exclude-extensions = ( ".fcgi" )
-server.port                = 81
-server.bind                = "localhost"
-server.username            = "svn"
-server.groupname           = "svn"
-fastcgi.server = ("/public" =>
-                   ("public" =>
-                     ("socket" => "/tmp/trac-fastcgi.sock",
-                      "bin-path" => "/usr/local/share/trac/cgi-bin/trac.fcgi",
-                      "check-local" => "disable",
-                      "bin-environment" =>
-                        ("TRAC_ENV" => "/home/miya/trac/public")
-                     )
-                   )
-</pre>
-
-
-
-
-<p class="entryBody">
-たったこれだけの設定でちゃんと動きました。起動は以下のコマンドで。
-</p>
-
-
-
-
-<pre class="code">
-$ sudo /usr/local/sbin/lighttpd -f /usr/local/etc/lighttpd.conf
-</pre>
-
-
-
-
-<p class="entryBody">
-あとは apache の設定を変更してやれば OK。<a href="http://trac.mizzy.org/public/" target="_blank">こんな感じで</a> 動いてます。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/27/">&larr; Older</a>
@@ -796,6 +806,10 @@ $ sudo /usr/local/sbin/lighttpd -f /usr/local/etc/lighttpd.conf
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -809,10 +823,6 @@ $ sudo /usr/local/sbin/lighttpd -f /usr/local/etc/lighttpd.conf
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

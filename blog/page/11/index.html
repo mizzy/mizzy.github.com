@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Koan (Kickstart over a network) を使うと、Cobbler と連携して、PXE ブートを使わずに OS を再インストールしたり、Xen または QEMU のゲスト OS をコマンド一発でインストールすることができます。 以下、Fedora 7 で Koan &hellip;">
+  <meta name="description" content="Cobbler や Koan について触れたところで、次は Virt-Factory です。 Yappo さんが Xen 環境で Cobbler/Koan が動くことを検証してくださったので、心置きなく Virt-Factory の紹介ができます。こちらの身勝手なお願いに応じてくれた Yappo &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,64 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/01/05/VirtFactory/">VirtFactory</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-01-05T20:17:06+09:00" pubdate>Jan 5<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/01/05/VirtFactory/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://trac.mizzy.org/public/wiki/Cobbler">Cobbler</a> や <a href="http://trac.mizzy.org/public/wiki/Koan">Koan</a> について触れたところで、次は <a href="http://virt-factory.et.redhat.com/">Virt-Factory</a> です。</p>
+
+<p><a href="http://blog.yappo.jp/yappo/archives/000555.html">Yappo さんが Xen 環境で Cobbler/Koan が動くことを検証してくださった</a>ので、心置きなく Virt-Factory の紹介ができます。こちらの身勝手なお願いに応じてくれた Yappo さん、ありがとうございます。</p>
+
+<p>Virt-Factory は、大量の仮想サーバの管理を楽に行うためのツールで、Cobbler/Koan + Puppet + これらをラップするサーバ/クライアントデーモンとコマンドラインツール + Web UI + XMLRPC API、といった感じです。具体的には、以下のような感じ。</p>
+
+<ul>
+<li>Cobbler/Koan、Puppet の統合
+
+<ul>
+<li>Cobbler による PXE ブート + ネットワークインストール環境の構築。単に Cobbler を利用する場合とは違い、キックスタートファイルに、Virt-Factory に必要なパッケージのインストールや、インストール後に必要な処理の実行を含めてくれる。</li>
+<li>Koan によるホスト OS や Xen/QEMU ゲスト OS のコマンド一発インストール。Koan を使う場合は、ホスト OS 上で実行する必要があるが、Virt-Factory を使うと中央のサーバからリモートで実行できる。</li>
+<li>リモートのホスト OS 上にある仮想サーバの状況を、中央のサーバで一元管理できる。</li>
+<li>Cobbler でのキックスタートファイル作成時に、Puppet パッケージのインストール処理を含めてくれたり、プロファイル属性として Puppet クラスを指定できたりとか。おそらく Puppet サーバのノード管理とも連携するんじゃないだろうか。（ここはまだちゃんと検証できてない。）</li>
+</ul>
+</li>
+<li>Web UI でプロファイルやシステムの登録、管理などができる</li>
+<li>Web UI やコマンドラインツールは XMLRPC API と連携してる</li>
+</ul>
+
+
+<p>とてもよさげなツールではあるのですが、色んなツールを統合してるだけあって、できることが多すぎてわけがわからないし、<a href="http://virt-factory.et.redhat.com/vf-install-setup.php">本家サイトのインストール/セットアップドキュメント</a>の通りにやっても動かないし、ドキュメントも不十分で、これから触ってみようと思う方は苦労するかと思いますので、インストール手順から使い方まで、自分が理解できた範囲で、今後数回にわけてご紹介していこうと思います。</p>
+
+<p>ただしプロダクトとしてはまだ発展途上という感じで、すぐに実践投入できるものではなさそうです。</p>
+
+<p><del>とりあえず次回は Virt-Factory サーバのインストールと設定について解説予定です。</del><a href="http://trac.mizzy.org/public/wiki/VirtFactoryServerSetup">解説をアップしました</a>。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1161,174 +1219,6 @@ on https://client1.example.org:51234 running service status (ntpd)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/11/16/Lisa07TechSession2ndDay/">Lisa07TechSession2ndDay</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-11-16T14:32:03+09:00" pubdate>Nov 16<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/11/16/Lisa07TechSession2ndDay/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.usenix.org/events/lisa07/">LISA&#8217;07</a> テクニカルセッション2日目の、気になったテーマに関する簡単なメモ。</p>
-
-<h1>Ganeti: An Open Source Multi-Node HA Cluster Based on Xen</h1>
-
-<p>Google でつくられている Xen ベースのオープンソースなマルチノード HA クラスタ（タイトルまんま）。<a href="http://code.google.com/p/ganeti/">プロジェクトページはこちら</a>。</p>
-
-<p>要するに HA + Virtualization。通常の HA は、実マシンから実マシンへフェイルオーバするけど、Ganeti では VM から VM へフェイルオーバーする、と。仮想化は Xen を利用しており、管理用コマンドラインツールには Python を、ディスク管理には LVM, DRBD, MD を、コマンドラインツールから各ノード（Xen dom0）やインスタンス（Xen domU）への命令実行は、Twisted や ssh を利用している。</p>
-
-<p>管理コマンドはマスタノード上で実行する。</p>
-
-<ul>
-<li>gnt-node add/remove/list cluster nodes</li>
-<li>gnt-instance
-
-<ul>
-<li>add/remove</li>
-<li>failover</li>
-<li>stop/start change params</li>
-</ul>
-</li>
-<li>gnt-os: instance os definitions</li>
-<li>gnt-cluster: cluster commands</li>
-<li>gnt-backup: instance export and import</li>
-</ul>
-
-
-<p>すべてのコマンドには man ページとインタラクティブヘルプが用意されてる。</p>
-
-<p>クラスタのセットアップは以下の様に実行する。（node0 というのがマスタノードらしい。）</p>
-
-<pre><code>node0# gnt-cluster init mycluster
-node0# gnt-node add node1
-node0# gnt-node add node2
-node0# gnt-node add node3
-node0# gnt-cluster cmmand apt-get install ganeti-instance-etch
-</code></pre>
-
-<p>インスタンスの作成。</p>
-
-<pre><code>node0# gnt-instance add -n node2:node1 -t drbd8 instance0
-</code></pre>
-
-<p>ノードがクラッシュした場合に別ノードに移行させる。</p>
-
-<pre><code>node0# gnt-instance failover --ignore-consitency instance0
-node0# gnt-instance replace-disks -s --new-secodary=node3 instance0
-</code></pre>
-
-<p>クラスタのステータスチェックコマンド。</p>
-
-<pre><code>node0# gnt-instance list
-node0# gnt-node list
-</code></pre>
-
-<p>サポートしているディスクタイプは、</p>
-
-<ul>
-<li>plain</li>
-<li>local_raid1</li>
-<li>remote_raid1</li>
-<li>drbd8(new)</li>
-</ul>
-
-
-<p>remote_raid1 はなんかすごい複雑だった。こんな感じ。</p>
-
-<pre><code>          +---------------+
-          | instance disk |
-          +---------------+
-                  |
-            +-----------+
-            | MD device |
-            +-----------+
-                  |
-           +-------------+
-           | DRBD device |
-           +-------------+
-             |         |
-  +------------+     +------------+
-  | LVM volume |     | LVM volume |
-  +------------+     +------------+
-        |                  |
-+----------------+ +----------------+
-| Physical disks | | Physical disks |
-|     node1      | |     node2      |
-+----------------+ +----------------+
-</code></pre>
-
-<p>DRBD8 を使えば、もっとシンプルにできるらしい。</p>
-
-<p>ネットワークまわりの機能。（いまいちよくわからなかった。）</p>
-
-<ul>
-<li>Separate replication network</li>
-<li>multiple bridges/VLAN support</li>
-<li>Tagging(new)</li>
-</ul>
-
-
-<p>Google での使われ方。</p>
-
-<ul>
-<li>20-node Ganeti cluster</li>
-<li>64-bit nodes OS</li>
-<li>80 virtual isntances</li>
-<li>used for internal systems</li>
-<li>not used for google.com</li>
-<li>best for non-resource intensive systems</li>
-</ul>
-
-
-<p>将来的に追加したい機能。</p>
-
-<ul>
-<li>automatic instance failover（ってことは今は自動でフェイルオーバーしない？）</li>
-<li>automatic node allocation</li>
-<li>master node election</li>
-<li>manage GUI / meta-cluster manager</li>
-</ul>
-
-
-<p>全体的に気になること、わからないことだらけなんだけど、ソースが公開されてるから使ってみるのがてっとりばやそうだ。HA クラスタは今後うまく活用していきたいし、仮想化によるサーバ集約も興味があるので、時間を作ってぜひ検証してみたい。</p>
-
-<p>そういえば、以前いた会社では、メールサーバなんかはよく HA クラスタ構成でサーバ構築してたけど、最近 HA クラスタはご無沙汰だなぁ。</p>
-
-<p>Eメール送信元のレピュテーション（評価）を集約してシェアしよう、という試み。<a href="http://www.usenix.org/events/lisa07/tech/singaraju.html">概要はこちら</a>。<a href="http://isr.uncc.edu/repuscore/">プロジェクトページもある。</a></p>
-
-<p>SPF, DKIM, SenderID といったいわゆる送信者認証技術は、From ドメインと送信元サーバの組み合わせが正しいかどうかを判断することができるが、これが正しいからといって、スパマーかどうかは判断ができない。（実際、スパマーはいち早くこれらの送信者認証技術に対応してきているらしい。）それを補うのがこの RepuScore であり、送信元に関する評価を集合知的に集めてシェアすることが目的。</p>
-
-<p>SpamAssassin 用プラグインを近々公開予定らしい。</p>
-
-<p>RepuScore で興味深かったのは、不正なレポートを行う（Sybil attacksと呼んでいた）評価者の重みを下げることによって、評価全体への影響を低くして、不正なデータ操作が行えないようにする仕組みがあること。</p>
-
-<p>他のレピュテーションシステムとしては、<a href="http://www.returnpath.net/">SenderPath&#8217;s Sender Score</a> や <a href="http://www.habeas.com/en-US/Receivers/SenderIndex/">Habeas&#8217; SenderIndex</a> といったものがあるが、これらは IP アドレスベースのレピュテーションであり、RepuScore はドメインベースのレピュテーションである、という違いがある。（IPアドレスは組織間でシェアされていることもあるので、こういったレピュテーションシステムには向いていない、という記述もある。）</p>
-
-<p>Gmail も自前でユーザに通知させるレピュテーションの仕組みを持っているが、Gmail の中で閉じられている。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/12/">&larr; Older</a>
@@ -1346,6 +1236,10 @@ node0# gnt-node list
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -1359,10 +1253,6 @@ node0# gnt-node list
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

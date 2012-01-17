@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="現在、LISA という大規模システム管理者向けカンファレンスへの参加のため、ダラスに来ています。自分は 11/14 - 11/16 に開催されるテクニカルセッションのみに参加していて、本日はテクニカルセッションの初日でした。今日聞いた中で気になったテーマについて、さらっとご紹介、 &hellip;">
+  <meta name="description" content="LISA&#8217;07 テクニカルセッション2日目の、気になったテーマに関する簡単なメモ。 Ganeti: An Open Source Multi-Node HA Cluster Based on Xen Google でつくられている Xen ベースのオープンソースなマルチノード HA &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,174 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/16/Lisa07TechSession2ndDay/">Lisa07TechSession2ndDay</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-11-16T14:32:03+09:00" pubdate>Nov 16<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/11/16/Lisa07TechSession2ndDay/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.usenix.org/events/lisa07/">LISA&#8217;07</a> テクニカルセッション2日目の、気になったテーマに関する簡単なメモ。</p>
+
+<h1>Ganeti: An Open Source Multi-Node HA Cluster Based on Xen</h1>
+
+<p>Google でつくられている Xen ベースのオープンソースなマルチノード HA クラスタ（タイトルまんま）。<a href="http://code.google.com/p/ganeti/">プロジェクトページはこちら</a>。</p>
+
+<p>要するに HA + Virtualization。通常の HA は、実マシンから実マシンへフェイルオーバするけど、Ganeti では VM から VM へフェイルオーバーする、と。仮想化は Xen を利用しており、管理用コマンドラインツールには Python を、ディスク管理には LVM, DRBD, MD を、コマンドラインツールから各ノード（Xen dom0）やインスタンス（Xen domU）への命令実行は、Twisted や ssh を利用している。</p>
+
+<p>管理コマンドはマスタノード上で実行する。</p>
+
+<ul>
+<li>gnt-node add/remove/list cluster nodes</li>
+<li>gnt-instance
+
+<ul>
+<li>add/remove</li>
+<li>failover</li>
+<li>stop/start change params</li>
+</ul>
+</li>
+<li>gnt-os: instance os definitions</li>
+<li>gnt-cluster: cluster commands</li>
+<li>gnt-backup: instance export and import</li>
+</ul>
+
+
+<p>すべてのコマンドには man ページとインタラクティブヘルプが用意されてる。</p>
+
+<p>クラスタのセットアップは以下の様に実行する。（node0 というのがマスタノードらしい。）</p>
+
+<pre><code>node0# gnt-cluster init mycluster
+node0# gnt-node add node1
+node0# gnt-node add node2
+node0# gnt-node add node3
+node0# gnt-cluster cmmand apt-get install ganeti-instance-etch
+</code></pre>
+
+<p>インスタンスの作成。</p>
+
+<pre><code>node0# gnt-instance add -n node2:node1 -t drbd8 instance0
+</code></pre>
+
+<p>ノードがクラッシュした場合に別ノードに移行させる。</p>
+
+<pre><code>node0# gnt-instance failover --ignore-consitency instance0
+node0# gnt-instance replace-disks -s --new-secodary=node3 instance0
+</code></pre>
+
+<p>クラスタのステータスチェックコマンド。</p>
+
+<pre><code>node0# gnt-instance list
+node0# gnt-node list
+</code></pre>
+
+<p>サポートしているディスクタイプは、</p>
+
+<ul>
+<li>plain</li>
+<li>local_raid1</li>
+<li>remote_raid1</li>
+<li>drbd8(new)</li>
+</ul>
+
+
+<p>remote_raid1 はなんかすごい複雑だった。こんな感じ。</p>
+
+<pre><code>          +---------------+
+          | instance disk |
+          +---------------+
+                  |
+            +-----------+
+            | MD device |
+            +-----------+
+                  |
+           +-------------+
+           | DRBD device |
+           +-------------+
+             |         |
+  +------------+     +------------+
+  | LVM volume |     | LVM volume |
+  +------------+     +------------+
+        |                  |
++----------------+ +----------------+
+| Physical disks | | Physical disks |
+|     node1      | |     node2      |
++----------------+ +----------------+
+</code></pre>
+
+<p>DRBD8 を使えば、もっとシンプルにできるらしい。</p>
+
+<p>ネットワークまわりの機能。（いまいちよくわからなかった。）</p>
+
+<ul>
+<li>Separate replication network</li>
+<li>multiple bridges/VLAN support</li>
+<li>Tagging(new)</li>
+</ul>
+
+
+<p>Google での使われ方。</p>
+
+<ul>
+<li>20-node Ganeti cluster</li>
+<li>64-bit nodes OS</li>
+<li>80 virtual isntances</li>
+<li>used for internal systems</li>
+<li>not used for google.com</li>
+<li>best for non-resource intensive systems</li>
+</ul>
+
+
+<p>将来的に追加したい機能。</p>
+
+<ul>
+<li>automatic instance failover（ってことは今は自動でフェイルオーバーしない？）</li>
+<li>automatic node allocation</li>
+<li>master node election</li>
+<li>manage GUI / meta-cluster manager</li>
+</ul>
+
+
+<p>全体的に気になること、わからないことだらけなんだけど、ソースが公開されてるから使ってみるのがてっとりばやそうだ。HA クラスタは今後うまく活用していきたいし、仮想化によるサーバ集約も興味があるので、時間を作ってぜひ検証してみたい。</p>
+
+<p>そういえば、以前いた会社では、メールサーバなんかはよく HA クラスタ構成でサーバ構築してたけど、最近 HA クラスタはご無沙汰だなぁ。</p>
+
+<p>Eメール送信元のレピュテーション（評価）を集約してシェアしよう、という試み。<a href="http://www.usenix.org/events/lisa07/tech/singaraju.html">概要はこちら</a>。<a href="http://isr.uncc.edu/repuscore/">プロジェクトページもある。</a></p>
+
+<p>SPF, DKIM, SenderID といったいわゆる送信者認証技術は、From ドメインと送信元サーバの組み合わせが正しいかどうかを判断することができるが、これが正しいからといって、スパマーかどうかは判断ができない。（実際、スパマーはいち早くこれらの送信者認証技術に対応してきているらしい。）それを補うのがこの RepuScore であり、送信元に関する評価を集合知的に集めてシェアすることが目的。</p>
+
+<p>SpamAssassin 用プラグインを近々公開予定らしい。</p>
+
+<p>RepuScore で興味深かったのは、不正なレポートを行う（Sybil attacksと呼んでいた）評価者の重みを下げることによって、評価全体への影響を低くして、不正なデータ操作が行えないようにする仕組みがあること。</p>
+
+<p>他のレピュテーションシステムとしては、<a href="http://www.returnpath.net/">SenderPath&#8217;s Sender Score</a> や <a href="http://www.habeas.com/en-US/Receivers/SenderIndex/">Habeas&#8217; SenderIndex</a> といったものがあるが、これらは IP アドレスベースのレピュテーションであり、RepuScore はドメインベースのレピュテーションである、という違いがある。（IPアドレスは組織間でシェアされていることもあるので、こういったレピュテーションシステムには向いていない、という記述もある。）</p>
+
+<p>Gmail も自前でユーザに通知させるレピュテーションの仕組みを持っているが、Gmail の中で閉じられている。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -946,124 +1114,6 @@ package { ssh:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/08/03/520/">Pushmi つかってます & 技術者募集中 at 福岡</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-08-03T01:52:00+09:00" pubdate>Aug 3<span>rd</span>, 2007</time>
-        
-         | <a href="/blog/2007/08/03/520/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>&#8220;弊社&#8221;:http://www.paperboy.co.jp/ は東京と福岡にオフィスがあり、それぞれの拠点に Subversion + Trac 環境を構築し、&#8221;OpenVPN&#8221;:http://openvpn.net/ により VPN 接続してお互いの開発状況を公開しています。サービス絡みの開発は基本的に、東京は東京、福岡は福岡で完結しているので、この方式で問題はないのですが、サーバ管理関連のスクリプトなんかは、東京と福岡で共通するものが多いため、別々の SVN リポジトリで管理されてると不便なんですよね。かといって、どちらかの拠点だけしかリポジトリがないと、VPN の障害発生時に、リポジトリのない拠点からはまったくアクセスができない、という困ったことになってしまいます。</p>
-
-<p>そこで、SVN リポジトリレプリケーションツール &#8220;Pushmi&#8221;:http://search.cpan.org/dist/Pushmi/lib/Pushmi.pm を導入してみました。詳細は &#8220;YAPC::Asia での 作者 Cl Kao によるスピーチ動画&#8221;:http://video.google.com/videoplay?docid=-7181301487103062288&amp;q=yapc+asia+2007&amp;total=46&amp;start=0&amp;num=50&amp;so=1&amp;type=search&amp;plindex=13 を見て頂くとして、ここでは行った設定についてメモを残しておきます。ほとんど perldoc Pushmi の内容と同じですが。</p>
-
-<p>まず当然 Pushmi のインストールが必要です。これの手順は省略。また、より良いアトミックロック実現のために &#8220;memcached&#8221;:http://www.danga.com/memcached/ を利用している、ということなのでインストールしておきます。これも手順は省略。</p>
-
-<p>memcached を起動します。</p>
-
-<pre><code>$ sudo /usr/bin/memcached -p 8123 -dP /var/run/memcached.pid -u nobody
-</code></pre>
-
-
-<p>/etc/pushmi.conf を設定します。弊社の環境では memcached のポートのみ指定してます。</p>
-
-<pre><code>authproxy_port: 8123
-</code></pre>
-
-
-<p>ミラーリポジトリを作成します。</p>
-
-<pre><code>$ pushmi mirror /var/db/my-local-mirror http://master.repository/svn
-Mirror initialized.
-</code></pre>
-
-
-<p>ミラーリポジトリとマスターリポジトリを同期します。</p>
-
-<pre><code>$ pushmi sync /var/db/my-local-mirror
-Retrieving log information from 1 to 62
-</code></pre>
-
-
-<p>ミラーリポジトリは、svnadmin create で作成するのと同様なディレクトリ、ファイル構造になってますが、Pushmi 用の pre-commit スクリプトと post-commit スクリプトが置かれている、というところが異なります。</p>
-
-<p>pre-commit では以下の様なコマンドが実行され、ミラーリポジトリにコミットされた内容を、マスターリポジトリにコミットしに行きます。</p>
-
-<pre><code>/usr/bin/pushmi runhook $1 --txnname $2
-</code></pre>
-
-
-<p>post-commit では以下の様なコマンドが実行され、ミラーとマスターの整合性を確認しています。</p>
-
-<pre><code>/usr/bin/pushmi verify $1 --revision $2
-</code></pre>
-
-
-<p>Apache + WebDAV で SVN リポジトリにアクセスするために、以下の様な設定を Apache で行います。</p>
-
-<pre><code><Location /svn/server>
-  PerlSetVar SVNPath /var/db/my-local-mirror
-  PerlSetVar Pushmi /usr/bin/pushmi
-  PerlSetVar PushmiConfig /etc/pushmi.conf
-  <LimitExcept GET PROPFIND OPTIONS REPORT>
-    AuthName "mirrored private area"
-    AuthType Basic
-    Require valid-user
-    AuthLDAPURL ldap://localhost:389/ou=people,o=paperboy?uid?sub?(objectclass=*)
-    PerlAuthenHandler Pushmi::Apache::AuthCommit
-  </LimitExcept>
-</Location>
-</code></pre>
-
-
-<p>設定見て分かると思いますが、mod_perl を利用していて、Apche2 + mod_perl の環境が必要です。Apache は 2.0 系でも 2.2 系でも大丈夫なようです。弊社では 2.0 系を利用しています。</p>
-
-<p>特にポイントとなるのは、</p>
-
-<pre><code>PerlAuthenHandler Pushmi::Apache::AuthCommit
-</code></pre>
-
-
-<p>の部分で、認証で渡されたユーザ名、パスワードをこのモジュールで memcached にキャッシュしておき、マスタリポジトリへのコミット時の認証に利用します。Apache 2.2 系の場合には、以下の様に設定します。</p>
-
-<pre><code>AuthBasicProvider Pushmi::Apache::RelayProvider
-</code></pre>
-
-
-<p>この状態では、ミラーへのコミットは即マスターに反映されますが、マスターへのコミットはミラーに反映されませんので、以下の様な cron 設定を行い、5分おきにマスターとミラーを同期するようにします。</p>
-
-<pre><code>*/5 * * * * /usr/bin/pushmi sync --nowait /var/db/my-local-mirror
-</code></pre>
-
-
-<p>今のところこれで問題なく動いています。</p>
-
-<p>話変わりまして、弊社福岡支社では、&#8221;プログラマ&#8221;:http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=1&amp;ty=0&amp;rm=0 と &#8220;サーバエンジニア&#8221;:http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=2&amp;ty=0&amp;rm=0 を募集しています。Pushmi を実戦で使ってみたい！という方はぜひ。メガネ女子プログラマもいますよ。（東京本社にもいます。人妻ですが。）</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -1081,6 +1131,10 @@ Retrieving log information from 1 to 62
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -1094,10 +1148,6 @@ Retrieving log information from 1 to 62
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>

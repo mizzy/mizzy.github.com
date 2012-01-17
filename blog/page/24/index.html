@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="perl で ffmpeg を扱うモジュールには、FFmpeg というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、 &hellip;">
+  <meta name="description" content="前のエントリの FFmpeg::Command を利用して、Plagger::Plugin::Filger::FFmpeg 書いてみた。（っていうか、このために FFmpeg::Command つくったわけですが。） とりあえず形にして動くことを確認したかったので、変換パラメータが固定だったり、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,103 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/27/268/">Plagger::Plugin::Filter::FFmpeg #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-27T02:35:00+09:00" pubdate>Jul 27<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/27/268/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+前のエントリの <a class="ext-link" href="http://mizzy.org/program/ffmpeg00.html"><span class="icon"></span>FFmpeg::Command</a> を利用して、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Plagger::Plugin::Filger::FFmpeg</a> 書いてみた。（っていうか、このために FFmpeg::Command つくったわけですが。）
+</p>
+
+
+<p>
+とりあえず形にして動くことを確認したかったので、変換パラメータが固定だったり、適当すぎるつくりになってますが、おいおい改善していくということで。
+</p>
+
+
+<p>
+以下の様な設定で、YouTube の My Favorite 動画をダウンロード ⇒ mpeg4 へ変換 ⇒ enclosure url を rewrite ⇒ Publish::Feed で podcast、ってところまで確認済み。 
+</p>
+
+
+<p>
+<strong> 2006/07/27 03:23:30 追記</strong><br />
+miyagawa さんからの指摘で、URL の書き換えは Filter::RewriteEnclosureURL を使うようにしました。このプラグインの存在をすっかり見落としてました…
+</p>
+
+
+<pre class="wiki">
+global:
+  user_agent:
+    cookies: /home/miya/plagger/cookies.txt
+  log:
+    level: info
+
+plugins:
+  - module: Subscription::Config
+    config:
+      feed:
+        - http://www.youtube.com/my_favorites
+
+  - module: Filter::TruePermalink
+  - module: Filter::FindEnclosures
+  - module: Filter::EntryFullText
+  - module: Filter::HEADEnclosureMetadata
+  - module: Filter::FetchEnclosure
+    config:
+      dir: /home/miya/mov
+
+  - module: Filter::FFmpeg
+    config:
+      output_dir: /home/miya/mov
+      ext: mp4
+
+  - module: Filter::RewriteEnclosureURL
+    config:
+      rewrite:
+        - local: /home/miya/mov/
+          url:   http://mizzy.org/mov/
+
+  - module: Publish::Feed
+    config:
+      format: RSS
+      dir: /home/miya/plagger
+      filename: %t.rss
+</pre>
+
+
+<p>
+これに合わせて、FFmpeg::Command で ffmpeg を exec で呼び出してたのを、system に変更しました。exec だと Publish::Feed が動いてくれなかったので。おそらく exec はプロセスをフォークした後 wait しないのが原因かな、と。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1201,160 +1298,6 @@ Yappo さんご所望の挙動をカスタマイズできる機能は、これ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/06/20/384/">Text::Trac - Trac Wiki 記法パーサ #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-06-20T00:26:00+09:00" pubdate>Jun 20<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/06/20/384/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3 id="Text::Tracをblosxomから呼び出してみるテスト">Text::Trac を blosxom から呼び出してみる テスト</h3>
-
-
-<p>
-Text::Trac が形になってきたので、実際に文章を書いてテストしてみる。
-</p>
-
-
-<h4 id="もういっちょ見出しのテスト">もういっちょ見出しのテスト</h4>
-
-
-<p>
-paragraph 1<br />
-paragraph 1<br />
-paragraph 1
-</p>
-
-
-<p>
-paragraph 2<br />
-paragraph 2<br />
-paragraph 2
-</p>
-
-
-<ul><li>リスト 1</li>
-<li>リスト 2</li>
-<li>リスト 3</li></ul>
-
-
-<ol start="1"><li>リスト 1</li>
-<li>リスト 2</li>
-<li>リスト 3</li></ol>
-
-
-<dl>
-<dt>定義リスト1</dt>
-<dd>
-内容その1
-</dd>
-<dt>定義リスト2</dt>
-<dd>
-内容その2
-</dd>
-</dl>
-
-
-<p>
-上の内容は実際にはこんな感じで書いてます。
-</p>
-
-
-<pre class="wiki">
-= Text::Trac を blosxom から呼び出してみる テスト =
-
-== もういっちょ見出しのテスト ==
-
-paragraph 1[[BR]]
-paragraph 1[[BR]]
-paragraph 1
-
-paragraph 2[[BR]]
-paragraph 2[[BR]]
-paragraph 2
-
- * リスト 1
- * リスト 2
- * リスト 3
-
- 1. リスト 1
- 1. リスト 2
- 1. リスト 3
-
- 定義リスト1::
-   内容その1
- 定義リスト2::
-   内容その2
-</pre>
-
-
-<p>
-blosxom からは以下の様なプラグインで Text::Trac を呼び出してます。
-</p>
-
-
-<pre class="wiki">
-# Blosxom Plugin: text_trac
-# Author: Gosuke Miyashita &lt;miya at mizzy.org&gt;
-# Version: 2006-06-20
-# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
-
-package text_trac;
-
-use strict;
-use Text::Trac;
-
-sub start {
-  1;
-}
-
-sub story {
-  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
-
-  if ( $meta::syntax eq 'trac' ){
-      my $parser = Text::Trac-&gt;new( min_heading_level =&gt; 3 );
-      $parser-&gt;parse($$body_ref);
-      $$body_ref = $parser-&gt;html;
-  }
-
-  return 1;
-}
-
-1;
-
-__END__
-</pre>
-
-
-<p>
-Text::Trac 自体はもうちょいで CPAN にアップできると思います。ただし、Yappo さんご所望の機能はもう少し時間ください。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/25/">&larr; Older</a>
@@ -1372,6 +1315,10 @@ Text::Trac 自体はもうちょいで CPAN にアップできると思います
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
@@ -1385,10 +1332,6 @@ Text::Trac 自体はもうちょいで CPAN にアップできると思います
     
       <li class="post">
         <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/06/weechat-script-for-pushing-notification-to-im-dot-kayac-dot-com/">WeeChat script for pushing notification to im.kayac.com</a>
       </li>
     
   </ul>
