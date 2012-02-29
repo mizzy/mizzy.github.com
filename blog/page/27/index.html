@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="このエントリ の様な経緯で、うちでは apache + tracd という構成で trac を動かしてるのですが、tracd がしょっちゅう落ちるんですよね。1日に2, 3回ぐらいは落ちる感じ。で、5分ごとに cron で tracd プロセスを監視して、 &hellip;">
+  <meta name="description" content="Hoard というメモリアロケータを、弊社サーバエンジニアの方から教えてもらいました。 使い方は簡単で、 export LD_PRELOAD="/path/libhoard.so:/lib/libdl.so" などとしておくと、アプリケーション実行時に Hoard のライブラリを読み込み、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,70 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/18/374/">マルチプロセッサ/マルチスレッド メモリアロケータ Hoard</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-05-18T23:43:00+09:00" pubdate>May 18<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/05/18/374/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.hoard.org/" target="_blank">Hoard</a> というメモリアロケータを、弊社サーバエンジニアの方から教えてもらいました。
+</p>
+
+
+
+
+<p class="entryBody">
+使い方は簡単で、
+</p>
+
+
+
+
+<pre class="code">
+export LD_PRELOAD="/path/libhoard.so:/lib/libdl.so"
+</pre>
+
+
+
+
+<p class="entryBody">
+などとしておくと、アプリケーション実行時に Hoard のライブラリを読み込み、malloc/free を Hoard のものに置き換えます。これにより、マルチプロセッサ/マルチスレッド環境でパフォーマンスを発揮する Hoard のメモリアロケーションアルゴリズムが、アプリに一切手を加えることなく利用できる、というわけです。
+</p>
+
+
+
+
+<p class="entryBody">
+もちろん仕組み上、<a href="http://www.cs.umass.edu/~emery/hoard/faqs.html">FAQ</a> にあるように、スタティックリンクされたアプリや、malloc/free を使わずに独自のメモリアロケータを使っているアプリでは利用することはできませんが、ほとんどのアプリには利用できるんじゃないでしょうか。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -722,118 +786,6 @@ YouTube はタグ別に RSS を吐いているのですが、検索結果は RSS
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/04/05/278/">Plagger::Plugin::Filter::Amazon</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-04-05T21:19:00+09:00" pubdate>Apr 5<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/04/05/278/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Amazon.pm" target="_blank">P::P::Filter::Amazon</a> を作ってみました。<a href="http://mizzy.org/program/iTunesRecentPlay01.html" target="_blank">以前 CustomFeed::iTunesRecentPlay に Amazon Web Service からの情報取得機能をつけた</a> のですが、宮川さんから「Filter でやったほうがよい」というコメントを頂きましたので、Filter プラグインとして分離しました。
-</p>
-
-
-
-
-<p class="entryBody">
-Amazon から情報を取得して、entry に link, icon, summary をセットします。
-</p>
-
-
-
-
-<p class="entryBody">
-設定はこんな感じになります。
-</p>
-
-
-
-
-<pre class="code">
-  - module: Filter::Amazon
-    config:
-      keywords:
-        - title
-        - meta: artist
-        - meta: album
-      associate_id: xxxxxxx-22
-      developer_token: XXXXXXXXXXXXXXXXXXXX
-      locale: jp
-      mode: music
-</pre>
-
-
-
-
-<p class="entryBody">
-上の設定だと、$entry-&gt;title, $entry-&gt;meta-&gt;{artist}, $entry-&gt;meta-&gt;{album} を検索キーワードとします。
-</p>
-
-
-
-
-<p class="entryBody">
-この検索キーワード指定のフォーマットには、少し悩みました。このフォーマットだと、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/GoogleVideo.pm" target="_blank">CustomFeed::GoogleVideo</a> や <a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/YouTube.pm" target="_blank">CustomFeed::YouTube</a> で使われている様な、$entry->meta->{enclosure}->{url} といった深いハッシュには対応できないのですが、特殊なケースだと思うので、とりあえず考えないことにしました。
-</p>
-
-
-
-
-<p class="entryBody">
-あと悩んだのは名称ですね。Filter::Amazon にするか、 Filter::AWS にするか、 Filter::AmazonWebService にするか。とりあえず Net::Amazon に合わせてみました。
-</p>
-
-
-
-
-<p class="entryBody">
-<strong>追記</strong><br />
-IRC で宮川さんからアドバイス頂いたのでメモ。
-</p>
-
-
-
-
-<ul class="entryBody">
-<li>Filter::AmazonWebService に名称を変える。</li>
-<li>検索ワードは config.yaml で設定せずに、Filter::AWS で制約を設けて、metadata を見るようにする。music, books などの mode も metadata に入れる。</li>
-<li>曲名を入れて検索するとヒットしないことがあるので、その場合は曲名を抜いて検索しなおす。</li>
-</ul>
-
-
-
-
-<p class="entryBody">
-<strong>更に追記</strong><br />
-<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/AmazonWebService.pm" target="_blank">P::P::Filter::AmazonWebService</a> として作り直した。まだ音楽のみ対応。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/28/">&larr; Older</a>
@@ -851,6 +803,10 @@ IRC で宮川さんからアドバイス頂いたのでメモ。
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -864,10 +820,6 @@ IRC で宮川さんからアドバイス頂いたのでメモ。
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

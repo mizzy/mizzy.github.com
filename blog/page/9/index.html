@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ずいぶん間があいちゃいましたが、[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4] のつづき。今回は DM-MP により束ねられた仮想的なブロックデバイス（/dev/mapper/mpath0 と /dev/mapper &hellip;">
+  <meta name="description" content="TLUG Meeting 2008/09 で発表した How to build a scalable storage system with OSS なんですが、発表では概要しか触れてなくて、じゃあいったいどうやって構築するのよ、という部分が全然ないので、ぼちぼちこのブログで書いていくことにします &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,134 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/12/28/ScalableStorageWithOSS00/">ScalableStorageWithOSS00</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-12-28T17:21:10+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/12/28/ScalableStorageWithOSS00/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://trac.mizzy.org/public/wiki/HowToBuildAScalableStorageSystemWithOSS">TLUG Meeting 2008/09 で発表した How to build a scalable storage system with OSS</a> なんですが、発表では概要しか触れてなくて、じゃあいったいどうやって構築するのよ、という部分が全然ないので、ぼちぼちこのブログで書いていくことにします。</p>
+
+<p>で、スケーラブルというだけだと曖昧なので、以下のような要件を満たすものを、スケーラブルなストレージと想定することにします。</p>
+
+<ul>
+<li>特殊なソフトウェアを必要とせずに、OS からファイルシステムとしてマウントできるもの。なので MogileFS、Hadoop Distributed File System、Google File System 等は対象外。（FUSE 使えばやれないこともないけど…）</li>
+<li>容量をオンラインでダイナミックに追加できる。</li>
+<li>SPOF がない。</li>
+<li>複数のサーバから同時にマウントすることができる。</li>
+<li>物理的に I/O を柔軟に分散することができる。</li>
+<li>無駄な空きスペースができにくい。</li>
+</ul>
+
+
+<p>で、こういったストレージを、高価なハードウェアを買わずに、オープンソースソフトウェアだけで構築することができないか、と考えて、こんな感じで実現できそうだなあー、というのを発表したのが TLUG でのプレゼンの内容。このプレゼンで出てきたキーワードとその概要をおさらいすると、以下のような感じ。</p>
+
+<ul>
+<li><a href="http://sources.redhat.com/cluster/cman/">cman</a>
+
+<ul>
+<li>Cluster Manager</li>
+<li>Red Hat Cluster Suite の一コンポーネント</li>
+<li>クラスタのメンバーシップ管理とノード間のメッセージング</li>
+<li>以下に出てくる、CLVM や GFS2 を使うために必要</li>
+</ul>
+</li>
+<li><a href="http://sources.redhat.com/cluster/clvm/">CLVM</a>
+
+<ul>
+<li>Cluster Logical Volume Manager</li>
+<li>LVM2 のクラスタ版</li>
+<li>LVM2 のメタデータをクラスタノード間で自動的にシェアする</li>
+<li>CLVM で作成された論理ボリュームは、すべてのクラスタノードから参照できる</li>
+</ul>
+</li>
+<li><a href="http://sourceware.org/cluster/gnbd/">GNBD</a>
+
+<ul>
+<li>Global Network Block Device</li>
+<li>TCP/IP ネットワーク経由でのブロックデバイスアクセス</li>
+<li>iSCSI と同じようなもの</li>
+<li>iSCSI との違いは、フェンシング機能を持っていること（フェンシングについては機会があれば説明します）</li>
+</ul>
+</li>
+<li><a href="http://sources.redhat.com/cluster/gfs/">GFS2</a>
+
+<ul>
+<li>Global File System 2</li>
+<li>クラスタファイルシステム</li>
+<li>複数ノードから同時にマウントしてアクセスすることが可能</li>
+<li>cman の DLM(Distributed Lock Manager) を利用して排他制御し、ファイルの整合性を保つ</li>
+<li>OCFS(Oracle Cluster File System) なんかも同類</li>
+</ul>
+</li>
+<li><a href="http://www.drbd.org/">DRBD</a>
+
+<ul>
+<li>Ditributed Replicated Block Device</li>
+<li>要するにネットワーク越しの RAID1</li>
+</ul>
+</li>
+<li><a href="http://www.redhat.com/docs/manuals/csgfs/browse/4.6/DM_Multipath/index.html">DM-MP</a>
+
+<ul>
+<li>Device-Mapper Multipath</li>
+<li>複数の I/O 経路を仮想的にひとつに見せかけることができる</li>
+<li>Active/Passive、Active/Active どちらでも対応可</li>
+</ul>
+</li>
+</ul>
+
+
+<p><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">TLUG での発表資料</a> では、それぞれを図で説明していたり、これらをどう組み合わせて利用するのかを説明しているので、ご参照ください。</p>
+
+<p>で、これらを組み合わせて構築したストレージがとりあえず動くことは確認できたのだけど、実用に耐えうるかどうかは謎。特に以下の点が気になるところ。</p>
+
+<ul>
+<li>協調動作するコンポーネントが多くて、トラブルが起こりやすそう。</li>
+<li>安定性。</li>
+<li>パフォーマンス。</li>
+<li>ストレージとなるサーバを追加して容量を増やした場合のオーバーヘッドの増加具合。</li>
+</ul>
+
+
+<p>なので、今後実際に使うかどうかはまだ決めかねてるのですが、一通り動かせるところまでは試してみたので、次回から実際の構築手順を書いていこうと思います。</p>
+
+<h1>関連エントリ</h1>
+
+<ul>
+<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
+<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
+<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
+<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
+<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -634,49 +762,6 @@ ieiri
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/09/14/HowToBuildAScalableStorageSystemWithOSS/">HowToBuildAScalableStorageSystemWithOSS</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-09-14T13:48:34+09:00" pubdate>Sep 14<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/09/14/HowToBuildAScalableStorageSystemWithOSS/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.tlug.jp/wiki/Meetings:2008:09">TLUG Meeting 2008/09</a> で話した、<a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">How to build a scalable storage system with OSS のスライドを slideshare にアップ</a> しました。</p>
-
-<p>英語で初のプレゼンってことで、途中言葉が出てこないことがあったり、英語で質問された内容がうまく聞き取れなかったり、元々開始が遅くて押し気味のスケジュールのところ、時間感覚が全然なくてオーバーしてしまい、最後の Edward さんの発表時間がなくなってしまったりと、反省点だらけ。</p>
-
-<p>プレゼンの内容自体は、自分は今こんなこと検討していて、こういう技術について調べてみたんだけど、他にもいいやりかたとか、いい技術とかあれば教えてください、といったスタンスだったんですが、息子の容態がおかしい、と妻から連絡が入って、飲み会開始早々帰ることになったため、他の方の意見を聞く時間がなく、目的を果たせませんでした。（プレゼン後、飲み会の移動までの間に、二人の方と軽くお話できましたが。）あ、ちなみに息子は、今日は元気にもりもり飯食ってます。</p>
-
-<p>内容的にも、いろんなコンポーネントが協調して動くストレージシステムの話なので、短時間でプレゼンして議論するには、かなりきつかったですね。このネタだけでひとつカンファレンスが成り立つんじゃないかと思います。（と、StorageCon 開催フラグを立ててみる。）</p>
-
-<p>というわけで、初の英語プレゼンチャレンジは、成功したとは言い難いのですが、いい経験になりましたし、興味深い話が聞けて良かったと言ってくださった方もいたり、それにやっぱり、人前で技術プレゼンするのは楽しいなー、と改めて思ったりで、また機会があればぜひやらせてもらいたいです。</p>
-
-<p>この機会をくださった<a href="http://trombik.mine.nu/~cherry/w/">桜井さん</a>に大変感謝しています。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/10/">&larr; Older</a>
@@ -694,6 +779,10 @@ ieiri
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -707,10 +796,6 @@ ieiri
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

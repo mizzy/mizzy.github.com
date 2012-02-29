@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="TLUG Meeting 2008/09 で、高価なハードウェアを使わずに OSS のみで、スケーラブルなストレージをどうやって構成するのか、といった話をします。人生初の英語でのプレゼンにチャレンジ。 最初は桜井さんから、「ModSecurity の話をするのですが、興味ないですか？」 &hellip;">
+  <meta name="description" content="TLUG Meeting 2008/09 で話した、How to build a scalable storage system with OSS のスライドを slideshare にアップ しました。 英語で初のプレゼンってことで、途中言葉が出てこないことがあったり、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/09/14/HowToBuildAScalableStorageSystemWithOSS/">HowToBuildAScalableStorageSystemWithOSS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-09-14T13:48:34+09:00" pubdate>Sep 14<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/09/14/HowToBuildAScalableStorageSystemWithOSS/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.tlug.jp/wiki/Meetings:2008:09">TLUG Meeting 2008/09</a> で話した、<a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">How to build a scalable storage system with OSS のスライドを slideshare にアップ</a> しました。</p>
+
+<p>英語で初のプレゼンってことで、途中言葉が出てこないことがあったり、英語で質問された内容がうまく聞き取れなかったり、元々開始が遅くて押し気味のスケジュールのところ、時間感覚が全然なくてオーバーしてしまい、最後の Edward さんの発表時間がなくなってしまったりと、反省点だらけ。</p>
+
+<p>プレゼンの内容自体は、自分は今こんなこと検討していて、こういう技術について調べてみたんだけど、他にもいいやりかたとか、いい技術とかあれば教えてください、といったスタンスだったんですが、息子の容態がおかしい、と妻から連絡が入って、飲み会開始早々帰ることになったため、他の方の意見を聞く時間がなく、目的を果たせませんでした。（プレゼン後、飲み会の移動までの間に、二人の方と軽くお話できましたが。）あ、ちなみに息子は、今日は元気にもりもり飯食ってます。</p>
+
+<p>内容的にも、いろんなコンポーネントが協調して動くストレージシステムの話なので、短時間でプレゼンして議論するには、かなりきつかったですね。このネタだけでひとつカンファレンスが成り立つんじゃないかと思います。（と、StorageCon 開催フラグを立ててみる。）</p>
+
+<p>というわけで、初の英語プレゼンチャレンジは、成功したとは言い難いのですが、いい経験になりましたし、興味深い話が聞けて良かったと言ってくださった方もいたり、それにやっぱり、人前で技術プレゼンするのは楽しいなー、と改めて思ったりで、また機会があればぜひやらせてもらいたいです。</p>
+
+<p>この機会をくださった<a href="http://trombik.mine.nu/~cherry/w/">桜井さん</a>に大変感謝しています。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -336,7 +379,7 @@ warn Parent-&gt;x; # Child が表示されてしまう
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#109;&#97;&#x69;&#108;&#x74;&#111;&#x3a;&#103;&#111;&#115;&#117;&#107;&#101;&#x6e;&#x61;&#x74;&#x6f;&#x72;&#64;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#x6f;&#109;">&#x67;&#111;&#115;&#x75;&#x6b;&#101;&#x6e;&#97;&#116;&#x6f;&#114;&#64;&#x67;&#109;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>Gosuke Miyashita, <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#x6f;&#58;&#x67;&#x6f;&#x73;&#117;&#x6b;&#101;&#x6e;&#x61;&#116;&#111;&#x72;&#64;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;">&#x67;&#111;&#x73;&#117;&#x6b;&#x65;&#x6e;&#x61;&#x74;&#x6f;&#114;&#64;&#x67;&#109;&#x61;&#x69;&#108;&#46;&#x63;&#111;&#x6d;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
@@ -1079,106 +1122,6 @@ delete:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/01/12/VirtFactoryClientSetup/">VirtFactoryClientSetup</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-01-12T15:38:49+09:00" pubdate>Jan 12<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/01/12/VirtFactoryClientSetup/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://trac.mizzy.org/public/wiki/VirtFactoryServerSetup">前回</a>に続き、今回はクライアント側の手順です。クライアント側では、必要なソフトウェアのインストールと、サーバへの登録を行います。</p>
-
-<p>クライアントのサーバへの登録は、既に OS がインストールされた状態から行う方法と、OS がインストールされていないまっさらな状態から行う方法の2つがあります。</p>
-
-<p>以下、2つの方法について手順を解説します。これもサーバと一緒で、Fedora 7 で試しています。</p>
-
-<h1>既に OS がインストールされた状態から行う方法</h1>
-
-<h2>SELinux と iptables をオフに</h2>
-
-<p>とりあえず検証目的なので、こいつらはオフにしときます。手順は省略。</p>
-
-<h2>yum リポジトリの設定</h2>
-
-<p>これは <a href="http://trac.mizzy.org/public/wiki/VirtFactoryServerSetup#yum%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE%E8%A8%AD%E5%AE%9A">サーバ側の設定</a> と同じなので省略。</p>
-
-<h2>必要なパッケージのインストール</h2>
-
-<p>Virt-Factory は仮想サーバの管理を行うためのものなので、当然何らかの仮想環境が必要。というわけで、Xen カーネルとツールをインストール。</p>
-
-<pre><code>$ sudo yum install kernel-xen xen
-</code></pre>
-
-<p>それから、Python をアップデートしないと、後述する virt-factory-node-server でエラーが出たので、アップデートしておく。</p>
-
-<pre><code>$ sudo yum update python
-</code></pre>
-
-<p>Xen カーネルで起動するために、再起動する。</p>
-
-<p>現在の Virt-Factory は、Cobbler/Koan 0.6.2 を前提にしているため、バージョン指定で 0.6.2 をインストール。</p>
-
-<pre><code>$ sudo yum install koan-0.6.2-1.fc7
-</code></pre>
-
-<p>その他必要なパッケージをインストール。</p>
-
-<pre><code>$ sudo yum install virt-factory-nodes virt-factory-register libvirt-python
-</code></pre>
-
-<h2>サーバへの登録</h2>
-
-<p>Virt-Factory クライアントをサーバに登録するためには、次のコマンドを実行します。</p>
-
-<pre><code>$ sudo vf_register --serverurl=http://server.example.org:5150 --profile=Container     
-</code></pre>
-
-<p>server.example.org の部分は、サーバ側で Python の socket.gethostname() で取得できるホスト名と同一である必要があります。（qpid でのメッセージング処理の関係で。）</p>
-
-<p>登録が正常に完了すれば、サーバ側で ampm コマンドを実行して、確認することができます。（Web UI でも確認できます。）</p>
-
-<pre><code>$ sudo ampm list hosts
-hostname: client.example.org id: 1 profile_name: Container::F-7-xen-i386 
-</code></pre>
-
-<p>最後に virt-factory-node-server を起動します。</p>
-
-<pre><code>$ sudo /sbin/chkconfig virt-factory-node-server on
-$ sudo /etc/init.d/virt-factory-node-server start
-</code></pre>
-
-<h1>OS がインストールされていない状態からの登録</h1>
-
-<p>OS がインストールされていない場合、PXE ブートからネットワークインストールを行い、その流れでサーバへの登録まで一気にやってしまいます。これは、<a href="http://trac.mizzy.org/public/wiki/VirtFactoryServerSetup#yum%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE%E8%A8%AD%E5%AE%9A">前回の手順でインポートしたプロファイル</a>の中で、これらの手順をすべてやるように指定されているので、特にこれ以上何かを設定する必要はありません。マシンを PXE ブートし、boot: プロンプトでプロファイル名 (Container::F-7-xen-i386)を入力すれば、あとは全て自動的に進んでいくはずです。（まだきちんと検証できてません。）</p>
-
-<p>また、事前に Web UI で MAC アドレスを登録しておけば、boot: プロンプトにプロファイル名を入れる必要すらありません。</p>
-
-<p>以上で、Virt-Factory クライアントのサーバへの登録は完了です。この後、ampm コマンドで、リモートの Virt-Factory クライアント上にコマンド一発でゲスト OS をインストールしたり、ゲスト OS の起動や停止をリモートから行ったり、複数のリモートクライアント上にあるゲスト OS をすべてリストアップしたり、といった、Virt-Factory のメインの使い方に入るわけですが、この解説はまた次回に。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -1196,6 +1139,10 @@ $ sudo /etc/init.d/virt-factory-node-server start
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1209,10 +1156,6 @@ $ sudo /etc/init.d/virt-factory-node-server start
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

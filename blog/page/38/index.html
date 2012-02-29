@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="taggingプラグインをアップデート。 storyサブルーチンで、meta-tagsを抜き出すルーチンを自前で書いていたのですが、metaプラグインが$meta::tagsという変数に入れてくれてるので、それを利用するようにしました。なので、コードが少しすっきり。 &hellip;">
+  <meta name="description" content="Sack of AjaxというJavascriptライブラリがあるんですね。Simple AJAX Code Kitの略だそうです。 同じ様なajax Javascriptライブラリのprototype.js（厳密にはprototyps.jsは、ajaxだけのライブラリではないんですけどね） &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,151 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/11/453/">Sack of Ajax</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-11T13:04:00+09:00" pubdate>May 11<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/11/453/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://www.twilightuniverse.com/2005/05/sack-of-ajax/" target="_blank">Sack of Ajax</a>というJavascriptライブラリがあるんですね。Simple AJAX Code Kitの略だそうです。
+</p>
+
+
+
+
+<p class="entryBody">
+同じ様なajax Javascriptライブラリの<a href="http://prototype.conio.net/" target="_blank">prototype.js</a>（厳密にはprototyps.jsは、ajaxだけのライブラリではないんですけどね）と比較してみると、prototype.jsでは
+</p>
+
+
+
+
+<pre class="code">
+new Ajax.Updater(
+    'id', 
+    '/url',
+    { 
+      parameters: value,
+      onLoading: function(request){loading()} 
+    });
+</pre>
+
+
+
+
+<p class="entryBody">
+となるコードが、
+</p>
+
+
+
+
+<pre class="code">
+var mydata = value;
+ajax = new sack('/url');
+ajax.element = 'id';
+ajax.onLoading = function(){loading()};
+ajax.runAjax(mydata);
+</pre>
+
+
+
+
+<p class="entryBody">
+といった形で書けるようです。これはresponseTextを直接特定のエレメントにはめ込む例ですね。
+</p>
+
+
+
+
+<p class="entryBody">
+responseTextを一旦変数に入れて何かしたい場合は、<a href="http://mizzy.org/program/htmlPrototype02.html" target="_blank">「Catalystでajax - 補足」</a>で触れた例を使うと、prototype.jsでは、
+</p>
+
+
+
+
+<pre class="code">
+new Ajax.Request(
+    '/deislde/index.cgi',
+    {
+      method: 'GET',
+      onComplete: function(request){
+        eval('tagsListObj = ' +  request.responseText);
+    displayTags();
+      }
+    });
+</pre>
+
+
+
+
+<p class="entryBody">
+というコードが、Sackの方では
+</p>
+
+
+
+
+<pre class="code">
+ajax = new sack('/delside/index.cgi');
+ajax.method = 'GET';
+var response = ajax.response;
+ajax.onCompletion = function() {
+                eval('tagsListObj = ' +  response);
+                displayTags();
+                    };
+ajax.runAjax();
+</pre>
+
+
+
+
+<p class="entryBody">
+といった感じになるようです。（ここで挙げたコードは、たぶんこうだろうというのを書いただけで、実際には試していませんです。）
+</p>
+
+
+
+
+<p class="entryBody">
+prototypeでは、オブジェクトをnewすると同時に必要なパラメータを全部与えて即実行、という感じですが、Sackではオブジェクトをnewしてから、必要なパラメータを1つづつセットして、任意のタイミングで実行、という感じですね。
+</p>
+
+
+
+
+<p class="entryBody">
+俺はどちらかというと、Sackの方が好みなんですが、prototypeの方はフォームデータをシリアライズするメソッドなどがあって便利なので、両方組み合わせるとより快適ににajaxできるんではないでしょうか。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -768,182 +913,6 @@ function init() {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/30/362/">Catalystでajax - 実践編</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-30T22:28:00+09:00" pubdate>Apr 30<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/30/362/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>概要</h3>
-
-
-
-
-<p class="entryBody">
-<a href="/program/htmlPrototype.html" target="_blank">前回のエントリ</a>に関して、<a href="http://1470.net/mm/" target="_blank">MM/Memo</a>で、「うーん、便利なのかなー。perl（とかのサーバサイド）コード中にjavascriptが混ざるのって嫌な気がするけど。」と書いている方がいらっしゃったのですが、ちょっと勘違いをされているような気がします。自分でJavascriptのコードを一切書かずに済ませるための、HTML::PrototypeならびにCatalyst::Plugin::Prototypeですから。
-</p>
-
-
-
-
-<p class="entryBody">
-なので、今回は実践編っつーことで、Javascriptを一切書かずにajaxなウェブアプリ（ってほどのものではないけど）をCatalystで作ってみたいと思います。といっても、けんたろさんの<a href="http://antipop.zapto.org/mt/archives/001280.php">Catalyst で作る簡単 Web アプリケーション: Feed2JS 解説</a>で、既にCatalystでajaxで自分ではJavascriptを書いていないという、素晴らしいサンプルがあるのですが、ここではよりシンプルな（しょぼい）サンプルで、「こんなに簡単にajaxできるぜ」ってことを示したいと思います。
-</p>
-
-
-
-
-<h3>プロジェクト生成</h3>
-
-
-
-
-<pre class="code">
-$ catalyst.pl Ajax
-</pre>
-
-
-
-
-<h3>ビューの生成</h3>
-
-
-<pre class="code">
-$ cd Ajax
-$ ./script/ajax_create.pl view TT TT
-</pre>
-
-
-
-
-<h3>perlコード作成</h3>
-
-
-<p class="entryBody">
-lib/Ajax.pmを修正します。修正した部分だけ以下に示します。
-</p>
-
-
-
-
-<pre class="code">
-use Catalyst qw/Prototype/;
-
-sub default : Private {
-    my ( $self, $c ) = @_;
-    $c->stash->{template} = 'default';
-    $c->forward('Ajax::V::TT');
-}
-
-sub get : Global {
-    my ( $self, $c ) = @_;
-    $c->res->output('success.');
-}
-</pre>
-
-
-
-
-<h3>テンプレート作成</h3>
-
-
-<p class="entryBody">
-以下の内容のroot/default というファイルを作成します。
-</p>
-
-
-
-
-<pre class="code">
-&#x5b;% c.prototype.define_javascript_functions %&#x5d;
-&lt;p&gt;
-This is a sample of ajax web app using Catalyst.
-&lt;/p&gt;
-
-&lt;p&gt;
-&#x5b;% c.prototype.link_to_remote('click here and you will see the string "success."',
-                  {
-                update => 'container',
-                url => '/get',
-                }) %&#x5d;
-&lt;/p&gt;
-
-&lt;div id="container"&gt;
-&lt;/div&gt;
-</pre>
-
-
-
-
-<h3>アクセスしてみる</h3>
-
-
-
-
-<p class="entryBody">
-cgiで起動する場合には、以下の様なスクリプトを作成します。
-</p>
-
-
-
-
-<pre class="code">
-#!/usr/local/bin/perl -w
-
-use strict;
-use lib '/path/to/Ajax/lib';
-use Ajax;
-
-Ajax->run;
-</pre>
-
-
-
-
-<p class="entryBody">
-実際にアクセスしてみると<a href="/archives/Ajax/" target="_blank">こうなります</a>。リンクをクリックすると、画面遷移せずに「success.」という文字を表示します。
-</p>
-
-
-
-
-<p class="entryBody">
-以上で完了です。Javascriptを一切書かずにajaxなウェブアプリが作れる、ということがお分かり頂けたと思います。    
-</p>
-
-
-
-
-<p class="entryBody">
-xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ込むだけなので、サーバ側で生成したデータを、Javascript側で何らかの処理をしてからHTMLにはめ込むという用途には使えませんが、単純なajaxアプリであれば十分使えるかと。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/39/">&larr; Older</a>
@@ -961,6 +930,10 @@ xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -974,10 +947,6 @@ xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ�
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

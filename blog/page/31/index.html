@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ブランドとかにはあまりこだわりがなく、特に高級ブランドなんてお金がなくて縁がないわけですが、それでも好きなブランドはいくつかあるので、自分の為人を知ってもらうためにちょっと書いてみる。 MEN&#8217;S MELROSE ここ5年ぐらい、買う服の9割はここのものだったりします。 &hellip;">
+  <meta name="description" content="bloxsom のフレーバを Template-Toolkit で処理するためのプラグインが謎の挙動をしていて、昨日のエントリの permalink ページがエラーとなっていました。 で、原因となる箇所は特定できたのですが、原因がさっぱり分からないので、どなたかご存知の方は教えてください。 まず &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,109 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/01/09/326/">Tt プラグイン（というか Template::Parser ）の謎の挙動</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-01-09T16:12:00+09:00" pubdate>Jan 9<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/01/09/326/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+bloxsom のフレーバを Template-Toolkit で処理するための<a href="http://mizzy.org/program/blosxomTT.html" target="_blank">プラグイン</a>が謎の挙動をしていて、昨日のエントリの permalink ページがエラーとなっていました。
+</p>
+
+
+
+
+<p class="entryBody">
+で、原因となる箇所は特定できたのですが、原因がさっぱり分からないので、どなたかご存知の方は教えてください。
+</p>
+
+
+
+
+<p class="entryBody">
+まず、プラグインの処理の概要ですが、tt プラグインの interpolate() の中で、$template にフレーバの内容をつっこんで、同じプラグイン内の parse() に渡しています。parse() では、Template::Parser を利用して、TT のディレクティブからパラメータをひろって配列につっこんでいます。その後も処理があるのですが、今回の問題とは関係がないので省略。問題のある部分を抜粋すると以下の様な感じです。
+</p>
+
+
+
+
+<pre class="code">
+sub interpolate {
+    return sub {
+        my $template = shift;
+
+        # 省略
+
+        my @params = parse($template);
+
+        # 省略
+    }
+}
+
+sub parse {
+    my $template = shift;
+    my $parser = Template::Parser->new;
+    my $tokens = $parser->tokenise_directive($template);
+
+    # 省略
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+で、何が問題かというと、interpolate() 内の $template が、parse() の $parser->tokenise_directive($template) を実行すると空になってしまうのです。それも、$template がある程度長くなった場合のみ。（具体的に何byte 以上かは調べてないのですが。）
+</p>
+
+
+
+
+<p class="entryBody">
+parse() 内の $template は、 interpolate() 内の $template のコピーのはずなので、直接 interpolate() の $template はいじってないし、Template::Parser のソースを見ても、渡された $template をいじっているようには見えないんですよね。
+</p>
+
+
+
+
+<p class="entryBody">
+また、問題が発生する $template の内容と同一のデータを使って、blosxom のプラグインという形ではなく、単一のプログラムを書いて実行してみると、正常に処理できるんですよね。謎です。
+</p>
+
+
+
+
+<p class="entryBody">
+とりあえず長さが問題だということと、parse() には $template の中身をすべて渡す必要がなく、TT の ディレクティブだけ渡せばいいので、そういった処理をするように修正してしのいでいます。（それでも挙動がおかしいところがあるのですが。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1064,131 +1167,6 @@ Sledge 次期バージョンでは、ActiveRecord の様な Validation、コー�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/12/29/393/">ActiveRecord で Validation （Rails勉強中 #5）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-12-29T00:53:00+09:00" pubdate>Dec 29<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/12/29/393/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-Rails の実装で、ああこれ面白いなー、よさげだなー、と思ったものをメモ。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="/program/learningRails.html" target="_blank">Rails 勉強中 #0</a> でも触れたけど、ActiveRecord はモデルクラスでデータの Validation ができます。これはコントローラで Validation する必要がなくなるので、コードが簡略化できて見通しがよくなっていいです。その分モデルのコードが増えますが、元々モデルにはそんなにコードを書かないので、多少増えたところで見通しが悪くなったり、煩雑になったりということはないですし。
-</p>
-
-
-
-
-<p class="entryBody">
-また、Validation の処理のしかたもなかなかスマート。例えば、フォームで入力必須項目を設定したい場合には、モデルに
-</p>
-
-
-
-
-<pre class="code">
-validates_presence_of :email
-</pre>
-
-
-
-
-<p class="entryBody">
-とか書いておいて、View には
-</p>
-
-
-
-
-<pre class="code">
-&lt;!-- エラーメッセージ表示部分 --&gt;
-&lt;%= error_messages_for(:order) %&gt;
-
-&lt;!-- Email入力フィールド --&gt;
-EMail: &lt;%= text_field("order", "email", "size" => 40 ) %&gt;
-</pre>
-
-
-
-
-<p class="entryBody">
-とか書いておくと、以下の様なエラー画面を勝手に出してくれちゃいます。
-</p>
-
-
-
-
-<p class="entryBody" style="border: solid 1px #333333;">
-<img src="/img/rails_validation.jpg" />
-</p>
-
-
-
-
-<p class="entryBody">
-エラーメッセージも、
-</p>
-
-
-
-
-<pre class="code">
-validates_presence_of :email, :message => "can't be blank"
-</pre>
-
-
-
-
-<p class="entryBody">
-といった感じで任意に設定できますし。validates_presence_of 以外にも様々なヘルパーがありますし（詳しくは <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Rails本</a>で）、もちろん、自分で任意の Validation コードを書くことも可能です。
-</p>
-
-
-
-
-<p class="entryBody">
-また、日本人であれば当然、日本語にするにはどうするんだろう、という疑問を持つと思いますが、
-<a href="http://d.hatena.ne.jp/secondlife/" target="_blank">gorou</a> さん作の <a href="http://jp.rubyist.net/magazine/?0012-RubyOnRails" target="_blank">ActiveHeart</a> や、<a href="http://wota.jp/ac/?date=20051220" target="_blank">ヽ( ・∀・)ノきゅまきゅまーさんとこの jscaffold</a> とかがあるので心配無用です。お二方、素敵すぎです。
-</p>
-
-
-
-
-<p class="entryBody">
-次回はコールバックとオブザーバについて書こうと思います。ほんとは一気に書こうかと思ったので、このエントリのタイトルは最初「ActiveRecord とコールバックとオブザーバ」だったのですが、力尽きました。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/32/">&larr; Older</a>
@@ -1206,6 +1184,10 @@ validates_presence_of :email, :message => "can't be blank"
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1219,10 +1201,6 @@ validates_presence_of :email, :message => "can't be blank"
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Java言語で学ぶデザインパターン入門 の第6章 Prototype を Scala で書き直してみて、オブジェクトのクローニングでちょっとつまづいたのでメモ。 結論を先に言うと、オブジェクトのクローニングしたい場合には、クラスやトレイトの宣言時に、@cloneable アノテーションを入れると &hellip;">
+  <meta name="description" content="CentOS 5.4 から KVM が正式にサポートされたようなので、試してみた。 KVM が動く環境をつくる まずは既存の 5.3 環境から 5.4 にアップグレード。 $ sudo yum -y upgrade 不要になった kernel-xen は削除。 $ sudo yum -y &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,191 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/10/31/KvmOnCentOS54/">KvmOnCentOS54</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-10-31T11:40:59+09:00" pubdate>Oct 31<span>st</span>, 2009</time>
+        
+         | <a href="/blog/2009/10/31/KvmOnCentOS54/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>CentOS 5.4 から KVM が正式にサポートされたようなので、試してみた。</p>
+
+<h1>KVM が動く環境をつくる</h1>
+
+<p>まずは既存の 5.3 環境から 5.4 にアップグレード。</p>
+
+<pre><code>$ sudo yum -y upgrade
+</code></pre>
+
+<p>不要になった kernel-xen は削除。</p>
+
+<pre><code>$ sudo yum -y remove kernel-xen
+</code></pre>
+
+<p>kmod-kvm, kvm をインストール。</p>
+
+<pre><code>$ sudo yum -y install kmod-kvm kvm
+</code></pre>
+
+<p>/boot/grub/menu.lst 修正。</p>
+
+<pre><code>title CentOS (2.6.18-164.el5)
+    root (hd0,0)
+    kernel /vmlinuz-2.6.18-164.el5 ro root=/dev/vg00/lv_root vga=773
+    initrd /initrd-2.6.18-164.el5.img
+</code></pre>
+
+<p>再起動する。</p>
+
+<h1>Cobbler + Koan での VM 作成</h1>
+
+<p>今まで Xen をつかっていて、Cobbler + Koan で VM をつくっていたが、KVM でも同じ手順でできるはず、ってことで koan コマンド実行してみた。</p>
+
+<pre><code>$ sudo koan --server localhost --virt --profile=FC11-x86_64 --virt-name=fc11-kvm
+- looking for Cobbler at http://localhost/cobbler_api
+- reading URL: http://192.168.10.11/cblr/svc/op/ks/profile/FC11-x86_64
+install_tree: http://192.168.10.11:80/cblr/links/FC11-x86_64
+libvirtd (pid  3681) is running...
+- using qemu hypervisor, type=kvm
+Fri, 30 Oct 2009 17:37:07 DEBUG    No conn passed to Guest, opening URI 'qemu:///system'
+Fri, 30 Oct 2009 17:37:07 DEBUG    DistroInstaller location is a network source.
+libvir: QEMU error : Domain not found: no domain with matching name 'fc11-kvm'
+- adding disk: /opt/qemu//fc11-kvm-disk0 of size 5
+
+... 中略 ...
+
+libvir: QEMU error : internal error Failed to add tap interface 'vnet%d' to bridge 'xenbr0' : No such device
+
+... 以下略 ...
+</code></pre>
+
+<p>type=kvm と表示されているので、KVM が使われているようだが、エラーに。</p>
+
+<p>Xen ではないため、xenbr0 が存在しないが、Xen の時の設定が Cobbler に残っていた。</p>
+
+<p>libvirt が生成する virbr0 というブリッジインターフェースが存在するが、外部との接続ができないようなので、新たにブリッジインターフェースを作成することにした。</p>
+
+<p>まずは /etc/sysconfig/network-scripts/ifcfg-br0 を作成。</p>
+
+<pre><code>DEVICE=br0
+TYPE=Bridge
+BOOTPROTO=dhcp
+ONBOOT=yes
+</code></pre>
+
+<p>/etc/sysconfig/network-scripts/ifcfg-eth0 に以下を追加。</p>
+
+<pre><code>BRIDGE=br0
+</code></pre>
+
+<p>ネットワーク再起動する。</p>
+
+<pre><code>$ sudo /etc/init.d/network restart
+</code></pre>
+
+<p>これで br0 ができるので、br0 を使うように cobbler コマンドで設定する。</p>
+
+<pre><code>$ sudo cobbler profile edit --name=FC11-x86_64 --virt-bridge=br0
+</code></pre>
+
+<p>ついでに、CUI からコンソール接続できるように、この profile で利用している /var/lib/cobbler/kickstarts/sample.ks の bootloader 行を以下のように修正。</p>
+
+<pre><code>bootloader --location=mbr --append="console=tty0 console=ttyS0,115200"
+</code></pre>
+
+<p>再度 koan を実行して VM 作成。</p>
+
+<pre><code>$ sudo koan --server localhost --virt --profile=FC11-x86_64 --virt-name=fc11-kvm
+</code></pre>
+
+<p>状態確認。</p>
+
+<pre><code>$ sudo virsh list --all                                            
+ Id Name                 State
+----------------------------------
+ 10 fc11-kvm             running
+</code></pre>
+
+<p>インストールが終わると、shut off になる。</p>
+
+<pre><code>$ sudo virsh list --all
+ Id Name                 State
+----------------------------------
+  - fc11-kvm             shut off
+</code></pre>
+
+<p>起動する。</p>
+
+<pre><code>$ sudo virsh start fc11-kvm
+</code></pre>
+
+<p>コンソール接続してみる。</p>
+
+<pre><code>$ sudo virsh console fc11-kvm
+Connected to domain fc11-kvm
+Escape character is ^]
+?G      Welcome to Fedora 
+        Press 'I' to enter interactive startup.
+Starting udev: G[  OK  ]
+Setting hostname h029.southpark:  [  OK  ]
+mdadm: No arrays found in config file or automatically
+Setting up Logical Volume Management:   2 logical volume(s) in volume group "vg_h029" now active
+
+... 中略 ...
+
+Fedora release 11 (Leonidas)
+Kernel 2.6.29.4-167.fc11.x86_64 on an x86_64 (/dev/ttyS0)
+
+h029.southpark login: 
+</code></pre>
+
+<h1>ディスク追加してみる</h1>
+
+<p>イメージファイル作成。</p>
+
+<pre><code>$ sudo qemu-img create /opt/qemu/fc11-kvm-disk1 8G
+</code></pre>
+
+<p>disk.xml を以下の内容で作成。</p>
+
+<pre><code>&lt;disk type='file' device='disk'&gt;
+  &lt;source file='/opt/qemu/fc11-kvm-disk1'/&gt;
+  &lt;target dev='vdb' bus='virtio' /&gt;
+&lt;/disk&gt;
+</code></pre>
+
+<p>追加する。</p>
+
+<pre><code>$ sudo virsh attach-device fc11-kvm disk.xml
+Device attached successfully
+</code></pre>
+
+<p>これで /dev/vdb が VM から見えるようになる。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -610,112 +795,6 @@ exit;
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/05/10/AddModRewriteInternalFunction/">AddModRewriteInternalFunction</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-05-10T13:58:43+09:00" pubdate>May 10<span>th</span>, 2009</time>
-        
-         | <a href="/blog/2009/05/10/AddModRewriteInternalFunction/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html#rewritemap">RewriteMap</a> での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、という形なので、並列処理させることができません。これは rewrite 処理するときにデータベースへ問い合わせるなど、I/O ブロッキングが発生するような処理をさせたいときには致命的なパフォーマンス劣化を引き起こすことになります。</p>
-
-<p>これを解決するためには、Apache モジュールの中で望みの rewrite 処理をさせるようにすればいいのでは、と思い、RewriteMap にある int タイプに好きな internal function を追加できればいけるんじゃないないか、と考えたものの、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html">mod_rewrite のリファレンス</a> では、「you cannot create your own」とか書かれていて、追加できないっぽい。かと言って mod_rewrite.c に手を入れるのもやだなー、と思っていたところ、<a href="http://code.google.com/p/modicpquery/wiki/Internals">mod_icpquery のドキュメント</a> を見つけた。これを見ると、好きな internal function を独立したモジュールの形で追加できそう、ってことでやってみたらできた。</p>
-
-<p>以下が internal function を追加するためのモジュールテンプレ。rewrite_mapfunc_custom の中で、望みの処理を記述してあげるだけで OK。</p>
-
-<pre><code>#!c
-#include "httpd.h"
-#include "http_config.h"
-#include "apr_optional.h"
-
-/* rewrite map function prototype from mod_rewrite.h */
-typedef char *(rewrite_mapfunc_t)(request_rec *r, char *key);
-
-/* optional function declaration from mod_rewrite.h */
-APR_DECLARE_OPTIONAL_FN(void, ap_register_rewrite_mapfunc,
-                        (char *name, rewrite_mapfunc_t *func));
-
-static char *rewrite_mapfunc_custom(request_rec *req, char *key)
-{
-    /* key を元にごにょごにょして value を生成 */
-    return value;
-}
-
-/* from mod_rewrite.c */
-static int pre_config(apr_pool_t *pconf,
-                      apr_pool_t *plog,
-                      apr_pool_t *ptemp)
-{
-    APR_OPTIONAL_FN_TYPE(ap_register_rewrite_mapfunc) *map_pfn_register;
-
-    /* register int: rewritemap handlers */
-    map_pfn_register = APR_RETRIEVE_OPTIONAL_FN(ap_register_rewrite_mapfunc);
-    if (map_pfn_register) {
-        map_pfn_register("custom", rewrite_mapfunc_custom);
-    }
-    return OK;
-}
-
-static void register_hooks(apr_pool_t *p)
-{
-    ap_hook_pre_config(pre_config, NULL, NULL, APR_HOOK_MIDDLE);
-}
-
-module AP_MODULE_DECLARE_DATA rewrite_mapfunc_custom_module = {
-    STANDARD20_MODULE_STUFF,
-    NULL,                  /* create per-dir    config structures */
-    NULL,                  /* merge  per-dir    config structures */
-    NULL,                  /* create per-server config structures */
-    NULL,                  /* merge  per-server config structures */
-    NULL,                  /* table of config file commands       */
-    register_hooks         /* register hooks                      */
-};
-</code></pre>
-
-<p>追加した internal function を呼び出すための httpd.conf は以下のような感じ。</p>
-
-<pre><code>LoadModule rewrite_mapfunc_custom_module modules/mod_rewrite_mapfunc_custom.so
-
-RewriteEngine On
-ProxyPreserveHost On
-RewriteMap custom int:custom
-RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]
-</code></pre>
-
-<p>この例では、Host ヘッダの内容を custom function に渡して、ホスト名を変換して proxy するけど、Host ヘッダはオリジナルのままで変換しない、といった処理を想定してます。</p>
-
-<p>例の件はこんな感じで実現できそうだよ。＞<a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a></p>
-
-<p>*2009/05/10 13:57:00 追記 *</p>
-
-<p>github に Makefile 等も含めてコードアップしました。</p>
-
-<p>http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -733,6 +812,10 @@ RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -746,10 +829,6 @@ RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

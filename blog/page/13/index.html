@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="&#8220;弊社&#8221;:http://www.paperboy.co.jp/ は東京と福岡にオフィスがあり、それぞれの拠点に Subversion + Trac 環境を構築し、&#8221;OpenVPN&#8221;:http://openvpn.net/ により VPN &hellip;">
+  <meta name="description" content="&#8220;SearchHyperEstraierPlugin&#8221;:http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SearchHyperEstraierPlugin が、Trac 0.10.x というか、うちの環境で動かないので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,81 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/08/09/521/">Trac の SearchHyperEstraierPlugin を Trac 0.10.x で動かすパッチ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-08-09T03:03:00+09:00" pubdate>Aug 9<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/08/09/521/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>&#8220;SearchHyperEstraierPlugin&#8221;:http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SearchHyperEstraierPlugin が、Trac 0.10.x というか、うちの環境で動かないので、パッチ書いた。初 Python プログラミング。（というほどのものじゃないけど。）</p>
+
+<pre><code>
+=== searchhyperestraier/searchhyperestraier.py
+==================================================================
+--- searchhyperestraier/searchhyperestraier.py  (revision 892)
++++ searchhyperestraier/searchhyperestraier.py  (local)
+@@ -2,8 +2,9 @@
+ # SearchRepositoryWithNamazu plugin
+
+ from trac.core import *
+-from trac.Search import ISearchSource, query_to_sql, shorten_result
++from trac.Search import ISearchSource, shorten_result
+ from trac.util import NaivePopen
++from trac.util.text import to_unicode
+ from StringIO import StringIO
+ import urllib
+ import time
+@@ -44,9 +45,9 @@
+         browse_trac = self.env.config.get('searchhyperestraier', 'browse_trac','enabled')
+ 
+ 
+-        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,unicode(query,'utf-8').encode(estcmd_encode))
++        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,' '.join(query))
+         self.log.debug('SearchHyperEstraier:%s' % cmdline)
+-        np = NaivePopen(cmdline)
++        np = NaivePopen( cmdline.encode(estcmd_encode) )
+         #self.log.debug('Result:%s' % unicode(np.out,'utf-8').encode('mbcs'))
+         #self.log.debug('Result:%s' % np.out)
+         if np.errorlevel or np.err:
+@@ -74,7 +75,7 @@
+             attrelem_array = element.getElementsByTagName("attribute")
+             for attrelem in attrelem_array:
+                 attr_name = attrelem.getAttribute("name")
+-                attr_value = unicode(attrelem.getAttribute("value")).encode('utf-8')
++                attr_value = to_unicode(attrelem.getAttribute("value"))
+                 #URLとタイトルを生成
+                 if attr_name == "_lreal":
+                     attr_value=attr_value[len(replace_left):].replace("\\","/")
+</code></pre>
+
+
+<p>エラーが出るたびに、適当にいじってたら動いた、という感じ。なので、こんなんでいいのかはよく分からない。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -732,94 +807,6 @@ Retrieving log information from 1 to 62
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/05/23/512/">Write はユーザプロセスを待たせない？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-05-23T00:24:00+09:00" pubdate>May 23<span>rd</span>, 2007</time>
-        
-         | <a href="/blog/2007/05/23/512/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://naoya.g.hatena.ne.jp/naoya/20070522/1179830475">naoyaグループ - naoyaの日記 -  I/O, iowait</a> にちょっと反応してみます。</p>
-
-<blockquote><p>write はページに dirty フラグを立てるだけなので決してユーザープロセスを待たせない</p></blockquote>
-
-<p>って、本当にそうなんでしょうか？（否定しているわけではなく、純粋な疑問です。）</p>
-
-<p>最近、書き込みの多いメールサーバのディスク I/O 周りを調査していて、実際にどのプロセスの書き込みが多いのかを調べる方法がわからなかったため、I/O 待ちになっているプロセスをカウントして、そこから類推してみようと、まずは</p>
-
-<pre><code>while [ 1 ]
-  do
-    ps -eo comm,state|grep D|grep -v COMMAND &gt;&gt; ps.txt
-    sleep 1
-  done
-</code></pre>
-
-<p>な感じで STAT が D のプロセスを記録するスクリプトをしばらく走らせておいて、</p>
-
-<pre><code>sort ps.txt | uniq -c | sort -gr| more
-</code></pre>
-
-<p>でカウントしてみると、</p>
-
-<pre><code>9129 kjournald       D
-6576 qmail-queue     D
-2017 multilog        D
-1897 pdflush         D
-1373 qmail-send      D
-1094 procmail        D
-1032 syslogd         D
-</code></pre>
-
-<p>な感じで、kjournald と qmail-queue が圧倒的に多い。これってどっちも書き込みがメインの仕事のはず。</p>
-
-<p>man ps で見ても、</p>
-
-<pre><code>D    Uninterruptible sleep (usually IO)
-</code></pre>
-
-<p>なので、書き込みでプロセスが待たされてるのだと思うのですが、何か間違ってますでしょうか？</p>
-
-<p>ちなみに、書き込みが多いというのはどれぐらいかというと、iostat での r/s と w/s の比率が 1:7 ぐらいです。</p>
-
-<p>また、free の結果はこんな感じなので、メモリに余裕はあるみたいです。</p>
-
-<pre><code># free
-             total       used       free     shared    buffers     cached
-Mem:       2043756    2011160      32596          0     351016     847776
--/+ buffers/cache:     812368    1231388
-Swap:      1052248
-</code></pre>
-
-<p>ここ数日 I/O まわりを追いかけていたので、naoya さんのエントリはタイムリーでとてもためになります。ついでに色々教えてもらおうという甘い考えで、疑問に感じたことを書いてみました。</p>
-
-<p><strong><em>追記</em></strong></p>
-
-<p>もしかして「write はユーザプロセスを待たせない」というのは、非同期 I/O の話？であれば納得はいく。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/14/">&larr; Older</a>
@@ -837,6 +824,10 @@ Swap:      1052248
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -850,10 +841,6 @@ Swap:      1052248
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

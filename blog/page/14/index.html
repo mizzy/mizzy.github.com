@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="竹迫さん、Yappo さん に触発されて、FizzBuzz アセンブラ版 for x86/Linux をつくってみた。 20年ほど前に Z80 でアセンブラをちょっとかじった程度の知識しかないので、ベストには程遠いコードだと思います。だれかもっといいコードを教えてください。 &hellip;">
+  <meta name="description" content="naoyaグループ - naoyaの日記 - I/O, iowait にちょっと反応してみます。 write はページに dirty フラグを立てるだけなので決してユーザープロセスを待たせない って、本当にそうなんでしょうか？（否定しているわけではなく、純粋な疑問です。） 最近、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,94 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/05/23/512/">Write はユーザプロセスを待たせない？</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-05-23T00:24:00+09:00" pubdate>May 23<span>rd</span>, 2007</time>
+        
+         | <a href="/blog/2007/05/23/512/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://naoya.g.hatena.ne.jp/naoya/20070522/1179830475">naoyaグループ - naoyaの日記 -  I/O, iowait</a> にちょっと反応してみます。</p>
+
+<blockquote><p>write はページに dirty フラグを立てるだけなので決してユーザープロセスを待たせない</p></blockquote>
+
+<p>って、本当にそうなんでしょうか？（否定しているわけではなく、純粋な疑問です。）</p>
+
+<p>最近、書き込みの多いメールサーバのディスク I/O 周りを調査していて、実際にどのプロセスの書き込みが多いのかを調べる方法がわからなかったため、I/O 待ちになっているプロセスをカウントして、そこから類推してみようと、まずは</p>
+
+<pre><code>while [ 1 ]
+  do
+    ps -eo comm,state|grep D|grep -v COMMAND &gt;&gt; ps.txt
+    sleep 1
+  done
+</code></pre>
+
+<p>な感じで STAT が D のプロセスを記録するスクリプトをしばらく走らせておいて、</p>
+
+<pre><code>sort ps.txt | uniq -c | sort -gr| more
+</code></pre>
+
+<p>でカウントしてみると、</p>
+
+<pre><code>9129 kjournald       D
+6576 qmail-queue     D
+2017 multilog        D
+1897 pdflush         D
+1373 qmail-send      D
+1094 procmail        D
+1032 syslogd         D
+</code></pre>
+
+<p>な感じで、kjournald と qmail-queue が圧倒的に多い。これってどっちも書き込みがメインの仕事のはず。</p>
+
+<p>man ps で見ても、</p>
+
+<pre><code>D    Uninterruptible sleep (usually IO)
+</code></pre>
+
+<p>なので、書き込みでプロセスが待たされてるのだと思うのですが、何か間違ってますでしょうか？</p>
+
+<p>ちなみに、書き込みが多いというのはどれぐらいかというと、iostat での r/s と w/s の比率が 1:7 ぐらいです。</p>
+
+<p>また、free の結果はこんな感じなので、メモリに余裕はあるみたいです。</p>
+
+<pre><code># free
+             total       used       free     shared    buffers     cached
+Mem:       2043756    2011160      32596          0     351016     847776
+-/+ buffers/cache:     812368    1231388
+Swap:      1052248
+</code></pre>
+
+<p>ここ数日 I/O まわりを追いかけていたので、naoya さんのエントリはタイムリーでとてもためになります。ついでに色々教えてもらおうという甘い考えで、疑問に感じたことを書いてみました。</p>
+
+<p><strong><em>追記</em></strong></p>
+
+<p>もしかして「write はユーザプロセスを待たせない」というのは、非同期 I/O の話？であれば納得はいく。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -676,7 +764,7 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
 <h1>CO-MAINTAINER</h1>
 
-<p>Tatsuhiko Miyagawa <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x6d;&#x69;&#121;&#97;&#x67;&#97;&#x77;&#x61;&#x40;&#98;&#x75;&#108;&#x6b;&#x6e;&#101;&#119;&#115;&#x2e;&#x6e;&#101;&#116;">&#x6d;&#105;&#121;&#x61;&#103;&#x61;&#x77;&#97;&#64;&#98;&#x75;&#108;&#107;&#x6e;&#x65;&#x77;&#x73;&#x2e;&#110;&#x65;&#116;</a></p>
+<p>Tatsuhiko Miyagawa <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#109;&#105;&#121;&#x61;&#103;&#97;&#119;&#x61;&#x40;&#98;&#x75;&#108;&#x6b;&#x6e;&#101;&#119;&#x73;&#x2e;&#110;&#x65;&#x74;">&#109;&#105;&#121;&#x61;&#103;&#97;&#119;&#97;&#x40;&#98;&#117;&#x6c;&#x6b;&#x6e;&#x65;&#x77;&#115;&#46;&#110;&#101;&#x74;</a></p>
 </div>
   
   
@@ -986,65 +1074,6 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Person.pm/">XML-Atom-0.22/lib/XML/Atom/Person.pm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-30T23:41:45+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Person.pm/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Person.pm</p>
-
-<h1>NAME</h1>
-
-<p>XML::Atom::Person - Author or contributor object</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    my $person = XML::Atom::Person-&gt;new;
-    $person-&gt;email('foo@example.com');
-    $person-&gt;name('Foo Bar');
-    $entry-&gt;author($person);
-</code></pre>
-
-<h1>DESCRIPTION</h1>
-
-<p><em>XML::Atom::Person</em> represents an author or contributor element in an Atom feed or entry.</p>
-
-<h1>USAGE</h1>
-
-<h2>XML::Atom::Person->new</h2>
-
-<h2>$person->email([ $email ])</h2>
-
-<h2>$person->name([ $name ])</h2>
-
-<h2>$person->uri([ $uri ])</h2>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/15/">&larr; Older</a>
@@ -1062,6 +1091,10 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1075,10 +1108,6 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

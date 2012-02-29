@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="前のエントリの FFmpeg::Command を利用して、Plagger::Plugin::Filger::FFmpeg 書いてみた。（っていうか、このために FFmpeg::Command つくったわけですが。） とりあえず形にして動くことを確認したかったので、変換パラメータが固定だったり、 &hellip;">
+  <meta name="description" content="FFmpeg::Command の修正。 昨日のエントリでの宣言どおり、iPod か PSP を指定することにより、変換フォーマットのオプションを省略できるようにしてみた。 iPod の場合は device オプションすら省略可能で、 $ffmpeg->output_options({ file &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,148 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/28/305/">FFmpeg::Command - a Wrapper Class for Ffmpeg Command Line Utility #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-28T00:02:00+09:00" pubdate>Jul 28<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/28/305/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"><span class="icon"></span>FFmpeg::Command</a> の修正。
+</p>
+
+
+<p>
+昨日のエントリでの宣言どおり、iPod か PSP を指定することにより、変換フォーマットのオプションを省略できるようにしてみた。
+</p>
+
+
+<p>
+iPod の場合は device オプションすら省略可能で、
+</p>
+
+
+<pre class="wiki">
+$ffmpeg->output_options({
+    file => 'nba.mp4',
+});
+</pre>
+
+
+<p>
+は
+</p>
+
+
+<pre class="wiki">
+$ffmpeg->output_options({
+    file   => 'nba.mp4',
+    device => 'ipod',
+});
+</pre>
+
+
+<p>
+と同等で、更に
+</p>
+
+
+<pre class="wiki">
+$ffmpeg->output_options({
+    file                => 'nba.mp4',
+    format              => 'mp4',
+    video_codec         => 'h264',
+    bitrate             => 600,
+    size                => '320x240',
+    audio_codec         => 'aac',
+    audio_sampling_rate => 48000,
+    audio_bit_rate      => 64,
+});
+</pre>
+
+
+<p>
+とも同等です。
+</p>
+
+
+<p>
+PSP の場合は
+</p>
+
+
+<pre class="wiki">
+$ffmpeg->output_options({
+    file   => 'nba.mp4',
+    device => 'psp',
+});
+</pre>
+
+
+<p>
+と指定すれば OK で、
+</p>
+
+
+<pre class="wiki">
+$ffmpeg->output_options({
+    file                => 'nba.mp4',
+    format              => 'psp',
+    video_codec         => 'h264',
+    bitrate             => 600,
+    size                => '320x240',
+    audio_codec         => 'aac',
+    audio_sampling_rate => 48000,
+    audio_bit_rate      => 64,
+});
+</pre>
+
+
+<p>
+と同等になります。
+</p>
+
+
+<p>
+と言っても、デフォルト値がこれでいいのかはよく分からないので、このパラメータの値はこの方がいいんじゃない？などありましたら、ご指摘頂けると幸いです。
+</p>
+
+
+<p>
+あと、ボンヌさんと相談しまして、こちらで作っているものを CPAN にあげる、ということになりました。ボンヌさん、ありがとうございます。明日のランチ楽しみにしています。
+</p>
+
+
+<p>
+それから、CPAN にあげる前に、FFmpeg の作者の方の意向も聞いてみたいな、と思い、現在コンタクト中です。良い返事がもらえ次第、CPAN にアップしたいと思います。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1247,57 +1389,6 @@ PPerl Options:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/06/20/352/">Text::Trac - Trac Wiki 記法パーサ #2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-06-20T15:07:00+09:00" pubdate>Jun 20<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/06/20/352/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-昨日の時点では実装されていなかった autolink まわりを <a class="ext-link" href="http://d.hatena.ne.jp/drawnboy/"><span class="icon"></span>id:drawnboy さん</a> が実装してくれて、最低限の機能は実装されたかな、という状態になりましたので、とりあえず <a class="ext-link" href="http://search.cpan.org/~mizzy/Text-Trac/"><span class="icon"></span>CPAN に up</a> しました。
-</p>
-
-
-<p>
-id:drawnboy さんには autolink まわりだけではなく、他にも色々実装してもらい、大変助かりました。ありがとうございます！
-</p>
-
-
-<p>
-Yappo さんご所望の挙動をカスタマイズできる機能は、これから実装をどうするかを含めて検討しますので、もう少しお待ちください。
-</p>
-
-
-<p>
-挙動カスタマイズ機能も必要だけど、タグの class 設定とか、リンクの target 設定とかをカスタマイズできるようにもしたい。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/25/">&larr; Older</a>
@@ -1315,6 +1406,10 @@ Yappo さんご所望の挙動をカスタマイズできる機能は、これ�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1328,10 +1423,6 @@ Yappo さんご所望の挙動をカスタマイズできる機能は、これ�
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

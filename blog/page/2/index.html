@@ -9,7 +9,11 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Maglica Web is on GitHub ">
+  <meta name="description" content="diff --git a/Rakefile b/Rakefile
+index 7d7f6d8..41868ab 100644
+--- a/Rakefile
++++ b/Rakefile
+@@ -4,10 +4,10 @@ require &quot;stringex&quot; ## -- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +76,75 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/15/octopress-on-heteml/">How to Deploy a Blog Made by Octopress to Heteml</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-11-15T22:30:00+09:00" pubdate>Nov 15<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/11/15/octopress-on-heteml/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><div><script src='https://gist.github.com/1367192.js?file='></script>
+<noscript><pre><code>diff --git a/Rakefile b/Rakefile
+index 7d7f6d8..41868ab 100644
+--- a/Rakefile
++++ b/Rakefile
+@@ -4,10 +4,10 @@ require &quot;stringex&quot;
+ 
+ ## -- Rsync Deploy config -- ##
+ # Be sure your public key is listed in your server's ~/.ssh/authorized_keys file
+-ssh_user       = &quot;user@domain.com&quot;
+-ssh_port       = &quot;22&quot;
+-document_root  = &quot;~/website.com/&quot;
+-deploy_default = &quot;rsync&quot;
++ssh_user       = &quot;xxx@usersXX.heteml.jp&quot;
++ssh_port       = &quot;2222&quot;
++document_root  = &quot;~/web/octopress&quot;
++deploy_default = &quot;scp&quot;
+ 
+ # This will be configured for you when you run config_deploy
+ deploy_branch  = &quot;gh-pages&quot;
+@@ -224,6 +224,12 @@ task :rsync do
+   ok_failed system(&quot;rsync -avze 'ssh -p #{ssh_port}' --delete #{public_dir}/ #{ssh_user}:#{document_root}&quot;)
+ end
+ 
++desc &quot;Deploy website via scp&quot;
++task :scp do
++  puts &quot;## Deploying website via scp&quot;
++  ok_failed system(&quot;scp -r -P #{ssh_port} #{public_dir}/* #{ssh_user}:#{document_root}&quot;)
++end
++
+ desc &quot;deploy public directory to github pages&quot;
+ multitask :push do
+   puts &quot;## Deploying branch to Github Pages &quot;
+</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1127,100 +1200,6 @@ refresh_interval = 60
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/">HowDotCloudLazyCopyImplementsCopyOnWrite</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-07-17T23:44:34+09:00" pubdate>Jul 17<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="https://github.com/dotcloud/lazycopy">dotcloud/lazycopy</a> is a copy-on-write version of cp.It&#8217;s based on <a href="http://aufs.sourceforge.net/">aufs</a>.</p>
-
-<p>Scientific Linux 5 has aufs rpm on its base repo.So I tried aufs and lazycopy on SL5.CentOS and SL6 don&#8217;t have aufs rpm.</p>
-
-<p>I created source directories and files in them first.</p>
-
-<pre><code># mkdir /tmp/source0
-# mkdir /tmp/source1
-# mkdir /tmp/source2
-# echo source0 &gt; /tmp/source0/0
-# echo source1 &gt; /tmp/source1/1
-# echo source2 &gt; /tmp/source2/2
-</code></pre>
-
-<p>And copied these directories to /tmp/dest with lazycopy command.</p>
-
-<pre><code># lazycopy /tmp/source0 /tmp/source1 /tmp/source2 /tmp/dest
-['/tmp/source0', '/tmp/source1', '/tmp/source2'] -&gt; /tmp/dest
-</code></pre>
-
-<p>Confirmed that three files wiere there and the content of one of the files.</p>
-
-<pre><code># ls /tmp/dest/
-0  1  2
-# cat /tmp/dest/0
-source0
-</code></pre>
-
-<p>Changed the content of /tmp/dest/0 and confirmed that /tmp/source0/0 was not changed.</p>
-
-<pre><code># echo dest &gt; /tmp/dest/0 
-# cat /tmp/dest/0 
-dest
-# cat /tmp/source0/0 
-source0
-</code></pre>
-
-<p>Lazycopy implements copy-on-write by mounting directories with aufs like this.</p>
-
-<pre><code># mount
-...
-none on /tmp/dest type aufs (rw,br:/tmp/dest/.aufs/0=rw:/tmp/source0=ro:/tmp/source1=ro:/tmp/source2=ro)
-</code></pre>
-
-<p>Lazycopy creates .aufs/0 directory in the destination directory if it doesn&#8217;t exist and mounts it with rw mode as one of the aufs branch.Other source directories are mounted with ro mode, so files in these directories will not be changed.</p>
-
-<p>Changed files and newly created files are saved under /tmp/dest/.aufs/0 directory.So you can see the directory structures like this after unmounting /tmp/dest.</p>
-
-<pre><code># touch /tmp/dest/3
-# umount /tmp/dest
-# tree -a /tmp/dest
-/tmp/dest
-`-- .aufs
-    `-- 0
-        |-- .wh..wh..tmp
-        |-- .wh..wh.aufs
-        |-- .wh..wh.plnk
-        |-- 0
-        `-- 3
-</code></pre>
-
-<p>So if you unmount /tmp/dest directory and run lazycopy with same options again, you can see the changed files and created files again.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -1238,6 +1217,10 @@ none on /tmp/dest type aufs (rw,br:/tmp/dest/.aufs/0=rw:/tmp/source0=ro:/tmp/sou
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1251,10 +1234,6 @@ none on /tmp/dest type aufs (rw,br:/tmp/dest/.aufs/0=rw:/tmp/source0=ro:/tmp/sou
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

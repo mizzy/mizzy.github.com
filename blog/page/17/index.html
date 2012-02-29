@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="puppet のクライアント/サーバ間通信は https + XMLRPC で、認証は SSLv3 の証明書認証が利用されています。 通常、SSLv3 で証明書認証とかいうと、CA とか、自己署名証明書とか、色々めんどくさかったりしますが、puppet &hellip;">
+  <meta name="description" content="Puppet Executables より。またもや超意訳、というかメモ。 puppet スタンドアロンなインタプリタ。manifest ファイルを直接読んで、自ホストに適用する。あまり使うことはないと思う。 puppetca SSLv3 証明書ハンドリングのためのコマンド。この辺参照。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,135 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/03/21/499/">Puppet の実行ファイル</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-03-21T00:34:00+09:00" pubdate>Mar 21<span>st</span>, 2007</time>
+        
+         | <a href="/blog/2007/03/21/499/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/PuppetExecutables"><span class="icon"></span>Puppet Executables</a> より。またもや超意訳、というかメモ。
+</p>
+
+
+<h3 id="puppet">puppet</h3>
+
+
+<p>
+スタンドアロンなインタプリタ。manifest ファイルを直接読んで、自ホストに適用する。あまり使うことはないと思う。
+</p>
+
+
+<h3 id="puppetca">puppetca</h3>
+
+
+<p>
+SSLv3 証明書ハンドリングのためのコマンド。<a class="ext-link" href="http://mizzy.org/linux/puppet05.html"><span class="icon"></span>この辺参照</a>。
+</p>
+
+
+<h3 id="puppetd">puppetd</h3>
+
+
+<p>
+puppet クライアント側で実行するデーモン。デフォルトでは、puppet サーバに対して定期的に問い合わせに行くけれど、
+</p>
+
+
+<pre class="wiki">
+$ puppetd --listen --no-client
+</pre>
+
+
+<p>
+と実行することで、puppet サーバからキックされるのを待ち受ける状態になる。（サーバは後述の puppetrun を実行してキックする。）
+</p>
+
+
+<h3 id="puppetdoc">puppetdoc</h3>
+
+
+<p>
+puppet ソースからドキュメントを抽出するためのツール。これもあまり使わないと思う。
+</p>
+
+
+<h3 id="puppetmasterd">puppetmasterd</h3>
+
+
+<p>
+puppet サーバ側で起動するデーモン。
+</p>
+
+
+<h3 id="puppetrun">puppetrun</h3>
+
+
+<p>
+puppet クライアントをサーバ側からキックする時に使うコマンド。
+</p>
+
+
+<pre class="wiki">
+$ puppetrun --host hostA --host hostB
+</pre>
+
+
+<p>
+という感じで特定のクライアントのみキックできるし、
+</p>
+
+
+<pre class="wiki">
+$ puppetrun --all --parallel 5
+</pre>
+
+
+<p>
+とかですべてのクライアントをキックする（ただし同時にキックするのは 5 クライアント）といったことができる。
+</p>
+
+
+<pre class="wiki">
+$ puppetrun --class web
+</pre>
+
+
+<p>
+とかで web クラスのクライアントのみキックとかもできる。ただし、&#8211;all や &#8211;class は、クライアントホストを LDAP で管理している場合のみ。
+</p>
+
+
+<p>
+うちではこれをメインに使うことになりそう。サーバの数が数百台とかあるから、クライアントから定期的にポーリングされる負荷も馬鹿にならないし、いっぺんにファイルとりにこられたりすると、とんでもないことになるので。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1349,176 +1478,6 @@ plugins:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/02/25/402/">Angerwhale #0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-02-25T21:07:00+09:00" pubdate>Feb 25<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/02/25/402/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-コメント/トラックバックスパムがうざいので、一時的に受け付けないようにしました。
-</p>
-
-
-<p>
-で、blosxom で対策してもいいのですが、これを機会にブログツールを乗り換えようと、<a class="ext-link" href="http://trac.jrock.us/blog_software"><span class="icon"></span>Angerwhale</a> を試すことに。（本当は <a class="ext-link" href="http://catlxom.org/trac/"><span class="icon"></span>Catlxom</a> への乗換えを前々から検討していたのですが、大きく作り変えると typester さんがおっしゃっていたので、ちょっと様子見。）
-</p>
-
-
-<p>
-Angerwhale と同様に、Catalyst ベースのブログツールに <a class="ext-link" href="http://typeface-project.org/"><span class="icon"></span>Typeface</a> というのがあるのですが、Angerwhale はエントリをファイルベースで管理するので、blosxom に近いものがあるし、作者の <a class="ext-link" href="http://search.cpan.org/~jrockway/"><span class="icon"></span>jrockway</a> は <a class="ext-link" href="http://tokyo2007.yapcasia.org/blog/"><span class="icon"></span>YAPC::Asia Tokyo 2007</a> にも来るので、もしかしたら話す機会もあるかもしれないので、こちらを使ってみることに。
-</p>
-
-
-<p>
-使ってみてちょっと不便だな、と思ったのは、
-</p>
-
-
-<ul><li>エントリタイトルはメタデータとして管理する。</li>
-<li>カテゴリ名はディレクトリ名そのまま表示。</li></ul>
-
-
-<p>
-の2点。
-</p>
-
-
-<p>
-以下、もう少し詳しく説明します。まずはエントリタイトルの件。
-</p>
-
-
-<p>
-Angerwhale ではエントリの作成時間などを、メタデータとして管理します。メタデータは <a class="ext-link" href="http://search.cpan.org/dist/File-Attributes/"><span class="icon"></span>File::Attributes</a> を利用して作られ、.<i>entry_file_name</i>.attributes といったファイルが、エントリファイルと同じディレクトリに作られます。内容は以下のように YAML になってます。
-</p>
-
-
-<pre class="wiki">
----
-creation_time: 1172377648
-guid: 813B071C-C488-11DB-BB28-6F396B4151C7
-</pre>
-
-
-<p>
-このメタデータファイルに、
-</p>
-
-
-<pre class="wiki">
-title: エントリタイトル
-</pre>
-
-
-<p>
-といった記述があれば、これをエントリのタイトルとみなします。なければ、ファイル名から拡張子を除いたものがエントリのタイトルになります。
-</p>
-
-
-<p>
-ファイル名とタイトルが違う、なんてことがよくあるわけですが、そうしたい場合には今の仕様だと、
-</p>
-
-
-<ol start="1"><li>エントリファイルを置く</li>
-<li>一度ブラウザでアクセスしてメタデータファイルを作らせる</li>
-<li>メタデータファイルを開いてエントリタイトルを記述する</li></ol>
-
-
-<p>
-なんてことをしなければいけない、ということになります。めんどいですね。
-</p>
-
-
-<p>
-次にカテゴリ名の問題。
-</p>
-
-
-<p>
-Angerwhale は カテゴリ ＝ ディレクトリなんですが、ブラウザ上にはディレクトリ名をそのまま表示しちゃうんですね。ディレクトリは英語で、表示は日本語でしたい、ってのもよくあることなので、これも不便ですね。
-</p>
-
-
-<p>
-この辺り、パッチ作ったりして対応したいな、と思ってます。
-</p>
-
-
-<p>
-また、以下のバグと思わしき問題もありました。
-</p>
-
-
-<ul><li>ホームにアクセスすると、カテゴリわけされたエントリが表示されない。</li>
-<li>カテゴリにアクセスすると、404 エラー。</li></ul>
-
-
-<p>
-これは以下のパッチを書いて、jrockway に送ってみました。
-</p>
-
-
-<pre class="wiki">
-Index: lib/Angerwhale/Model/Filesystem.pm
-===================================================================
---- lib/Angerwhale/Model/Filesystem.pm  (revision 573)
-+++ lib/Angerwhale/Model/Filesystem.pm  (working copy)
-@@ -58,7 +58,7 @@
- sub get_article {
-     my $self    = shift;
-     my $article = shift;
--    my $base    = $self->base;
-+    my $base    = shift || $self->base;
-
-     die "article name contains weird characters"
-       if $article =~ m{/};
-@@ -90,10 +90,14 @@
-         my $entry = "$base/$article";
-         next if $article =~ m{^[.]};    # hidden files are also ignored
-         next if !-r $entry;
--        next if -d $entry;
-
-+        #next if -d $entry;
-+        if ( -d $entry ) {
-+            push @articles, $self->_ls($entry);
-+            next;
-+        }
-         #entry is acceptable
--        my $article = $self->get_article($article);
-+        my $article = $self->get_article($article, $base);
-         push @articles, $article;
-
-     }
-</pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/18/">&larr; Older</a>
@@ -1536,6 +1495,10 @@ Index: lib/Angerwhale/Model/Filesystem.pm
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1549,10 +1512,6 @@ Index: lib/Angerwhale/Model/Filesystem.pm
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

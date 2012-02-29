@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="もう1年以上前に書いたものですが、いまだに結構アクセスがあるので、一応ここからリンクしておきます。http://mizzy.org/linux/itunes.xhtml ここで紹介しているソフトウェアはバージョンも上がり、セットアップ方法なども現在は異なっているようですので、 &hellip;">
+  <meta name="description" content="このブログをカスタマイズしている過程で、Safari + xmlHttpRequestで取得したデータが文字化けする、という現象に悩んでいたのですが、&lt;?xml version=&#8221;1.0&#8221; encoding=&#8221;euc-jp&#8221;?&gt; &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/13/344/">Mac SafariでのxmlHttpRequest文字化け</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-13T11:29:00+09:00" pubdate>Apr 13<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/13/344/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+このブログをカスタマイズしている過程で、Safari + xmlHttpRequestで取得したデータが文字化けする、という現象に悩んでいたのですが、&lt;?xml version=&#8221;1.0&#8221; encoding=&#8221;euc-jp&#8221;?&gt; という一文を入れてあげると、文字化けが解消されました。
+</p>
+
+
+
+
+<p class="entryBody">
+どうやらSafariのxmlHttpRequestでは、HTTPのContent-typeヘッダのcharsetは無視されるようで、XML宣言（って呼び方でいいの?）で指定されたcharsetを解釈する模様。XML宣言がないと、iso-8859-1とみなすらしい。
+</p>
+
+
+
+
+<p class="entryBody">
+なので、xmlHttpRequestで取得するコメントとトラックバックには、XML宣言を入れてます。なんか気色悪いけど、しかたない。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -195,6 +245,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -208,10 +262,6 @@
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

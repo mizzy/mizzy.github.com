@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Agile Web Development With Rails の内容と、Rails 1.0 の違いメモ。 P178、profiler と benchmarker のパスが違う。まずは profiler 。 Rails 本
-depot> ruby script/profiler " &hellip;">
+  <meta name="description" content="Rails の実装で、ああこれ面白いなー、よさげだなー、と思ったものをメモ。 Rails 勉強中 #0 でも触れたけど、ActiveRecord はモデルクラスでデータの Validation ができます。これはコントローラで Validation する必要がなくなるので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,131 @@ depot> ruby script/profiler " &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/12/29/393/">ActiveRecord で Validation （Rails勉強中 #5）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-12-29T00:53:00+09:00" pubdate>Dec 29<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/12/29/393/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Rails の実装で、ああこれ面白いなー、よさげだなー、と思ったものをメモ。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="/program/learningRails.html" target="_blank">Rails 勉強中 #0</a> でも触れたけど、ActiveRecord はモデルクラスでデータの Validation ができます。これはコントローラで Validation する必要がなくなるので、コードが簡略化できて見通しがよくなっていいです。その分モデルのコードが増えますが、元々モデルにはそんなにコードを書かないので、多少増えたところで見通しが悪くなったり、煩雑になったりということはないですし。
+</p>
+
+
+
+
+<p class="entryBody">
+また、Validation の処理のしかたもなかなかスマート。例えば、フォームで入力必須項目を設定したい場合には、モデルに
+</p>
+
+
+
+
+<pre class="code">
+validates_presence_of :email
+</pre>
+
+
+
+
+<p class="entryBody">
+とか書いておいて、View には
+</p>
+
+
+
+
+<pre class="code">
+&lt;!-- エラーメッセージ表示部分 --&gt;
+&lt;%= error_messages_for(:order) %&gt;
+
+&lt;!-- Email入力フィールド --&gt;
+EMail: &lt;%= text_field("order", "email", "size" => 40 ) %&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+とか書いておくと、以下の様なエラー画面を勝手に出してくれちゃいます。
+</p>
+
+
+
+
+<p class="entryBody" style="border: solid 1px #333333;">
+<img src="/img/rails_validation.jpg" />
+</p>
+
+
+
+
+<p class="entryBody">
+エラーメッセージも、
+</p>
+
+
+
+
+<pre class="code">
+validates_presence_of :email, :message => "can't be blank"
+</pre>
+
+
+
+
+<p class="entryBody">
+といった感じで任意に設定できますし。validates_presence_of 以外にも様々なヘルパーがありますし（詳しくは <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Rails本</a>で）、もちろん、自分で任意の Validation コードを書くことも可能です。
+</p>
+
+
+
+
+<p class="entryBody">
+また、日本人であれば当然、日本語にするにはどうするんだろう、という疑問を持つと思いますが、
+<a href="http://d.hatena.ne.jp/secondlife/" target="_blank">gorou</a> さん作の <a href="http://jp.rubyist.net/magazine/?0012-RubyOnRails" target="_blank">ActiveHeart</a> や、<a href="http://wota.jp/ac/?date=20051220" target="_blank">ヽ( ・∀・)ノきゅまきゅまーさんとこの jscaffold</a> とかがあるので心配無用です。お二方、素敵すぎです。
+</p>
+
+
+
+
+<p class="entryBody">
+次回はコールバックとオブザーバについて書こうと思います。ほんとは一気に書こうかと思ったので、このエントリのタイトルは最初「ActiveRecord とコールバックとオブザーバ」だったのですが、力尽きました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -899,77 +1023,6 @@ Web Services を使って他から情報をひっぱってきてフィードに�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/12/12/498/">NBA 2.0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-12-12T15:03:00+09:00" pubdate>Dec 12<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/12/12/498/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-CNET Japan で <a href="http://japan.cnet.com/news/media/story/0,2000047715,20092624,00.htm" target="_blank">NBAの「Web 2.0」な英断&#8211;全映像をアーカイブ化、ファンに「解放」へ</a> という記事が！
-</p>
-
-
-
-
-<p class="entryBody">
-要は現存するすべての試合のアナログデータをデジタル化して開放する、ということで、Web 2.0 とは関係ないじゃん、って感じですが、より使いやすいシステムとするためには、Web 2.0 的な要素が不可欠なんでしょうね。
-</p>
-
-
-
-
-<p class="entryBody">
-例えば、「何年何月何日のどこ対どこの試合が見たい」、ということであれば、割と簡単に見たい試合が見つけられるでしょうが、「いつの試合か忘れたけど、残り時間わずかで Warriors の Tim Hardaway が Rockets の Hakeem Olajuwon の頭越しに決めた逆転のフェードアウェイショットがもう1度見たい！」ということになれば、それ相応のメタデータが蓄積されている必要があるわけで、こういった詳細なメタデータを、60年間に渡る試合全てに対して、NBA のスタッフだけでつけるのは大変でしょう。そこで CGM/Folksonomy の出番となるわけですね。
-</p>
-
-
-
-
-<p class="entryBody">
-ちなみに、上の試合は、Rockets の Vernon Maxwell によるまぐれだろそりゃ、と言いたくなるアクロバティックなショットで再逆転されて試合終了、がっくりきたのをよく覚えてます。
-</p>
-
-
-
-
-<p class="entryBody">
-更に映像とメタデータを API で開放して、Tim Hardaway のハイライトシーン、しかも killer cross over でディフェンスを切り裂くシーンのみをプログラムで自動抽出、とかできると最高！
-</p>
-
-
-
-
-<p class="entryBody">
-それよりも何よりも、今溜まっている膨大な数のVHSテープを廃棄できるのが一番うれしいかもしれない。ずっと以前から、劣化する前にデジタル化しようと考えてはいたものの、ストレージの容量、デジタル化の手間、メタデータの付与、バックアップなど、悩ましい問題がいろいろあってためらっていたので。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/33/">&larr; Older</a>
@@ -987,6 +1040,10 @@ CNET Japan で <a href="http://japan.cnet.com/news/media/story/0,2000047715,2009
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1000,10 +1057,6 @@ CNET Japan で <a href="http://japan.cnet.com/news/media/story/0,2000047715,2009
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

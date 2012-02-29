@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="LISA&#8217;07 テクニカルセッション2日目の、気になったテーマに関する簡単なメモ。 Ganeti: An Open Source Multi-Node HA Cluster Based on Xen Google でつくられている Xen ベースのオープンソースなマルチノード HA &hellip;">
+  <meta name="description" content="Software Design 2007年12月号の Puppet 特集を執筆させて頂きました。 概要や各章のタイトルは Software Design 2007年12月号のお知らせ - Software Design×はてな をご参照下さい。 gihyo.jp での連載 をベースに、大幅に加筆、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,45 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/17/SoftwareDesign200712Puppet/">SoftwareDesign200712Puppet</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-11-17T00:37:00+09:00" pubdate>Nov 17<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/11/17/SoftwareDesign200712Puppet/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Software Design 2007年12月号の Puppet 特集を執筆させて頂きました。</p>
+
+<p>概要や各章のタイトルは <a href="http://d.hatena.ne.jp/software_design/20071116">Software Design 2007年12月号のお知らせ - Software Design×はてな</a> をご参照下さい。</p>
+
+<p><a href="http://gihyo.jp/admin/serial/01/puppet">gihyo.jp での連載</a> をベースに、大幅に加筆、修正した内容となっており、リファレンスも含めて約50ページと、かなりのボリュームです。特にリファレンスは、各リソースタイプとパラメータがコンパクトにまとまっているので、手元に置いておくととても便利ですよ。</p>
+
+<p>以上宣伝でした。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1039,81 +1078,6 @@ package { ssh:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/08/09/521/">Trac の SearchHyperEstraierPlugin を Trac 0.10.x で動かすパッチ</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-08-09T03:03:00+09:00" pubdate>Aug 9<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/08/09/521/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>&#8220;SearchHyperEstraierPlugin&#8221;:http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SearchHyperEstraierPlugin が、Trac 0.10.x というか、うちの環境で動かないので、パッチ書いた。初 Python プログラミング。（というほどのものじゃないけど。）</p>
-
-<pre><code>
-=== searchhyperestraier/searchhyperestraier.py
-==================================================================
---- searchhyperestraier/searchhyperestraier.py  (revision 892)
-+++ searchhyperestraier/searchhyperestraier.py  (local)
-@@ -2,8 +2,9 @@
- # SearchRepositoryWithNamazu plugin
-
- from trac.core import *
--from trac.Search import ISearchSource, query_to_sql, shorten_result
-+from trac.Search import ISearchSource, shorten_result
- from trac.util import NaivePopen
-+from trac.util.text import to_unicode
- from StringIO import StringIO
- import urllib
- import time
-@@ -44,9 +45,9 @@
-         browse_trac = self.env.config.get('searchhyperestraier', 'browse_trac','enabled')
- 
- 
--        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,unicode(query,'utf-8').encode(estcmd_encode))
-+        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,' '.join(query))
-         self.log.debug('SearchHyperEstraier:%s' % cmdline)
--        np = NaivePopen(cmdline)
-+        np = NaivePopen( cmdline.encode(estcmd_encode) )
-         #self.log.debug('Result:%s' % unicode(np.out,'utf-8').encode('mbcs'))
-         #self.log.debug('Result:%s' % np.out)
-         if np.errorlevel or np.err:
-@@ -74,7 +75,7 @@
-             attrelem_array = element.getElementsByTagName("attribute")
-             for attrelem in attrelem_array:
-                 attr_name = attrelem.getAttribute("name")
--                attr_value = unicode(attrelem.getAttribute("value")).encode('utf-8')
-+                attr_value = to_unicode(attrelem.getAttribute("value"))
-                 #URLとタイトルを生成
-                 if attr_name == "_lreal":
-                     attr_value=attr_value[len(replace_left):].replace("\\","/")
-</code></pre>
-
-
-<p>エラーが出るたびに、適当にいじってたら動いた、という感じ。なので、こんなんでいいのかはよく分からない。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -1131,6 +1095,10 @@ package { ssh:
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
@@ -1144,10 +1112,6 @@ package { ssh:
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi - A script for converting web sites to mobipocket format</a>
       </li>
     
   </ul>

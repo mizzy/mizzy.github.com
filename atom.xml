@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-01-19T00:00:53+09:00</updated>
+  <updated>2012-02-29T22:37:09+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,95 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Paperboy's engineer evaluation system]]></title>
+    <link href="http://mizzy.org/blog/2012/02/29/paperboys-engineer-evaluation-system/"/>
+    <updated>2012-02-29T21:54:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/02/29/paperboys-engineer-evaluation-system</id>
+    <content type="html"><![CDATA[<p>今年から新たに<a href="http://www.paperboy.co.jp/">ペパボ</a>で導入された、技術者向けの評価制度については、<a href="http://mizzy.org/blog/2012/01/17/paperboy-is-hiring/">こちらのエントリ</a> で書いたのですが、本日、その一次評価が完了しました。</p>
+
+<p>評価のプロセスは、一次はテクニカル・マネージャーによる評価、二次は経営会議メンバーによる評価、と二段階の評価となっています。</p>
+
+<p>自分が担当した一次評価の詳細は、以下のようになっています。</p>
+
+<ol>
+<li>シニア、またはアドバンスドシニアに上がりたい人には、自ら立候補してもらう。</li>
+<li>立候補する人は、定められたフォーマットにしたがって、自分がそのポジションにふさわしいと思う理由や実績について Markdown で書き、指定した Git リポジトリに push する。（「定められたフォーマット」と言っても、最初に名前、次に希望のポジションを書いてもらうだけで、それ以外は自由。）</li>
+<li>文書に提出後、一人一人と面談を行う。</li>
+<li>文書の内容と面談の結果にもとづいて、各人が提出した文書の末尾に、結果（通過 or 不通過）、評価ポイント、今後期待すること、を評価者が追記し、git push する。</li>
+</ol>
+
+
+<p>Git リポジトリは社内で誰でも参照できるし、Markdown で書かれた文書は、HTML 変換＆index.html を生成し、社内の誰もが見えるところに置いてありますので、評価の過程が、面談以外はすべてオープン、という形をとっています。</p>
+
+<p>今回、この制度が導入されて初めての一次評価ということもあって、総評を社内 SNS に書いてみたのですが、せっかくなのでその内容をこちらで公開したいと思います。</p>
+
+<p>多少文言を直したり、完全に社内向けな部分は改変してますが、内容はほとんどこのまんまです。</p>
+
+<hr />
+
+<p>ペパボで初めて導入された技術者評価制度ということもあり、また、他社の人と話していても、技術者の評価については、一定の明確な基準を設けることが難しい、ということで、基準についてはとても悩みました。</p>
+
+<p>悩みましたが、まず今回は初めてということもあり、厳し目に評価しています。（最初に緩くして後で厳しくするよりは、最初に厳しくして、後で緩めるほうがいいだろう、ということで。）</p>
+
+<p>今回評価にあたっては、以下の3つに重点を置いてます。</p>
+
+<ol>
+<li>プロフェッショナル領域であるからには、純粋に技術だけで評価する。</li>
+<li>シニアと呼ぶからには、他の人にはない、技術的に優れた何かを持っている。</li>
+<li>アウトプットしている。</li>
+</ol>
+
+
+<p>特に1についてですが、サービス運営のためには、必ずしも高い技術力は必要ないわけで、技術以外の面で多大な貢献をしてきている技術者も多くいると思います。ですが、そういった部分の評価は、各部署で行うべきであって、宮下が評価すべきではないと判断し、敢えて技術だけで評価することにしました。</p>
+
+<p>また、2や3は、両方ともきちんと満たしていなければいけないか、というとそういうわけではなく、どちらか一方が圧倒的に優れている場合には、もう一方はあまり重視していません。（とは言え、両方満たしてるのが望ましいですが。）</p>
+
+<p>ただし、アウトプットがないと評価のしようもないので、最低限のアウトプットはやはり必要です。</p>
+
+<p>この様な観点に基づいた各人に対する評価については、完全にオープンにしてますので、こちらで確認できます。</p>
+
+<p>（社内サーバのURLなので省略）</p>
+
+<p>評価全体を見渡してみると、評価の高い人には、以下の傾向が見られます。（一人がすべてを満たしている、というわけではないです。）</p>
+
+<ul>
+<li>開発手法、開発フローに対するきちんとした理解と実践</li>
+<li>開発もインフラもできるオールラウンドな能力</li>
+<li>常に新しい技術情報を追いかけ、それを仕事にも取り込み活かしている</li>
+<li>現状これでやれてるから、とそこに留まらずに常に改善していこうとしている</li>
+<li>一部の技術ではずば抜けていて、社内で他にできる人が少ない、あるいはいない</li>
+<li>いかに自動化して楽をするか、ということを常に考え実践している</li>
+<li>アウトプットがすごい</li>
+</ul>
+
+
+<p>ただしこれらは、結果として表にこのように見えてるだけで、評価の高い人は、技術者としての意識、思考、姿勢がそもそも異なると考えています。なので、こういったことを表面だけ真似しようとしても、決して高い評価が与えられることはないです。</p>
+
+<p>また、今回通過した人の中では、インフラエンジニアは○○さん一人という、インフラの人にとっては厳しい結果になっています。これは、インフラの人も開発力を持つべき、という考えに基づいています。（OSより上はすべてソフトウェアであるし、ソフトウェアに関する技術力＝開発力、と考えているので。特にOSSな世界では。）その辺りについての宮下の考えは、<a href="http://gihyo.jp/magazine/SD/archive/2009/200904">Software Design 2009年4月号</a> に詳しく書いていて、記事の内容を以下に転載しましたので、読んでみてください。（<a href="http://gihyo.jp/book/2011/978-4-7741-4600-3">サーバ／インフラエンジニア養成読本</a> にもこの記事の内容が収録されています。）</p>
+
+<p>（これも社内サーバのURLなので省略）</p>
+
+<p>（記事が古く、この頃はインフラエンジニアという言葉はなく、サーバエンジニアという言葉を使っています。）</p>
+
+<p>ただし、ネットワークやハードウェアで優れた技術力があるのであれば、開発力はなくても技術者としては高い評価を与えます。（うちの業務形態的には、ネットワークやハードウェアの技術が優れていても、仕事に活かしにくい、といった面はありますが。）</p>
+
+<p>また、技術者のあるべき姿としては、<a href="http://heikou-konton.blogspot.com/2001/03/blog-post.html">こちら</a>も参考にしています。</p>
+
+<p>それから、今回通過した人達にもまだまだ足りない面はあるのですが、それはOSSに対する貢献です。OSSを仕事でバリバリ使っているのであれば、ソースは読んで当たり前だし、不具合があったら直して、開発元にパッチを送る、ということは当たり前の行為です。むしろ、こういったことをやらないのがおかしいぐらいです。一度もこういったことをしたことがない、考えたこともない、という技術者は考えを改めるべきですし、今までしたことがある人は、更に意識してやるようにしてください。自分も意識して積極的にやるようにします。</p>
+
+<p>ここを最後に強く強調してるのは、自分が技術者として成長してきた一番の根幹は、OSS との関わりにあるからだと思っているからです。blosxom のプラグインを書いて公開したり、CPAN Authors にパッチを送ったり、Plagger のコミッタにしてもらったり、CPAN Author になったり、自分が書いたコードを積極的に公開したり、GitHub で Pull Requests を送ってみたり、YAPC などの技術系カンファレンスでプレゼンしたり、と、こういった活動の中で、外部の素晴らしい技術者達とのつながりもでき、数多くのものを得てきました。</p>
+
+<p>説明会でも話した「技術者や技術はオープンであるべき」という考えは、このような経験が元になっています。ありきたりな言葉ですが、「ギブ＆テイク」の通り、オープンにすることによって得られるものは非常に多く、また、技術者にとっては何事にも代え難い財産になります。こういった経験を、ペパボの技術者のみなさんにもぜひ味わってもらいたいです。</p>
+
+<hr />
+
+<p><a href="http://www.paperboy.co.jp/">ペパボ</a> という会社では、こんな感じで技術者向けの評価制度がスタートしました。</p>
+
+<p>こんなペパボは、東京、京都、福岡で <a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml">様々な職種で人材募集中です</a>。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[paperboy is hiring]]></title>
@@ -1288,76 +1377,6 @@ refresh_interval = 60
 </code></pre>
 
 <p>Access to port 8080 of this server and you&#8217;ll see the screen of Graphite.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[HowDotCloudLazyCopyImplementsCopyOnWrite]]></title>
-    <link href="http://mizzy.org/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/"/>
-    <updated>2011-07-17T23:44:34+09:00</updated>
-    <id>http://mizzy.org/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite</id>
-    <content type="html"><![CDATA[<p><a href="https://github.com/dotcloud/lazycopy">dotcloud/lazycopy</a> is a copy-on-write version of cp.It&#8217;s based on <a href="http://aufs.sourceforge.net/">aufs</a>.</p>
-
-<p>Scientific Linux 5 has aufs rpm on its base repo.So I tried aufs and lazycopy on SL5.CentOS and SL6 don&#8217;t have aufs rpm.</p>
-
-<p>I created source directories and files in them first.</p>
-
-<pre><code># mkdir /tmp/source0
-# mkdir /tmp/source1
-# mkdir /tmp/source2
-# echo source0 &gt; /tmp/source0/0
-# echo source1 &gt; /tmp/source1/1
-# echo source2 &gt; /tmp/source2/2
-</code></pre>
-
-<p>And copied these directories to /tmp/dest with lazycopy command.</p>
-
-<pre><code># lazycopy /tmp/source0 /tmp/source1 /tmp/source2 /tmp/dest
-['/tmp/source0', '/tmp/source1', '/tmp/source2'] -&gt; /tmp/dest
-</code></pre>
-
-<p>Confirmed that three files wiere there and the content of one of the files.</p>
-
-<pre><code># ls /tmp/dest/
-0  1  2
-# cat /tmp/dest/0
-source0
-</code></pre>
-
-<p>Changed the content of /tmp/dest/0 and confirmed that /tmp/source0/0 was not changed.</p>
-
-<pre><code># echo dest &gt; /tmp/dest/0 
-# cat /tmp/dest/0 
-dest
-# cat /tmp/source0/0 
-source0
-</code></pre>
-
-<p>Lazycopy implements copy-on-write by mounting directories with aufs like this.</p>
-
-<pre><code># mount
-...
-none on /tmp/dest type aufs (rw,br:/tmp/dest/.aufs/0=rw:/tmp/source0=ro:/tmp/source1=ro:/tmp/source2=ro)
-</code></pre>
-
-<p>Lazycopy creates .aufs/0 directory in the destination directory if it doesn&#8217;t exist and mounts it with rw mode as one of the aufs branch.Other source directories are mounted with ro mode, so files in these directories will not be changed.</p>
-
-<p>Changed files and newly created files are saved under /tmp/dest/.aufs/0 directory.So you can see the directory structures like this after unmounting /tmp/dest.</p>
-
-<pre><code># touch /tmp/dest/3
-# umount /tmp/dest
-# tree -a /tmp/dest
-/tmp/dest
-`-- .aufs
-    `-- 0
-        |-- .wh..wh..tmp
-        |-- .wh..wh.aufs
-        |-- .wh..wh.plnk
-        |-- 0
-        `-- 3
-</code></pre>
-
-<p>So if you unmount /tmp/dest directory and run lazycopy with same options again, you can see the changed files and created files again.</p>
 ]]></content>
   </entry>
   
