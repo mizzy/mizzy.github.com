@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="!html &lt;a href="http://www.oreilly.co.jp/books/9784873114934/"&gt;&lt;img src="http://ec3.images-amazon.com/images/I/51-ThZ6FRfL._SS500_.jpg" /&gt &hellip;">
+  <meta name="description" content="tokuhirom さんが IRC で「ufw べんり！」「iptables より簡単」っておっしゃっていて、日頃から iptables のコマンドインターフェースは最悪だと思っていたので、お、それは試してみたい、ってことで、ちょろっと触ってみました。 ufw って Ubuntu &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,300 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/05/12/WebOperations/">WebOperations</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/05/27/UfwOnCentOS5/">Ufw On Cent Os5</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-05-27T01:05:06+09:00" pubdate>May 27<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/05/27/UfwOnCentOS5/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://d.hatena.ne.jp/tokuhirom/">tokuhirom</a> さんが IRC で「<a href="https://launchpad.net/ufw">ufw</a> べんり！」「iptables より簡単」っておっしゃっていて、日頃から iptables のコマンドインターフェースは最悪だと思っていたので、お、それは試してみたい、ってことで、ちょろっと触ってみました。</p>
+
+<p>ufw って Ubuntu に標準で付属してるんですね。Ubuntu 使ってないんで知りませんでした。で、ufw の u は Ubuntu の u なのかな、と思ったら、Uncomplicated Firewall の略だそうで、だったら普段一番使ってる CentOS5 でも動くかも、と思って、パッケージ作ったり軽く動かしたりしてみたんで、その記録です。（CentOS の今後については色々言われてますが、まあそこは気にせずに。）</p>
+
+<p>まず RPM パッケージをつくろう、ってことで、ググったら <a href="http://www.openmamba.org/pub/openmamba/devel-ercolinux/specs/ufw.spec">ufw.spec</a> を見つけたので、これを CentOS5 で動くようにカスタマイズして、<a href="http://svn.mizzy.org/public/yum/SRPMS/ufw-0.30.1-1.src.rpm">ソース RPM</a> と <a href="http://svn.mizzy.org/public/yum/RPMS/centos/5/x86_64/RPMS/ufw-0.30.1-1.x86_64.rpm">バイナリ RPM</a> を作成。ufw は python 2.5 以降が必要なんですが、CentOS5 デフォルトは 2.4 なので、python26 パッケージが必要です。あと、spec のカスタマイズも超適当だけど気にしないでください。</p>
+
+<p>で、パッケージインストール後、iptables が動いてない状態から、ufw enable して iptables -L -n してみたら、以下のようにルールが設定されていた。</p>
+
+<pre><code>$ sudo /usr/sbin/ufw enable
+Password: 
+Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+Firewall is active and enabled on system startup
+
+$ sudo /sbin/iptables -L -n
+Chain INPUT (policy DROP)
+target     prot opt source               destination         
+ufw-before-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-track-input  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain FORWARD (policy DROP)
+target     prot opt source               destination         
+ufw-before-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+ufw-before-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-track-output  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-after-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-after-input (1 references)
+target     prot opt source               destination         
+ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:137 
+ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:138 
+ufw-skip-to-policy-input  tcp  --  0.0.0.0/0            0.0.0.0/0           tcp dpt:139 
+ufw-skip-to-policy-input  tcp  --  0.0.0.0/0            0.0.0.0/0           tcp dpt:445 
+ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:67 
+ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:68 
+ufw-skip-to-policy-input  all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type BROADCAST 
+
+Chain ufw-after-logging-forward (1 references)
+target     prot opt source               destination         
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
+
+Chain ufw-after-logging-input (1 references)
+target     prot opt source               destination         
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
+
+Chain ufw-after-logging-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-after-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-forward (1 references)
+target     prot opt source               destination         
+ufw-user-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-before-input (1 references)
+target     prot opt source               destination         
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           state RELATED,ESTABLISHED 
+ufw-logging-deny  all  --  0.0.0.0/0            0.0.0.0/0           state INVALID 
+DROP       all  --  0.0.0.0/0            0.0.0.0/0           state INVALID 
+ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 3 
+ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 4 
+ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 11 
+ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 12 
+ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 8 
+ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0           udp spt:67 dpt:68 
+ufw-not-local  all  --  0.0.0.0/0            0.0.0.0/0           
+ACCEPT     udp  --  0.0.0.0/0            224.0.0.251         udp dpt:5353 
+ufw-user-input  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-before-logging-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-logging-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-logging-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-output (1 references)
+target     prot opt source               destination         
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           state RELATED,ESTABLISHED 
+ufw-user-output  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-logging-allow (0 references)
+target     prot opt source               destination         
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW ALLOW] ' 
+
+Chain ufw-logging-deny (2 references)
+target     prot opt source               destination         
+RETURN     all  --  0.0.0.0/0            0.0.0.0/0           state INVALID limit: avg 3/min burst 10 
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
+
+Chain ufw-not-local (1 references)
+target     prot opt source               destination         
+RETURN     all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type LOCAL 
+RETURN     all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type MULTICAST 
+RETURN     all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type BROADCAST 
+ufw-logging-deny  all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 
+DROP       all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-reject-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-reject-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-reject-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-skip-to-policy-forward (0 references)
+target     prot opt source               destination         
+DROP       all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-skip-to-policy-input (7 references)
+target     prot opt source               destination         
+DROP       all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-skip-to-policy-output (0 references)
+target     prot opt source               destination         
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-track-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-track-output (1 references)
+target     prot opt source               destination         
+ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0           state NEW 
+ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0           state NEW 
+
+Chain ufw-user-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-user-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-user-limit (0 references)
+target     prot opt source               destination         
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 5 LOG flags 0 level 4 prefix `[UFW LIMIT BLOCK] ' 
+REJECT     all  --  0.0.0.0/0            0.0.0.0/0           reject-with icmp-port-unreachable 
+
+Chain ufw-user-limit-accept (0 references)
+target     prot opt source               destination         
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-user-logging-forward (0 references)
+target     prot opt source               destination         
+
+Chain ufw-user-logging-input (0 references)
+target     prot opt source               destination         
+
+Chain ufw-user-logging-output (0 references)
+target     prot opt source               destination         
+
+Chain ufw-user-output (1 references)
+target     prot opt source               destination         
+</code></pre>
+
+<p>で、今度は ufw disable してみたら、以下のようになった。chain は残る模様。</p>
+
+<pre><code>$ sudo /usr/sbin/ufw disable
+Firewall stopped and disabled on system startup
+
+$ sudo /sbin/iptables -L -n
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+ufw-before-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-input  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-track-input  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+ufw-before-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-forward  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+ufw-before-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-output  all  --  0.0.0.0/0            0.0.0.0/0           
+ufw-track-output  all  --  0.0.0.0/0            0.0.0.0/0           
+
+Chain ufw-after-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-after-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-after-logging-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-after-logging-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-after-logging-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-after-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-logging-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-logging-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-logging-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-before-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-reject-forward (1 references)
+target     prot opt source               destination         
+
+Chain ufw-reject-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-reject-output (1 references)
+target     prot opt source               destination         
+
+Chain ufw-track-input (1 references)
+target     prot opt source               destination         
+
+Chain ufw-track-output (1 references)
+target     prot opt source               destination         
+</code></pre>
+
+<p>とりあえず CentOS5 でも動くようなんで、色々遊んでみようと思う。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/05/12/WebOperations/">Web Operations</a></h1>
     
     
       <p class="meta">
@@ -152,7 +445,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/04/27/SupervisorAProcessControlSystem/">SupervisorAProcessControlSystem</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/04/27/SupervisorAProcessControlSystem/">Supervisor A Process Control System</a></h1>
     
     
       <p class="meta">
@@ -322,7 +615,7 @@ port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/04/05/NagiosBook/">NagiosBook</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/04/05/NagiosBook/">Nagios Book</a></h1>
     
     
       <p class="meta">
@@ -393,7 +686,7 @@ port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/03/02/I4PC/">I4PC</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/03/02/I4PC/">I4 Pc</a></h1>
     
     
       <p class="meta">
@@ -432,7 +725,7 @@ port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/02/23/TeXPageFilledWithImage/">TeXPageFilledWithImage</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/02/23/TeXPageFilledWithImage/">Te X Page Filled With Image</a></h1>
     
     
       <p class="meta">
@@ -503,7 +796,7 @@ port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/02/17/JSONParserWithParseYapp/">JSONParserWithParseYapp</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/02/17/JSONParserWithParseYapp/">Json Parser With Parse Yapp</a></h1>
     
     
       <p class="meta">
@@ -645,7 +938,7 @@ is_deeply($result, ['Mercury', "Venus", ["Earth", ['Moon']], ['Mars', ["Phobos",
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/02/11/PtexLiveOnCentOS5/">PtexLiveOnCentOS5</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/02/11/PtexLiveOnCentOS5/">Ptex Live On Cent Os5</a></h1>
     
     
       <p class="meta">
@@ -733,7 +1026,7 @@ make install
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/12/14/InstagramForPC/">InstagramForPC</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/12/14/InstagramForPC/">Instagram For Pc</a></h1>
     
     
       <p class="meta">
@@ -776,7 +1069,7 @@ make install
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/07/13/SystemTap01/">SystemTap01</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/07/13/SystemTap01/">System Tap01</a></h1>
     
     
       <p class="meta">
@@ -906,161 +1199,6 @@ probe module("ext3").function("*").return { }
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/07/08/SystemTap00/">SystemTap00</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-07-08T01:45:26+09:00" pubdate>Jul 8<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/07/08/SystemTap00/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://sourceware.org/systemtap/">SystemTap</a> が以前から気になってたので、ちゃんと調べてみることに。</p>
-
-<p>ざっとググってみた感じだと、<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">SystemTap Beginners Guide</a> がしっかりまとまっていてわかりやすそうなので、これをベースに調べたことをメモしていく。<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide.pdf">PDF 版</a>もあるので Kindle に入れて持ち運べるし。</p>
-
-<h1>SystemTap とは？</h1>
-
-<ul>
-<li>カーネルの動きをモニタリングするためのフレームワーク</li>
-<li>netstat, ps, top, iostat なんかで得られるのと同じような情報が取得できる</li>
-<li>こういった情報が得られるだけではなく、フィルタリングしたり解析したりもできる</li>
-</ul>
-
-
-<p>といったもののようです。DTrace を知ってる方なら、それに似たようなもの、と言えばわかりやすいのかもしれません。（自分は DTrace よく知りませんが。）</p>
-
-<ul>
-<li>参考 URL
-
-<ul>
-<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/introduction.html</li>
-<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/intro-systemtap-vs-others.html</li>
-</ul>
-</li>
-</ul>
-
-
-<h1>SystemTap の利用</h1>
-
-<p>CentOS 5 でインストールした際のメモ。</p>
-
-<p>利用している kernel と同じバージョンの kernel-devel パッケージをインストール。（systemtap パッケージを入れると依存で勝手に入るけど、利用中の kernel バージョンと異なる場合もあるので、先に入れておくといいです。）</p>
-
-<pre><code>$ sudo yum install kernel-devel-2.6.18-164.el5
-</code></pre>
-
-<p>systemtap パッケージをインストール。</p>
-
-<pre><code>$ sudo yum install sytemtap
-</code></pre>
-
-<p>kernel-debuginfo と kernel-debuginfo-common のインストールのために、debuginfo-install コマンドが含まれる yum-utils パッケージをインストール。</p>
-
-<pre><code>$ sudo yum install yum-utils
-</code></pre>
-
-<p>kernel-debuginfo と kernel-debuginfo-common を yum で取得できるように、以下のような /etc/yum.repos.d/CentOS-debuginfo.repo を作成。</p>
-
-<pre><code>[debuginfo]
-name=CentOS debuginfo
-baseurl=http://debuginfo.centos.org/$releasever/$basearch/
-gpgcheck=0
-enabled=1
-</code></pre>
-
-<p>kernel-debuginfo と kernel-debuginfo-common を インストール。</p>
-
-<pre><code>$ sudo debuginfo-install kernel
-</code></pre>
-
-<p>kernel-headers も必要かも？</p>
-
-<p>あとは stap コマンドを実行すれば OK。(root 権限が必要だけど、stapdev グループに属しているユーザであれば、権限は不要。)</p>
-
-<pre><code>$ stap -v -e 'probe vfs.read {printf("read performed\n"); exit()}'
-Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 170usr/50sys/210real ms.
-Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116696virt/75204res/41808shr kb, in 310usr/50sys/369real ms.
-Pass 3: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.c
-Pass 4: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.ko
-Pass 5: starting run.
-read performed
-Pass 5: run completed in 20usr/50sys/96real ms.
-</code></pre>
-
-<p>-v オプションで詳細表示。v を増やすと更に詳細に。</p>
-
-<p>表示されるメッセージを見るとなんとなくわかるけど、SystemTap スクリプトをコンパイルしてカーネルモジュールを生成して実行してる。なので gcc や make なんかも必要。（なはず。）</p>
-
-<ul>
-<li>参考 URL
-
-<ul>
-<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/using-systemtap.html</li>
-</ul>
-</li>
-</ul>
-
-
-<h1>他のマシンで実行できる SystemTap モジュールを生成</h1>
-
-<p>上で見たように、SystemTap の利用には、コンパイラや debuginfo パッケージのインストールが必要なんだけど、ポリシー的にそれが許されない環境ではどうするか？実は SystemTap にはコンパイル済みのモジュールを実行する仕組みもある。（このコンパイル済みモジュールのことを、ドキュメントでは Instrumentation と呼んでいる。）</p>
-
-<p>コンパイル済みモジュールは以下のように stap コマンドで生成できる。(-r と -m オプションを指定する。）</p>
-
-<pre><code>$ stap -r 2.6.18-164.el5 -e 'probe vfs.read {exit()}' -m simple -v  [miya@h026]
-Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 180usr/20sys/205real ms.
-Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116816virt/75200res/41808shr kb, in 320usr/40sys/364real ms.
-Pass 3: translated to C into "/tmp/stapPGBW7a/simple.c" using 116816virt/75940res/42548shr kb, in 230usr/10sys/269real ms.
-Pass 4: compiled C into "simple.ko" in 3820usr/790sys/4619real ms.
-Pass 5: starting run.
-Pass 5: run completed in 20usr/50sys/97real ms.
-</code></pre>
-
-<p>simple.ko が生成されるので、これを実行したいマシンにコピーする。そのマシン上では、systemtap-runtime パッケージがインストールされていれば良い。で、以下のように staprun コマンドを叩いてモジュールを実行する。</p>
-
-<pre><code>$ staprun simple.ko -v
-stapio:cleanup_and_exit:400 detach=0
-stapio:cleanup_and_exit:417 closing control channel
-staprun:remove_module:205 Module simple removed.
-</code></pre>
-
-<p>これも root 権限が必要だけど、stapusr グループに属していれば権限は必要ない。（stapdev グループでももちろん実行できる。）</p>
-
-<ul>
-<li>参考 URL
-
-<ul>
-<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/cross-compiling.html</li>
-</ul>
-</li>
-</ul>
-
-
-<p>今日はここまで。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1078,6 +1216,10 @@ staprun:remove_module:205 Module simple removed.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1091,10 +1233,6 @@ staprun:remove_module:205 Module simple removed.
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

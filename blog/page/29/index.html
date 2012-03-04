@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="iTunes や iPod で聴いた曲情報を非同期で PLAYLOG へアップするスクリプト を Plagger Plugin として書き直してみました。よくわかってないので、他の方がつくったプラグインの見様見真似で。 Plagger::Plugin::CustomFeed:: &hellip;">
+  <meta name="description" content="Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアップデート。本家サイト にコミットしてますので、こちらをご参照ください。 宮川さんの助言にしたがって、CustomFeed::iTunesRecentPlay &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,79 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/03/07/317/">PLAYLOG HACKS With Plagger #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/03/07/493/">Playlog Hacks With Plagger #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-07T14:57:00+09:00" pubdate>Mar 7<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/07/493/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアップデート。<a href="http://plagger.org/trac" target="_blank">本家サイト</a> にコミットしてますので、こちらをご参照ください。
+</p>
+
+
+
+
+<p class="entryBody">
+宮川さんの助言にしたがって、CustomFeed::iTunesRecentPlay の中の reload_period を廃止して、Rule::Fresh を利用するようにししました。
+</p>
+
+
+
+
+<p class="entryBody">
+それにともない、Publish::Playlog も publish.feed の代わりに publish.entry を利用するようにしています。（entry ひとつひとつの日時を見る必要があるため。）
+</p>
+
+
+
+
+<p class="entryBody">
+最初、宮川さんが CustomFeed::iTunesRecentPlay を修正しているのに気づかないままローカルコピーをいじってました…。svn update する癖をつけないといかんですね。
+</p>
+
+
+
+
+<p class="entryBody">
+次のタスクは、宮川さんの助言にある「スマートリストまたは iTunes API の利用」と otsune さんの助言にある「iTunes Music Library.xml の URL 指定での取得」ですね。といっても、実は「スマートリストの利用」というのが具体的にどうするのかがわからなかったりします。XML をパースするわけでもなく、API も利用せずに、スマートリストを取得する方法があるのでしょうか？#plagger-ja に宮川さんがいらっしゃれば聞いてみようと思ったのですが、誰もいなかったので忘れないようにここにメモしておきます。またコメントしてくれることを期待して:-)
+</p>
+
+
+
+
+<p class="entryBody">
+<strong>2006/03/07 14:50 追記</strong><br />
+深夜に回線ダウンしている間に、宮川さんからメールで回答頂けました。多謝。 #plagger-ja に誰もいなかったのは、単にサーバ選択を間違えていたからでした。 IRC ビギナーなので、クライアントでサーバ選択できるのを見て、「分散システムになってて、どこのサーバ選んでもいいのかな？」と激しく勘違いしてました…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/07/317/">Playlog Hacks With Plagger #0</a></h1>
     
     
       <p class="meta">
@@ -212,7 +284,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/03/04/406/">PLAYLOG HACKS</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/03/04/406/">Playlog Hacks</a></h1>
     
     
       <p class="meta">
@@ -262,7 +334,7 @@ XML のパースは宮川さんのブログにあったものを参考にさせ�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/03/04/485/">Apache2 って最初から LDAP 認証用モジュールが含まれてるのね</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/03/04/485/">Apache2 って最初から Ldap 認証用モジュールが含まれてるのね</a></h1>
     
     
       <p class="meta">
@@ -305,7 +377,7 @@ subversion を WebDAV と合わせて使おうと思い、apache2 をインス�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/03/02/262/">Trac で Browse Source 時にハングする現象の解決法(trac Tips #0)</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/03/02/262/">Trac で Browse Source 時にハングする現象の解決法(Trac Tips #0)</a></h1>
     
     
       <p class="meta">
@@ -459,7 +531,7 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/02/26/271/">Six Apart ユーザーギャザリング vol.2 に行きます</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/02/26/271/">Six Apart ユーザーギャザリング Vol.2 に行きます</a></h1>
     
     
       <p class="meta">
@@ -552,7 +624,7 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/02/22/302/">Catalyst で Atom API テストツール #4</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/02/22/302/">Catalyst で Atom Api テストツール #4</a></h1>
     
     
       <p class="meta">
@@ -597,56 +669,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/02/22/387/">はてラボ + Ning</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-02-22T21:34:00+09:00" pubdate>Feb 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/02/22/387/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-はてラボについて「はてな社員以外も参加できるとおもしろい」みたいなことが色々なところで言われてますが、Ning みたいなサービスをはてラボでやることのメリットって、はてなドメインに自分のウェブアプリを置くことによって、JavaScript から直接はてな API にアクセスできることじゃなかろうか、と思ったりした。（はてラボはドメイン違うからダメだけど。）
-</p>
-
-
-
-
-<p class="entryBody">
-はてな API に簡単にアクセスできるような Javascript ライブラリを、はてなだったり他の誰かが作ってくれたりとか、はてな API の出力を JSON にしてくれたりして、それを利用した Javascript アプリをはてなドメイン上に置くことができるとなると、はてな API を利用したオリジナルアプリを開発する敷居はぐっと低くなるだろうし、さらに 他サービス API へのアクセスを中継してくれるようなものをはてな側で用意してくれれば、<a href="http://qooqle.jp" target="_blank">qooqle</a> の様なものをフル Javascript で書いたり、ってことができるんじゃなかろうか、と。（Yahoo みたいにリクエスト数に制限があるときついけど。）
-</p>
-
-
-
-
-<p class="entryBody">
-あとは当然はてななので、Ning と違って perl の環境用意してくれるよなー、とか、はてなフレームワーク使わせてくれるかなー、とか、gorou さんがいるから Ruby on Rails も用意してくれるんじゃなかろうか、とか、妄想が膨らむばかりです。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/30/">&larr; Older</a>
@@ -664,6 +686,10 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -677,10 +703,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="naoyaグループ - naoyaの日記 - I/O, iowait にちょっと反応してみます。 write はページに dirty フラグを立てるだけなので決してユーザープロセスを待たせない って、本当にそうなんでしょうか？（否定しているわけではなく、純粋な疑問です。） 最近、 &hellip;">
+  <meta name="description" content="前回のエントリ について、naoya さんから僕の期待以上の素晴らしい回答を頂きました。感謝感謝です。 詳細は上記エントリをじっくり読んで頂きたいのですが、僕の疑問への直接の答えとなるのが、まとめにある write はプロセスを待たせない
+ただし明示的に sync する場合は待たせる ですね。「 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,67 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/05/25/513/">Write はユーザプロセスを待たせない？の答え</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-05-25T20:03:00+09:00" pubdate>May 25<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/05/25/513/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://blog.mizzy.org/articles/2007/05/23/linux-disk-io-00">前回のエントリ</a> について、naoya さんから<a href="http://d.hatena.ne.jp/naoya/20070523/1179938637">僕の期待以上の素晴らしい回答</a>を頂きました。感謝感謝です。</p>
+
+<p>詳細は上記エントリをじっくり読んで頂きたいのですが、僕の疑問への直接の答えとなるのが、まとめにある</p>
+
+<blockquote><ul>
+<li>write はプロセスを待たせない</li>
+<li>ただし明示的に sync する場合は待たせる</li>
+</ul>
+</blockquote>
+
+<p>ですね。「write はプロセスを待たせない」が正しい、というのは naoya さんの解説を読んで納得しました。プロセスが write するということと、それが実際にディスクに書き出されることを、区別しないで考えていたのが僕の敗因ですね。</p>
+
+<p>また、こちらの環境で kjournald や qmail-queue プロセスが待たされていたのは、sync してるから、ということでした。kjournald は確かめていないのですが、qmail-queue のソースの中では確かに fsync() が実行されていました。考えてみれば当然ですよね。ジャーナルのメタデータやメールキューなど、大事なデータを write して sync しないなんてことはあり得ないでしょうし。</p>
+
+<p>なので、<a href="http://d.hatena.ne.jp/hirose31/">id:hirose31</a>さんからのコメント「fsync(2)のせい？」がずばり回答になっていました。ありがとうございます。今度カレーおごらせてください。</p>
+
+<p>というわけで、「write はユーザプロセスを待たせない？」は「待たせない」が答え、ということで完結です。</p>
+
+<p>あと、</p>
+
+<blockquote><p>ということですが free の結果では、プロセスに割り当てるためのメモリが足りてるかどうかはわかりますが、ページキャッシュ用にメモリが足りてるかどうかはわかりません。</p>
+
+<p>実際そのサーバーが主な仕事で使っているデータは、合計でどのぐらいのサイズでしょう。おそらく、キューに溜まったメールその他 OS 上で必要なデータのサイズをあわせると 800MB を超えるんではないかなあと思います。外してたらごめん。</p></blockquote>
+
+<p>もおっしゃるとおりですね。プロセスに必要なメモリ容量と、キャッシュに必要なメモリ容量をちゃんと区別していませんでした。</p>
+
+<p>となると、メモリを増やせば書き込み性能が向上する可能性があるのでは、と思ったのですが、今回のケースではおそらく向上することはなさそうです。というのも、iostat の値を見てると、avgqu-sz が 1 日平均でおよそ 5、短時間で見ると 10 とか 20 あるいはそれ以上ということがざらにあります。avgqu-sz はキューに入っていて待ちとなっている I/O リクエストの数なので、常に処理待ちとなっている I/O リクエストが存在する、ということなります。なので、ページキャッシュの容量の問題ではなく、ディスクの性能がボトルネックになっている、と言えそうです。（これも自分の勘違いなら恥ずかしいなー…メモリを簡単に増やせるなら、試してみたいんですけどね。）</p>
+
+<p>naoya さん、詳細な解説ありがとうございました。大変勉強になりました。僕のために時間を割いて長文エントリ書いてくれた、と思うとちょっと萌えました。（べっ、別にあんたのために…、とか言われそうですが。）</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -166,7 +228,7 @@ Swap:      1052248
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/05/13/511/">FizzBuzz アセンブラ版 for x86/Linux</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/05/13/511/">Fizz Buzz アセンブラ版 For X86/Linux</a></h1>
     
     
       <p class="meta">
@@ -405,7 +467,7 @@ sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40 
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/05/06/508/">Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/05/06/508/">Re: Dbicとdb Ix/Class/Schema/Loader 僕のいろいろな勘違い</a></h1>
     
     
       <p class="meta">
@@ -569,7 +631,7 @@ __PACKAGE__-&gt;belongs_to(
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/05/01/332/">SVN::TracWiki #2</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/05/01/332/">Svn/Trac Wiki #2</a></h1>
     
     
       <p class="meta">
@@ -629,7 +691,7 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/05/01/SVN-TracWiki-lib-SVN-TracWiki.pm/">SVN-TracWiki/lib/SVN/TracWiki.pm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/05/01/SVN-TracWiki-lib-SVN-TracWiki.pm/">Svn Trac Wiki/Lib/Svn/Trac Wiki.Pm</a></h1>
     
     
       <p class="meta">
@@ -719,7 +781,7 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom.pm/">XML-Atom-0.22/lib/XML/Atom.pm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom.pm/">Xml Atom 0.22/Lib/Xml/Atom.Pm</a></h1>
     
     
       <p class="meta">
@@ -764,7 +826,7 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
 <h1>CO-MAINTAINER</h1>
 
-<p>Tatsuhiko Miyagawa <a href="&#109;&#97;&#105;&#x6c;&#116;&#111;&#58;&#x6d;&#105;&#x79;&#97;&#103;&#x61;&#119;&#x61;&#x40;&#98;&#x75;&#108;&#107;&#x6e;&#101;&#119;&#115;&#x2e;&#110;&#101;&#x74;">&#x6d;&#x69;&#121;&#x61;&#x67;&#x61;&#119;&#97;&#x40;&#98;&#x75;&#x6c;&#x6b;&#110;&#101;&#x77;&#115;&#x2e;&#110;&#101;&#116;</a></p>
+<p>Tatsuhiko Miyagawa <a href="&#109;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#x6d;&#x69;&#x79;&#97;&#103;&#x61;&#119;&#x61;&#x40;&#98;&#x75;&#108;&#107;&#x6e;&#101;&#119;&#x73;&#x2e;&#110;&#x65;&#116;">&#x6d;&#105;&#121;&#x61;&#x67;&#x61;&#x77;&#97;&#64;&#98;&#117;&#x6c;&#x6b;&#110;&#x65;&#x77;&#115;&#x2e;&#110;&#x65;&#116;</a></p>
 </div>
   
   
@@ -777,7 +839,7 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Util.pm/">XML-Atom-0.22/lib/XML/Atom/Util.pm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Util.pm/">Xml Atom 0.22/Lib/Xml/Atom/Util.Pm</a></h1>
     
     
       <p class="meta">
@@ -829,251 +891,6 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Server.pm/">XML-Atom-0.22/lib/XML/Atom/Server.pm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-30T23:41:45+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom-Server.pm/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom/Server.pm</p>
-
-<h1>NAME</h1>
-
-<p>XML::Atom::Server - A server for the Atom API</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    package My::Server;
-    use base qw( XML::Atom::Server );
-    sub handle_request {
-        my $server = shift;
-        $server-&gt;authenticate or return;
-        my $method = $server-&gt;request_method;
-        if ($method eq 'POST') {
-            return $server-&gt;new_post;
-        }
-        ...
-    }
-
-    my %Passwords;
-    sub password_for_user {
-        my $server = shift;
-        my($username) = @_;
-        $Passwords{$username};
-    }
-
-    sub new_post {
-        my $server = shift;
-        my $entry = $server-&gt;atom_body or return;
-        ## $entry is an XML::Atom::Entry object.
-        ## ... Save the new entry ...
-    }
-
-    package main;
-    my $server = My::Server-&gt;new;
-    $server-&gt;run;
-</code></pre>
-
-<h1>DESCRIPTION</h1>
-
-<p><em>XML::Atom::Server</em> provides a base class for Atom API servers. It handles all core server processing, both the SOAP and REST formats of the protocol, and WSSE authentication. It can also run as either a mod_perl handler or as part of a CGI program.</p>
-
-<p>It does not provide functions specific to any particular implementation, such as posting an entry, retrieving a list of entries, deleting an entry, etc. Implementations should subclass <em>XML::Atom::Server&#8221;, overriding the &#8221;handle_request</em> method, and handle all functions such as this themselves.</p>
-
-<h1>SUBCLASSING</h1>
-
-<h2>Request Handling</h2>
-
-<p>Subclasses of <em>XML::Atom::Server&#8221; must override the &#8221;handle_request</em> method to perform all request processing. The implementation must set all response headers, including the response code and any relevant HTTP headers, and should return a scalar representing the response body to be sent back to the client.</p>
-
-<p>For example:</p>
-
-<pre><code>    sub handle_request {
-        my $server = shift;
-        my $method = $server-&gt;request_method;
-        if ($method eq 'POST') {
-            return $server-&gt;new_post;
-        }
-        ## ... handle GET, PUT, etc
-    }
-
-    sub new_post {
-        my $server = shift;
-        my $entry = $server-&gt;atom_body or return;
-        my $id = save_this_entry($entry);  ## Implementation-specific
-        $server-&gt;response_header(Location =&gt; $server-&gt;uri . '/entry_id=' . $id);
-        $server-&gt;response_code(201);
-        $server-&gt;response_content_type('application/x.atom+xml');
-        return serialize_entry($entry);    ## Implementation-specific
-    }
-</code></pre>
-
-<h2>Authentication</h2>
-
-<p>Servers that require authentication for posting or retrieving entries or feeds should override the <em>password_for_user&#8221; method. Given a username (from the WSSE header), &#8221;password_for_user</em> should return that user&#8217;s password in plaintext. This will then be combined with the nonce and the creation time to generate the digest, which will be compared with the digest sent in the WSSE header. If the supplied username doesn&#8217;t exist in your user database or alike, just return <code>undef</code>.</p>
-
-<p>For example:</p>
-
-<pre><code>    my %Passwords &gt; 'bar' );   ## The password for "foo" is "bar".
-    sub password_for_user {
-        my $server = shift;
-        my($username) = @_;
-        $Passwords{$username};
-    }
-</code></pre>
-
-<h1>METHODS</h1>
-
-<p><em>XML::Atom::Server</em> provides a variety of methods to be used by subclasses for retrieving headers, content, and other request information, and for setting the same on the response.</p>
-
-<h2>Client Request Parameters</h2>
-
-<ul>
-<li>$server->uri</li>
-</ul>
-
-
-<p> Returns the URI of the Atom server implementation.</p>
-
-<ul>
-<li>$server->request_method</li>
-</ul>
-
-
-<p> Returns the name of the request method sent to the server from the client (for example, <code>GET</code>, <code>POST</code>, etc). Note that if the client sent the request in a SOAP envelope, the method is obtained from the <em>SOAPAction</em> HTTP header.</p>
-
-<ul>
-<li>$server->request_header($header)</li>
-</ul>
-
-
-<p> Retrieves the value of the HTTP request header <em>$header</em>.</p>
-
-<ul>
-<li>$server->request_content</li>
-</ul>
-
-
-<p> Returns a scalar containing the contents of a POST or PUT request from the client.</p>
-
-<ul>
-<li>$server->request_param($param)</li>
-</ul>
-
-
-<p> <em>XML::Atom::Server</em> automatically parses the PATH_INFO sent in the request and breaks it up into key-value pairs. This can be used to pass parameters. For example, in the URI</p>
-
-<pre><code>    http://localhost/atom-server/entry_id=1
-</code></pre>
-
-<p> the <em>entry_id</em> parameter would be set to <code>1</code>.</p>
-
-<p> <em>request_param&#8221; returns the value of the value of the parameter &#8221;$param</em>.</p>
-
-<h2>Setting up the Response</h2>
-
-<ul>
-<li>$server->response_header($header, $value)</li>
-</ul>
-
-
-<p> Sets the value of the HTTP response header <em>$header&#8221; to &#8221;$value</em>.</p>
-
-<ul>
-<li>$server->response_code([ $code ])</li>
-</ul>
-
-
-<p> Returns the current response code to be sent back to the client, and if <em>$code</em> is given, sets the response code.</p>
-
-<ul>
-<li>$server->response_content_type([ $type ])</li>
-</ul>
-
-
-<p> Returns the current <em>Content-Type&#8221; header to be sent back to the client, and &#8221;$type</em> is given, sets the value for that header.</p>
-
-<h2>Processing the Request</h2>
-
-<ul>
-<li>$server->authenticate</li>
-</ul>
-
-
-<p> Attempts to authenticate the request based on the authentication information present in the request (currently just WSSE). This will call the <em>password_for_user</em> method in the subclass to obtain the cleartext password for the username given in the request.</p>
-
-<ul>
-<li>$server->atom_body</li>
-</ul>
-
-
-<p> Returns an <em>XML::Atom::Entry</em> object containing the entry sent in the request.</p>
-
-<h1>USAGE</h1>
-
-<p>Once you have defined your server subclass, you can set it up either as a CGI program or as a mod_perl handler.</p>
-
-<p>A simple CGI program would look something like this:</p>
-
-<pre><code>    #!/usr/bin/perl -w
-    use strict;
-
-    use My::Server;
-    my $server = My::Server-&gt;new;
-    $server-&gt;run;
-</code></pre>
-
-<p>A simple mod_perl handler configuration would look something like this:</p>
-
-<pre><code>    PerlModule My::Server
-    &lt;Location /atom-server&gt;
-        SetHandler perl-script
-        PerlHandler My::Server
-    &lt;/Location&gt;
-</code></pre>
-
-<h1>ERROR HANDLING</h1>
-
-<p>If you wish to return an error from <em>handle_request&#8221;, you can use the built-in &#8221;error</em> method:</p>
-
-<pre><code>    sub handle_request {
-        my $server = shift;
-        ...
-        return $server-&gt;error(500, "Something went wrong");
-    }
-</code></pre>
-
-<p>This will be returned to the client with a response code of 500 and an error string of <code>Something went wrong</code>. Errors are automatically serialized into SOAP faults if the incoming request is enclosed in a SOAP envelope.</p>
-
-<h1>AUTHOR &amp; COPYRIGHT</h1>
-
-<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/15/">&larr; Older</a>
@@ -1091,6 +908,10 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1104,10 +925,6 @@ Trac はソースコード自体の検索ができないので、当然 pod の�
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

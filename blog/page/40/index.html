@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="taggingプラグインをアップデート。現在自分がいるカテゴリ内のエントリにあるタグだけを表示できる様にしてみました。カテゴリ移動時に左のtagsメニューにご注目頂ければ、どんな動作かおわかりになるかと思います。download: taggingプラグイン カテゴリ名の表示には、hail2u. &hellip;">
+  <meta name="description" content="taggingプラグインをアップデート。約束通り、ajax（もどき）でタグを絞り込めるように改造。xmlHttpRequestに対応しているブラウザであれば、find tagフォームに文字を入れると、前方一致でダイナミックにタグが絞り込まれる様を見ることができます。対応していないブラウザでも、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,78 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/19/281/">Blosxomでtagging #5</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-19T23:19:00+09:00" pubdate>Apr 19<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/04/19/281/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+taggingプラグインをアップデート。約束通り、ajax（もどき）でタグを絞り込めるように改造。xmlHttpRequestに対応しているブラウザであれば、find tagフォームに文字を入れると、前方一致でダイナミックにタグが絞り込まれる様を見ることができます。対応していないブラウザでも、文字を入れてEnterを押せば同様にタグの絞込みができます。download: <a href="/archives/tagging">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+もちろん、xmlHttpRequestによる検索はこのプラグインだけでなく、Javascriptも必要です。Javascriptのコードについては、このサイトのソースをご参照下さい。
+</p>
+
+
+
+
+<p class="entryBody">
+これで大体欲しい機能は実装できたので、後はいじるとすると、バグフィックスとかパフォーマンス改善とか、その辺りかな。yuuさんからコメントでStorableモジュールを使わないで済むコードを頂いたのですが、こちらのコードに取り込むのはやめにしました。理由は、
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>Storableモジュールはperl5.8では標準で入ってるらしい。いまどき5.8が使えない環境は少ないだろう。</li>
+<li>今後キャッシュデータが増えたり、データ構造を変えたりするかもしれないので、その度にシリアライズルーチンを変更するのも面倒。それならば汎用的なシリアライザを使ったほうが良いだろう。</li>
+</ul>
+
+
+
+
+<p class="entryBody">
+といったところです。yuuさん、せっかく頂いたのに申し訳ありません。
+</p>
+
+
+
+
+<p class="entryBody">
+ちゃんとドキュメントつくらないとなぁ…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -435,7 +507,7 @@ blosxom 3.0+3iのTag.pmを参考にしようかと思ったら、ファイル名
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/04/13/471/">shelf.mizzy.org</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/04/13/471/">Shelf.Mizzy.Org</a></h1>
     
     
       <p class="meta">
@@ -545,73 +617,6 @@ blosxom 3.0+3iのTag.pmを参考にしようかと思ったら、ファイル名
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/13/435/">Ajaxなウェブメールを作る #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-13T11:29:00+09:00" pubdate>Apr 13<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/13/435/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変えているのですが、決定的にこれがいい、というものがないわけですよ。（だからこそ気分次第、なのですが。）
-</p>
-
-
-
-
-<p class="entryBody">
-まあ、ウェブメールなんだからしゃあないか、と妥協していたのですが、gmailが教えてくれました。ウェブメールでもJavaScriptをうまく使えば使い勝手がいいものが作れる、と。
-</p>
-
-
-
-
-<p class="entryBody">
-そこで、自分で作ってみようということになり、現在ちまちま作っております。目標としては、普段使っているのがWanderlustなので、それに使い勝手が近いものを作ろう、と考えています。以下の様なコンセプトで。
-</p>
-
-
-
-
-<ul class="entryBody">
-<li>画面遷移しない。</li>
-<li>3ペイン表示。</li>
-<li>キーボードのみで操作可能。ショートカットはWanderlust風。</li>
-<li>メッセージを先読みして待ち時間を少なく。</li>
-</ul>
-
-
-
-
-<p class="entryBody">
-まだ全然このコンセプト通りにはなってませんが、とりあえずメールが読める、という状態にはなってます。近いうちに動作デモを公開予定。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/41/">&larr; Older</a>
@@ -629,6 +634,10 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -642,10 +651,6 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

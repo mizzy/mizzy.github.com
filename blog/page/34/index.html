@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="greasemonkeyによるfeedbringer remix用のcssを色々いじってみました。cssを適用したスクリーンショット。オリジナルのものと見比べてもらえれば、違いは一目瞭然だと思います。 オリジナルから一番大きく変えた点は、ツリーメニュー表示欄とコンテンツ表示欄をfixにして、 &hellip;">
+  <meta name="description" content="feedbringer用greasemonkeyユーザスクリプトの白黒バージョンを修正しました。 白黒バージョンではアイコンを強引に入れ替えてるのですが、入れ替わるのが最初にページにアクセスした時だけで、15分毎のツリーメニューのアップデート時には、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/23/346/">Feedbringerをremixin&#8217; #4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-23T18:31:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/23/346/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.user.js" target="_blank">白黒バージョン</a>を修正しました。
+</p>
+
+
+
+
+<p class="entryBody">
+白黒バージョンではアイコンを強引に入れ替えてるのですが、入れ替わるのが最初にページにアクセスした時だけで、15分毎のツリーメニューのアップデート時には、入れ替わらずにオリジナルの青いアイコンのままになってしまう、というバグを修正しました。
+</p>
+
+
+
+
+<p class="entryBody">
+feedbringerはprototype.jsを利用しているので、Ajax.Updater.prototype.updateContentをオーバーライドするという強引な方法で対処しました。もっとスマートなやり方があると思うのですが、他に思い浮かばなかったので。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -308,7 +358,7 @@ user cssでやってもいいんでしょうけど、単一のサイトに適用
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/11/23/330/">Ajaxで「戻る」「進む」（feedbringerをremixin&#8217; #7）</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/11/23/330/">Ajaxで「戻る」「進む」（Feedbringerをremixin&#8217; #7）</a></h1>
     
     
       <p class="meta">
@@ -457,7 +507,7 @@ Ajax.Updater.prototype.extend(Ajax.Request.prototype).extend({
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/11/08/466/">Blosxom のエントリを OpenID でアクセス制限</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/11/08/466/">Blosxom のエントリを Open Id でアクセス制限</a></h1>
     
     
       <p class="meta">
@@ -507,7 +557,7 @@ meta プラグインと組み合わせて、meta-access: private と記述して
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/11/05/494/">perlでOpenID Consumerを実装してみる</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/11/05/494/">Perlでopen Id Consumerを実装してみる</a></h1>
     
     
       <p class="meta">
@@ -558,7 +608,7 @@ meta プラグインと組み合わせて、meta-access: private と記述して
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/11/01/270/">Blosxom + Text::Hatena #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/11/01/270/">Blosxom + Text/Hatena #0</a></h1>
     
     
       <p class="meta">
@@ -672,78 +722,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/10/03/478/">FormValidator::Simple関連モジュール</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-10-03T20:55:00+09:00" pubdate>Oct 3<span>rd</span>, 2005</time>
-        
-         | <a href="/blog/2005/10/03/478/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-今までフォームの validation は自前でモジュール書いていたのですが、 <a href="http://www.lost-season.jp/mt/2005/10/2005100121.html" target="_blank">CatalystでSledge風Validation</a> にある FormValidator::Simple がすごく良さげなので、さっそく使わせて頂くことにしました。
-</p>
-
-
-
-
-<p class="entryBody">
-ついでに、 FormValidator::Simple で電話番号チェックするプラグインと、 CGI::Application から FormValidator::Simple を利用するためのプラグインを作って、 CPAN にアップしました。
-</p>
-
-
-
-
-<ul class="entryBody">
-<li><a href="http://search.cpan.org/perldoc?FormValidator%3A%3ASimple%3A%3APlugin%3A%3ANumber%3A%3APhone%3A%3AJP" target="_blank">FormValidator::Simple::Plugin::Number::Phone::JP</a></li>
-<li><a href="http://search.cpan.org/perldoc?CGI::Application::Plugin::FormValidator::Simple" target="_blank">CGI::Application::Plugin::FormValidator::Simple</a></li>
-</ul>
-
-
-
-
-<p class="entryBody">
-ドキュメントの内容は、 FormValidator::Simple や Catalyst::Plugin::FormValidator::Simple をパクらせて頂きました。 CGI::Application::Plugin::FormValidator::Simple は、使い方が Catalyst::Plugin::FormValidator::Simple とできるだけ同じになるようにしています。（ set_invalid_form はまだ実装してませんが。）
-</p>
-
-
-
-
-<p class="entryBody">
-やたらとモジュール名が長いのが気になるのと、初めて CPAN にアップしたので、こんなんで良いのか不安です…
-</p>
-
-
-
-
-<p class="entryBody">
-それから、FormValidator::Simple::Plugin::Number::Phone::JP 0.01のSYNOPSISが間違ってるので、ご注意下さい。0.02で修正しています。（上記リンクでは現在、0.01に行ってしまいます。しばらくすれば0.02になると思います。）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/35/">&larr; Older</a>
@@ -761,6 +739,10 @@ meta プラグインと組み合わせて、meta-access: private と記述して
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -774,10 +756,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

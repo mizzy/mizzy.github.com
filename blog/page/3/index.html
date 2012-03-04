@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="dotcloud/lazycopy is a copy-on-write version of cp.It&#8217;s based on aufs. Scientific Linux 5 has aufs rpm on its base repo.So I tried aufs and &hellip;">
+  <meta name="description" content="I found a interest tool, Graphite when I was exploring https://github.com/etsy .(Screen Shots of Graphite.) Install Carbon Carbon is a backend &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,148 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/">HowDotCloudLazyCopyImplementsCopyOnWrite</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/07/24/HowToGetGraphiteWorkingOnScientificLinux6/">How To Get Graphite Working On Scientific Linux6</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-07-24T23:18:15+09:00" pubdate>Jul 24<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/24/HowToGetGraphiteWorkingOnScientificLinux6/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I found a interest tool, <a href="http://graphite.wikidot.com/">Graphite</a> when I was exploring https://github.com/etsy .(<a href="http://graphite.wikidot.com/screen-shots">Screen Shots of Graphite</a>.)</p>
+
+<h1>Install Carbon</h1>
+
+<p><a href="http://graphite.wikidot.com/carbon">Carbon</a> is a backend storage application for Graphite.</p>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
+# tar zxvf carbon-0.9.8.tar.gz
+# pushd carbon-0.9.8
+# python setup.py install
+# popd
+</code></pre>
+
+<h1>Install Whisper</h1>
+
+<p><a href="http://graphite.wikidot.com/whisper">Whisper</a> is an alternate to RRD.</p>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
+# tar zxvf whisper-0.9.8.tar.gz
+# pushd whisper-0.9.8
+# python setup.py install
+# popd
+</code></pre>
+
+<h1>Install Graphite</h1>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
+# tar zxvf graphite-web-0.9.8.tar.gz
+# pushd graphite-web-0.9.8      
+</code></pre>
+
+<p>Run check-dependencies.py.</p>
+
+<pre><code># ./check-dependencies.py 
+[FATAL] Unable to import the 'cairo' module, do you have pycairo installed for python 2.6.5?
+[FATAL] Unable to import the 'django' module, do you have Django installed for python 2.6.5?
+[WARNING] Unable to import the 'mod_python' module, do you have mod_python installed for python 2.6.5?
+This means you will only be able to run graphite in the development server mode, which is not
+recommended for production use.
+[WARNING]
+Unable to import the 'memcache' module, do you have python-memcached installed for python 2.6.5?
+This feature is not required but greatly improves performance.
+
+[WARNING]
+Unable to import the 'ldap' module, do you have python-ldap installed for python 2.6.5?
+Without python-ldap, you will not be able to use LDAP authentication in the graphite webapp.
+
+[WARNING]
+Unable to import the 'twisted' package, do you have Twisted installed for python 2.6.5?
+Without Twisted, you cannot run carbon on this server.
+[WARNING]
+Unable to import the 'txamqp' module, this is required if you want to use AMQP.
+Note that txamqp requires python 2.5 or greater.
+2 necessary dependencies not met. Graphite will not function until these dependencies are fulfilled.
+5 optional dependencies not met. Please consider the warning messages before proceeding.
+</code></pre>
+
+<p>I use a development server included in Graphite, so mod_python is not needed.</p>
+
+<p>Install packages other than mod_python.</p>
+
+<pre><code># yum install pycairo
+# rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+# yum install Django python-twisted python-memcached python-ldap
+# yum install python-setuptools gcc python-devel
+# easy_install txamqp
+</code></pre>
+
+<p>You need bitmap fonts, so intall it.</p>
+
+<pre><code># yum install bitmap-console-fonts
+</code></pre>
+
+<p>Install Graphite and setup it.</p>
+
+<pre><code># python setup.py install
+# python /opt/graphite/webapp/graphite/manage.py syncdb
+# pushd /opt/graphite/conf
+# cp carbon.conf.example carbon.conf
+# cp storage-schemas.conf.example storage-schemas.conf
+# cp dashboard.conf.example dashboard.conf
+</code></pre>
+
+<p>Edit dashborad.conf and uncomment these.</p>
+
+<pre><code>[ui]
+default_graph_width = 400
+default_graph_height = 250
+automatic_variants = true
+refresh_interval = 60
+</code></pre>
+
+<p>Start Carbon.</p>
+
+<pre><code># /opt/graphite/bin/carbon-cache.py start
+</code></pre>
+
+<p>Start example-client included in Graphite source code to send load average data to Carbon.</p>
+
+<pre><code># popd
+# python ./examples/example-client.py
+</code></pre>
+
+<p>Start a develepment server of Graphite.</p>
+
+<pre><code># /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite  
+</code></pre>
+
+<p>Access to port 8080 of this server and you&#8217;ll see the screen of Graphite.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/17/HowDotCloudLazyCopyImplementsCopyOnWrite/">How Dot Cloud Lazy Copy Implements Copy On Write</a></h1>
     
     
       <p class="meta">
@@ -172,7 +313,7 @@ none on /tmp/dest type aufs (rw,br:/tmp/dest/.aufs/0=rw:/tmp/source0=ro:/tmp/sou
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/17/LinuxContainer00/">LinuxContainer00</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/07/17/LinuxContainer00/">Linux Container00</a></h1>
     
     
       <p class="meta">
@@ -304,7 +445,7 @@ lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/12/DotCloudCliSourceCodeReading00/">DotCloudCliSourceCodeReading00</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/07/12/DotCloudCliSourceCodeReading00/">Dot Cloud Cli Source Code Reading00</a></h1>
     
     
       <p class="meta">
@@ -438,7 +579,7 @@ lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/10/DotCloudCliBehaviorOverView/">DotCloudCliBehaviorOverView</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/07/10/DotCloudCliBehaviorOverView/">Dot Cloud Cli Behavior Over View</a></h1>
     
     
       <p class="meta">
@@ -559,7 +700,7 @@ def run_remote(cmd):
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/10/ProPuppet00/">ProPuppet00</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/07/10/ProPuppet00/">Pro Puppet00</a></h1>
     
     
       <p class="meta">
@@ -823,7 +964,7 @@ index 9745478..e82621c 100644
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/08/ManagingInfrastructureWithPuppet/">ManagingInfrastructureWithPuppet</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/07/08/ManagingInfrastructureWithPuppet/">Managing Infrastructure With Puppet</a></h1>
     
     
       <p class="meta">
@@ -1070,7 +1211,7 @@ $ mc-service --with-class apache2 --with-fact architecture=x86_64 apache2 restar
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/29/SubsonicThroughApacheProxy/">SubsonicThroughApacheProxy</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/06/29/SubsonicThroughApacheProxy/">Subsonic Through Apache Proxy</a></h1>
     
     
       <p class="meta">
@@ -1126,7 +1267,7 @@ ProxyPassReverse / http://192.168.10.14:4040/
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/25/ModRuidTestAgain/">ModRuidTestAgain</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/06/25/ModRuidTestAgain/">Mod Ruid Test Again</a></h1>
     
     
       <p class="meta">
@@ -1245,7 +1386,7 @@ apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worke
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/06/25/DevOpsConference/">DevOpsConference</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/06/25/DevOpsConference/">Dev Ops Conference</a></h1>
     
     
       <p class="meta">
@@ -1307,299 +1448,6 @@ apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worke
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/05/27/UfwOnCentOS5/">UfwOnCentOS5</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-05-27T01:05:06+09:00" pubdate>May 27<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/05/27/UfwOnCentOS5/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://d.hatena.ne.jp/tokuhirom/">tokuhirom</a> さんが IRC で「<a href="https://launchpad.net/ufw">ufw</a> べんり！」「iptables より簡単」っておっしゃっていて、日頃から iptables のコマンドインターフェースは最悪だと思っていたので、お、それは試してみたい、ってことで、ちょろっと触ってみました。</p>
-
-<p>ufw って Ubuntu に標準で付属してるんですね。Ubuntu 使ってないんで知りませんでした。で、ufw の u は Ubuntu の u なのかな、と思ったら、Uncomplicated Firewall の略だそうで、だったら普段一番使ってる CentOS5 でも動くかも、と思って、パッケージ作ったり軽く動かしたりしてみたんで、その記録です。（CentOS の今後については色々言われてますが、まあそこは気にせずに。）</p>
-
-<p>まず RPM パッケージをつくろう、ってことで、ググったら <a href="http://www.openmamba.org/pub/openmamba/devel-ercolinux/specs/ufw.spec">ufw.spec</a> を見つけたので、これを CentOS5 で動くようにカスタマイズして、<a href="http://svn.mizzy.org/public/yum/SRPMS/ufw-0.30.1-1.src.rpm">ソース RPM</a> と <a href="http://svn.mizzy.org/public/yum/RPMS/centos/5/x86_64/RPMS/ufw-0.30.1-1.x86_64.rpm">バイナリ RPM</a> を作成。ufw は python 2.5 以降が必要なんですが、CentOS5 デフォルトは 2.4 なので、python26 パッケージが必要です。あと、spec のカスタマイズも超適当だけど気にしないでください。</p>
-
-<p>で、パッケージインストール後、iptables が動いてない状態から、ufw enable して iptables -L -n してみたら、以下のようにルールが設定されていた。</p>
-
-<pre><code>$ sudo /usr/sbin/ufw enable
-Password: 
-Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
-Firewall is active and enabled on system startup
-
-$ sudo /sbin/iptables -L -n
-Chain INPUT (policy DROP)
-target     prot opt source               destination         
-ufw-before-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-before-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-reject-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-track-input  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain FORWARD (policy DROP)
-target     prot opt source               destination         
-ufw-before-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-before-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-reject-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain OUTPUT (policy ACCEPT)
-target     prot opt source               destination         
-ufw-before-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-before-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-reject-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-track-output  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-after-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-after-input (1 references)
-target     prot opt source               destination         
-ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:137 
-ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:138 
-ufw-skip-to-policy-input  tcp  --  0.0.0.0/0            0.0.0.0/0           tcp dpt:139 
-ufw-skip-to-policy-input  tcp  --  0.0.0.0/0            0.0.0.0/0           tcp dpt:445 
-ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:67 
-ufw-skip-to-policy-input  udp  --  0.0.0.0/0            0.0.0.0/0           udp dpt:68 
-ufw-skip-to-policy-input  all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type BROADCAST 
-
-Chain ufw-after-logging-forward (1 references)
-target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
-
-Chain ufw-after-logging-input (1 references)
-target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
-
-Chain ufw-after-logging-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-after-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-forward (1 references)
-target     prot opt source               destination         
-ufw-user-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-before-input (1 references)
-target     prot opt source               destination         
-ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
-ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           state RELATED,ESTABLISHED 
-ufw-logging-deny  all  --  0.0.0.0/0            0.0.0.0/0           state INVALID 
-DROP       all  --  0.0.0.0/0            0.0.0.0/0           state INVALID 
-ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 3 
-ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 4 
-ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 11 
-ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 12 
-ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           icmp type 8 
-ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0           udp spt:67 dpt:68 
-ufw-not-local  all  --  0.0.0.0/0            0.0.0.0/0           
-ACCEPT     udp  --  0.0.0.0/0            224.0.0.251         udp dpt:5353 
-ufw-user-input  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-before-logging-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-logging-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-logging-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-output (1 references)
-target     prot opt source               destination         
-ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
-ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           state RELATED,ESTABLISHED 
-ufw-user-output  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-logging-allow (0 references)
-target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW ALLOW] ' 
-
-Chain ufw-logging-deny (2 references)
-target     prot opt source               destination         
-RETURN     all  --  0.0.0.0/0            0.0.0.0/0           state INVALID limit: avg 3/min burst 10 
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
-
-Chain ufw-not-local (1 references)
-target     prot opt source               destination         
-RETURN     all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type LOCAL 
-RETURN     all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type MULTICAST 
-RETURN     all  --  0.0.0.0/0            0.0.0.0/0           ADDRTYPE match dst-type BROADCAST 
-ufw-logging-deny  all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 
-DROP       all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-reject-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-reject-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-reject-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-skip-to-policy-forward (0 references)
-target     prot opt source               destination         
-DROP       all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-skip-to-policy-input (7 references)
-target     prot opt source               destination         
-DROP       all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-skip-to-policy-output (0 references)
-target     prot opt source               destination         
-ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-track-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-track-output (1 references)
-target     prot opt source               destination         
-ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0           state NEW 
-ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0           state NEW 
-
-Chain ufw-user-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-user-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-user-limit (0 references)
-target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 5 LOG flags 0 level 4 prefix `[UFW LIMIT BLOCK] ' 
-REJECT     all  --  0.0.0.0/0            0.0.0.0/0           reject-with icmp-port-unreachable 
-
-Chain ufw-user-limit-accept (0 references)
-target     prot opt source               destination         
-ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-user-logging-forward (0 references)
-target     prot opt source               destination         
-
-Chain ufw-user-logging-input (0 references)
-target     prot opt source               destination         
-
-Chain ufw-user-logging-output (0 references)
-target     prot opt source               destination         
-
-Chain ufw-user-output (1 references)
-target     prot opt source               destination         
-</code></pre>
-
-<p>で、今度は ufw disable してみたら、以下のようになった。chain は残る模様。</p>
-
-<pre><code>$ sudo /usr/sbin/ufw disable
-Firewall stopped and disabled on system startup
-
-$ sudo /sbin/iptables -L -n
-Chain INPUT (policy ACCEPT)
-target     prot opt source               destination         
-ufw-before-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-before-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-reject-input  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-track-input  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain FORWARD (policy ACCEPT)
-target     prot opt source               destination         
-ufw-before-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-before-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-logging-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-reject-forward  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain OUTPUT (policy ACCEPT)
-target     prot opt source               destination         
-ufw-before-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-before-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-after-logging-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-reject-output  all  --  0.0.0.0/0            0.0.0.0/0           
-ufw-track-output  all  --  0.0.0.0/0            0.0.0.0/0           
-
-Chain ufw-after-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-after-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-after-logging-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-after-logging-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-after-logging-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-after-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-logging-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-logging-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-logging-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-before-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-reject-forward (1 references)
-target     prot opt source               destination         
-
-Chain ufw-reject-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-reject-output (1 references)
-target     prot opt source               destination         
-
-Chain ufw-track-input (1 references)
-target     prot opt source               destination         
-
-Chain ufw-track-output (1 references)
-target     prot opt source               destination         
-</code></pre>
-
-<p>とりあえず CentOS5 でも動くようなんで、色々遊んでみようと思う。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1617,6 +1465,10 @@ target     prot opt source               destination
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1630,10 +1482,6 @@ target     prot opt source               destination
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

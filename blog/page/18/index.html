@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="コメント/トラックバックスパムがうざいので、一時的に受け付けないようにしました。 で、blosxom で対策してもいいのですが、これを機会にブログツールを乗り換えようと、Angerwhale を試すことに。（本当は Catlxom への乗換えを前々から検討していたのですが、大きく作り変えると &hellip;">
+  <meta name="description" content="「PlaggerになくてYahoo!pipesにあるもの」は書き方が悪かった について。 Plagger について理解できてないだけです。書き方の問題じゃありません。まず、 このときPublish::Gmailがおかしいなと思った。なにがおかしいかというとフィルター機能があることだ。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,116 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/27/463/">「Plaggerになくてyahoo!Pipesにあるもの」は書き方が悪かったのではなく Plagger を理解してないだけ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-27T13:08:00+09:00" pubdate>Feb 27<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/02/27/463/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://pythonbeginner.blog78.fc2.com/blog-entry-214.html"><span class="icon"></span>「PlaggerになくてYahoo!pipesにあるもの」は書き方が悪かった</a> について。
+</p>
+
+
+<p>
+Plagger について理解できてないだけです。書き方の問題じゃありません。まず、
+</p>
+
+
+<blockquote>
+<p>
+  このときPublish::Gmailがおかしいなと思った。なにがおかしいかというとフィルター機能があることだ。
+</p>
+</blockquote>
+
+
+<p>
+Publish::Gmail にはフィルタ機能はありません。Plagger に実装されているものを、Publish::Gmail で利用しているだけです。
+</p>
+
+
+<p>
+また、Publish::Gmail で利用しているのは、実際はフィルタ機能ではなく、ルール機能だったりします。似たような機能でややこしいかもしれませんが、Plagger では フィルタとルールは別物です。
+</p>
+
+
+<blockquote>
+<p>
+  本来フィルターの機能はFilterが担うべきで、Publishのプラグインにつけるべき機能ではない。
+</p>
+</blockquote>
+
+
+<p>
+はい、Plagger はちゃんとそうなってますよ。
+</p>
+
+
+<blockquote>
+<p>
+  例えばBloglineからフィードを取得し、その中からいくつかのブログのフィードを各ブログごと取り出し各ブログごと異なる条件でフィルタリングしたり、はてなブックマークに登録し、残りのフィードはそのままGmailに送るということは本来的にはできないのでは無いかと考えた。
+</p>
+</blockquote>
+
+
+<p>
+できます。たとえば、mizzy.org だけローマ字変換して Gmail へ、残りはそのままはてブへ、ということであればこんな感じ。（設定はかなりはしょってますが。）
+</p>
+
+
+<pre class="wiki">
+plugins:
+  - module: Subscription::Bloglines
+
+  - module: Filter::Romanize::Japanese
+    rule:
+      expression:  $args->{feed}->title eq 'mizzy.org'
+
+  - module: Publish::Gmail
+    rule:
+      expression: $args->{feed}->title eq 'mizzy.org'
+
+  - module: Publish::HatenaBookmark
+    rule:
+      expression: $args->{feed}->title ne 'mizzy.org'
+</pre>
+
+
+<p>
+この例では、2つの Publish プラグインの出力対象フィードが別だから、プラグイン毎に rule 設定してるけど、両プラグインが同じフィードを出力するのであれば、Filter::Rule プラグインでフィルタすれば、rule を指定する必要がなくなる。
+</p>
+
+
+<p>
+まあ、この辺りは分かりやすくはないから、誤解するのもしょうがいない気がするけれど、設定例だけ見て、そこから推測したものがあたかも実際の Plagger の仕様であるかのように書くのはやめようよ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -248,7 +358,7 @@ Index: lib/Angerwhale/Model/Filesystem.pm
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/02/24/418/">Plagger にあって Yahoo!pipes にあるもの</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/02/24/418/">Plagger にあって Yahoo!Pipes にあるもの</a></h1>
     
     
       <p class="meta">
@@ -863,7 +973,7 @@ IRC での会話の流れで、テストだけではなく監視もカバーす�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/01/17/483/">Assurer - サーバテスティングフレームワーク #4</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/01/17/483/">Assurer   サーバテスティングフレームワーク #4</a></h1>
     
     
       <p class="meta">
@@ -996,78 +1106,6 @@ hosts:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/14/267/">Assurer - サーバテスティングフレームワーク #3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-01-14T16:04:00+09:00" pubdate>Jan 14<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/01/14/267/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) を修正。主な修正点は以下の通りです。
-</p>
-
-
-<ul><li>テスト結果を保持する Assurer::Results クラスを削除。代わりに Test::TAP::Model を使うようにした。</li>
-<li>Format, Publish まわりを実装し、Format::Text, Format::HTML, Publish::Term を実装。</li>
-<li>Assurer::Test でテスト結果をターミナルに表示していたのを、Publish::Term に分離。</li></ul>
-
-
-<pre class="wiki">
-format:
-  - module: HTML
-    config:
-      css_uri: htmlmatrix.css
-
-publish:
-  - module: Term
-</pre>
-
-
-<p>
-といった設定をして、
-</p>
-
-
-<pre class="wiki">
-$ ./assurer.pl -c examples/config.yaml > tap.html
-</pre>
-
-
-<p>
-と実行すると、<a class="ext-link" href="http://mizzy.org/archives/tap.html"><span class="icon"></span>こんな感じの HTML</a> が得られます。
-</p>
-
-
-<p>
-これで大枠はだいぶ整ってきた気がする。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -1085,6 +1123,10 @@ $ ./assurer.pl -c examples/config.yaml > tap.html
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1098,10 +1140,6 @@ $ ./assurer.pl -c examples/config.yaml > tap.html
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

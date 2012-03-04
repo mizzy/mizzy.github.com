@@ -9,11 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="diff --git a/Rakefile b/Rakefile
-index 7d7f6d8..41868ab 100644
---- a/Rakefile
-+++ b/Rakefile
-@@ -4,10 +4,10 @@ require &quot;stringex&quot; ## -- &hellip;">
+  <meta name="description" content="I talked about Maglica at Hatena on Dec. 9, 2011. I appreciate @kentaro-san and Hatena staffs.I had a very good time to talking with you and drinking &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,7 +78,48 @@ index 7d7f6d8..41868ab 100644
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/11/15/octopress-on-heteml/">How to Deploy a Blog Made by Octopress to Heteml</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/12/13/maglica-presentation-at-hatena/">Maglica Presentation At Hatena</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-12-13T21:14:00+09:00" pubdate>Dec 13<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/13/maglica-presentation-at-hatena/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I talked about <a href="https://github.com/mizzy/maglica">Maglica</a> at <a href="http://hatena.ne.jp/">Hatena</a> on Dec. 9, 2011.</p>
+
+<p>I appreciate <a href="http://twitter.com/#!/kentaro">@kentaro</a>-san and Hatena staffs.I had a very good time to talking with you and drinking Dr Peppers :-)</p>
+
+<p><a href="/slides/maglica/">This is the slide I talked</a>.</p>
+
+<p>Maglica is a simple internal cloud tool I made.I don&#8217;t like complicated and blackboxed tools.It seems for me that existing internal cloud tools are so complicated and overengineered for my use case.So I made the simple one.</p>
+
+<p>&#8220;Tenjin&#8221; font is embedded in this slide using CSS Fonts Module. <a href="http://twitter.com/#!/chocolatina">@chocolatina</a> made this cool font.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/15/octopress-on-heteml/">How To Deploy A Blog Made By Octopress To Heteml</a></h1>
     
     
       <p class="meta">
@@ -324,7 +361,7 @@ index 7d7f6d8..41868ab 100644
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/10/29/typo-to-octopress/">Typo to Octopress</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/10/29/typo-to-octopress/">Typo To Octopress</a></h1>
     
     
       <p class="meta">
@@ -404,7 +441,7 @@ end
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/10/21/twan-tag-plugin/">TWAN Tag Plugin for Jekyll</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/10/21/twan-tag-plugin/">Twan Tag Plugin For Jekyll</a></h1>
     
     
       <p class="meta">
@@ -880,7 +917,7 @@ end
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/09/03/SSLCertOfLolipop/">SSLCertOfLolipop</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/09/03/SSLCertOfLolipop/">Ssl Cert Of Lolipop</a></h1>
     
     
       <p class="meta">
@@ -938,7 +975,7 @@ end
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/08/18/MaglicaInternalCloudTool/">MaglicaInternalCloudTool</a></h1>
+      <h1 class="entry-title"><a href="/blog/2011/08/18/MaglicaInternalCloudTool/">Maglica Internal Cloud Tool</a></h1>
     
     
       <p class="meta">
@@ -1059,147 +1096,6 @@ SL6.1-x86_64.original                    host1.example.jp
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/24/HowToGetGraphiteWorkingOnScientificLinux6/">HowToGetGraphiteWorkingOnScientificLinux6</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-07-24T23:18:15+09:00" pubdate>Jul 24<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/07/24/HowToGetGraphiteWorkingOnScientificLinux6/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I found a interest tool, <a href="http://graphite.wikidot.com/">Graphite</a> when I was exploring https://github.com/etsy .(<a href="http://graphite.wikidot.com/screen-shots">Screen Shots of Graphite</a>.)</p>
-
-<h1>Install Carbon</h1>
-
-<p><a href="http://graphite.wikidot.com/carbon">Carbon</a> is a backend storage application for Graphite.</p>
-
-<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
-# tar zxvf carbon-0.9.8.tar.gz
-# pushd carbon-0.9.8
-# python setup.py install
-# popd
-</code></pre>
-
-<h1>Install Whisper</h1>
-
-<p><a href="http://graphite.wikidot.com/whisper">Whisper</a> is an alternate to RRD.</p>
-
-<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
-# tar zxvf whisper-0.9.8.tar.gz
-# pushd whisper-0.9.8
-# python setup.py install
-# popd
-</code></pre>
-
-<h1>Install Graphite</h1>
-
-<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
-# tar zxvf graphite-web-0.9.8.tar.gz
-# pushd graphite-web-0.9.8      
-</code></pre>
-
-<p>Run check-dependencies.py.</p>
-
-<pre><code># ./check-dependencies.py 
-[FATAL] Unable to import the 'cairo' module, do you have pycairo installed for python 2.6.5?
-[FATAL] Unable to import the 'django' module, do you have Django installed for python 2.6.5?
-[WARNING] Unable to import the 'mod_python' module, do you have mod_python installed for python 2.6.5?
-This means you will only be able to run graphite in the development server mode, which is not
-recommended for production use.
-[WARNING]
-Unable to import the 'memcache' module, do you have python-memcached installed for python 2.6.5?
-This feature is not required but greatly improves performance.
-
-[WARNING]
-Unable to import the 'ldap' module, do you have python-ldap installed for python 2.6.5?
-Without python-ldap, you will not be able to use LDAP authentication in the graphite webapp.
-
-[WARNING]
-Unable to import the 'twisted' package, do you have Twisted installed for python 2.6.5?
-Without Twisted, you cannot run carbon on this server.
-[WARNING]
-Unable to import the 'txamqp' module, this is required if you want to use AMQP.
-Note that txamqp requires python 2.5 or greater.
-2 necessary dependencies not met. Graphite will not function until these dependencies are fulfilled.
-5 optional dependencies not met. Please consider the warning messages before proceeding.
-</code></pre>
-
-<p>I use a development server included in Graphite, so mod_python is not needed.</p>
-
-<p>Install packages other than mod_python.</p>
-
-<pre><code># yum install pycairo
-# rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
-# yum install Django python-twisted python-memcached python-ldap
-# yum install python-setuptools gcc python-devel
-# easy_install txamqp
-</code></pre>
-
-<p>You need bitmap fonts, so intall it.</p>
-
-<pre><code># yum install bitmap-console-fonts
-</code></pre>
-
-<p>Install Graphite and setup it.</p>
-
-<pre><code># python setup.py install
-# python /opt/graphite/webapp/graphite/manage.py syncdb
-# pushd /opt/graphite/conf
-# cp carbon.conf.example carbon.conf
-# cp storage-schemas.conf.example storage-schemas.conf
-# cp dashboard.conf.example dashboard.conf
-</code></pre>
-
-<p>Edit dashborad.conf and uncomment these.</p>
-
-<pre><code>[ui]
-default_graph_width = 400
-default_graph_height = 250
-automatic_variants = true
-refresh_interval = 60
-</code></pre>
-
-<p>Start Carbon.</p>
-
-<pre><code># /opt/graphite/bin/carbon-cache.py start
-</code></pre>
-
-<p>Start example-client included in Graphite source code to send load average data to Carbon.</p>
-
-<pre><code># popd
-# python ./examples/example-client.py
-</code></pre>
-
-<p>Start a develepment server of Graphite.</p>
-
-<pre><code># /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite  
-</code></pre>
-
-<p>Access to port 8080 of this server and you&#8217;ll see the screen of Graphite.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -1217,6 +1113,10 @@ refresh_interval = 60
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1230,10 +1130,6 @@ refresh_interval = 60
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

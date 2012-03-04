@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="2004年初めにこんなページを書いたものの、家では子供がうるさくてゆっくり音楽聴くことができないため、せっかく構築した環境がほったらかしになってました。 ところが、嫁が珍しく「聞きたい音楽がある」と言うので、久々にiTunesサーバを復活させることに。で、1年半前に入れた daapd では、 &hellip;">
+  <meta name="description" content="今までフォームの validation は自前でモジュール書いていたのですが、 CatalystでSledge風Validation にある FormValidator::Simple がすごく良さげなので、さっそく使わせて頂くことにしました。 ついでに、 FormValidator:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,79 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/09/26/446/">daapdでAACのメタデータを扱う</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/10/03/478/">Form Validator/Simple関連モジュール</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-10-03T20:55:00+09:00" pubdate>Oct 3<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/10/03/478/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+今までフォームの validation は自前でモジュール書いていたのですが、 <a href="http://www.lost-season.jp/mt/2005/10/2005100121.html" target="_blank">CatalystでSledge風Validation</a> にある FormValidator::Simple がすごく良さげなので、さっそく使わせて頂くことにしました。
+</p>
+
+
+
+
+<p class="entryBody">
+ついでに、 FormValidator::Simple で電話番号チェックするプラグインと、 CGI::Application から FormValidator::Simple を利用するためのプラグインを作って、 CPAN にアップしました。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li><a href="http://search.cpan.org/perldoc?FormValidator%3A%3ASimple%3A%3APlugin%3A%3ANumber%3A%3APhone%3A%3AJP" target="_blank">FormValidator::Simple::Plugin::Number::Phone::JP</a></li>
+<li><a href="http://search.cpan.org/perldoc?CGI::Application::Plugin::FormValidator::Simple" target="_blank">CGI::Application::Plugin::FormValidator::Simple</a></li>
+</ul>
+
+
+
+
+<p class="entryBody">
+ドキュメントの内容は、 FormValidator::Simple や Catalyst::Plugin::FormValidator::Simple をパクらせて頂きました。 CGI::Application::Plugin::FormValidator::Simple は、使い方が Catalyst::Plugin::FormValidator::Simple とできるだけ同じになるようにしています。（ set_invalid_form はまだ実装してませんが。）
+</p>
+
+
+
+
+<p class="entryBody">
+やたらとモジュール名が長いのが気になるのと、初めて CPAN にアップしたので、こんなんで良いのか不安です…
+</p>
+
+
+
+
+<p class="entryBody">
+それから、FormValidator::Simple::Plugin::Number::Phone::JP 0.01のSYNOPSISが間違ってるので、ご注意下さい。0.02で修正しています。（上記リンクでは現在、0.01に行ってしまいます。しばらくすれば0.02になると思います。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/09/26/446/">Daapdでaacのメタデータを扱う</a></h1>
     
     
       <p class="meta">
@@ -210,7 +282,7 @@ make install
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/09/10/286/">Catalystでajax (HTML::Prototypeモジュールの使い方)</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/09/10/286/">Catalystでajax (Html/Prototypeモジュールの使い方)</a></h1>
     
     
       <p class="meta">
@@ -1001,7 +1073,7 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/08/13/467/">Same_topicプラグイン</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/08/13/467/">Same Topicプラグイン</a></h1>
     
     
       <p class="meta">
@@ -1095,7 +1167,7 @@ feedbringer、使うのをやめることにしました。bloglines に戻り�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/08/11/486/">blosxomをAccount Auto-Discoveryに対応させるプラグイン #1</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/08/11/486/">Blosxomをaccount Auto Discoveryに対応させるプラグイン #1</a></h1>
     
     
       <p class="meta">
@@ -1154,7 +1226,7 @@ my @accounts = (
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/08/11/461/">blosxomをAccount Auto-Discoveryに対応させるプラグイン #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/08/11/461/">Blosxomをaccount Auto Discoveryに対応させるプラグイン #0</a></h1>
     
     
       <p class="meta">
@@ -1221,42 +1293,6 @@ blosxomの場合、permalinkのフォーマットは様々なため、環境変�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/07/27/378/">LiveLinesでfeedbringerにフィードを登録する</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-07-27T22:18:00+09:00" pubdate>Jul 27<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/07/27/378/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-Firefoxのextensionである<a href="http://heygom.com/extensions/?p=11" target="_blank">LiveLines</a>で、feedbringerにフィードを登録するには、Subscription URLにhttp://feedbringer.net/feed/add/?url=^U と入れてやればOK。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/36/">&larr; Older</a>
@@ -1274,6 +1310,10 @@ Firefoxのextensionである<a href="http://heygom.com/extensions/?p=11" target=
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1287,10 +1327,6 @@ Firefoxのextensionである<a href="http://heygom.com/extensions/?p=11" target=
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

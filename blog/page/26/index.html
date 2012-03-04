@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="追記
-CPAN モジュールが Perl 5.8.7 じゃないとインストールできない、という指摘が宮川さんからありましたので、修正しました。CPAN に反映されるまで時間がかかりますので、ここから取得してください 。モジュール作るのに h2xs を使うのはやめます。今は Module:: &hellip;">
+  <meta name="description" content="隣の席のオオヒダさんが、早速 JugemKey 認証 API を利用したステキサービスを作ってくれちゃいました。Qooqle Video Clippers! YouTube のお気に入り動画をがんがんクリップしてタグづけたりコメントつけたり、人気の動画を一覧で見たり RSS &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,7 +78,71 @@ CPAN モジュールが Perl 5.8.7 じゃないとインストールできない
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/05/31/365/">JugemKey 認証 API リリース</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/06/01/444/">Qooqle Video Clippers!</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-01T17:14:00+09:00" pubdate>Jun 1<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/01/444/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+隣の席のオオヒダさんが、早速 JugemKey 認証 API を利用したステキサービスを作ってくれちゃいました。<a href="http://clippers.qooqle.jp/" target="_blank">Qooqle Video Clippers!</a> 
+</p>
+
+
+
+
+<p class="entryBody">
+YouTube のお気に入り動画をがんがんクリップしてタグづけたりコメントつけたり、人気の動画を一覧で見たり RSS で購読したりできちゃいます。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://clippers.qooqle.jp/tag/%E3%83%81%E3%83%A7%E3%82%B3%E3%83%9C%E3%83%BC%E3%82%A4" target="_blank">こんな風に特定のタグで見れば</a>、YouTube まとめサイトっぽくも使えるし。
+</p>
+
+
+
+
+<p class="entryBody">
+Clippers! は参加型で集合知な感じなのが、他の見るだけの YouTube 系サービスと一線を画してますね。今後どう発展していくのか楽しみです。
+</p>
+
+
+
+
+<p class="entryBody">
+認証は JugemKey だけではなく、はてな認証 API にも対応してるので、はてなユーザも登録なしで使えますよ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/05/31/365/">Jugem Key 認証 Api リリース</a></h1>
     
     
       <p class="meta">
@@ -488,7 +551,7 @@ Index: plugins/Template/TT.pm
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/05/23/288/">Plagger::Plugin::Aggregator::Simple の Media RSS サポート</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/05/23/288/">Plagger/Plugin/Aggregator/Simple の Media Rss サポート</a></h1>
     
     
       <p class="meta">
@@ -538,7 +601,7 @@ Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/publ
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/05/22/318/">Plagger::Plugin::CustomFeed::iTMS #1</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/05/22/318/">Plagger/Plugin/Custom Feed/I Tms #1</a></h1>
     
     
       <p class="meta">
@@ -598,7 +661,7 @@ Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/publ
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/05/22/433/">Plagger::Plugin::CustomFeed::iTMS #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/05/22/433/">Plagger/Plugin/Custom Feed/I Tms #0</a></h1>
     
     
       <p class="meta">
@@ -667,7 +730,7 @@ plugins:
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/05/21/279/">Lighttpd の認証を LDAP で</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/05/21/279/">Lighttpd の認証を Ldap で</a></h1>
     
     
       <p class="meta">
@@ -765,49 +828,6 @@ auth.require = ( "/public/login" =>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/21/359/">Plagger::Plugin::CustomFeed::Xmltv</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-21T00:04:00+09:00" pubdate>May 21<span>st</span>, 2006</time>
-        
-         | <a href="/blog/2006/05/21/359/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/Xmltv.pm" target="_blank">CustomFeed::Xmltv</a> プラグイン作った。
-</p>
-
-
-
-
-<p class="entryBody">
-これを利用して、Filter::EntryTitle とか Publish::TvRecReserveMail といったプラグイン作って、番組名に特定のワードを含むものを、メール録画に対応した機器で録画予約、とかやりたい。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/27/">&larr; Older</a>
@@ -825,6 +845,10 @@ auth.require = ( "/public/login" =>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -838,10 +862,6 @@ auth.require = ( "/public/login" =>
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

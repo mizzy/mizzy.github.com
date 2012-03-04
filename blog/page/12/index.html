@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Software Design 2007年12月号の Puppet 特集を執筆させて頂きました。 概要や各章のタイトルは Software Design 2007年12月号のお知らせ - Software Design×はてな をご参照下さい。 gihyo.jp での連載 をベースに、大幅に加筆、 &hellip;">
+  <meta name="description" content="source:library/perl/trunk/Text-Trac/lib/Text/Trac.pm NAME Text::Trac - Perl extension for formatting text with Trac Wiki Style. VERSION Version 0.08 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,167 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/11/17/SoftwareDesign200712Puppet/">SoftwareDesign200712Puppet</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/11/20/library-perl-trunk-Text-Trac-lib-Text-Trac.pm/">Library/Perl/Trunk/Text Trac/Lib/Text/Trac.Pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-11-20T23:20:38+09:00" pubdate>Nov 20<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/11/20/library-perl-trunk-Text-Trac-lib-Text-Trac.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:library/perl/trunk/Text-Trac/lib/Text/Trac.pm</p>
+
+<h1>NAME</h1>
+
+<p>Text::Trac - Perl extension for formatting text with Trac Wiki Style.</p>
+
+<h1>VERSION</h1>
+
+<p>Version 0.08</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use Text::Trac;
+
+    my $parser = Text::Trac-&gt;new(
+        trac_url      =&gt; 'http://trac.mizzy.org/public/',
+        disable_links =&gt; [ qw( changeset ticket ) ],
+    );
+
+    $parser-&gt;parse($text);
+
+    print $parser-&gt;html;
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p>Text::Trac parses text with Trac WikiFormatting and convert it to html format.</p>
+
+<h1>METHODS</h1>
+
+<h2>new</h2>
+
+<p>Constructs Text::Trac object.</p>
+
+<p>Available arguments are:</p>
+
+<h3>trac_url</h3>
+
+<p>Base URL for TracLinks.Default is /. You can specify each type of URL individually. Available URLs are:</p>
+
+<p> trac_attachment_url::  trac_changeset_url::  trac_log_url::  trac_milestone_url::  trac_report_url::  trac_source_url::  trac_ticket_url::  trac_wiki_url::</p>
+
+<h3>disable_links</h3>
+
+<p>Specify TracLink types you want to disable. All types are enabled if you don&#8217;t specify this option.</p>
+
+<pre><code>    my $parser = Text::Trac-&gt;new(
+        disable_links =&gt; [ qw( changeset ticket ) ],
+    );
+</code></pre>
+
+<h3>enable_links</h3>
+
+<p>Specify TracLink types you want to enable.Other types are disabled. You cannot use both disable_links and enable_links at once.</p>
+
+<pre><code>    my $parser = Text::Trac-&gt;new(
+        enable_links =&gt; [ qw( changeset ticket ) ],
+    );
+</code></pre>
+
+<h2>parse</h2>
+
+<p>Parses text and converts it to html format.</p>
+
+<h2>process</h2>
+
+<p>An alias of parse method.</p>
+
+<h2>html</h2>
+
+<p>Return converted html string.</p>
+
+<h1>SEE ALSO</h1>
+
+<p> Text::Hatena::  Trac http://www.edgewall.com/trac/::  Trac WikiFormatting http://projects.edgewall.com/trac/wiki/WikiFormatting::</p>
+
+<h1>AUTHORS</h1>
+
+<p>Gosuke Miyashita, <code>&lt;gosukenator at gmail.com&gt;</code></p>
+
+<p>Hideaki Tanaka, <code>&lt;drawn.boy at gmail.com)&gt;</code></p>
+
+<h1>BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-text-trac at rt.cpan.org</code>, or through the web interface at http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Trac. I will be notified, and then you&#8217;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1>SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Text::Trac
+</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+<li>AnnoCPAN: Annotated CPAN documentation</li>
+</ul>
+
+
+<p> http://annocpan.org/dist/Text-Trac</p>
+
+<ul>
+<li>CPAN Ratings</li>
+</ul>
+
+
+<p> http://cpanratings.perl.org/d/Text-Trac</p>
+
+<ul>
+<li>RT: CPAN&#8217;s request tracker</li>
+</ul>
+
+
+<p> http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Trac</p>
+
+<ul>
+<li>Search CPAN</li>
+</ul>
+
+
+<p> http://search.cpan.org/dist/Text-Trac</p>
+
+<h1>COPYRIGHT &amp; LICENSE</h1>
+
+<p>Copyright 2006 Gosuke Miyashita, all rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/17/SoftwareDesign200712Puppet/">Software Design200712 Puppet</a></h1>
     
     
       <p class="meta">
@@ -117,7 +277,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/11/16/Lisa07TechSession2ndDay/">Lisa07TechSession2ndDay</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/11/16/Lisa07TechSession2ndDay/">Lisa07 Tech Session2nd Day</a></h1>
     
     
       <p class="meta">
@@ -285,7 +445,7 @@ node0# gnt-node list
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/11/16/LISA07TechSessionFirstDay/">LISA07TechSessionFirstDay</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/11/16/LISA07TechSessionFirstDay/">Lisa07 Tech Session First Day</a></h1>
     
     
       <p class="meta">
@@ -383,7 +543,7 @@ def BulkByteTransferRate(adapter):
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/11/12/PerlbalPluginProxyPass/">PerlbalPluginProxyPass</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/11/12/PerlbalPluginProxyPass/">Perlbal Plugin Proxy Pass</a></h1>
     
     
       <p class="meta">
@@ -524,7 +684,7 @@ ENABLE selector
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/11/08/CampAndLisa/">CampAndLisa</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/11/08/CampAndLisa/">Camp And Lisa</a></h1>
     
     
       <p class="meta">
@@ -559,7 +719,7 @@ ENABLE selector
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/10/28/ModSuid2AndModRuidAndLinuxCapability/">ModSuid2AndModRuidAndLinuxCapability</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/10/28/ModSuid2AndModRuidAndLinuxCapability/">Mod Suid2 And Mod Ruid And Linux Capability</a></h1>
     
     
       <p class="meta">
@@ -654,7 +814,7 @@ asmlinkage long sys_setuid(uid_t uid)
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/10/27/MigrateBlogToTrac/">MigrateBlogToTrac</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/10/27/MigrateBlogToTrac/">Migrate Blog To Trac</a></h1>
     
     
       <p class="meta">
@@ -693,7 +853,7 @@ asmlinkage long sys_setuid(uid_t uid)
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/10/08/529/">FLV::Info で Ustream の FLV ファイル情報をとろうとするとエラーになる件</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/10/08/529/">Flv/Info で Ustream の Flv ファイル情報をとろうとするとエラーになる件</a></h1>
     
     
       <p class="meta">
@@ -947,7 +1107,7 @@ audio format: Nellymoser
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/10/01/528/">Shibuya.pm テクニカルトーク #8 でしゃべってきました</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/10/01/528/">Shibuya.Pm テクニカルトーク #8 でしゃべってきました</a></h1>
     
     
       <p class="meta">
@@ -977,107 +1137,6 @@ audio format: Nellymoser
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/08/30/524/">puppet-mode.el のパッチ</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-08-30T00:30:00+09:00" pubdate>Aug 30<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/08/30/524/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Puppet で同じタイプのリソースを大量に記述する時には、</p>
-
-<pre><code>package { sudo:
-  ensure => latest
-}
-
-package { ntp:
-  ensure => latest
-}
-
-package { ssh:
-  ensure => latest
-}
-</code></pre>
-
-
-<p>なんて書くのはだるいので、</p>
-
-<pre><code>package {
-  sudo:
-    ensure => latest;
-  ntp:
-    ensure => latest;
-  ssh:
-    ensure => latest;
-}
-</code></pre>
-
-
-<p>と書きたいのですが、Emacs + &#8220;puppet-mode.el&#8221;:https://reductivelabs.com/svn/puppet/trunk/ext/emacs/puppet-mode.el では、後者みたいな書き方だと、インデントが意図した通りにならなくて、イラっときてパッチ書いた。</p>
-
-<pre><code>=== puppet-mode.el
-==================================================================
---- puppet-mode.el      (revision 1800)
-+++ puppet-mode.el      (local)
-@@ -106,7 +106,9 @@
-                  (progn
-                     (setq cur-indent (- (current-indentation) 2))
-                    (setq not-indented nil))
--               (setq cur-indent (- (current-indentation) 2))))
-+               (setq cur-indent (- (current-indentation) 2)))
-+              (if (looking-at "^.*;")
-+                  (setq cur-indent (- cur-indent 2))))
-            (if (< cur-indent 0)     ; We can't indent past the left margin
-                (setq cur-indent 0)))
-        (save-excursion
-@@ -125,6 +127,18 @@
-                    (setq cur-indent (+ (current-indentation) 2))
-                    (setq not-indented nil))
-                (if (bobp)
-+                   (setq not-indented nil)))
-+             (if (looking-at "^.*:\s*$")
-+                 (progn
-+                   (setq cur-indent (+ (current-indentation) 2))
-+                   (setq not-indented nil))
-+               (if (bobp)
-+                   (setq not-indented nil)))
-+             (if (looking-at "^.*;")
-+                 (progn
-+                    (setq cur-indent (- (current-indentation) 2))
-+                   (setq not-indented nil))
-+               (if (bobp)
-                    (setq not-indented nil)))))))
-       (if cur-indent
-          (indent-line-to cur-indent) 
-</code></pre>
-
-
-<p>他にもインデントまわりの動作で微妙なところはあるけど、ちょっとはましになった。インデントまわりの処理で参考になる emacs-lisp って何かないかな？</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/13/">&larr; Older</a>
@@ -1095,6 +1154,10 @@ package { ssh:
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1108,10 +1171,6 @@ package { ssh:
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

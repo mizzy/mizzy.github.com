@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="概要 前回のエントリに関して、MM/Memoで、「うーん、便利なのかなー。perl（とかのサーバサイド）コード中にjavascriptが混ざるのって嫌な気がするけど。」と書いている方がいらっしゃったのですが、ちょっと勘違いをされているような気がします。 &hellip;">
+  <meta name="description" content="今回はCatalystはあんまり関係なくて、prototype.jsの使い方に関する補足、といった感じです。 前回のエントリの最後で、「xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ込むだけなので、サーバ側で生成したデータを、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,183 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/04/30/362/">Catalystでajax - 実践編</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/05/02/389/">Catalystでajax   補足</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-02T21:46:00+09:00" pubdate>May 2<span>nd</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/02/389/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+今回はCatalystはあんまり関係なくて、prototype.jsの使い方に関する補足、といった感じです。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/program/htmlPrototype01.html" target="_blank">前回のエントリ</a>の最後で、「xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ込むだけなので、サーバ側で生成したデータを、Javascript側で何らかの処理をしてからHTMLにはめ込むという用途には使えませんが、単純なajaxアプリであれば十分使えるかと。」ということを書いたのですが、これはHTML::Prototypeが吐き出すJavascriptが、基本的にAjax.Updaterという関数を使っているからですね。なので、<a href="http://prototype.conio.net/" target="_blank">prototype.js</a>自体が、「Javascript側で何らかの処理をしてからHTMLにはめ込む」という処理ができない、というわけではないです。
+</p>
+
+
+
+
+<p class="entryBody">
+この様な処理をするには、具体的には以下の様なコードになります。ただしこの方法では、HTML::PrototypeやCatalyst::Plugin::Prototypeが使えないので、若干手間が増えます。
+</p>
+
+
+
+
+<pre class="code">
+&lt;script type="text/javascript" src="prototype.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+function completed(request){
+    var data = request.responseText;
+    // 何か処理をする...
+}
+&lt;/script&gt;
+&lt;form onsubmit="new <strong>Ajax.Request</strong>( '/url', { parameters: Form.serialize(this),<strong>onComplete: function(request){ completed(request) }</strong> } ) ; return false;"&gt;
+&lt;input type="text" name="text" /&gt;
+&lt;input type="submit" /&gt;
+&lt;/form&gt;
+</pre>
+
+
+
+
+<p class="entryBody">
+肝になるのはAjax.Requestという関数を使っていることと、「onComplete」の部分ですね。この部分で、xmlHttpRequestでサーバからデータを取得完了した時点で実行する関数を指定できます。requestはxmlHttpRequestオブジェクトなので、呼び出した関数内で、request.responseTextでサーバからのデータを取り出すことができます。その上で取得したデータに対して何か処理してやれば良い、ってわけですね。
+</p>
+
+
+
+
+<p class="entryBody">
+HTML::PrototypeやCatalyst::Plugin::Prototypeが使えないのはちょっと痛いですが、Ajax.Request関数の書式に慣れてしまえば、自分でxmlHttpRequest周りのコードを書かなくて良いのですから、メリットの方が大きいと思います。
+</p>
+
+
+
+
+<p class="entryBody">
+で、実際に上の方法を用いて、<a href="http://mizzy.org/program/deliciousBar00.html" target="_blank">ajaxでdel.icio.usを使いやすく #0</a>のdel.icio.usサイドバーのJavascript部分を書き直してみると、どんな感じになるのか見てみることにします。
+</p>
+
+
+
+
+<p class="entryBody">
+まず、prototype.jsを使わずに何も考えずに書いたもの。(xmlHttpRequestを使っているfunctionのみ抜き出しています。)JSON形式のデータを受け取って、evalでオブジェクトに変換する、という処理です。
+</p>
+
+
+
+
+<pre class="code">
+function init() {
+    tagsArea.innerHTML = '&lt;p class="loading"&gt;loading tags ...&lt;/p&gt;';
+    <strong>
+    var req1 = new XMLHttpRequest();
+    if(req1){
+    req1.onreadystatechange = function() { 
+        if (req1.readyState == 4 &amp;&amp; req1.status == 200) {
+        eval('tagsListObj = ' +  req1.responseText);
+        displayTags();
+        }
+    };
+    req1.open('GET', '/delside/index.cgi');
+    req1.send(null);
+    }
+
+    var req2 = new XMLHttpRequest();
+    if(req2){
+    req2.onreadystatechange = function() { 
+        if (req2.readyState == 4 &amp;&amp; req2.status == 200) {
+        eval('tagToLinkObj = ' +  req2.responseText);
+        }
+    };
+    req2.open('GET', '/delside/index.cgi?rm=tagToLink');
+    req2.send(null);
+    }
+    </strong>
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+次にprototype.jsのAjax.Request関数を使って書き直したもの。
+</p>
+
+
+
+
+<pre class="code">
+function init() {
+    tagsArea.innerHTML = '&lt;p class="loading"&gt;loading tags ...&lt;/p&gt;';
+    <strong>
+    new Ajax.Request( '/deislde/index.cgi',
+    {
+    method: 'GET',
+    onComplete: function(request){
+        eval('tagsListObj = ' +  request.responseText);
+        displayTags();
+    }
+    });
+    
+    new Ajax.Request( '/delside/index.cgi?rm=tagToLink',
+    {
+    method: 'GET',
+    onComplete: function(request){
+        eval('tagToLinkObj = ' +  request.responseText);
+    }
+    });
+    </strong>
+}
+</pre>
+
+
+
+
+<p class="entryBody">
+太字部分が変更された箇所です。若干ですが、コードがすっきりしましたよね？
+</p>
+
+
+
+
+<p class="entryBody">
+以上、prototype.jsがこんな風にも使える、という例でした。おしまい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/30/362/">Catalystでajax   実践編</a></h1>
     
     
       <p class="meta">
@@ -459,7 +635,7 @@ Win IE6, Win Mozilla Firefox, Mac Camino, Mac Safariで表示確認してます�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/04/24/460/">ajaxでdel.icio.usを使いやすく #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/04/24/460/">Ajaxでdel.Icio.Usを使いやすく #0</a></h1>
     
     
       <p class="meta">
@@ -546,7 +722,7 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/04/24/287/">ソーシャルブックマークのRSSをブラウザのブックマークに取り込む #1</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/04/24/287/">ソーシャルブックマークのrssをブラウザのブックマークに取り込む #1</a></h1>
     
     
       <p class="meta">
@@ -619,7 +795,7 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/04/23/264/">ソーシャルブックマークのRSSをブラウザのブックマークに取り込む #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/04/23/264/">ソーシャルブックマークのrssをブラウザのブックマークに取り込む #0</a></h1>
     
     
       <p class="meta">
@@ -704,7 +880,7 @@ Spurl Barの劣化コピーです。アイコンも拝借してしまいまし�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2005/04/21/351/">SiteBar 3.3を試してみた</a></h1>
+      <h1 class="entry-title"><a href="/blog/2005/04/21/351/">Site Bar 3.3を試してみた</a></h1>
     
     
       <p class="meta">
@@ -1017,78 +1193,6 @@ extensionはここのサイトに行ってインストールします。
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/19/281/">Blosxomでtagging #5</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-19T23:19:00+09:00" pubdate>Apr 19<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/19/281/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-taggingプラグインをアップデート。約束通り、ajax（もどき）でタグを絞り込めるように改造。xmlHttpRequestに対応しているブラウザであれば、find tagフォームに文字を入れると、前方一致でダイナミックにタグが絞り込まれる様を見ることができます。対応していないブラウザでも、文字を入れてEnterを押せば同様にタグの絞込みができます。download: <a href="/archives/tagging">taggingプラグイン</a>
-</p>
-
-
-
-
-<p class="entryBody">
-もちろん、xmlHttpRequestによる検索はこのプラグインだけでなく、Javascriptも必要です。Javascriptのコードについては、このサイトのソースをご参照下さい。
-</p>
-
-
-
-
-<p class="entryBody">
-これで大体欲しい機能は実装できたので、後はいじるとすると、バグフィックスとかパフォーマンス改善とか、その辺りかな。yuuさんからコメントでStorableモジュールを使わないで済むコードを頂いたのですが、こちらのコードに取り込むのはやめにしました。理由は、
-</p>
-
-
-
-
-<ul class="entryBody">
-<li>Storableモジュールはperl5.8では標準で入ってるらしい。いまどき5.8が使えない環境は少ないだろう。</li>
-<li>今後キャッシュデータが増えたり、データ構造を変えたりするかもしれないので、その度にシリアライズルーチンを変更するのも面倒。それならば汎用的なシリアライザを使ったほうが良いだろう。</li>
-</ul>
-
-
-
-
-<p class="entryBody">
-といったところです。yuuさん、せっかく頂いたのに申し訳ありません。
-</p>
-
-
-
-
-<p class="entryBody">
-ちゃんとドキュメントつくらないとなぁ…
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/40/">&larr; Older</a>
@@ -1106,6 +1210,10 @@ taggingプラグインをアップデート。約束通り、ajax（もどき）
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1119,10 +1227,6 @@ taggingプラグインをアップデート。約束通り、ajax（もどき）
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

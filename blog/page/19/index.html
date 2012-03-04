@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Net::LDAP::Alterntive あらため Net::LDAP::Abstract ですが、この名前だと Net::LDAP の中のモジュールと区別がつかないし、パッと見何をやるモジュールなのか分からないので、Net::LDAPx::Simple (SVN) とまた名称を変更しました。 &hellip;">
+  <meta name="description" content="Assurer (SVN) を修正。主な修正点は以下の通りです。 テスト結果を保持する Assurer::Results クラスを削除。代わりに Test::TAP::Model を使うようにした。
+Format, Publish まわりを実装し、Format::Text, Format:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +79,79 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/01/12/394/">Net::LDAPx::Simple と Catalyst::Model::LDAPx::Simple</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/01/14/267/">Assurer   サーバテスティングフレームワーク #3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-01-14T16:04:00+09:00" pubdate>Jan 14<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/01/14/267/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) を修正。主な修正点は以下の通りです。
+</p>
+
+
+<ul><li>テスト結果を保持する Assurer::Results クラスを削除。代わりに Test::TAP::Model を使うようにした。</li>
+<li>Format, Publish まわりを実装し、Format::Text, Format::HTML, Publish::Term を実装。</li>
+<li>Assurer::Test でテスト結果をターミナルに表示していたのを、Publish::Term に分離。</li></ul>
+
+
+<pre class="wiki">
+format:
+  - module: HTML
+    config:
+      css_uri: htmlmatrix.css
+
+publish:
+  - module: Term
+</pre>
+
+
+<p>
+といった設定をして、
+</p>
+
+
+<pre class="wiki">
+$ ./assurer.pl -c examples/config.yaml > tap.html
+</pre>
+
+
+<p>
+と実行すると、<a class="ext-link" href="http://mizzy.org/archives/tap.html"><span class="icon"></span>こんな感じの HTML</a> が得られます。
+</p>
+
+
+<p>
+これで大枠はだいぶ整ってきた気がする。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/12/394/">Net/Lda Px/Simple と Catalyst/Model/Lda Px/Simple</a></h1>
     
     
       <p class="meta">
@@ -154,7 +227,7 @@ $entry->delete;
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/01/08/361/">Assurer - サーバテスティングフレームワーク #2</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/01/08/361/">Assurer   サーバテスティングフレームワーク #2</a></h1>
     
     
       <p class="meta">
@@ -251,7 +324,7 @@ publish:
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/01/06/300/">Assurer - サーバテスティングフレームワーク #1</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/01/06/300/">Assurer   サーバテスティングフレームワーク #1</a></h1>
     
     
       <p class="meta">
@@ -349,7 +422,7 @@ Assurer::Test は今後、 Assurer::Test::More とか Assurer::Test::Class と�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/01/06/432/">Assurer - サーバテスティングフレームワーク #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/01/06/432/">Assurer   サーバテスティングフレームワーク #0</a></h1>
     
     
       <p class="meta">
@@ -414,7 +487,7 @@ plugins:
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/01/03/341/">Net::LDAP::Abstract #0</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/01/03/341/">Net/Ldap/Abstract #0</a></h1>
     
     
       <p class="meta">
@@ -501,7 +574,7 @@ my $entries = $ldap->search({
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2007/01/01/372/">Net::LDAP::Alternative</a></h1>
+      <h1 class="entry-title"><a href="/blog/2007/01/01/372/">Net/Ldap/Alternative</a></h1>
     
     
       <p class="meta">
@@ -655,7 +728,7 @@ my $entry = $ldap->search({
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/12/31/306/">/etc/sudoers を LDAP で管理する</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/12/31/306/">/Etc/Sudoers を Ldap で管理する</a></h1>
     
     
       <p class="meta">
@@ -862,7 +935,7 @@ sudouser: %group
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/12/29/367/">OpenSSH の公開鍵を LDAP で管理</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/12/29/367/">Open Ssh の公開鍵を Ldap で管理</a></h1>
     
     
       <p class="meta">
@@ -1035,7 +1108,7 @@ lpk patch をあてるとソースディレクトリに以下のドキュメン�
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2006/12/26/391/">Cfengine メモ #0 - Cfengine の構成パターン</a></h1>
+      <h1 class="entry-title"><a href="/blog/2006/12/26/391/">Cfengine メモ #0   Cfengine の構成パターン</a></h1>
     
     
       <p class="meta">
@@ -1168,52 +1241,6 @@ cfrun は1ホストに対して1回実行というわけではなく、cfrun.hos
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/11/03/425/">空前の Use Perl; ブーム</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-11-03T02:04:00+09:00" pubdate>Nov 3<span>rd</span>, 2006</time>
-        
-         | <a href="/blog/2006/11/03/425/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-今 Perler の間では、<a class="ext-link" href="http://use.perl.org/"><span class="icon"></span>use Perl;</a> に英語で Perl ネタを書くのがアツイ、というわけで、自分もそのブームに<a class="ext-link" href="http://use.perl.org/~mizzy/journal/"><span class="icon"></span>便乗することにしました</a>。まだ何も書いてませんが。
-</p>
-
-
-<p>
-今後 Perl ネタはそっちの方に書くことにします。
-</p>
-
-
-<p>
-あと、Yappo さんが <a class="ext-link" href="http://subtech.g.hatena.ne.jp/yappo/20061102"><span class="icon"></span>use Perl; 一覧を XOXO で提供</a> してくれてますので、Perler な人は Plagger::Plugin::Subscription::XOXO で購読しない手はないでしょう。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/20/">&larr; Older</a>
@@ -1231,6 +1258,10 @@ cfrun は1ホストに対して1回実行というわけではなく、cfrun.hos
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1244,10 +1275,6 @@ cfrun は1ホストに対して1回実行というわけではなく、cfrun.hos
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

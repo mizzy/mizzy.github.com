@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="!html &lt;a href="http://www.amazon.co.jp/dp/4774143073"&gt;&lt;img src="http://ec3.images-amazon.com/images/I/51GW5jxmdvL._SL500_AA300_.jpg" /&gt;& &hellip;">
+  <meta name="description" content="SystemTap が以前から気になってたので、ちゃんと調べてみることに。 ざっとググってみた感じだと、SystemTap Beginners Guide がしっかりまとまっていてわかりやすそうなので、これをベースに調べたことをメモしていく。PDF 版もあるので Kindle に入れて持ち運べるし &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,162 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/07/03/LargeServiceTechnologyIntroBook/">LargeServiceTechnologyIntroBook</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/07/08/SystemTap00/">System Tap00</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-07-08T01:45:26+09:00" pubdate>Jul 8<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/07/08/SystemTap00/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://sourceware.org/systemtap/">SystemTap</a> が以前から気になってたので、ちゃんと調べてみることに。</p>
+
+<p>ざっとググってみた感じだと、<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">SystemTap Beginners Guide</a> がしっかりまとまっていてわかりやすそうなので、これをベースに調べたことをメモしていく。<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide.pdf">PDF 版</a>もあるので Kindle に入れて持ち運べるし。</p>
+
+<h1>SystemTap とは？</h1>
+
+<ul>
+<li>カーネルの動きをモニタリングするためのフレームワーク</li>
+<li>netstat, ps, top, iostat なんかで得られるのと同じような情報が取得できる</li>
+<li>こういった情報が得られるだけではなく、フィルタリングしたり解析したりもできる</li>
+</ul>
+
+
+<p>といったもののようです。DTrace を知ってる方なら、それに似たようなもの、と言えばわかりやすいのかもしれません。（自分は DTrace よく知りませんが。）</p>
+
+<ul>
+<li>参考 URL
+
+<ul>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/introduction.html</li>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/intro-systemtap-vs-others.html</li>
+</ul>
+</li>
+</ul>
+
+
+<h1>SystemTap の利用</h1>
+
+<p>CentOS 5 でインストールした際のメモ。</p>
+
+<p>利用している kernel と同じバージョンの kernel-devel パッケージをインストール。（systemtap パッケージを入れると依存で勝手に入るけど、利用中の kernel バージョンと異なる場合もあるので、先に入れておくといいです。）</p>
+
+<pre><code>$ sudo yum install kernel-devel-2.6.18-164.el5
+</code></pre>
+
+<p>systemtap パッケージをインストール。</p>
+
+<pre><code>$ sudo yum install sytemtap
+</code></pre>
+
+<p>kernel-debuginfo と kernel-debuginfo-common のインストールのために、debuginfo-install コマンドが含まれる yum-utils パッケージをインストール。</p>
+
+<pre><code>$ sudo yum install yum-utils
+</code></pre>
+
+<p>kernel-debuginfo と kernel-debuginfo-common を yum で取得できるように、以下のような /etc/yum.repos.d/CentOS-debuginfo.repo を作成。</p>
+
+<pre><code>[debuginfo]
+name=CentOS debuginfo
+baseurl=http://debuginfo.centos.org/$releasever/$basearch/
+gpgcheck=0
+enabled=1
+</code></pre>
+
+<p>kernel-debuginfo と kernel-debuginfo-common を インストール。</p>
+
+<pre><code>$ sudo debuginfo-install kernel
+</code></pre>
+
+<p>kernel-headers も必要かも？</p>
+
+<p>あとは stap コマンドを実行すれば OK。(root 権限が必要だけど、stapdev グループに属しているユーザであれば、権限は不要。)</p>
+
+<pre><code>$ stap -v -e 'probe vfs.read {printf("read performed\n"); exit()}'
+Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 170usr/50sys/210real ms.
+Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116696virt/75204res/41808shr kb, in 310usr/50sys/369real ms.
+Pass 3: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.c
+Pass 4: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.ko
+Pass 5: starting run.
+read performed
+Pass 5: run completed in 20usr/50sys/96real ms.
+</code></pre>
+
+<p>-v オプションで詳細表示。v を増やすと更に詳細に。</p>
+
+<p>表示されるメッセージを見るとなんとなくわかるけど、SystemTap スクリプトをコンパイルしてカーネルモジュールを生成して実行してる。なので gcc や make なんかも必要。（なはず。）</p>
+
+<ul>
+<li>参考 URL
+
+<ul>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/using-systemtap.html</li>
+</ul>
+</li>
+</ul>
+
+
+<h1>他のマシンで実行できる SystemTap モジュールを生成</h1>
+
+<p>上で見たように、SystemTap の利用には、コンパイラや debuginfo パッケージのインストールが必要なんだけど、ポリシー的にそれが許されない環境ではどうするか？実は SystemTap にはコンパイル済みのモジュールを実行する仕組みもある。（このコンパイル済みモジュールのことを、ドキュメントでは Instrumentation と呼んでいる。）</p>
+
+<p>コンパイル済みモジュールは以下のように stap コマンドで生成できる。(-r と -m オプションを指定する。）</p>
+
+<pre><code>$ stap -r 2.6.18-164.el5 -e 'probe vfs.read {exit()}' -m simple -v  [miya@h026]
+Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 180usr/20sys/205real ms.
+Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116816virt/75200res/41808shr kb, in 320usr/40sys/364real ms.
+Pass 3: translated to C into "/tmp/stapPGBW7a/simple.c" using 116816virt/75940res/42548shr kb, in 230usr/10sys/269real ms.
+Pass 4: compiled C into "simple.ko" in 3820usr/790sys/4619real ms.
+Pass 5: starting run.
+Pass 5: run completed in 20usr/50sys/97real ms.
+</code></pre>
+
+<p>simple.ko が生成されるので、これを実行したいマシンにコピーする。そのマシン上では、systemtap-runtime パッケージがインストールされていれば良い。で、以下のように staprun コマンドを叩いてモジュールを実行する。</p>
+
+<pre><code>$ staprun simple.ko -v
+stapio:cleanup_and_exit:400 detach=0
+stapio:cleanup_and_exit:417 closing control channel
+staprun:remove_module:205 Module simple removed.
+</code></pre>
+
+<p>これも root 権限が必要だけど、stapusr グループに属していれば権限は必要ない。（stapdev グループでももちろん実行できる。）</p>
+
+<ul>
+<li>参考 URL
+
+<ul>
+<li>http://sourceware.org/systemtap/SystemTap_Beginners_Guide/cross-compiling.html</li>
+</ul>
+</li>
+</ul>
+
+
+<p>今日はここまで。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/07/03/LargeServiceTechnologyIntroBook/">Large Service Technology Intro Book</a></h1>
     
     
       <p class="meta">
@@ -266,7 +421,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/06/27/ZabbixBook/">ZabbixBook</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/06/27/ZabbixBook/">Zabbix Book</a></h1>
     
     
       <p class="meta">
@@ -337,7 +492,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/05/20/DevOpsPresentationSlide/">DevOpsPresentationSlide</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/05/20/DevOpsPresentationSlide/">Dev Ops Presentation Slide</a></h1>
     
     
       <p class="meta">
@@ -372,7 +527,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/">HadoopAndScalaPackagesForCentOS</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/04/14/HadoopAndScalaPackagesForCentOS/">Hadoop And Scala Packages For Cent Os</a></h1>
     
     
       <p class="meta">
@@ -437,7 +592,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/03/26/OpenSourceProvisioningToolchain/">OpenSourceProvisioningToolchain</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/03/26/OpenSourceProvisioningToolchain/">Open Source Provisioning Toolchain</a></h1>
     
     
       <p class="meta">
@@ -553,7 +708,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/03/25/DevOps/">DevOps</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/03/25/DevOps/">Dev Ops</a></h1>
     
     
       <p class="meta">
@@ -679,7 +834,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/03/20/KindleJapaneseTitle/">KindleJapaneseTitle</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/03/20/KindleJapaneseTitle/">Kindle Japanese Title</a></h1>
     
     
       <p class="meta">
@@ -758,7 +913,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/02/24/PuppetAtHbStudy8/">PuppetAtHbStudy8</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/02/24/PuppetAtHbStudy8/">Puppet At Hb Study8</a></h1>
     
     
       <p class="meta">
@@ -854,7 +1009,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2010/02/17/OpenSocialAppDeveloperRecruiting/">OpenSocialAppDeveloperRecruiting</a></h1>
+      <h1 class="entry-title"><a href="/blog/2010/02/17/OpenSocialAppDeveloperRecruiting/">Open Social App Developer Recruiting</a></h1>
     
     
       <p class="meta">
@@ -892,156 +1047,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/02/07/KindleScreenShots/">KindleScreenShots</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-02-07T19:56:58+09:00" pubdate>Feb 7<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/02/07/KindleScreenShots/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近、4人目の子供も生まれ、子供たちが成長するにつれて家がどんどん手狭になっていくため、<a href="http://www.amazon.com/dp/B0015T963C">Kindle</a>（DX じゃない方）と <a href="http://scansnap.fujitsu.com/jp/product/s1500/index.html?userid=ss1500">ScanSnap S1500</a>、<a href="http://store.shopping.yahoo.co.jp/shop-nexstage/542.html">裁断機</a> を買って家の本を電子化していっています。</p>
-
-<p>で、Kindle にはスクリーンショットが撮れる機能があるため、どんな感じで Kindle 上で表示されるのか、様々な種類の本で示したいと思います。</p>
-
-<p>Kindle の購入を検討している方のご参考になれば幸いです。</p>
-
-<p>（画像はクリックすると大きいサイズで表示されます。）</p>
-
-<hr />
-
-<h1>Kindle Store から購入した本（Perl Best Practices）</h1>
-
-<p><a href="http://www.amazon.co.jp/dp/0596001738">Perl Best Practices</a> は既に持っているのですが、Damian Conway の直筆サイン入りなので裁断機でバラして電子化するわけにはいかず、Kindle Edition を買ってみました。</p>
-
-<p>文字サイズは3番目に小さい文字。</p>
-
-<p>[[Image(http://mizzy.org/img/kindle/perl01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/perl02.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/perl03.gif, 25%)]]</p>
-
-<p>コードとそうじゃない部分や、ボールドとそうじゃない部分がもっと区別がつきやすいといいなー、と思ったけど、それ以外は今のところ特に不満なし。</p>
-
-<hr />
-
-<h1>青空キンドルで生成された PDF</h1>
-
-<p><a href="http://a2k.aill.org/">青空キンドル</a> で青空文庫のテキストを PDF にしたものです。</p>
-
-<p>[[Image(http://mizzy.org/img/kindle/bottyan01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/bottyan02.gif, 25%)]]</p>
-
-<p>とても読みやすいです。</p>
-
-<hr />
-
-<p>ここから以下は、すべて ScanSnap で PDF 化したものです。</p>
-
-<hr />
-
-<h1>文庫本（麻雀放浪記（一） 青春編）</h1>
-
-<p>[[Image(http://mizzy.org/img/kindle/mahjong01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/mahjong02.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/mahjong03.gif, 25%)]]</p>
-
-<p>青空キンドルより文字は若干小さめ。でも許容できる範囲。</p>
-
-<hr />
-
-<h1>新書（北方謙三の『水滸伝』ノート）</h1>
-
-<p>[[Image(http://mizzy.org/img/kindle/suiko01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/suiko02.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/suiko03.gif, 25%)]]</p>
-
-<p>Kindle で読むとやや文字が小さいけど、許容範囲内。</p>
-
-<hr />
-
-<h1>フルカラーの新書（暗黒宇宙で銀河が生まれる）</h1>
-
-<p>[[Image(http://mizzy.org/img/kindle/ginga01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/ginga02.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/ginga03.gif, 25%)]]</p>
-
-<p>[[Image(http://mizzy.org/img/kindle/ginga04.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/ginga05.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/ginga06.gif, 25%)]]</p>
-
-<p>フルカラーのものは残念な感じ。カラーページがモノクロになるのはしかたないにしても、ScanSnap でスキャン時の色設定を、カラーやグレースケールにすると、文字が薄くなってしまって読みにくい。設定の調整でもっと見やすくできるかもだけど、そんな苦労をするよりは、iPad でフルカラーで見る方がいいと思う。</p>
-
-<hr />
-
-<h1>単行本（楊令伝 十二 九天の章）</h1>
-
-<p>[[Image(http://mizzy.org/img/kindle/youreiden01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/youreiden02.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/youreiden03.gif, 25%)]]</p>
-
-<p>[[Image(http://mizzy.org/img/kindle/youreiden04.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/youreiden05.gif, 25%)]]</p>
-
-<p>Kindle で読むとやや文字が小さいけど、許容範囲内。実際一冊読み切ってみたけど、特に目が疲れるということもなかった。</p>
-
-<hr />
-
-<h1>漫画（海皇紀 1, 寸法 17.2 x 11.6 x 1.8 cm）</h1>
-
-<p>漫画ではもっとも一般的なサイズと思われるもの。</p>
-
-<p>[[Image(http://mizzy.org/img/kindle/kaiouki01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/kaiouki02.gif, 25%)]]</p>
-
-<p>本編はグレースケールではなく白黒で取り込んでいるせいか、若干荒い感じ。でもそれほど読みづらくはない。</p>
-
-<hr />
-
-<h1>漫画（OL進化論 14, 寸法 20.8 x 14.8 x 1.6 cm）</h1>
-
-<p>四コマ漫画に多い、ちょっと大きめサイズの本。</p>
-
-<p>[[Image(http://mizzy.org/img/kindle/ol01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/ol02.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/ol03.gif, 25%)]]</p>
-
-<p>真ん中のカラーページを取り込んだモノは、やはり見づらい。白黒ページはかなり見やすい。</p>
-
-<hr />
-
-<h1>技術本（DNS &amp; BINDクックブック)</h1>
-
-<p>オライリー本。</p>
-
-<p>[[Image(http://mizzy.org/img/kindle/bind01.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/bind02.gif, 25%)]]
-[[Image(http://mizzy.org/img/kindle/bind03.gif, 25%)]]</p>
-
-<p>グレースケールでの取り込みは文字が薄くなり読みにくいので、白黒で取り込んでいるが、そのせいかグレーで網掛けになっている部分は見づらい感じ。また、6インチ Kindle では文字が小さくて読みにくい。これは DX じゃないと読む気になれない。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -1059,6 +1064,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
       </li>
     
@@ -1072,10 +1081,6 @@
     
       <li class="post">
         <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>
