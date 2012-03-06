@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="はてラボについて「はてな社員以外も参加できるとおもしろい」みたいなことが色々なところで言われてますが、Ning みたいなサービスをはてラボでやることのメリットって、はてなドメインに自分のウェブアプリを置くことによって、JavaScript から直接はてな API &hellip;">
+  <meta name="description" content="無事 XML::LibXML の make が通った（パッチあてた）ので、Atom API テストツール 「A2T2」のデモを公開します。好きに使っちゃってください。 それにともなって、見た目をほんのちょっとだけいじってみました。背景画像に gorouさん作 Background Image &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/02/22/302/">Catalyst で Atom Api テストツール #4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-02-22T23:10:00+09:00" pubdate>Feb 22<span>nd</span>, 2006</time>
+        
+         | <a href="/blog/2006/02/22/302/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+無事 XML::LibXML の make が通った（パッチあてた）ので、<a href="http://mizzy.org/atom/" target="_blank">Atom API テストツール 「A2T2」のデモを公開します</a>。好きに使っちゃってください。
+</p>
+
+
+
+
+<p class="entryBody">
+それにともなって、見た目をほんのちょっとだけいじってみました。背景画像に gorouさん作 <a href="http://lab.rails2u.com/bgmaker/" target="_blank">Background Image Maker</a> で作った画像を使わせて頂いたり、アクセス中のインジケータとして、<a href="http://blog.nomadscafe.jp/archives/000610.html" target="_blank">かぜぶろさんのとこ</a>で知った <a href="http://www.sanbaldo.com/wordpress/1/ajax_gif/" target="_blank">SanBaldo &#187; Blog Archive &#187; Ajax loading animated gif</a> から GIF アニメ画像を頂いたり。感謝感謝。
+</p>
+
+
+
+
+<p class="entryBody">
+デモといっても、テストツールとしてガンガン使ってくださって構いません。ご要望などありましたら、コメントください。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -760,78 +810,6 @@ iPod 5G を買った本来の目的は、通勤しながら NBAや米カレッ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/01/22/475/">Cygwin の Sshd がエラーを吐くようになった</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-01-22T04:43:00+09:00" pubdate>Jan 22<span>nd</span>, 2006</time>
-        
-         | <a href="/blog/2006/01/22/475/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-うちでは<a href="http://mizzy.org/mtv2000/index.xhtml?css=white" target="_blank">こんなことをして</a> 無理やりウェブから MTV2000 の録画予約しているのですが、cygwin のパッケージを色々アップデートしたら、cygwin の sshd に対して接続できなくなってしまいました。ちなみにエラーはこんな感じ。
-</p>
-
-
-
-
-<pre class="code">
-initgroups: No such process
-</pre>
-
-
-
-
-<p class="entryBody">
-ssh コマンドをデバッグモードで実行すると、認証まではちゃんとできているということと、initgroups という言葉から、/etc/group の処理あたりでこけているのではないかと踏んで、以下の様に /etc/group と念のため /etc/passwd も作り直したら、正常に接続できるようになりました。
-</p>
-
-
-
-
-<pre class="code">
-$ mkpassed -l > /etc/passwd
-$ mkgroup -l > /etc/group
-</pre>
-
-
-
-
-<p class="entryBody">
-もとのファイルをとっておくのを忘れたので、何が原因だったのかはわからないけど、解決したから良しとしよう。
-</p>
-
-
-
-
-<p class="entryBody">
-同じような症状に遭遇する方もいるかもしれませんので、ここにメモしておきます。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/31/">&larr; Older</a>
@@ -849,6 +827,10 @@ $ mkgroup -l > /etc/group
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -862,10 +844,6 @@ $ mkgroup -l > /etc/group
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

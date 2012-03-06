@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="bloglinesモバイルゲートウェイを久々にアップデート。 マルチユーザ版
-シングルユーザ版 うたかた - scatterbrain - いつでもどこでもなんでも巡回にて、「未読をクリアする機能があると更にスバラシイかも」というお言葉を頂きまして、俺自身もその機能があった方がいいかなぁ、 &hellip;">
+  <meta name="description" content="ブログのサイドバーは、ブログ内のエントリへのアクセシビリティを高める、というのが主目的だと思うのですが（それ以外の使われ方もしていますが）、サイドバー自体のアクセシビリティはあまり考えられていないような気がします。特にサイドバー内の項目が増えてくると、どこに何があるのかが見つけにくく、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/14/457/">ブログのサイドバーをパーソナライズ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-14T23:20:00+09:00" pubdate>May 14<span>th</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/14/457/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+ブログのサイドバーは、ブログ内のエントリへのアクセシビリティを高める、というのが主目的だと思うのですが（それ以外の使われ方もしていますが）、サイドバー自体のアクセシビリティはあまり考えられていないような気がします。特にサイドバー内の項目が増えてくると、どこに何があるのかが見つけにくく、本来の目的を果たせないような状態になってしまいます。
+</p>
+
+
+
+
+<p class="entryBody">
+で、このブログではそのあたりも何とかしたいな、という考えで、サイドバーの各項目を開いたり閉じたりできるようにして、自分が必要な情報だけ表示しておくことができ、その状態をcookieで保持できるような仕組みにしていたのですが、これをもう一歩進めて、順番を自由に入れ替えられるようになるといいな、と考えていたところ、ちょうどよいサイトを見つけました。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://www.brothercake.com/site/resources/scripts/dbx/" target="_blank">[brothercake] Docking boxes (dbx)</a>にあるJavascriptを利用すると、このブログのサイドバーの様に、各項目を自由にdrag &amp; dropで移動したり、クリックで開閉したり、といったことが可能です。また、移動はカーソルキーでも行えますし、順番や開閉の状態はcookieで保持してくれます。
+</p>
+
+
+
+
+<p class="entryBody">
+移動時にはアニメーションしたり半透明になったりで、なかなか楽しいです。これでアクセシビリティが高まるのかどうか、しばらく様子を見たいと思います。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -767,49 +823,6 @@ $entries = [
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/05/03/385/">Blosxom + Template Toolkit #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-05-03T13:51:00+09:00" pubdate>May 3<span>rd</span>, 2005</time>
-        
-         | <a href="/blog/2005/05/03/385/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="/archives/tt" target="_blank">ttプラグイン</a>を修正。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://mizzy.org/program/blosxomTT.html" target="_blank">前回のエントリ</a>で「複雑なデータ構造のものをFOREACHでまわしたりするのは、正常に動作しないと思う」と書いていたのですが、複雑どころが単純なFOREACHでも動作しないというまぬけな状態だったので、修正しました。とりあえず、単一のFOREACHであれば動作するようになりました。入れ子になってるとどうなるか分かりません。今のところ必要がないので、確認する気もなし。必要になってから考えます。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/39/">&larr; Older</a>
@@ -827,6 +840,10 @@ $entries = [
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -840,10 +857,6 @@ $entries = [
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

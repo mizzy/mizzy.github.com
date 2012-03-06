@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="関西オープンソース 2008 で、30days Album の 裏側についてお話します。 30days Album で利用している OSS を思いつくままざっとあげてみると、Linux, Perl, Perlbal, lighttpd, MogileFS, Gearman, TheSchwartz &hellip;">
+  <meta name="description" content="関西オープンソース 2008 で発表した 30days Album の裏側のプレゼン資料をSlideShare にアップしました。
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,39 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/11/10/Inside30daysAlbumBackend/">Inside30days Album Backend</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-11-10T22:59:59+09:00" pubdate>Nov 10<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/11/10/Inside30daysAlbumBackend/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://k-of.jp/2008/">関西オープンソース 2008</a> で発表した <a href="http://30d.jp/">30days Album</a> の裏側のプレゼン資料を<a href="http://www.slideshare.net/mizzy/2008-30days-album-presentation">SlideShare にアップしました</a>。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -414,7 +448,7 @@ warn Parent-&gt;x; # Child が表示されてしまう
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#109;&#97;&#x69;&#x6c;&#x74;&#111;&#x3a;&#x67;&#x6f;&#115;&#x75;&#107;&#x65;&#110;&#97;&#x74;&#111;&#114;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#x2e;&#x63;&#111;&#109;">&#103;&#111;&#115;&#117;&#107;&#101;&#110;&#x61;&#116;&#x6f;&#114;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#109;</a></p>
+<p>Gosuke Miyashita, <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#x67;&#111;&#x73;&#x75;&#x6b;&#101;&#x6e;&#97;&#116;&#111;&#114;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;">&#103;&#x6f;&#x73;&#x75;&#107;&#101;&#110;&#x61;&#116;&#111;&#114;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#109;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
@@ -559,185 +593,6 @@ $ virt-manager
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/02/03/YCombinatorWithPerl/">Y Combinator With Perl</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-02-03T03:03:52+09:00" pubdate>Feb 3<span>rd</span>, 2008</time>
-        
-         | <a href="/blog/2008/02/03/YCombinatorWithPerl/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>計算機科学を学んでいる人にとっては今更な話題らしいですが、経済学部出身の自分には目新しい話題なので書いてみます。（といっても、全然知らなかった、というわけでもないんですが。）</p>
-
-<p><a href="http://d.hatena.ne.jp/amachang/20080124/1201199469">id:amachang</a> さんのエントリにある最終形のみを Perl で書くとこんな感じかな。</p>
-
-<pre><code>#!perl
-my $Y = sub {
-    my $f = shift;
-    return sub {
-        my $g = shift;
-        return sub {
-            my $m = shift;
-            return $f-&gt;($g-&gt;($g))-&gt;($m);
-        }
-    }-&gt;(
-        sub {
-            my $g = shift;
-            return sub {
-                my $m = shift;
-                return $f-&gt;($g-&gt;($g))-&gt;($m);
-            };
-        }
-    )
-};
-
-my $fib = sub {
-    my $f = shift;
-    return sub {
-        my $n = shift;
-        return $n &lt;= 2 ? 1 : $f-&gt;($n - 1) + $f-&gt;($n - 2);
-    };
-};
-
-warn $Y-&gt;($fib)-&gt;(10);
-</code></pre>
-
-<hr />
-
-<p>なぜこれで再帰として動作するかを考えるにあたって、<a href="http://d.hatena.ne.jp/gotin/20080127/1201372491">id:gotin</a> さんのエントリと同内容のことを、Perl で考えてみる。</p>
-
-<p>簡単にするために最終形の Y コンビネータになる前の中間形のコードで考える。</p>
-
-<pre><code>#!perl
-my $Y = sub {
-    my $f = shift;
-    my $g;
-    return $g = sub {
-        my $n = shift;
-        $f-&gt;($g)-&gt;($n);
-    }
-};
-
-my $fib = sub {
-    my $f = shift;
-    return sub {
-        my $n = shift;
-        return $n &lt;= 2 ? 1 : $f-&gt;($n - 1) + $f-&gt;($n - 2);
-    }
-};
-
-warn $Y-&gt;($fib)-&gt;(5);
-</code></pre>
-
-<p>$Y->($fib) は、 my $Y = sub { &#8230; } において、$f に $fib が代入され、結果として以下の関数が返ることになる。</p>
-
-<pre><code>#!perl
-sub {
-    my $n = shift;
-    $fib-&gt;($g)-&gt;($n);
-}
-</code></pre>
-
-<p>そうなると $Y->($fib)->(5) は、以下のように変換できる。</p>
-
-<pre><code>#!perl
-$fib-&gt;($g)-&gt;(5)
-</code></pre>
-
-<p>$fib->($g) は、my $fib = sub { &#8230; } の $f に $g が代入されるので、$fib->($g)->(5) は、</p>
-
-<pre><code>#!perl
-sub {
-   my $n = shift;
-   return $n &lt;= 2 ? 1 : $g-&gt;($n - 1) + $g-&gt;($n - 2);
-}-&gt;(5);
-</code></pre>
-
-<p>ということになる。</p>
-
-<p>なのでこの $n に 5 が代入され、結果として $fib->($g)->(5) は以下のように変換される。</p>
-
-<pre><code>#!perl
-  $g-&gt;(4) ... [A]
-+ $g-&gt;(3) ... [B]
-</code></pre>
-
-<p>[A] を更に変換してみると、$g->(4) は $fib->($g)->(4) となり、</p>
-
-<pre><code>#!perl
-sub {
-   my $n = shift;
-   return $n &lt;= 2 ? 1 : $g-&gt;($n - 1) + $g-&gt;($n - 2);
-}-&gt;(4);
-</code></pre>
-
-<p>を実行するのと同じ。というわけで、$g->(4) は、</p>
-
-<pre><code>#!perl
-$g-&gt;(3) + $g-&gt;(2) ... [A]
-</code></pre>
-
-<p>になる。同様に [B] を変換すると、</p>
-
-<pre><code>#!perl
-$g-&gt;(2) + $g-&gt;(1) ... [B]
-</code></pre>
-
-<p>となる。今までのところまでをまとめると、$Y->($fib)->(5) は以下のように変換される。</p>
-
-<pre><code>#!perl
-  $g-&gt;(3) + $g-&gt;(2) ... [A]
-+ $g-&gt;(2) + $g-&gt;(1) ... [B]
-</code></pre>
-
-<p>で、$g->(3) は [B] の変換と同様なので、更に以下のように変換される。</p>
-
-<pre><code>#!perl
-  $g-&gt;(2) + $g-&gt;(1) + $g-&gt;(2) ... [A]
-+ $g-&gt;(2) + $g-&gt;(1)           ... [B]
-</code></pre>
-
-<p>ここで $g->(2) は、</p>
-
-<pre><code>#!perl
-sub {
-   my $n = shift;
-   return $n &lt;= 2 ? 1 : $g-&gt;($n - 1) + $g-&gt;($n - 2);
-}-&gt;(2);
-</code></pre>
-
-<p>であり、$n &lt;= 2 であれば 1 が返る。ということは、$g->(2) も $g->(1) も 1 だから、[A] + [B] は以下のように変換される。</p>
-
-<pre><code>#!perl
-  1 + 1 + 1 ... [A]
-+ 1 + 1     ... [B]
-</code></pre>
-
-<p>というわけで、結果は 5 になる。ということらしい。なんとなくわかった。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/11/">&larr; Older</a>
@@ -755,6 +610,10 @@ sub {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -768,10 +627,6 @@ sub {
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

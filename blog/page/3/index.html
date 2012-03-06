@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="I found a interest tool, Graphite when I was exploring https://github.com/etsy .(Screen Shots of Graphite.) Install Carbon Carbon is a backend &hellip;">
+  <meta name="description" content="Overview Maglica is a Python library and command-line tool for an internal cloud. (This tool is very primitive beta now.) This is very simple and &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,132 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/08/18/MaglicaInternalCloudTool/">Maglica Internal Cloud Tool</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-08-18T17:25:28+09:00" pubdate>Aug 18<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/08/18/MaglicaInternalCloudTool/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Overview</h1>
+
+<p><a href="https://github.com/mizzy/maglica">Maglica</a> is a Python library and command-line tool for an internal cloud. (This tool is very primitive beta now.)</p>
+
+<p>This is very simple and based on libvirt, virt-clone and zeromq (for RPC).</p>
+
+<p>The name &#8220;Maglica&#8221; is derived from a Bosnian word that means &#8220;Nebula.&#8221;</p>
+
+<p>I&#8217;m developing this tool because other internal cloud tools(CloudStack, OpenStack, Eucalyptus and so on) are so complicated for internal use.I need a simple tool.</p>
+
+<hr />
+
+<h1>Architecture of Maglica</h1>
+
+<p>Maglica has four components.</p>
+
+<ol>
+<li>Library</li>
+<li>CLI</li>
+<li>Client worker</li>
+<li>Host workers</li>
+</ol>
+
+
+<p>Maglica library is a main component of Maglica.Maglica CLI calls the library
+to do the jobs.The library talks to libvirtd on other hosts directly to get
+virtual machines information.</p>
+
+<p>Maglica client worker is running on the same host on which CLI runs.
+Client worker binds zeromq PUB socket to tcp://<em>:5555 and REP socket
+to tcp://</em>:5556.</p>
+
+<p>Client worker recieves requests from library through REP socket and throws
+request to host workers through PUB socket.Also REP socket recives job results
+from host workers.</p>
+
+<p>Host workers are running on hosts which virtual machines are running on.</p>
+
+<p>Host workers connect to the PUB socket of a client worker to receive job
+requests and the REP socket of a client worker to throw job results.</p>
+
+<p>[[Image(http://mizzy.org/img/maglica_architecture.jpg)]]</p>
+
+<hr />
+
+<h1>How to use Maglica</h1>
+
+<p>You must setup libvirtd running on host machines and accessible through
+tcp port. (See http://libvirt.org/remote.html)</p>
+
+<p>Clone Maglica on a host machine and run the host worker.</p>
+
+<pre><code># git clone git://github.com/mizzy/maglica.git
+# cd maglica
+# cp etc/maglica.conf.example etc/maglica.conf
+</code></pre>
+
+<p>Edit etc/maglica.conf that points to the correct client worker host and port.</p>
+
+<pre><code># ./scripts/maglica_host_worker
+</code></pre>
+
+<p>Clone Maglica on a client machine.</p>
+
+<pre><code># git clone git://github.com/mizzy/maglica.git
+# cd maglica
+# cp etc/maglica.conf.example etc/maglica.conf
+</code></pre>
+
+<p>Edit etc/maglica.conf that points to host machines.</p>
+
+<p>Run the client worker.</p>
+
+<pre><code># ./scripts/maglica_client_worker
+</code></pre>
+
+<p>Run maglica command to list up &#8220;original images&#8221;(which name is end with
+the string &#8220;oroginal&#8221;).</p>
+
+<pre><code># PYTHONPATH=. ./scripts/maglica image list
+Name                                     Host
+---------------------------------------------------------
+SL6.0-x86_64.original                    host0.example.jp  
+SL6.1-x86_64.original                    host0.example.jp  
+SL6.0-x86_64.original                    host1.example.jp  
+SL6.1-x86_64.original                    host1.example.jp  
+</code></pre>
+
+<p>Run maclica command to clone a virtual machine image.</p>
+
+<pre><code># ./scripts/maglica vm clone --image=SL6.1-x86_64.original --hostname=vm0.example.jp
+</code></pre>
+
+<p>This command clones the image on a host and rewrites network setting of the image with libguestfs.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1381,73 +1507,6 @@ apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worke
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/06/25/DevOpsConference/">Dev Ops Conference</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-06-25T02:16:22+09:00" pubdate>Jun 25<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/06/25/DevOpsConference/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://partake.in/events/b5472f43-5bc0-42d0-9469-dc70d7d95b24">DevOps カンファレンス</a> に参加してきたので、個人的なまとめ＆補足など。</p>
-
-<p>といっても <a href="http://twitter.com/#!/kuwa_tw">@kuwa_tw さん</a> の <a href="http://togetter.com/li/153695">togetter まとめ</a> が既にあるので、まとめというよりは、自分が話した内容の補足なんかをしてみようかと。</p>
-
-<p>プレゼンに利用したスライドは <a href="http://www.slideshare.net/mizzy/10devops">slideshare にアップ</a> してますが、話すこと前提でスライドの内容は薄いので、togetter と併せてご覧下さい。</p>
-
-<p>カンファレンスの内容が素晴らしかったのは自分が敢えてここで書く必要はないので、個人的に内容以外でよかった点を挙げると、</p>
-
-<ul>
-<li><a href="http://twitter.com/#!/kdmsnr">@kdmsnr</a> さんと初めてお会いして、ウェブオペレーションを献本頂いたお礼を直接言うことができた！</li>
-<li><a href="http://twitter.com/#!/riywo">@riywo</a> さんとは以前からお会いしたいなー、と思っていたので、ようやくその願いが叶った！</li>
-</ul>
-
-
-<p>といったあたりですかね。</p>
-
-<p>自分の発表では最初に、Dev な人、Ops な人、Dev &amp;&amp; Ops な人、!(Dev &amp;&amp; Ops) な人、それぞれで挙手してもらったんですが、Dev な人が意外と多い印象でした。プレゼンでも話しましたが、元々 Ops 発祥のムーブメントなので、Ops の人の方が圧倒的に多いんじゃないかと思ってましたが、意外な結果でした。</p>
-
-<p>ただし、スピーカー陣は全員 Ops 寄りな人で、Ops の話がメインでしたね。（<a href="http://twitter.com/#!/hiroshi19790209">諸富さん</a> は Dev も Ops も兼ねてらっしゃるようですが、Ops の話がメインでしたしね。）</p>
-
-<p>第2回では Dev な人のお話をぜひ聞いてみたいですね。<a href="http://twitter.com/#!/acotie/status/84302902939750400">@acotie が何かしゃべってくれそうです</a> 。</p>
-
-<p>それから、プレゼンに盛り込もうと思っていたけど、時間の関係で断念したんですが、DevOps に対する批判、というものもあります。</p>
-
-<ul>
-<li><a href="http://www.rationalsurvivability.com/blog/?p=1890">Incomplete Thought: The DevOps Disconnect | Rational Survivability</a></li>
-<li><a href="http://teddziuba.com/2011/03/devops-scam.html">Devops Is a Poorly Executed Scam</a></li>
-</ul>
-
-
-<p>このうちのひとつめのエントリに対する John Allspaw 氏のコメントをプレゼンでは引用させてもらいました。</p>
-
-<p>まあ、批判する人はどこにでもいるし、批判の内容もわからんでもないんですが、それが何か？という感じですね。</p>
-
-<p>帰り際に <a href="http://twitter.com/#!/marqs">@marqs さん</a> と、みんな同じような問題意識を抱えているんだな、ということ、ただそれを適切に表す言葉がいままでなかったために、お互いの共通認識として情報を共有する場を持てなかった、でも、DevOps という言葉が与えられることによって、それがはっきりと共通認識として浮かび上がり、共有する場を持てるようなった、それって、とても素晴らしいことだよね、なんて事を話して、がっちり握手を交わしてきました。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -1465,6 +1524,10 @@ apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worke
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -1478,10 +1541,6 @@ apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worke
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

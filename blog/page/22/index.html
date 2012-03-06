@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="OpenSSL で クライアント証明書を発行する手順メモ。 openssl.cnf の修正 パスは環境によって違うでしょうが、うちの場合は /usr/local/ssl/openssl.cnf 。 # For normal client use this is typical
-# &hellip;">
+  <meta name="description" content="Apache 2.x で SSL クライアント証明書による認証を行うためのメモ。ssl.conf があるので、そいつに以下の様な設定を入れる。（コメントアウトされてるので、# を外して適当に書き換える。） SSLCACertificatePath /usr/local/apache/conf/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,64 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/09/380/">Apache での Ssl クライアント証明書による認証</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-09T03:47:00+09:00" pubdate>Sep 9<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/09/09/380/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+Apache 2.x で SSL クライアント証明書による認証を行うためのメモ。ssl.conf があるので、そいつに以下の様な設定を入れる。（コメントアウトされてるので、# を外して適当に書き換える。）
+</p>
+
+
+<pre class="wiki">
+SSLCACertificatePath /usr/local/apache/conf/ca
+SSLCACertificateFile /usr/local/apache/conf/ca/cacert.pem
+</pre>
+
+
+<p>
+cacert.pem は <a class="ext-link" href="http://mizzy.org/linux/ssl_client_certificate.html"><span class="icon"></span>このエントリ</a> で生成された cacert.pem を適当な場所にコピーするなり、ダイレクトにパスを指定するなりする。
+</p>
+
+
+<pre class="wiki">
+SSLVerifyClient require
+SSLVerifyDepth  10
+</pre>
+
+
+<p>
+これで Apache を再起動してやれば OK。cacert.pem を持つ CA から発行された証明書のみ、アクセスが許可されるようになる。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1155,52 +1212,6 @@ ffmpeg が &#8211;enable-libogg と &#8211;ebale-mp3lame つきでコンパイ�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/26/396/">Plagger/Rule/Ahead</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-26T23:47:00+09:00" pubdate>Aug 26<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/08/26/396/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-Plagger の Rule まわりの実装は今までちゃんと見たことなかったので、勉強も兼ねて <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Rule/Ahead.pm"><span class="icon"></span>Plagger::Rule::Ahead</a> を実装してみた。 前エントリの <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FutureEvents.pm"><span class="icon"></span>Filter::FutureEvents</a> と同様のことを、Rule ベースで実現します。現在時刻よりも<strong>後</strong>に発生するイベントを持つエントリを抽出、ということで Ahead という名前にしてみました。イベントを持っていないエントリの場合には、エントリの更新時刻をチェックします。
-</p>
-
-
-<p>
-Filter::FutureEvents も Rule::Ahead も <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Event.pm"><span class="icon"></span>Plagger::Event</a> があることを前提としてるので、そのままでは 本家 trunk では動作しません。ご注意を。
-</p>
-
-
-<p>
- 
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -1218,6 +1229,10 @@ Filter::FutureEvents も Rule::Ahead も <a class="ext-link" href="http://trac.m
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -1231,10 +1246,6 @@ Filter::FutureEvents も Rule::Ahead も <a class="ext-link" href="http://trac.m
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

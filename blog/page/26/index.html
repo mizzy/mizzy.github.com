@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="隣の席のオオヒダさんが、早速 JugemKey 認証 API を利用したステキサービスを作ってくれちゃいました。Qooqle Video Clippers! YouTube のお気に入り動画をがんがんクリップしてタグづけたりコメントつけたり、人気の動画を一覧で見たり RSS &hellip;">
+  <meta name="description" content="よくある Inside Backend 系の話と違って、ハードの話ではなくプログラムの話が中心です。 JugemKey 認証 API の仕様や PHP/Perl ライブラリ を読んだ方はお気づきだと思いますが、認証 API を利用するには2つのサーバにアクセスする必要があります。1つは &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,144 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/01/284/">Inside Jugem Key&#8217;s Backend</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-01T23:36:00+09:00" pubdate>Jun 1<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/06/01/284/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+よくある Inside Backend 系の話と違って、ハードの話ではなくプログラムの話が中心です。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://jugemkey.jp/api/auth/" target="_blank">JugemKey 認証 API の仕様や PHP/Perl ライブラリ</a> を読んだ方はお気づきだと思いますが、認証 API を利用するには2つのサーバにアクセスする必要があります。1つは secure.jugemkey.jp、もう 1つが api.jugemkey.jp です。
+</p>
+
+
+
+
+<p class="entryBody">
+secure.jugemkey.jp の方は、直接ユーザに見える部分をを担当していて、PHP で開発されています。https://secure.jugemkey.jp/ で見えるところがこれにあたります。
+</p>
+
+
+
+
+<p class="entryBody">
+api.jugemkey.jp はそのバックエンドで動いていて、実際のユーザ登録や認証などの処理はこいつが担当し、AtomPP ライクな API を実装しています。
+</p>
+
+
+
+
+<p class="entryBody">
+つまり、secure.jugemkey.jp と api.jugemkey.jp の間のやりとりは、AtomPP でやってる、というわけですね。
+</p>
+
+
+
+
+<p class="entryBody">
+で、今回の認証 API リリースでは、今まで secure.jugemkey.jp にしか開放していなかった API を、一部だけ外部に公開した、ということになります。
+</p>
+
+
+
+
+<p class="entryBody">
+そもそもなぜフロントとバックを分けて API で繋ぐようにしたか、ということなんですが、認証 API の様に外部へ API を公開する、という目的もあるのですが、それよりもまず、JugemKey 自体の最初の目的が、ペパボの各サービスで分散されているユーザ管理を統合する、ということだったので、重要な機能は一箇所にまとめてそれを API でラップし、各サービスでは API を叩くライブラリを利用することにより、実装効率を高めてサービス間の連携を容易にする、という狙いがあったからです。
+</p>
+
+
+
+
+<p class="entryBody">
+また、自分は Perl 好きで、ペパボは PHP メインの会社なわけですが、API で繋ぐことによってフロントとバックの実装を明確に分離することができると、お互い得意な言語に集中して実装できるというメリットもありますね。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、JugemKey 認証 API に関連するフロント部分は、自分が PHP で実装しているのですが、面倒な処理はバックエンドのサーバがやってくれて、フロントからは AtomPP な割とシンプルな API を叩くだけだし、PHP 用ライブラリは既に社内の PHP 得意な人が実装してくれてるし、といった感じで、PHP に慣れてない自分でも割とさくさく実装することができました。
+</p>
+
+
+
+
+<p class="entryBody">
+転職したばかりの頃に <a href="http://mizzy.org/web/build_on_your_own_api.html" target="_blank">こんなエントリを書いた</a> のですが、まさにこれを実践した、というわけです。
+</p>
+
+
+
+
+<p class="entryBody">
+話変わって AtomPP ライクな API を実装している api.jugemkey.jp ですが、こいつは Perl + Catalyst で実装されていて、特にコアな部分は、主に以下の CPAN モジュールに依存しています。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li><a href="http://search.cpan.org/perldoc/DBIx::Class" target="_blank">DBIx::Class</a></li>
+<li><a href="http://search.cpan.org/perldoc/Catalyst::Model::DBIC::Schema" target="_blank">Catalyst::Model::DBIC::Schema</a></li>
+<li><a href="http://search.cpan.org/perldoc/Catalyst::Plugin::AtomServer" target="_blank">Catalyst::Plugin::AtomServer</a></li>
+<li><a href="http://search.cpan.org/perldoc/Catalyst::Plugin::AtomPP" target="_blank">Catalyst::Plugin::AtomPP</a></li>
+<li><a href="http://search.cpan.org/perldoc/XML::Atom::Entry" target="_blank">XML::Atom::Entry</a></li>
+</ul>
+
+
+
+
+<p class="entryBody">
+Catalyst::Plugin::AtomServer に含まれている C::P::Authentication::Credential::Atom は、当初 Basic 認証では crypted/hashed な形で保持されたパスワードに対応していなかったので、修正して使ってました。0.03 からこの修正をとりこんでもらっていますので、今は対応しています。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://mizzy.org/?topic=/program/atom_client_with_catalyst" target="_blank">Catalyst で Atom API テストツール</a> を作ったのも、この様に AtomPP なサーバを実装してたからだったりします。
+</p>
+
+
+
+
+<p class="entryBody">
+この手の Inside Backend 系の話は大好物なので、みんなどんどん公開してくれないかなー、と思ってるのですが、それなら自分も公開するのが筋だろう、ってことでこんなエントリ書いてみました。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -725,109 +863,6 @@ plugins:
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/21/279/">Lighttpd の認証を Ldap で</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-21T15:17:00+09:00" pubdate>May 21<span>st</span>, 2006</time>
-        
-         | <a href="/blog/2006/05/21/279/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://trac.mizzy.org/public/" target="_blank">おうち trac</a> が認証を一切せずに、誰でも wiki の書き換えができたり、ticket の発行ができたり、という状態だったので、それはまずかろうってことで認証かけることにした。
-</p>
-
-
-
-
-<p class="entryBody">
-<a href="http://mizzy.org/linux/trac_and_lighty.html" target="_blank">「trac を lighttpd + FastCGI で動かす」</a> で触れたとおり、trac は lighttpd 上で動いているので、認証は lighttpd で設定します。やりかたは lighttpd のサイトにある <a href="http://www.lighttpd.net/documentation/authentication.html" target="_blank">「Using Authentication Module: mod_auth」</a> の通りなので、あまり難しいことはないのですが、とりあえずやったことをメモ。
-</p>
-
-
-
-
-<p class="entryBody">
-うちの Linux サーバ上で動いているサービスは、ほとんどが LDAP で認証しているので、lighttpd も LDAP で認証するようにします。
-</p>
-
-
-
-
-<p class="entryBody">
-まず、lighty のデフォルト configure オプションでは、auth_ldap が disable になってるので、以下の様にして再インストール。
-</p>
-
-
-
-
-<pre class="code">
-$ ./configure --with-ldap
-$ make
-$ sudo make install
-</pre>
-
-
-
-
-<p class="entryBody">
-でもって、/usr/local/etc/lighttpd.conf を書き換え。関連する部分だけ抜き出すとこんな感じ。
-</p>
-
-
-
-
-<pre class="code">
-server.modules              = (
-                               "mod_auth",
-                               "mod_fastcgi",
-                              )
-
-auth.backend = "ldap"
-auth.backend.ldap.hostname = "kenny"
-auth.backend.ldap.base-dn = "ou=people,o=southpark"
-auth.backend.ldap.filter = "(uid=$)"
-
-auth.require = ( "/public/login" =>
-                 (
-                   "method"  => "basic",
-                   "realm"   => "trac admin area",
-                   "require" => "user=xxx"
-                  )
-                )
-</pre>
-
-
-
-
-<p class="entryBody">
-これで lighty を再起動すれば OK。あとは<a href="http://projects.edgewall.com/trac/wiki/TracPermissions" target="_blank">「Trac Permissions」</a> を参照しながら trac-admin コマンドでパーミッション設定。<a href="http://projects.edgewall.com/trac/wiki/WebAdmin" target="_blank">Web Admin Plugin</a> を導入している場合は trac-admin 使わずにウェブから設定。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/27/">&larr; Older</a>
@@ -845,6 +880,10 @@ auth.require = ( "/public/login" =>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -858,10 +897,6 @@ auth.require = ( "/public/login" =>
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

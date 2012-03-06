@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="I&#8217;ve wrote Rakuten tag plugin for Jekyll. This is inspired by Amazon Plugin for Octopress. You can use this plugin like this. {{ "nikondirect: &hellip;">
+  <meta name="description" content="I&#8217;ve wrote EXIF tag plugin for Jekyll. If you write text like this: {% img /images/2012/03/first_shot_orion.jpg %} {% exif /images/2012/03/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,52 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2012/03/07/exif-tag-plugin/">Exif Tag Plugin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2012-03-07T00:19:00+09:00" pubdate>Mar 7<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/03/07/exif-tag-plugin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve wrote <a href="https://github.com/mizzy/jekyll-plugins/blob/master/exif_tag.rb">EXIF tag plugin for Jekyll</a>.</p>
+
+<p>If you write text like this:</p>
+
+<pre><code>{% img /images/2012/03/first_shot_orion.jpg %}
+
+{% exif /images/2012/03/first_shot_orion.jpg %}
+</code></pre>
+
+<p>You will see the converted result like this:</p>
+
+<p><img src="/images/2012/03/first_shot_orion.jpg"></p>
+
+<p>焦点距離 10 mm F5.6 NIKON D5000 ISO 1600 15 秒露光</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten Tag Plugin For Jekyll</a></h1>
     
     
@@ -122,7 +168,7 @@
 <pre><code>{{ "nikondirect:10000349" | rakuten_link }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70【RCPmar4】</a></p>
+<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70</a></p>
 </div>
   
   
@@ -774,45 +820,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/20/a-picture-of-geminids/">A Picture Of Geminids</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-12-20T00:12:00+09:00" pubdate>Dec 20<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/12/20/a-picture-of-geminids/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is a picture of a shooting star of Gemnids I took on Dec. 15, 2011.I took over 2,000 pictures and only 3 pictures got a shooting star.</p>
-
-<p><img src="/images/2011/12/geminids-shooting-star.jpg" title="A shooting star of Geminids" ></p>
-
-<p>A red bright star on left side is Aldebaran of Taurus and dense small stars on center are Pleiades.</p>
-
-<p>It was so cold but looking at stars and shooting stars were so fun.It would never be boring for me.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -828,6 +835,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -841,10 +852,6 @@
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>

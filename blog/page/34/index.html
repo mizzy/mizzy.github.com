@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="feedbringer用greasemonkeyユーザスクリプトの白黒バージョンを修正しました。 白黒バージョンではアイコンを強引に入れ替えてるのですが、入れ替わるのが最初にページにアクセスした時だけで、15分毎のツリーメニューのアップデート時には、 &hellip;">
+  <meta name="description" content="feedbringer用greasemonkeyユーザスクリプトから呼び出しているcssを若干変更。 今日のメンテナンスで、「このページのトップへ」というリンクが追加され、修正前のcssではこれが左上に表示されて邪魔なので、display: none; で消去。 たぶん、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,70 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/11/23/353/">Feedbringerをremixin&#8217; #6</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-11-23T18:31:00+09:00" pubdate>Nov 23<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/11/23/353/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/js/feedbringer2.user.js" target="_blank">feedbringer用greasemonkeyユーザスクリプト</a>から呼び出しているcssを若干変更。
+</p>
+
+
+
+
+<p class="entryBody">
+<a href="http://blog.feedbringer.net/feed/archives/2005/08/814_2.html" target="_blank">今日のメンテナンス</a>で、「このページのトップへ」というリンクが追加され、修正前のcssではこれが左上に表示されて邪魔なので、display: none; で消去。
+</p>
+
+
+
+
+<p class="entryBody">
+たぶん、フィードを下まで読んでいって、読み終わったらページの先頭への移動がすぐにできるように追加されたんでしょうが、このcssでは全く使う必要がないので。
+</p>
+
+
+
+
+<p class="entryBody">
+それにしても、HTMLがダメすぎ。「ああ、こういうのをdiv厨と呼ぶんだな」という典型的な例。しかも、今回追加されたリンクもに見られるように、classがalign-rightとか、nav-tab-rightとか、思いっきりレイアウトを意識したクラス名になってるし。HTMLやCSSに対して、この程度の理解しかないから、インターフェースもダメなんだろうなぁ、と妙に納得してしまった。（と、自分のことは棚に上げてみる。）
+</p>
+
+
+
+
+<p class="entryBody">
+なんかひどいこと言ってますが、それだけ期待してるってことで。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -653,75 +717,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/10/29/308/">ブログエントリの全文/要約表示を読者に委ねる</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-10-29T12:31:00+09:00" pubdate>Oct 29<span>th</span>, 2005</time>
-        
-         | <a href="/blog/2005/10/29/308/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-「<a href="http://mizzy.org/web/sideBarPersonalize.html" target="_blank">ブログのサイドバーをパーソナライズ</a>」につづく、読者によるカスタマイズシリーズ第2弾。
-</p>
-
-
-
-
-<p class="entryBody">
-ブログエントリの表示で、概要だけ表示して「続きを読む」で全文にリンクするようなやり方は、読む立場としては自分はあまり好きじゃなかったりします。が、書く立場としては、文章が長すぎるから、まずは概要だけ表示した方が親切だろう、とか、ネタバレがあるからいきなり表示しちゃまずいだろ、とか、色々と配慮して概要だけ表示しているものと思われます。
-</p>
-
-
-
-
-<p class="entryBody">
-この辺りは一長一短もあり、好みの問題もあるため、一概にどちらがいいとも言えませんよね。それならば、読む側が全文/要約表示を選択できるようになれば、どちらがいいとか悩む必要がなくなるよな、ってことでちょいと実装してみました。
-</p>
-
-
-
-
-<p class="entryBody">
-エントリ一覧が表示されるページのサイドバーに、「表示オプション」というのをつけて、ここで選択できるようにしています。（個別エントリページでこれをご覧の方は、<a href="/">トップ</a>へ移動してみてください。
-</p>
-
-
-
-
-<p class="entryBody">
-デフォルトでは全文表示になっていますが、「要約表示」を選択すると前半だけ表示して、（続きを読む）リンクが現れます。
-</p>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2005/10/29/308/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/35/">&larr; Older</a>
@@ -739,6 +734,10 @@ meta プラグインと組み合わせて、meta-access: private と記述して
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/04/rakuten-tag-plugin/">Rakuten tag plugin for Jekyll</a>
       </li>
     
@@ -752,10 +751,6 @@ meta プラグインと組み合わせて、meta-access: private と記述して
     
       <li class="post">
         <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/10/webiblo-web-to-ebook-project-en/">Webiblo - web to ebook project</a>
       </li>
     
   </ul>
