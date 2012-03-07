@@ -9,8 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="関西オープンソース 2008 で発表した 30days Album の裏側のプレゼン資料をSlideShare にアップしました。
-">
+  <meta name="description" content="Xen Summit 2008 Tokyo で発表した、「Operating Xen domains through LL(Perl/Python) with libvirt」の資料を SlideShare にアップしました。 libvirt &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,45 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/11/20/XenSummitTokyo2008Libvirt/">Xen Summit Tokyo2008 Libvirt</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2008-11-20T16:33:16+09:00" pubdate>Nov 20<span>th</span>, 2008</time>
+        
+         | <a href="/blog/2008/11/20/XenSummitTokyo2008Libvirt/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://software.fujitsu.com/jp/linux/event/xensummit2008-tokyo/">Xen Summit 2008 Tokyo</a> で発表した、「Operating Xen domains through LL(Perl/Python) with libvirt」の資料を <a href="http://www.slideshare.net/mizzy/xen-summit-2008-tokyo-operating-xen-domains-through-llperlpython-with-libvirt-presentation/">SlideShare にアップしました</a>。</p>
+
+<p><a href="http://libvirt.org/">libvirt</a> という仮想化システムを操作するためのライブラリがあるんですが、それをつかって Perl/Python で Xen を管理するプログラムを書く、ということにフォーカスした内容です。</p>
+
+<p>Perl/Python での libvirt プログラミングだけではなく、libvirt そのものの概要やアーキテクチャ、<a href="http://avahi.org/">Avahi</a> という mDNS 実装との連携で、libvirtd が動いているホストを自動で発見する Perl コードのサンプル、Func の virt モジュールは裏で libvirt を使ってる、といったような内容が含まれています。</p>
+
+<p>Xen Summit では、フリードリンクとしてドクターペッパーが用意されていました。しかも、スタッフの方が僕がドクターペッパー好きだということを知っていて用意してくださった、ということで、あまりの VIP 待遇に感激しました。<a href="http://daiskip.com/">daisikip さん</a> に言われたのですが、そのうちドクターペッパーの CM 出演依頼が来るんじゃないかと思います。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -448,144 +486,13 @@ warn Parent-&gt;x; # Child が表示されてしまう
 
 <h1>AUTHOR</h1>
 
-<p>Gosuke Miyashita, <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#x67;&#111;&#x73;&#x75;&#x6b;&#101;&#x6e;&#97;&#116;&#111;&#114;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;">&#103;&#x6f;&#x73;&#x75;&#107;&#101;&#110;&#x61;&#116;&#111;&#114;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#109;</a></p>
+<p>Gosuke Miyashita, <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#103;&#x6f;&#115;&#117;&#x6b;&#x65;&#110;&#97;&#x74;&#x6f;&#x72;&#x40;&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#109;">&#103;&#111;&#115;&#x75;&#x6b;&#x65;&#110;&#x61;&#x74;&#x6f;&#114;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#99;&#111;&#109;</a></p>
 
 <h1>COPYRIGHT AND LICENSE</h1>
 
 <p>Copyright (C) 2005 by Gosuke Miyashita</p>
 
 <p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.5 or, at your option, any later version of Perl 5 you may have available.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/03/04/oVirt00/">O Virt00</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-03-04T01:20:28+09:00" pubdate>Mar 4<span>th</span>, 2008</time>
-        
-         | <a href="/blog/2008/03/04/oVirt00/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Puppet Dojo で知り合った方から、<a href="http://virt-factory.et.redhat.com/">Virt-Factory</a> はもうアクティブじゃなくなって、今は<a href="http://ovirt.org/">oVirt</a> という新しいプロジェクトに移ってる、ということをお聞きして、Virt-Factory のサイトに行ってみたら本当にそう書いてある！Xen が動かせるマシンが調達できたら、本格的に Virt-Factory 検証しよう、と思ってしばらくアクセスしてなかったら、いつの間にやらこんなことに…</p>
-
-<p>つーわけで、Virt-Factory は捨てて oVirt の検証していくです。</p>
-
-<p><a href="http://ovirt.org/install-instructions.html">Installing Instructions</a> を見てみると、パッケージを配布してるわけじゃなく、QEMU/KVM の仮想マシンイメージとして配布されてる模様。まずはこのイメージを動かすところまでやってみる。</p>
-
-<p>検証環境は CentOS 5 x86_64 です。手順は上記サイトの「Installing the management appliance」の通りではあるのですが、説明があまり親切ではないし、その通りではうまくいかないところもあったので、試してみたい方は、以下の手順も合わせて参考にしてみてください。。</p>
-
-<p>まずは VM イメージを取得。場所はどこでもいいんですが、自分は ~/vm というディレクトリを作成して、その下に置いた。</p>
-
-<pre><code>$ mkdir ~/vm
-$ cd ~/vm
-$ wget http://ovirt.org/download/wui-appliance.dsk.bz2
-$ bzip2 -d wui-appliance.dsk.bz2
-</code></pre>
-
-<p>次に必要なパッケージのインストール。</p>
-
-<pre><code>$ sudo yum install libvirt qemu kvm
-</code></pre>
-
-<p>以下のような ~/vm/wui-appliance.xml を作成。</p>
-
-<pre><code>&lt;domain type="kvm"&gt;
-  &lt;name&gt;wui-appliance&lt;/name&gt;
-  &lt;memory&gt;768000&lt;/memory&gt;
-  &lt;currentMemory&gt;768000&lt;/currentMemory&gt;
-  &lt;vcpu&gt;1&lt;/vcpu&gt;
-  &lt;os&gt;
-    &lt;type&gt;hvm&lt;/type&gt;
-    &lt;boot dev="hd"/&gt;
-  &lt;/os&gt;
-  &lt;clock offset="utc"/&gt;
-  &lt;on_poweroff&gt;destroy&lt;/on_poweroff&gt;
-  &lt;on_reboot&gt;restart&lt;/on_reboot&gt;
-  &lt;on_crash&gt;destroy&lt;/on_crash&gt;
-  &lt;devices&gt;
-    &lt;emulator&gt;/usr/bin/qemu-kvm&lt;/emulator&gt;
-    &lt;disk type="file"&gt;
-      &lt;source file="/home/miya/vm/wui-appliance.dsk"/&gt;
-      &lt;target dev="hda"/&gt;
-    &lt;/disk&gt;
-    &lt;interface type="bridge"&gt;
-      &lt;mac address="00:16:3e:08:97:e7"/&gt;
-      &lt;source bridge="xenbr0"/&gt;
-    &lt;/interface&gt;
-    &lt;input type="mouse" bus="ps2"/&gt;
-    &lt;graphics type="vnc" port="-1" listen="0.0.0.0"/&gt;
-  &lt;/devices&gt;
-&lt;/domain&gt;
-</code></pre>
-
-<p>libvirtd を起動して、virsh で qemu に接続、create でさきほどの XML ファイルを指定して VM 作成。</p>
-
-<pre><code>$ sudo /sbin/chkconfig libvirtd on
-$ sudo /etc/init.d/libvirtd start
-$ sudo virsh --connect qemu:///system  
-virsh #  create wui-appliance.xml
-Domain wui-appliance created from wui-appliance.xml
-virsh # list
- Id Name                 State
-----------------------------------
-  1 wui-appliance        running
-</code></pre>
-
-<p>以上で VM 起動まで完了。で、VM に SSH とかでアクセスしたいんだけど、IP アドレスがわからない！（VM の IP アドレスを外から知る方法をご存知な方は教えてください。）というわけで、virt-manager からつないでみることにする。</p>
-
-<pre><code>$ sudo yum install virt-manager
-</code></pre>
-
-<p>virt-manager 入れたのはいいけど、CentOS は X 使えるようにしていないことに気づく。とりあえず手元の PC の cygwin に X が入ってたので、cygwin のシェルで</p>
-
-<pre><code>$ startxwin.sh
-$ xhost +
-</code></pre>
-
-<p>でもって CentOS 上で</p>
-
-<pre><code>$ export DISPLAY=192.168.10.19:0.0
-$ virt-manager
-</code></pre>
-
-<p>で virt-manager 起動。</p>
-
-<p>[[Image(01.jpg)]]</p>
-
-<p>無事に画面が出たので、QEMU を選択して接続。</p>
-
-<p>[[Image(02.jpg)]]</p>
-
-<p>VM が見えるので選択して、右下の「Open」をクリック。</p>
-
-<p>[[Image(03.jpg)]]</p>
-
-<p>無事アクセスできた。root のパスワードは ovirtwui 。</p>
-
-<p>ここまでやってから、XML で MAC アドレス指定してるんだから、DHCP サーバのログから IP アドレス調べればいいだけだった、ということに気づく。</p>
-
-<p>今日はここまで。</p>
 </div>
   
   
@@ -610,6 +517,10 @@ $ virt-manager
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -623,10 +534,6 @@ $ virt-manager
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

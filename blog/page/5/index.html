@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="[wiki:SystemTap00 SystemTap メモ #0] の続き。今回は SystemTap Beginners Guide の 3.2. SystemTap Scripts から抜粋。 スクリプトのフォーマット SystemTap スクリプトのフォーマットはこんな感じ。 probe &hellip;">
+  <meta name="description" content="Instagram for PC というものを daiskip さん と一緒につくって、あまりおおっぴらにもせず、かといって制限かけるわけでもなく、主にペパボの人たちに使ってもらってたんですが、他の人たちにも捕捉されて tweet されたりなんかしてるので、これについて書いときます。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/12/14/InstagramForPC/">Instagram For Pc</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-12-14T21:41:45+09:00" pubdate>Dec 14<span>th</span>, 2010</time>
+        
+         | <a href="/blog/2010/12/14/InstagramForPC/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://instagrampc.appspot.com/">Instagram for PC</a> というものを <a href="http://daiskip.com/">daiskip さん</a> と一緒につくって、あまりおおっぴらにもせず、かといって制限かけるわけでもなく、主にペパボの人たちに使ってもらってたんですが、他の人たちにも捕捉されて tweet されたりなんかしてるので、これについて書いときます。</p>
+
+<p>Instagram for PC は、もちろん言うまでもなく <a href="http://instagr.am/">Instagram</a> の PC 版で、遅い3G回線や小さい iPhone のディスプレイで見るよりも、速い回線やPCの大きな画面で見たいな、ってことでつくりはじめました。画面こんな感じです。</p>
+
+<p>[[Image(http://distillery.s3.amazonaws.com/media/2010/10/23/879c0bd9444e4e00a60469d99b777f13_6.jpg)]]</p>
+
+<p>Google App Engine 上で動かしてるんですが、tweet されたことでアクセスが増え、Over Quota になってアクセスできない状態になってたので、とりあえずはアクセスできるアカウントを制限した形で現在は公開しています。ごめんなさい。</p>
+
+<p>とは言うものの、好意的な反応をしてくださってる tweet が多く、できれば制限なしで公開したいと思ってます。ただ、なにぶん非公開な API を叩いてるため、本家の許可無く公開するのはよろしくないため、まずは本家とコンタクトをとって許可を得たいと思います。</p>
+
+<p>パスワードについて懸念されてる方がいますが、こちらで保存はしてないと言っても、信じない人は信じないでしょうし、気になる人は使わないでください、としかこちらとしては言いようがないですね。Instagram が oAuth なんかに対応してくれるといいんですけどね。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1043,102 +1086,6 @@ staprun:remove_module:205 Module simple removed.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/02/24/PuppetAtHbStudy8/">Puppet At Hb Study8</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2010-02-24T23:43:33+09:00" pubdate>Feb 24<span>th</span>, 2010</time>
-        
-         | <a href="/blog/2010/02/24/PuppetAtHbStudy8/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://heartbeats.jp/hbstudy/2010/02/hbstudy8.html">hbstudy#8</a> で、「Puppet のススメ」というタイトルでプレゼンさせていただきました。機会をくださった<a href="http://heartbeats.jp/">株式会社ハートビーツ</a>の藤崎さん、馬場さん、坂口さん、また、運営スタッフのみなさま、聞きに来て下さったみなさま、twitter やブログで感想述べてくださったみなさま、本当にありがとうございました。</p>
-
-<p>当日の資料は <a href="http://www.slideshare.net/mizzy/puppet-3258268">slideshare にアップしています</a>。</p>
-
-<p>内容は主に Puppet を知らない方、これから使ってみようかどうか検討している方をターゲットとして、</p>
-
-<ul>
-<li>Puppet とはどんなものか</li>
-<li>どんな風に動かすのか</li>
-<li>どういった使い方をすればいいのか</li>
-<li>使うために知っておいた方がいいこと</li>
-<li>使ってみて微妙だなと思うところ</li>
-</ul>
-
-
-<p>といったお話をさせて頂きました。Puppet を既に実運用でバリバリ使っている方には、特に目新しい話はなかったと思いますが、そういった方からは逆にこちらが知らないこと、見落としてること、間違ってることなんかの情報をもらえればいいなー、という思いでプレゼンさせていただきました。</p>
-
-<p>これだけではなんなので、プレゼンの補足事項とか、twitter のハッシュタグ #hbstudy やブログなんかで色々コメント頂いてますので、その辺まとめてみようと思います。</p>
-
-<p>まずは twitter からいくつかピっくアップしてみます。</p>
-
-<p>  matsuu puppetの気づきにくいメリットの１つは、puppetをいつでもやめられること。puppetをやめても既存の設定はpuppetに依存しないのでいつでもやめられる。これ大きいよね。 http://twitter.com/matsuu/statuses/9521601261</p>
-
-<p>これは確かにおっしゃる通りですね。Puppet でサーバ構築しても、できあがったものは特に Puppet に縛られるものではないので、いつ使うのやめても大丈夫です。そして、プレゼンでも触れましたが、単に動かしてみるだけなら、比較的さくっと試せます。使いはじめる、あるいは使うのをやめる敷居が低い、というのは良いツールの条件だと思いますので、これはとても大きいメリットですね。</p>
-
-<p>  yuzorock puppetの気付きにくいメリットの1つはsshではないこと。 http://twitter.com/yuzorock/statuses/9521698444</p>
-
-<p>おっしゃる通り、メリットでもあると思うのですが、<a href="http://d.hatena.ne.jp/tokuhirom/20100224/1266979391">sshd で代用できたらいいのに</a> という意見もあったりで、ここはなかなか難しい問題だなー、と思います。SSH ではないことは、メリットでもあるしデメリットでもありそうですね。メリットとしては、SSH 経由でマニフェストを適用するとなると、そのためのユーザ管理や鍵の管理、sudo まわりの設定、といったものが必要になるけど、そういった手間がかからない、といったところでしょうか。（他にもあれば教えて下さい。）逆にデメリットとしては、デーモンが常時上がってるとメモリ食うし、常にあがってる必要がないものがあがってる、という気持ち悪さ、といったあたりですかね。とくに、運用監視系のツールを色々入れていて、それぞれがデーモン持ってる、という状態はあまり好ましくないのではないかと思います。</p>
-
-<p>  xaicron manifest の学習コストはどうなんだろ http://twitter.com/xaicron/statuses/9521881525</p>
-
-<p>  yuzorock manifestの学習コストはたいしたこと無い。コマンド打つのとやることは同じだから。 http://twitter.com/yuzorock/statuses/9521927420</p>
-
-<p>ここは感じ方は人それぞれだと思うので、一般的に学習コストがどうなのかを言うのは難しいのですが、自分は yuzorock さんと同意見で、それほど学習コスト高くないと思っています。</p>
-
-<p>  matsuu #hbstudy puppetでcron設定管理してるとcrontabがどんどん汚れていくんだぜ&#8230;gentooだけかも http://twitter.com/matsuu/statuses/9522038117</p>
-
-<p>最近はマニフェストで cron リソース定義するよりも、file リソースで /etc/cron.d にファイル置く方がわかりやすいかな、と思ったりしてます。</p>
-
-<p>  matsuu あ、puppetのテンプレートの機能の話でてきた？ http://twitter.com/matsuu/statuses/9522545344</p>
-
-<p>すみません、忘れてました！話したいことが多すぎて…テンプレートについて詳しく知りたい方は、 http://gihyo.jp/admin/serial/01/puppet/0007 とか Software Design の記事なんかをご覧ください。</p>
-
-<p>  hirose31 なにげに PSP がリモコン http://twitter.com/hirose31/statuses/9522592495</p>
-
-<p><a href="http://coderepos.org/share/wiki/PSPSlidePanel">スライド操作パネル for PSP</a> つかってます！これは超便利です。スライドの進行状況と残り時間がわかりやすく視覚化されるので、話しながら時間調整ができます。（Puppet関係ないですね。）</p>
-
-<p>  mkouhei うーむ、良い点よりも不満の方が多いように聞こえる。 http://twitter.com/mkouhei/statuses/9522637899</p>
-
-<p>デメリットに触れているような文章はあまり見かけないので、敢えて不満点を色々上げてみましたが、こっちの方が目立っちゃいましたかね。自分としてはとても良いツールだと思っています。</p>
-
-<p>次はブログから拾ってみます。</p>
-
-<p><a href="http://d.hatena.ne.jp/tokuhirom/20100224/1266979391">tokuhirom さんのブログ</a>。tokuhirom さんの感想を見て思ったのは、Puppet を導入してメリットがあるかどうか、というのは、どういう状況に置かれてるのか、どういったことをツールで解決したいのか、に大きく依存するので、それ抜きでは語れないな、と。Puppet に限った話でもないし、当り前のことなのですが、再確認させていただきました。</p>
-
-<p>これと併せて <a href="http://www.sssg.org/blogs/naoya/archives/1717">n0ts さんのブログ</a> を読んでみると、やはり重要なのは、「いかに楽をするか」だよね、と。n0ts さんの意見にとても賛成です。でも、置かれてる状況や人によって、「どこで楽をするのか」は異なってきそうですね。tokuhirom さんの感想にある、</p>
-
-<p>  「シェルスクリプトで構築すればこれ簡単なのに!」みたいな場合に、いちいち puppet rule 書くのダルくね?</p>
-
-<p>も、構築を自動化する、というポイントに置いて楽をしたいのであれば、シェルスクリプトでやっちゃうのが楽だと思います。そこを少し視線を変えて、構築シェルスクリプトはずっとメンテし続ける必要があるし、かといって作成した人がずっとメンテできるわけではないし、ずっとメンテできるとしても、長年メンテしつづけて作成した人にとってもカオスになることもあり得る、という状況が考えられる場合には、Puppet も選択肢のひとつとして検討に値する、といったことになるのではないかと。これはまさに、tokuhirom さんの感想にある</p>
-
-<p>  自由度を制限して、属人性を排除するというアプローチはアリだとおもう。</p>
-
-<p>の通り、属人性を排除する、ということを考えると、Puppet は有力な選択肢になる、という例だと思います。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -1156,6 +1103,10 @@ staprun:remove_module:205 Module simple removed.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -1169,10 +1120,6 @@ staprun:remove_module:205 Module simple removed.
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

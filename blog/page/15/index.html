@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom/Util.pm NAME XML::Atom::Util - Utility functions SYNOPSIS use XML::Atom::Util qw( iso2dt ); my $dt = iso2dt($entry &hellip;">
+  <meta name="description" content="source:XML-Atom-0.22/lib/XML/Atom.pm NAME XML::Atom - Atom feed and API implementation SYNOPSIS use XML::Atom; DESCRIPTION Atom is a syndication, API &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,64 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom.pm/">Xml Atom 0.22/Lib/Xml/Atom.Pm</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-30T23:41:46+09:00" pubdate>Apr 30<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/04/30/XML-Atom-0.22-lib-XML-Atom.pm/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>source:XML-Atom-0.22/lib/XML/Atom.pm</p>
+
+<h1>NAME</h1>
+
+<p>XML::Atom - Atom feed and API implementation</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use XML::Atom;
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p>Atom is a syndication, API, and archiving format for weblogs and other data. <em>XML::Atom</em> implements the feed format as well as a client for the API.</p>
+
+<h1>LICENSE</h1>
+
+<p><em>XML::Atom</em> is free software; you may redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1>AUTHOR &amp; COPYRIGHT</h1>
+
+<p>Except where otherwise noted, <em>XML::Atom</em> is Copyright 2003-2005 Benjamin Trott, cpan@stupidfool.org. All rights reserved.</p>
+
+<h1>CO-MAINTAINER</h1>
+
+<p>Tatsuhiko Miyagawa <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#58;&#x6d;&#105;&#121;&#x61;&#103;&#x61;&#119;&#97;&#64;&#98;&#117;&#108;&#107;&#x6e;&#x65;&#x77;&#x73;&#46;&#110;&#x65;&#x74;">&#109;&#105;&#x79;&#x61;&#x67;&#x61;&#x77;&#97;&#64;&#x62;&#117;&#108;&#107;&#x6e;&#x65;&#x77;&#x73;&#x2e;&#x6e;&#x65;&#116;</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2036,126 +2094,6 @@ Data::ObjectDriver::Driver::Cache::Cache-&gt;new(
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/04/23/OpenVPN/">Open Vpn</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
-        
-         | <a href="/blog/2007/04/23/OpenVPN/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>ダウンロード</h1>
-
-<p>http://openvpn.net/ からダウンロード</p>
-
-<h1>インストール</h1>
-
-<pre><code>$ tar zxvf openvpn-2.0.9.tar.gz
-$ cd openvpn-2.0.9
-$ ./configure --with-ssl-headers=/usr/local/ssl/include --with-ssl-lib=/usr/local/ssl/lib
-$ make
-$ sudo make install
-</code></pre>
-
-<h1>サーバの設定/起動</h1>
-
-<h2>キーの生成</h2>
-
-<pre><code>$ sudo mkdir /etc/openvpn
-$ sudo /usr/local/sbin/openvpn --genkey --secret /etc/openvpn/server.key
-</code></pre>
-
-<h2>設定ファイル</h2>
-
-<p>/etc/openvpn/server.conf</p>
-
-<pre><code>proto tcp-server
-
-dev tap
-
-ifconfig 172.16.0.1 255.255.255.0
-route 192.168.25.0 255.255.255.0 172.16.0.2
-secret /etc/openvpn/server.key
-link-mtu 1200
-
-ping 10
-ping-restart 60
-ping-timer-rem
-persist-key
-persist-tun
-verb 3     
-</code></pre>
-
-<p>デフォルトのポート番号は 1194。</p>
-
-<h2>起動</h2>
-
-<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;
-</code></pre>
-
-<h1>クライアントの設定/起動</h1>
-
-<h2>キー</h2>
-
-<p>サーバで生成したものをコピー</p>
-
-<h2>設定ファイル</h2>
-
-<pre><code>remote mizzy.org
-proto tcp-client
-port 1194
-dev tap
-verb 3
-ping    3600
-secret /etc/openvpn/server.key
-ifconfig 172.16.0.2 255.255.255.0
-route 192.168.10.0 255.255.255.0 172.16.0.1 
-</code></pre>
-
-<h2>起動</h2>
-
-<p>サーバと一緒。</p>
-
-<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/client.conf &amp;
-</code></pre>
-
-<h1>その他</h1>
-
-<p>Linux のルーティング設定が必要。</p>
-
-<p>/etc/sysconfig/network</p>
-
-<pre><code>FORWARD_IPV4=yes
-</code></pre>
-
-<p>即反映するなら</p>
-
-<pre><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/16/">&larr; Older</a>
@@ -2173,6 +2111,10 @@ route 192.168.10.0 255.255.255.0 172.16.0.1
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -2186,10 +2128,6 @@ route 192.168.10.0 255.255.255.0 172.16.0.1
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

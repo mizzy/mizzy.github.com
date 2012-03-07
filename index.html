@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="I&#8217;ve wrote EXIF tag plugin for Jekyll. If you write text like this: {% img /images/2012/03/first_shot_orion.jpg %} {% exif /images/2012/03/ &hellip;">
+  <meta name="description" content="I&#8217;ve modified Image tag plugin into Image with EXIF tag plugin based on the idea of mattn-san&#8217;s comment.(Thanks, mattn-san!) If you write &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,50 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image With Exif Tag Plugin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2012-03-07T23:38:00+09:00" pubdate>Mar 7<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/03/07/image-with-exif-tag-plugin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve modified <a href="https://github.com/imathis/octopress/blob/master/plugins/image_tag.rb">Image tag plugin</a> into <a href="https://github.com/mizzy/jekyll-plugins/blob/master/image_with_exif_tag.rb">Image with EXIF tag plugin</a> based on <a href="/blog/2012/03/07/exif-tag-plugin/#disqus_thread">the idea of mattn-san&#8217;s comment</a>.(Thanks, mattn-san!)</p>
+
+<p>If you write text like this:</p>
+
+<pre><code>{% img_with_exif /images/2012/03/first_shot_orion.jpg %}
+</code></pre>
+
+<p>You will see the converted result like this:</p>
+
+<p><img src="/images/2012/03/first_shot_orion.jpg" alt="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900" title="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900"></p>
+
+<p>The title and alt attribute have EXIF data of thie image file.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/03/07/exif-tag-plugin/">Exif Tag Plugin</a></h1>
     
     
@@ -109,9 +153,9 @@
 
 <p>You will see the converted result like this:</p>
 
-<p><img src="/images/2012/03/first_shot_orion.jpg"></p>
+<p><img src="/images/2012/03/first_shot_orion.jpg" alt="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900" title="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900"></p>
 
-<p>焦点距離 10 mm F5.6 NIKON D5000 ISO 1600 15 秒露光</p>
+<p>焦点距離 10 mm F5.6 NIKON D5000 ISO 1600 15 秒露光 2010-11-05 01:32:07 +0900</p>
 </div>
   
   
@@ -168,7 +212,7 @@
 <pre><code>{{ "nikondirect:10000349" | rakuten_link }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70</a></p>
+<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70【2sp_120307_b】</a></p>
 </div>
   
   
@@ -392,7 +436,7 @@
 
   <div class="entry-content"><p>I&#8217;ve hacked Octopress quickly for displaying <a href="http://coderwall.com/">coderwall</a> badges on the sidebar.</p>
 
-<p><img src="/images/2012/01/sidebar.png"></p>
+<p>{% img /images/2012/01/sidebar.png %}</p>
 
 <p>This is the <a href="https://github.com/mizzy/octopress/commit/d564e8d468c29e9ef51858a40ab2f414b94540e7">changeset</a> for this hack.</p>
 </div>
@@ -646,9 +690,9 @@
 
 <p>webiblo で生成したデータを Kindle Previewer で見ると、こういった感じになります。</p>
 
-<p><img src="/images/2012/01/sicp_cover.png" width="250" title="SICP Cover" >
-<img src="/images/2012/01/sicp_toc.png" width="250" title="SICP TOC" >
-<img src="/images/2012/01/sicp_content.png" width="250" title="SICP Content" ></p>
+<p>{% img /images/2012/01/sicp_cover.png 250 SICP Cover %}
+{% img /images/2012/01/sicp_toc.png 250 SICP TOC %}
+{% img /images/2012/01/sicp_content.png 250 SICP Content %}</p>
 
 <p>元々は、単に Getting Real 英語版のデータを mobipocket 形式に変換したかっただけなんですが、Facebook での otsune さんのアドバイスにより、こういった形で、書籍固有のデータを分離する形でつくってみました。</p>
 
@@ -728,7 +772,7 @@
 
 <p>This is the image of showing the converted file on Kindle Previewer.</p>
 
-<p><img src="/images/2012/01/getting_real.png" title="Getting Real on Kindle" ></p>
+<p>{% img /images/2012/01/getting_real.png Getting Real on Kindle %}</p>
 </div>
   
   
@@ -767,52 +811,9 @@
 
 <p>This is the image of pushing notification to iPhone by this script.</p>
 
-<p><img src="/images/2012/01/im_kayac_com_notify.png" width="320" title="Notification on iPhone" ></p>
+<p>{% img /images/2012/01/im_kayac_com_notify.png 320 Notification on iPhone %}</p>
 
 <p>This script is hosted on <a href="https://github.com/mizzy/weechat-plugins/blob/master/im_kayac_com_notify.py">GitHub</a>.Pull requests are welcome.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/20/lunar-eclipse/">Lunar Eclipse</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-12-20T01:32:00+09:00" pubdate>Dec 20<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/12/20/lunar-eclipse/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>These are pictures of a lunar eclipse on Dec. 10, 2011.</p>
-
-<p><img src="/images/2011/12/red-moon.jpg" title="Red Moon" ></p>
-
-<p>Three red stars.(Moon, Betelgeuse and Aldebaran)</p>
-
-<p><img src="/images/2011/12/three-red-stars.jpg" title="Three Red Stars" ></p>
-
-<p>This is the composite picture from the penumbral eclipse to the beginning of the total eclipse.</p>
-
-<p><img src="/images/2011/12/composite-of-lunar-eclipse.jpg" title="Composite" ></p>
 </div>
   
   
@@ -835,6 +836,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -848,10 +853,6 @@
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

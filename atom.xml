@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-03-07T00:38:21+09:00</updated>
+  <updated>2012-03-07T23:50:30+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,26 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Image with EXIF tag plugin]]></title>
+    <link href="http://mizzy.org/blog/2012/03/07/image-with-exif-tag-plugin/"/>
+    <updated>2012-03-07T23:38:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/03/07/image-with-exif-tag-plugin</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve modified <a href="https://github.com/imathis/octopress/blob/master/plugins/image_tag.rb">Image tag plugin</a> into <a href="https://github.com/mizzy/jekyll-plugins/blob/master/image_with_exif_tag.rb">Image with EXIF tag plugin</a> based on <a href="http://mizzy.org/blog/2012/03/07/exif-tag-plugin/#disqus_thread">the idea of mattn-san&#8217;s comment</a>.(Thanks, mattn-san!)</p>
+
+<p>If you write text like this:</p>
+
+<pre><code>{% img_with_exif /images/2012/03/first_shot_orion.jpg %}
+</code></pre>
+
+<p>You will see the converted result like this:</p>
+
+<p><img src="http://mizzy.org/images/2012/03/first_shot_orion.jpg" alt="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900" title="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900"></p>
+
+<p>The title and alt attribute have EXIF data of thie image file.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[EXIF tag plugin]]></title>
@@ -29,9 +49,9 @@
 
 <p>You will see the converted result like this:</p>
 
-<p><img src="http://mizzy.org/images/2012/03/first_shot_orion.jpg"></p>
+<p><img src="http://mizzy.org/images/2012/03/first_shot_orion.jpg" alt="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900" title="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900"></p>
 
-<p>焦点距離 10 mm F5.6 NIKON D5000 ISO 1600 15 秒露光</p>
+<p>焦点距離 10 mm F5.6 NIKON D5000 ISO 1600 15 秒露光 2010-11-05 01:32:07 +0900</p>
 ]]></content>
   </entry>
   
@@ -64,7 +84,7 @@
 <pre><code>{{ "nikondirect:10000349" | rakuten_link }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70</a></p>
+<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70【2sp_120307_b】</a></p>
 ]]></content>
   </entry>
   
@@ -216,7 +236,7 @@
     <id>http://mizzy.org/blog/2012/01/13/coderwall-badges-on-the-sidebar</id>
     <content type="html"><![CDATA[<p>I&#8217;ve hacked Octopress quickly for displaying <a href="http://coderwall.com/">coderwall</a> badges on the sidebar.</p>
 
-<p><img src="http://mizzy.org/images/2012/01/sidebar.png"></p>
+<p>{% img /images/2012/01/sidebar.png %}</p>
 
 <p>This is the <a href="https://github.com/mizzy/octopress/commit/d564e8d468c29e9ef51858a40ab2f414b94540e7">changeset</a> for this hack.</p>
 ]]></content>
@@ -422,9 +442,9 @@
 
 <p>webiblo で生成したデータを Kindle Previewer で見ると、こういった感じになります。</p>
 
-<p><img src="http://mizzy.org/images/2012/01/sicp_cover.png" width="250" title="SICP Cover" >
-<img src="http://mizzy.org/images/2012/01/sicp_toc.png" width="250" title="SICP TOC" >
-<img src="http://mizzy.org/images/2012/01/sicp_content.png" width="250" title="SICP Content" ></p>
+<p>{% img /images/2012/01/sicp_cover.png 250 SICP Cover %}
+{% img /images/2012/01/sicp_toc.png 250 SICP TOC %}
+{% img /images/2012/01/sicp_content.png 250 SICP Content %}</p>
 
 <p>元々は、単に Getting Real 英語版のデータを mobipocket 形式に変換したかっただけなんですが、Facebook での otsune さんのアドバイスにより、こういった形で、書籍固有のデータを分離する形でつくってみました。</p>
 
@@ -480,7 +500,7 @@
 
 <p>This is the image of showing the converted file on Kindle Previewer.</p>
 
-<p><img src="http://mizzy.org/images/2012/01/getting_real.png" title="Getting Real on Kindle" ></p>
+<p>{% img /images/2012/01/getting_real.png Getting Real on Kindle %}</p>
 ]]></content>
   </entry>
   
@@ -495,7 +515,7 @@
 
 <p>This is the image of pushing notification to iPhone by this script.</p>
 
-<p><img src="http://mizzy.org/images/2012/01/im_kayac_com_notify.png" width="320" title="Notification on iPhone" ></p>
+<p>{% img /images/2012/01/im_kayac_com_notify.png 320 Notification on iPhone %}</p>
 
 <p>This script is hosted on <a href="https://github.com/mizzy/weechat-plugins/blob/master/im_kayac_com_notify.py">GitHub</a>.Pull requests are welcome.</p>
 ]]></content>
@@ -508,7 +528,7 @@
     <id>http://mizzy.org/blog/2011/12/20/lunar-eclipse</id>
     <content type="html"><![CDATA[<p>These are pictures of a lunar eclipse on Dec. 10, 2011.</p>
 
-<p><img src="http://mizzy.org/images/2011/12/red-moon.jpg" title="Red Moon" ></p>
+<p><img src="http://mizzy.org/images/2011/12/red-moon.jpg" title="Focal Length 200.0 mm F6.3 NIKON D5000 ISO 800 Exposure Time 1 second 2011-12-10 23:23:47 +0900" alt="Focal Length 200.0 mm F6.3 NIKON D5000 ISO 800 Exposure Time 1 second 2011-12-10 23:23:47 +0900"></p>
 
 <p>Three red stars.(Moon, Betelgeuse and Aldebaran)</p>
 
@@ -516,7 +536,7 @@
 
 <p>This is the composite picture from the penumbral eclipse to the beginning of the total eclipse.</p>
 
-<p><img src="http://mizzy.org/images/2011/12/composite-of-lunar-eclipse.jpg" title="Composite" ></p>
+<p><img src="http://mizzy.org/images/2011/12/composite-of-lunar-eclipse.jpg" title="Focal Length 20.0 mm F5.6 NIKON D5000 ISO 800 Exposure Time 9 second 2011-12-10 22:52:18 +0900" alt="Focal Length 20.0 mm F5.6 NIKON D5000 ISO 800 Exposure Time 9 second 2011-12-10 22:52:18 +0900"></p>
 ]]></content>
   </entry>
   
@@ -1179,40 +1199,6 @@ end
 <hr />
 
 <p>mailto: gosukenator at gmail.com</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[SSLCertOfLolipop]]></title>
-    <link href="http://mizzy.org/blog/2011/09/03/SSLCertOfLolipop/"/>
-    <updated>2011-09-03T01:41:19+09:00</updated>
-    <id>http://mizzy.org/blog/2011/09/03/SSLCertOfLolipop</id>
-    <content type="html"><![CDATA[<p><a href="http://blog2.or6.jp/ftpisdead">FFFTP開発終了で大騒ぎしている人たちへ</a> にて、</p>
-
-<pre><code>SSL証明書がまともなものでないと接続時にエラーが出るのですが、ロリポップなんかだと
-このエラーを無視するように公式ドキュメントに書いてあるので、かなり悪質です。
-</code></pre>
-
-<p>と書かれていますので、これについて説明させて頂きます。</p>
-
-<p>この方が指摘されているのは、<del><a href="http://lolipop.jp/manual/hp/w-fz/">Win FileZillaの設定 / ホームページ / マニュアル - ロリポップ！</a> </del>(FileZilla非推奨のため現在は削除されています)の中の、</p>
-
-<pre><code> 証明書の確認を行います。『今後もこの証明書を常に信用する(A)』にチェックを入れて、『OK』をクリックします。
-</code></pre>
-
-<p>という部分だと思われるのですが、確かに、無条件で信用するにチェックを入れるようお客様に指示するのは大変良くないですね。</p>
-
-<p>ロリポップでは <a href="http://www.digicert.ne.jp/">DigiCert Inc社</a> によって発行されている証明書を利用しているのですが、Filezillaでは警告が出てしまうようです。</p>
-
-<p>調べてみたところ、FilezillaはルートCAの証明書を保持しておらず、どのような証明書であっても、ユーザが「信用する」にチェックを入れなければ警告が出る仕様となっているようです。</p>
-
-<p><a href="http://forum.filezilla-project.org/viewtopic.php?f=2&amp;t=20767">how to install root CA certificate on Filezilla</a></p>
-
-<p>OR6 blog 様のご指摘により、このような証明書の検証をきちんと行っていないソフトウェアをお客様に推奨すべきではないと判断いたしましたので、Windows/Mac版ともに存在し、証明書の検証をきちんと行っている <a href="http://cyberduck.ch/">Cyberduck</a> を推奨するよう、マニュアルを変更させて頂くことになりました。</p>
-
-<p>また、蛇足ですが、ロリポップの <a href="http://lolipop.jp/service/plan-chicappa/">チカッパプラン</a> では SSH サービスを提供していますので、FTPS の代わりに SCP/SFTP もご利用頂けます。</p>
-
-<p>OR6 blog 様、この度はご指摘誠にありがとうございました。</p>
 ]]></content>
   </entry>
   

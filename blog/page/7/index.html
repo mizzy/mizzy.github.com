@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="検証用に VM をつくったり消したり、ってことをよくやるんですが、毎回毎回同じような設定をするのがいやなので、うちでは Cobbler + Puppet でこんな風にやってるよ、という例を紹介します。最近 KVM に移行しましたが、ブリッジの設定以外は、Xen でもほぼそのまま適用できると思います &hellip;">
+  <meta name="description" content="クックパッドさん主催のtechlife ライトにングトーク で発表した資料をひとまず slideshare にアップしました。動画が後日クックパッドさんから公開されると思います。気になる方は#tllt をチェックしてください。 「Puppet Best Pracices?」と題して、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,43 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/12/04/TecLifeLTPuppet/">Tec Life Lt Puppet</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-12-04T07:43:35+09:00" pubdate>Dec 4<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009/12/04/TecLifeLTPuppet/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>クックパッドさん主催の<a href="http://techlife.cookpad.com/2009/10/24/techlife_introduction/">techlife ライトにングトーク</a> で発表した資料をひとまず <a href="http://www.slideshare.net/mizzy/puppet-best-practices-at-cookpad">slideshare にアップしました</a>。動画が後日クックパッドさんから公開されると思います。気になる方は<a href="http://twitter.com/#search?q=%23tllt">#tllt</a> をチェックしてください。</p>
+
+<p>「Puppet Best Pracices?」と題して、実際に実践していることからいくつかピックアップして話してみました。? がついてる通り、ベストかどうかはわからないのですが、自分で実践しているネタを出すことで、より良い意見をもらえて、ベストに少しでも近づけていけるかな、と思い、こういったお題で話してみました。</p>
+
+<p>とはいうものの、話す時間の関係でボリューム不足ではあるので、スライド内容を更に肉付けする形で、最近更新をさぼっている<a href="http://trac.mizzy.org/puppet">パペウィキ</a> の方に書いていこうかな、と思ってます。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -932,59 +969,6 @@ trait Product extends java.lang.Cloneable {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/08/13/YapcAsia2009/">Yapc Asia2009</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-08-13T01:18:44+09:00" pubdate>Aug 13<span>th</span>, 2009</time>
-        
-         | <a href="/blog/2009/08/13/YapcAsia2009/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>このところ、ほとんどエントリ更新してませんが、それは、<a href="http://japan.cnet.com/extra/paperboy_0907/story/0,3800098768,20394957,00.htm">ナウでヤングなレンタルサーバー ロリポップ！のインフラ再構築</a> で多忙だったからです。（それだけではないですが。）</p>
-
-<p>というわけで、ブログエントリをほとんど書いてないので細切れにもなりようがないのですが、ロリポ含めて、ペパボが提供するサービスの中で、Perl がどのように使われているのかという話を <a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a> と一緒に YAPC::Asia 2009 でさせていただくことにしました。</p>
-
-<p>また、それとは別に、以前からの関心事であった、Perlbal で非同期処理するプラグインを書く方法についても、ベースとなる Danga::Socket の説明も含めて、お話したいと思います。</p>
-
-<p>YAPC::Asia 2009 は9月10日(木)と11日(金)の2日間、東京工業大学大岡山キャンパスで開催されます。すでにチケット販売も始まったので、興味のある方はお越しいただければ、と思います。</p>
-
-<ul>
-<li><a href="http://conferences.yapcasia.org/ya2009/">YAPC::Asia 2009</a></li>
-<li><a href="http://conferences.yapcasia.org/ya2009/talk/2166">ペパボでの Perl のつかいかた</a></li>
-<li><a href="http://conferences.yapcasia.org/ya2009/talk/2220">Perlbalで非同期処理するプラグインを書く方法</a></li>
-</ul>
-
-
-<p>【参考文献】</p>
-
-<ul>
-<li>http://d.hatena.ne.jp/hirose31/20090807/1249611130</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -1002,6 +986,10 @@ trait Product extends java.lang.Cloneable {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -1015,10 +1003,6 @@ trait Product extends java.lang.Cloneable {
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Assurer の最近の状況など。 franck が開発に参加 Plagger コミッタでもある franck がジョインしてくれ、プラグインやパッチなどを送ってくれたり、新しいアイデアを提案/実装してくれたりしてます。この週末も素敵な機能を実装してくれるみたいです。 Notify &hellip;">
+  <meta name="description" content="タイトルは MASHUP++ です。その名の通り、マッシュアップを主題とした本なのですが、主に自分でマッシュアップな開発をしてみたい、という方向けの本で、自分は「マッシュアップとプラガブルなフレームワーク」をテーマに、Plagger プラグインの開発方法について書きました。 内容としては、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,72 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/03/14/299/">Plagger について本に書きました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-03-14T22:51:00+09:00" pubdate>Mar 14<span>th</span>, 2007</time>
+        
+         | <a href="/blog/2007/03/14/299/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+タイトルは <a class="ext-link" href="http://www.9-ten.co.jp/bookdata/1654.php"><span class="icon"></span>MASHUP++</a> です。その名の通り、マッシュアップを主題とした本なのですが、主に自分でマッシュアップな開発をしてみたい、という方向けの本で、自分は「マッシュアップとプラガブルなフレームワーク」をテーマに、Plagger プラグインの開発方法について書きました。
+</p>
+
+
+<p>
+内容としては、プラグイン開発の基礎知識として、
+</p>
+
+
+<ul><li>内部データ形式である Plagger::Feed と Plagger::Entry</li>
+<li>フィードデータがどの様に入力、加工、出力されるのか</li>
+<li>プラグインの用途と種類にはどんなものがあるのか</li>
+<li>各プラグインの関係や実行フェーズ、実行順序</li></ul>
+
+
+<p>
+といったことを解説しています。また、後半は
+</p>
+
+
+<ul><li>各フェーズの実際のプラグインソースコードを引用しながらの解説</li>
+<li>プラグインの雛形生成、ドキュメント、テストの書き方といったプラグイン開発の流れ</li></ul>
+
+
+<p>
+といった感じになっています。プラグインを開発してみたいけど、どこから手をつけていいのかわからない、という方に是非ご覧頂きたいです。
+</p>
+
+
+<p>
+他にも <a class="ext-link" href="http://vgzh.dtdns.net/"><span class="icon"></span>さうなまん</a> さん、<a class="ext-link" href="http://www.koui.net/"><span class="icon"></span>鹿倉公維</a> さん、<a class="ext-link" href="http://graffiti-web.org/"><span class="icon"></span>セトウナオ</a> さん、<a class="ext-link" href="http://pickles.tv/"><span class="icon"></span>タナカミノル</a> さんといった <a class="ext-link" href="http://www.amazon.co.jp/dp/4872835905"><span class="icon"></span>.fla</a> の執筆陣による Flash を主体としたマッシュアップ（タナカさんは今回は Flash ではないですが）や、<a class="ext-link" href="http://www.catwalk.co.jp/"><span class="icon"></span>CATWALK</a> の三宅涼さん、澤久裕昭さんによる、これぞ正当なマッシュアップ、といった感じの PHP と JavaScript によるマッシュアップ、そして、タナカミノルさんと<a class="ext-link" href="http://www.tsumuji.net"><span class="icon"></span>原央樹</a> さんによる、<a class="ext-link" href="http://gainer.cc/"><span class="icon"></span>Gainer</a>というハードウェアを使ったマッシュアップなど、バリエーション豊かなマッシュアップがソースコードつきで解説されています。必読。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1059,61 +1125,6 @@ shell>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/18/470/">Assurer のプロジェクトサイト立ち上げました</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-01-18T01:19:00+09:00" pubdate>Jan 18<span>th</span>, 2007</time>
-        
-         | <a href="/blog/2007/01/18/470/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-irc#assurer@freenode での会話が盛り上がったので、勢いで <a class="ext-link" href="http://assurer.jp/trac"><span class="icon"></span>ドメインを取得して、独立した trac と svn repos を立ち上げてみました</a>。（最低限の体裁だけ。しかも <a class="ext-link" href="http://plagger.org/"><span class="icon"></span>plagger.org</a> からコピペ。）
-</p>
-
-
-<p>
-<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/"><span class="icon"></span>id:tokuhirom</a> さんからの contribute で、テストプラグインも増えてます。また、<a class="ext-link" href="http://blog.yappo.jp/"><span class="icon"></span>信頼のおける Yappo</a> さんから、Publish::File プラグインを提供してもらいました。感謝感謝。
-</p>
-
-
-<p>
-IRC での会話の流れで、テストだけではなく監視もカバーする、という方向性で行くことになりました。会話の断片はこちらで参照できます。
-</p>
-
-
-<ul><li><a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20070117/1169018818"><span class="icon"></span>http://d.hatena.ne.jp/tokuhirom/20070117/1169018818</a></li>
-<li><a class="ext-link" href="http://subtech.g.hatena.ne.jp/yappo/20070117/1169031325"><span class="icon"></span>http://subtech.g.hatena.ne.jp/yappo/20070117/1169031325</a></li></ul>
-
-
-<p>
-なんか略称がヒドイことになってます…（その略称に OK を出したのは自分ですが…）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/19/">&larr; Older</a>
@@ -1131,6 +1142,10 @@ IRC での会話の流れで、テストだけではなく監視もカバーす�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -1144,10 +1159,6 @@ IRC での会話の流れで、テストだけではなく監視もカバーす�
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

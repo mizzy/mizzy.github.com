@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="待ってました〜！Filter::FFmpeg！ Windows環境でもバッチリ動きました。 &lt;&#8230; 中略 &#8230;&gt; エンコード後にダイレクトにiTunesに登録するようにするには、Publish系のプラグインで実装する形になるのかなぁ？ from: SHIMIBOW &hellip;">
+  <meta name="description" content="FFmpeg-Command-0.01 を CPAN にアップしました。 エラーハンドリングのために、system() での実行をやめて、IPC::Run::start() を利用するようにしました。
+ただ、これによる弊害がひとつあって、ffmpeg コマンド実行時に表示される、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,93 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/07/31/400/">F Fmpeg/Command   A Wrapper Class For Ffmpeg Command Line Utility #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-07-31T13:51:00+09:00" pubdate>Jul 31<span>st</span>, 2006</time>
+        
+         | <a href="/blog/2006/07/31/400/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://search.cpan.org/~mizzy/FFmpeg-Command-0.01/"><span class="icon"></span>FFmpeg-Command-0.01</a> を CPAN にアップしました。
+</p>
+
+
+<p>
+エラーハンドリングのために、system() での実行をやめて、IPC::Run::start() を利用するようにしました。
+ただ、これによる弊害がひとつあって、ffmpeg コマンド実行時に表示される、以下の様な実行状態が見えなくなるんですよね。
+</p>
+
+
+<pre class="wiki">
+Seems that stream 0 comes from film source: 1000.00 (1000/1) -> 10.00 (10/1)
+Input #0, flv, from 'mizzy.flv':
+  Duration: 00:00:07.9, bitrate: N/A
+  Stream #0.0: Video: flv, yuv420p, 320x240, 10.00 fps(r)
+Output #0, mp4, to 'mizzy.mp4':
+  Stream #0.0: Video: h264, yuv420p, 320x240, q=2-31, 600 kb/s, 10.00 fps(c)
+Stream mapping:
+  Stream #0.0 -> #0.0
+[h264 @ 0x40424010]using cpu capabilities MMX
+Press [q] to stop encoding
+frame=   35 q=24.0 size=     263kB time=3.5 bitrate= 616.7kbits/s
+</pre>
+
+
+<p>
+というのも、この内容は標準エラー出力に対して出力されているのですが、FFmpeg::Command ではエラーの内容を捕捉するために、
+</p>
+
+
+<pre class="wiki">
+start [ command, options ], \$in, \$out, \$err;
+</pre>
+
+
+<p>
+といった感じで IPC::Run::start() を実行して、標準エラー出力への出力を $err に格納しています。そのせいで標準エラー出力への出力内容が、画面に表示されなくなってしまっています。
+</p>
+
+
+<p>
+これが標準エラー出力ではなく、標準出力に対して出力されていれば、
+</p>
+
+
+<pre class="wiki">
+start [ command, options ], \$in, undef, \$err;
+</pre>
+
+
+<p>
+と実行してやることにより、エラーを捕捉しつつ実行状態を画面に表示、ってことができるんですけどね…なんで標準出力ではなく標準エラー出力なんだろう…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1105,68 +1193,6 @@ sub default : Private {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/07/18/366/">『ふつうの Haskell』を読む前に</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-07-18T22:01:00+09:00" pubdate>Jul 18<span>th</span>, 2006</time>
-        
-         | <a href="/blog/2006/07/18/366/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-『<a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/4274065979/httshemizorg-22/ref=nosim"><span class="icon"></span>ハッカーと画家</a>』を読んだ時に、関数型言語を何かひとつ、かじる程度でいいから学びたいなぁ、と思っていたのですが、当時はどこから学んで良いのかもよく分からない状態でした。
-</p>
-
-
-<p>
-そのまますっかりそのことは忘れていたのですが、最近の Haskell ブームのあおりでふと思い出したので、『<a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/4797336021/httshemizorg-22/ref=nosim"><span class="icon"></span>ふつうの Haskell</a>』 を Amazon に発注して、それが今日届きました。何か乗り遅れた感がありますが気にしない。
-</p>
-
-
-<p>
-で、以前に、関数型言語とセットでよく出てくる「ラムダ」って何？と思って調べていて参考になった資料を以下に挙げておきます。
-</p>
-
-
-<ul><li><a class="ext-link" href="http://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%A0%E3%83%80%E8%A8%88%E7%AE%97"><span class="icon"></span>ラムダ計算 - Wikipedia</a></li>
-<li><a class="ext-link" href="http://members.at.infoseek.co.jp/nbz/ref/lambda.html"><span class="icon"></span>ラムダ計算ＡＢＣ</a></li>
-<li><a class="ext-link" href="http://www.kurims.kyoto-u.ac.jp/~cs/csnyumon/appendix_A.pdf"><span class="icon"></span>ラムダ計算：プログラミング言語の数学モデル (pdf)</a></li>
-<li><a class="ext-link" href="http://www.kb.ecei.tohoku.ac.jp/~sumii/class/keisanki-software-kougaku-2005/lambda.pdf"><span class="icon"></span>ラムダ計算入門 (pdf)</a></li></ul>
-
-
-<p>
-ラムダ計算は関数型言語の理論的基盤なので、Haskell の理解に役立つのではないかと。『ふつうの Haskell』の最初の方でも、「関数適用」や「変数の束縛」などといった用語が出てきますが、これらはラムダ計算の用語ですし。
-</p>
-
-
-<p>
-ただし、知っていれば Haskell の理解に役立つかもしれないけど、知らないと理解できないというものでもないので、数学苦手な方は読まない方がいいと思います。この本の著者の方も、数学知らなくても Haskell 学ぶことはできる、っておっしゃってますし。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/25/">&larr; Older</a>
@@ -1184,6 +1210,10 @@ sub default : Private {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -1197,10 +1227,6 @@ sub default : Private {
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

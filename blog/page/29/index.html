@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Plagger Plugin の CustomFeed::iTunesRecentPlay をアップデート。 前回廃止した reload_period ですが、ライブラリが大きいとメモリ食いまくるからあった方がいいかも、と宮川さんから助言があったため、復活しました。ただし、Rule::Fresh &hellip;">
+  <meta name="description" content="PLAYLOG が関係なくなったので、タイトル変更。Publish::MTWidget と組み合わせて、MT + Sidebar Manager の環境で、サイドバーに iTunes で最近聴いた曲を表示できるように、エントリの title に曲名とアーティスト名をセットするようにしてみました。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,65 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/10/420/">Plagger/Plugin/Custom Feed/I Tunes Recent Play #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-03-10T10:42:00+09:00" pubdate>Mar 10<span>th</span>, 2006</time>
+        
+         | <a href="/blog/2006/03/10/420/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+PLAYLOG が関係なくなったので、タイトル変更。Publish::MTWidget と組み合わせて、MT + <a href="http://www.majordojo.com/projects/SidebarManager/" target="_blank">Sidebar Manager</a> の環境で、サイドバーに iTunes で最近聴いた曲を表示できるように、エントリの title に曲名とアーティスト名をセットするようにしてみました。こんな感じで表示されます。
+</p>
+
+
+
+
+<p class="entryBody">
+<img src="http://mizzy.org/img/irp.jpg" />
+</p>
+
+
+
+
+<p class="entryBody">
+ですがまだ課題が色々あるので、コミットしてません。ここに TODO をまとめておきます。
+</p>
+
+
+
+
+<ul class="entryBody">
+<li>「曲名 - アーティスト名」というフォーマット決めうちなので、config.yaml で自由にカスタマイズできるようにしたい。MTWidget だけでなく、他の Publish 系プラグインと組み合わせるには、どの要素に何を入れるかカスタマイズできる必要があるので、ここは必須かな。</li>
+<li>link 要素に Amazon へのリンクを入れたい。Filter でやるのがスマートかなぁ。</li>
+<li>表示する件数を固定できるようにしたい。今は duration でしか制御ができない。</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -642,42 +701,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/02/23/311/">広報ブログで顔出し</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-02-23T22:38:00+09:00" pubdate>Feb 23<span>rd</span>, 2006</time>
-        
-         | <a href="/blog/2006/02/23/311/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://paperboy.jugem.jp/?eid=75" target="_blank">会社の広報ブログ</a>に顔写真が載ってます。どんなツラしてるのか興味がある方はどうぞ。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/30/">&larr; Older</a>
@@ -695,6 +718,10 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -708,10 +735,6 @@ Ben と会話することができました！ちょうど今日は Catalyst::Pl
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>

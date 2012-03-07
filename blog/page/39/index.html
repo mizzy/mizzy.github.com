@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ttプラグインを修正。 前回のエントリで「複雑なデータ構造のものをFOREACHでまわしたりするのは、正常に動作しないと思う」と書いていたのですが、複雑どころが単純なFOREACHでも動作しないというまぬけな状態だったので、修正しました。とりあえず、 &hellip;">
+  <meta name="description" content="
+taggingプラグインを修正しました。タグでエントリを絞り込む部分のアルゴリズムを見直し。大量にエントリがある場合にはパフォーマンスが良くなるはず。 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,42 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/05/03/283/">Blosxomでtagging #7</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-05-03T13:54:00+09:00" pubdate>May 3<span>rd</span>, 2005</time>
+        
+         | <a href="/blog/2005/05/03/283/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="/archives/tagging" target="_blank">taggingプラグイン</a>を修正しました。タグでエントリを絞り込む部分のアルゴリズムを見直し。大量にエントリがある場合にはパフォーマンスが良くなるはず。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1114,77 +1151,6 @@ extensionはここのサイトに行ってインストールします。
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/04/21/422/">ウェブサイトのスタイルというものについて考えてみる　#0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2005-04-21T11:15:00+09:00" pubdate>Apr 21<span>st</span>, 2005</time>
-        
-         | <a href="/blog/2005/04/21/422/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="/index.xhtml" target="_blank">旧サイト</a>から今のブログ形式に移行した理由のひとつは、ウェブサイトはどうあるべきか、という問いに対して、サイトスタイルを変えてみることにより、何か見えてくるものがあるんじゃないか、という実験的なものだったりします。
-</p>
-
-
-
-
-<p class="entryBody">
-旧サイトの様に、トップページがあり、また各テーマ毎のページがあり、トップにメニューを置いて各テーマに対してリンクする（または更にサブメニューがある）、というスタイルは俺がウェブサイトを作り始めた95年あたりでもごく普通のものだったし、今でも変わらずそうなんじゃないかと思う。
-</p>
-
-
-
-
-<p class="entryBody">
-これはこれでサイトのスタイルとしては一般的だし、一般的だからこそ分かりやすい、必要な情報にたどりつきやすいものだと思って、内容やデザインは違えど、今までずっとこのスタイルで通してきたわけですが、果たして本当に、このスタイルが一番いいものなのだろうか？と疑問を抱いたのが、ブログへの移行のきっかけのひとつだったりします。
-</p>
-
-
-
-
-<p class="entryBody">
-移行するのは別にブログでなくても、他のスタイルでもよかったのですが、画期的なスタイルをつくれるほどの創造性が俺にあるわけでもないので、とりあえずブログ形式を選択してみた、という感じです。要するに何でもいいからスタイルを変えてみて、そこから何かが見えるのか、あるいは見えないのか、とりあえずやってみようぜ、と。
-</p>
-
-
-
-
-<p class="entryBody">
-で、この２週間ほど、blosxomを導入して、既成のプラグインをつっこんでみたり改造してみたり、自分でプラグインをつくってみたり、ちょっとajax的なものを入れてみたり、という感じで自分なりのブログスタイルみたいなものをつくってきたわけですが、今までのスタイルと比較しての、ブログスタイルのメリット、デメリットみたいなものがちょっと見えてきた気がするので、まずはそれについて整理をしてみたいな、と。
-</p>
-
-
-
-
-<p class="entryBody">
-続く。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/40/">&larr; Older</a>
@@ -1202,6 +1168,10 @@ extensionはここのサイトに行ってインストールします。
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/exif-tag-plugin/">EXIF tag plugin</a>
       </li>
     
@@ -1215,10 +1185,6 @@ extensionはここのサイトに行ってインストールします。
     
       <li class="post">
         <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/13/coderwall-badges-on-the-sidebar/">coderwall badges on the sidebar</a>
       </li>
     
   </ul>
