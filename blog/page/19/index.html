@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="irc#assurer@freenode での会話が盛り上がったので、勢いで ドメインを取得して、独立した trac と svn repos を立ち上げてみました。（最低限の体裁だけ。しかも plagger.org からコピペ。） id:tokuhirom さんからの contribute で、 &hellip;">
+  <meta name="description" content="id:tokuhirom さん作のデプロイツール Archer を最近使い始めたのですが、これがすげーいいっす。 で、この週末は更に便利に使えるように、Archer 用のプラグイン書いたりしてました。 Archer::Plugin::SVN::Log
+Archer::Plugin::SVN:: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,162 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/12/392/">デプロイツール Archer #0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-02-12T03:35:00+09:00" pubdate>Feb 12<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/"><span class="icon"></span>id:tokuhirom</a> さん作のデプロイツール <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> を最近使い始めたのですが、これがすげーいいっす。
+</p>
+
+
+<p>
+で、この週末は更に便利に使えるように、Archer 用のプラグイン書いたりしてました。
+</p>
+
+
+<ul><li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Log.pm"><span class="icon"></span>Archer::Plugin::SVN::Log</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Diff.pm"><span class="icon"></span>Archer::Plugin::SVN::Diff</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Update.pm"><span class="icon"></span>Archer::Plugin::SVN::Update</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Rsync.pm"><span class="icon"></span>Archer::Plugin::Rsync</a></li>
+<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Shell.pm"><span class="icon"></span>Archer::Plugin::Shell</a></li></ul>
+
+
+<pre class="wiki">
+global:
+  work_dir: /home/miya/work
+  dest_dir: /home/miya/assurer
+
+tasks:
+  init:
+    - module: SVN::Diff
+
+    - module: Confirm
+      config:
+        msg: really update? [y/n]
+
+    - module: SVN::Update
+
+    - module: Confirm
+      config:
+        msg: really deploy? [y/n]
+
+  process:
+    - module: Rsync
+
+projects:
+  Assurer:
+    app:
+      - mizzy.org
+</pre>
+
+
+<p>
+こんな感じの設定をして、
+</p>
+
+
+<pre class="wiki">
+$ archer.pl Assurer -c assurer.yaml
+</pre>
+
+
+<p>
+とか実行すると、
+</p>
+
+
+<p>
+<ul>
+<li>/home/miya/work/Assurer にある svn co したファイルと、SVN HEAD の diff を表示。</li>
+<li>svn up するかどうか、プロンプト表示。</li>
+<li>svn up 実行。</li>
+<li>実際にデプロイするか、プロンプトを表示。</li>
+<li>ローカルの /home/miya/work/Assurer から リモートサーバ上の /home/miya/assurer へ rsync でファイルコピー。</li>
+</ul>
+</p>
+
+
+<p>
+といった動作になります。
+</p>
+
+
+<p>
+<a class="ext-link" href="http://code.mfac.jp/trac/file/Archer/examples/config.yaml"><span class="icon"></span>Archer 同梱の config.yaml</a> では、svn log, svn up, rsync は Exec::Local プラグインで実行しているのですが、この辺りの記述をできるだけ簡略化したいな、ということで、こういったプラグインをつくってみました。
+</p>
+
+
+<p>
+また、ライブドアテクノロジーセミナーの <a class="ext-link" href="http://d.hatena.ne.jp/naoya/20061214/1166063145"><span class="icon"></span>naoya さんのプレゼン</a> で、Capistrano にはシェルプロンプトを表示して、指定したコマンドを複数のリモートサーバ上で一発で実行できる、という機能があって、これがうらやましかったので、Archer プラグインとして実装してみました。
+</p>
+
+
+<pre class="wiki">
+tasks:
+  init:
+    - module: Shell
+      config:
+        role: app
+        para: 1
+
+projects:
+  mizzy.org:
+    app:
+      - www.mizzy.org
+      - svn.mizzy.org
+      - ftp.mizzy.org
+</pre>
+
+
+<p>
+といった設定をしやると、以下の様な感じで実行できます。（3つのサーバは実体が同じなので、結果が同じですが。）
+</p>
+
+
+<pre class="wiki">
+$ ./archer.pl -c shell.yaml mizzy.org
+[info] run hook init
+[debug] load Archer::Plugin::Shell
+[info] run Archer::Plugin::Shell
+shell> uptime
+[www.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[svn.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+[ftp.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+shell> 
+</pre>
+
+
+<p>
+<a class="ext-link" href="http://code.mfac.jp/svn/Archer/"><span class="icon"></span>Archer はこちらから</a>入手できます。また、俺が書いたプラグインなんかは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Archer/"><span class="icon"></span>ここに置いてあります</a>。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -897,211 +1054,6 @@ my $entry = $ldap->search({
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/12/31/306/">/Etc/Sudoers を Ldap で管理する</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-12-31T01:12:00+09:00" pubdate>Dec 31<span>st</span>, 2006</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-/etc/sudoers を LDAP で一元管理とかできないのかなぁ、と思っていたら、<a class="ext-link" href="http://www.gratisoft.us/sudo/readme_ldap.html"><span class="icon"></span>ちゃんと対応してた</a>。
-</p>
-
-
-<p>
-利用方法はわりと簡単で、上記リンクの README.LDAP （ソースに同じものが同梱されてる）を見ればすぐわかるけど、一応ここにやったことをメモ。ほとんど README からの抜粋です。
-</p>
-
-
-<p>
-手元の Slackware に元から入っている sudo は LDAP 対応していないので、<a class="ext-link" href="http://www.gratisoft.us/sudo/download.html"><span class="icon"></span>ここからダウンロード</a> して以下の手順でインストール。
-</p>
-
-
-<pre class="wiki">
-$ ./configure --with-ldap
-$ make
-$ sudo make install
-</pre>
-
-
-<p>
-でもって /etc/ldap.conf に以下の記述を追加。（元々 LDAP は利用していて、基本的な設定はできているので、追加は一行だけ。）
-</p>
-
-
-<pre class="wiki">
-sudoers_base   ou=SUDOers,o=southpark
-</pre>
-
-
-<p>
-LDAP 側の設定はまずスキーマの追加。
-</p>
-
-
-<pre class="wiki">
-  #
-  #  schema file for sudo
-  #
-
-  attributetype ( 1.3.6.1.4.1.15953.9.1.1
-        NAME 'sudoUser'
-        DESC 'User(s) who may  run sudo'
-        EQUALITY caseExactIA5Match
-        SUBSTR caseExactIA5SubstringsMatch
-        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
-
-  attributetype ( 1.3.6.1.4.1.15953.9.1.2
-        NAME 'sudoHost'
-        DESC 'Host(s) who may run sudo'
-        EQUALITY caseExactIA5Match
-        SUBSTR caseExactIA5SubstringsMatch
-        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
-
-  attributetype ( 1.3.6.1.4.1.15953.9.1.3
-        NAME 'sudoCommand'
-        DESC 'Command(s) to be executed by sudo'
-        EQUALITY caseExactIA5Match
-        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
-
-  attributetype ( 1.3.6.1.4.1.15953.9.1.4
-        NAME 'sudoRunAs'
-        DESC 'User(s) impersonated by sudo'
-        EQUALITY caseExactIA5Match
-        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
-
-  attributetype ( 1.3.6.1.4.1.15953.9.1.5
-        NAME 'sudoOption'
-        DESC 'Options(s) followed by sudo'
-        EQUALITY caseExactIA5Match
-        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
-
-  objectclass ( 1.3.6.1.4.1.15953.9.2.1 NAME 'sudoRole' SUP top STRUCTURAL
-        DESC 'Sudoer Entries'
-        MUST ( cn )
-        MAY ( sudoUser $ sudoHost $ sudoCommand $ sudoRunAs $ sudoOption $
-              description )
-        )
-</pre>
-
-
-<p>
-次に sudoers 用のコンテナ ou=SUDOers, o=southpark と、デフォルト設定用の cn=defaults, ou=SUDOers, o=southpark を LDAP エントリに追加。
-</p>
-
-
-<pre class="wiki">
-dn: ou=SUDOers,o=southpark
-objectclass: organizationalunit
-ou: SUDOers
-
-dn: cn=defaults,ou=SUDOers,o=southpark
-objectclass: top
-objectclass: sudorole
-cn: defaults
-sudoOption: ignore_local_sudoers
-</pre>
-
-
-<p>
-sudoOption: ignore_local_sudoers があると、/etc/sudoers ファイルを見なくなる。
-</p>
-
-
-<p>
-最後に sudo 用 role エントリを追加して準備 OK。
-</p>
-
-
-<pre class="wiki">
-dn: cn=role1,ou=SUDOers,o=southpark
-changetype: add
-objectclass: top
-objectclass: sudorole
-cn: role1
-sudouser: miya
-sudohost: ALL
-sudocommand: ALL
-</pre>
-
-
-<p>
-sudouser, sudohost, sudocommand は複数設定可。! で否定になる。なので、特定のユーザだけ許可しない、という場合には、
-</p>
-
-
-<pre class="wiki">
-sudouser: ALL
-sudouser: !miya
-</pre>
-
-
-<p>
-なんて書き方もできる。同様に特定のホストだけ許可しない、という場合には、
-</p>
-
-
-<pre class="wiki">
-sudohost: ALL
-sudohost: !kenny
-</pre>
-
-
-<p>
-とかできるし、特定のコマンドだけ許可しない、という場合には、
-</p>
-
-
-<pre class="wiki">
-sudocommand: ALL
-sudocommand: !/sbin/reboot
-</pre>
-
-
-<p>
-とかできる。もちろんこれらの組み合わせも OK。
-</p>
-
-
-<p>
-あと、ユーザではなくグループで指定したい場合には
-</p>
-
-
-<pre class="wiki">
-sudouser: %group
-</pre>
-
-
-<p>
-とする。（これは README.LDAP には明記されてない。/etc/sudoers の書き方から類推すればわかるけど。）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/20/">&larr; Older</a>
@@ -1119,6 +1071,10 @@ sudouser: %group
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -1132,10 +1088,6 @@ sudouser: %group
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

@@ -9,10 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="typester さんが NEXT やめやめ。
-なんもうれしいことない。
-plagger の hook 機構をぱくろう。そうしよう。
-from: CLON - 2006/05/04 - Plugin とおっしゃっていたので、plagger の hook 機構を catlxom &hellip;">
+  <meta name="description" content="前回のエントリの続き。実際に plagger の hook 機構をパクってみた。 これに合わせて、Entry::Blosxom と Template::TT も修正してますが、他のプラグインはまだ対応させてないので、動かないです。また、plugin 機構以外の、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +72,262 @@ from: CLON - 2006/05/04 - Plugin とおっしゃっていたので、plagger の
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/06/11/274/">Catlxom の プラグイン機構を Plagger ライクに #0 (Catlxom メモ #5)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-06-11T21:55:00+09:00" pubdate>Jun 11<span>th</span>, 2006</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+<a href="http://mizzy.org/program/catlxom_memo_04.html" target="_blank">前回のエントリ</a>の続き。実際に plagger の hook 機構をパクってみた。
+</p>
+
+
+
+
+<p class="entryBody">
+これに合わせて、Entry::Blosxom と Template::TT も修正してますが、他のプラグインはまだ対応させてないので、動かないです。また、plugin 機構以外の、今までのエントリで挙げた修正もこの中に含まれてます。
+</p>
+
+
+
+
+<p class="entryBody">
+あと、filter 部分はまだ着手してないです。ここだけ他の hook と扱いが違うので、どうすればキレイに実装できるかなぁ、と思案中。
+</p>
+
+
+
+
+<pre class="code">
+Index: plugins/Entry/Blosxom.pm
+===================================================================
+--- plugins/Entry/Blosxom.pm    (revision 23)
++++ plugins/Entry/Blosxom.pm    (working copy)
+@@ -9,6 +9,15 @@
+ 
+ __PACKAGE__-&gt;classdata-&gt;{entries} = [];
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'setup'  =&gt; 'setup',
++        'update' =&gt; 'update',
++    );
++}
++
+ sub setup {
+     my ( $self, $c ) = @_;
+ 
+@@ -44,20 +53,15 @@
+                     )
+                 }
+             );
+-
+             push @{ $self-&gt;classdata-&gt;{entries} }, $entry;
+         }
+     );
+ 
+-    $self-&gt;entries-&gt;add( __PACKAGE__ );
+-
+-    $self-&gt;NEXT::setup($c);
++    $c-&gt;catlxom-&gt;entries-&gt;add( __PACKAGE__ );
+ }
+ 
+ sub update {
+     my ( $self, $c ) = @_;
+-
+-    $self-&gt;NEXT::update($c);
+ }
+ 
+ 1;
+Index: plugins/Template/TT.pm
+===================================================================
+--- plugins/Template/TT.pm  (revision 23)
++++ plugins/Template/TT.pm  (working copy)
+@@ -10,15 +10,24 @@
+ 
+ our $VERSION = '0.01';
+ 
++my $template_dir = Catlxom::Util::load_dir('template');
++my $path_root    = join '/', $template_dir-&gt;dir_list;
++
+ __PACKAGE__-&gt;classdata-&gt;{templates} = {};
+-__PACKAGE__-&gt;classdata-&gt;{tt}        = Template-&gt;new;
++__PACKAGE__-&gt;classdata-&gt;{tt}        = Template-&gt;new( INCLUDE_PATH =&gt; $path_root );
+ 
++sub register {
++    my ($class, $c) = @_;
++    $c-&gt;catlxom-&gt;register_hook(
++        $class,
++        'setup'       =&gt; 'setup',
++        'interpolate' =&gt; 'interpolate',
++    );
++}
++
+ sub setup {
+     my ( $self, $c ) = @_;
+ 
+-    my $template_dir = Catlxom::Util::load_dir('template');
+-    my $path_root    = join '/', $template_dir-&gt;dir_list;
+-
+     $template_dir-&gt;recurse(
+         callback =&gt; sub {
+             my $file = shift;
+@@ -48,8 +57,6 @@
+             };
+         }
+     );
+-
+-    $self-&gt;NEXT::setup($c);
+ }
+ 
+ sub interpolate {
+@@ -78,16 +85,14 @@
+             \$template-&gt;{template},
+             {
+                 name =&gt; $c-&gt;config-&gt;{name},
+-                %{ $self-&gt;stashall },
+-                entries =&gt; $self-&gt;entries-&gt;filtered,
++                %{ $c-&gt;catlxom-&gt;stashall },
++                entries =&gt; $c-&gt;catlxom-&gt;entries-&gt;filtered,
+ 
+                 c =&gt; $c,
+             },
+             \$c-&gt;res-&gt;{body},
+-        );
++        ) or $c-&gt;error( $self-&gt;classdata-&gt;{tt}-&gt;error );
+     }
+-
+-    $self-&gt;NEXT::interpolate($c);
+ }
+ 
+ 1;
+Index: lib/Catlxom/Context/Base.pm
+===================================================================
+--- lib/Catlxom/Context/Base.pm (revision 23)
++++ lib/Catlxom/Context/Base.pm (working copy)
+@@ -14,14 +14,8 @@
+ 
+ sub setup {
+     my ($self, $c) = @_;
+-
+     $self-&gt;plugin-&gt;load($c);
+-    {
+-        # plugin setup
+-        no warnings 'redefine';
+-        local *setup = sub { };
+-        $self-&gt;setup($c);
+-    }
++    $self-&gt;run_hook($c, 'setup');
+ }
+ 
+ sub initialize {
+@@ -30,34 +24,48 @@
+     $self-&gt;_stash( {} );
+ }
+ 
+-sub start       { }
+-sub update      { }
+-sub sort        { }
+-sub paginate    { }
+-sub fixedup     { }
+-sub interpolate { }
+-sub end         { }
++sub register_hook {
++    my ($self, $plugin, @hooks) = @_;
++    while (my($hook, $callback) = splice @hooks, 0, 2) {
++        push @{ $self-&gt;{hooks}-&gt;{$hook} }, {
++            callback  =&gt; $callback,
++            plugin    =&gt; $plugin,
++        };
++    }
++}
+ 
++sub run_hook {
++    my($self, $c, $hook) = @_;
++    for my $action (@{ $self-&gt;{hooks}-&gt;{$hook} }) {
++        my $plugin   = $action-&gt;{plugin};
++        my $callback = $action-&gt;{callback};
++        no strict 'refs';
++        $plugin-&gt;$callback($c);
++    }
++}
++
+ sub dispatch {
+     my ( $self, $c ) = @_;
+ 
+-    $self-&gt;initialize($c);
++    $self-&gt;run_hook($c, 'initialize');
+ 
+-    $self-&gt;start($c);
+-    $self-&gt;update($c);
++    $self-&gt;run_hook($c, 'start');
++    $self-&gt;run_hook($c, 'update');
+ 
+     $self-&gt;entries-&gt;filter($c);
+-    $self-&gt;sort($c);
+-    $self-&gt;paginate($c);
++    $self-&gt;run_hook($c, 'filter');
++    $self-&gt;run_hook($c, 'sort');
++    $self-&gt;run_hook($c, 'paginate');
+ 
+-    $self-&gt;fixedup($c);
+-    $self-&gt;interpolate($c);
+-    $self-&gt;end($c);
++    $self-&gt;run_hook($c, 'fixedup');
++    $self-&gt;run_hook($c, 'interpolate');
++    $self-&gt;run_hook($c, 'end');
+ }
+ 
+ sub stash {
+     my $self   = shift;
+-    my $caller = caller(0);
++    ( my $caller = lc caller(0) ) =~ s/Catlxom::Plugin:://i;
++    $caller =~ s/::/_/g;
+ 
+     if (@_) {
+         my $stash = @_ &gt; 1 ? {@_} : $_[0];
+Index: lib/Catlxom/Plugins.pm
+===================================================================
+--- lib/Catlxom/Plugins.pm  (revision 23)
++++ lib/Catlxom/Plugins.pm  (working copy)
+@@ -51,7 +51,7 @@
+         ( my $plugin = 'Catlxom::Plugin::' . join( '::', @path ) . $file-&gt;basename )
+             =~ s/\.pm$//;
+ 
+-        unshift @Catlxom::Context::ISA, $plugin;
++        $plugin-&gt;register($c);
+     }
+ 
+     if ( $c-&gt;debug ) {
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1066,64 +1319,6 @@ Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/publ
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/05/22/318/">Plagger/Plugin/Custom Feed/I Tms #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-05-22T21:38:00+09:00" pubdate>May 22<span>nd</span>, 2006</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p class="entryBody">
-<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTMS.pm" target="_blank">CustomFeed::iTMS</a> は内部で <a href="http://search.cpan.org/~billh/LWP-UserAgent-iTMS_Client/" target="_blank">LWP::UserAgent::iTMS_Client</a> を利用しているのですが、コンストラクタで国名を指定してもちゃんとハンドリングしてくれないので、パッチ書いた。ついでにモジュール作者にパッチ送っておいた。
-</p>
-
-
-
-
-<pre class="code">
---- iTMS_Client.pm.org  2006-05-22 16:06:46.000000000 +0900
-+++ iTMS_Client.pm      2006-05-22 16:11:27.000000000 +0900
-@@ -466,7 +466,7 @@
-         'X-Apple-Tz'          => msec_since_epoch(),
-         'X-Apple-Validation'  => $self->compute_validator( $url, $agent_name ),
-         'Accept-Encoding'     => "gzip, x-aes-cbc",
--        'X-Apple-Store-Front' => $self->store_front,
-+        'X-Apple-Store-Front' => $self->store_front($self->{protocol}->{country}),
-     );
-     $hdr->header( 'X-Token' => $self->{protocol}->{password_token} )
-       if $self->{protocol}->{password_token};       
-</pre>
-
-
-
-
-<p class="entryBody">
-<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTMS.pm" target="_blank">CustomFeed::iTMS</a> も修正して、国を指定できるようにし、pod も追加しました。これで日本の iTMS からも検索できます。query も UTF-8 であれば日本語も大丈夫。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/27/">&larr; Older</a>
@@ -1141,6 +1336,10 @@ Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/publ
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -1154,10 +1353,6 @@ Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/publ
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

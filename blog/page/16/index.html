@@ -9,9 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="ダウンロード http://openvpn.net/ からダウンロード インストール $ tar zxvf openvpn-2.0.9.tar.gz
-$ cd openvpn-2.0.9
-$ ./configure --with-ssl-headers=/usr/local/ssl/include &hellip;">
+  <meta name="description" content="[[PageOutline(2, 目次, inline)]] Mark Json Dominus - Higher-order parsing techniques プレゼン資料 Higher-Order Perl という本で有名な人。通称 mjd.
+日本の Perl ギークは「マジデ」と呼ぶ。（ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +73,549 @@ $ ./configure --with-ssl-headers=/usr/local/ssl/include &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/04/23/YapcAsia2007/">Yapc Asia2007</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-04-23T02:05:31+09:00" pubdate>Apr 23<span>rd</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>[[PageOutline(2, 目次, inline)]]</p>
+
+<h1>Mark Json Dominus - Higher-order parsing techniques</h1>
+
+<p><a href="http://perl.plover.com/yak/parsing/">プレゼン資料</a></p>
+
+<p>Higher-Order Perl という本で有名な人。通称 mjd.
+日本の Perl ギークは「マジデ」と呼ぶ。（こともある。）</p>
+
+<p>プレゼンの内容は Higher-Order Perl にも書かれてるみたい。</p>
+
+<p>高階関数やクロージャを使うと、構文解析プログラムがこんなにすっきり書けるよ！というお話。</p>
+
+<p>このプレゼン自体では、高階関数やクロージャの説明がなかった。ので簡単に説明すると、クロージャとは、Perl で書くとこんな感じ。（言葉の定義は <a href="http://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AD%E3%83%BC%E3%82%B8%E3%83%A3">Wikipedia</a> とか参照。たぶん、言葉の定義だけ見てもよくわからないと思う。）</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use wanings;
+
+sub calc {
+    my $op = shift;
+    return sub {
+        my ( $a, $b ) = @_;
+        return eval "$a $op $b";
+    };
+    # このリターンされている無名サブルーチンがクロージャ。
+    # サブルーチンの外で定義されている $op を内部で参照している
+    # ことに注目。この様に外部で定義された変数を内部に閉じ込める
+    # ので「クロージャ（Closure, 閉包）」と呼ばれる。
+}
+
+my $plus = calc('+');
+print $plus-&gt;(3, 2); # 結果は 5
+
+my $minus = calc('-');
+print $minus-&gt;(3, 2); # 結果は 1
+</code></pre>
+
+<p>こんな感じで、加算する関数と減算する関数を、ひとつの関数定義から生成できる、という感じで、クロージャを使うと似たような関数の生成が楽になる。（クロージャの用法はこれ以外にもあるけど。）</p>
+
+<p>また高階関数とは、「関数を引数にとる関数」のこと。例えばこんな感じ。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+sub calc {
+    my $op = shift;
+    return sub {
+        my ( $a, $b ) = @_;
+        return eval "$a $op $b";
+    };
+}
+
+my $plus  = calc('+');
+my $minus = calc('-');
+
+# ここまではクロージャの例と一緒
+
+# 複数の関数の結果を掛け合わせる関数
+# これが高階関数
+# 引数だけでなく、結果も関数となっている（クロージャ）
+sub multiply {
+    my @funcs = @_;
+    return sub {
+        my ( $a, $b ) = @_;
+        my $result = 1;
+        for ( @funcs ) {
+            $result *= $_-&gt;($a, $b);
+        }
+        return $result;
+    };
+}
+
+# 加算関数と減算関数を掛け合わせる関数を multiply で生成し、
+# 引数に 5 と 3 を与える
+multiply($plus, $minus)-&gt;(5, 3); # ( 5 + 3 ) * ( 5 - 3 ) が実行され結果は 16
+</code></pre>
+
+<p>高階関数とかクロージャとか知らない人は、これだけでお腹いっぱいになる気がする。</p>
+
+<p>クロージャとか高階関数って、どんなものかは知っていても、使うことがあまりなかったり、どう使うのかがよく分からなかったりするが、このプレゼンでの構文解析プログラムがその回答のひとつ。</p>
+
+<p>あとは細かい Perl コードの話になるので省略。クロージャ使って似たようなパーサコードの生成を簡略化し、連続した関数の実行を if + &amp;&amp; でやっているところを、高階関数をつかうことによってまとめてすっきりさせる、というのがだいたいの流れ。</p>
+
+<p>あと、「バックトラッキングも重要だけど、詳しくは本を読んで」とのこと。</p>
+
+<p>Ingy からの「Wiki パーサにも応用できるか」との質問に「できる」と回答してた。自分も Trac の Wiki 記法パーサモジュールを CPAN にあげてるので、参考になりそう。特に、リストのパースは自分で書いた処理がいけてなくて、時々動きがおかしかったりするのだけど、<a href="http://perl.plover.com/classes/parsing/samples/slide032.html">これを参考にすれば</a> いい感じで書けそうだ。というわけで、Higher-Order Perl 買う。</p>
+
+<h1>Naoya Ito - Perl and UNIX Network Programming</h1>
+
+<p><a href="http://bloghackers.net/~naoya/ppt/070404Perl_and_UNIX_Network_Programming.ppt">プレゼン資料(PPT)</a></p>
+
+<p>Perl の「今風な」ネットワークプログラミングに関するお話。</p>
+
+<h2>Perl による UNIX ネットワークプログラミングの基礎</h2>
+
+<ul>
+<li>BSD Socket API with C (not perl)</li>
+<li>Socket モジュール (C API に近い)</li>
+<li>IO::Socket モジュール (オブジェクト指向で書きやすい)</li>
+</ul>
+
+
+<h2>ブロッキング</h2>
+
+<ul>
+<li>sysread でブロックが発生</li>
+<li>busy loop と blocking は別 (busy loop は CPU 時間を消費、blocking は消費しない)</li>
+<li>ブロックされているプロセスは TASK_UNITERRUPTIBLE になり、デバイスからの割り込み待ちとなる</li>
+</ul>
+
+
+<h2>並列処理</h2>
+
+<ul>
+<li>プロセスフォーク</li>
+<li>スレッド</li>
+<li>シグナル I/O</li>
+<li>I/O 多重化</li>
+<li>非同期 I/O</li>
+</ul>
+
+
+<h2>I/O 多重化</h2>
+
+<ul>
+<li>ファイルディスクリプタの I/O イベントを監視</li>
+<li>fork/threads よりもリソース消費量が少ない</li>
+<li>select(2)/poll(2) を利用</li>
+</ul>
+
+
+<h2>select</h2>
+
+<ul>
+<li>perl だと select() か IO::Select を利用</li>
+<li>FD_SETSIZE の制限がある</li>
+<li>非効率 (FDs のカーネルへのコピー、全ての FDs をスキャン)</li>
+</ul>
+
+
+<h2>select(2)/poll(2) よりもモダンな API</h2>
+
+<ul>
+<li>epoll (Linux 2.6)</li>
+<li>/dev/kqueue (BSD)</li>
+<li>devpoll (Solaris)</li>
+</ul>
+
+
+<h2>epoll(4)</h2>
+
+<ul>
+<li>FDs の制限なし</li>
+<li>O(1) スケーラビリティ
+
+<ul>
+<li>FDs のコピーの必要なし</li>
+<li>イベントの発生した FDs のみリターンされる</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>epoll on perl</h2>
+
+<ul>
+<li>Sys::Syscall</li>
+<li>IO::Epoll</li>
+</ul>
+
+
+<h2>今風の Perl ネットワークプログラミングライブラリ</h2>
+
+<ul>
+<li>POE</li>
+<li>Event::Lib</li>
+<li>Danga::Socket</li>
+<li>Event</li>
+<li>Stem</li>
+<li>Coro</li>
+<li><p>&#8230;</p></li>
+<li><p>イベントベースで並列化</p></li>
+<li>システムコールの抽象化
+
+<ul>
+<li>select(2) / poll(2) / epoll / kqueue(2) / devpoll</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>POE</h2>
+
+<ul>
+<li>イベントドリブンな並列処理用フレームワーク</li>
+<li><p>プログラミングを容易にしてくれるコンポーネントがたくさん</p>
+
+<ul>
+<li>PoCo::IRC</li>
+<li>PoCo::Client::HTTP</li>
+<li>PoCo::Server::HTTP</li>
+<li>PoCo::EasyDBI</li>
+<li>PoCo::Cron</li>
+<li>PoCo::Client::MSN</li>
+<li>PoCo::Client::Lingr</li>
+<li>&#8230;</li>
+</ul>
+</li>
+<li><p>POE::Loop::Epoll</p></li>
+</ul>
+
+
+<h2>Event::Lib</h2>
+
+<ul>
+<li>libevent のラッパー</li>
+<li>libevent は
+
+<ul>
+<li>イベントベースプログラミング</li>
+<li>システムコールの抽象化</li>
+</ul>
+</li>
+<li>Event.pm に似てる</li>
+<li>シンプル</li>
+</ul>
+
+
+<h2>Danga::Socket</h2>
+
+<ul>
+<li>Brad Fitzpatrick (イケメン) 作</li>
+<li>イベントドリブンプログラミングと epoll の抽象化</li>
+<li>Perlbal とか MogileFS とかで使われてる</li>
+</ul>
+
+
+<h2>まとめ</h2>
+
+<ul>
+<li>ネットワークプログラミングには、OS、特にプロセススケジューリング, I/O, TCP/IP の実装に関する知識が必要</li>
+<li>コードをシンプルに保つために、モダンなライブラリを使おう</li>
+<li>perl にはいいライブラリがたくさんあるよ</li>
+</ul>
+
+
+<h1>Ben Trott - How we build Vox</h1>
+
+<p><a href="http://www.slideshare.net/miyagawa/how-we-build-vox/">発表資料</a></p>
+
+<h2>APIs: Tools</h2>
+
+<ul>
+<li>カスタムライブラリを使う
+
+<ul>
+<li>Net::Amazon や Net::Flickr はつかわない</li>
+<li>XML パーサがたくさんあって、それぞれ利用するパーサが異なる</li>
+<li>XML::LibXML のみを使う</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>APIs: Open Media Profile</h2>
+
+<ul>
+<li>Open Search のメディアデータ版？</li>
+</ul>
+
+
+<h2>APIs: Outboud</h2>
+
+<ul>
+<li>Atom Publishing Protocol</li>
+<li>すべての情報を Atom/RSS で</li>
+<li>Cool URIs
+
+<ul>
+<li>/library/posts/atom.xml</li>
+<li>/library/posts/2007/03/atom.xml</li>
+<li>/library/posts/2007/03/tags/yapc/atom.xml</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Ajax</h2>
+
+<ul>
+<li>JSON でシリアライズ
+
+<ul>
+<li>軽量</li>
+<li>よく使われている</li>
+</ul>
+</li>
+<li>Catalyst + JSON-RPC</li>
+<li>すべてが API</li>
+<li>独自コア JS ライブラリ</li>
+</ul>
+
+
+<h2>Data::ObjectDriver</h2>
+
+<ul>
+<li>MT や TypePad で使われている OR マッパー</li>
+</ul>
+
+
+<h2>Data::ObjectDriver: Caching</h2>
+
+<ul>
+<li><p>memcached のビルトインサポート</p>
+
+<p>  #!perl
+  Data::ObjectDriver::Driver::Cache::Memcached->new(</p>
+
+<pre><code>  cache    =&gt; Cache::Memcached-&gt;new({ servers =&gt; [ ... ] }),
+  fallback =&gt; Data::ObjectDriver::Driver::DBI-&gt;new(
+      dsn =&gt; 'dbi:SQLite:dbname=global.db',
+  ),
+</code></pre>
+
+<p>  );</p></li>
+</ul>
+
+
+<h2>Data::ObjectDriver: Partitioning</h2>
+
+<pre><code>#!perl
+Data::ObjectDriver::Driver::Cache::Cache-&gt;new(
+    cache =&gt; Cache::Memcached-&gt;new({ servers =&gt; [ ... ] }),
+    fallback =&gt; Data::ObjectDriver::Driver::SimplePartiotion-&gt;new(
+        using =&gt; 'Recipe',
+    ),
+);
+</code></pre>
+
+<h2>JobQueueing</h2>
+
+<ul>
+<li>重い処理を Apache から切り離して実行</li>
+<li>TheSchwartz
+
+<ul>
+<li>非同期、信頼性の高いジョブキュー</li>
+<li>N データベース</li>
+<li>ジョブハンドリングのためのワーカープール</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Template Toolkit</h2>
+
+<ul>
+<li>重い</li>
+<li>キャッシュを有効活用</li>
+<li>バージョン化されたキャッシュ</li>
+</ul>
+
+
+<h2>Perlbal</h2>
+
+<ul>
+<li>Perl 製負荷分散リバースプロキシ</li>
+<li>CSS, 画像, JavaScript など、スタティックファイルの配信もできる</li>
+<li>複数の JS や CSS をひとまとめにして配信できる</li>
+<li>Last-Modified や If-Modified-Since もちゃんとハンドリングできる</li>
+</ul>
+
+
+<p>http://code.sixapart.com/</p>
+
+<h1>Tomohiro Ikebe - Inside livedoor 2006 - 2007</h1>
+
+<ul>
+<li><a href="http://www.i-revo.jp/yapcasia/archive/08.html">動画</a></li>
+<li><p><a href="http://blog.livedoor.jp/techblog/paper/YAPC-livedoor.pdf">プレゼン資料(PDF)</a></p></li>
+<li><p>Livedoor でも LiveDoor でもなく livedoor が正しい</p></li>
+</ul>
+
+
+<h2>Softwares</h2>
+
+<ul>
+<li>FreeBSD or Linux</li>
+<li>Apache 2.0, 2.2 - Reverse Proxy</li>
+<li>Apache 1.3 - mod_perl</li>
+<li>MySQL 4.0, 5.0</li>
+<li>memcached</li>
+<li>Sledge</li>
+</ul>
+
+
+<p>WEB+DB PRESS とかまるごと Perl とか見れば詳しく載ってる。</p>
+
+<h2>CVS から Subversion へ</h2>
+
+<ul>
+<li>CVS ださい/飽き飽きしてきた（が、なんとかなる、意外といける）</li>
+<li>「CVS は小学生まで」ということを事あるごとに言う人がいるので乗り換え</li>
+<li>mod_dav_svn</li>
+<li>HTTP Authentication</li>
+<li>mod_dav_svn + mod_auth_mysql + Catalyst</li>
+<li>Trac</li>
+</ul>
+
+
+<h2>Sledge</h2>
+
+<ul>
+<li>MVC フレームワーク</li>
+<li>2001年からある</li>
+<li>安定してるけど古い</li>
+</ul>
+
+
+<h2>Sledge 2.0</h2>
+
+<ul>
+<li>Rails, Catalyst いいよね</li>
+<li>なのでぱくる</li>
+<li>stash, Sledge::View, Helper, module name based dispatch など</li>
+<li>10分でつくる Sledge アプリと言う名のタイピング自慢 by にぽたん</li>
+<li>Sledge 2.0 はムーブメント（なので完成すると思わないでほしい）</li>
+</ul>
+
+
+<h2>他の言語</h2>
+
+<ul>
+<li>Perl 90%</li>
+<li>C - Apache モジュール</li>
+<li>Java - Lucene</li>
+</ul>
+
+
+<h2>Apache module</h2>
+
+<ul>
+<li>ちょっぱや</li>
+<li>APR 便利（メモリ管理、文字列操作）</li>
+<li>mod_livedoor_sso.so</li>
+<li>mod_livedoor_page.so</li>
+</ul>
+
+
+<h2>mod_livedoor_page.so</h2>
+
+<ul>
+<li>ClearSilver テンプレートエンジン</li>
+</ul>
+
+
+<h2>ClearSilver vs. Template Toolkit</h2>
+
+<ul>
+<li>ClearSilver が圧倒的に速い</li>
+</ul>
+
+
+<h2>Catalyst</h2>
+
+<ul>
+<li>カスタマサポートツールとかバックオフィスツール</li>
+</ul>
+
+
+<h2>Madeleine CMS</h2>
+
+<ul>
+<li>Catalyst + DBIx::Class</li>
+<li><a href="http://radiantcms.org/">Radiant CMS</a> っぽいもの</li>
+<li>Write your pages with TT syntax.</li>
+<li>Yahoo UI Library, FCKEditor</li>
+<li><a href="http://svn.shebang.jp/repos/Madeleine/trunk">Open Source!</a></li>
+</ul>
+
+
+<h2>クローラ</h2>
+
+<ul>
+<li>Xango</li>
+<li>Parallel::ForkManaer</li>
+</ul>
+
+
+<h2>Next Stage</h2>
+
+<ul>
+<li>No RDBMS</li>
+<li>分散ファイルシステム</li>
+<li>ashiatod, ○○d (ちっちゃい仕事をするデーモンをいっぱいつくる)</li>
+<li>文書のクラスタリング、カテゴライズ</li>
+</ul>
+
+
+<h2>Coming Soon</h2>
+
+<ul>
+<li>認証 API（ユーザハッシュ or ID ベースの認証）</li>
+<li>livedoor Reader 英語バージョン</li>
+<li>新しいブログサービス</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -676,55 +1218,6 @@ sub filter {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/03/25/459/">Puppet 日本語 Wiki はじめました</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-03-25T03:02:00+09:00" pubdate>Mar 25<span>th</span>, 2007</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-略して <a class="ext-link" href="http://trac.mizzy.org/puppet"><span class="icon"></span>パペウィキ</a> 。<a class="ext-link" href="http://www.paperboy.co.jp/"><span class="icon"></span>弊社</a> の社内ウィキはペパウィキですが、一切関係ありません。
-</p>
-
-
-<p>
-やはりブログは情報整理に向いてないので、ウィキで整理してみることにしました。
-</p>
-
-
-<p>
-このブログで書いたことも、順次移していきます。（元々このブログは Trac Wiki Formatting で書いてるので、移すのが楽。）
-</p>
-
-
-<p>
-どなたでも編集できますので、お気づきの点などあれば、直接編集しちゃってくださいませ。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/17/">&larr; Older</a>
@@ -742,6 +1235,10 @@ sub filter {
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -755,10 +1252,6 @@ sub filter {
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

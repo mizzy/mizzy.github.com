@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="hbstudy#8 で、「Puppet のススメ」というタイトルでプレゼンさせていただきました。機会をくださった株式会社ハートビーツの藤崎さん、馬場さん、坂口さん、また、運営スタッフのみなさま、聞きに来て下さったみなさま、twitter やブログで感想述べてくださったみなさま、 &hellip;">
+  <meta name="description" content="Kindle Store で樋口一葉、芥川龍之介、夏目漱石らの日本語書籍が出てたのは以前から知っていたのですが、最近 Amazon Kindleで日本語のコンテンツが読める！ 日本語電子書籍「想隆社文庫」創刊！一般向けおよび図書館向けに提供を開始 といったプレスリリースが出てたので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,83 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/03/20/KindleJapaneseTitle/">Kindle Japanese Title</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2010-03-20T19:04:33+09:00" pubdate>Mar 20<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Kindle Store で樋口一葉、芥川龍之介、夏目漱石らの日本語書籍が出てたのは以前から知っていたのですが、最近 <a href="http://www.atpress.ne.jp/view/14142">Amazon Kindleで日本語のコンテンツが読める！ 日本語電子書籍「想隆社文庫」創刊！一般向けおよび図書館向けに提供を開始</a> といったプレスリリースが出てたので、どんなものか確認するために、実際に購入してみました。</p>
+
+<p>結論から言うと、「6インチ Kindle 上では薄くて読みづらい。お金出して買う価値なし。今出てるタイトルなら、青空キンドルを使っとけ。」といったところでしょうか。</p>
+
+<hr />
+
+<p>以前から出てた日本語タイトルのスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/kokoro.gif, 25%)]]</p>
+
+<hr />
+
+<p>最近プレスリリースが出ていた、「これまでの電子書籍と異なり、従来の紙の本好きが違和感なく読めることを重視。書籍DTPを行う職人による組版を採用し、版面の美しさを追求しました。」と謳われているもののスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/sumidagawa.gif, 25%)]]</p>
+
+<hr />
+
+<p>青空キンドルのスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/bottyan02.gif, 25%)]]</p>
+
+<hr />
+
+<p>自分でスキャンしたもののスクリーンショット。</p>
+
+<p>[[Image(http://mizzy.org/img/kindle/mahjong03.gif, 25%)]]</p>
+
+<hr />
+
+<p>こうして比較してみると、青空キンドルが神すぎる。また、自分でスキャンしたものは文字サイズが小さいけど、濃さ的には上2つよりも読みやすい。実際、Kindle実機上だと上2つは、スクリーンショットのものよりも更に薄くて読みづらい。</p>
+
+<p>どうやら上2つの Kindle Store で手に入る日本語タイトルは、すべて画像データの模様。（ちなみに、Kindle の azw フォーマットは、Mobipocket フォーマットをベースにしていて、文字データは HTML で記述する。）フォントの関係で、画像になっちゃうのはしかたないのかもしれないけど、文字サイズ変更もできないし、テキスト読み上げもできないし、その上読みづらい、といった感じで、Kindle 版を購入するメリットがまったくない。</p>
+
+<p>発売されている（またはこれから発売予定の）タイトルも、すべて青空文庫で手に入るタイトルばかりのようなので、現段階なら青空キンドルを利用するのがベスト。</p>
+
+<p>DX の方だともう少し読みやすかったりするのかもしれないけど、小説の類はDXで読むメリットはあまりないと思う。</p>
+
+<hr />
+
+<p>ちなみに、実際にファイルを展開してみたら、やはり全部画像ファイルでした。ファイルの展開は Perl の EBook::Tools モジュールを利用すると簡単にできます。</p>
+
+<pre><code>$ perl -MEBook::Tools::Unpack \
+ -e 'EBook::Tools::Unpack-&gt;new(
+ file =&gt; "Natsume Soseki Story Selection v-asin_B00300H6UY-type_EBOK-v_0.azw"
+ )-&gt;unpack'
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1392,43 +1469,6 @@ enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/12/31/DizzyMizzLizzyCustomFeedScript/">Dizzy Mizz Lizzy Custom Feed Script</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2009-12-31T03:11:40+09:00" pubdate>Dec 31<span>st</span>, 2009</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.clubcitta.co.jp/information.html#news13">Dizzy Mizz Lizzy が再結成ツアーで来日することが決定</a> したようで、チケット発売情報を漏らさないために、Plagger の CustomFeed::Script 用スクリプトを書きました。</p>
-
-<p>http://gist.github.com/266224</p>
-
-<p>彼らは95年、96年も来日していて、当時自分は学生で札幌在住だったわけですが、運良く2度とも札幌に来てくれ、ライブを見ることができました。（95年は Bad Moon Rising の前座だった。）</p>
-
-<p>4年ぶりの再結成、14年ぶりの来日、ってことで、2度と見られないかもしれないので、5/8, 9 の2日とも行く予定です。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -1446,6 +1486,10 @@ enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -1459,10 +1503,6 @@ enable "Auth::Basic", authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

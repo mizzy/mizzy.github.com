@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="puppet 今試すなら バージョン 0.22.1 を使え、そして gem で入れるな というエントリを書いたわけですが、puppetrun で特に exec を使って puppet クライアントで何かコマンドを実行させたい、ということであれば、今は trunk 版を使ったほうがいいかも。 理由 &hellip;">
+  <meta name="description" content="略して パペウィキ 。弊社 の社内ウィキはペパウィキですが、一切関係ありません。 やはりブログは情報整理に向いてないので、ウィキで整理してみることにしました。 このブログで書いたことも、順次移していきます。（元々このブログは Trac Wiki Formatting で書いてるので、移すのが楽 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/03/25/459/">Puppet 日本語 Wiki はじめました</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2007-03-25T03:02:00+09:00" pubdate>Mar 25<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+略して <a class="ext-link" href="http://trac.mizzy.org/puppet"><span class="icon"></span>パペウィキ</a> 。<a class="ext-link" href="http://www.paperboy.co.jp/"><span class="icon"></span>弊社</a> の社内ウィキはペパウィキですが、一切関係ありません。
+</p>
+
+
+<p>
+やはりブログは情報整理に向いてないので、ウィキで整理してみることにしました。
+</p>
+
+
+<p>
+このブログで書いたことも、順次移していきます。（元々このブログは Trac Wiki Formatting で書いてるので、移すのが楽。）
+</p>
+
+
+<p>
+どなたでも編集できますので、お気づきの点などあれば、直接編集しちゃってくださいませ。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1396,68 +1445,6 @@ node 'nag.example.com' {
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/03/18/304/">Cfengine よりも Puppet がよさげ</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2007-03-18T21:33:00+09:00" pubdate>Mar 18<span>th</span>, 2007</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://trombik.mine.nu/~cherry/w/index.php/2007/02/06/845/links-roundup-159"><span class="icon"></span>I, newbie &raquo; Links Roundup</a> 経由で puppet というシステム管理ツールを知って以来ずっと気になっていたのですが、このエントリの著者さんが <a class="ext-link" href="http://dev.gentoo.gr.jp/~trombik/pub/OSC2007/OSC2007.pdf"><span class="icon"></span>OSC2007 の発表資料(PDF)</a>で「Puppet is so sexy.」と書かれているのを見て、本気で触ってみることにしました。
-</p>
-
-
-<p>
-puppet がどんなものかは、上記資料とか <a class="ext-link" href="http://www.madoro.org/nikki/entry/8"><span class="icon"></span>だ！日記さんのエントリ</a> にも書かれているのですが、<a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/CfengineVsPuppet"><span class="icon"></span>本家の Cfengine vs. Puppet</a> というエントリから cfengine との違いを一部適当に意訳してみると、こんな感じです。
-</p>
-
-
-<ul><li>next-generation version of cfengine ということで、cfengine をベースとしながらも、より良いものを目指している。</li>
-<li>リソース抽象化レイヤーにより、OS やディストリビューションの違いを意識しなくても良い。</li>
-<li>タスクの実行順序を制御できる。（cfengine ではできないor難しいらしい。）</li>
-<li>設定ファイルで記述する内部言語が強力になっている。</li>
-<li>type の拡張が簡単。</li>
-<li>Ruby でできている。</li></ul>
-
-
-<p>
-というわけで、cfengine の導入を検討して、<a class="ext-link" href="http://mizzy.org/linux/cfengine00.html"><span class="icon"></span>こんなエントリ</a> を書いたりしてたのですが、cfengine は捨てて puppet でいこうかな、と思ってます。
-</p>
-
-
-<p>
-<a class="ext-link" href="http://reductivelabs.com/trac/puppet/browser/trunk/ext/emacs"><span class="icon"></span>emacs 用のヘルパーモード</a> なんかも提供されているのがさらに好印象です。<a class="ext-link" href="http://reductivelabs.com/trac/puppet/browser/trunk/ext/vim"><span class="icon"></span>vim 用もあるし</a>。
-</p>
-
-
-<p>
-それから、まだ Experimental ですが、<a class="ext-link" href="http://reductivelabs.com/trac/puppetshow"><span class="icon"></span>puppetshow</a> という Rails でできたウェブインターフェースもあるようです。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/18/">&larr; Older</a>
@@ -1475,6 +1462,10 @@ puppet がどんなものかは、上記資料とか <a class="ext-link" href="h
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -1488,10 +1479,6 @@ puppet がどんなものかは、上記資料とか <a class="ext-link" href="h
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="OpenSSH LDAP Public key patch を試してみたのでメモ。（略して lpk patch とか言うらしい。） SSH で公開鍵認証を行う場合、通常はホームディレクトリの .ssh/authorized_keys を参照しますが、このパッチを適用すると、 &hellip;">
+  <meta name="description" content="/etc/sudoers を LDAP で一元管理とかできないのかなぁ、と思っていたら、ちゃんと対応してた。 利用方法はわりと簡単で、上記リンクの README.LDAP （ソースに同じものが同梱されてる）を見ればすぐわかるけど、一応ここにやったことをメモ。ほとんど README からの抜粋です &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,211 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/12/31/306/">/Etc/Sudoers を Ldap で管理する</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-12-31T01:12:00+09:00" pubdate>Dec 31<span>st</span>, 2006</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+/etc/sudoers を LDAP で一元管理とかできないのかなぁ、と思っていたら、<a class="ext-link" href="http://www.gratisoft.us/sudo/readme_ldap.html"><span class="icon"></span>ちゃんと対応してた</a>。
+</p>
+
+
+<p>
+利用方法はわりと簡単で、上記リンクの README.LDAP （ソースに同じものが同梱されてる）を見ればすぐわかるけど、一応ここにやったことをメモ。ほとんど README からの抜粋です。
+</p>
+
+
+<p>
+手元の Slackware に元から入っている sudo は LDAP 対応していないので、<a class="ext-link" href="http://www.gratisoft.us/sudo/download.html"><span class="icon"></span>ここからダウンロード</a> して以下の手順でインストール。
+</p>
+
+
+<pre class="wiki">
+$ ./configure --with-ldap
+$ make
+$ sudo make install
+</pre>
+
+
+<p>
+でもって /etc/ldap.conf に以下の記述を追加。（元々 LDAP は利用していて、基本的な設定はできているので、追加は一行だけ。）
+</p>
+
+
+<pre class="wiki">
+sudoers_base   ou=SUDOers,o=southpark
+</pre>
+
+
+<p>
+LDAP 側の設定はまずスキーマの追加。
+</p>
+
+
+<pre class="wiki">
+  #
+  #  schema file for sudo
+  #
+
+  attributetype ( 1.3.6.1.4.1.15953.9.1.1
+        NAME 'sudoUser'
+        DESC 'User(s) who may  run sudo'
+        EQUALITY caseExactIA5Match
+        SUBSTR caseExactIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+  attributetype ( 1.3.6.1.4.1.15953.9.1.2
+        NAME 'sudoHost'
+        DESC 'Host(s) who may run sudo'
+        EQUALITY caseExactIA5Match
+        SUBSTR caseExactIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+  attributetype ( 1.3.6.1.4.1.15953.9.1.3
+        NAME 'sudoCommand'
+        DESC 'Command(s) to be executed by sudo'
+        EQUALITY caseExactIA5Match
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+  attributetype ( 1.3.6.1.4.1.15953.9.1.4
+        NAME 'sudoRunAs'
+        DESC 'User(s) impersonated by sudo'
+        EQUALITY caseExactIA5Match
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+  attributetype ( 1.3.6.1.4.1.15953.9.1.5
+        NAME 'sudoOption'
+        DESC 'Options(s) followed by sudo'
+        EQUALITY caseExactIA5Match
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+  objectclass ( 1.3.6.1.4.1.15953.9.2.1 NAME 'sudoRole' SUP top STRUCTURAL
+        DESC 'Sudoer Entries'
+        MUST ( cn )
+        MAY ( sudoUser $ sudoHost $ sudoCommand $ sudoRunAs $ sudoOption $
+              description )
+        )
+</pre>
+
+
+<p>
+次に sudoers 用のコンテナ ou=SUDOers, o=southpark と、デフォルト設定用の cn=defaults, ou=SUDOers, o=southpark を LDAP エントリに追加。
+</p>
+
+
+<pre class="wiki">
+dn: ou=SUDOers,o=southpark
+objectclass: organizationalunit
+ou: SUDOers
+
+dn: cn=defaults,ou=SUDOers,o=southpark
+objectclass: top
+objectclass: sudorole
+cn: defaults
+sudoOption: ignore_local_sudoers
+</pre>
+
+
+<p>
+sudoOption: ignore_local_sudoers があると、/etc/sudoers ファイルを見なくなる。
+</p>
+
+
+<p>
+最後に sudo 用 role エントリを追加して準備 OK。
+</p>
+
+
+<pre class="wiki">
+dn: cn=role1,ou=SUDOers,o=southpark
+changetype: add
+objectclass: top
+objectclass: sudorole
+cn: role1
+sudouser: miya
+sudohost: ALL
+sudocommand: ALL
+</pre>
+
+
+<p>
+sudouser, sudohost, sudocommand は複数設定可。! で否定になる。なので、特定のユーザだけ許可しない、という場合には、
+</p>
+
+
+<pre class="wiki">
+sudouser: ALL
+sudouser: !miya
+</pre>
+
+
+<p>
+なんて書き方もできる。同様に特定のホストだけ許可しない、という場合には、
+</p>
+
+
+<pre class="wiki">
+sudohost: ALL
+sudohost: !kenny
+</pre>
+
+
+<p>
+とかできるし、特定のコマンドだけ許可しない、という場合には、
+</p>
+
+
+<pre class="wiki">
+sudocommand: ALL
+sudocommand: !/sbin/reboot
+</pre>
+
+
+<p>
+とかできる。もちろんこれらの組み合わせも OK。
+</p>
+
+
+<p>
+あと、ユーザではなくグループで指定したい場合には
+</p>
+
+
+<pre class="wiki">
+sudouser: %group
+</pre>
+
+
+<p>
+とする。（これは README.LDAP には明記されてない。/etc/sudoers の書き方から類推すればわかるけど。）
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -904,61 +1109,6 @@ $widget->process($query)->save_to( file => 'config.yaml' );
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/10/17/447/">Net/Amazon/Ecs</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-10-17T00:02:00+09:00" pubdate>Oct 17<span>th</span>, 2006</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-Plagger で Amazon Web Service をつかって、発売日を Publish::iCal して Google Calendar で表示したり、今日・明日発売する商品を Publish::Gmail してるのですが、なんか最近 Google Calendar に表示される商品数が少ないな、と思ったら、AWS3.0 で ReleaseDate が取得できていない模様。（そもそも結果の XML に ReleaseDate が存在しない。一部の商品は ReleaseDate 取得できるけど、取得できない方が圧倒的に多い。）しかも、以前には確かに ReleaseDate が取得できていた商品も、なぜか取得できなくなってます。でも同じ商品でも、ECS4.0 ならちゃんと日付が取得できるんですよね。
-</p>
-
-
-<p>
-で、問い合わせは<a class="ext-link" href="http://forums.prospero.com/am-assocdevxml"><span class="icon"></span>ディスカッションボード</a>に投稿しろ、と<a class="ext-link" href="http://www.amazon.co.jp/gp/feature.html?docId=451209"><span class="icon"></span>ここ</a>に書いてあったのでディスカッションボードを覗いてみても、どこから投稿していいのかさっぱり分からないし、あまり動きが活発でもなさそうで、素早い対応は期待できなさそう…そもそも AWS3.0 自体が古い API なわけだし、ということで、ECS4.0 対応の<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Net-Amazon-ECS"><span class="icon"></span>Net::Amazon::ECS</a> をつくってみました。検索してみても公開されているものはなさそうだったので。（あったら誰か教えてください。）
-</p>
-
-
-<p>
-といっても、とりあえず自分がやりたいこと（Plagger で発売日を iCal に Publish したり、今日・明日発売の商品情報をメールで飛ばしたり）に最低限必要な機能しか実装してないです。あと、今のところ CPAN にあげる予定はありません。
-</p>
-
-
-<p>
-ついでに野良プラグインの <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm"><span class="icon"></span>CustomFeed::AmazonWebService</a> を Net::Amazon::ECS に対応させた <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonECS.pm"><span class="icon"></span>CustomFeed::AmazonECS</a> もつくりました。
-</p>
-
-
-<p>
-<strong>追記</strong><br />
-なんかはてなの中の人が、ECS4.0 対応のモジュール作っていて、CPAN に up 予定らしい。なので近いうちにこれは必要なくなりそうですね。期待。
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/21/">&larr; Older</a>
@@ -976,6 +1126,10 @@ Plagger で Amazon Web Service をつかって、発売日を Publish::iCal し�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -989,10 +1143,6 @@ Plagger で Amazon Web Service をつかって、発売日を Publish::iCal し�
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

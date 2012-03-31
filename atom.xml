@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-03-08T00:34:39+09:00</updated>
+  <updated>2012-03-31T22:57:48+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,21 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[puppet-report-ikachan]]></title>
+    <link href="http://mizzy.org/blog/2012/03/31/puppet-report-ikachan/"/>
+    <updated>2012-03-31T22:31:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/03/31/puppet-report-ikachan</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve made a puppet module <a href="https://github.com/mizzy/puppet-report-ikachan">puppet-report-ikachan</a> to send reports to <a href="https://github.com/yappo/p5-App-Ikachan">Ikachan</a> and uploaded this module to <a href="https://forge.puppetlabs.com/users/mizzy/modules/report_ikachan">Puppet Forge</a></p>
+
+<p>This is the screenshot of showing reports sent by this module on Limechat.</p>
+
+<p><img src="http://mizzy.org/images/2012/03/ikachan.png"></p>
+
+<p>This module is very primitive, so please give me feedbak on <a href="https://github.com/mizzy/puppet-report-ikachan">GitHub</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Image with EXIF tag plugin]]></title>
@@ -84,7 +99,7 @@
 <pre><code>{{ "nikondirect:10000349" | rakuten_link }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70【2sp_120307_b】</a></p>
+<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70</a></p>
 ]]></content>
   </entry>
   
@@ -829,376 +844,6 @@ end
 <p>とても良さそうなので、しばらくこれで運用してみます。</p>
 
 <p>過去エントリについては、Trac に入ってた分ぐらいは移行しようかな、と考えてます。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[My Resume]]></title>
-    <link href="http://mizzy.org/blog/2011/10/05/MyResume/"/>
-    <updated>2011-10-05T17:14:06+09:00</updated>
-    <id>http://mizzy.org/blog/2011/10/05/MyResume</id>
-    <content type="html"><![CDATA[<h1>Educations</h1>
-
-<ul>
-<li>Hokkaido University (1993-1997)
-
-<ul>
-<li>Department of Economics
-
-<ul>
-<li>Operations Research</li>
-<li>Linear Programming</li>
-<li>Multivariable Analysis</li>
-<li>A theme of graduation thesis is &#8220;Analyze NBA Players ablility with Multivariable Analysis&#8221;</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-
-<hr />
-
-<h1>Jobs</h1>
-
-<ul>
-<li><a href="http://www.ctc-g.co.jp/en/">CTC</a>
-
-<ul>
-<li>1997-
-
-<ul>
-<li>Netscape Server Software Products Engineer
-
-<ul>
-<li>Netscape Enterprise Server (Web Server)</li>
-<li>Netscape Messaging Server (Mail Server)</li>
-<li>Netscape Directory Server (LDAP Server)</li>
-<li>and so on</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>1998-
-
-<ul>
-<li>Support Engineer of Netscape Server Software Products at Netscape Japan</li>
-</ul>
-</li>
-<li>1999-2000
-
-<ul>
-<li>QA of I18N Netscpe Server Software Products at Netscape US</li>
-<li>Working at Mountain View</li>
-<li>Lining in Sunnyvale</li>
-</ul>
-</li>
-<li>2000-2005
-
-<ul>
-<li>iPlanet(formerly known as Netscape) Server Software Products Engineer at CTC again.</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-
-<hr />
-
-<ul>
-<li><a href="http://www.netmarks.co.jp/english/index.html">Netmarks</a>
-
-<ul>
-<li>2005-
-
-<ul>
-<li>Testing Network Quarantine Systems
-
-<ul>
-<li>It is for blocking insecure computers automatically.</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-
-<hr />
-
-<ul>
-<li><a href="http://www.paperboy.co.jp/">paperboy&amp;co.</a> (Now)
-
-<ul>
-<li>2006-
-
-<ul>
-<li>Software Engineer</li>
-<li>JugemKey (http://jugemkey.jp/)
-
-<ul>
-<li>Central authorization system for multiple services in paperboy&amp;co.</li>
-<li>Write backend API with Perl</li>
-</ul>
-</li>
-<li>JugemKey Authentication API
-
-<ul>
-<li>Similar to Flickr authentication API</li>
-<li>Write frontend with PHP and backend with Perl</li>
-</ul>
-</li>
-<li>JUGEM (http://jugem.jp/)
-
-<ul>
-<li>Blog service</li>
-<li>Write accounting function by credit cards with PHP</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>2007-
-
-<ul>
-<li>Technical Manager</li>
-<li>30days Album (http://30d.jp/)
-
-<ul>
-<li>A photo Album Service</li>
-<li>In charge of overall architect design</li>
-<li>Write some Perlbal plugins</li>
-<li>Write frontend API for MogileFS
-
-<ul>
-<li>Perl + Catalyst</li>
-</ul>
-</li>
-<li>Other technology stacks
-
-<ul>
-<li>Linux, Ruby On Rails, lighttpd, Gearman, TheSchwartz</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Lolipop Rental Server (http://lolipop.jp/)
-
-<ul>
-<li>A plain old style rental servers</li>
-<li>In charge of overall architect design in system renewal</li>
-<li>Designed Internal API and implemented a proto type</li>
-<li>Other technology stacks
-
-<ul>
-<li>Linux, Cobbler, LVS, Apache, MySQL, Postfix, qpsmtpd, Courier-IMAP, ClamAV, Puppet, Func</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Improve development environments in the company
-
-<ul>
-<li>Introduce Subversion and Trac</li>
-<li>Recently introduce Git and Jenkins CI</li>
-<li>Now writing original internal cloud tool
-
-<ul>
-<li>Very simple system with kvm, libvirtd, virt-clone and zeromq
-
-<ul>
-<li><a href="https://github.com/mizzy/maglica">Maglica on GitHub</a></li>
-<li><a href="http://mizzy.org/slides/maglica">Maglica Slide</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-
-<hr />
-
-<h1>Talks</h1>
-
-<ul>
-<li><a href="http://tokyo2007.yapcasia.org/blog/">YAPC::Asia 2007 Tokyo</a>
-
-<ul>
-<li><a href="http://tokyo2007.yapcasia.org/sessions/2007/02/assurer_a_pluggable_server_tes.html">Assurer - a pluggable server testing/monitoring framework</a></li>
-<li><a href="http://www.slideshare.net/mizzy/assurer-a-pluggable-server-testingmonitoring-framework">SlideShare</a></li>
-<li><a href="https://github.com/mizzy/Assurer">Code on github</a></li>
-</ul>
-</li>
-<li><a href="http://conferences.yapcasia.org/ya2008/index.html">YAPC::Asia 2008 Tokyo</a>
-
-<ul>
-<li><a href="http://conferences.yapcasia.org/ya2008/talk/973">Easy system administration programming with a framework</a></li>
-<li><a href="https://github.com/mizzy/Punc">Code on github</a></li>
-</ul>
-</li>
-<li><a href="http://conferences.yapcasia.org/ya2009/">YAPC::Asia 2009 Tokyo</a>
-
-<ul>
-<li><a href="http://conferences.yapcasia.org/ya2009/talk/2166">How to use Perl in paperboy&amp;co.</a></li>
-<li><a href="http://conferences.yapcasia.org/ya2009/talk/2220">How Danga::Socket handles asynchronous processing and how to write asynchronous Perlbal plugins</a></li>
-</ul>
-</li>
-<li>Xen Summit 2008 Tokyo
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/xen-summit-2008-tokyo-operating-xen-domains-through-llperlpython-with-libvirt-presentation">Operating Xen domains through LL(Perl/Python) with libvirt</a></li>
-</ul>
-</li>
-<li><a href="http://www.tlug.jp/wiki/Meetings:2008:09">TLUG Meeting 2008/09/13</a>
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">How To Build A Scalable Storage System with OSS</a></li>
-</ul>
-</li>
-<li><a href="http://dsas.blog.klab.org/archives/51208101.html">KLab Study #4</a>
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/open-source-system-administration-framework-func">Open Source System Administration Framework - Func</a> (Japanese)</li>
-</ul>
-</li>
-<li><a href="http://techlife.cookpad.com/2009/10/24/techlife_introduction/">techlife lightning talk at Cookpad</a>
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/puppet-best-practices-at-cookpad">Puppet Best Practices?</a> (Japanese)</li>
-</ul>
-</li>
-<li><a href="http://heartbeats.jp/hbstudy/2010/02/hbstudy8.html">hbstudy #8</a>
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/puppet-3258268">About Puppet</a> (Japanese)</li>
-</ul>
-</li>
-<li><a href="http://partake.in/events/b5472f43-5bc0-42d0-9469-dc70d7d95b24">DevOps Conference</a>
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/10devops">DevOps in 10 minutes</a> (Japanese)</li>
-</ul>
-</li>
-<li>Tech Talk at NTT Resonant Inc
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/devops-4156440">What is DevOps?</a> (Japanese)</li>
-</ul>
-</li>
-<li><a href="http://k-of.jp/2008/">Kansai Open Source 2008</a>
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy/2008-30days-album-presentation">Inside 30days Album&#8217;s Backend</a> (Japanese)</li>
-</ul>
-</li>
-<li><a href="http://shibuya.pm.org/blosxom/techtalks/200610.html">Shibuya.pm Technical Talk #7</a>
-
-<ul>
-<li>LT: Plagger Plugins development process by using SVK</li>
-</ul>
-</li>
-<li><a href="http://shibuya.pm.org/blosxom/techtalks/200710.html">Shibuya.pm Technical Talk #8</a>
-
-<ul>
-<li>LT: About Pushmi</li>
-</ul>
-</li>
-</ul>
-
-
-<hr />
-
-<h1>Others</h1>
-
-<ul>
-<li>I4PC (Instagram for PC)
-
-<ul>
-<li>http://www.i4pc.jp/</li>
-</ul>
-</li>
-<li>CPAN
-
-<ul>
-<li>http://search.cpan.org/~mizzy/</li>
-</ul>
-</li>
-<li>GitHub
-
-<ul>
-<li>https://github.com/mizzy</li>
-</ul>
-</li>
-<li>codewall
-
-<ul>
-<li>http://coderwall.com/mizzy</li>
-</ul>
-</li>
-<li>twitter
-
-<ul>
-<li>http://twitter.com/gosukenator</li>
-</ul>
-</li>
-<li>Facebook
-
-<ul>
-<li>http://www.facebook.com/gosukenator</li>
-</ul>
-</li>
-<li>SlideShare
-
-<ul>
-<li>http://www.slideshare.net/mizzy/presentations</li>
-</ul>
-</li>
-<li>Articles about Puppet in gihyo.jp (Japanese)
-
-<ul>
-<li>http://gihyo.jp/admin/serial/01/puppet</li>
-</ul>
-</li>
-<li>Articles about Puppet in Software Design magazine (Japanese)
-
-<ul>
-<li>http://gihyo.jp/magazine/SD/archive/2007/200712</li>
-</ul>
-</li>
-<li>Interview articles (Japanese)
-
-<ul>
-<li>http://japan.cnet.com/extra/paperboy_0907/story/0,3800098768,20394957,00.htm</li>
-<li>http://web-engineer.buyuden.net/buyuden/2010/01/39paperboyco.html</li>
-<li>http://jibun.atmarkit.co.jp/lcom01/rensai/comrade04/comrade01.html</li>
-</ul>
-</li>
-<li>LinkedIn
-
-<ul>
-<li>http://www.linkedin.com/in/mizzy</li>
-</ul>
-</li>
-<li>Personal sites
-
-<ul>
-<li>http://mizzy.org/</li>
-<li>http://astralscape.tumblr.com/</li>
-</ul>
-</li>
-</ul>
-
-
-<hr />
-
-<p>mailto: gosukenator at gmail.com</p>
 ]]></content>
   </entry>
   

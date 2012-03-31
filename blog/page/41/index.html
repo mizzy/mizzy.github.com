@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="本棚.orgやブクログを見て、「俺だったらこんな風につくるなぁ」という思いを形にしてみたのがこれ。 一般公開は考えてはいるものの、今のマシンリソースでは厳しいので、要望があれば考える、という感じです。一般公開するにしても、知り合いだけの閉じた空間は大切にしたいので、今あるものとは別にすると思う &hellip;">
+  <meta name="description" content="taggingプラグインをアップデート。タグで絞り込んで表示することができるようになりました。ファイルはここ。taggingプラグイン サイドメニューのタグリストで、各タグ毎のリンクを表示してます。 QUERY_STRINGやPOSTパラメータで、tag=tag1,tag2,&#8230; &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,68 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2005/04/13/301/">Blosxomでtagging #2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2005-04-13T22:32:00+09:00" pubdate>Apr 13<span>th</span>, 2005</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p class="entryBody">
+taggingプラグインをアップデート。タグで絞り込んで表示することができるようになりました。ファイルはここ。<a href="/archives/tagging">taggingプラグイン</a>
+</p>
+
+
+
+
+<p class="entryBody">
+サイドメニューのタグリストで、各タグ毎のリンクを表示してます。
+</p>
+
+
+
+
+<p class="entryBody">
+QUERY_STRINGやPOSTパラメータで、tag=tag1,tag2,&#8230;と指定することにより複数タグでの絞込みができます。（ANDで絞込み。）
+</p>
+
+
+
+
+<p class="entryBody">
+でも、毎回エントリファイルの中を見てタグとマッチするか調べる、ってことをやるので、ファイルが増えるととんでもないことになるなぁ…何か方法考えなきゃ。タグとファイルを対応付けるインデックスファイルをキャッシュとして作成する、って感じかな。キャッシュは任意のタイミングで更新できるようにして。
+</p>
+
+
+
+
+<p class="entryBody">
+blosxom 3.0+3iのTag.pmを参考にしようかと思ったら、ファイル名にタグを入れちゃってるから、あんまり美しくないしなぁ…
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -415,6 +477,10 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -428,10 +494,6 @@ ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変え�
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

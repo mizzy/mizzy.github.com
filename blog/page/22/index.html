@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="思いつきで YAPC::NA 2006 での宮川さんのプレゼン 『 Hacking iTunes from Perl(PDF) 』の 「 Hack #5 Download songs from iTunes share 」を Plagger プラグインとして実装してみた。 CustomFeed &hellip;">
+  <meta name="description" content="CustomFeed::DAAP と Filter::FetchDAAP を、enclosure サポートして他のプラグインとも連携できるように 修正してみた。 これで Filter::RewriteEnclosureURL + Publish::Feed で Podcasting したり、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,50 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/09/12/256/">Custom Feed/Daap と Filter/Fetch Daap #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-09-12T23:11:00+09:00" pubdate>Sep 12<span>th</span>, 2006</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+CustomFeed::DAAP と Filter::FetchDAAP を、enclosure サポートして他のプラグインとも連携できるように <a class="ext-link" href="http://trac.mizzy.org/public/changeset/262"><span class="icon"></span>修正してみた</a>。
+</p>
+
+
+<p>
+これで Filter::RewriteEnclosureURL + Publish::Feed で Podcasting したり、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Publish/iTunes.pm"><span class="icon"></span>Publish::iTunes</a> で直接 iTunes へ追加、とかできるはず。試してないけど。
+</p>
+
+
+<p>
+ますますクロい。
+</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1122,48 +1166,6 @@ system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/08/28/474/">Filter/Audio #1</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-08-28T22:15:00+09:00" pubdate>Aug 28<span>th</span>, 2006</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> を色々修正しました。機能追加ではなくあくまでも修正です。うまく動かないところとかあったので。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/246"><span class="icon"></span>trac のチェンジセットはこちら</a>。
-</p>
-
-
-<p>
-<strong>#plagger-ja にて課せられた（と勝手に自分が思っている）宿題</strong>
-</p>
-
-
-<ul><li>音量/音質の均一化</li></ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/23/">&larr; Older</a>
@@ -1181,6 +1183,10 @@ system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -1194,10 +1200,6 @@ system('sox', '-v', $vol, $converted_file_before_move, $converted_file);
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

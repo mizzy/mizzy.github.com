@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="Convert Apache index to Podcasts とか RubyKaigi2006の音声ファイルをPlaggerで色々 を見て、音声ファイル変換用のプラグインがあれば便利かな、と思い、Filter::Audio をつくってみました。 宮川さんの設定に以下の様な内容を追加すれば、 &hellip;">
+  <meta name="description" content="
+Filter::Audio を色々修正しました。機能追加ではなくあくまでも修正です。うまく動かないところとかあったので。trac のチェンジセットはこちら。 #plagger-ja にて課せられた（と勝手に自分が思っている）宿題 音量/音質の均一化 ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,48 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/08/28/474/">Filter/Audio #1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2006-08-28T22:15:00+09:00" pubdate>Aug 28<span>th</span>, 2006</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> を色々修正しました。機能追加ではなくあくまでも修正です。うまく動かないところとかあったので。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/246"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+</p>
+
+
+<p>
+<strong>#plagger-ja にて課せられた（と勝手に自分が思っている）宿題</strong>
+</p>
+
+
+<ul><li>音量/音質の均一化</li></ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -897,49 +940,6 @@ ORGANIZER<strong>:</strong>CN=Gosuke Miyashita:MAILTO:gosukenator@gmail.com
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/07/31/462/">Plagger/Plugin/Filter/F Fmpeg &Amp; F Fmpeg/Command</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2006-07-31T23:57:00+09:00" pubdate>Jul 31<span>st</span>, 2006</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>
-<a class="ext-link" href="http://mizzy.org/program/plagger_and_itunes00.html"><span class="icon"></span>このエントリ</a> の <a class="ext-link" href="http://d.hatena.ne.jp/shimibow/"><span class="icon"></span>id:shimibow</a> さんからのコメントで、-title オプションでつけたタイトルが iTunes でも表示される、という情報頂きましたので、FFmpeg::Command で title をセットできるようにし、Plagger::Plugin::Filter::FFmpeg もそれに対応させてみました。（残念ながらうちの環境では、やはり iTunes では表示されませんでした…何が悪いのかなぁ…何かしょぼいミスとかしてそうな気がする…）
-</p>
-
-
-<ul><li><a class="ext-link" href="http://search.cpan.org/~mizzy/FFmpeg-Command-0.03/"><span class="icon"></span>FFmpeg-Command-0.03</a> （07/31 23:49 現在、まだ CPAN には反映されていません。待ちきれない場合は <a class="ext-link" href="http://svn.mizzy.org/public/library/perl/tags/FFmpeg-Command-0.03/"><span class="icon"></span>こちらの svn リポジトリ</a> からどうぞ。）</li>
-<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Plagger::Plugin::Filter::FFmpeg</a></li></ul>
-
-
-<p>
-FFmpeg::Command ならびに Filter::FFmpeg では、title だけではなく、author, comment もセットできるようにしました。また、Filter::FFmpeg では、encoding オプションでこれらの値のエンコーディングを指定できるようにしています。（何も指定しなければ、デフォルトで cp932 でエンコードされます。）
-</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/24/">&larr; Older</a>
@@ -957,6 +957,10 @@ FFmpeg::Command ならびに Filter::FFmpeg では、title だけではなく、
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -970,10 +974,6 @@ FFmpeg::Command ならびに Filter::FFmpeg では、title だけではなく、
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

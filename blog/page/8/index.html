@@ -9,7 +9,8 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="このところ、ほとんどエントリ更新してませんが、それは、ナウでヤングなレンタルサーバー ロリポップ！のインフラ再構築 で多忙だったからです。（それだけではないですが。） というわけで、ブログエントリをほとんど書いてないので細切れにもなりようがないのですが、ロリポ含めて、ペパボが提供するサービスの中で &hellip;">
+  <meta name="description" content="ペパボでは以下の2つのサービスで開発者を募集中です。 Color Me Shop!pro
+30days Album 併せて開発アルバイトも募集中です。 詳しくは募集要項をご確認ください。 募集要項にはありませんが、採用された方にはドクターペッパーチェリーを差し上げます。合い言葉は「 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,51 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/09/02/DeveloperRecruitAtPaperboy/">Developer Recruit At Paperboy</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2009-09-02T02:16:46+09:00" pubdate>Sep 2<span>nd</span>, 2009</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ペパボでは以下の2つのサービスで開発者を募集中です。</p>
+
+<ul>
+<li><a href="http://www.paperboy.co.jp/recruit/job/090821.php">Color Me Shop!pro</a></li>
+<li><a href="http://www.paperboy.co.jp/recruit/job/090806.php">30days Album</a></li>
+</ul>
+
+
+<p>併せて<a href="http://www.paperboy.co.jp/recruit/job/090821b.php">開発アルバイト</a>も募集中です。</p>
+
+<p>詳しくは募集要項をご確認ください。</p>
+
+<p>募集要項にはありませんが、採用された方にはドクターペッパーチェリーを差し上げます。合い言葉は「ドクターペッパーチェリー飲みたい！」です。僕との面接時に必ず声に出して言ってください。</p>
+
+<p>[[Image(http://gyazo.com/37db61b8bd76e406987622d9863fbe5f.png)]]</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1305,90 +1351,6 @@ gpgcheck=0
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/12/28/ScalableStorageWithOSS04/">Scalable Storage With Oss04</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2008-12-28T17:23:16+09:00" pubdate>Dec 28<span>th</span>, 2008</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3] のつづき。今回は Device-Mapper Multipath をつかって、DRBD によりミラーされている2つのブロックデバイスを、仮想的にひとつに見えるようにします。</p>
-
-<p>まずは client0 と client1 に device-mapper-multipath がインストールされていなければ、インストール。</p>
-
-<pre><code>$ sudo yum -y install device-mapper-multipath
-</code></pre>
-
-<p>/etc/multipath.conf を修正。デフォルトでは blacklist の devnode に * が指定されていて、すべてのデバイスに対して無効になっているので、blacklist をコメントアウト。</p>
-
-<pre><code># Blacklist all devices by default. Remove this to enable multipathing
-# on the default devices.
-#blacklist {
-#        devnode "*"
-#}
-</code></pre>
-
-<p>multipathd を restart。</p>
-
-<pre><code>$ sudo /etc/init.d/multipathd restart
-</code></pre>
-
-<p>multipath -l で確認。</p>
-
-<pre><code>$ sudo /sbin/multipath -l
-mpath1 (1) dm-1 GNBD,GNBD
-[size=1024M][features=0][hwhandler=0]
-\_ round-robin 0 [prio=0][active]
- \_ #:#:#:# gnbd2 252:2 [active][undef]
- \_ #:#:#:# gnbd3 252:3 [active][undef]
-mpath0 (0) dm-0 GNBD,GNBD
-[size=1024M][features=0][hwhandler=0]
-\_ round-robin 0 [prio=0][active]
- \_ #:#:#:# gnbd0 252:0 [active][undef]
- \_ #:#:#:# gnbd1 252:1 [active][undef]  
-</code></pre>
-
-<p>gnbd0 と gnbd1 が /dev/mapper/mpath0 として見え、gnbd2 と gnbd3 が /dev/mapper/mpath1 として見える。</p>
-
-<p>この状態で、/dev/mapper/mpath0 へ書き込みが発生すると、gnbd0 か gnbd1 のどちらかに書き込まれ、DRBD によりもう一方にミラーされる、という状態ができあがり。図にすると以下のような状態。/dev/mapper/mpath0 から読み込んだ場合にも、gnbd0 か gnbd1 のどちらかから読み込むことになるが、DRBD によりミラーされているので、どちらを読みに行っても OK。</p>
-
-<p>[[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS04/storages_with_dmmp.jpg?format=raw)]]</p>
-
-<p>次回は /dev/mapper/mpath0 と /dev/mapper/mpath1 を物理ボリュームとして、 CLVM によりひとつの論理ボリュームを構成し、論理ボリュームのメタデータを client0 と client1 間で共有する方法について解説します。</p>
-
-<h1>関連エントリ</h1>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
-<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
-<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
-<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
-<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/9/">&larr; Older</a>
@@ -1406,6 +1368,10 @@ mpath0 (0) dm-0 GNBD,GNBD
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -1419,10 +1385,6 @@ mpath0 (0) dm-0 GNBD,GNBD
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>

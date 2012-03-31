@@ -9,7 +9,7 @@
   <meta name="author" content="Gosuke Miyashita">
 
   
-  <meta name="description" content="3,4年ぐらい前に、[wiki:ModSuid2AndModRuidAndLinuxCapability mod_suid2 とか mod_ruid とか Linux ケーパビリティとか] で、mod_ruid の setuid/setgid は、プロセス単位なのか、それともスレッド単位なのか、 &hellip;">
+  <meta name="description" content="@earlcyborg くん に教えてもらった Subsonic がよさげなので、家の中に環境作り、Apache mod_proxy 経由でアクセスしようとしたらはまったのでメモ。 結論: ProxyPreserveHost On を入れないとはまる。 最初、 &lt;VirtualHost *& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,60 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/06/29/SubsonicThroughApacheProxy/">Subsonic Through Apache Proxy</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-06-29T22:40:54+09:00" pubdate>Jun 29<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://twitter.com/#!/earlcyborg">@earlcyborg くん</a> に教えてもらった <a href="http://www.subsonic.org/pages/index.jsp">Subsonic</a> がよさげなので、家の中に環境作り、Apache mod_proxy 経由でアクセスしようとしたらはまったのでメモ。</p>
+
+<p>結論: ProxyPreserveHost On を入れないとはまる。</p>
+
+<p>最初、</p>
+
+<pre><code>&lt;VirtualHost *&gt;
+ServerName subsonic.mizzy.org
+ProxyPass / http://192.168.10.14:4040/
+ProxyPassReverse / http://192.168.10.14:4040/
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>という設定で http://subsonic.mizzy.org/ にアクセスしたら、http://192.168.10.14:4040/login.view? にリダイレクトされてしまった。Subsonic にホスト名を設定するところもなさそう。そこで、おそらく Host ヘッダに設定されたホストがリダイレクト先になるんじゃなかろうか、と仮説を立てて、以下のように設定してみた。</p>
+
+<pre><code>&lt;VirtualHost *&gt;
+ServerName subsonic.mizzy.org
+ProxyPreserveHost On
+ProxyPass / http://192.168.10.14:4040/
+ProxyPassReverse / http://192.168.10.14:4040/
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>これでうまくいった。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1101,92 +1155,6 @@ is_deeply($result, ['Mercury', "Venus", ["Earth", ['Moon']], ['Mars', ["Phobos",
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/02/11/PtexLiveOnCentOS5/">Ptex Live On Cent Os5</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-02-11T11:31:55+09:00" pubdate>Feb 11<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>ptexlive のビルドに必要なパッケージインストール用 Puppet マニフェスト</p>
-
-<pre><code>package {
-  'xz':
-    ensure =&gt; present;
-  'libXt-devel':
-    ensure =&gt; present;
-  'libXaw-devel':
-    ensure =&gt; present;
-  'gcc':
-    ensure =&gt; present;
-  'make':
-    ensure =&gt; present;
-  'gcc-c++':
-    ensure =&gt; present;
-  'fontconfig-devel':
-    ensure =&gt; present;
-  'ghostscript':
-    ensure =&gt; present;
-}
-</code></pre>
-
-<p>ビルド＆インストール用シェルスクリプト</p>
-
-<pre><code>#!sh
-#!/bin/sh
-
-wget ftp://tug.org/historic/systems/texlive/2009/texlive2009-20091107.iso.xz
-unxz texlive2009-20091107.iso.xz
-
-mount -o loop texlive2009-20091107.iso /mnt
-
-cd /mnt
-
-./install-tl
-
-cd
-
-wget http://tutimura.ath.cx/~nob/tex/ptexlive/ptexlive-20100711.tar.gz
-tar zxvf ptexlive-20100711.tar.gz
-
-cd ptexlive-20100711
-cp ptexlive.sample ptexlive.cfg
-
-sed -i 's!ISO_DIR=/media/TeXLive2009!ISO_DIR=/mnt!g' ptexlive.cfg
-sed -i 's!# conf_option --without-x!conf_option --without-x!g' ptexlive.cfg
-sed -i 's!# conf_option --disable-xdvik!conf_option --disable-xdvik!g' ptexlive.cfg
-sed -i 's!# conf_option --disable-pxdvik!conf_option --disable-pxdvik!g' ptexlive.cfg
-sed -i 's!# XDVI=echo!XDVI=echo!g' ptexlive.cfg
-
-sed -i 's/grep "recursive calls"/grep "Loop in Pages tree"/g' 8test.sh
-
-yes yes | make
-
-make install
-</code></pre>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1204,6 +1172,10 @@ make install
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/03/31/puppet-report-ikachan/">puppet-report-ikachan</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/03/07/image-with-exif-tag-plugin/">Image with EXIF tag plugin</a>
       </li>
     
@@ -1217,10 +1189,6 @@ make install
     
       <li class="post">
         <a href="/blog/2012/02/29/paperboys-engineer-evaluation-system/">Paperboy&#8217;s engineer evaluation system</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/01/17/paperboy-is-hiring/">paperboy is hiring</a>
       </li>
     
   </ul>
