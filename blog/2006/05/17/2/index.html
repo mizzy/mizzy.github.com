@@ -1,0 +1,93 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>trac を lighttpd + FastCGI で動かす - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 17<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/05/17/2">trac を lighttpd + FastCGI で動かす</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+<a href="http://mizzy.org/program/trac.html" target="_blank">このエントリ</a> の様な経緯で、うちでは apache + tracd という構成で trac を動かしてるのですが、tracd がしょっちゅう落ちるんですよね。1日に2, 3回ぐらいは落ちる感じ。で、5分ごとに cron で tracd プロセスを監視して、落ちてたら再起動ってなことをやってるんですが、<a href="http://unknownplace.org/memo/" target="_blank">typester さん</a> から「うちは lighttpd + FastCGI でやってるよ」というアドバイスを頂いたので、試してみました。
+</p>
+
+<p class="entryBody">
+やったことは以下の通り。
+</p>
+
+<ol class="entryBody">
+<li>FastCGI のインストール</li>
+<li>lighttpd のインストール</li>
+<li>lighttpd.conf を書く</li>
+<li>lighttpd の起動</li>
+</ol>
+
+<p class="entryBody">
+1, 2 については省略。ディストリビューションによって違うでしょうし、うちは Slackware だからあんまり参考にならないだろうし。3 については以下の様な内容の /usr/local/etc/lighttpd.conf を作成した。
+</p>
+
+<pre class="code">
+server.modules              = (
+                               "mod_fastcgi",
+                              )
+server.document-root        = "/home/miya/html"
+server.errorlog             = "/var/log/lighttpd.error.log"
+mimetype.assign             = (
+  ".png"          =>      "image/png",
+ )
+static-file.exclude-extensions = ( ".fcgi" )
+server.port                = 81
+server.bind                = "localhost"
+server.username            = "svn"
+server.groupname           = "svn"
+fastcgi.server = ("/public" =>
+                   ("public" =>
+                     ("socket" => "/tmp/trac-fastcgi.sock",
+                      "bin-path" => "/usr/local/share/trac/cgi-bin/trac.fcgi",
+                      "check-local" => "disable",
+                      "bin-environment" =>
+                        ("TRAC_ENV" => "/home/miya/trac/public")
+                     )
+                   )
+</pre>
+
+<p class="entryBody">
+たったこれだけの設定でちゃんと動きました。起動は以下のコマンドで。
+</p>
+
+<pre class="code">
+$ sudo /usr/local/sbin/lighttpd -f /usr/local/etc/lighttpd.conf
+</pre>
+
+<p class="entryBody">
+あとは apache の設定を変更してやれば OK。<a href="http://trac.mizzy.org/public/" target="_blank">こんな感じで</a> 動いてます。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/05/17/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/05/18/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

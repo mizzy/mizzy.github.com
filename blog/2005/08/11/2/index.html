@@ -1,0 +1,58 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>blosxomをAccount Auto-Discoveryに対応させるプラグイン #1 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Aug 11<span>th</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/08/11/2">blosxomをAccount Auto-Discoveryに対応させるプラグイン #1</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+blosxom用<a href="http://mizzy.org/archives/account_auto_discovery" target="blank">account_auto_discoveryプラグイン</a>を修正しました。account_nameとaccount_service_homepageを、以下の様な感じで複数設定できるようにしています。
+</p>
+
+<pre class="code">
+my @accounts = (
+        {
+            account_name =&gt; "gosukenator",
+            account_service_homepage =&gt; "http://www.hatena.ne.jp/",
+        },
+        {
+            account_name =&gt; "other_account",
+            account_service_homepage =&gt; "http://www.xxx.ne.jp/",
+        },
+        );
+</pre>
+
+<p class="entryBody">
+こうしておけば、今後はてな以外にもAccount Auto-Discoveryに対応したサービスを提供するところが出てきた場合に、フレーバをいじることなく対応できるので良いのではないかと。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/08/11/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/08/13/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

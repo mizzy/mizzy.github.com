@@ -1,0 +1,68 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>catlxom メモ #1 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 27<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/05/27/2">catlxom メモ #1</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+catlxom の Template::TT プラグインで、INCLUDE_PATH を指定するための patch 。
+</p>
+
+<pre class="code">
+Index: plugins/Template/TT.pm
+===================================================================
+--- plugins/Template/TT.pm      (revision 23)
++++ plugins/Template/TT.pm      (working copy)
+@@ -10,15 +10,15 @@
+
+ our $VERSION = '0.01';
+
++my $template_dir = Catlxom::Util::load_dir('template');
++my $path_root    = join '/', $template_dir->dir_list;
++
+ __PACKAGE__->classdata->{templates} = {};
+-__PACKAGE__->classdata->{tt}        = Template->new;
++__PACKAGE__->classdata->{tt}        = Template->new( INCLUDE_PATH => $path_root );
+
+ sub setup {
+     my ( $self, $c ) = @_;
+
+-    my $template_dir = Catlxom::Util::load_dir('template');
+-    my $path_root    = join '/', $template_dir->dir_list;
+-
+     $template_dir->recurse(
+         callback => sub {
+             my $file = shift;
+</pre>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/05/27/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/05/28/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>HowToRpmizeCpanModules - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Feb 6<span>th</span>, 2009</time>
+  <h1 class="entry-title"><a href="/blog/2009/02/06/1">HowToRpmizeCpanModules</a></h1>
+
+  <div class="content">
+    <p><a href="http://wassr.jp/">Wassr</a> で <a href="http://d.hatena.ne.jp/ZIGOROu/">ZIGOROu さん</a> や <a href="http://blog.hide-k.net/">hidek さん</a> とやりとりした内容をまとめてみます。</p>
+
+<p>CPAN モジュールの rpm パッケージ作成なんですが、自分は<a href="http://search.cpan.org/dist/RPM-Specfile/">RPM::Specfile</a> に付属している、cpanflute2 を基本的に使ってます。</p>
+
+<p><a href="http://perl.arix.com/cpan2rpm/">cpan2rpm</a> の方がメジャーだとは思うんですが、オリジナルのダウンロード用FTPサイトが接続できないのと、吐き出す SPEC ファイルが微妙な感じがするので、なんとなくイヤで使ってないんですが、それ以外はそんなに明確な理由もなく、cpanflute2 の方を使ってます。</p>
+
+<p>ただ、cpanflute2 には以下の問題点があります。</p>
+
+<ul>
+<li>依存関係を自動的に解決してくれない（これは cpan2rpm も同じ）</li>
+<li>モジュールの tar ball を自分で取得しないといけない（cpan2rpm はsearch.cpan.org から取得してくれる）</li>
+</ul>
+
+<p>なので、<a href="http://gist.github.com/59314">cpanflute2_wrapper.pl</a> といったラッパースクリプトを書いて使ってます。これを使うと、</p>
+
+<pre><code>$ cpanflute2_wrapper.pl --buildall Catalyst::Runtime
+</code></pre>
+
+<p>みたいに実行すると、Catalyt::Runtime とそれに依存するモジュールの srpm と rpm を「半自動」で全部作ってくれます。--buildall とかのオプションは、中で呼び出される cpanflute2 にそのまま渡されます。</p>
+
+<p>「半自動」と言ってるのは、スクリプトがいろいろとイケてなくて、場合によっては途中でこけてるのを目視で確認して、依存関係を自分で解決しないといけない時があったりするからです。あと、エラー処理やエラーメッセージもイケてなくてわかりにくかったり、ということもあって、今まで公開してなかったんですが、Wassr の流れで gist にスクリプト貼り付けちゃったので、ここでまとめてみることにしました。</p>
+
+<p>他にも注意点があって、まずは rpmbuild の問題。rpmbuild でパッケージを作る際に、use/require してるモジュールがすべて勝手に SPEC ファイルのRequires に含まれてしまう、という問題があります。eval しているモジュールは依存関係の対象とはならないが、以下のように複数行にまたがっていると、依存関係の対象になってしまう。</p>
+
+<pre><code>eval {
+    require &#39;Hoge&#39;;
+}
+</code></pre>
+
+<p>そのせいで、Linux 上でビルドしてるのに、Requires に Win32::*** が含まれる、ということがあったりします。で、Requires に含まれないようにするためには、/usr/lib/rpm/perl.req を以下のように修正します。（cpanflute2 が Makefile.PL を見て Requires に加えてくれるので、rpmbuild で Requires の処理してる部分はコメントアウトしちゃう。）</p>
+
+<pre><code>#!diff
+--- /usr/lib/rpm/perl.req.org   2008-01-31 19:21:31.000000000 +0900
++++ /usr/lib/rpm/perl.req       2008-01-31 19:21:41.000000000 +0900
+@@ -221,8 +221,8 @@
+
+       ($module  =~ m/\.ph$/) &amp;&amp; next;
+
+-      $require{$module}=$version;
+-      $line{$module}=$_;
++      #$require{$module}=$version;
++      #$line{$module}=$_;
+     }
+
+   }
+</code></pre>
+
+<p>それから、cpanflute2自体に問題があって、以下のパッチをあてておく必要がある。</p>
+
+<pre><code>#!diff
+--- cpanflute2.org      2008-02-26 12:20:28.000000000 +0900
++++ cpanflute2  2008-02-26 12:21:15.000000000 +0900
+@@ -159,10 +159,12 @@
+       my $yaml = Load($contents);
+
+       while (my ($mod, $ver) = each %{$yaml-&gt;{build_requires}}) {
+-       push @build_requires, [ &quot;perl($mod)&quot;, $ver ];
++        $mod = &quot;perl($mod)&quot; if $mod ne &#39;perl&#39;;
++       push @build_requires, [ &quot;$mod&quot;, $ver ];
+       }
+       while (my ($mod, $ver) = each %{$yaml-&gt;{requires}}) {
+-       push @requires, [ &quot;perl($mod)&quot;, $ver ];
++        $mod = &quot;perl($mod)&quot; if $mod ne &#39;perl&#39;;
++       push @requires, [ &quot;$mod&quot;, $ver ];
+       }
+     }
+
+@@ -289,12 +291,7 @@
+ my $makefile_pl = qq{CFLAGS=&quot;\$RPM_OPT_FLAGS&quot; %{__perl} Makefile.PL &lt; /dev/null};
+ my $make_install = qq{make pure_install PERL_INSTALL_ROOT=\$RPM_BUILD_ROOT};
+
+-if ($use_module_build) {
+-  $makefile_pl = qq{CFLAGS=&quot;\$RPM_OPT_FLAGS&quot; %{__perl} Makefile.PL destdir=\$RPM_BUILD_ROOT $installdirs &lt; /dev/null};
+-}
+-else {
+-  $makefile_pl = qq{CFLAGS=&quot;\$RPM_OPT_FLAGS&quot; %{__perl} Makefile.PL $installdirs};
+-}
++$makefile_pl = qq{CFLAGS=&quot;\$RPM_OPT_FLAGS&quot; %{__perl} Makefile.PL $installdirs};
+
+ $spec-&gt;build(&lt;&lt;EOB);
+ $makefile_pl
+</code></pre>
+
+<p>前半の修正は、Makefile.PL の PREREQ_PM とか requires とかに perl が含まれていると、SPEC ファイルの Requires に perl(perl) とか入っちゃっておかしなことになるので、そうならないように修正。</p>
+
+<p>後半の修正は、なんで修正したかあまり覚えてないんだけど、時々 RPM<em>BUILD</em>ROOT がおかしくなることがあって、それに対する修正だったと思う。</p>
+
+<p>そういえば、<a href="http://d.hatena.ne.jp/stanaka/20070728/1185605498">まっさらなサーバを30分で本番投入できるようにする</a> で stanaka さんが「CPANの依存関係を解析してrpm化する手製スクリプトで、CPANモジュールのrpm化が、ほぼ自動化されています」と書いてるんだけど、これって公開してくれないのかなー。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2009/01/13/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2009/03/03/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

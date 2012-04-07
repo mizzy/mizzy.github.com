@@ -1,0 +1,64 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>SSLCertOfLolipop - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Sep 3<span>rd</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/09/03/1">SSLCertOfLolipop</a></h1>
+
+  <div class="content">
+    <p><a href="http://blog2.or6.jp/ftpisdead">FFFTP開発終了で大騒ぎしている人たちへ</a> にて、</p>
+
+<pre><code>SSL証明書がまともなものでないと接続時にエラーが出るのですが、ロリポップなんかだと
+このエラーを無視するように公式ドキュメントに書いてあるので、かなり悪質です。
+</code></pre>
+
+<p>と書かれていますので、これについて説明させて頂きます。</p>
+
+<p>この方が指摘されているのは、~~<a href="http://lolipop.jp/manual/hp/w-fz/">Win FileZillaの設定 / ホームページ / マニュアル - ロリポップ！</a> ~~(FileZilla非推奨のため現在は削除されています)の中の、</p>
+
+<pre><code> 証明書の確認を行います。『今後もこの証明書を常に信用する(A)』にチェックを入れて、『OK』をクリックします。
+</code></pre>
+
+<p>という部分だと思われるのですが、確かに、無条件で信用するにチェックを入れるようお客様に指示するのは大変良くないですね。</p>
+
+<p>ロリポップでは <a href="http://www.digicert.ne.jp/">DigiCert Inc社</a> によって発行されている証明書を利用しているのですが、Filezillaでは警告が出てしまうようです。</p>
+
+<p>調べてみたところ、FilezillaはルートCAの証明書を保持しておらず、どのような証明書であっても、ユーザが「信用する」にチェックを入れなければ警告が出る仕様となっているようです。</p>
+
+<p><a href="http://forum.filezilla-project.org/viewtopic.php?f=2&amp;t=20767">how to install root CA certificate on Filezilla</a></p>
+
+<p>OR6 blog 様のご指摘により、このような証明書の検証をきちんと行っていないソフトウェアをお客様に推奨すべきではないと判断いたしましたので、Windows/Mac版ともに存在し、証明書の検証をきちんと行っている <a href="http://cyberduck.ch/">Cyberduck</a> を推奨するよう、マニュアルを変更させて頂くことになりました。</p>
+
+<p>また、蛇足ですが、ロリポップの <a href="http://lolipop.jp/service/plan-chicappa/">チカッパプラン</a> では SSH サービスを提供していますので、FTPS の代わりに SCP/SFTP もご利用頂けます。</p>
+
+<p>OR6 blog 様、この度はご指摘誠にありがとうございました。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/08/18/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/10/05/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

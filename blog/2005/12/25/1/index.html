@@ -1,0 +1,96 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>test_helper.rb の Rails 本と Rails 1.0 の違い（Rails 勉強中 #3） - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 25<span>th</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/12/25/1">test_helper.rb の Rails 本と Rails 1.0 の違い（Rails 勉強中 #3）</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+<a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Agile Web Development With Rails</a> の内容と、最新バージョンである Rails 1.0 の食い違いにより、何度かはまっているわけなのですが、同じようにはまる人がいるかもしれないので、気づいた点はここにメモしていくことにします。
+</p>
+
+<p class="entryBody">
+P153 では、test_helper.rb の内容が以下の様に記述されています。
+</p>
+
+<pre class="code">
+ENV["RAILS_ENV"] = "test"
+require File.dirname(__FILE__) + "/../config/environment"
+require 'application'
+require 'test/unit'
+require 'active_record/fixtures'
+require 'action_controller/test_process'
+require 'action_web_service/test_invoke'
+require 'breakpoint'
+def create_fixtures(*table_names)
+  Fixtures.create_fixtures(File.dirname(__FILE__) + "/fixtures", table_names)
+end
+Test::Unit::TestCase.fixture_path = File.dirname(__FILE__) + "/fixtures/"
+</pre>
+
+<p class="entryBody">
+が、1.0 では実際には以下の様になってます。（コメントや空行は省略）
+</p>
+
+<pre class="code">
+ENV["RAILS_ENV"] = "test"
+require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+require 'test_help'
+class Test::Unit::TestCase
+  self.use_transactional_fixtures = true
+  self.use_instantiated_fixtures  = true
+end
+</pre>
+
+<p class="entryBody">
+どうやら require 'test_help' がポイントらしい、というわけで、/usr/local/lib/ruby/gems/1.8/gems/rails-1.0.0/lib/test_help.rb を覗いてみると、こんな風になってます。（コメントや空行は省略）
+</p>
+
+<pre class="code">
+require 'application'
+silence_warnings { RAILS_ENV = "test" }
+require 'test/unit'
+require 'active_record/fixtures'
+require 'action_controller/test_process'
+require 'action_web_service/test_invoke'
+require 'breakpoint'
+Test::Unit::TestCase.fixture_path = RAILS_ROOT + "/test/fixtures/"
+def create_fixtures(*table_names)
+  Fixtures.create_fixtures(RAILS_ROOT + "/test/fixtures", table_names)
+end
+</pre>
+
+<p class="entryBody">
+というわけで、test_helper.rb の内容は Rails 本とは異なり、一部が test_help.rb に移されてるんですね。そんだけです。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/12/24/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/12/25/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

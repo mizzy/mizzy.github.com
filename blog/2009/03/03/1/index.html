@@ -1,0 +1,236 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 3<span>rd</span>, 2009</time>
+  <h1 class="entry-title"><a href="/blog/2009/03/03/1">library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm</a></h1>
+
+  <div class="content">
+    <p>source:library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm</p>
+
+<h1>NAME</h1>
+
+<p>FFmpeg::Command - A wrapper class for ffmpeg command line utility.</p>
+
+<h1>DESCRIPTION</h1>
+
+<p>A simple interface for using ffmpeg command line utility.</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use FFmpeg::Command;
+
+    my $ffmpeg = FFmpeg::Command-&gt;new(&#39;/usr/local/bin/ffmpeg&#39;);
+
+    $ffmpeg-&gt;input_options({
+        file =&gt; $input_file,
+    });
+
+    # Set timeout
+    $ffmpeg-&gt;timeout(300);
+
+    # Convert a video file into iPod playable format.
+    $ffmpeg-&gt;output_options({
+        file   =&gt; $output_file,
+        device =&gt; &#39;ipod&#39;,
+    });
+
+    my $result = $ffmpeg-&gt;exec();
+
+    croak $ffmpeg-&gt;errstr unless $result;
+
+    # This is same as above.
+    $ffmpeg-&gt;output_options({
+        file                =&gt; $output_file,
+        format              =&gt; &#39;mp4&#39;,
+        video_codec         =&gt; &#39;mpeg4&#39;,
+        bitrate             =&gt; 600,
+        frame_size          =&gt; &#39;320x240&#39;,
+        audio_codec         =&gt; &#39;libaac&#39;,
+        audio_sampling_rate =&gt; 48000,
+        audio_bit_rate      =&gt; 64,
+    });
+
+    $ffmpeg-&gt;exec();
+
+
+    # Convert a video file into PSP playable format.
+    $ffmpeg-&gt;output_options({
+        file  =&gt; $output_file,
+        device =&gt; &#39;psp&#39;,
+    });
+
+    $ffmpeg-&gt;exec();
+
+    # This is same as above.
+    $ffmpeg-&gt;output_options({
+        file                =&gt; $output_file,
+        format              =&gt; &#39;psp&#39;,
+        video_codec         =&gt; &#39;mpeg4&#39;,
+        bitrate             =&gt; 600,
+        frame_size          =&gt; &#39;320x240&#39;,
+        audio_codec         =&gt; &#39;libaac&#39;,
+        audio_sampling_rate =&gt; 48000,
+        audio_bit_rate      =&gt; 64,
+    });
+
+    $ffmpeg-&gt;exec();
+
+    # Execute ffmpeg with any options you like.
+    # This sample code takes a screnn shot.
+    $ffmpeg-&gt;input_file($input_file);
+    $ffmpeg-&gt;output_file($output_file);
+
+    $ffmpeg-&gt;options(
+        &#39;-y&#39;,
+        &#39;-f&#39;       =&gt; &#39;image2&#39;,
+        &#39;-pix_fmt&#39; =&gt; &#39;jpg&#39;,
+        &#39;-vframes&#39; =&gt; 1,
+        &#39;-ss&#39;      =&gt; 30,
+        &#39;-s&#39;       =&gt; &#39;320x240&#39;,
+        &#39;-an&#39;,
+    );
+
+    $ffmpeg-&gt;exec();
+</code></pre>
+
+<h1>METHODS</h1>
+
+<h2>new(&#39;/usr/bin/ffmpeg&#39;)</h2>
+
+<p>Contructs FFmpeg::Command object.It takes a path of ffmpeg command. You can omit this argument and this module searches ffmpeg command within PATH environment variable.</p>
+
+<h2>timeout()</h2>
+
+<p>Set command timeout.Default is 0.</p>
+
+<h2>input_options({ %options })</h2>
+
+<p>Specify input file name and input options.(Now no options are available.)</p>
+
+<p>file:: a file name of input file.</p>
+
+<h2>output_options({ %options })</h2>
+
+<p>Specify output file name and output options.</p>
+
+<p>Avaiable options are:</p>
+
+<p>file:: a file name of output file.
+ format:: Output video format.
+ video<em>codec:: Output video codec.
+ bitrate:: Output video bitrate.
+ frame</em>size:: Output video screen size.
+ audio<em>codec:: Output audio code.
+ audio</em>sampling<em>rate:: Output audio sampling rate.
+ audio</em>bit_rate:: Output audio bit rate.
+ title:: Set the title.
+ author:: Set the author.
+ comment:: Set the comment.</p>
+
+<h2>input<em>file(&#39;/path/to/inpuf</em>file&#39;)</h2>
+
+<p>Specify input file name using with options() method.</p>
+
+<h2>output<em>file(&#39;/path/to/output</em>file&#39;)</h2>
+
+<p>Specify output file name using with options() method.</p>
+
+<h2>options( @options )</h2>
+
+<p>Specify ffmpeg command options directly.</p>
+
+<h2>execute()</h2>
+
+<p>Executes ffmpeg comman with specified options.</p>
+
+<h2>exec()</h2>
+
+<p>An alias of execute()</p>
+
+<h2>stdout()</h2>
+
+<p>Get ffmpeg command output to stdout.</p>
+
+<h2>stderr()</h2>
+
+<p>Get ffmpeg command output to stderr.</p>
+
+<h1>AUTHOR</h1>
+
+<p>Gosuke Miyashita, <code>&lt;gosukenator at gmail.com&gt;</code></p>
+
+<h1>BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-ffmpeg-command at rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FFmpeg-Command">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FFmpeg-Command</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1>SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc FFmpeg::Command
+</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+<li>AnnoCPAN: Annotated CPAN documentation</li>
+</ul>
+
+<p><a href="http://annocpan.org/dist/FFmpeg-Command">http://annocpan.org/dist/FFmpeg-Command</a></p>
+
+<ul>
+<li>CPAN Ratings</li>
+</ul>
+
+<p><a href="http://cpanratings.perl.org/d/FFmpeg-Command">http://cpanratings.perl.org/d/FFmpeg-Command</a></p>
+
+<ul>
+<li>RT: CPAN&#39;s request tracker</li>
+</ul>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Command">http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Command</a></p>
+
+<ul>
+<li>Search CPAN</li>
+</ul>
+
+<p><a href="http://search.cpan.org/dist/FFmpeg-Command">http://search.cpan.org/dist/FFmpeg-Command</a></p>
+
+<h1>ACKNOWLEDGEMENTS</h1>
+
+<h1>COPYRIGHT &amp; LICENSE</h1>
+
+<p>Copyright 2006 Gosuke Miyashita, all rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2009/02/06/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2009/03/21/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

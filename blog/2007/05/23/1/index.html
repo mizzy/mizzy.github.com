@@ -1,0 +1,96 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>write はユーザプロセスを待たせない？ - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 23<span>rd</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/05/23/1">write はユーザプロセスを待たせない？</a></h1>
+
+  <div class="content">
+    <p><a href="http://naoya.g.hatena.ne.jp/naoya/20070522/1179830475">naoyaグループ - naoyaの日記 -  I/O, iowait</a> にちょっと反応してみます。</p>
+
+<blockquote>
+<p>write はページに dirty フラグを立てるだけなので決してユーザープロセスを待たせない</p>
+</blockquote>
+
+<p>って、本当にそうなんでしょうか？（否定しているわけではなく、純粋な疑問です。）</p>
+
+<p>最近、書き込みの多いメールサーバのディスク I/O 周りを調査していて、実際にどのプロセスの書き込みが多いのかを調べる方法がわからなかったため、I/O 待ちになっているプロセスをカウントして、そこから類推してみようと、まずは</p>
+
+<pre><code>while [ 1 ]
+  do
+    ps -eo comm,state|grep D|grep -v COMMAND &gt;&gt; ps.txt
+    sleep 1
+  done
+</code></pre>
+
+<p>な感じで STAT が D のプロセスを記録するスクリプトをしばらく走らせておいて、</p>
+
+<pre><code>sort ps.txt | uniq -c | sort -gr| more
+</code></pre>
+
+<p>でカウントしてみると、</p>
+
+<pre><code>9129 kjournald       D
+6576 qmail-queue     D
+2017 multilog        D
+1897 pdflush         D
+1373 qmail-send      D
+1094 procmail        D
+1032 syslogd         D
+</code></pre>
+
+<p>な感じで、kjournald と qmail-queue が圧倒的に多い。これってどっちも書き込みがメインの仕事のはず。</p>
+
+<p>man ps で見ても、</p>
+
+<pre><code>D    Uninterruptible sleep (usually IO)
+</code></pre>
+
+<p>なので、書き込みでプロセスが待たされてるのだと思うのですが、何か間違ってますでしょうか？</p>
+
+<p>ちなみに、書き込みが多いというのはどれぐらいかというと、iostat での r/s と w/s の比率が 1:7 ぐらいです。</p>
+
+<p>また、free の結果はこんな感じなので、メモリに余裕はあるみたいです。</p>
+
+<pre><code># free
+             total       used       free     shared    buffers     cached
+Mem:       2043756    2011160      32596          0     351016     847776
+-/+ buffers/cache:     812368    1231388
+Swap:      1052248
+</code></pre>
+
+<p>ここ数日 I/O まわりを追いかけていたので、naoya さんのエントリはタイムリーでとてもためになります。ついでに色々教えてもらおうという甘い考えで、疑問に感じたことを書いてみました。</p>
+
+<p><strong><em>追記</em></strong></p>
+
+<p>もしかして「write はユーザプロセスを待たせない」というのは、非同期 I/O の話？であれば納得はいく。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/05/13/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/05/25/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

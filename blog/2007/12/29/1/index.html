@@ -1,0 +1,233 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Cobbler - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 29<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/12/29/1">Cobbler</a></h1>
+
+  <div class="content">
+    <p>ネットワークインストール環境がさくっと構築できる <a href="http://cobbler.et.redhat.com/">Cobbler</a> がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。</p>
+
+<ul>
+<li><a href="http://www.cafechantant.com/blog/2007/08/09/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae5/">サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）</a></li>
+<li><a href="http://www.cafechantant.com/blog/2007/09/05/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae6/">サーバの構築を簡単にするためのステップ （その6：Cobber編 Part2 ）</a></li>
+<li><a href="http://www.asahi-net.or.jp/%7Eaa4t-nngk/pxeinstall.html">PXEネットワークインストール(Cobbler)</a></li>
+<li><a href="http://www.cafechantant.com/trac/wiki/cobbler_top">cobbler_top - Cafe Chantant Info Repositry - Trac</a></li>
+</ul>
+
+<p>以下、Fedora 7 で Cobbler を動かしてみたメモ。</p>
+
+<h1>インストール</h1>
+
+<p>yum で一発インストール。</p>
+
+<pre><code>$ sudo yum install cobbler
+</code></pre>
+
+<h1>設定</h1>
+
+<p>cobbler check コマンドを実行すると、見直すべき設定ポイントを教えてくれる。親切。</p>
+
+<pre><code>$ sudo cobbler check
+The following potential problems were detected:
+#0: The &#39;server&#39; field in /var/lib/cobbler/settings must be set to something other than localhost, or kickstarting features will not work.  This should be a resolvable hostname or IP for the boot server as reachable by all machines that will use it.
+#1: For PXE to be functional, the &#39;next_server&#39; field in /var/lib/cobbler/settings must be set to something other than 127.0.0.1, and should match the IP of the boot server on the PXE network.
+#2: service cobblerd is not running
+#3: syslinux should be installed but is not, expecting to find something at /usr/lib/syslinux/pxelinux.0
+#4: service xinetd is not running
+#5: change &#39;disable&#39; to &#39;no&#39; in /etc/xinetd.d/tftp
+#6: service httpd is not running
+#7: since iptables may be running, ensure 69, 80, 25150, and 25151 are unblocked#8: reposync is not installed, need for cobbler reposync, install/upgrade yum-utils?
+#9: yumdownloader is not installed, needed for cobbler repo add with --rpm-list
+parameter, install/upgrade yum-utils? 
+</code></pre>
+
+<p>これを元に設定変更を行っていく。まずは /var/lib/cobbler/settings を以下のように修正。</p>
+
+<pre><code>manage_dhcp: 1
+next_server: &#39;192.168.10.12&#39;
+server: 192.168.10.12
+</code></pre>
+
+<p>192.168.10.12 は Cobbler が動いているマシンの IP アドレス。</p>
+
+<p>cobblerd を起動。</p>
+
+<pre><code>$ sudo /sbin/chkconfig cobblerd on 
+$ sudo /etc/init.d/cobblerd start 
+</code></pre>
+
+<p>syslinux をインストール。</p>
+
+<pre><code>$ sudo yum install syslinux
+</code></pre>
+
+<p>tftpd と xinetd を起動。</p>
+
+<pre><code>$ sudo /sbin/chkconfig tftp on
+$ sudo /sbin/chkconfig xinetd on 
+$ sudo /etc/init.d/xinetd start 
+</code></pre>
+
+<p>httpd を起動。</p>
+
+<pre><code>$ sudo /sbin/chkconfig httpd on
+$ sudo /etc/init.d/httpd start 
+</code></pre>
+
+<p>iptables はとりあえずオフにしとく。</p>
+
+<pre><code>$ sudo /sbin/chkconfig iptables off
+$ sudo /etc/init.d/iptables stop 
+</code></pre>
+
+<p>yum-utils のインストール。</p>
+
+<pre><code>$ sudo yum install yum-utils
+</code></pre>
+
+<p>/etc/cobbler/dhcp.template を以下のような感じで修正。</p>
+
+<pre><code># ******************************************************************
+# Cobbler managed dhcpd.conf file
+#
+# generated from cobbler dhcp.conf template ($date)
+#
+# ******************************************************************
+
+ddns-update-style interim;
+
+allow booting;
+allow bootp;
+
+ignore client-updates;
+set vendorclass = option vendor-class-identifier;
+
+subnet 192.168.10.0 netmask 255.255.255.0 {
+     option routers          192.168.10.1;
+     option subnet-mask      255.255.255.0;
+     range dynamic-bootp     192.168.10.100 192.168.10.254;
+     filename                &quot;/pxelinux.0&quot;;
+     default-lease-time      21600;
+     max-lease-time          43200;
+     next-server             $next_server;
+}
+
+$insert_cobbler_system_definitions
+</code></pre>
+
+<p>dhcp をインストールしておく。dhcpd はこの段階では起動しなくていい。（起動してもエラーになる。）</p>
+
+<pre><code>$ sudo yum install dhcp
+$ sudo /sbin/chkconfig dhcpd on
+</code></pre>
+
+<h1>ネットワークインストールに必要なファイルの用意</h1>
+
+<p>インストールイメージとか、キックスタートファイルとかを作成。</p>
+
+<pre><code>$ sudo cobbler import --path=rsync://ftp.jaist.ac.jp/pub/Linux/Fedora/releases/7/Fedora/i386/os --name=f7
+</code></pre>
+
+<p>このコマンド一発で必要なものを全部つくってくれる。超簡単。時間はかかるけど。</p>
+
+<p>cobbler report を実行すると、どこにどんなファイルがあるかとかを表示してくれる。</p>
+
+<pre><code>$ sudo cobbler report
+distro          : f7-i386
+kernel          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/vmlinuz
+initrd          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/initrd.img
+kernel options  : {}
+architecture    : x86
+ks metadata     : {&#39;tree&#39;: &#39;http://@@server@@/cblr/links/f7-i386&#39;}
+breed           : redhat
+
+distro          : f7-xen-i386
+kernel          : /var/www/cobbler/ks_mirror/f7/images/xen/vmlinuz
+initrd          : /var/www/cobbler/ks_mirror/f7/images/xen/initrd.img
+kernel options  : {}
+architecture    : x86
+ks metadata     : {&#39;tree&#39;: &#39;http://@@server@@/cblr/links/f7-xen-i386&#39;}
+breed           : redhat
+
+profile         : f7-i386
+distro          : f7-i386
+kickstart       : /etc/cobbler/kickstart_fc6.ks
+kernel options  : {}
+ks metadata     : {}
+virt file size  : 5
+virt ram        : 512
+virt type       : auto
+virt path       :
+virt bridge     : xenbr0
+virt cpus       : 1
+repos           : []
+dhcp tag        : default
+server          : &lt;&lt;inherit&gt;&gt;
+
+profile         : f7-xen-i386
+distro          : f7-xen-i386
+kickstart       : /etc/cobbler/kickstart_fc6.ks
+kernel options  : {}
+ks metadata     : {}
+virt file size  : 5
+virt ram        : 512
+virt type       : auto
+virt path       :
+virt bridge     : xenbr0
+virt cpus       : 1
+repos           : []
+dhcp tag        : default
+server          : &lt;&lt;inherit&gt;&gt;
+</code></pre>
+
+<p>これを見て分かるとおり、Xen 用のイメージなんかも勝手に作ってくれる。</p>
+
+<p>あとは必要に応じてキックスタートファイル（/etc/cobbler/kickstart_fc6.ks）なんかをいじる。何かファイルを修正したりしたら、cobbler sync を忘れずに実行。</p>
+
+<pre><code>$ sudo cobbler sync
+</code></pre>
+
+<h1>ネットワークインストールを実行する</h1>
+
+<p>ここまできたら、別のマシンを PXE ブートで起動して、boot プロンプトで cobbler import で作成したイメージの名前を入力。</p>
+
+<pre><code>boot: f7-i386
+</code></pre>
+
+<p>あとは勝手にインストールが始まる。</p>
+
+<p>以下のように system 登録しておくと、PXE ブート時にイメージ名を入力しなくても、勝手に割り当てられたイメージでブートしてくれる。</p>
+
+<pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386
+</code></pre>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/12/08/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/12/29/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

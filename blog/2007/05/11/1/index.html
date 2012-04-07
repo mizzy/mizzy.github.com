@@ -1,0 +1,79 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Linux の iostat は何を見てるのか - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 11<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/05/11/1">Linux の iostat は何を見てるのか</a></h1>
+
+  <div class="content">
+    <p>Linux の iostat が出している数値が、正確には何なのか、ということを知る必要があり、調べてみたのでメモ。</p>
+
+<p>知りたいのは、とりあえずは以下の様に実行した場合の、rrqm/s, wrqm/s, r/s, w/s の 4 つ。</p>
+
+<pre><code>$ iostat -d -x
+Device:    rrqm/s wrqm/s   r/s   w/s  rsec/s  wsec/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
+sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40     0.77   22.15   3.26  11.39
+</code></pre>
+
+<p>特に rrqm/s, wrqm/s が man を読んでもよく分からない。</p>
+
+<pre><code>          rrqm/s
+                 The  number  of read requests merged per second that
+                 were issued to the device.
+
+          wrqm/s
+                 The number of write requests merged per second  that
+                 were issued to the device.
+</code></pre>
+
+<p>r/s, w/s が実際にデバイスにリクエストされた I/O 数で、rrqm/s, wrqm/s が、プロセスからリクエストされたものの、デバイスに渡される前にマージされたリクエスト数ではないか、推測。それが正しいかどうか確かめる。</p>
+
+<p>また、このリクエスト数というのが正確には何なのか、ということも確かめる。read/write 系のシステムコールの数？</p>
+
+<p>まずはおそらく /proc/diskstat から値を取得しているのだろう、ということで、中身を見てみると、こんな行がある。</p>
+
+<pre><code>8    0 sda 4506815 26232 69968005 66785384 37727406 87380973 1002794888 868225876 125 137597988 935021144
+</code></pre>
+
+<p>でもって、sysstat-5.0.5 の iostat.c を見てみると、544行目あたりにこんな記述があった。</p>
+
+<pre><code>if (dev_type == DT_DEVICE)
+   i = (fscanf(sysfp, &quot;%lu %lu %llu %lu %lu %lu %llu %lu %lu %lu %lu&quot;,
+       &amp;sdev.rd_ios, &amp;sdev.rd_merges,
+       &amp;sdev.rd_sectors, &amp;sdev.rd_ticks,
+       &amp;sdev.wr_ios, &amp;sdev.wr_merges,
+       &amp;sdev.wr_sectors, &amp;sdev.wr_ticks,
+       &amp;sdev.ios_pgr, &amp;sdev.tot_ticks, &amp;sdev.rq_ticks) == 11);
+</code></pre>
+
+<p>/proc/diskstat 内の sda 右横にあるカラム数とも一致してるので、ここと考えて良さそう。そうなると、r/s, rrqm/s が 1, 2番目のカラム、w/s と wrqm/s が 5,6 番目のカラム、ってことになる。 </p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/05/06/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/05/13/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

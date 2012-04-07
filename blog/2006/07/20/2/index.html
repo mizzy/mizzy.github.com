@@ -1,0 +1,61 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Catalyst Tips #1 default アクションでの args の扱い - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jul 20<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/07/20/2">Catalyst Tips #1 default アクションでの args の扱い</a></h1>
+
+  <div class="content">
+    <p>
+Catalyst では /controller/action/foo/bar といった パスでアクセスした場合、$c-&gt;req-&gt;args-&gt;<a class="changeset" href="/changeset/0">[0]</a> で foo、$c-&gt;req-&gt;args-&gt;<a class="changeset" href="/changeset/1">[1]</a> で bar が取り出せるのですが、/controller/foo/bar といったアクションの指定がないパスだと、$c-&gt;req-&gt;args-&gt;<a class="changeset" href="/changeset/0">[0]</a> には controller が入ってしまいます。
+</p>
+<p>
+$c-&gt;req-&gt;args は Catalyst::Dispatcher の prepare_action メソッドでセットされるのですが、default アクションが呼び出される場合には、更に Catalyst::DispatchType::Default 中の以下のコードが実行され、$c-&gt;req-&gt;args に コントローラ名がつっこまれる、という仕様になっているようです。
+</p>
+<pre class="wiki">
+# default methods receive the controller name as the first argument
+unshift @{ $c-&gt;req-&gt;args }, $path if $path;  
+</pre>
+<p>
+default アクションとその他のアクションで、$c-&gt;req-&gt;args の値の入り方が違うのは気持ち悪いし、共通のサブルーチンで args を処理する場合に面倒なので、以下の様なコードで回避することにしました。
+</p>
+<pre class="wiki">
+sub default : Private {
+    my ( $self, $c ) = @_;
+    shift @{ $c-&gt;req-&gt;args };
+    ...
+}
+</pre>
+<p>
+それにしても、なぜ default アクションの場合、コントローラ名を args に入れる必要があるんだろう？
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/07/20/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/07/22/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>blosxomでtagging #9 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 8<span>th</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/05/08/1">blosxomでtagging #9</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+<a href="/archives/tagging" target="_blank">taggingプラグイン</a>をアップデート。
+</p>
+
+<p class="entryBody">
+storyサブルーチンで、meta-tagsを抜き出すルーチンを自前で書いていたのですが、<a href="http://www.blosxom.com/plugins/meta/meta.htm" target="_blank">metaプラグイン</a>が$meta::tagsという変数に入れてくれてるので、それを利用するようにしました。なので、コードが少しすっきり。
+</p>
+
+<p class="entryBody">
+以前はtaggingプラグインがmetaプラグインより前に呼び出される必要があったのですが、この修正により、逆にmetaプラグインよりも後に呼び出されるようにしないと、正常に動作しなくなりました。ご利用頂いている方は、ご注意下さい。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/05/05/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/05/11/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

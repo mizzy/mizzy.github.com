@@ -1,0 +1,80 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Trac の SearchHyperEstraierPlugin を Trac 0.10.x で動かすパッチ - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Aug 9<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/08/09/1">Trac の SearchHyperEstraierPlugin を Trac 0.10.x で動かすパッチ</a></h1>
+
+  <div class="content">
+    <p>&quot;SearchHyperEstraierPlugin&quot;:<a href="http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SearchHyperEstraierPlugin">http://weekbuild.sakura.ne.jp/trac/wiki/TracDoc/SearchHyperEstraierPlugin</a> が、Trac 0.10.x というか、うちの環境で動かないので、パッチ書いた。初 Python プログラミング。（というほどのものじゃないけど。）</p>
+
+<pre><code>
+=== searchhyperestraier/searchhyperestraier.py
+==================================================================
+--- searchhyperestraier/searchhyperestraier.py  (revision 892)
++++ searchhyperestraier/searchhyperestraier.py  (local)
+@@ -2,8 +2,9 @@
+ # SearchRepositoryWithNamazu plugin
+
+ from trac.core import *
+-from trac.Search import ISearchSource, query_to_sql, shorten_result
++from trac.Search import ISearchSource, shorten_result
+ from trac.util import NaivePopen
++from trac.util.text import to_unicode
+ from StringIO import StringIO
+ import urllib
+ import time
+@@ -44,9 +45,9 @@
+         browse_trac = self.env.config.get('searchhyperestraier', 'browse_trac','enabled')
+ 
+ 
+-        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,unicode(query,'utf-8').encode(estcmd_encode))
++        cmdline = "%s %s %s %s" % (estcmd_path,estcmd_arg,index_path,' '.join(query))
+         self.log.debug('SearchHyperEstraier:%s' % cmdline)
+-        np = NaivePopen(cmdline)
++        np = NaivePopen( cmdline.encode(estcmd_encode) )
+         #self.log.debug('Result:%s' % unicode(np.out,'utf-8').encode('mbcs'))
+         #self.log.debug('Result:%s' % np.out)
+         if np.errorlevel or np.err:
+@@ -74,7 +75,7 @@
+             attrelem_array = element.getElementsByTagName("attribute")
+             for attrelem in attrelem_array:
+                 attr_name = attrelem.getAttribute("name")
+-                attr_value = unicode(attrelem.getAttribute("value")).encode('utf-8')
++                attr_value = to_unicode(attrelem.getAttribute("value"))
+                 #URLとタイトルを生成
+                 if attr_name == "_lreal":
+                     attr_value=attr_value[len(replace_left):].replace("\\","/")
+</code></pre>
+
+<p>エラーが出るたびに、適当にいじってたら動いた、という感じ。なので、こんなんでいいのかはよく分からない。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/08/03/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/08/30/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

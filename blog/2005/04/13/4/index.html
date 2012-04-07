@@ -1,0 +1,49 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Mac SafariでのxmlHttpRequest文字化け - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Apr 13<span>th</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/04/13/4">Mac SafariでのxmlHttpRequest文字化け</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+このブログをカスタマイズしている過程で、Safari + xmlHttpRequestで取得したデータが文字化けする、という現象に悩んでいたのですが、&lt;?xml version="1.0" encoding="euc-jp"?&gt; という一文を入れてあげると、文字化けが解消されました。
+</p>
+
+<p class="entryBody">
+どうやらSafariのxmlHttpRequestでは、HTTPのContent-typeヘッダのcharsetは無視されるようで、XML宣言（って呼び方でいいの?）で指定されたcharsetを解釈する模様。XML宣言がないと、iso-8859-1とみなすらしい。
+</p>
+
+<p class="entryBody">
+なので、xmlHttpRequestで取得するコメントとトラックバックには、XML宣言を入れてます。なんか気色悪いけど、しかたない。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/04/13/3" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/04/13/5">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

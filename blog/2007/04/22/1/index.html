@@ -1,0 +1,85 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>SVN::TracWiki #0 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Apr 22<span>nd</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/04/22/1">SVN::TracWiki #0</a></h1>
+
+  <div class="content">
+    <p>
+<a class="ext-link" href="http://trac.mizzy.org/public/browser/SVN-TracWiki"><span class="icon"></span>SVN::TracWiki</a> というツールをつくってみました。<a class="ext-link" href="http://svn.mizzy.org/public/SVN-TracWiki/"><span class="icon"></span>svn repos はこちら</a>。 
+</p>
+<p>
+何をするものかというと、Subversion の post-commit スクリプトとして動作して、コミットされたファイルからテキストを抽出、そのファイルの実体へのリンクを付加して、Trac の Wiki へ自動ポストするというもの。
+</p>
+<p>
+具体的な例としては、PowerPoint ファイルをコミットしたら、そのファイルからテキストのみを抽出して Wiki へ自動ポスト。<a class="ext-link" href="http://trac.mizzy.org/public/wiki/docs/YAPC-Assurer-ja-public.ppt"><span class="icon"></span>こんな感じで</a>。
+</p>
+<p>
+これで何がうれしいかというと、Subversion で管理している PowerPoint ファイルを、Trac 上で検索ができるようになります。<a class="ext-link" href="http://trac.mizzy.org/public/search?q=%E8%87%AA%E5%B7%B1%E7%B4%B9%E4%BB%8B&wiki=on&changeset=on&ticket=on"><span class="icon"></span>こんな感じですね</a>。元ファイルへのリンクもあるので、検索して元ファイルを開いて読む、ってことが簡単にできます。
+</p>
+<p>
+例によって YAMLで設定 and プラガブル。ファイルからテキストを抽出する部分がプラグインになっていて、簡単に拡張できるようにしています。
+</p>
+<p>
+現在は PowerPoint 用フィルタプラグインしかないのですが、以下の様なコードになっていて、フィルタ対象ファイルの MIME タイプを register() で指定、テキスト抽出ルーチンを filter() に記述、という感じで書きます。
+</p>
+<pre class="wiki">
+package SVN::TracWiki::Plugin::Filter::PowerPoint;
+
+use strict;
+use warnings;
+use base qw( SVN::TracWiki::Plugin::Filter );
+use Encode;
+
+sub register {
+    my $self = shift;
+    $self->register_mime_types( qw! application/vnd.ms-powerpoint !);
+}
+
+sub filter {
+    my ( $self, $file ) = @_;
+    my $html = `/usr/local/bin/ppthtml $file`;
+    my $text = $self->strip_html($html);
+
+    $text = Encode::decode('utf8', $text);
+    $text = Encode::encode('utf8', $text);
+
+    return $text;
+}
+
+1;
+</pre>
+<p>
+とりあえず動くようになっただけで、いけてない部分盛りだくさんですが、こんなのつくってみました、ってことで。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/04/09/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/04/22/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

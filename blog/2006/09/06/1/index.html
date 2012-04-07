@@ -1,0 +1,93 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Plagger::Plugin::SmartFeed の使い方 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Sep 6<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/09/06/1">Plagger::Plugin::SmartFeed の使い方</a></h1>
+
+  <div class="content">
+    <p>
+<a class="ext-link" href="http://mizzy.org/program/filter_rule_and_filter_clone_feed.html"><span class="icon"></span>前回のエントリ</a> について、それ SmartFeed でできるよ、と宮川さんに教えて頂きました。こんな感じで。
+</p>
+<pre class="wiki">
+  - module: CustomFeed::AmazonWebService
+    config:
+      title: Amazon - New Books
+      developer_token: XXXXXXXXXXXXXXXXXXXX
+      associate_id: xxxxxx-22
+      keywords:
+        - 川原正敏
+
+  - module: SmartFeed
+    rule:
+      module: Ahead
+    config:
+      title: Amazon - New Books
+
+  - module: Publish::iCal
+    config:
+      dir: /home/miya/ical
+      filename: %t.ics
+    rule:
+      expression: $args->{feed}->id ne 'smartfeed:ahead'
+
+  - module: Publish::Gmail
+    config:
+      mailto:   xxx@gmail.com
+      mailfrom: xxx@mizzy.org
+      mailroute:
+        via: smtp
+        host: localhost
+    rule:
+      expression: $args->{feed}->id eq 'smartfeed:ahead'
+</pre>
+<p>
+というわけで、Filter::Rule の改造も、Filter::CloneFeed の存在もまったく必要なし、でした。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/260"><span class="icon"></span>Rule::Ahead には若干手を加えました</a> 。
+</p>
+<p>
+今まで SmartFeed が全然理解できていなかったのですが、Filter::Rule の DESCRIPTION に以下の様な記述がある、ということも教えて頂きました。
+</p>
+<pre class="wiki">
+DESCRIPTION
+       This module strips entries and feeds using Rules. It's
+       sort of like SmartFeed, but while SmartFeed creates new
+       feed using Rule, Filter::Rule strips entries and feeds
+       that don't match with Rules.
+</pre>
+<p>
+「Filter::Rule は Rule に基づいてフィード/エントリをフィルタリングする（元フィード自体に手を加える）、SmartFeed は 指定された Rule に基づいて新しくフィードを生成する（元フィードには手を加えない）」ってことですね。
+</p>
+<p>
+<strong>追記</strong><br />
+<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060906"><span class="icon"></span>宮川さんがこちらに書いてくださってましたね</a>。ありがとうございます！
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/09/05/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/09/09/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

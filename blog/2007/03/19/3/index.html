@@ -1,0 +1,88 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>puppet でファイルが変更されたら指定したコマンドを実行するレシピ - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 19<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/03/19/3">puppet でファイルが変更されたら指定したコマンドを実行するレシピ</a></h1>
+
+  <div class="content">
+    <p><p>
+puppet で <a class="ext-link" href="http://mizzy.org/linux/puppet03.html"><span class="icon"></span>ファイルの配布</a> ができたので、次はファイルが変更されたら特定のコマンドを実行、にチャレンジ。これは <a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/FrequentlyAskedQuestions#how-do-i-run-a-command-whenever-a-file-changes"><span class="icon"></span>FAQ</a> にやり方書いてました。
+</p>
+<p>
+puppet サーバで管理している /etc/httpd/conf.d/ 以下のファイルが変更されたら、puppet クライアント上のファイルを更新して httpd を再起動するレシピはこんな感じ。
+</p>
+<pre class="wiki">
+class web {
+  define httpd {
+    $path = &#39;/etc/httpd/conf.d&#39;
+    file { $path:
+      source  =&gt; &#39;puppet://mizzy.org/files/etc/httpd/conf.d&#39;,
+      recurse =&gt; &#39;true&#39;,
+    }
+    exec { &#39;httpd restart&#39;:
+      command     =&gt; &#39;/etc/init.d/httpd restart&#39;,
+      subscribe   =&gt; File[$path],
+      refreshonly =&gt; true
+    }
+  }</p>
+
+<p>httpd { &#39;httpd settings&#39;: }
+}</p>
+
+<p>node &#39;<a href="http://www.mizzy.org">www.mizzy.org</a>&#39; {
+  include web
+}
+</pre>
+<p>
+/etc/httpd/cond.d/perl.conf を変更して puppet クライアント上で puppetd --test を実行するとこんな感じに。
+</p>
+<pre class="wiki">
+$ sudo /usr/sbin/puppetd --server mizzy.org --test
+info: Caching configuration at /var/lib/puppet/localconfig.yaml
+notice: Starting configuration run
+info: //<a href="http://www.mizzy.org/web/httpd%5Bhttpd">www.mizzy.org/web/httpd[httpd</a> settings]/file=/etc/httpd/conf.d/perl.conf: Removing old backup of type file
+notice: //<a href="http://www.mizzy.org/web/httpd%5Bhttpd">www.mizzy.org/web/httpd[httpd</a> settings]/file=/etc/httpd/conf.d/perl.conf/source: source changed &#39;{md5}b78c3e53dd7fef842c99f105e9e4204f&#39; to &#39;{md5}a28770c2cdfc4c23faa2ea41b2e67397&#39;
+info: //<a href="http://www.mizzy.org/web/httpd%5Bhttpd">www.mizzy.org/web/httpd[httpd</a> settings]/file=/etc/httpd/conf.d/perl.conf: Scheduling refresh of exec[httpd restart]
+notice: //<a href="http://www.mizzy.org/web/httpd%5Bhttpd">www.mizzy.org/web/httpd[httpd</a> settings]/exec=/etc/init.d/httpd restart: Triggering &#39;refresh&#39; from 1 dependencies
+notice: Finished configuration run in 7.42 seconds<br>
+</pre>
+<p>
+ファイルが更新されてない場合はこうなる。
+</p>
+<pre class="wiki">
+$ sudo /usr/sbin/puppetd --server mizzy.org --test
+info: Caching configuration at /var/lib/puppet/localconfig.yaml
+notice: Starting configuration run
+notice: Finished configuration run in 6.80 second
+</pre></p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/03/19/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/03/21/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

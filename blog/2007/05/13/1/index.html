@@ -1,0 +1,172 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FizzBuzz アセンブラ版 for x86/Linux - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 13<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/05/13/1">FizzBuzz アセンブラ版 for x86/Linux</a></h1>
+
+  <div class="content">
+    <p><a href="http://labs.cybozu.co.jp/blog/takesako/2007/05/fizzbuzz_x86.html">竹迫さん</a>、<a href="http://subtech.g.hatena.ne.jp/yappo/20070511/1178907299">Yappo さん</a> に触発されて、FizzBuzz アセンブラ版 for x86/Linux をつくってみた。</p>
+
+<p>20年ほど前に Z80 でアセンブラをちょっとかじった程度の知識しかないので、ベストには程遠いコードだと思います。だれかもっといいコードを教えてください。</p>
+
+<p>最初竹迫さんのコードと同じように書けるかな、と思ったのですが、Windows とちがって、画面に表示するだけで EAX, EBX, ECX, EDX レジスタ使うので、竹迫さんのように BX レジスタを見張り役に、CX レジスタをカウンタに、ってことができませんでした。</p>
+
+<p>また、とりあえず書いただけで疲れたので、コードゴルフにチャレンジする気力はありません。</p>
+
+<pre><code>global  _start
+
+_start:
+        mov     si, 0
+
+mawasu: 
+        call    space
+        inc     si
+        mov     ax, si
+
+        mov     di, 3
+        xor     edx, edx
+        div     di
+        cmp     dx, 0
+        je      pfizz
+
+        mov     ax, si
+        mov     di, 5
+        xor     edx, edx
+        div     di
+        cmp     dx, 0
+        je      pbuzz
+
+        call    num
+        cmp     si, 100
+        jb      mawasu
+
+pfizz:
+        call    fizz
+
+        mov     ax, si
+        mov     di, 5
+        xor     edx, edx
+        div     di
+        cmp     dx, 0
+        je      pbuzz
+
+        jmp     mawasu
+
+pbuzz:
+        call    buzz
+        jmp     mawasu
+
+num:
+        mov     ax, si
+
+        mov     di, 100
+        cmp     ax, di
+        jnge    num2
+
+        jmp     end
+
+num2:
+        mov     di, 10
+        cmp     ax, di
+        jnge    num3
+
+        xor     edx, edx
+        div     di
+        add     ax, 48
+        call    print
+
+num3:   
+        mov     ax, si
+        mov     di, 10
+        xor     edx, edx
+        div     di
+        mov     al, dl
+        add     al, 48
+        call    print
+        ret
+
+fizz:
+        mov     al, 0x46
+        call    print
+        mov     al, 0x69
+        call    print
+        mov     al, 0x7a
+        call    print
+        call    print
+        ret
+
+buzz:
+        mov     al, 0x42
+        call    print
+        mov     al, 0x75
+        call    print
+        mov     al, 0x7a
+        call    print
+        call    print
+        ret
+
+space:
+        mov     al, 0x20
+        call    print
+        ret
+
+print:
+        push    eax
+        mov     eax, 4
+        mov     ebx, 1
+        mov     ecx, esp
+        mov     edx, 1
+        int     0x80
+        pop     eax
+        ret
+
+end:    
+        mov     al, 0x0a
+        call    print
+
+        mov     al, 1
+        mov     bl, 0
+        int     0x80
+</code></pre>
+
+<p>nasm を使ってこんな感じで動かすことができます。</p>
+
+<pre><code>$ nasm -f elf fizzbuzz.asm
+$ ld -s -o fizzbuzz fizzbuzz.o
+$ ./fizzbuzz 
+</code></pre>
+
+<p><img src="/files/fizzbuzz.jpg" alt="fizzbuzz.asm"></p>
+
+<p>書いていてアセンブラの TMTOWTDI っぷりは Perl の比じゃないと思った。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/05/11/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/05/23/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

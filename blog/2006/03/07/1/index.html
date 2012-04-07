@@ -1,0 +1,61 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>PLAYLOG HACKS with Plagger #0 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 7<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/03/07/1">PLAYLOG HACKS with Plagger #0</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+<a href="http://mizzy.org/program/playlog_hacks.html" target="_blank">iTunes や iPod で聴いた曲情報を非同期で PLAYLOG へアップするスクリプト</a> を Plagger Plugin として書き直してみました。よくわかってないので、他の方がつくったプラグインの見様見真似で。
+</p>
+
+<ul class="entryBody">
+<li><a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTunesRecentPlay.pm" target="_blank">Plagger::Plugin::CustomFeed::iTunesRecentPlay</a></li>
+<li><a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Publish/Playlog.pm" target="_blank">Plagger::Plugin::Publish::Playlog</a></li>
+</ul>
+
+<p class="entryBody">
+とりあえず気になった点をここに書いておけば、宮川さんとかが答えてくれるかも。
+</p>
+
+<ul class="entryBody">
+<li>CustomFeed の下に置くのは適切？</li>
+<li>iTunes Music Library.xml から取得した曲データは、全部 $entry->meta につっこんでるけど、このやり方は正しい？</li>
+<li>今後「最近聴いた曲」以外の情報を取得するプラグインとかも必要になるかもしれないから、Plugin::iTunes とか作って、その下に Plugin::iTunes::RecentPlay とか作った方がいいかも。</li>
+<li>Publish::Playlog も、Publish::AtomPP::Playlog とかにした方がいいかも。</li>
+</ul>
+
+<p class="entryBody">
+この辺りもっとブラッシュアップしてから、commit 権もらって commit させてもらおうっと。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/03/04/3" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/03/07/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

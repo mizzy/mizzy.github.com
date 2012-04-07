@@ -1,0 +1,100 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ModSuid2AndModRuidAndLinuxCapability - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Oct 28<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/10/28/1">ModSuid2AndModRuidAndLinuxCapability</a></h1>
+
+  <div class="content">
+    <p>Apache の suEXEC では setuid/setgid を使って、httpd 実行ユーザとは異なるユーザ権限で CGI プログラムや SSI プログラムを実行できるわけですが、mod_php で処理される PHP プログラムのように、httpd 内で処理されるプログラムは、httpd 実行ユーザの権限で実行されてしまいます。こういったものまで httpd とは異なるユーザ権限で実行するためのモジュールとして、<a href="http://bluecoara.net/download/mod_suid2/">mod_suid2</a> や <a href="http://websupport.sk/%7Estanojr/projects/mod_ruid/">mod_ruid</a> といったものがあります。</p>
+
+<p>mod_suid2 は、httpd を root で起動しておいて、リクエストに応じて（VirtualHost 単位等で）setuid/setgid して実行ユーザを切り替える、という動作をします。そのため、以下のような問題があります。</p>
+
+<ul>
+<li>-DBIG<em>SECURITY</em>HOLE つきで Apache をコンパイルする必要がある。</li>
+<li>root でプロセスを起動する危険性。</li>
+<li>MaxRequestsPerChild が 1 に設定されることによるパフォーマンスの劣化。（一度 setuid/setgid してしまうと、root ではなくなり setuid/setgid できなくなるので、リクエストを処理するたびにプロセス/スレッドを殺す必要があるため）</li>
+</ul>
+
+<p>これに対し、mod<em>ruid は Linux に実装されている POSIX 1003.1e で定義された<a href="http://opentechpress.jp/security/03/08/06/0941214.shtml">ケーパビリティ</a> を利用して、root で httpd を起動することなく、setuid/segid できる権限のみ与えて、プロセス/スレッドの実行ユーザを切り替えています。そのため、mod</em>suid2 が抱える問題点の多くを解消しています。（また、mod_suid2 と違い、参照するファイルやディレクトリのユーザ/グループに実行権限を切り替える機能もあります。）</p>
+
+<p>ここで気になったのは、「setuid/setgid って、プロセス単位じゃなくてスレッド単位でもできるの？」ということ。もしできないのであれば、worker ではなく prefork で動かす必要もある、ということになる。で、結論からいうと「できる」でした。<a href="http://d.hatena.ne.jp/naoya/20071010/1192040413">マルチスレッドのコンテキスト切り替えに伴うコスト - naoyaのはてなダイアリー</a> をご覧になると分かるように、スレッドを生成する毎に dup<em>task</em>struct(current) して、各スレッドが個別にプロセスディスクリプタを持つので、当然と言えば当然なのですが、mod<em>ruid を有効にした Apache のプロセス状態を表示することによって、スレッドごとに実行ユーザがちゃんと異なっていることを確認しました。（mod</em>ruid はリクエスト処理後に元のユーザに戻してしまうため、確認のため戻さないようにソースを少しいじってます。）</p>
+
+<pre><code>$ ps -efL
+UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD 
+daemon    4156  4153  4188  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start 
+miya      4156  4153  4189  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
+puppet    4156  4153  4225  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
+</code></pre>
+
+<p>ちなみに、Linux での setuid の処理は、kernel/sys.c で以下のようになっています。</p>
+
+<pre><code>#!c
+asmlinkage long sys_setuid(uid_t uid)
+{
+    int old_euid = current-&gt;euid;
+    int old_ruid, old_suid, new_suid;
+    int retval;
+
+    retval = security_task_setuid(uid, (uid_t)-1, (uid_t)-1, LSM_SETID_ID);
+    if (retval)
+        return retval;
+
+    old_ruid = current-&gt;uid;
+    old_suid = current-&gt;suid;
+    new_suid = old_suid;
+
+    if (capable(CAP_SETUID)) {
+        if (uid != old_ruid &amp;&amp; set_user(uid, old_euid != uid) &lt; 0)
+            return -EAGAIN;
+        new_suid = uid;
+    } else if ((uid != current-&gt;uid) &amp;&amp; (uid != new_suid))
+        return -EPERM;
+
+    if (old_euid != uid) {
+        set_dumpable(current-&gt;mm, suid_dumpable);
+        smp_wmb();
+    }
+    current-&gt;fsuid uid;
+    current-&gt;suid = new_suid;
+
+    key_fsuid_changed(current);
+    proc_id_connector(current, PROC_EVENT_UID);
+
+    return security_task_post_setuid(old_ruid, old_euid, old_suid, LSM_SETID_ID);
+}
+</code></pre>
+
+<p>task_struct 構造体の、fsuid, euid, suid あたりを書き換えているようですね。</p>
+
+<p>まとまりのないエントリになってしまいましたが、ケーパビリティとか、スレッド単位で setuid/setgid できるとか、はじめて知ることが多かったのでとりあえずメモ。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/10/27/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/11/08/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

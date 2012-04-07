@@ -1,0 +1,126 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>OpenVPN - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Apr 23<span>rd</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/04/23/2">OpenVPN</a></h1>
+
+  <div class="content">
+    <h1>ダウンロード</h1>
+
+<p><a href="http://openvpn.net/">http://openvpn.net/</a> からダウンロード</p>
+
+<h1>インストール</h1>
+
+<pre><code>$ tar zxvf openvpn-2.0.9.tar.gz
+$ cd openvpn-2.0.9
+$ ./configure --with-ssl-headers=/usr/local/ssl/include --with-ssl-lib=/usr/local/ssl/lib
+$ make
+$ sudo make install
+</code></pre>
+
+<h1>サーバの設定/起動</h1>
+
+<h2>キーの生成</h2>
+
+<pre><code>$ sudo mkdir /etc/openvpn
+$ sudo /usr/local/sbin/openvpn --genkey --secret /etc/openvpn/server.key
+</code></pre>
+
+<h2>設定ファイル</h2>
+
+<p>/etc/openvpn/server.conf</p>
+
+<pre><code>proto tcp-server
+
+dev tap
+
+ifconfig 172.16.0.1 255.255.255.0
+route 192.168.25.0 255.255.255.0 172.16.0.2
+secret /etc/openvpn/server.key
+link-mtu 1200
+
+ping 10
+ping-restart 60
+ping-timer-rem
+persist-key
+persist-tun
+verb 3     
+</code></pre>
+
+<p>デフォルトのポート番号は 1194。</p>
+
+<h2>起動</h2>
+
+<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;
+</code></pre>
+
+<h1>クライアントの設定/起動</h1>
+
+<h2>キー</h2>
+
+<p>サーバで生成したものをコピー</p>
+
+<h2>設定ファイル</h2>
+
+<pre><code>remote mizzy.org
+proto tcp-client
+port 1194
+dev tap
+verb 3
+ping    3600
+secret /etc/openvpn/server.key
+ifconfig 172.16.0.2 255.255.255.0
+route 192.168.10.0 255.255.255.0 172.16.0.1 
+</code></pre>
+
+<h2>起動</h2>
+
+<p>サーバと一緒。</p>
+
+<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/client.conf &amp;
+</code></pre>
+
+<h1>その他</h1>
+
+<p>Linux のルーティング設定が必要。</p>
+
+<p>/etc/sysconfig/network</p>
+
+<pre><code>FORWARD_IPV4=yes
+</code></pre>
+
+<p>即反映するなら</p>
+
+<pre><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+</code></pre>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/04/23/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/04/23/3">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

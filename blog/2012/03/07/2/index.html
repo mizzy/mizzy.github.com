@@ -1,0 +1,50 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Image with EXIF tag plugin - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 7<span>th</span>, 2012</time>
+  <h1 class="entry-title"><a href="/blog/2012/03/07/2">Image with EXIF tag plugin</a></h1>
+
+  <div class="content">
+    <p>I&#39;ve modified <a href="https://github.com/imathis/octopress/blob/master/plugins/image_tag.rb">Image tag plugin</a> into <a href="https://github.com/mizzy/jekyll-plugins/blob/master/image_with_exif_tag.rb">Image with EXIF tag plugin</a> based on <a href="/blog/2012/03/07/exif-tag-plugin">the idea of mattn-san&#39;s comment</a>. (Thanks, mattn-san!)</p>
+
+<p>If you write text like this:</p>
+
+<pre><code>{% img_with_exif /images/2012/03/first_shot_orion.jpg %}
+</code></pre>
+
+<p>You will see the converted result like this:</p>
+
+<p><img src="/images/2012/03/first_shot_orion.jpg" alt="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900" title="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900"></p>
+
+<p>The title and alt attribute have EXIF data of thie image file.</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2012/03/07/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2012/03/31/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

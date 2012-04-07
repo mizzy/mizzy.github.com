@@ -1,0 +1,45 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>apache2 って最初から LDAP 認証用モジュールが含まれてるのね - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 4<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/03/04/1">apache2 って最初から LDAP 認証用モジュールが含まれてるのね</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+subversion を WebDAV と合わせて使おうと思い、apache2 をインストールして、認証は LDAP でやりたいので、apache1 と同じ感覚で modules.apache.org で見つけた mod_auth_ldap とか modXLdapAuth とかを入れてみようと思っても、make が通らない。
+</p>
+
+<p class="entryBody">
+で、いくら頑張っても make が通らないので諦めかけていたところ、なんとなく apache2 のソースディレクトリ以下を find してみたら、mod_authnz_ldap.c とかいうものを発見。ドキュメントを読んでみたらまさにこれが LDAP 認証のためのモジュールでした。これで2時間無駄にした…
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/03/02/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/03/04/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

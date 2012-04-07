@@ -1,0 +1,94 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>PtexLiveOnCentOS5 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Feb 11<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/02/11/1">PtexLiveOnCentOS5</a></h1>
+
+  <div class="content">
+    <p>ptexlive のビルドに必要なパッケージインストール用 Puppet マニフェスト</p>
+
+<pre><code>package {
+  &#39;xz&#39;:
+    ensure =&gt; present;
+  &#39;libXt-devel&#39;:
+    ensure =&gt; present;
+  &#39;libXaw-devel&#39;:
+    ensure =&gt; present;
+  &#39;gcc&#39;:
+    ensure =&gt; present;
+  &#39;make&#39;:
+    ensure =&gt; present;
+  &#39;gcc-c++&#39;:
+    ensure =&gt; present;
+  &#39;fontconfig-devel&#39;:
+    ensure =&gt; present;
+  &#39;ghostscript&#39;:
+    ensure =&gt; present;
+}
+</code></pre>
+
+<p>ビルド＆インストール用シェルスクリプト</p>
+
+<pre><code>#!sh
+#!/bin/sh
+
+wget ftp://tug.org/historic/systems/texlive/2009/texlive2009-20091107.iso.xz
+unxz texlive2009-20091107.iso.xz
+
+mount -o loop texlive2009-20091107.iso /mnt
+
+cd /mnt
+
+./install-tl
+
+cd
+
+wget http://tutimura.ath.cx/~nob/tex/ptexlive/ptexlive-20100711.tar.gz
+tar zxvf ptexlive-20100711.tar.gz
+
+cd ptexlive-20100711
+cp ptexlive.sample ptexlive.cfg
+
+sed -i &#39;s!ISO_DIR=/media/TeXLive2009!ISO_DIR=/mnt!g&#39; ptexlive.cfg
+sed -i &#39;s!# conf_option --without-x!conf_option --without-x!g&#39; ptexlive.cfg
+sed -i &#39;s!# conf_option --disable-xdvik!conf_option --disable-xdvik!g&#39; ptexlive.cfg
+sed -i &#39;s!# conf_option --disable-pxdvik!conf_option --disable-pxdvik!g&#39; ptexlive.cfg
+sed -i &#39;s!# XDVI=echo!XDVI=echo!g&#39; ptexlive.cfg
+
+sed -i &#39;s/grep &quot;recursive calls&quot;/grep &quot;Loop in Pages tree&quot;/g&#39; 8test.sh
+
+yes yes | make
+
+make install
+</code></pre>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2010/12/14/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/02/17/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

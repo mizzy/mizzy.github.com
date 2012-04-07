@@ -1,0 +1,168 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Lisa07TechSession2ndDay - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Nov 16<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/11/16/2">Lisa07TechSession2ndDay</a></h1>
+
+  <div class="content">
+    <p><a href="http://www.usenix.org/events/lisa07/">LISA&#39;07</a> テクニカルセッション2日目の、気になったテーマに関する簡単なメモ。</p>
+
+<h1>Ganeti: An Open Source Multi-Node HA Cluster Based on Xen</h1>
+
+<p>Google でつくられている Xen ベースのオープンソースなマルチノード HA クラスタ（タイトルまんま）。<a href="http://code.google.com/p/ganeti/">プロジェクトページはこちら</a>。</p>
+
+<p>要するに HA + Virtualization。通常の HA は、実マシンから実マシンへフェイルオーバするけど、Ganeti では VM から VM へフェイルオーバーする、と。仮想化は Xen を利用しており、管理用コマンドラインツールには Python を、ディスク管理には LVM, DRBD, MD を、コマンドラインツールから各ノード（Xen dom0）やインスタンス（Xen domU）への命令実行は、Twisted や ssh を利用している。</p>
+
+<p>管理コマンドはマスタノード上で実行する。</p>
+
+<ul>
+<li>gnt-node add/remove/list cluster nodes</li>
+<li>gnt-instance
+
+<ul>
+<li>add/remove</li>
+<li>failover</li>
+<li>stop/start change params</li>
+</ul></li>
+<li>gnt-os: instance os definitions</li>
+<li>gnt-cluster: cluster commands</li>
+<li>gnt-backup: instance export and import</li>
+</ul>
+
+<p>すべてのコマンドには man ページとインタラクティブヘルプが用意されてる。</p>
+
+<p>クラスタのセットアップは以下の様に実行する。（node0 というのがマスタノードらしい。）</p>
+
+<pre><code>node0# gnt-cluster init mycluster
+node0# gnt-node add node1
+node0# gnt-node add node2
+node0# gnt-node add node3
+node0# gnt-cluster cmmand apt-get install ganeti-instance-etch
+</code></pre>
+
+<p>インスタンスの作成。</p>
+
+<pre><code>node0# gnt-instance add -n node2:node1 -t drbd8 instance0
+</code></pre>
+
+<p>ノードがクラッシュした場合に別ノードに移行させる。</p>
+
+<pre><code>node0# gnt-instance failover --ignore-consitency instance0
+node0# gnt-instance replace-disks -s --new-secodary=node3 instance0
+</code></pre>
+
+<p>クラスタのステータスチェックコマンド。</p>
+
+<pre><code>node0# gnt-instance list
+node0# gnt-node list
+</code></pre>
+
+<p>サポートしているディスクタイプは、</p>
+
+<ul>
+<li>plain</li>
+<li>local_raid1</li>
+<li>remote_raid1</li>
+<li>drbd8(new)</li>
+</ul>
+
+<p>remote_raid1 はなんかすごい複雑だった。こんな感じ。</p>
+
+<pre><code>          +---------------+
+          | instance disk |
+          +---------------+
+                  |
+            +-----------+
+            | MD device |
+            +-----------+
+                  |
+           +-------------+
+           | DRBD device |
+           +-------------+
+             |         |
+  +------------+     +------------+
+  | LVM volume |     | LVM volume |
+  +------------+     +------------+
+        |                  |
++----------------+ +----------------+
+| Physical disks | | Physical disks |
+|     node1      | |     node2      |
++----------------+ +----------------+
+</code></pre>
+
+<p>DRBD8 を使えば、もっとシンプルにできるらしい。</p>
+
+<p>ネットワークまわりの機能。（いまいちよくわからなかった。）</p>
+
+<ul>
+<li>Separate replication network</li>
+<li>multiple bridges/VLAN support</li>
+<li>Tagging(new)</li>
+</ul>
+
+<p>Google での使われ方。</p>
+
+<ul>
+<li>20-node Ganeti cluster</li>
+<li>64-bit nodes OS</li>
+<li>80 virtual isntances</li>
+<li>used for internal systems</li>
+<li>not used for google.com</li>
+<li>best for non-resource intensive systems</li>
+</ul>
+
+<p>将来的に追加したい機能。</p>
+
+<ul>
+<li>automatic instance failover（ってことは今は自動でフェイルオーバーしない？）</li>
+<li>automatic node allocation</li>
+<li>master node election</li>
+<li>manage GUI / meta-cluster manager</li>
+</ul>
+
+<p>全体的に気になること、わからないことだらけなんだけど、ソースが公開されてるから使ってみるのがてっとりばやそうだ。HA クラスタは今後うまく活用していきたいし、仮想化によるサーバ集約も興味があるので、時間を作ってぜひ検証してみたい。</p>
+
+<p>そういえば、以前いた会社では、メールサーバなんかはよく HA クラスタ構成でサーバ構築してたけど、最近 HA クラスタはご無沙汰だなぁ。</p>
+
+<p>Eメール送信元のレピュテーション（評価）を集約してシェアしよう、という試み。<a href="http://www.usenix.org/events/lisa07/tech/singaraju.html">概要はこちら</a>。<a href="http://isr.uncc.edu/repuscore/">プロジェクトページもある。</a></p>
+
+<p>SPF, DKIM, SenderID といったいわゆる送信者認証技術は、From ドメインと送信元サーバの組み合わせが正しいかどうかを判断することができるが、これが正しいからといって、スパマーかどうかは判断ができない。（実際、スパマーはいち早くこれらの送信者認証技術に対応してきているらしい。）それを補うのがこの RepuScore であり、送信元に関する評価を集合知的に集めてシェアすることが目的。</p>
+
+<p>SpamAssassin 用プラグインを近々公開予定らしい。</p>
+
+<p>RepuScore で興味深かったのは、不正なレポートを行う（Sybil attacksと呼んでいた）評価者の重みを下げることによって、評価全体への影響を低くして、不正なデータ操作が行えないようにする仕組みがあること。</p>
+
+<p>他のレピュテーションシステムとしては、<a href="http://www.returnpath.net/">SenderPath&#39;s Sender Score</a> や <a href="http://www.habeas.com/en-US/Receivers/SenderIndex/">Habeas&#39; SenderIndex</a> といったものがあるが、これらは IP アドレスベースのレピュテーションであり、RepuScore はドメインベースのレピュテーションである、という違いがある。（IPアドレスは組織間でシェアされていることもあるので、こういったレピュテーションシステムには向いていない、という記述もある。）</p>
+
+<p>Gmail も自前でユーザに通知させるレピュテーションの仕組みを持っているが、Gmail の中で閉じられている。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/11/16/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/11/17/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

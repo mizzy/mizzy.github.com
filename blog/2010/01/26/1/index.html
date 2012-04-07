@@ -1,0 +1,80 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Karesansui - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jan 26<span>th</span>, 2010</time>
+  <h1 class="entry-title"><a href="/blog/2010/01/26/1">Karesansui</a></h1>
+
+  <div class="content">
+    <p><a href="http://karesansui-project.info/">Karesansui</a> が <a href="http://builder.japan.zdnet.com/news/story/0,3800079086,20407326,00.htm">KVM に対応というニュース</a> を見たので、試してみることにした。</p>
+
+<p><a href="http://karesansui-project.info/wiki/karesansui/Ja_tutorial">チュートリアル</a> では OS インストールから解説されていてとても親切なんだけれど、うちの既存環境は CentOS 5.3 から 5.4 にアップグレードして KVM 環境を整えたせいか、いくつかはまったポイントが。</p>
+
+<p>チュートリアルでは、kvm-qemu-img を削除しておけ、と書いてるんだけど、うちの環境では、以下の qemu と名のつくパッケージをすべて削除する必要があった。</p>
+
+<ul>
+<li>qemu</li>
+<li>qemu-system-sh4</li>
+<li>qemu-system-ppc</li>
+<li>qemu-system-arm</li>
+<li>qemu-system-x86</li>
+<li>qemu-system-cris</li>
+<li>qemu-system-sparc</li>
+<li>qemu-system-mips</li>
+<li>qemu-system-m68k</li>
+<li>qemu-user</li>
+<li>qemu-common</li>
+<li>qemu-img<br></li>
+</ul>
+
+<p>また、PyXML も別途インストールが必要だった。</p>
+
+<p>あとはチュートリアルの通りに、karesansui-install を実行して、画面に従ってインストール。設定も特にいらず、簡単。</p>
+
+<p>まだインストールしてブラウザでアクセスしただけなんだけど、気になった点がいくつか。</p>
+
+<ul>
+<li>既にある KVM ゲストが一覧に表示されない
+
+<ul>
+<li>おそらくどこか(/var/opt/karesansui/karesansui.db あたり？)にゲスト情報を持つことになってるんだろうけど、libvirt あたりつかって既存のゲストを自動認識、とかしてくれるといいな</li>
+</ul></li>
+<li>同じ理由で、Cobbler + Koan でゲスト作成しても認識してくれなさそう</li>
+<li>リモートホストのゲスト管理
+
+<ul>
+<li><a href="http://karesansui-project.info/wiki/karesansui/Ja_howto_multi_host">複数ホスト構成にするには？</a> を見ると、すべてのホストに Karesansui をインストールすることで、一カ所でまとめて管理できるみたいだけど、Karesansui 入れるのは一カ所だけで、あとは libvirtd さえ動いてれば OK、とかできるといいなー。おそらく事情があってこうなってないんでしょうけど。</li>
+</ul></li>
+</ul>
+
+<p>まあ、オープンソースなんでグダグダ言ってないでパッチ書け、ってとこですかね。とりあえず動作を追ってみるところからはじめてみます。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2010/01/22/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2010/02/07/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

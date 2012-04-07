@@ -1,0 +1,77 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>WebOperations - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 12<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/05/12/1">WebOperations</a></h1>
+
+  <div class="content">
+    <p>#!html
+    <a href="http://www.oreilly.co.jp/books/9784873114934/"><img src="http://ec3.images-amazon.com/images/I/51-ThZ6FRfL._SS500_.jpg" /></a></p>
+
+<p>献本頂きました。<a href="http://www.oreilly.co.jp/">O&#39;Reilly Japan</a> 様、<a href="http://twitter.com/#!/kdmsnr">@kdmsnr</a> さん、<a href="http://twitter.com/#!/hmsk">@hmsk</a> さん、ありがとうございます！</p>
+
+<p>本書はタイトルにある通り、ウェブの運用に関わる本なんですが、僕が敬愛する John Allspaw 氏と、Chef で有名な Opscode の CEO、Jesse Robbins 氏の監修による、17 + 1 本のエッセイ集で、監修の両氏以外にも様々な方によって書かれています。（+1 は日本語版のみに収録されている、@hmsk さんによるクックパッドのインフラの話です。）</p>
+
+<p>目次は以下の通りとなっています。</p>
+
+<ul>
+<li>1章 ウェブオペレーション：キャリア</li>
+<li>2章 Picnikにおけるクラウドコンピューティングの利用とその教訓</li>
+<li>3章 インフラとアプリケーションのメトリクス</li>
+<li>4章 継続的デプロイ</li>
+<li>5章 コードとしてのインフラ</li>
+<li>6章 監視</li>
+<li>7章 いかにして複雑なシステムは失敗するか</li>
+<li>8章 コミュニティ管理とウェブオペレーション</li>
+<li>9章 予期しないトラフィック急増への対応</li>
+<li>10章 開発と運用の協力と連携</li>
+<li>11章 訪問者の気持ち：ユーザ対面メトリクス</li>
+<li>12章 ウェブにおけるリレーショナルデータベースの戦略と戦術</li>
+<li>13章 障害を活用する：ふりかえりの技芸と科学</li>
+<li>14章 ストレージ</li>
+<li>15章 非リレーショナルデータベース</li>
+<li>16章 アジャイルインフラストラクチャ</li>
+<li>17章 夜中に聞こえる奇妙な物音（と、ぐっすり眠る方法）</li>
+<li>18章 日本の料理のインフラ</li>
+</ul>
+
+<p>このように、運用や監視の話、運用者のキャリアに関する話、クラウドに関する話、DevOps に関する話、リレーショナルや非リレーショナルなデータベースの話、ストレージの話、障害対応に関する話、などなど、ウェブの運用に関して多岐にわたった話が掲載されています。</p>
+
+<p>どの話もとても興味深いのですが、特に興味深かったのは、「2章 Picnikにおけるクラウドコンピューティングの利用とその教訓」と「12章 ウェブにおけるリレーショナルデータベースの戦略と戦術」です。</p>
+
+<p>ペパボでは写真サービス <a href="http://30d.jp/">30days Album</a> を提供していて、一時的な高負荷に対応するために、クラウドをいかに活用するかを模索しているところなので、同じ写真サービスである <a href="http://www.picnik.com/">Picnik</a> におけるクラウドの活用に関する話は、とても参考になります。（といってもサービスの性質が違うため、そのまま真似できるわけではありませんが。）</p>
+
+<p>また、12章は、実践ハイパフォーマンスMySQL 第2版の著者の1人である、Baron Schwartz 氏によるもので、最適なデータベースアーキテクチャを選択するためにはどうすれば良いか、ということについて書いてるんですが、「GUID を（主キーに）使うのは、データベースが何であれ、最悪だ！」とか、「みんな平気な顔をしているようだが、もっとシャーディングを怖がるべきだ」「シャーディングはウェブアプリケーションに適したアーキテクチャではない」「まともなハードウェアを購入せずに大量の安いマシンでシャーディングアーキテクチャを構築し、スケーラビリティを確保しようとするのは、私に言わせれば、単なるバカだ」とか、「このプロダクトが、MySQL Cluster と呼ばれているのは残念」とか、小気味よい調子で良いアーキテクチャを選択するための指針を示してくれています。</p>
+
+<p>詳しくはぜひお手元にとって読んでみて下さい。ひとつひとつの章が独立した話でそれほど長くないので、好きなところからさくっと読めるのがいいですね。自分は英語版は一通り読んだので、日本語版ではまずは 18章 のクックパッドさんの話から読んでみようと思います。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/04/27/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/05/27/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

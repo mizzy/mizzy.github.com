@@ -1,0 +1,94 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ActiveRecord で Validation （Rails勉強中 #5） - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 29<span>th</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/12/29/1">ActiveRecord で Validation （Rails勉強中 #5）</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+Rails の実装で、ああこれ面白いなー、よさげだなー、と思ったものをメモ。
+</p>
+
+<p class="entryBody">
+<a href="/program/learningRails.html" target="_blank">Rails 勉強中 #0</a> でも触れたけど、ActiveRecord はモデルクラスでデータの Validation ができます。これはコントローラで Validation する必要がなくなるので、コードが簡略化できて見通しがよくなっていいです。その分モデルのコードが増えますが、元々モデルにはそんなにコードを書かないので、多少増えたところで見通しが悪くなったり、煩雑になったりということはないですし。
+</p>
+
+<p class="entryBody">
+また、Validation の処理のしかたもなかなかスマート。例えば、フォームで入力必須項目を設定したい場合には、モデルに
+</p>
+
+<pre class="code">
+validates_presence_of :email
+</pre>
+
+<p class="entryBody">
+とか書いておいて、View には
+</p>
+
+<pre class="code">
+&lt;!-- エラーメッセージ表示部分 --&gt;
+&lt;%= error_messages_for(:order) %&gt;
+
+&lt;!-- Email入力フィールド --&gt;
+EMail: &lt;%= text_field("order", "email", "size" => 40 ) %&gt;
+</pre>
+
+<p class="entryBody">
+とか書いておくと、以下の様なエラー画面を勝手に出してくれちゃいます。
+</p>
+
+<p class="entryBody" style="border: solid 1px #333333;">
+<img src="/img/rails_validation.jpg" />
+</p>
+
+<p class="entryBody">
+エラーメッセージも、
+</p>
+
+<pre class="code">
+validates_presence_of :email, :message => "can't be blank"
+</pre>
+
+<p class="entryBody">
+といった感じで任意に設定できますし。validates_presence_of 以外にも様々なヘルパーがありますし（詳しくは <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Rails本</a>で）、もちろん、自分で任意の Validation コードを書くことも可能です。
+</p>
+
+<p class="entryBody">
+また、日本人であれば当然、日本語にするにはどうするんだろう、という疑問を持つと思いますが、
+<a href="http://d.hatena.ne.jp/secondlife/" target="_blank">gorou</a> さん作の <a href="http://jp.rubyist.net/magazine/?0012-RubyOnRails" target="_blank">ActiveHeart</a> や、<a href="http://wota.jp/ac/?date=20051220" target="_blank">ヽ( ・∀・)ノきゅまきゅまーさんとこの jscaffold</a> とかがあるので心配無用です。お二方、素敵すぎです。
+</p>
+
+<p class="entryBody">
+次回はコールバックとオブザーバについて書こうと思います。ほんとは一気に書こうかと思ったので、このエントリのタイトルは最初「ActiveRecord とコールバックとオブザーバ」だったのですが、力尽きました。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/12/26/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/12/29/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

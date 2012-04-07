@@ -1,0 +1,327 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>CobblerAndPuppet - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Nov 15<span>th</span>, 2009</time>
+  <h1 class="entry-title"><a href="/blog/2009/11/15/1">CobblerAndPuppet</a></h1>
+
+  <div class="content">
+    <p>検証用に VM をつくったり消したり、ってことをよくやるんですが、毎回毎回同じような設定をするのがいやなので、うちでは Cobbler + Puppet でこんな風にやってるよ、という例を紹介します。最近 KVM に移行しましたが、ブリッジの設定以外は、Xen でもほぼそのまま適用できると思います。</p>
+
+<p>VM 作成のざっくりとした流れは次のような感じで、3 ステップで完了します。まず koan コマンドで以下のように VM インストールします。</p>
+
+<pre><code>$ sudo koan --server localhost --virt --system=template --virt-name=test-vm
+</code></pre>
+
+<p>インストールが終わったら、VM を起動して、コンソールにアクセスします。</p>
+
+<pre><code>$ sudo virsh start test-vm
+$ sudo virsh console test-vm
+</code></pre>
+
+<p>puppet をインストールして、実行します。</p>
+
+<pre><code># yum -y install puppet
+# puppetd --server puppet.hoge.com --verbose --no-daemonize --onetime
+</code></pre>
+
+<p>この時点で、毎回 VM を作成するたびに行っている、以下のような設定が既に完了している、という状態となります。</p>
+
+<ul>
+<li>yum リポジトリの設定
+
+<ul>
+<li>dag, epel に加えて、自前リポジトリを参照するように設定。</li>
+</ul></li>
+<li>NIC の設定
+
+<ul>
+<li>複数 NIC の環境で検証したいこともあるので、自動的に eth0 と eth1 の NIC を設定。</li>
+</ul></li>
+<li>iptables を off
+
+<ul>
+<li>検証環境ではとりあえず必要ないので。</li>
+</ul></li>
+<li>selinux を off
+
+<ul>
+<li>これも検証環境では必要ないので。</li>
+</ul></li>
+<li>ntp の設定
+
+<ul>
+<li>検証によっては VM 間で時刻が正確に同期してる必要があるので。</li>
+</ul></li>
+<li>最低限必要なパッケージのインストール。
+
+<ul>
+<li>zsh</li>
+<li>screen</li>
+<li>vim-enhanced</li>
+<li>perl-ack</li>
+<li>subversion</li>
+<li>git</li>
+</ul></li>
+<li>/etc/sudoers の設定
+
+<ul>
+<li>基本的には root ログインしないので、sudo できるようにしておく。</li>
+</ul></li>
+<li>nss<em>ldap/pam</em>ldap まわりの設定
+
+<ul>
+<li>LDAP アカウントで SSH ログインできるようにするのが主な目的。</li>
+<li>アカウントを各 VM で管理するのがイヤなので、LDAP サーバで集中管理してます。</li>
+</ul></li>
+<li>autofs の設定
+
+<ul>
+<li>/home はファイルサーバをマウント。これにより、どの VM からも、/home が同じ内容で参照できる。</li>
+<li>メインマシンである Mac からもファイルサーバをマウントしており、どの VM を使うことになっても、プログラム書いたりするのがすべて Mac 上の emacs で完結できるのでとても楽。</li>
+</ul></li>
+</ul>
+
+<p>以下、このようなことを、具体的にどのような設定で実現しているのか、ざっくりとですが説明します。</p>
+
+<hr>
+
+<h1>Cobbler まわりの設定</h1>
+
+<h2>Cobbler のインストールと設定</h2>
+
+<p>Cobbler サーバを立てて、インストール、設定を行います。ここの手順については省略。<a href="http://trac.mizzy.org/public/wiki/Cobbler">この辺</a> を参照してください。（ただ若干情報古いです。）</p>
+
+<h2>CentOS 5.4 の Cobbler へのインポート</h2>
+
+<pre><code>$ sudo cobbler import \
+  --mirror=rsync://ftp.jaist.ac.jp/pub/Linux/CentOS/5.4/os/x86_64/ \
+  --name=CentOS5.4-x86_64
+</code></pre>
+
+<h2>yum リポジトリの追加</h2>
+
+<p>cobbler repo add で、参照すべき yum リポジトリを追加します。</p>
+
+<pre><code>$ sudo cobbler repo add \
+  --name=CentOS5-epel \
+  --mirror=http://download.fedoraproject.org/pub/epel/5/x86_64/ \
+  --mirror-locally=N
+$ sudo cobbler repo add \
+  --name=CentOS5-dag \
+  --mirror=http://ftp.riken.jp/Linux/dag/redhat/el5/en/x86_64/dag/ \
+  --mirror-locally=N
+$ sudo cobbler repo add \
+  --name=CentOS5-mizzy \
+  --mirror=http://hoge.mizzy.org/yum/centos/5/x86_64/ \
+  --mirror-locally=N
+$ sudo cobbler reposync
+</code></pre>
+
+<h2>profile にリポジトリ追加</h2>
+
+<pre><code>$ sudo cobbler profile edit \
+  --name=CentOS5.4-x86_64 \
+  --repos=&quot;CentOS5-epel CentOS5-dag CentOS5-mizzy&quot;
+</code></pre>
+
+<h2>bridge の設定</h2>
+
+<p><a href="http://trac.mizzy.org/public/wiki/KvmOnCentOS54">ここ</a> を参考に、br0 というブリッジインターフェースをまず作成。こいつを VM 上の eth0 のブリッジとして利用するように、template という名前の system を登録する。</p>
+
+<pre><code>$ sudo cobbler system add \
+  --name=template \
+  --profile=CentOS5.4-x86_64 \
+$ sudo cobbler system edit \
+  --name=template \
+  --interface=eth0 \
+  --virt-bridge=br0
+</code></pre>
+
+<p>また、libvirt 標準の virbr0 を eth1 のブリッジとして利用するように、system edit する。（eth1 は外と通信する必要がなく、 VM 同士でだけ通信できればいいので、virbr0 がそのまま使える。）</p>
+
+<pre><code>$ sudo cobbler system edit \
+  --name=template \
+  --interface=eth1 \
+  --virt-bridge=virbr0
+</code></pre>
+
+<p>（本当は system じゃなくて profile でやりたいけど、profile では複数のブリッジの設定ができないっぽいので。）</p>
+
+<h2>iptables/selinux の設定</h2>
+
+<p>Cobbler で参照してる kickstart ファイルに、以下のように設定するだけ。</p>
+
+<pre><code>firewall --disabled
+selinux --disabled
+</code></pre>
+
+<hr>
+
+<h1>Puppet マニフェスト</h1>
+
+<p>Puppet サーバを用意し、以下のようなマニフェスト作成。Puppet のインストールや設定については省略。</p>
+
+<h2>ntpd の設定</h2>
+
+<p>ntp パッケージをインストールして、ntpd を起動。</p>
+
+<pre><code>package { &#39;ntp&#39;: ensure =&gt; present }
+
+service { &#39;ntpd&#39;:
+    enable =&gt; true,
+    ensure =&gt; running,
+}
+</code></pre>
+
+<h2>必要なパッケージのインストール</h2>
+
+<p>この辺は kickstart で設定しても構わない。</p>
+
+<pre><code>package {
+    &#39;zsh&#39;:
+        ensure =&gt; present;
+    &#39;screen&#39;:
+        ensure =&gt; present;
+    &#39;vim-enhanced&#39;:
+        ensure =&gt; present;
+    &#39;perl-ack&#39;:
+        ensure =&gt; present;
+    &#39;subversion&#39;:
+        ensure =&gt; present;
+    &#39;subversion&#39;:
+        ensure =&gt; present;
+    &#39;git-all&#39;:
+        ensure =&gt; &#39;1.6.5.2-1&#39;;
+}
+</code></pre>
+
+<h2>/etc/sudoers の設定</h2>
+
+<p>あらかじめ作成しておいた /etc/sudoers を Puppet で配布。</p>
+
+<pre><code>package { &#39;sudo&#39;: ensure =&gt; installed }
+
+file { &#39;/etc/sudoers&#39;:
+    source =&gt; &quot;puppet://$server/dist/base/etc/sudoers&quot;,
+    mode   =&gt; 440,
+}
+</code></pre>
+
+<h2>nss<em>ldap/pam</em>ldap の設定</h2>
+
+<p>必要なパッケージインストール、NSS や PAM まわりの設定、nscd の起動なんかを行う。</p>
+
+<pre><code>package {
+    &#39;nss_ldap&#39;:
+        ensure =&gt; present;
+    &#39;openldap&#39;:
+        ensure =&gt; present;
+    &#39;nscd&#39;:
+        ensure =&gt; present;
+}
+
+service { &#39;nscd&#39;:
+    enable  =&gt; true,
+    ensure  =&gt; running,
+    require =&gt; Package[&#39;nscd&#39;],
+}
+
+file { &#39;/etc/pam.d/system-auth-ac&#39;:
+    source =&gt; &quot;puppet://$server/dist/base/etc/pam.d/system-auth-ac&quot;,
+}
+
+file { &#39;/etc/nsswitch.conf&#39;:
+    source =&gt; &quot;puppet://$server/dist/base/etc/nsswitch.conf&quot;,
+}
+
+file { &#39;/etc/ldap.conf&#39;:
+    source =&gt; &quot;puppet://$server/dist/base/etc/ldap.conf&quot;,
+}
+</code></pre>
+
+<h2>autofs の設定</h2>
+
+<p>必要なパッケージのインストール、portmap や autofs の起動、/etc/auto.master, /etc/auto.home の設定を行う。</p>
+
+<pre><code>package {
+    &#39;autofs&#39;:
+        ensure =&gt; present;
+    &#39;portmap&#39;:
+        ensure =&gt; present;
+    &#39;nfs-utils&#39;:
+        ensure =&gt; present;
+}
+
+service { &#39;portmap&#39;:
+    enable  =&gt; true,
+    ensure  =&gt; running,
+    require =&gt; Package[&#39;portmap&#39;],
+    before  =&gt; Service[&#39;autofs&#39;],
+}
+
+service { &#39;autofs&#39;:
+    enable    =&gt; true,
+    ensure    =&gt; running,
+    require   =&gt; Package[&#39;autofs&#39;],
+    subscribe =&gt; [ File[&#39;/etc/auto.master&#39;], File[&#39;/etc/auto.home&#39;] ],
+}
+
+file { &#39;/etc/auto.master&#39;:
+    content =&gt; &#39;/home /etc/auto.home&#39;,
+}
+
+file { &#39;/etc/auto.home&#39;:
+    content =&gt; &#39;* -fstype=nfs,soft,int,rsize=32768,wsize=32768,nosuid,nocache fileserver.hoge.com:/home/&amp;&#39;,
+}
+</code></pre>
+
+<hr>
+
+<p>上記のような感じで Cobbler や Puppet の環境を構築しておくと、最初に書いたとおり、以下のようなステップで、必要な設定がなされた VM の作成がさくっと完了します。</p>
+
+<pre><code>;; VM インストール
+$ sudo koan --server localhost --virt --system=template --virt-name=test-vm
+
+;; インストール後、起動してコンソールアクセス
+$ sudo virsh start test-vm
+$ sudo virsh console test-vm
+
+;; puppet インストールし/実行
+# yum -y install puppet
+# puppetd --server puppet.hoge.com --verbose --no-daemonize --onetime
+</code></pre>
+
+<p><a href="https://fedorahosted.org/cobbler/wiki/SupportForOtherDistros">ここを参照すると</a>、Cobbler は RedHat 系だけではなく、Debian, Ubuntu, SuSE あたりにも利用できるみたいなので、他の Linux ディストリビューションでも、同じような手順でいけそうですね。</p>
+
+<p>他の OS だとどうなんだろう？</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2009/11/07/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2009/12/04/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

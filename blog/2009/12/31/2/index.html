@@ -1,0 +1,66 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>PlackMiddlewareAuthLDAP - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 31<span>st</span>, 2009</time>
+  <h1 class="entry-title"><a href="/blog/2009/12/31/2">PlackMiddlewareAuthLDAP</a></h1>
+
+  <div class="content">
+    <p><em>追記</em></p>
+
+<p>miyagawa さんから助言があり、authenticator 追加するだけでサブクラスが増えると使いにくいというのと、<a href="http://search.cpan.org/%7Echansen/Authen-Simple-LDAP/">Authen::Simple::LDAP</a> を使えば、LDAP で認証するためにそれほどコード書くこともないので、わざわざモジュール化する必要もない、ということで、github からは削除することにしました。</p>
+
+<p>また、Plack::Middleware::Auth::Basic の authenticator に Authen::Simple オブジェクトがそのまま渡せるように miyagawa さんが修正してくださいました。</p>
+
+<p><a href="http://github.com/miyagawa/Plack/commit/9f1ad6a3c2f33cd8f37c6cfcbb0993c55c84bbb9">http://github.com/miyagawa/Plack/commit/9f1ad6a3c2f33cd8f37c6cfcbb0993c55c84bbb9</a></p>
+
+<p>これで Plack::Middleware::Auth::Basic そのままで、以下のような感じで LDAP で認証できます。</p>
+
+<pre><code>#!perl
+use Authen::Simple::LDAP;
+enable &quot;Auth::Basic&quot;, authenticator =&gt; Authen::Simple::LDAP-&gt;new(...);
+</code></pre>
+
+<p>miyagawa さん、ありがとうございました。</p>
+
+<hr>
+
+<p>最近公私ともに、いちからウェブアプリ（ウェブ API 除く）書いてなくて、久々にウェブアプリを書こうかな−、と思いながらも、フレームワークに何を使おうか迷っていて、<a href="http://opensource.kayac.com/ja/projects/ark/advent/2009/">Ark Advent Calendar 2009</a> を読んだり、<a href="http://d.hatena.ne.jp/tokuhirom/20091230/1262133671">Amon</a> をウォッチしたりして、この年末を過ごしています。</p>
+
+<p>で、いずれのフレームワーク使うにしても、Plack はキーになりそうだな、ってことで、LDAP で認証するための Plack::Middleware を書いてみました。</p>
+
+<p><a href="http://github.com/mizzy/p5-plack-middleware-auth-ldap">http://github.com/mizzy/p5-plack-middleware-auth-ldap</a></p>
+
+<p><a href="http://search.cpan.org/%7Emiyagawa/Plack/lib/Plack/Middleware/Auth/Basic.pm">Plack::Middleware::Auth::Basic</a> を継承し、authorizer を追加する形で実装しています。</p>
+
+<p>ネームスペースは Plack::Middleware::Auth::Basic::LDAP の方がいいのかな、とか、ダイジェスト認証対応しようと思ったら、別モジュールにした方がいいのか、合わせてひとつのモジュールにした方がいいのか、その場合のネームスペースはどうすればいいのか、など、色々固まってない点があるので、まだ CPAN にはアップしない予定です。が、とりあえず自分で使う分には問題なく動いてるっぽいです。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2009/12/31/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2010/01/15/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>DotCloudCliBehaviorOverView - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jul 10<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/07/10/2">DotCloudCliBehaviorOverView</a></h1>
+
+  <div class="content">
+    <p>Now I&#39;m investigating the behavior of <a href="http://pypi.python.org/pypi/dotcloud.cli">dotcloud.cli</a>.I will write down the things I found.</p>
+
+<p>With --export option, you can see the raw response of dotcloud API.</p>
+
+<p>For example, if you execute dotcloud command for the first time with --export option, you will see the result like this.</p>
+
+<pre><code>$ dotcloud --export
+Warning: /Users/miya/.dotcloud/dotcloud.conf does not exist.
+Enter your api key (You can find it at http://www.dotcloud.com/account/settings): XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+{
+    &quot;data&quot;: [
+        [
+            &quot;key&quot;, 
+            &quot;-----BEGIN DSA PRIVATE KEY-----\nXXXXXXXXXX...\n-----END DSA PRIVATE KEY-----\n&quot;
+        ]
+    ], 
+    &quot;type&quot;: &quot;cmd&quot;
+}
+</code></pre>
+
+<p>If &#39;&quot;type&quot;: &quot;cmd&quot;&#39; is given, dotcloud command call the appropriate method.In this case, key() method of Remote class in dotcloud/cli/remote.py will be called and SSH key string will be written to ~/.dotcloud/dotcloud.key.</p>
+
+<p>Which method is called are defined in dotcloud/cli/cli.py like this.</p>
+
+<pre><code>#!python
+def run_remote(cmd):
+    r = remote.Remote()
+    handlers = {
+            &#39;set_url&#39;: r.set_url,
+            &#39;run&#39;: r.run,
+            &#39;script&#39;: r.run_script,
+            &#39;sftp&#39;: r.sftp,
+            &#39;pull&#39;: r.pull,
+            &#39;push&#39;: r.push,
+            &#39;rsync&#39;: r.rsync,
+            &#39;git&#39;: r.git,
+            &#39;hg&#39;: r.hg,
+            &#39;upload&#39;: r.upload,
+            &#39;loop&#39;: lambda *x: run_loop(*x),
+            &#39;confirm&#39;: local.confirm,
+            &#39;call&#39;: lambda x: run_command(x, True),
+            &#39;echo&#39;: lambda x: sys.stdout.write(&#39;{0}\n&#39;.format(x)),
+            &#39;echo_error&#39;: lambda x: sys.stderr.write(&#39;{0}\n&#39;.format(x)),
+            &#39;set_verbose&#39;: r.set_verbose,
+            &#39;key&#39;: r.key
+            }
+</code></pre>
+
+<p>Let&#39;s see another command option.</p>
+
+<pre><code>$ dotcloud --export create helloworldapp
+{
+    &quot;data&quot;: &quot;Created repos \&quot;helloworldapp\&quot;&quot;, 
+    &quot;type&quot;: &quot;success&quot;
+}
+</code></pre>
+
+<p>In this case, type is not cmd, so dotcloud command will do nothing anymore.</p>
+
+<p>In the case of option push, API response is like this.</p>
+
+<pre><code>$ dotcloud --export push helloworldapp
+{
+    &quot;data&quot;: [
+        [
+            &quot;upload&quot;, 
+            &quot;.&quot;, 
+            &quot;ssh://dotcloud@uploader.dotcloud.com:21122/helloworldapp&quot;, 
+            {
+                &quot;rsync&quot;: {
+                    &quot;excludes&quot;: [
+                        &quot;*.pyc&quot;, 
+                        &quot;.git&quot;, 
+                        &quot;.hg&quot;
+                    ]
+                }, 
+                &quot;check&quot;: true
+            }
+        ], 
+        [
+            &quot;call&quot;, 
+            &quot;deploy helloworldapp.default&quot;
+        ]
+    ], 
+    &quot;type&quot;: &quot;cmd&quot;
+}
+</code></pre>
+
+<p>&quot;type&quot; is &quot;cmd&quot;, so Remote.upload() will be called and run_command(&#39;deploy helloworldapp.default&#39;, True) will be called.</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/07/10/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/07/12/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

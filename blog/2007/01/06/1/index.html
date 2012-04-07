@@ -1,0 +1,60 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Assurer - サーバテスティングフレームワーク #0 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jan 6<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/01/06/1">Assurer - サーバテスティングフレームワーク #0</a></h1>
+
+  <div class="content">
+    <p>
+構築したサーバがちゃんと動作するかどうかのテストを自動化したいなー、とスクリプトを書こうと思ったのですが、Perler としてはここはやはり、<a class="ext-link" href="http://plagger.org/trac"><span class="icon"></span>Plagger</a> とか <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> みたく、プラガブルで YAML で設定書けば OK みたいのを作るべきだろう、ってことで、<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) というサーバテスティングフレームワークをでっちあげてみました。
+</p>
+<p>
+テストのことを Quality Assurance とか言ったりするし、Plagger や Archer が er で終わってるので、それに倣って命名してます。
+</p>
+<p>
+今のところ Plagger や Archer からコピペして、ごく簡単な HTTP テストプラグインをつくっただけでまだまだ未完成ですが、以下のような config.yaml で実行すると、HTTP GET して取得したコンテンツに「It works!」が含まれているかどうかテストする、といった感じで動作します。
+</p>
+<pre class="wiki">
+plugins:
+  - module: HTTP
+    config:
+      url: http://svn.mizzy.org/
+      match: It works!
+</pre>
+<p>
+これって、サーバのテストだけでなく、監視にも使えるよなー、と思ったところで、<a class="ext-link" href="http://d.hatena.ne.jp/naoya/20061214/1166063145"><span class="icon"></span>ライブドアテクノロジーセミナーで naoya さんが触れていた</a>、Observer というはてな製監視フレームワークとかぶるんじゃないか、という気がしてきました。Plagger ライクって言っていたし。
+</p>
+<p>
+ということは、はてなが Overver を公開してくれれば、自分で開発する必要がなくなって楽ができそう、ってことで、公開希望とここでつぶやいておきます。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/01/03/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/01/06/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

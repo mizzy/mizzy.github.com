@@ -1,0 +1,176 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>SupervisorAProcessControlSystem - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Apr 27<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/04/27/1">SupervisorAProcessControlSystem</a></h1>
+
+  <div class="content">
+    <p>node.js なサーバデーモン＆ログの管理をしようと思い、何を使おうか検討していたのですが、この手のデファクトスタンダードである <a href="http://cr.yp.to/daemontools.html">daemontools</a> は、特定のディレクトリ構造に従わないといけなかったり、run スクリプトや log/run スクリプトを置いたりしきゃいけなかったりで、余計な作業が多くてお手軽じゃない、ってことで <a href="http://smarden.org/runit/">runit</a> を見てみたんですが、ぱっと見 daemontools との違いがよくわからなくて、daemontools とそれほど煩雑さは変わらないように見えたので、もっとお手軽なものがないかと探していたところ見つけたのが <a href="http://supervisord.org/">Supervisor</a> 。（といっても自分が知らなかっただけで以前からあるみたいですが。）</p>
+
+<p>Python 製で easy_install 一発でインストールできる。</p>
+
+<pre><code>$ sudo easy_install supervisor  
+</code></pre>
+
+<p>デフォルトの設定ファイルを以下のように生成。</p>
+
+<pre><code>$ sudo echo_supervisord_conf &gt; /etc/supervisord.conf
+</code></pre>
+
+<p>あとは実行。とりあえず試しなので、-n をつけてフォアグラウンド起動。</p>
+
+<pre><code>$ sudo supervisord -n
+2011-04-26 15:13:11,384 CRIT Supervisor running as root (no user in config file)
+2011-04-26 15:13:11,420 INFO RPC interface &#39;supervisor&#39; initialized
+2011-04-26 15:13:11,421 CRIT Server &#39;unix_http_server&#39; running without any HTTP authentication checking
+2011-04-26 15:13:11,421 INFO supervisord started with pid 25859
+</code></pre>
+
+<p>この状態ではデーモンを一切管理してない。で、/etc/supervisord.conf を覗くと、以下のような記述があって、どうやらこんな感じで管理するデーモンを設定するらしい。</p>
+
+<pre><code>;[program:theprogramname]
+;command=/bin/cat              ; the program (relative uses PATH, can take args)
+;process_name=%(program_name)s ; process_name expr (default %(program_name)s)
+;numprocs=1                    ; number of processes copies to start (def 1)
+;directory=/tmp                ; directory to cwd to before exec (def no cwd)
+;umask=022                     ; umask for process (default None)
+;priority=999                  ; the relative start priority (default 999)
+;autostart=true                ; start at supervisord start (default: true)
+;autorestart=true              ; retstart at unexpected quit (default: true)
+;startsecs=10                  ; number of secs prog must stay running (def. 1)
+;startretries=3                ; max # of serial start failures (default 3)
+;exitcodes=0,2                 ; &#39;expected&#39; exit codes for process (default 0,2)
+;stopsignal=QUIT               ; signal used to kill process (default TERM)
+;stopwaitsecs=10               ; max num secs to wait b4 SIGKILL (default 10)
+;user=chrism                   ; setuid to this UNIX account to run the program
+;redirect_stderr=true          ; redirect proc stderr to stdout (default false)
+;stdout_logfile=/a/path        ; stdout log path, NONE for none; default AUTO
+;stdout_logfile_maxbytes=1MB   ; max # logfile bytes b4 rotation (default 50MB)
+;stdout_logfile_backups=10     ; # of stdout logfile backups (default 10)
+;stdout_capture_maxbytes=1MB   ; number of bytes in &#39;capturemode&#39; (default 0)
+;stdout_events_enabled=false   ; emit events on stdout writes (default false)
+;stderr_logfile=/a/path        ; stderr log path, NONE for none; default AUTO
+;stderr_logfile_maxbytes=1MB   ; max # logfile bytes b4 rotation (default 50MB)
+;stderr_events_enabled=false   ; emit events on stderr writes (default false)
+;environment=A=1,B=2           ; process environment additions (def no adds)
+;serverurl=AUTO                ; override serverurl computation (childutils)
+</code></pre>
+
+<p>これを真似して、node.js な echo サーバをデーモン化してみた。最低限以下の設定を書けば OK。</p>
+
+<pre><code>[program:echo]
+command=/usr/local/bin/node /home/miya/echo.js
+stdout_logfile=/var/log/echo.log
+stderr_logfile=/var/log/echo.log
+</code></pre>
+
+<p>これで起動してみる。</p>
+
+<pre><code>$ sudo supervisord -n
+2011-04-26 15:22:05,577 CRIT Supervisor running as root (no user in config file)
+2011-04-26 15:22:05,612 INFO RPC interface &#39;supervisor&#39; initialized
+2011-04-26 15:22:05,612 CRIT Server &#39;unix_http_server&#39; running without any HTTP authentication checking
+2011-04-26 15:22:05,613 INFO supervisord started with pid 26078
+2011-04-26 15:22:06,621 INFO spawned: &#39;echo&#39; with pid 26079
+2011-04-26 15:22:07,623 INFO success: echo entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)
+</code></pre>
+
+<p>echo サーバがちゃんと起動した。こんな感じで、特定のディレクトリ構造にしたり、run スクリプト置いたりしなくても、4行ほど設定書くだけでさくっとデーモン化できる。試しに kill してみたら、再起動してくれた。</p>
+
+<pre><code>2011-04-26 15:22:38,714 INFO exited: echo (exit status 1; not expected)
+2011-04-26 15:22:39,718 INFO spawned: &#39;echo&#39; with pid 26122
+2011-04-26 15:22:40,720 INFO success: echo entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)
+</code></pre>
+
+<p>include が使えるので、実運用ではデーモン毎にファイルをわけてやると管理しやすそう。</p>
+
+<pre><code>;[include]
+;files = relative/directory/*.ini
+</code></pre>
+
+<p>supervisorctl というコマンドラインツールでステータス確認や起動/停止ができる。</p>
+
+<pre><code>$ sudo supervisorctl status echo
+echo                             RUNNING    pid 26256, uptime 0:05:41
+
+$ sudo supervisorctl stop echo
+echo: stopped
+
+$ sudo supervisorctl start echo
+echo: started
+</code></pre>
+
+<p>何も引数を指定しなければ、対話型のインターフェースが起動する。</p>
+
+<pre><code>$ sudo supervisorctl
+echo                             RUNNING    pid 26161, uptime 0:01:43
+supervisor&gt; 
+</code></pre>
+
+<p>? で利用できるコマンド表示。</p>
+
+<pre><code>supervisor&gt; ?
+
+default commands (type help &lt;topic&gt;):
+=====================================
+add    clear  fg        open  quit    remove  restart   start   stop  update 
+avail  exit   maintail  pid   reload  reread  shutdown  status  tail  version
+</code></pre>
+
+<p>help command で command の説明。</p>
+
+<pre><code>supervisor&gt; help stop
+stop &lt;name&gt;     Stop a process
+stop &lt;gname&gt;:*      Stop all processes in a group
+stop &lt;name&gt; &lt;name&gt;  Stop multiple processes or groups
+stop all        Stop all processes
+</code></pre>
+
+<p>それから、デフォルトではオフになってるけど、HTTP のインタフェースもある。こんな感じでオンにしてやる。（とりあえず検証目的なのでユーザ名やパスワードは設定しない。）</p>
+
+<pre><code>[inet_http_server]         ; inet (TCP) server disabled by default
+port=0.0.0.0:9001          ; (ip_address:port specifier, *:port for all iface)
+;username=user             ; (default is no username (open server))
+;password=123              ; (default is no password (open server))
+</code></pre>
+
+<p>ブラウザからアクセスするとこんな感じ。起動/停止やログの確認ができる。複数のデーモンを管理していれば、それらを一気に停止/起動もできるみたい。</p>
+
+<p>[[Image(<a href="http://mizzy.org/img/supervisor.png)%5D">http://mizzy.org/img/supervisor.png)]</a>]</p>
+
+<p>supervisord 自体は、daemontools と同様、/etc/inittab とか、Upstart なら /etc/init/* とかで起動してやればいい。</p>
+
+<p>いまいちなところは、multilog と違ってログにタイムスタンプつけてくれなかったり、syslog に吐く機能もなかったりと、ログまわりはちょっと物足りない。</p>
+
+<p>他にも XML-RPC なインターフェースがあったり、色々機能はあるみたいなんだけど、とりあえず今日はこの辺で。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/04/05/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/05/12/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

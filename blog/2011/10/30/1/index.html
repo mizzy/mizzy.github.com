@@ -1,0 +1,86 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Vimeo tag plugin - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Oct 30<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/10/30/1">Vimeo tag plugin</a></h1>
+
+  <div class="content">
+    <p><iframe src="http://player.vimeo.com/video/24149087?color=ffffff" width="800" height="600" frameborder="0" webkitAllowFullScreen allowFullScreen></iframe><p><a href="http://vimeo.com/24149087">Black Hole Sun - Astronomic Landscape and Milky Way TimeLapse</a> from <a href="http://vimeo.com/user1722616">Christoph Malin</a> on <a href="http://vimeo.com">Vimeo</a>.</p></p>
+
+<div><script src='https://gist.github.com/2326439.js?file='></script>
+<noscript><pre><code># A Liquid tag for Jekyll sites that allows embedding vimeo movies
+# by: Gosuke Miyashita
+#
+# Example usage: {% vimeo 28040685 800 600 %}
+
+require 'open-uri'
+require 'multi_json' 
+
+module Jekyll
+  class VimeoTag &lt; Liquid::Tag
+    def initialize(tag_name, text, token)
+      super
+      @text = text
+      @cache_dir = File.expand_path &quot;../.vimeo-cache&quot;, File.dirname(__FILE__)
+      FileUtils.mkdir_p @cache_dir
+    end
+
+    def render(context)
+      if parts = @text.match(/(\d+) (\d+) (\d+)/)
+        id, width, height = parts[1].strip, parts[2].strip, parts[3].strip
+      end
+
+      vimeo = get_vimeo(id)
+      &lt;&lt;-HTML
+&lt;iframe src=&quot;http://player.vimeo.com/video/#{id}?color=ffffff&quot; width=&quot;#{width}&quot; height=&quot;#{height}&quot; frameborder=&quot;0&quot; webkitAllowFullScreen allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;http://vimeo.com/#{id}&quot;&gt;#{vimeo[&quot;title&quot;]}&lt;/a&gt; from &lt;a href=&quot;#{vimeo[&quot;author_url&quot;]}&quot;&gt;#{vimeo[&quot;author_name&quot;]}&lt;/a&gt; on &lt;a href=&quot;http://vimeo.com&quot;&gt;Vimeo&lt;/a&gt;.&lt;/p&gt;
+      HTML
+    end
+
+    def get_vimeo(id)
+      cache_file = File.join @cache_dir, id
+      if File.exist? cache_file
+        MultiJson.decode(File.read cache_file)
+      else
+        json = open(&quot;http://vimeo.com/api/oembed.json?url=http%3A//vimeo.com/#{id}&quot;).read
+        File.open(cache_file, &quot;w&quot;) do |io|
+          io.write json
+        end
+        MultiJson.decode(json)
+      end
+    end
+
+  end
+end
+
+Liquid::Template.register_tag('vimeo', Jekyll::VimeoTag)</code></pre></noscript></div>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/10/29/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/11/05/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

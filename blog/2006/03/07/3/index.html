@@ -1,0 +1,53 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>PLAYLOG HACKS with Plagger #2 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 7<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/03/07/3">PLAYLOG HACKS with Plagger #2</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+Plagger Plugin の <a href="http://plagger.org/trac/browser/trunk/plagger/lib/Plagger/Plugin/CustomFeed/iTunesRecentPlay.pm" target="_blank">CustomFeed::iTunesRecentPlay</a> をアップデート。
+</p>
+
+<p class="entryBody">
+前回廃止した reload_period ですが、ライブラリが大きいとメモリ食いまくるからあった方がいいかも、と宮川さんから助言があったため、復活しました。ただし、Rule::Fresh と合わせてパラメータ名は duration とし、分単位で指定するようにしています。
+</p>
+
+<p class="entryBody">
+また、otsune さんからリクエストあがっていた、URL を指定しての iTunes Music Library.xml の取得処理の実装は見送ることにしました。というのも、iTunes を動かしていないどこかのサーバで plagger を動かす場合、直接 iTunes が動いているマシンから HTTP GET で iTunes Music Library.xml を取得することはないでしょうから、必ずどこかにファイルを移すことになると思います。であれば、plagger を動かすサーバに直接ファイルをアップして、 config.yaml の library_path でパスを指定すれば事足りるかな、と。
+</p>
+
+<p class="entryBody">
+あと、ローカルファイルの場合はファイルハンドルを while で回して処理、URL 指定の場合は一度変数にデータを格納してから処理、という違いがあり、この違いをエレガントに吸収する仕組みがすぐに思いつかなかった、という理由もあったりします。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/03/07/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/03/10/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

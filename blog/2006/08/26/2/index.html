@@ -1,0 +1,59 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Filter::FutureEvents - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Aug 26<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/08/26/2">Filter::FutureEvents</a></h1>
+
+  <div class="content">
+    <p>
+<a class="ext-link" href="http://mizzy.org/program/plagger_event.html"><span class="icon"></span>このエントリ</a> の様な感じで、iCal データに時刻も入れたところ、ちゃんと Google Calendar で通知メールが来るようになりました。が、Google Calendar では終日イベントは背景がキレイに色づけされるのに、時刻が指定されたイベントは背景が色づけされないんですよね。こんな感じで。 
+</p>
+<p>
+<img src="http://mizzy.org/img/events.jpg" alt="Google Calendar" />
+</p>
+<p>
+「歯医者」とあるのが時刻指定イベント。それ以外は終日イベントで青が本、緑が音楽、赤が休日。
+</p>
+<p>
+やっぱ見た目重要なので、iCal データに時刻を入れるのはやめることに。というわけで昨日の作業は無意味に終りました。（いや、収穫もありましたよ、たぶん…）
+</p>
+<p>
+そうなると、今度は Google Calendar が通知メール出してくれない、とふりだしに戻るわけですが、それ Pla(ry ってことで、Plagger でやることに。
+</p>
+<p>
+イベント通知となると、「今から1日以内に発生するイベントを通知する」といった感じになるわけですが、この「1日以内に発生するイベント」という条件でフィルタするためのプラグインが要るな、というわけで、 <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FutureEvents.pm"><span class="icon"></span>Filter::FutureEvents</a> というものを作ってみました。duration のパースなんかは Rule::Fresh を参考にしています。
+</p>
+<p>
+これを CustomFeed::AmazonWebService, Publish::Gmail と組み合わせて、深夜とか早朝に cron で動かしておけば、その日に発売される商品情報がメールで届く、ということが実現できます。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/08/26/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/08/26/3">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

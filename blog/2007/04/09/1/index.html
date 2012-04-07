@@ -1,0 +1,121 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Apr 9<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/04/09/1">html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた</a></h1>
+
+  <div class="content">
+    <p><p>
+<a class="ext-link" href="http://clouder.jp/yoshiki/mt/archives/000377.html"><span class="icon"></span>Clouder::Blogger: html-tt - emacsのTemplate Toolkit用のmode</a> を html-helper-mode ではなく、sgml-mode のマイナーモードで動くようにしたパッチ。（置換しただけ。）
+</p>
+<p>
+別に sgml-mode に思い入れはなく、Meadow でデフォルトで動いてるからそのまま使ってるだけなので、html-helper-mode にしてもいいんだけど、どうも Meadow でうまく色づけされないので、その原因追求するよりも、sgml-mode で動くようにした方がはやかったので。
+</p>
+<p>
+本当はどっちでも動くようにするのがいいんだろうけど、それはまた今度。
+</p>
+<pre class="wiki"></p>
+
+<h1>=== html-tt.el</h1>
+
+<p>--- html-tt.el  (revision 193)
++++ html-tt.el  (local)
+@@ -66,7 +66,7 @@
+ ;; Code:</p>
+
+<p>(provide &#39;html-tt)
+-(require &#39;html-helper-mode)
++(require &#39;sgml-mode)
+ (require &#39;tempo)
+ (require &#39;font-lock)</p>
+
+<p>@@ -217,38 +217,38 @@
+ (defun html-tt-load-hook ()
+   (interactive)
+   ;; define key bind
+-  ;(define-key html-helper-mode-map &quot;\C-cs&quot;
++  ;(define-key sgml-mode-map &quot;\C-cs&quot;
+   ;  &#39;html-tt-insert-sequence)
+-  (define-key html-helper-mode-map &quot;\C-cs&quot;
++  (define-key sgml-mode-map &quot;\C-cs&quot;
+     &#39;tempo-template-html-tt-insert-sequence)
+-  (define-key html-helper-mode-map &quot;\C-cd&quot;
++  (define-key sgml-mode-map &quot;\C-cd&quot;
+     &#39;html-tt-insert-directive)
+-  (define-key html-helper-mode-map &quot;\C-cn&quot;
++  (define-key sgml-mode-map &quot;\C-cn&quot;
+     &#39;tempo-template-html-tt-insert-directive)
+-  (define-key html-helper-mode-map &quot;\C-ci&quot;
++  (define-key sgml-mode-map &quot;\C-ci&quot;
+     &#39;tempo-template-html-tt-insert-if)
+-  (define-key html-helper-mode-map &quot;\C-cl&quot;
++  (define-key sgml-mode-map &quot;\C-cl&quot;
+     &#39;tempo-template-html-tt-insert-elsif)
+-  (define-key html-helper-mode-map &quot;\C-ce&quot;
++  (define-key sgml-mode-map &quot;\C-ce&quot;
+     &#39;tempo-template-html-tt-insert-else)
+-  (define-key html-helper-mode-map &quot;\C-cf&quot;
++  (define-key sgml-mode-map &quot;\C-cf&quot;
+     &#39;tempo-template-html-tt-insert-foreach)
+-  (define-key html-helper-mode-map &quot;\C-cw&quot;
++  (define-key sgml-mode-map &quot;\C-cw&quot;
+     &#39;tempo-template-html-tt-insert-while)
+-  (define-key html-helper-mode-map &quot;\C-cm&quot;
++  (define-key sgml-mode-map &quot;\C-cm&quot;
+     &#39;tempo-template-html-tt-insert-switch)
+-  (define-key html-helper-mode-map &quot;\C-cn&quot;
++  (define-key sgml-mode-map &quot;\C-cn&quot;
+     &#39;tempo-template-html-tt-insert-include)</p>
+
+<p>;; add hilit-set-mode-pattern, if use hilit19.
+   (if (featurep &#39;hilit19)
+-      (hilit-add-pattern &quot;\&#x5b;%&quot; &quot;%\&#x5d;&quot; &#39;midnightblue &#39;html-helper-mode)
++      (hilit-add-pattern &quot;\&#x5b;%&quot; &quot;%\&#x5d;&quot; &#39;midnightblue &#39;sgml-mode)
+     )</p>
+
+<p>;; set font-lock
+   (make-local-variable &#39;font-lock-defaults)
+   (setq html-tt-font-lock-keywords
+-   (append html-helper-font-lock-keywords html-tt-font-lock-keywords))
++   (append sgml-font-lock-keywords html-tt-font-lock-keywords))
+   (setq font-lock-defaults &#39;(html-tt-font-lock-keywords t t))
+   ) 
+</pre>
+<p>
+.emacs での設定はこんな感じで。
+</p>
+<pre class="wiki">
+(require &#39;html-tt)
+(add-hook &#39;sgml-mode-hook &#39;html-tt-load-hook)
+</pre></p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/03/25/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/04/22/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

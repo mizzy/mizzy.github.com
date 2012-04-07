@@ -1,0 +1,49 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>feedbringerをremixin' #4 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Nov 23<span>rd</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/11/23/6">feedbringerをremixin' #4</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.user.js" target="_blank">白黒バージョン</a>を修正しました。
+</p>
+
+<p class="entryBody">
+白黒バージョンではアイコンを強引に入れ替えてるのですが、入れ替わるのが最初にページにアクセスした時だけで、15分毎のツリーメニューのアップデート時には、入れ替わらずにオリジナルの青いアイコンのままになってしまう、というバグを修正しました。
+</p>
+
+<p class="entryBody">
+feedbringerはprototype.jsを利用しているので、Ajax.Updater.prototype.updateContentをオーバーライドするという強引な方法で対処しました。もっとスマートなやり方があると思うのですが、他に思い浮かばなかったので。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/11/23/5" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/11/23/7">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

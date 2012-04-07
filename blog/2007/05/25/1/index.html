@@ -1,0 +1,70 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>write はユーザプロセスを待たせない？の答え - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 25<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/05/25/1">write はユーザプロセスを待たせない？の答え</a></h1>
+
+  <div class="content">
+    <p><a href="http://blog.mizzy.org/articles/2007/05/23/linux-disk-io-00">前回のエントリ</a> について、naoya さんから<a href="http://d.hatena.ne.jp/naoya/20070523/1179938637">僕の期待以上の素晴らしい回答</a>を頂きました。感謝感謝です。</p>
+
+<p>詳細は上記エントリをじっくり読んで頂きたいのですが、僕の疑問への直接の答えとなるのが、まとめにある</p>
+
+<blockquote>
+<ul>
+<li>write はプロセスを待たせない</li>
+<li>ただし明示的に sync する場合は待たせる</li>
+</ul>
+</blockquote>
+
+<p>ですね。「write はプロセスを待たせない」が正しい、というのは naoya さんの解説を読んで納得しました。プロセスが write するということと、それが実際にディスクに書き出されることを、区別しないで考えていたのが僕の敗因ですね。</p>
+
+<p>また、こちらの環境で kjournald や qmail-queue プロセスが待たされていたのは、sync してるから、ということでした。kjournald は確かめていないのですが、qmail-queue のソースの中では確かに fsync() が実行されていました。考えてみれば当然ですよね。ジャーナルのメタデータやメールキューなど、大事なデータを write して sync しないなんてことはあり得ないでしょうし。</p>
+
+<p>なので、<a href="http://d.hatena.ne.jp/hirose31/">id:hirose31</a>さんからのコメント「fsync(2)のせい？」がずばり回答になっていました。ありがとうございます。今度カレーおごらせてください。</p>
+
+<p>というわけで、「write はユーザプロセスを待たせない？」は「待たせない」が答え、ということで完結です。</p>
+
+<p>あと、</p>
+
+<blockquote>
+<p>ということですが free の結果では、プロセスに割り当てるためのメモリが足りてるかどうかはわかりますが、ページキャッシュ用にメモリが足りてるかどうかはわかりません。</p>
+
+<p>実際そのサーバーが主な仕事で使っているデータは、合計でどのぐらいのサイズでしょう。おそらく、キューに溜まったメールその他 OS 上で必要なデータのサイズをあわせると 800MB を超えるんではないかなあと思います。外してたらごめん。</p>
+</blockquote>
+
+<p>もおっしゃるとおりですね。プロセスに必要なメモリ容量と、キャッシュに必要なメモリ容量をちゃんと区別していませんでした。</p>
+
+<p>となると、メモリを増やせば書き込み性能が向上する可能性があるのでは、と思ったのですが、今回のケースではおそらく向上することはなさそうです。というのも、iostat の値を見てると、avgqu-sz が 1 日平均でおよそ 5、短時間で見ると 10 とか 20 あるいはそれ以上ということがざらにあります。avgqu-sz はキューに入っていて待ちとなっている I/O リクエストの数なので、常に処理待ちとなっている I/O リクエストが存在する、ということなります。なので、ページキャッシュの容量の問題ではなく、ディスクの性能がボトルネックになっている、と言えそうです。（これも自分の勘違いなら恥ずかしいなー…メモリを簡単に増やせるなら、試してみたいんですけどね。）</p>
+
+<p>naoya さん、詳細な解説ありがとうございました。大変勉強になりました。僕のために時間を割いて長文エントリ書いてくれた、と思うとちょっと萌えました。（べっ、別にあんたのために…、とか言われそうですが。）</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/05/23/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/05/25/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Plagger::Plugin::Aggregator::Simple の Media RSS サポート - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 23<span>rd</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/05/23/1">Plagger::Plugin::Aggregator::Simple の Media RSS サポート</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+Google Video は Media RSS を吐くので、<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Aggregator/Simple.pm" target="_blank">Aggregator::Simple を Media RSS に対応させてみた</a>。<a href="http://trac.mizzy.org/public/changeset/124" target="_blank">diff はこちら</a>。
+</p>
+
+<p class="entryBody">
+でも、つくってから気づいたんだけど、Google Video の RSS にはちゃんと enclosure も入ってるので、別に Media RSS 対応させる必要なかった…。といっても、enclosure に入っているのは iPod 用の mpeg4 だけで、media:content 要素には他に flv, wmv, PSP 用の mpeg4 も含まれてるので、対応しておいても損ではないかな、と。
+</p>
+
+<p class="entryBody">
+これで <a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/GoogleVideo.pm" target="_blank">CustomFeed::GoogleVideo</a> はもう必要ないですね。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/05/22/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/05/27/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

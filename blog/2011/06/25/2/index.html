@@ -1,0 +1,125 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ModRuidTestAgain - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jun 25<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/06/25/2">ModRuidTestAgain</a></h1>
+
+  <div class="content">
+    <p>3,4年ぐらい前に、[wiki:ModSuid2AndModRuidAndLinuxCapability  mod<em>suid2 とか mod</em>ruid とか Linux ケーパビリティとか] で、mod_ruid の setuid/setgid は、プロセス単位なのか、それともスレッド単位なのか、という実験をして、スレッド単位で setuid/setgid する、という結果が得られたんですが、Linux kernel 2.4 というだいぶ古い環境での実験だったので、比較的最近の環境で実験してみた。</p>
+
+<p>OS はこんな感じ。</p>
+
+<pre><code>$ uname -a
+Linux h026.southpark 2.6.18-164.el5 #1 SMP Thu Sep 3 03:28:30 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux
+$ cat /etc/redhat-release
+CentOS release 5.4 (Final)
+</code></pre>
+
+<p>httpd のバージョン。</p>
+
+<pre><code>$ rpm -q httpd
+httpd-2.2.3-45.el5.centos.1
+</code></pre>
+
+<p>ps でプロセス/スレッドが見やすいように /etc/httpd/conf/httpd.conf をいじる。</p>
+
+<pre><code>&lt;IfModule worker.c&gt;
+StartServers        1
+MaxClients          1
+MinSpareThreads     1
+MaxSpareThreads     1
+ThreadsPerChild     1
+MaxRequestsPerChild  0
+&lt;/IfModule&gt;
+</code></pre>
+
+<p>/etc/sysconfig/httpd の以下の行を有効にして worker mpm で動かす。</p>
+
+<pre><code>HTTPD=/usr/sbin/httpd.worker
+</code></pre>
+
+<p>mod_ruid は処理が終わるとすぐに元のユーザに戻してしまうので、戻らないようにコメントアウト。</p>
+
+<pre><code>#!diff
+diff --git a/mod_ruid.c b/mod_ruid.c
+index 5294d32..deed59b 100644
+--- a/mod_ruid.c
++++ b/mod_ruid.c
+@@ -269,9 +269,9 @@ static int ruid_suidback (request_rec * r)
+        }
+        cap_free(cap);
+
+-       setgroups(0,NULL);
+-       setgid(unixd_config.group_id);
+-       setuid(unixd_config.user_id);
++       //setgroups(0,NULL);
++       //setgid(unixd_config.group_id);
++       //setuid(unixd_config.user_id);
+
+        cap=cap_get_proc();
+        capval[0]=CAP_SETUID;
+</code></pre>
+
+<p>apxs でビルド＆インストール。</p>
+
+<pre><code>$ sudo /usr/sbin/apxs -a -i -l cap -c mod_ruid.c
+</code></pre>
+
+<p>/etc/init.d/httpd restart して、プロセスとスレッドの UID を確認。下3つは PID が同じなので、スレッドだと判断できる。UID はすべて apache。</p>
+
+<pre><code>$ ps -eLf
+UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
+root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+</code></pre>
+
+<p>ここで httpd へアクセスし、再度 ps で確認。</p>
+
+<pre><code>UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
+root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+100      13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
+</code></pre>
+
+<p>スレッドのひとつだけ UID が 100 になってる。これは mod_ruid.c に以下のようにデフォルトが定義されているから。</p>
+
+<pre><code>#!c
+#define SUID_DEFAULT_UID        100
+#define SUID_DEFAULT_GID        100
+</code></pre>
+
+<p>というわけで、スレッド単位で setuid/setgid される、ということには変わりありませんでした、という結果に。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/06/25/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/06/29/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

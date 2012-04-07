@@ -1,0 +1,147 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>HowToGetGraphiteWorkingOnScientificLinux6 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jul 24<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/07/24/1">HowToGetGraphiteWorkingOnScientificLinux6</a></h1>
+
+  <div class="content">
+    <p>I found a interest tool, <a href="http://graphite.wikidot.com/">Graphite</a> when I was exploring <a href="https://github.com/etsy">https://github.com/etsy</a> .(<a href="http://graphite.wikidot.com/screen-shots">Screen Shots of Graphite</a>.)</p>
+
+<h1>Install Carbon</h1>
+
+<p><a href="http://graphite.wikidot.com/carbon">Carbon</a> is a backend storage application for Graphite.</p>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
+# tar zxvf carbon-0.9.8.tar.gz
+# pushd carbon-0.9.8
+# python setup.py install
+# popd
+</code></pre>
+
+<h1>Install Whisper</h1>
+
+<p><a href="http://graphite.wikidot.com/whisper">Whisper</a> is an alternate to RRD.</p>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
+# tar zxvf whisper-0.9.8.tar.gz
+# pushd whisper-0.9.8
+# python setup.py install
+# popd
+</code></pre>
+
+<h1>Install Graphite</h1>
+
+<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
+# tar zxvf graphite-web-0.9.8.tar.gz
+# pushd graphite-web-0.9.8      
+</code></pre>
+
+<p>Run check-dependencies.py.</p>
+
+<pre><code># ./check-dependencies.py 
+[FATAL] Unable to import the &#39;cairo&#39; module, do you have pycairo installed for python 2.6.5?
+[FATAL] Unable to import the &#39;django&#39; module, do you have Django installed for python 2.6.5?
+[WARNING] Unable to import the &#39;mod_python&#39; module, do you have mod_python installed for python 2.6.5?
+This means you will only be able to run graphite in the development server mode, which is not
+recommended for production use.
+[WARNING]
+Unable to import the &#39;memcache&#39; module, do you have python-memcached installed for python 2.6.5?
+This feature is not required but greatly improves performance.
+
+[WARNING]
+Unable to import the &#39;ldap&#39; module, do you have python-ldap installed for python 2.6.5?
+Without python-ldap, you will not be able to use LDAP authentication in the graphite webapp.
+
+[WARNING]
+Unable to import the &#39;twisted&#39; package, do you have Twisted installed for python 2.6.5?
+Without Twisted, you cannot run carbon on this server.
+[WARNING]
+Unable to import the &#39;txamqp&#39; module, this is required if you want to use AMQP.
+Note that txamqp requires python 2.5 or greater.
+2 necessary dependencies not met. Graphite will not function until these dependencies are fulfilled.
+5 optional dependencies not met. Please consider the warning messages before proceeding.
+</code></pre>
+
+<p>I use a development server included in Graphite, so mod_python is not needed.</p>
+
+<p>Install packages other than mod_python.</p>
+
+<pre><code># yum install pycairo
+# rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
+# yum install Django python-twisted python-memcached python-ldap
+# yum install python-setuptools gcc python-devel
+# easy_install txamqp
+</code></pre>
+
+<p>You need bitmap fonts, so intall it.</p>
+
+<pre><code># yum install bitmap-console-fonts
+</code></pre>
+
+<p>Install Graphite and setup it.</p>
+
+<pre><code># python setup.py install
+# python /opt/graphite/webapp/graphite/manage.py syncdb
+# pushd /opt/graphite/conf
+# cp carbon.conf.example carbon.conf
+# cp storage-schemas.conf.example storage-schemas.conf
+# cp dashboard.conf.example dashboard.conf
+</code></pre>
+
+<p>Edit dashborad.conf and uncomment these.</p>
+
+<pre><code>[ui]
+default_graph_width = 400
+default_graph_height = 250
+automatic_variants = true
+refresh_interval = 60
+</code></pre>
+
+<p>Start Carbon.</p>
+
+<pre><code># /opt/graphite/bin/carbon-cache.py start
+</code></pre>
+
+<p>Start example-client included in Graphite source code to send load average data to Carbon.</p>
+
+<pre><code># popd
+# python ./examples/example-client.py
+</code></pre>
+
+<p>Start a develepment server of Graphite.</p>
+
+<pre><code># /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite  
+</code></pre>
+
+<p>Access to port 8080 of this server and you&#39;ll see the screen of Graphite.</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/07/17/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/08/18/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

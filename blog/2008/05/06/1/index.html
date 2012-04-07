@@ -1,0 +1,63 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>MooseXClassAttribute - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 6<span>th</span>, 2008</time>
+  <h1 class="entry-title"><a href="/blog/2008/05/06/1">MooseXClassAttribute</a></h1>
+
+  <div class="content">
+    <p>流行に乗って <a href="http://coderepos.org/share/wiki/Punc">Punc</a> にも Moose を取り入れようと思って、MooseX::ClassAttribute でクラス属性をハンドリングできるようにしてみたのですが、子クラスのクラス属性をセットすると、親クラスのクラス属性まで変わってしまう。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+package Parent;
+use Moose;
+use MooseX::ClassAttribute;
+
+class_has &#39;x&#39; =&gt; ( is =&gt; &#39;rw&#39; );
+
+package Child;
+use Moose;
+extends &#39;Parent&#39;;
+
+package main;
+
+Parent-&gt;x(&#39;Parent&#39;);
+warn Parent-&gt;x; # Parent が表示される
+
+Child-&gt;x(&#39;Child&#39;);
+warn Parent-&gt;x; # Child が表示されてしまう
+</code></pre>
+
+<p>これが一般的に望ましい動作なのかどうかわからないので、とりあえず Class::Data::Inheritable 使うように書き直した。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2008/03/30/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2008/05/16/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,267 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ProPuppet00 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jul 10<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/07/10/1">ProPuppet00</a></h1>
+
+  <div class="content">
+    <p>#!html
+    <img src="http://www.apress.com/media/catalog/product/cache/9/image/9df78eab33525d08d6e5fb8d27136e95/A/9/A9781430230571-3d_11.png" /></p>
+
+<p>[wiki:ManagingInfrastructureWithPuppet Managing Infrastructure With Puppet] の中でも少しだけ触れた、<a href="http://www.apress.com/9781430230571">Pro Puppet</a> についてメモ。</p>
+
+<p>こちらは内容盛りだくさんで、Puppet をヘビーに使っている人でも読みごたえがあるんじゃないかと。たとえば、バージョン違いの Puppet を混在させる方法、といったところもフォローされていたり。</p>
+
+<p>ただし、Puppet や、Git といった周辺ツールのインストール方法まで詳細に書かれていて、この辺は自分には必要ないなー、と思ったりもした。</p>
+
+<p>とはいえ、最近の Puppet 動向を追いかけていない自分には、とても有意義な内容が多かったので、その辺についてメモしてみる。</p>
+
+<p>（あんまり書きすぎると出版社の人に怒られそうなんで、さらっと。あと、量が多くなりそうなので、何度かにわけて書く。）</p>
+
+<hr>
+
+<h1>モジュール化について</h1>
+
+<p>Puppet 解説書なんで、当然のことながらマニフェストの書き方が最初の方に出てくるんだけど、本書ではいきなりモジュールを作成するところから始めていて驚いた。</p>
+
+<p>このことで思ったのは、マニフェストはとにかく全部モジュール化しちゃう、というのがベストプラクティスなのかもしれない、ということ。</p>
+
+<p><a href="http://gihyo.jp/admin/serial/01/puppet/0008">第8回　Puppet実践テクニック（その3）</a> の中で書いているデータファイルの構造は、modules ディレクトリはあるものの、すべてをモジュール化することは想定していないため、menifests ディレクトリの下に、クラス毎にマニフェストファイルを置いている。</p>
+
+<p>このやり方だと、dist の下にもクラス毎にスタティックなファイルがあったり、templates の下にもクラス毎にテンプレートがあったりで、同じクラスで利用するマニフェスト、スタティックファイル、テンプレートがばらばらな場所にあって、非常にさがしづらい、といったはめになる。（なので上の記事の内容は今となっては真似しない方がいい。）</p>
+
+<p>これがすべてモジュール化されていると、</p>
+
+<pre><code>modules/
+  |
+  +--- ssh/
+  |     |
+  |     +--- files/
+  |     |
+  |     +--- manifets/
+  |     |
+  |     +--- templates/
+  |
+  +--- postfix/
+        |
+        +--- files/
+        |
+        +--- manifests/
+        |
+        +--- templates/
+</code></pre>
+
+<p>といった形で、関連するマニフェスト、スタティックファイル、テンプレートが1カ所にまとまっていて、非常に見通しが良い。</p>
+
+<hr>
+
+<h1>モジュールのマニフェストファイルとクラスの分け方</h1>
+
+<p>本書では以下のようにマニフェストファイルをわけている。(ssh モジュールの例。ファイル内容は本とは少し変えてる。)</p>
+
+<pre><code>ssh/
+ |
+ +--- manifets/
+        |
+        +--- init.pp
+        |
+        +--- params.pp
+        |
+        +--- install.pp
+        |
+        +--- config.pp
+        |
+        +--- service.pp
+</code></pre>
+
+<p>で、各ファイルの内容は以下のような感じ。</p>
+
+<p><em>init.pp</em></p>
+
+<p>ssh モジュールを利用をするために include ssh すると、このファイルが読み込まれ ssh モジュールが適用される。</p>
+
+<p>このファイルでは、さらにモジュール内で細分化されたクラスを include しているだけ。</p>
+
+<pre><code>class ssh {
+    include ssh::params, ssh::install, ssh::config, ssh::service
+}
+</code></pre>
+
+<ul>
+<li>params.pp*</li>
+</ul>
+
+<p>環境毎に異なるパラメータをまとめるためのファイル。このファイル内にパラメータをまとめることによって、モジュール全体の見通しを良くする。</p>
+
+<pre><code>class ssh::params {
+    case $operatingsystem {
+        Solaris: {
+            $package_name = &#39;openssh&#39;
+            $service_name = &#39;sshd&#39;
+        }
+        ...
+    }
+}
+</code></pre>
+
+<p><em>install.pp</em></p>
+
+<p>必要なパッケージをインストールするためのマニフェスト。</p>
+
+<pre><code>class ssh::install {
+    package { $ssh::params::package_name: ensure =&gt; installed }
+}
+</code></pre>
+
+<p><em>config.pp</em></p>
+
+<p>設定ファイル用マニフェスト。</p>
+
+<pre><code>class ssh::config {
+    file { &#39;/etc/ssh/sshd_config&#39;:
+        ensure  =&gt; present,
+        source  =&gt; &#39;puppet:///modules/ssh/sshd_config&#39;,
+        require =&gt; Class[&#39;ssh::install&#39;],
+        notify  =&gt; Class[&#39;ssh::service&#39;],
+    }
+}
+</code></pre>
+
+<p><em>service.pp</em></p>
+
+<p>サービス用マニフェスト。</p>
+
+<pre><code>class ssh::service {
+    ensure  =&gt; running,
+    enable  =&gt; true,
+    require =&gt; Class[&#39;ssh::config&#39;],
+}
+</code></pre>
+
+<p>こういった形で、ssh モジュールの中でも、ssh::params, ssh::install, ssh::config, ssh::service といった形でクラスを役割毎に細分化して、ファイルもクラス毎に作成、といった形で、一ファイル内の見通しを良くする、というやり方が紹介されている。</p>
+
+<p>もうひとつのポイントは、require や notify で Class 指定していること。（Class を require とかするのって以前のバージョンからできるんだっけ？）</p>
+
+<p>たとえば、sercice.pp では、</p>
+
+<pre><code>require =&gt; Class[&#39;ssh::config&#39;],
+</code></pre>
+
+<p>といった指定があるが、これは以下のように、Class ではなく File でも指定できる。</p>
+
+<pre><code>require =&gt; File[&#39;/etc/ssh/sshd_config&#39;],
+</code></pre>
+
+<p>ひとつの設定ファイルから構成されているようなモジュールであればこれでも良いが、複数の設定ファイルから構成されるようなモジュールだと、変更に対して脆くなってしまう。例えば postfix モジュールで考えてみる。</p>
+
+<p>最初は main.cf のみ Puppet で管理して、他の設定ファイルはデフォルトのまま、という状態を想定すると、マニフェストは以下のようになる。</p>
+
+<pre><code>class postfix::config {
+    file { &#39;/etc/postfix/main.cf&#39;:
+        source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+    }
+}
+
+class postfix::service {
+    service { &#39;postfix&#39;:
+        ensure  =&gt; running,
+        enable  =&gt; true,
+        require =&gt; File[&#39;/etc/postfix/main.cf&#39;],
+    }
+}
+</code></pre>
+
+<p>後から、master.cf もデフォルトのままではなくなったので、Puppet で管理することにすると、マニフェストは以下のように、postfix::config と postfix::service の両方を書き換えることになる。</p>
+
+<pre><code>#!diff
+diff --git a/postfix.pp b/postfix.pp
+index f55234e..a032d65 100644
+--- a/postfix.pp
++++ b/postfix.pp
+@@ -2,12 +2,16 @@ class postfix::config {
+     file { &#39;/etc/postfix/main.cf&#39;:
+         source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+     }
++    file { &#39;/etc/postfix/master.cf&#39;:
++        source =&gt; &#39;file:///modules/postfix/master.cf&#39;,
++    }
+ }
+
+ class postfix::service {
+     service { &#39;postfix&#39;:
+         ensure  =&gt; running,
+         enable  =&gt; true,
+-        require =&gt; File[&#39;/etc/postfix/main.cf&#39;],
++        require =&gt; [ File[&#39;/etc/postfix/main.cf&#39;], File[&#39;/etc/postfix/master.cf
+     }
+ }
+</code></pre>
+
+<p>もし、Class を require するようになっていれば、main.cf だけを管理する最初の状態では、マニフェストは</p>
+
+<pre><code>class postfix::config {
+    file { &#39;/etc/postfix/main.cf&#39;:
+        source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+    }
+}
+
+class postfix::service {
+    service { &#39;postfix&#39;:
+        ensure  =&gt; running,
+        enable  =&gt; true,
+        require =&gt; Class[&#39;postfix::config&#39;],
+    }
+}
+</code></pre>
+
+<p>となっており、master.cf を追加した場合、差分は</p>
+
+<pre><code>#!diff
+diff --git a/postfix.pp b/postfix.pp
+index 9745478..e82621c 100644
+--- a/postfix.pp
++++ b/postfix.pp
+@@ -2,6 +2,9 @@ class postfix::config {
+     file { &#39;/etc/postfix/main.cf&#39;:
+         source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+     }
++    file { &#39;/etc/postfix/master.cf&#39;:
++        source =&gt; &#39;file:///modules/postfix/master.cf&#39;,
++    }
+ }
+
+ class postfix::service {
+</code></pre>
+
+<p>だけになり、postfix::service はまったく変更する必要がない。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/07/08/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/07/10/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

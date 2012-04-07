@@ -1,0 +1,77 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>puppet の node 設定ではまる - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 18<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/03/18/2">puppet の node 設定ではまる</a></h1>
+
+  <div class="content">
+    <p><ul><li><a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/InstallationGuide"><span class="icon"></span><a href="http://reductivelabs.com/trac/puppet/wiki/InstallationGuide">http://reductivelabs.com/trac/puppet/wiki/InstallationGuide</a></a></li>
+<li><a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/TestingGuide"><span class="icon"></span><a href="http://reductivelabs.com/trac/puppet/wiki/TestingGuide">http://reductivelabs.com/trac/puppet/wiki/TestingGuide</a></a></li>
+<li><a class="ext-link" href="http://people.redhat.com/dlutter/puppet-app.html"><span class="icon"></span><a href="http://people.redhat.com/dlutter/puppet-app.html">http://people.redhat.com/dlutter/puppet-app.html</a></a></li></ul>
+<p>
+といったあたりを読みながら puppet を試していたのですが、node の設定ではまったのでメモ。
+</p>
+<p>
+pueppt では、
+</p>
+<pre class="wiki">
+node nag.example.com {
+  include yum-rawhide
+  include horde-db-pg
+  include horde-nag
+}
+</pre>
+<p>
+といった設定でターゲットとなるホストと、そのホストでどのようなタスクを実行するかを定義できるのですが、これで puppetmasterd を実行すると、
+</p>
+<pre class="wiki">
+Syntax error at &#39;.&#39; at /etc/puppet/manifests/site.pp:5 
+</pre>
+<p>
+と怒られます。そこで、
+</p>
+<pre class="wiki">
+node &#39;nag.example.com&#39; {
+  include yum-rawhide
+  include horde-db-pg
+  include horde-nag
+}
+</pre>
+<p>
+とクォートしてあげると OK でした。最初に挙げた URL にあるチュートリアルの例ではクォートされておらず、そのままやるとはまりますのでご注意を。
+</p>
+<p>
+<strong>追記</strong><br />
+<a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/LanguageStructures"><span class="icon"></span>Language Structures</a> を読んだら、「You can specify fully-qualified node names, but you have to single-quote the names:」ってちゃんと書いてあった。
+</p></p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/03/18/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/03/19/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

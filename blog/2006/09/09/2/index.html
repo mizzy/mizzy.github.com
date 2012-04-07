@@ -1,0 +1,55 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Apache での SSL クライアント証明書による認証 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Sep 9<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/09/09/2">Apache での SSL クライアント証明書による認証</a></h1>
+
+  <div class="content">
+    <p>
+Apache 2.x で SSL クライアント証明書による認証を行うためのメモ。ssl.conf があるので、そいつに以下の様な設定を入れる。（コメントアウトされてるので、# を外して適当に書き換える。）
+</p>
+<pre class="wiki">
+SSLCACertificatePath /usr/local/apache/conf/ca
+SSLCACertificateFile /usr/local/apache/conf/ca/cacert.pem
+</pre>
+<p>
+cacert.pem は <a class="ext-link" href="http://mizzy.org/linux/ssl_client_certificate.html"><span class="icon"></span>このエントリ</a> で生成された cacert.pem を適当な場所にコピーするなり、ダイレクトにパスを指定するなりする。
+</p>
+<pre class="wiki">
+SSLVerifyClient require
+SSLVerifyDepth  10
+</pre>
+<p>
+これで Apache を再起動してやれば OK。cacert.pem を持つ CA から発行された証明書のみ、アクセスが許可されるようになる。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/09/09/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/09/11/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

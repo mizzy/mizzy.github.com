@@ -1,0 +1,92 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>puppet の実行ファイル - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 21<span>st</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/03/21/2">puppet の実行ファイル</a></h1>
+
+  <div class="content">
+    <p>
+<a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/PuppetExecutables"><span class="icon"></span>Puppet Executables</a> より。またもや超意訳、というかメモ。
+</p>
+<h3 id="puppet">puppet</h3>
+<p>
+スタンドアロンなインタプリタ。manifest ファイルを直接読んで、自ホストに適用する。あまり使うことはないと思う。
+</p>
+<h3 id="puppetca">puppetca</h3>
+<p>
+SSLv3 証明書ハンドリングのためのコマンド。<a class="ext-link" href="http://mizzy.org/linux/puppet05.html"><span class="icon"></span>この辺参照</a>。
+</p>
+<h3 id="puppetd">puppetd</h3>
+<p>
+puppet クライアント側で実行するデーモン。デフォルトでは、puppet サーバに対して定期的に問い合わせに行くけれど、
+</p>
+<pre class="wiki">
+$ puppetd --listen --no-client
+</pre>
+<p>
+と実行することで、puppet サーバからキックされるのを待ち受ける状態になる。（サーバは後述の puppetrun を実行してキックする。）
+</p>
+<h3 id="puppetdoc">puppetdoc</h3>
+<p>
+puppet ソースからドキュメントを抽出するためのツール。これもあまり使わないと思う。
+</p>
+<h3 id="puppetmasterd">puppetmasterd</h3>
+<p>
+puppet サーバ側で起動するデーモン。
+</p>
+<h3 id="puppetrun">puppetrun</h3>
+<p>
+puppet クライアントをサーバ側からキックする時に使うコマンド。
+</p>
+<pre class="wiki">
+$ puppetrun --host hostA --host hostB
+</pre>
+<p>
+という感じで特定のクライアントのみキックできるし、
+</p>
+<pre class="wiki">
+$ puppetrun --all --parallel 5
+</pre>
+<p>
+とかですべてのクライアントをキックする（ただし同時にキックするのは 5 クライアント）といったことができる。
+</p>
+<pre class="wiki">
+$ puppetrun --class web
+</pre>
+<p>
+とかで web クラスのクライアントのみキックとかもできる。ただし、--all や --class は、クライアントホストを LDAP で管理している場合のみ。
+</p>
+<p>
+うちではこれをメインに使うことになりそう。サーバの数が数百台とかあるから、クライアントから定期的にポーリングされる負荷も馬鹿にならないし、いっぺんにファイルとりにこられたりすると、とんでもないことになるので。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/03/21/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/03/21/3">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

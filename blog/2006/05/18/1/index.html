@@ -1,0 +1,57 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>マルチプロセッサ/マルチスレッド メモリアロケータ Hoard - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 18<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/05/18/1">マルチプロセッサ/マルチスレッド メモリアロケータ Hoard</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+<a href="http://www.hoard.org/" target="_blank">Hoard</a> というメモリアロケータを、弊社サーバエンジニアの方から教えてもらいました。
+</p>
+
+<p class="entryBody">
+使い方は簡単で、
+</p>
+
+<pre class="code">
+export LD_PRELOAD="/path/libhoard.so:/lib/libdl.so"
+</pre>
+
+<p class="entryBody">
+などとしておくと、アプリケーション実行時に Hoard のライブラリを読み込み、malloc/free を Hoard のものに置き換えます。これにより、マルチプロセッサ/マルチスレッド環境でパフォーマンスを発揮する Hoard のメモリアロケーションアルゴリズムが、アプリに一切手を加えることなく利用できる、というわけです。
+</p>
+
+<p class="entryBody">
+もちろん仕組み上、<a href="http://www.cs.umass.edu/~emery/hoard/faqs.html">FAQ</a> にあるように、スタティックリンクされたアプリや、malloc/free を使わずに独自のメモリアロケータを使っているアプリでは利用することはできませんが、ほとんどのアプリには利用できるんじゃないでしょうか。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/05/17/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/05/21/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

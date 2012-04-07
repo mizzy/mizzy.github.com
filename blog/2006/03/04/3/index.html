@@ -1,0 +1,59 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>svk のインストールではまる - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 4<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/03/04/3">svk のインストールではまる</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+正確には svk ではなく、subversion の perl binding のインストールではまったのでメモ。svk をインストールしようとすると、「SVN::Core がねーよ、subversion の perl binding をちゃんと入れとけ」みたいなことを言われたので、subversion のソースディレクトリで make swig-pl; make check-swig-pl したところで、以下の様なエラーが大量に出る。
+
+</p>
+
+<p class="code">
+../../../../../subversion/bindings/swig/perl/native/t/4pool......Can't load '/home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so' for module SVN::_Core: /home/miya/src/subversion-1.1.4/subversion/bindings/swig/perl/native/blib/arch/auto/SVN/_Core/_Core.so: undefined symbol: svn_swig_pl_thunk_config_enumerator at /usr/local/lib/perl5/5.8.7/i686-linux/DynaLoader.pm line 230.
+</p>
+
+<p class="entryBody">
+「undefined symbol: svn_swig_pl_thunk_config_enumerator」と出てるので、こいつが含まれるライブラリがリンクされてないんだろうな、と思いまずはライブラリ探し。これは libsvn_swig_perl-1.so であることを発見。で、ldd _Core.so を実行してみると、案の定このライブラリがリンクされてない。
+</p>
+
+<p class="entryBody">
+というわけで、subversion/bindings/swig/perl/native/Makefile の LOADLIBS の行の最後に、-lsvn_swig_perl-1 を追加して make swig-pl; make check-swig-pl すると今度はエラーもなくチェック完了。このまま make install で無事インストールができた。
+</p>
+
+<p class="entryBody">
+<strong>追記</strong><br />
+あとで最初からやりなおしてみたら、最初から Makefile に -lsvn_swig_perl-1 があった。なんだったんだろう？
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/03/04/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/03/07/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

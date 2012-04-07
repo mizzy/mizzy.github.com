@@ -1,0 +1,270 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FuncIntro - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 8<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/12/08/2">FuncIntro</a></h1>
+
+  <div class="content">
+    <p><a href="http://opentechpress.jp/developer/07/12/06/0046247.shtml">Open Tech Press</a> で知った、<a href="https://hosted.fedoraproject.org/projects/func/">Func</a> がおもしろそうだ。</p>
+
+<p>とりあえずどんなツールかを要約すると、</p>
+
+<ul>
+<li>複数のサーバに対して、何らかの処理を一括でまとめて実行して結果が取得できる。たとえば、yum でパッケージをインストールとか。</li>
+<li>「何らかの処理」の部分は、モジュールで拡張できる。</li>
+<li>「何らかの処理」はコマンドラインから実行して単に結果を表示、ということもできるし、Python API でプログラマブルに処理することもできる。</li>
+<li>クライアント/サーバアーキテクチャ</li>
+</ul>
+
+<p>これだけだと何となくわかるようでわからない。触ってみるのが一番。というわけでまずはインストール。</p>
+
+<h1>インストール</h1>
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/InstallAndSetupGuide">InstallAndSetupGuide</a> を読むと、（おそらく最近の）Fedora であれば yum 一発でインストールできるみたいだけど、手元にある CentOS 5 用のパッケージがなさそうなので、ソース RPM からパッケージをつくる。（noarch なので FC7 用でもそのまま入りそうだけど、せっかくだからつくってみる。）</p>
+
+<p>まずは <a href="https://hosted.fedoraproject.org/projects/func/wiki/FuncReleases">FuncReleases</a> から func-0.13-3.fc7.src.rpm をゲット。</p>
+
+<p>次にソース RPM からリビルドするために必要なパッケージをインストール。</p>
+
+<pre><code>$ sudo yum -y install rpm-build python-devel python-setuptools 
+</code></pre>
+
+<p>リビルドしてインストール。依存パッケージの PyOpenSSL も忘れずに。</p>
+
+<pre><code>$ sudo rpmbuild --rebuild func-0.13-3.fc7.src.rpm
+$ sudo yum -y install pyOpenSSL
+$ sudo rpm -ivh /usr/src/redhat/RPMS/noarch/func-0.13-3.noarch.rpm
+</code></pre>
+
+<p>サーバを起動する。サーバは master と呼ばれるみたい。</p>
+
+<pre><code>$ sudo /etc/init.d/certmaster start
+</code></pre>
+
+<p>次にクライアント側。クライアントは minion と呼ばれているようだ。インストール手順は master と同じなので省略。</p>
+
+<p>クライアント側では設定ファイル /etc/func/minion.conf を修正する必要がある。といっても、certmaster で master を指定してあげるだけでとりあえず OK。</p>
+
+<pre><code># configuration for minions
+
+[main]
+log_level = DEBUG
+certmaster = server.example.org
+cert_dir = /etc/pki/func
+acl_dir = /etc/func/minion-acl.d 
+</code></pre>
+
+<p>クライアント側で常駐するデーモン funcd を起動。</p>
+
+<pre><code>$ sudo /etc/init.d/funcd start   
+</code></pre>
+
+<p>master と minion の通信は SSL 証明書での認証が必要なので、master 側で証明書リクエストに対して署名を行う。（この辺りはPuppetと一緒だ。）</p>
+
+<pre><code>$ sudo certmaster-ca --list
+client.example.org
+$ sudo certmaster-ca --sign client.example.org
+</code></pre>
+
+<p>これで使うための準備はできた。</p>
+
+<h1>コマンド実行</h1>
+
+<p>master 上で func コマンドを実行する。まずは minion の一覧を表示。</p>
+
+<pre><code>$ sudo func &quot;*&quot; list_minions
+[&#39;https://client0.example.org:51234&#39;, &#39;https://client1.example.org:51234&#39;]
+client0.example.org
+client1.example.org
+0
+</code></pre>
+
+<p>www ではじまる minion だけを表示。</p>
+
+<pre><code>$ sudo func &quot;www*&quot; list_minions
+[&#39;https://www0.example.org:51234&#39;, &#39;https://www1.example.org:51234&#39;]
+www0.example.org
+www1.example.org
+0
+</code></pre>
+
+<p>各 minion で利用できるモジュールの一覧を表示。</p>
+
+<pre><code>$ sudo func &quot;*&quot; call system list_modules
+on https://client0.example.org:51234 running system list_modules ()
+[&#39;command&#39;, &#39;copyfile&#39;, &#39;func_module&#39;, &#39;hardware&#39;, &#39;nagios-check&#39;, &#39;process&#39;, &#39;reboot&#39;, &#39;rpms&#39;, &#39;service&#39;, &#39;smart&#39;, &#39;snmp&#39;, &#39;test&#39;, &#39;yum&#39;]
+on https://client1.example.org:51234 running system list_modules ()
+[&#39;command&#39;, &#39;copyfile&#39;, &#39;func_module&#39;, &#39;hardware&#39;, &#39;nagios-check&#39;, &#39;process&#39;, &#39;reboot&#39;, &#39;rpms&#39;, &#39;service&#39;, &#39;smart&#39;, &#39;snmp&#39;, &#39;test&#39;, &#39;yum&#39;]
+{&#39;client0.example.org&#39;: [&#39;command&#39;,
+                        &#39;copyfile&#39;,
+                        &#39;func_module&#39;,
+                        &#39;hardware&#39;,
+                        &#39;nagios-check&#39;,
+                        &#39;process&#39;,
+                        &#39;reboot&#39;,
+                        &#39;rpms&#39;,
+                        &#39;service&#39;,
+                        &#39;smart&#39;,
+                        &#39;snmp&#39;,
+                        &#39;test&#39;,
+                        &#39;yum&#39;],
+ &#39;client1.example.org&#39;: [&#39;command&#39;,
+                        &#39;copyfile&#39;,
+                        &#39;func_module&#39;,
+                        &#39;hardware&#39;,
+                        &#39;nagios-check&#39;,
+                        &#39;process&#39;,
+                        &#39;reboot&#39;,
+                        &#39;rpms&#39;,
+                        &#39;service&#39;,
+                        &#39;smart&#39;,
+                        &#39;snmp&#39;,
+                        &#39;test&#39;,
+                        &#39;yum&#39;]}   
+</code></pre>
+
+<p>service モジュールで使えるメソッド一覧を表示。</p>
+
+<pre><code>$ sudo func &quot;client0.example.org&quot; call service list_methods
+on https://client0.example.org:51234 running service list_methods ()
+[&#39;status&#39;, &#39;reload&#39;, &#39;get_running&#39;, &#39;stop&#39;, &#39;start&#39;, &#39;inventory&#39;, &#39;get_enabled&#39;, &#39;restart&#39;, &#39;module_description&#39;, &#39;module_version&#39;, &#39;module_api_version&#39;, &#39;list_methods&#39;]
+{&#39;client0.example.org&#39;: [&#39;status&#39;,
+                        &#39;reload&#39;,
+                        &#39;get_running&#39;,
+                        &#39;stop&#39;,
+                        &#39;start&#39;,
+                        &#39;inventory&#39;,
+                        &#39;get_enabled&#39;,
+                        &#39;restart&#39;,
+                        &#39;module_description&#39;,
+                        &#39;module_version&#39;,
+                        &#39;module_api_version&#39;,
+                        &#39;list_methods&#39;]} 
+</code></pre>
+
+<p>service モジュールの status メソッドで ntpd の起動状態を確認。以下はすべての minion で ntpd が停止してる状態での実行結果。</p>
+
+<pre><code>$ sudo func &quot;*&quot; call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+3
+on https://client1.example.org:51234 running service status (ntpd)
+3
+{&#39;client1.example.org&#39;: 3, &#39;client0.example.org&#39;: 3}
+</code></pre>
+
+<p>ntpd を起動。</p>
+
+<pre><code>$ sudo func &quot;*&quot; call service start ntpd
+on https://client0.example.org:51234 running service start (ntpd)
+0
+on https://client1.example.org:51234 running service start (ntpd)
+0
+{&#39;client1.example.org&#39;: 0, &#39;client0.example.org&#39;: 0}   
+</code></pre>
+
+<p>ntpd の起動状態を確認。</p>
+
+<pre><code>$ sudo func &quot;*&quot; call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+0
+on https://client1.example.org:51234 running service status (ntpd)
+0
+{&#39;client1.example.org&#39;: 0, &#39;client0.example.org&#39;: 0}   
+</code></pre>
+
+<p>*.example.org のみをターゲットにする。</p>
+
+<pre><code>$ sudo func &quot;*.example.org&quot; call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+0
+on https://client1.example.org:51234 running service status (ntpd)
+0
+{&#39;client1.example.org&#39;: 0, &#39;client0.example.org&#39;: 0}   
+</code></pre>
+
+<p>client0.example.org と client1.example.org のみをターゲットにする。</p>
+
+<pre><code>$ sudo func &quot;client0.example.org; client1.example.org&quot; call service status ntpd
+on https://client0.example.org:51234 running service status (ntpd)
+0
+on https://client1.example.org:51234 running service status (ntpd)
+0
+{&#39;client1.example.org&#39;: 0, &#39;client0.example.org&#39;: 0}   
+</code></pre>
+
+<p>ここまで実行してみれば、何となく感じは掴めると思う。</p>
+
+<h1>モジュール</h1>
+
+<p>デフォルトで付属しているモジュールには以下のものがある。</p>
+
+<ul>
+<li>command</li>
+<li>copyfile</li>
+<li>func_module</li>
+<li>hardware</li>
+<li>nagios-check</li>
+<li>process</li>
+<li>reboot</li>
+<li>rpms</li>
+<li>service</li>
+<li>smart</li>
+<li>snmp</li>
+<li>test</li>
+<li>yum</li>
+</ul>
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/#ListofStockModules">使い方はこの辺参照。</a></p>
+
+<p>とりあえず</p>
+
+<pre><code>$ sudo func client0.example.org system list_modules
+</code></pre>
+
+<p>で利用できるモジュールを調べて、</p>
+
+<pre><code>$sudo func client0.example.org call module list_methods
+</code></pre>
+
+<p>でモジュールで使えるメソッド一覧を表示してみると、どんなモジュールがあるか、そのモジュールはどんなことができるのか、がおおよそわかるはず。</p>
+
+<h1>モジュールの書き方</h1>
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/HowToWriteAndDistributeNewModules">ここに書かれてる。</a>これで自分が好きなように機能拡張ができる。</p>
+
+<h1>Python プログラムから呼び出し</h1>
+
+<p><a href="https://hosted.fedoraproject.org/projects/func/wiki/PythonApiExamples">ここにサンプルがある。</a></p>
+
+<p>今後は [wiki:Func こちらの Wiki ページ] に情報まとめていく予定。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/12/08/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/12/29/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FLV::Info で ustream の FLV ファイル情報をとろうとするとエラーになる件 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Oct 8<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/10/08/1">FLV::Info で ustream の FLV ファイル情報をとろうとするとエラーになる件</a></h1>
+
+  <div class="content">
+    <p>ustream の FLV をダウンロードして音声変換する方法は、&quot;typesterさんのとこに詳しく書いてある&quot;:<a href="http://unknownplace.org/memo/2007/10/03">http://unknownplace.org/memo/2007/10/03</a> わけですが、sox に渡すときにサンプルレートを指定する必要があったりします。</p>
+
+<p>で、これを Plagger プラグインで実現するためには、何らかの方法で元ファイルのサンプルレートを取得しないといけないわけで、&quot;FLV::Info&quot;:<a href="http://search.cpan.org/dist/FLV-Info/">http://search.cpan.org/dist/FLV-Info/</a> でできそうだな、と思ったところ</p>
+
+<pre><code>Failed to read FLV file: Tag size is too small (0) at byte 193 (0xc1) at /usr/local/lib/perl5/site_perl/5.8.7/FLV/Tag.pm line 81.
+</code></pre>
+
+<p>といったエラーが出ます。色々調べてみたところ、ustream の FLV ファイル中に、ボディが 0 のオーディオタグが存在するから、ということがわかったので、&quot;パッチを書いて RT に投げておきました。&quot;:<a href="https://rt.cpan.org/Ticket/Display.html?id=29831">https://rt.cpan.org/Ticket/Display.html?id=29831</a></p>
+
+<p>パッチ自体は数行コメントアウトして1行追加しただけ、という簡単なものなのですが、このパッチを書くために、&quot;FLVのファイルフォーマット&quot;:<a href="http://osflash.org/flv">http://osflash.org/flv</a> を調べて、音声フォーマットを取得する Perl スクリプトを自分で書いてみたりと、えらく回り道しました。せっかくなんでスクリプトを載せておきます。スクリプト作成にあたって、<a href="http://code.google.com/p/nelly2pcm/">nelly2pcm</a> のソースも参考にしています。</p>
+
+<p>Liquid error: undefined method `join&#39; for #<a href="String:0x00000101129600">String:0x00000101129600</a></p>
+
+<p>こんな感じで FLV ファイルの音声情報を表示します。</p>
+
+<pre><code>$ ./get_flv_info.pl broadcast_35957_1191232400660.flv
+audio type: mono
+audio size: 16 bit
+audio rate: 11 Hz
+audio format: Nellymoser  
+</code></pre>
+
+<p>あとは Plagger プラグインを書くだけ、という感じなのですが、リビドーが沸いてこないのでちょっと保留。FFmpeg で Nellymoser に対応する予定がある（既に SVN HEAD には Nellymoser という文字列がコード中にある）ようなので、それまで待ってもいいかなー、と。</p>
+
+<p>音声変換するプラグイン &quot;Filter::Audio&quot;:<a href="http://coderepos.org/share/browser/lang/perl/plagger/lib/Plagger/Plugin/Filter/Audio.pm">http://coderepos.org/share/browser/lang/perl/plagger/lib/Plagger/Plugin/Filter/Audio.pm</a> は coderepos にあげてありますので、俺が対応してやるぜ、という方はお好きなようにいじってください。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/10/01/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/10/27/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

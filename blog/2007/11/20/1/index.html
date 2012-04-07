@@ -1,0 +1,162 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>library/perl/trunk/Text-Trac/lib/Text/Trac.pm - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Nov 20<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/11/20/1">library/perl/trunk/Text-Trac/lib/Text/Trac.pm</a></h1>
+
+  <div class="content">
+    <p>source:library/perl/trunk/Text-Trac/lib/Text/Trac.pm</p>
+
+<h1>NAME</h1>
+
+<p>Text::Trac - Perl extension for formatting text with Trac Wiki Style.</p>
+
+<h1>VERSION</h1>
+
+<p>Version 0.08</p>
+
+<h1>SYNOPSIS</h1>
+
+<pre><code>    use Text::Trac;
+
+    my $parser = Text::Trac-&gt;new(
+        trac_url      =&gt; &#39;http://trac.mizzy.org/public/&#39;,
+        disable_links =&gt; [ qw( changeset ticket ) ],
+    );
+
+    $parser-&gt;parse($text);
+
+    print $parser-&gt;html;
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p>Text::Trac parses text with Trac WikiFormatting and convert it to html format.</p>
+
+<h1>METHODS</h1>
+
+<h2>new</h2>
+
+<p>Constructs Text::Trac object.</p>
+
+<p>Available arguments are:</p>
+
+<h3>trac_url</h3>
+
+<p>Base URL for TracLinks.Default is /. You can specify each type of URL individually. Available URLs are:</p>
+
+<p>trac<em>attachment</em>url::  trac<em>changeset</em>url::  trac<em>log</em>url::  trac<em>milestone</em>url::  trac<em>report</em>url::  trac<em>source</em>url::  trac<em>ticket</em>url::  trac<em>wiki</em>url:: </p>
+
+<h3>disable_links</h3>
+
+<p>Specify TracLink types you want to disable. All types are enabled if you don&#39;t specify this option.</p>
+
+<pre><code>    my $parser = Text::Trac-&gt;new(
+        disable_links =&gt; [ qw( changeset ticket ) ],
+    );
+</code></pre>
+
+<h3>enable_links</h3>
+
+<p>Specify TracLink types you want to enable.Other types are disabled. You cannot use both disable<em>links and enable</em>links at once.</p>
+
+<pre><code>    my $parser = Text::Trac-&gt;new(
+        enable_links =&gt; [ qw( changeset ticket ) ],
+    );
+</code></pre>
+
+<h2>parse</h2>
+
+<p>Parses text and converts it to html format.</p>
+
+<h2>process</h2>
+
+<p>An alias of parse method.</p>
+
+<h2>html</h2>
+
+<p>Return converted html string.</p>
+
+<h1>SEE ALSO</h1>
+
+<p>Text::Hatena::  Trac <a href="http://www.edgewall.com/trac/::">http://www.edgewall.com/trac/::</a>  Trac WikiFormatting <a href="http://projects.edgewall.com/trac/wiki/WikiFormatting::">http://projects.edgewall.com/trac/wiki/WikiFormatting::</a> </p>
+
+<h1>AUTHORS</h1>
+
+<p>Gosuke Miyashita, <code>&lt;gosukenator at gmail.com&gt;</code></p>
+
+<p>Hideaki Tanaka, <code>&lt;drawn.boy at gmail.com)&gt;</code></p>
+
+<h1>BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-text-trac at rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Trac">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Trac</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1>SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Text::Trac
+</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+<li>AnnoCPAN: Annotated CPAN documentation</li>
+</ul>
+
+<p><a href="http://annocpan.org/dist/Text-Trac">http://annocpan.org/dist/Text-Trac</a></p>
+
+<ul>
+<li>CPAN Ratings</li>
+</ul>
+
+<p><a href="http://cpanratings.perl.org/d/Text-Trac">http://cpanratings.perl.org/d/Text-Trac</a></p>
+
+<ul>
+<li>RT: CPAN&#39;s request tracker</li>
+</ul>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Trac">http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Trac</a></p>
+
+<ul>
+<li>Search CPAN</li>
+</ul>
+
+<p><a href="http://search.cpan.org/dist/Text-Trac">http://search.cpan.org/dist/Text-Trac</a></p>
+
+<h1>COPYRIGHT &amp; LICENSE</h1>
+
+<p>Copyright 2006 Gosuke Miyashita, all rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/11/17/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/12/03/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

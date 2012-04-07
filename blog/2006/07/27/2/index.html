@@ -1,0 +1,92 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Plagger::Plugin::Filter::FFmpeg #0 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jul 27<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/07/27/2">Plagger::Plugin::Filter::FFmpeg #0</a></h1>
+
+  <div class="content">
+    <p>
+前のエントリの <a class="ext-link" href="http://mizzy.org/program/ffmpeg00.html"><span class="icon"></span>FFmpeg::Command</a> を利用して、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Plagger::Plugin::Filger::FFmpeg</a> 書いてみた。（っていうか、このために FFmpeg::Command つくったわけですが。）
+</p>
+<p>
+とりあえず形にして動くことを確認したかったので、変換パラメータが固定だったり、適当すぎるつくりになってますが、おいおい改善していくということで。
+</p>
+<p>
+以下の様な設定で、YouTube の My Favorite 動画をダウンロード ⇒ mpeg4 へ変換 ⇒ enclosure url を rewrite ⇒ Publish::Feed で podcast、ってところまで確認済み。 
+</p>
+<p>
+<strong> 2006/07/27 03:23:30 追記</strong><br />
+miyagawa さんからの指摘で、URL の書き換えは Filter::RewriteEnclosureURL を使うようにしました。このプラグインの存在をすっかり見落としてました…
+</p>
+<pre class="wiki">
+global:
+  user_agent:
+    cookies: /home/miya/plagger/cookies.txt
+  log:
+    level: info
+
+plugins:
+  - module: Subscription::Config
+    config:
+      feed:
+        - http://www.youtube.com/my_favorites
+
+  - module: Filter::TruePermalink
+  - module: Filter::FindEnclosures
+  - module: Filter::EntryFullText
+  - module: Filter::HEADEnclosureMetadata
+  - module: Filter::FetchEnclosure
+    config:
+      dir: /home/miya/mov
+
+  - module: Filter::FFmpeg
+    config:
+      output_dir: /home/miya/mov
+      ext: mp4
+
+  - module: Filter::RewriteEnclosureURL
+    config:
+      rewrite:
+        - local: /home/miya/mov/
+          url:   http://mizzy.org/mov/
+
+  - module: Publish::Feed
+    config:
+      format: RSS
+      dir: /home/miya/plagger
+      filename: %t.rss
+</pre>
+<p>
+これに合わせて、FFmpeg::Command で ffmpeg を exec で呼び出してたのを、system に変更しました。exec だと Publish::Feed が動いてくれなかったので。おそらく exec はプロセスをフォークした後 wait しないのが原因かな、と。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/07/27/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/07/28/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

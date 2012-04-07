@@ -1,0 +1,59 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Plagger::Plugin::CustomFeed::iTMS #1 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 22<span>nd</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/05/22/2">Plagger::Plugin::CustomFeed::iTMS #1</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTMS.pm" target="_blank">CustomFeed::iTMS</a> は内部で <a href="http://search.cpan.org/~billh/LWP-UserAgent-iTMS_Client/" target="_blank">LWP::UserAgent::iTMS_Client</a> を利用しているのですが、コンストラクタで国名を指定してもちゃんとハンドリングしてくれないので、パッチ書いた。ついでにモジュール作者にパッチ送っておいた。
+</p>
+
+<pre class="code">
+--- iTMS_Client.pm.org  2006-05-22 16:06:46.000000000 +0900
++++ iTMS_Client.pm      2006-05-22 16:11:27.000000000 +0900
+@@ -466,7 +466,7 @@
+         'X-Apple-Tz'          => msec_since_epoch(),
+         'X-Apple-Validation'  => $self->compute_validator( $url, $agent_name ),
+         'Accept-Encoding'     => "gzip, x-aes-cbc",
+-        'X-Apple-Store-Front' => $self->store_front,
++        'X-Apple-Store-Front' => $self->store_front($self->{protocol}->{country}),
+     );
+     $hdr->header( 'X-Token' => $self->{protocol}->{password_token} )
+       if $self->{protocol}->{password_token};       
+</pre>
+
+<p class="entryBody">
+<a href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/iTMS.pm" target="_blank">CustomFeed::iTMS</a> も修正して、国を指定できるようにし、pod も追加しました。これで日本の iTMS からも検索できます。query も UTF-8 であれば日本語も大丈夫。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/05/22/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/05/23/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

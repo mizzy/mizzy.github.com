@@ -1,0 +1,139 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9) - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jul 22<span>nd</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/07/22/2">catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)</a></h1>
+
+  <div class="content">
+    <p><p>
+catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは <a class="ext-link" href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery"><span class="icon"></span>Account Auto-Discovery</a> データを追加するプラグインを書いてみた。
+</p>
+<p>
+blosxom でも <a class="ext-link" href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/account_auto_discovery"><span class="icon"></span>同様のプラグイン</a> を書いているのですが、一番大きな違いは、blosxom プラグインはテンプレートの修正が必要なのに対し、catlxom プラグインはテンプレートの修正が一切必要ありません。XML::TreeBuilder を利用して、HTML ヘッダにデータを追加するような作りにしています。
+</p>
+<p>
+利用上の注意点として、Template::TT よりも後にこのプラグインをロードしなければいけいのですが、自動ロードを有効にしてると先にロードされちゃうので、自動ロードをオフにして yaml で明示的に利用プラグインを指定する必要があります。
+</p>
+<pre class="wiki">
+package Catlxom::Plugin::Format::AccountAutoDiscovery;
+use strict;
+use warnings;
+use base qw/Catlxom::Plugin/;</p>
+
+<p>use NEXT;
+use XML::TreeBuilder;</p>
+
+<p>sub interpolate {
+    my ( $self, $c ) = @_;</p>
+
+<pre><code>my $accounts = $c-&amp;gt;config-&amp;gt;{account_auto_discovery};
+
+my $tree = XML::TreeBuilder-&amp;gt;new();
+$tree-&amp;gt;parse($c-&amp;gt;res-&amp;gt;body);
+
+my $head = $tree-&amp;gt;find(&#39;head&#39;);
+
+for ( @$accounts ){
+    my $rdf = XML::Element-&amp;gt;new(
+        &#39;rdf:RDF&#39;,
+        &#39;xmlns:rdf&#39;  =&amp;gt; &#39;http://www.w3.org/1999/02/22-rdf-syntax-ns#&#39;,
+        &#39;xmlns:foaf&#39; =&amp;gt; &#39;http://xmlns.com/foaf/0.1/&#39;,
+    );
+
+    my $rdf_description = XML::Element-&amp;gt;new(
+        &#39;rdf:Description&#39;,
+        &#39;rdf:about&#39; =&amp;gt; $c-&amp;gt;req-&amp;gt;uri,
+    );
+
+    my $foaf_maker = XML::Element-&amp;gt;new(
+        &#39;foaf:maker&#39;,
+        &#39;rdf:parseType&#39; =&amp;gt; &#39;Resource&#39;,
+    );
+
+    my $foaf_holds_acount = XML::Element-&amp;gt;new( &#39;foaf:holdsAccount&#39; );
+
+    my $foaf_online_account = XML::Element-&amp;gt;new(
+        &#39;foaf:OnlineAccount&#39;,
+        &#39;foaf:accountName&#39; =&amp;gt; $_-&amp;gt;{account_name},
+    );
+
+    my $foaf_account_service_homepage = XML::Element-&amp;gt;new(
+        &#39;foaf:accountServiceHomepage&#39;,
+        &#39;rdf:resource&#39; =&amp;gt; $_-&amp;gt;{account_service_homepage},
+    );
+
+    $head-&amp;gt;push_content($rdf);
+    $rdf-&amp;gt;push_content($rdf_description);
+    $rdf_description-&amp;gt;push_content($foaf_maker);
+    $foaf_maker-&amp;gt;push_content($foaf_holds_acount);
+    $foaf_holds_acount-&amp;gt;push_content($foaf_online_account);
+    $foaf_online_account-&amp;gt;push_content($foaf_account_service_homepage);
+}
+
+$c-&amp;gt;res-&amp;gt;{body} = $tree-&amp;gt;as_HTML;
+$self-&amp;gt;NEXT::interpolate($c);
+</code></pre>
+
+<p>}</p>
+
+<p>1;</p>
+
+<p><strong>END</strong></p>
+
+<p>=head1 NAME</p>
+
+<p>Catlxom::Plugin::Format::AccountAutoDiscovery</p>
+
+<p>=head1 SYNOPSIS</p>
+
+<p>account<em>auto</em>discovery:
+  - account<em>name: gosukenator
+    account</em>service<em>homepage: <a href="http://www.hatena.ne.jp/">http://www.hatena.ne.jp/</a>
+  - account</em>name: xxxx
+    account<em>service</em>homepage: <a href="http://xxx.ne.jp/">http://xxx.ne.jp/</a></p>
+
+<p>=head1 DESCRIPTION</p>
+
+<p>This plugin inserts Account Auto-Discovery data into HTML header.</p>
+
+<p>=head1 AUTHOR</p>
+
+<p>Gosuke Miyashita</p>
+
+<p>=head1 SEE ALSO</p>
+
+<p>L&lt;<a href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery">http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery</a>&gt;</p>
+
+<p>=cut
+</pre></p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/07/22/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/07/27/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

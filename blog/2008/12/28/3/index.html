@@ -1,0 +1,124 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ScalableStorageWithOSS01 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 28<span>th</span>, 2008</time>
+  <h1 class="entry-title"><a href="/blog/2008/12/28/3">ScalableStorageWithOSS01</a></h1>
+
+  <div class="content">
+    <p>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0] のつづき。</p>
+
+<h1>サーバ構成概要</h1>
+
+<p><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">TLUG 発表資料</a> で触れた、全体的な構成のおさらい。構成図は以下のような感じ。</p>
+
+<p>[[Image(<a href="http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)%5D">http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]</a>]</p>
+
+<p>この構成について説明すると、以下のようになります。</p>
+
+<ul>
+<li>DRBD により、2台一組でブロックデバイスをミラーリング
+
+<ul>
+<li>/dev/gnbd0 と /dev/gnbd1 がセット</li>
+<li>/dev/gnbd2 と /dev/gnbd3 がセット<br></li>
+</ul></li>
+<li>GNBD でブロックデバイスをエクスポート
+
+<ul>
+<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 がネットワーク越しに見える</li>
+</ul></li>
+<li>クライアント側で GNBD でエクスポートされたブロックデバイスをインポート
+
+<ul>
+<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 をすべてインポート</li>
+</ul></li>
+<li>DM-MP により、2つのデバイスを1つに見せる
+
+<ul>
+<li>/dev/gnbd0 + /dev/gnbd1 が /dev/mapper/mpath0 として見える</li>
+<li>/dev/gnbd2 + /dev/gnbd3 が /dev/mapper/mpath1 として見える</li>
+</ul></li>
+<li>CLVM により論理ボリュームを作成<br>
+
+<ul>
+<li>/dev/mapper/mpath0 と /dev/mapper/mpath1 が物理ボリューム</li>
+<li>この2つの物理ボリュームから、ボリュームグループ VG0 を作成</li>
+<li>VG0 上に論理ボリューム LV0 を作成</li>
+<li>この論理ボリュームが、/dev/VG0/LV0 として見える</li>
+</ul></li>
+<li>/dev/VG0/LV0 を GFS2 でフォーマット</li>
+<li>ストレージ全体が論理ボリューム /dev/VG0/LV0 として見えるので、こいつをマウントする</li>
+</ul>
+
+<h1>構築手順概要</h1>
+
+<p>構築手順はざっと以下のようになります。CentOS 5.2 + Xen で検証しています。</p>
+
+<ul>
+<li>Xen インスタンスをつくる
+
+<ul>
+<li>client0, client1</li>
+<li>storage0a, storage0b</li>
+<li>storage1a, storage1b</li>
+</ul></li>
+<li>ストレージサーバで GNBD によりエクスポートするブロックデバイスを作成する</li>
+<li>2台セットで DRBD ミラーリング
+
+<ul>
+<li>storage0a と storage0b を同期</li>
+<li>storage1a と storage1b を同期</li>
+</ul></li>
+<li>storage![01][ab] で GNBD によりブロックデバイスをエクスポート</li>
+<li>client![01]でブロックデバイスをインポート</li>
+<li>client![01]上で、DM-MP により複数のデバイスをまとめる
+
+<ul>
+<li>storage0[ab] からエクスポートしたデバイスをひとつに見せる</li>
+<li>storage1[ab] からエクスポートしたデバイスをひとつに見せる</li>
+</ul></li>
+<li>DM-MP でまとめたデバイスを、CLVM によりひとつの論理ボリュームに見せる</li>
+<li>論理ボリュームを GFS2 でフォーマットする</li>
+<li>論理ボリュームをマウントする</li>
+</ul>
+
+<p>次回以降、それぞれについて解説していきます。</p>
+
+<ul>
+<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
+<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
+<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
+<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
+<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
+</ul>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2008/12/28/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2008/12/28/4">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>cygwin の sshd がエラーを吐くようになった - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jan 22<span>nd</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/01/22/1">cygwin の sshd がエラーを吐くようになった</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+うちでは<a href="http://mizzy.org/mtv2000/index.xhtml?css=white" target="_blank">こんなことをして</a> 無理やりウェブから MTV2000 の録画予約しているのですが、cygwin のパッケージを色々アップデートしたら、cygwin の sshd に対して接続できなくなってしまいました。ちなみにエラーはこんな感じ。
+</p>
+
+<pre class="code">
+initgroups: No such process
+</pre>
+
+<p class="entryBody">
+ssh コマンドをデバッグモードで実行すると、認証まではちゃんとできているということと、initgroups という言葉から、/etc/group の処理あたりでこけているのではないかと踏んで、以下の様に /etc/group と念のため /etc/passwd も作り直したら、正常に接続できるようになりました。
+</p>
+
+<pre class="code">
+$ mkpassed -l > /etc/passwd
+$ mkgroup -l > /etc/group
+</pre>
+
+<p class="entryBody">
+もとのファイルをとっておくのを忘れたので、何が原因だったのかはわからないけど、解決したから良しとしよう。
+</p>
+
+<p class="entryBody">
+同じような症状に遭遇する方もいるかもしれませんので、ここにメモしておきます。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/01/16/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/01/23/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

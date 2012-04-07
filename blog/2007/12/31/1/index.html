@@ -1,0 +1,113 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Koan - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 31<span>st</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/12/31/1">Koan</a></h1>
+
+  <div class="content">
+    <p><a href="http://cobbler.et.redhat.com/docs/koan.html">Koan (Kickstart over a network)</a> を使うと、Cobbler と連携して、PXE ブートを使わずに OS を再インストールしたり、Xen または QEMU のゲスト OS をコマンド一発でインストールすることができます。</p>
+
+<p>以下、Fedora 7 で Koan を試してみたメモ。</p>
+
+<h1>Koan のインストール</h1>
+
+<pre><code>$ sudo yum install koan
+</code></pre>
+
+<h1>プロファイルやシステムの一覧を表示</h1>
+
+<p>プロファイル一覧を表示する。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --list-profile
+fc7-i386
+fc7-xen-i386 
+</code></pre>
+
+<p>システム一覧を表示する。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --list-system
+test-server.example.org
+</code></pre>
+
+<p>cobbler.example.org は cobbler が動いてるサーバ。koan による OS インストールを行うときには、プロファイルかシステムのどちらかを指定する。</p>
+
+<h1>OS の再インストール</h1>
+
+<p>OS を再インストールする時には、--replace-self オプション と --profile または --system を指定して koan を実行。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --replace-self --profile=f7-i386
+- using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+downloading initrd initrd.img to /boot/initrd.img
+url=http://cobbler.example.org/cobbler/images/f7-i386/initrd.img
+- using kickstart from cobbler: http://cobbler.example.org/cobbler/images/f7-i386/initrd.img
+downloading kernel vmlinuz to /boot/vmlinuz
+url=http://cobbler.example.org/cobbler/images/f7-i386/vmlinuz
+- using kickstart from cobbler: http://cobbler.example.org/cobbler/images/f7-i386/vmlinuz
+- kickstart: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+- downloading http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+- using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
+- [&#39;/bin/bash&#39;, &#39;/var/spool/koan/insert.sh&#39;]
+cpio
+14535 blocks
+14538 blocks
+done
+- [&#39;/sbin/grubby&#39;, &#39;--grub&#39;, &#39;--add-kernel&#39;, &#39;/boot/vmlinuz&#39;, &#39;--initrd&#39;, &#39;/boot/initrd.img&#39;, &#39;--make-default&#39;, &#39;--title&#39;, &#39;kick1199098439&#39;, &#39;--args&#39;, &#39;ksdevice=eth0 lang=  kssendmac syslog=cobbler.example.org:25150 text  ks=file:ks.cfg&#39;, &#39;--copy-default&#39;]
+- reboot to apply changes 
+</code></pre>
+
+<p>ネットワークインストール用の /boot/initrd.img とか /boot/vmlinuz とかを cobbler サーバからダウンロードして、/boot/grub/menu.lst を書き換えてくれる。</p>
+
+<p>あとは再起動すれば、OS の再インストールが勝手にはじまる。</p>
+
+<h1>Xen ゲスト OS のインストール</h1>
+
+<h2>Xen のインストールと Xen カーネルの起動</h2>
+
+<p>当然 Xen 環境が必要になるので、Xen をインストール。</p>
+
+<pre><code>$ sudo yum install kernel-xen xen
+</code></pre>
+
+<p>インストール後、/boot/grub/menu.lst を書き換えて、デフォルトで Xen カーネルが起動するようにして再起動する。</p>
+
+<h2>koan コマンドでの Xen ゲスト OS インストール</h2>
+
+<p>--replace-self ではなく --virt を指定する。</p>
+
+<pre><code>$ sudo koan --server=cobbler.example.org --virt --profile=f7-xen-i386
+</code></pre>
+
+<p>これで Xen ゲスト OS のインストールがはじまる、はずなんだけど、うちの環境では Segmentation Fault になってしまった。VMWare 上で Xen を動かすというのは無理があるのかもしれない。</p>
+
+<p>実機で試したいところだけど、試せるサーバがないので保留。Yappo さんあたりが試してレポートしてくれるに違いない、きっと。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/12/29/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2008/01/05/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>PLAYLOG HACKS with Plagger #1 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 7<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/03/07/2">PLAYLOG HACKS with Plagger #1</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアップデート。<a href="http://plagger.org/trac" target="_blank">本家サイト</a> にコミットしてますので、こちらをご参照ください。
+</p>
+
+<p class="entryBody">
+宮川さんの助言にしたがって、CustomFeed::iTunesRecentPlay の中の reload_period を廃止して、Rule::Fresh を利用するようにししました。
+</p>
+
+<p class="entryBody">
+それにともない、Publish::Playlog も publish.feed の代わりに publish.entry を利用するようにしています。（entry ひとつひとつの日時を見る必要があるため。）
+</p>
+
+<p class="entryBody">
+最初、宮川さんが CustomFeed::iTunesRecentPlay を修正しているのに気づかないままローカルコピーをいじってました…。svn update する癖をつけないといかんですね。
+</p>
+
+<p class="entryBody">
+次のタスクは、宮川さんの助言にある「スマートリストまたは iTunes API の利用」と otsune さんの助言にある「iTunes Music Library.xml の URL 指定での取得」ですね。といっても、実は「スマートリストの利用」というのが具体的にどうするのかがわからなかったりします。XML をパースするわけでもなく、API も利用せずに、スマートリストを取得する方法があるのでしょうか？#plagger-ja に宮川さんがいらっしゃれば聞いてみようと思ったのですが、誰もいなかったので忘れないようにここにメモしておきます。またコメントしてくれることを期待して:-)
+</p>
+
+<p class="entryBody">
+<strong>2006/03/07 14:50 追記</strong><br />
+深夜に回線ダウンしている間に、宮川さんからメールで回答頂けました。多謝。 #plagger-ja に誰もいなかったのは、単にサーバ選択を間違えていたからでした。 IRC ビギナーなので、クライアントでサーバ選択できるのを見て、「分散システムになってて、どこのサーバ選んでもいいのかな？」と激しく勘違いしてました…
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/03/07/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/03/07/3">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

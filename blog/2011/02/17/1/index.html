@@ -1,0 +1,148 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>JSONParserWithParseYapp - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Feb 17<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/02/17/1">JSONParserWithParseYapp</a></h1>
+
+  <div class="content">
+    <p>構文解析をちゃんと学ばないとなー、と前々から思いつつしばらく放置だったけど、なんとなくやる気になったのでやってみる。</p>
+
+<p><a href="http://twitter.com/zigorou">ZIGOROu</a> さんの <a href="http://d.hatena.ne.jp/ZIGOROu/20080422/1208849930">Parse::Yapp ヨチヨチ歩き</a> で <a href="http://search.cpan.org/%7Efdesar/Parse-Yapp/lib/Parse/Yapp.pm">Parse::Yapp</a> の使い方を学びつつ、<a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> でパーサの書き方の基礎がなんとなくわかった気になり、でも実際は自分で書いてみなきゃわからん、ってことで、<a href="http://twitter.com/hakobe">hakobe</a> さんの <a href="http://d.hatena.ne.jp/hakobe932/20090130/1233327296">Parse::RecDescentでJSONをパース</a> を参考に、Parse::Yapp で JSON パーサを書いてみることにした。</p>
+
+<p>パーサ＋スキャナは以下のような感じ。</p>
+
+<pre><code>#!perl
+%{
+use strict;
+use warnings;
+%}
+%%
+JSON       : value
+           ;
+value      : atom
+           | number
+           | string
+           | &#39;[&#39; array             { return $_[2] }
+           | &#39;{&#39; object            { return $_[2] }
+           ;
+array      : &#39;]&#39;                   { return [] }
+           | &#39;,&#39; &#39;]&#39;               { return [] }
+           | element array_cdr     { unshift @{$_[2]}, $_[1];return $_[2] }
+           ;
+array_cdr  : &#39;]&#39;                   { return [] }
+           | &#39;,&#39; &#39;]&#39;               { return [] }
+           | &#39;,&#39; element array_cdr { unshift @{$_[3]}, $_[2];return $_[3] }
+           ;
+element    : value
+           ;
+object     : &#39;}&#39;                   { return {} }
+           | &#39;,&#39; &#39;}&#39;               { return {} }
+           | member object_cdr     { return { %{ $_[2] }, %{ $_[1] } } }
+           ;
+object_cdr : &#39;}&#39;                   { return {} }
+           | &#39;,&#39; &#39;}&#39;               { return {} }
+           | &#39;,&#39; member object_cdr { return { %{ $_[3] }, %{ $_[2] } } }
+           ;
+member     : key &#39;:&#39; value         { return { $_[1] =&gt; $_[3] } }
+           ;
+key        : string
+           | identifier
+           ;
+%%
+sub yyerror {}
+
+sub yylex {
+    my ( $self ) = @_;
+    my $number = qr/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]\d+)?/;
+    my $double_quoted_string = qr/
+            ^&quot;([^\x00-\x1f\&quot;\\]*
+            (?:\\(?:[\&quot;\\\/bfnrt]|u[0-9a-fA-F]{4})
+            [^\x00-\x1f\&quot;\\]*)*)&quot;
+        /xms;
+    my $single_quoted_string = qr/
+            ^&#39;([^\x00-\x1f\&#39;\\]*
+            (?:\\(?:[\&#39;\\\/bfnrt]|u[0-9a-fA-F]{4})
+            [^\x00-\x1f\&#39;\\]*)*)&#39;
+        /xms;
+
+    for ( $self-&gt;YYData-&gt;{INPUT} ) {
+        s|\s+||;
+        s|^($number)||                and return (&#39;number&#39;, $1);
+        s/^(true|false|null)//        and return (&#39;atom&#39;, $1);
+        s|^([_a-zA-Z][_a-zA-Z0-9]*)|| and return (&#39;identifier&#39;, $1);
+        s|$double_quoted_string||     and return (&#39;string&#39;, $1);
+        s|$single_quoted_string||     and return (&#39;string&#39;, $1);
+        s|^(.)||                      and return ($1, $1);
+    }
+    return (&#39;&#39;, undef);
+}
+
+sub run {
+    my $self = shift;
+    return $self-&gt;YYParse( yylex =&gt; \&amp;yylex, yyerror =&gt; \&amp;yyerror );
+}
+</code></pre>
+
+<p>こいつを yapp コマンドにかけるとパーサモジュールができる。</p>
+
+<pre><code>#!sh
+$ yapp -m JSONParser json.yp
+</code></pre>
+
+<p>このモジュールを使ってパースしてみる。</p>
+
+<pre><code>#!perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Test::More qw(no_plan);
+use JSONParser;
+
+my $parser = JSONParser-&gt;new;
+$parser-&gt;YYData-&gt;{INPUT} = q{[
+        &#39;Mercury&#39;,
+        &quot;Venus&quot;,
+        [&quot;Earth&quot;, [&#39;Moon&#39;]],
+        [&#39;Mars&#39;, [&quot;Phobos&quot;, &#39;Deimos&#39;]],
+        [&#39;Jupiter&#39;,[&quot;Io&quot;, &#39;Europa&#39;, &quot;Ganymede&quot;, &#39;Callisto&#39;]]
+]};
+my $result = $parser-&gt;run;
+
+is_deeply($result, [&#39;Mercury&#39;, &quot;Venus&quot;, [&quot;Earth&quot;, [&#39;Moon&#39;]], [&#39;Mars&#39;, [&quot;Phobos&quot;, &#39;Deimos&#39;]], [&#39;Jupiter&#39;,[&quot;Io&quot;, &#39;Europa&#39;, &quot;Ganymede&quot;, &#39;Callisto&#39;]]]);
+</code></pre>
+
+<p>うん、なんとなくわかってきた気がする。</p>
+
+<p><a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> の中で「客観的に見てもこの分野に関しては一番わかりやすい本」とオススメされていた<a href="http://www.amazon.co.jp/dp/4756137091">Rubyを256倍使うための本 無道編</a> も買ってみた。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/02/11/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/02/23/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

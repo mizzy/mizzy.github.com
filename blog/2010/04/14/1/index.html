@@ -1,0 +1,68 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>HadoopAndScalaPackagesForCentOS - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Apr 14<span>th</span>, 2010</time>
+  <h1 class="entry-title"><a href="/blog/2010/04/14/1">HadoopAndScalaPackagesForCentOS</a></h1>
+
+  <div class="content">
+    <p><em>2010/04/14 追記</em></p>
+
+<p>太田さんから twitter で<a href="http://twitter.com/kzk_mover/status/12147992526">Hadoopは基本的にSun JDKのみでテストされているので、OpenJDKでの使用は危険らしいです。</a> とご指摘いただきました。ありがとうございます。</p>
+
+<p>となると、Hadoop 以外にも Java 関連パッケージを利用したい場合には、Hadoop を OpenJDK 用にビルドするんじゃなくて、他の Java 関連パッケージを Sun JDK 用にビルドしなおすか、気持ち悪いけど併用するか、のどちらかになってしまうんですかね。</p>
+
+<hr>
+
+<p>Hadoop を CentOS5 で利用する場合、<a href="http://www.cloudera.com/hadoop/">Cloudera’s Distribution for Hadoop (CDH)</a> を <a href="http://archive.cloudera.com/docs/_yum.html">yum でインストール</a> するのが簡単なんですが、<a href="http://java.sun.com/">http://java.sun.com/</a> から入手できる JDK パッケージに依存してるので、CentOS5で yum install できる OpenJDK パッケージ が使えません。</p>
+
+<p>Hadoop 使うだけならそれでもいいんですが、他の yum で入る ant 等の Java 製ソフトウェアを利用しようと思うと、Sun から入手した JDK パッケージと yum で入る OpenJDK パッケージが同居して、気持ちが悪いです。</p>
+
+<p>幸い、<a href="http://archive.cloudera.com/redhat/cdh/3/SRPMS/">CDH の SRPM</a> も入手できるので、こいつを OpenJDK パッケージを利用する形でパッケージングしなおしました。</p>
+
+<ul>
+<li><a href="http://svn.mizzy.org/public/yum/SRPMS/hadoop-0.20-0.20.2+228-1.centos.src.rpm">http://svn.mizzy.org/public/yum/SRPMS/hadoop-0.20-0.20.2+228-1.centos.src.rpm</a></li>
+</ul>
+
+<p>こいつをビルドするために ant 1.7 以降が必要なのだけど、CentOS で yum で入るのは 1.6 なので、ant 1.7 のパッケージもつくった。</p>
+
+<ul>
+<li><a href="http://svn.mizzy.org/public/yum/SRPMS/ant-1.7.1-11.1.src.rpm">http://svn.mizzy.org/public/yum/SRPMS/ant-1.7.1-11.1.src.rpm</a></li>
+</ul>
+
+<p>また、Hadoop + Scala を試してみたいので、Scala のパッケージと、Scala に必要な jline のパッケージもつくった。</p>
+
+<ul>
+<li><a href="http://svn.mizzy.org/public/yum/SRPMS/scala-2.7.7-1.centos.src.rpm">http://svn.mizzy.org/public/yum/SRPMS/scala-2.7.7-1.centos.src.rpm</a></li>
+<li><a href="http://svn.mizzy.org/public/yum/SRPMS/jline-0.9.94-0.6.src.rpm">http://svn.mizzy.org/public/yum/SRPMS/jline-0.9.94-0.6.src.rpm</a></li>
+</ul>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2010/03/26/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2010/05/20/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

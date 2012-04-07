@@ -1,0 +1,139 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 6<span>th</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/05/06/2">Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い</a></h1>
+
+  <div class="content">
+    <p><a href="http://en.yummy.stripper.jp/?eid=550053">ブログが続かないわけ | DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い</a> にて、</p>
+
+<blockquote>
+<p>とはいえ、僕の稼働中のアプリはすでに手動型のSchema で動いている。スキーマを作り直したら、リレーションの設定を全てしなおさなければならないので、それは現実的じゃない。inflate, deflate の指定は、やっぱりすべてのSchema にかかなきゃだめそうだ。</p>
+</blockquote>
+
+<p>とあったので、これに関して少し楽ができる方法をコメントしようと思ったけれど、コメント欄ではうまく伝えられる自信がないので、こちらで書いてみることにしました。</p>
+
+<h3>load_components で 読み込む方法</h3>
+
+<p>DBIx::Class::Schema::Loader ではなく DBIx::Class::Schema を継承したスキーマの場合には、各スキーマファイルに以下の様に書いてあげれば OK です。（既にご存知かもしれませんが。）</p>
+
+<pre><code>package My::Schema::Table;
+
+__PACKAGE__-&gt;load_components(
+  &quot;InflateColumn::DateTime&quot;,
+  &quot;PK::Auto&quot;,
+  &quot;Core&quot;,
+);
+</code></pre>
+
+<p>すべてのスキーマファイルに書かなきゃいけないことには変わりありませんが、各カラムに inflate/deflate を設定するよりははるかに楽だと思います。</p>
+
+<h3>make_schema_at を使う方法</h3>
+
+<p>make_schema_at でスキーマファイルを生成しているのであれば、こんな感じでリレーションだけ定義した ./tmp/lib/My/Schema/Table.pm をまず用意します。</p>
+
+<pre><code>package My::Schema::Table;
+
+__PACKAGE__-&gt;belongs_to(
+    realation =&gt; &#39;My::Schema::OtherTable
+    { &#39;foreign.id&#39; =&gt; &#39;self.other_table_id&#39; },
+);
+
+1;
+</code></pre>
+
+<p>でもって、こんなスクリプトを実行します。</p>
+
+<pre><code>#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib qw( ./tmp/lib );
+use Carp;
+use DBIx::Class::Schema::Loader qw( make_schema_at dump_to_dir:lib dump_overwrite );
+
+make_schema_at(
+    &#39;My::Schema::Table&#39;,
+    {
+        components     =&gt; [qw/ ResultSetManager UTF8Columns InflateColumn::DateTime /],
+        dump_overwrite =&gt; 1,
+    },
+    [&#39;dbi:mysql:dbname&#39; ,&#39;user&#39;, &#39;password&#39;],
+);
+</code></pre>
+
+<p>そうすると、lib/My/Schema/Table.pm に以下の内容を吐き出してくれます。</p>
+
+<pre><code>package My::Schema::Table;
+
+# Created by DBIx::Class::Schema::Loader v0.03009 @ 2007-04-26 18:21:23
+
+use strict;
+use warnings;
+
+use base &#39;DBIx::Class&#39;;
+
+__PACKAGE__-&gt;load_components(
+  &quot;ResultSetManager&quot;,
+  &quot;UTF8Columns&quot;,
+  &quot;InflateColumn::DateTime&quot;,
+  &quot;PK::Auto&quot;,
+  &quot;Core&quot;,
+);
+__PACKAGE__-&gt;table(&quot;table&quot;);
+__PACKAGE__-&gt;add_columns(
+  &quot;id&quot;,
+  { data_type =&gt; &quot;INT&quot;, default_value =&gt; undef, is_nullable =&gt; 0, size =&gt; 11 },
+  &quot;other_table_id&quot;,
+  { data_type =&gt; &quot;INT&quot;, default_value =&gt; 0, is_nullable =&gt; 0, size =&gt; 11 },
+  &quot;date&quot;,
+  { data_type =&gt; &quot;DATE&quot;, default_value =&gt; undef, is_nullable =&gt; 1, size =&gt; 10 },
+
+__PACKAGE__-&gt;set_primary_key(&quot;id&quot;);
+# These lines loaded from user-supplied external file:
+package My::Schema::Table;
+
+__PACKAGE__-&gt;belongs_to(
+    employees =&gt; &#39;My::Schema::Table&#39;,
+    { &#39;foreign.id&#39; =&gt; &#39;self.other_table_id&#39; },
+);
+
+1;
+# End of lines loaded from user-supplied external file
+</code></pre>
+
+<p>この方法を使うと、スキーマを作り直しても、リレーションの再設定をしなくて済みます。</p>
+
+<p>手動でやるのが楽なのか、上の方法のいずれかを使うのが楽なのかは、状況にもよると思いますが、こんな方法もありますよ、ということで、ご参考になれば幸いです。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/05/06/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/05/11/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

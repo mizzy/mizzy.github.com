@@ -1,0 +1,74 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Web-to-mobi - A script for converting web sites to mobipocket format - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jan 9<span>th</span>, 2012</time>
+  <h1 class="entry-title"><a href="/blog/2012/01/09/1">Web-to-mobi - A script for converting web sites to mobipocket format</a></h1>
+
+  <div class="content">
+    <p>I&#39;ve written a script to convert <a href="http://gettingreal.37signals.com/toc.php">Getting Real</a> into mobipocket format.</p>
+
+<p>But the kindle edition of Getting Real is sold at amazon.com, publishing this script may be illegal.</p>
+
+<p>So I&#39;ve re-written this script like <a href="https://github.com/mizzy/web-to-mobi">this</a> following the advice from <a href="https://twitter.com/#!/otsune">@otsune</a>-san.</p>
+
+<p>This script gets JSON data about a web site from STDIN and converts web data to mobipcoket format.</p>
+
+<p>JSON data format is like this.</p>
+
+<pre><code>{
+     &quot;title&quot;    : &quot;Getting Real&quot;,
+     &quot;author&quot;   : &quot;37signals&quot;,
+     &quot;chapters&quot; : [
+         {
+             &quot;title&quot;     : &quot;Introduction&quot;,
+              &quot;sections&quot; : [
+                  {
+                      &quot;title&quot; : &quot;What is Getting Real?&quot;,
+                      &quot;uri&quot;   : &quot;http://gettingreal.37signals.com/ch01_What_is_Getting_Real.php&quot;
+                  },
+                  {
+                      &quot;title&quot; : &quot;About 37signals&quot;,
+                      &quot;uri&quot;   : &quot;http://gettingreal.37signals.com/ch01_About_37signals.php&quot;
+                  },
+              ]
+        }
+     ],
+     &quot;content_xpath&quot; : &quot;//div[@class=\&quot;content\&quot;]&quot;,
+     &quot;exclude_xpath&quot; : &quot;//div[@class=\&quot;next\&quot;]&quot;
+}
+</code></pre>
+
+<p>This is the image of showing the converted file on Kindle Previewer.</p>
+
+<p><img src="/images/2012/01/getting_real.png" title="Getting Real on Kindle" ></p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2012/01/06/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2012/01/10/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

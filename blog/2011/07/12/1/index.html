@@ -1,0 +1,140 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>DotCloudCliSourceCodeReading00 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jul 12<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/07/12/1">DotCloudCliSourceCodeReading00</a></h1>
+
+  <div class="content">
+    <p>I wonder how &quot;dotcloud push&quot; acts, especially on uploading files, so I read the <a href="http://pypi.python.org/pypi/dotcloud.cli">dotcloud.cli source code</a>.</p>
+
+<p>If you execute &quot;dotcloud push&quot; with --export option, you&#39;ll get the response like this.</p>
+
+<pre><code>$ dotcloud --export push helloworldapp
+{
+    &quot;data&quot;: [
+        [
+            &quot;upload&quot;, 
+            &quot;.&quot;, 
+            &quot;ssh://dotcloud@uploader.dotcloud.com:21122/helloworldapp&quot;, 
+            {
+                &quot;rsync&quot;: {
+                    &quot;excludes&quot;: [
+                        &quot;*.pyc&quot;, 
+                        &quot;.git&quot;, 
+                        &quot;.hg&quot;
+                    ]
+                }, 
+                &quot;check&quot;: true
+            }
+        ], 
+        [
+            &quot;call&quot;, 
+            &quot;deploy helloworldapp.default&quot;
+        ]
+    ], 
+    &quot;type&quot;: &quot;cmd&quot;
+}
+</code></pre>
+
+<p>So you know that dotcloud command will run Remote.upload() method.(See DotCloudCliBehaviorOverView.)</p>
+
+<p>You can see the upload() method in dotcloud/cli/remote.py.</p>
+
+<pre><code>#!python
+    def upload(self, local_dir, destination, args):
+        if args.get(&#39;check&#39;):
+            local_dir = self.check_pushdir(local_dir)
+        self.info(&#39;# upload {0} {1}&#39;.format(local_dir, destination))
+        if os.path.isdir(os.path.join(local_dir, &#39;.hg&#39;)):
+            return self.hg(local_dir, destination, args.get(&#39;hg&#39;, {}))
+        if os.path.isdir(os.path.join(local_dir, &#39;.git&#39;)):
+            return self.git(local_dir, destination, args.get(&#39;git&#39;, {}))
+        return self.rsync(local_dir, destination, args.get(&#39;rsync&#39;, {}))
+</code></pre>
+
+<p>If you have .hg directory, dotcloud command runs self.hg().If you have .git directory, dotcloud command runs self.git().Otherwise dotcloud command runs self.rsync().</p>
+
+<p>You can see these methods in the same file.</p>
+
+<pre><code>#!python
+    def rsync(self, local_dir, destination, args):
+        self.info(&#39;# rsync&#39;)
+        excludes = args.get(&#39;excludes&#39;)
+        url = utils.parse_url(destination)
+        ssh = &#39; &#39;.join(self._ssh_options)
+        ssh += &#39; -p {0}&#39;.format(url[&#39;port&#39;])
+        if not os.path.isfile(local_dir) and not local_dir.endswith(&#39;/&#39;):
+            local_dir += &#39;/&#39;
+        rsync = (
+                    &#39;rsync&#39;, &#39;-lpthrvz&#39;, &#39;--delete&#39;, &#39;--safe-links&#39;,
+                ) + tuple(&#39;--exclude={0}&#39;.format(e) for e in excludes) + (
+                    &#39;-e&#39;, ssh, local_dir,
+                    &#39;{user}@{host}:{dest}/&#39;.format(user=url[&#39;user&#39;],
+                        host=url[&#39;host&#39;], dest=url[&#39;path&#39;])
+                )
+        try:
+            ret = subprocess.call(rsync, close_fds=True)
+            if ret != 0:
+                self.warning_ssh()
+            return ret
+        except OSError:
+            self.die(&#39;rsync&#39;)
+
+    def hg(self, local_dir, destination, args):
+        self.info(&#39;# hg&#39;)
+        with utils.cd(local_dir):
+            try:
+                ssh = &#39; &#39;.join(self._ssh_options)
+                args = (&#39;hg&#39;, &#39;push&#39;, &#39;--ssh&#39;, ssh, &#39;-f&#39;, destination)
+                ret = subprocess.call(args, close_fds=True)
+                if ret != 0:
+                    self.warning_ssh()
+                return ret
+            except OSError:
+                self.die(&#39;hg&#39;)
+
+    def git(self, local_dir, destination, args):
+        self.info(&#39;# git&#39;)
+        with utils.cd(local_dir):
+            try:
+                os.environ[&#39;GIT_SSH&#39;] = &#39;__dotcloud_git_ssh&#39;
+                os.environ[&#39;DOTCLOUD_SSH_KEY&#39;] = config.CONFIG_KEY
+                ret = subprocess.call((&#39;git&#39;, &#39;push&#39;, &#39;-f&#39;, &#39;--all&#39;,
+                    destination), close_fds=True)
+                if ret != 0:
+                    self.warning_ssh()
+                return ret
+            except OSError:
+                self.die(&#39;git&#39;)
+</code></pre>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/07/10/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/07/17/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

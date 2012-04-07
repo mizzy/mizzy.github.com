@@ -1,0 +1,58 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Catalyst Tips #0 Catalystでファイルのアップロード - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Sep 8<span>th</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/09/08/1">Catalyst Tips #0 Catalystでファイルのアップロード</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+業務で使うウェブアプをCatalystで作っているのですが、ファイルのアップロード処理でちょっとだけはまったのでメモ。
+</p>
+
+<p class="entryBody">
+最初、 <a href="http://search.cpan.org/~mramberg/Catalyst-5.33/lib/Catalyst/Request/Upload.pm" target="_blank">Catalyst::Request::Upload</a> の説明を読んだのですが、これだけだとさっぱり使い方が分からない。で、 <a href="http://search.cpan.org/~mramberg/Catalyst-5.33/lib/Catalyst/Request.pm" target="_blank">Catalyst::Request</a> を併せて読むことで、ようやくわかりました。こんな感じです。
+</p>
+
+<pre class="code">
+for my $upload (values $c->request->uploads){
+    if($upload->filename){
+        $upload->copy_to('/path/to/' . $upload->filename);
+    }
+    unlink $upload->tempname;
+}
+</pre>
+
+<p class="entryBody">
+注意点としては、&lt;input type="file" /&gt; の入力フォームが空の状態でpostしても、$c->request->uploadsは空にはならないので、 $upload->filename が空かどうかチェックすること。それと、 $upload->tempname で示されるパスにテンポラリファイルが作られる（しかもファイル入力フォームが空の状態でも）ので、ちゃんと消しておかないとうざい、といったあたりでしょうか。
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/09/01/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/09/10/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

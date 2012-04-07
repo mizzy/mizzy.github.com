@@ -1,0 +1,87 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Plagger で Amazon2iCal の patch - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Aug 22<span>nd</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/08/22/1">Plagger で Amazon2iCal の patch</a></h1>
+
+  <div class="content">
+    <p><p>
+<a class="ext-link" href="http://d.hatena.ne.jp/wata_d/20060821/1156113214"><span class="icon"></span>ベイダー日記 - Amazon2iCal</a> を見て、そうそう、これやりたかったんだよねー、ということで、早速プラグインを頂いて試してみたのですが、いくつかこちらの環境でうまく動かなかったところがあったので、パッチを晒してみます。具体的な修正点は以下の通り。
+</p>
+<ul><li>プラグインのフェーズを customfeed.handle から subscription.load へ</li>
+<li>日本語の検索がうまく動かなかったので、 $keyword を encode するようにした</li>
+<li>日付がうまくとれなかった場合に next で次のループへ</li></ul>
+<p>
+<del>でも、日本語の混じった iCalデータ を Google Calendar へインポートしようとするとエラーが出るな…</del> 正確にはインポートではなくて、Other Calendars で iCal ファイルの URL を指定した場合、のことだったのですが、いま試したらちゃんと反映されてました。なんだったんだろう？
+</p>
+<pre class="wiki">
+--- AmazonSearch.pm.org 2006-08-22 00:16:35.000000000 +0900
++++ AmazonSearch.pm 2006-08-22 00:15:16.000000000 +0900
+@@ -3,12 +3,13 @@
+ use base qw( Plagger::Plugin );
+ use Net::Amazon;
+ use Net::Amazon::Request::Keyword;
++use Encode;</p>
+
+<p>sub register {
+     my($self, $context) = @<em>;
+     $context-&gt;register</em>hook(
+         $self,
+-        &#39;customfeed.handle&#39; =&gt; &amp;amp;aggregate,
++        &#39;subscription.load&#39; =&gt; &amp;amp;aggregate,
+     );
+ }</p>
+
+<p>@@ -32,6 +33,7 @@
+         locale    =&gt; $self-&gt;conf-&gt;{locale},
+     );</p>
+
+<ul>
+<li><p>$keyword = encode(&#39;UTF-8&#39;, $keyword);
+ my $req = Net::Amazon::Request::Keyword-&gt;new(
+     keyword =&gt; $keyword,
+     mode    =&gt; $self-&gt;conf-&gt;{mode},
+@@ -53,6 +55,7 @@</p>
+
+<pre><code> my $date = Plagger::Date-&gt;strptime(&quot;%Y/%m/%d&quot;, $prop-&gt;ReleaseDate);
+    $date = Plagger::Date-&gt;strptime(&quot;%Y/%m&quot;, $prop-&gt;ReleaseDate) unless $date;
+</code></pre></li>
+<li><pre><code>   next unless $date;
+ $e-&gt;date($date);
+
+ my $d = $date - $dt;
+</code></pre>
+
+<p></pre></p></li>
+</ul>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/07/31/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/08/22/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

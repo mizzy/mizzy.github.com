@@ -1,0 +1,62 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>SubsonicThroughApacheProxy - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Jun 29<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/06/29/1">SubsonicThroughApacheProxy</a></h1>
+
+  <div class="content">
+    <p><a href="http://twitter.com/#!/earlcyborg">@earlcyborg くん</a> に教えてもらった <a href="http://www.subsonic.org/pages/index.jsp">Subsonic</a> がよさげなので、家の中に環境作り、Apache mod_proxy 経由でアクセスしようとしたらはまったのでメモ。</p>
+
+<p>結論: ProxyPreserveHost On を入れないとはまる。</p>
+
+<p>最初、</p>
+
+<pre><code>&lt;VirtualHost *&gt;
+ServerName subsonic.mizzy.org
+ProxyPass / http://192.168.10.14:4040/
+ProxyPassReverse / http://192.168.10.14:4040/
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>という設定で <a href="http://subsonic.mizzy.org/">http://subsonic.mizzy.org/</a> にアクセスしたら、<a href="http://192.168.10.14:4040/login.view">http://192.168.10.14:4040/login.view</a>? にリダイレクトされてしまった。Subsonic にホスト名を設定するところもなさそう。そこで、おそらく Host ヘッダに設定されたホストがリダイレクト先になるんじゃなかろうか、と仮説を立てて、以下のように設定してみた。</p>
+
+<pre><code>&lt;VirtualHost *&gt;
+ServerName subsonic.mizzy.org
+ProxyPreserveHost On
+ProxyPass / http://192.168.10.14:4040/
+ProxyPassReverse / http://192.168.10.14:4040/
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>これでうまくいった。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/06/25/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/07/08/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

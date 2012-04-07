@@ -1,0 +1,94 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ScalaObjectCloning - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Oct 18<span>th</span>, 2009</time>
+  <h1 class="entry-title"><a href="/blog/2009/10/18/1">ScalaObjectCloning</a></h1>
+
+  <div class="content">
+    <p><a href="http://www.amazon.co.jp/dp/4797327030/">Java言語で学ぶデザインパターン入門</a> の第6章 Prototype を <a href="http://github.com/mizzy/scala-design-patterns/tree/master/Prototype/">Scala で書き直してみて</a>、オブジェクトのクローニングでちょっとつまづいたのでメモ。</p>
+
+<p>結論を先に言うと、オブジェクトのクローニングしたい場合には、クラスやトレイトの宣言時に、@cloneable アノテーションを入れると OK。</p>
+
+<pre><code>@cloneable class Hoge {
+  ...
+}
+</code></pre>
+
+<p>以下、つまづいて調べた経緯。元書籍での Product クラスは以下のように、Cloneable を継承している。</p>
+
+<pre><code>#!java
+package framework;
+
+public interface Product extends Cloneable {
+    public abstract void use(String s);
+    public abstract Product createClone(); 
+}
+</code></pre>
+
+<p>で、Scala でのクローニングについて、「Scala cloneable」でググると、一番上に出てきた <a href="http://www.scala-lang.org/node/110">http://www.scala-lang.org/node/110</a> では、以下のようなコードが載っていた。</p>
+
+<pre><code>trait Cloneable extends java.lang.Cloneable {
+  override def clone(): Cloneable = { super.clone(); this }
+}
+trait Resetable {
+  def reset: Unit
+}
+</code></pre>
+
+<p>これを参考にして、Product クラスを Scala で以下のように書き直してみた。</p>
+
+<pre><code>package framework
+
+trait Product extends java.lang.Cloneable {
+  def use(s: String): Unit
+  def createClone(): Product
+  override def clone(): Cloneable = { super.clone(); this }
+}
+</code></pre>
+
+<p>これでとりあえずは動いたんだけど、いまいちスッキリしない。そもそも Scala は Java だけではなく、.NET でも動くということなんだけど、java.lang.Cloneable を継承してると、Java でしか動かなくてイマイチ。（まあ、習作用コードでそこまで気にする必要もないんだけど。）</p>
+
+<p>というわけで調べてみたら、@cloneable アノテーションを使えばいいみたい。</p>
+
+<pre><code>package framework
+
+@cloneable trait Product {
+  def use(s: String): Unit
+  def createClone(): Product
+}
+</code></pre>
+
+<p>これで意図通りに動いた。</p>
+
+<p>@cloneable を頭に入れないと、実行時に CloneNotSupportedException が発生する。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2009/10/06/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2009/10/31/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

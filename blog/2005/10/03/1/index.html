@@ -1,0 +1,62 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FormValidator::Simple関連モジュール - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Oct 3<span>rd</span>, 2005</time>
+  <h1 class="entry-title"><a href="/blog/2005/10/03/1">FormValidator::Simple関連モジュール</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+今までフォームの validation は自前でモジュール書いていたのですが、 <a href="http://www.lost-season.jp/mt/2005/10/2005100121.html" target="_blank">CatalystでSledge風Validation</a> にある FormValidator::Simple がすごく良さげなので、さっそく使わせて頂くことにしました。
+</p>
+
+<p class="entryBody">
+ついでに、 FormValidator::Simple で電話番号チェックするプラグインと、 CGI::Application から FormValidator::Simple を利用するためのプラグインを作って、 CPAN にアップしました。
+</p>
+
+<ul class="entryBody">
+<li><a href="http://search.cpan.org/perldoc?FormValidator%3A%3ASimple%3A%3APlugin%3A%3ANumber%3A%3APhone%3A%3AJP" target="_blank">FormValidator::Simple::Plugin::Number::Phone::JP</a></li>
+<li><a href="http://search.cpan.org/perldoc?CGI::Application::Plugin::FormValidator::Simple" target="_blank">CGI::Application::Plugin::FormValidator::Simple</a></li>
+</ul>
+
+<p class="entryBody">
+ドキュメントの内容は、 FormValidator::Simple や Catalyst::Plugin::FormValidator::Simple をパクらせて頂きました。 CGI::Application::Plugin::FormValidator::Simple は、使い方が Catalyst::Plugin::FormValidator::Simple とできるだけ同じになるようにしています。（ set_invalid_form はまだ実装してませんが。）
+</p>
+
+<p class="entryBody">
+やたらとモジュール名が長いのが気になるのと、初めて CPAN にアップしたので、こんなんで良いのか不安です…
+</p>
+
+<p class="entryBody">
+それから、FormValidator::Simple::Plugin::Number::Phone::JP 0.01のSYNOPSISが間違ってるので、ご注意下さい。0.02で修正しています。（上記リンクでは現在、0.01に行ってしまいます。しばらくすれば0.02になると思います。）
+</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2005/09/26/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2005/10/29/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

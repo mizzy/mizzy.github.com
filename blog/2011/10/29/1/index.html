@@ -1,0 +1,83 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Typo to Octopress - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Oct 29<span>th</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/10/29/1">Typo to Octopress</a></h1>
+
+  <div class="content">
+    <p>I&#39;ve moved my <a href="http://fdv.github.com/typo/">Typo</a> blog contents to this octopress blog.</p>
+
+<p>For this purpose I made this tiny script.</p>
+
+<div><script src='https://gist.github.com/1324352.js?file='></script>
+<noscript><pre><code>require &quot;rubygems&quot;
+require &quot;active_record&quot;
+
+ActiveRecord::Base.establish_connection(
+    :adapter  =&gt; &quot;mysql2&quot;,
+    :host     =&gt; &quot;192.168.10.12&quot;,
+    :user     =&gt; &quot;root&quot;,
+    :password =&gt; &quot;root&quot;,
+    :database =&gt; &quot;typo&quot;,
+    :encoding =&gt; &quot;utf8&quot;
+)
+
+class Content &lt; ActiveRecord::Base
+  Content.inheritance_column = 'foo'
+end
+
+contents = Content.all
+
+contents.each do |content|
+  dt = content.published_at
+  date = sprintf(&quot;%04s-%02d-%02d&quot;, dt.year, dt.month, dt.day)
+  datetime = date + sprintf(&quot; %02d:%02d&quot;, dt.hour, dt.min)
+  file = date + &quot;-&quot; + content.id.to_s + &quot;.markdown&quot;
+
+  body = &lt;&lt;BODY
+---
+layout: post
+title: &quot;#{content.title}&quot;
+date: #{datetime}
+comments: true
+categories:
+---
+#{content.body}
+BODY
+
+  File.open(file, 'w') do |file|
+    file.write(body)
+  end
+end
+</code></pre></noscript></div>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/10/21/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/10/30/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

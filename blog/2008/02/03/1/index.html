@@ -1,0 +1,185 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>YCombinatorWithPerl - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Feb 3<span>rd</span>, 2008</time>
+  <h1 class="entry-title"><a href="/blog/2008/02/03/1">YCombinatorWithPerl</a></h1>
+
+  <div class="content">
+    <p>計算機科学を学んでいる人にとっては今更な話題らしいですが、経済学部出身の自分には目新しい話題なので書いてみます。（といっても、全然知らなかった、というわけでもないんですが。）</p>
+
+<p><a href="http://d.hatena.ne.jp/amachang/20080124/1201199469">id:amachang</a> さんのエントリにある最終形のみを Perl で書くとこんな感じかな。</p>
+
+<pre><code>#!perl
+my $Y = sub {
+    my $f = shift;
+    return sub {
+        my $g = shift;
+        return sub {
+            my $m = shift;
+            return $f-&gt;($g-&gt;($g))-&gt;($m);
+        }
+    }-&gt;(
+        sub {
+            my $g = shift;
+            return sub {
+                my $m = shift;
+                return $f-&gt;($g-&gt;($g))-&gt;($m);
+            };
+        }
+    )
+};
+
+my $fib = sub {
+    my $f = shift;
+    return sub {
+        my $n = shift;
+        return $n &lt;= 2 ? 1 : $f-&gt;($n - 1) + $f-&gt;($n - 2);
+    };
+};
+
+warn $Y-&gt;($fib)-&gt;(10);
+</code></pre>
+
+<hr>
+
+<p>なぜこれで再帰として動作するかを考えるにあたって、<a href="http://d.hatena.ne.jp/gotin/20080127/1201372491">id:gotin</a> さんのエントリと同内容のことを、Perl で考えてみる。</p>
+
+<p>簡単にするために最終形の Y コンビネータになる前の中間形のコードで考える。</p>
+
+<pre><code>#!perl
+my $Y = sub {
+    my $f = shift;
+    my $g;
+    return $g = sub {
+        my $n = shift;
+        $f-&gt;($g)-&gt;($n);
+    }
+};
+
+my $fib = sub {
+    my $f = shift;
+    return sub {
+        my $n = shift;
+        return $n &lt;= 2 ? 1 : $f-&gt;($n - 1) + $f-&gt;($n - 2);
+    }
+};
+
+warn $Y-&gt;($fib)-&gt;(5);
+</code></pre>
+
+<p>$Y-&gt;($fib) は、 my $Y = sub { ... } において、$f に $fib が代入され、結果として以下の関数が返ることになる。</p>
+
+<pre><code>#!perl
+sub {
+    my $n = shift;
+    $fib-&gt;($g)-&gt;($n);
+}
+</code></pre>
+
+<p>そうなると $Y-&gt;($fib)-&gt;(5) は、以下のように変換できる。</p>
+
+<pre><code>#!perl
+$fib-&gt;($g)-&gt;(5)
+</code></pre>
+
+<p>$fib-&gt;($g) は、my $fib = sub { ... } の $f に $g が代入されるので、$fib-&gt;($g)-&gt;(5) は、</p>
+
+<pre><code>#!perl
+sub {
+   my $n = shift;
+   return $n &lt;= 2 ? 1 : $g-&gt;($n - 1) + $g-&gt;($n - 2);
+}-&gt;(5);
+</code></pre>
+
+<p>ということになる。</p>
+
+<p>なのでこの $n に 5 が代入され、結果として $fib-&gt;($g)-&gt;(5) は以下のように変換される。</p>
+
+<pre><code>#!perl
+  $g-&gt;(4) ... [A]
++ $g-&gt;(3) ... [B]
+</code></pre>
+
+<p>[A] を更に変換してみると、$g-&gt;(4) は $fib-&gt;($g)-&gt;(4) となり、</p>
+
+<pre><code>#!perl
+sub {
+   my $n = shift;
+   return $n &lt;= 2 ? 1 : $g-&gt;($n - 1) + $g-&gt;($n - 2);
+}-&gt;(4);
+</code></pre>
+
+<p>を実行するのと同じ。というわけで、$g-&gt;(4) は、</p>
+
+<pre><code>#!perl
+$g-&gt;(3) + $g-&gt;(2) ... [A]
+</code></pre>
+
+<p>になる。同様に [B] を変換すると、</p>
+
+<pre><code>#!perl
+$g-&gt;(2) + $g-&gt;(1) ... [B]
+</code></pre>
+
+<p>となる。今までのところまでをまとめると、$Y-&gt;($fib)-&gt;(5) は以下のように変換される。</p>
+
+<pre><code>#!perl
+  $g-&gt;(3) + $g-&gt;(2) ... [A]
++ $g-&gt;(2) + $g-&gt;(1) ... [B]
+</code></pre>
+
+<p>で、$g-&gt;(3) は [B] の変換と同様なので、更に以下のように変換される。</p>
+
+<pre><code>#!perl
+  $g-&gt;(2) + $g-&gt;(1) + $g-&gt;(2) ... [A]
++ $g-&gt;(2) + $g-&gt;(1)           ... [B]
+</code></pre>
+
+<p>ここで $g-&gt;(2) は、</p>
+
+<pre><code>#!perl
+sub {
+   my $n = shift;
+   return $n &lt;= 2 ? 1 : $g-&gt;($n - 1) + $g-&gt;($n - 2);
+}-&gt;(2);
+</code></pre>
+
+<p>であり、$n &lt;= 2 であれば 1 が返る。ということは、$g-&gt;(2) も $g-&gt;(1) も 1 だから、[A] + [B] は以下のように変換される。</p>
+
+<pre><code>#!perl
+  1 + 1 + 1 ... [A]
++ 1 + 1     ... [B]
+</code></pre>
+
+<p>というわけで、結果は 5 になる。ということらしい。なんとなくわかった。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2008/01/12/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2008/03/04/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

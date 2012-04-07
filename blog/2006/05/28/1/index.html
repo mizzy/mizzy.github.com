@@ -1,0 +1,57 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>catlxom メモ #2 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>May 28<span>th</span>, 2006</time>
+  <h1 class="entry-title"><a href="/blog/2006/05/28/1">catlxom メモ #2</a></h1>
+
+  <div class="content">
+    <p class="entryBody">
+catlxom の Template::TT プラグイン で、$self-&gt;classdata-&gt;{tt}-&gt;process() がエラーになっても、真っ白な画面が表示されるだけで、エラーログにも何も出なくてかなり悩む羽目になったので patch 。
+</p>
+
+<pre class="code">
+Index: plugins/Template/TT.pm
+===================================================================
+--- plugins/Template/TT.pm      (revision 23)
++++ plugins/Template/TT.pm      (working copy)
+@@ -84,7 +84,7 @@
+                 c =&gt; $c,
+             },
+             \$c-&gt;res-&gt;{body},
+-        );
++        ) or $c-&gt;error( $self-&gt;classdata-&gt;{tt}-&gt;error );
+     }
+
+     $self-&gt;NEXT::interpolate($c);
+</pre>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2006/05/27/2" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2006/05/28/2">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

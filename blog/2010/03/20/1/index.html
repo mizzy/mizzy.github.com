@@ -1,0 +1,85 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>KindleJapaneseTitle - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Mar 20<span>th</span>, 2010</time>
+  <h1 class="entry-title"><a href="/blog/2010/03/20/1">KindleJapaneseTitle</a></h1>
+
+  <div class="content">
+    <p>Kindle Store で樋口一葉、芥川龍之介、夏目漱石らの日本語書籍が出てたのは以前から知っていたのですが、最近 <a href="http://www.atpress.ne.jp/view/14142">Amazon Kindleで日本語のコンテンツが読める！ 日本語電子書籍「想隆社文庫」創刊！一般向けおよび図書館向けに提供を開始</a> といったプレスリリースが出てたので、どんなものか確認するために、実際に購入してみました。</p>
+
+<p>結論から言うと、「6インチ Kindle 上では薄くて読みづらい。お金出して買う価値なし。今出てるタイトルなら、青空キンドルを使っとけ。」といったところでしょうか。</p>
+
+<hr>
+
+<p>以前から出てた日本語タイトルのスクリーンショット。</p>
+
+<p>[[Image(<a href="http://mizzy.org/img/kindle/kokoro.gif">http://mizzy.org/img/kindle/kokoro.gif</a>, 25%)]]</p>
+
+<hr>
+
+<p>最近プレスリリースが出ていた、「これまでの電子書籍と異なり、従来の紙の本好きが違和感なく読めることを重視。書籍DTPを行う職人による組版を採用し、版面の美しさを追求しました。」と謳われているもののスクリーンショット。</p>
+
+<p>[[Image(<a href="http://mizzy.org/img/kindle/sumidagawa.gif">http://mizzy.org/img/kindle/sumidagawa.gif</a>, 25%)]]</p>
+
+<hr>
+
+<p>青空キンドルのスクリーンショット。</p>
+
+<p>[[Image(<a href="http://mizzy.org/img/kindle/bottyan02.gif">http://mizzy.org/img/kindle/bottyan02.gif</a>, 25%)]]</p>
+
+<hr>
+
+<p>自分でスキャンしたもののスクリーンショット。</p>
+
+<p>[[Image(<a href="http://mizzy.org/img/kindle/mahjong03.gif">http://mizzy.org/img/kindle/mahjong03.gif</a>, 25%)]]</p>
+
+<hr>
+
+<p>こうして比較してみると、青空キンドルが神すぎる。また、自分でスキャンしたものは文字サイズが小さいけど、濃さ的には上2つよりも読みやすい。実際、Kindle実機上だと上2つは、スクリーンショットのものよりも更に薄くて読みづらい。</p>
+
+<p>どうやら上2つの Kindle Store で手に入る日本語タイトルは、すべて画像データの模様。（ちなみに、Kindle の azw フォーマットは、Mobipocket フォーマットをベースにしていて、文字データは HTML で記述する。）フォントの関係で、画像になっちゃうのはしかたないのかもしれないけど、文字サイズ変更もできないし、テキスト読み上げもできないし、その上読みづらい、といった感じで、Kindle 版を購入するメリットがまったくない。</p>
+
+<p>発売されている（またはこれから発売予定の）タイトルも、すべて青空文庫で手に入るタイトルばかりのようなので、現段階なら青空キンドルを利用するのがベスト。</p>
+
+<p>DX の方だともう少し読みやすかったりするのかもしれないけど、小説の類はDXで読むメリットはあまりないと思う。</p>
+
+<hr>
+
+<p>ちなみに、実際にファイルを展開してみたら、やはり全部画像ファイルでした。ファイルの展開は Perl の EBook::Tools モジュールを利用すると簡単にできます。</p>
+
+<pre><code>$ perl -MEBook::Tools::Unpack \
+ -e &#39;EBook::Tools::Unpack-&gt;new(
+ file =&gt; &quot;Natsume Soseki Story Selection v-asin_B00300H6UY-type_EBOK-v_0.azw&quot;
+ )-&gt;unpack&#39;
+</code></pre>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2010/02/24/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2010/03/25/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

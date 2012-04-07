@@ -1,0 +1,77 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>TeXPageFilledWithImage - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Feb 23<span>rd</span>, 2011</time>
+  <h1 class="entry-title"><a href="/blog/2011/02/23/1">TeXPageFilledWithImage</a></h1>
+
+  <div class="content">
+    <p>TeX で表紙画像的なものが作りたくて色々調べてたら、<a href="https://groups.google.com/group/fj.comp.texhax/browse_thread/thread/0be2662c944adf8f/6a4fdf56cfaeecaa?hl=ja&amp;pli=1">Google グループで見つけた</a> のでメモ。</p>
+
+<pre><code>#!tex
+\documentclass[a4paper]{jsbook}
+\usepackage[dvipdfmx,hiresbb]{graphicx}
+\begin{document}
+
+\enlargethispage{\paperwidth}
+\thispagestyle{empty}
+\vspace*{-1truein}
+\vspace*{-\topmargin}
+\vspace*{-\headheight}
+\vspace*{-\headsep}
+\vspace*{-\topskip}
+\noindent\hspace*{-1in}\hspace*{-\oddsidemargin}
+\includegraphics[width=\paperwidth,height=\paperheight]{cover_image.png}
+
+\end{document}
+</code></pre>
+
+<p>いくつか注意が必要で、</p>
+
+<pre><code>#!tex
+\enlargethispage{\paperwidth}
+</code></pre>
+
+<p>は、これがないと、1ページ目を画像いっぱいのページにしようと思っても空白ページになってしまい、画像いっぱいのページは2ページ目になってしまう。また、</p>
+
+<pre><code>#!tex
+\noindent\hspace*{-1in}\hspace*{-\oddsidemargin}
+</code></pre>
+
+<p>は奇数ページの場合なので、偶数ページの場合は、</p>
+
+<pre><code>#!tex
+\noindent\hspace*{-1in}\hspace*{-\evensidemargin}
+</code></pre>
+
+<p>とする。</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2011/02/17/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2011/03/02/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>

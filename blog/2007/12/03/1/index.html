@@ -1,0 +1,100 @@
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>PacSec2007 - Gosuke Miyashita</title>
+<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
+<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
+<script type="text/javascript" src="/js/tass.js"></script>
+<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+</head>
+<body>
+<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+
+<div class="content autopagerize_page_element">
+
+  <time>Dec 3<span>rd</span>, 2007</time>
+  <h1 class="entry-title"><a href="/blog/2007/12/03/1">PacSec2007</a></h1>
+
+  <div class="content">
+    <p><a href="http://trombik.mine.nu/%7Echerry/w/">桜井さん</a>のご好意により、11月29日, 30日に行われた、<a href="http://pacsec.jp/">PacSec 2007</a>というコンピュータセキュリティに関するカンファレンスに参加してきました。このカンファレンスは、日本以外でも、カナダ(CanSecWest)、イギリス(EuSecWest)で行われているようです。また、カンファレンスに先立って、27日、28日には<a href="http://www.pacsec.jp/dojo.html">セキュリティ・マスターズ道場</a>と題したトレーニングも行われていました。</p>
+
+<p>自分はセキュリティ情報はあまりウォッチしておらず、苦手な分野ではあるのですが、その分知らないことだらけでとても新鮮で、刺激的なカンファレンスでした。内容の半分も理解できていませんが。</p>
+
+<p>特に興味深かったセッションと簡単なメモです。（メモしたファイルは会社の PC にあって今見られないので、記憶を辿りながら書きます。間違いが多かったらすみません。）</p>
+
+<ul>
+<li>Microsoft Officeのゼロデイと悪いヤツら - Takumi Onodera Microsoft
+
+<ul>
+<li>Microsoft Office セキュリティに関する話。</li>
+<li>SDL(Security Development Lifecycle)という言葉をはじめて聞いた。</li>
+<li><a href="http://www.microsoft.com/technet/sysinternals/utilities/processexplorer.mspx">Process Explorer</a> とか <a href="http://www.microsoft.com/technet/sysinternals/utilities/processmonitor.mspx">Process Monitor</a> というツールをはじめて知った。</li>
+<li>これらのツールをつかって、不正なバイナリコードが埋め込まれた PowerPoint ファイルを開き、不正コードへのファイルへの書き出しや実行が行われる様子を具体的に見ることができておもしろい。</li>
+<li>「攻撃を防ぐための完璧な対策はない。攻撃される可能性を減らすための対策を積み重ねていくことが重要」</li>
+</ul></li>
+<li>TOMOYO Linux: Linuxサーバを理解し守る実践的な手法 - Toshiharu Harada 株式会社NTTデータ
+
+<ul>
+<li>専用のポリシーエディタが付属しており、init からはじまるプロセスが起動された状態をツリー構造で表示したり、各プロセスが読み書きするファイルを表示したり、各プロセスごとにアクセスポリシーを設定したり、ということができる。</li>
+<li>SELinux はめんどくさすぎて使う気にはなれないけど、TOMOYO Linux のポリシーエディタは使いやすそうだ。</li>
+<li>同じプロセスであっても「どのプロセスから起動されたか」によって別々のポリシーを設定することもできるらしい。</li>
+</ul></li>
+<li>Agent-oriented SQL Abuse - Fernando Russ &amp; Diego Tiscornia, Core
+
+<ul>
+<li><a href="http://www.coresecurity.com/">Core Security Technologies</a> という会社の人がスピーカ。</li>
+<li>Python でできた、SQL を HTTP リクエストに変換して、SQL インジェクションのペネトレーションテストを行うためのフレームワーク。</li>
+<li>残念ながら、ソースは公開されてなさそう。（おそらくこのツールによる自社の優位性、というのもあるだろうし、悪用される恐れもあるだろうし。）</li>
+<li>他のセッションでも、Python で作られたツールの話があった。セキュリティ分野は Python がよく使われてるのかな？</li>
+</ul></li>
+<li>Fuzzing Frameworks, Fuzzing Languages!? - Stephen Ridley &amp; Colin Delaney, McAfee
+
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Fuzz_testing">Fuzzing</a> というテスト手法ははじめて聞いた。</li>
+<li><a href="http://ruxxer.com/">Ruxxer</a> という Fuzzing のためのフレームワーク。</li>
+<li>従来のツールは「使いやすいけど機能に乏し」かったり「機能は豊富だけど使いにくい」という問題がある。</li>
+<li>それを解決するために、独自の言語を定義することによって「使いやすさ」を提供し、Python API によって「豊富な機能」を提供。</li>
+</ul></li>
+<li>Developing Fuzzers with Peach - Michael Eddington, Leviathan Security
+
+<ul>
+<li><a href="http://peachfuzz.sourceforge.net/">Peach</a> というツール。こちらも Fuzzing のためのフレームワーク。これも Python 製らしい。</li>
+<li>Windows 上で動く GUI ツール。</li>
+<li>Python APIや C, .NET, Java, COM, XPCOM のバインディングもある。</li>
+</ul></li>
+</ul>
+
+<p>PacSec 2007 に関するインタビュー記事も見つけたので載せておきます。</p>
+
+<ul>
+<li><a href="http://itpro.nikkeibp.co.jp/article/Interview/20071121/287737/">http://itpro.nikkeibp.co.jp/article/Interview/20071121/287737/</a></li>
+<li><a href="http://japan.zdnet.com/sp/interview/story/0,2000056426,20361870,00.htm">http://japan.zdnet.com/sp/interview/story/0,2000056426,20361870,00.htm</a></li>
+</ul>
+
+<p>主催の Dragos さんと軽く話をしたのですが、現地の運営スタッフが足りない、と嘆いていました。なので、来年はぜひ運営のお手伝いをさせてもらおうかな、と思っています。もし、運営スタッフやってもいいよ、という方がいらっしゃいましたら、gosukenator at gmail.com までご連絡ください。</p>
+
+<p>参加者は半数ぐらいは海外の方で、懇親会では更に海外の方の割合が増す、という状態でしたので、海外のセキュリティエンジニアとお友達になりたい方にはチャンスですよ。</p>
+
+<p>自分は <a href="http://search.cpan.org/dist/Apache-SMTP/">Apache::SMTP</a> という Apache を SMTP サーバにしてしまう mod_perl プログラムを書いてる方（ActiveState にいたこともあるそうです）や、OpenBSD の pf 開発者の一人である <a href="http://kerneltrap.org/node/2873">Ryan</a> さん（Puppet の OpenBSD まわりのメンテもしているそうです）とお話することができました。</p>
+
+<p>が、自分の英語力不足もあってあまり深い話はできなかったので、<a href="http://www.iknow.co.jp/">iKnow!</a>で英語勉強します。（英語だけじゃなく、セキュリティ関連の知識不足もありますが…）</p>
+
+  </div>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2007/11/20/1" rel="next">next post</a>
+    
+    
+    
+    <a href="/blog/2007/12/07/1">previous post</a>
+    
+  </div>
+
+</div>
+
+<div class="autopagerize_insert_before"></div>
+
+</body>
+</html>
