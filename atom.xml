@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-03-31T22:31:00+09:00</updated>
+  <updated>2012-04-07T23:22:00+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,34 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Stellar - A static site generator]]></title>
+    <link href="http://mizzy.org/"/>
+    <updated>2012-04-07T23:22:00+09:00</updated>
+    <id>http://mizzy.org/ </id>
+    <content type="html"><![CDATA[
+自宅サーバが死んでから、緊急避難的に [Octopress](http://octopress.org/) + GitHub Pages でブログを運用してたけど、Octopress 飽きたし、generate 時間が長いので、一から自分でつくった。
+
+[mizzy/stellar](https://github.com/mizzy/stellar)
+
+まあでもそんな大したものじゃなくて、130行弱の Ruby スクリプトが本体。
+
+[mizzy/stellar-site](https://github.com/mizzy/stellar-site) のような形で、テンプレやら CSS ファイルやら JavaScript ファイルやら ポスト用 Markdown データやらを用意して、stellar を実行すると、今あたなが見ているこのブログのような形でデータを生成してくれる。
+
+特徴らしきものをあげれば、
+
+ * Jekyll/Octopress で利用していたポスト用 Markdown データがそのまま使える
+ * Jekyll/Octopress で利用していたプラグインがそのまま使える
+ * 個別エントリページしか生成しない
+
+といったあたり。特に、静的タイプのブログシステムの場合、ひとつファイルを追加するだけで、すべてのページ（複数のエントリを含むページ）を更新しないといけない、というのが、再生成に時間がかかる原因なので、そういったページはなくした。別にそういったものがなくても、Autopagerize で自動的に個別エントリを読みこんでいければ十分。
+
+これで、自分の環境では Octopress で50秒かかっていた再生成時間が、3秒まで短縮できた。
+
+とりあえず自分しか使わない前提でつくったので、色々ハードコートされてたり、使い方とかまとめてないけど、興味のある方がいれば、Pull Request なり Issue 登録なりお気軽にどうぞ。]
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[puppet-report-ikachan]]></title>
@@ -424,51 +452,6 @@ webiblo で生成したデータを Kindle Previewer で見ると、こういっ
  * EPUB3 など、mobipocket 以外のフォーマット対応
  * CLI から JSON カタログを検索して、簡単にデータ生成できるようにする
 ]
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Web-to-mobi - A script for converting web sites to mobipocket format]]></title>
-    <link href="http://mizzy.org/"/>
-    <updated>2012-01-09T03:46:00+09:00</updated>
-    <id>http://mizzy.org/ </id>
-    <content type="html"><![CDATA[
-I've written a script to convert [Getting Real](http://gettingreal.37signals.com/toc.php) into mobipocket format.
-
-But the kindle edition of Getting Real is sold at amazon.com, publishing this script may be illegal.
-
-So I've re-written this script like [this](https://github.com/mizzy/web-to-mobi) following the advice from [@otsune](https://twitter.com/#!/otsune)-san.
-
-This script gets JSON data about a web site from STDIN and converts web data to mobipcoket format.
-
-JSON data format is like this.
-
-    {
-         "title"    : "Getting Real",
-         "author"   : "37signals",
-         "chapters" : [
-             {
-                 "title"     : "Introduction",
-                  "sections" : [
-                      {
-                          "title" : "What is Getting Real?",
-                          "uri"   : "http://gettingreal.37signals.com/ch01_What_is_Getting_Real.php"
-                      },
-                      {
-                          "title" : "About 37signals",
-                          "uri"   : "http://gettingreal.37signals.com/ch01_About_37signals.php"
-                      },
-                  ]
-            }
-         ],
-         "content_xpath" : "//div[@class=\"content\"]",
-         "exclude_xpath" : "//div[@class=\"next\"]"
-    }
-
-
-This is the image of showing the converted file on Kindle Previewer.
-
-<img src="/images/2012/01/getting_real.png" title="Getting Real on Kindle" >]
 ]]></content>
   </entry>
 

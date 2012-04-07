@@ -1,7 +1,7 @@
 <html lang="ja">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>XML-Atom-0.22/lib/XML/Atom/Server.pm - Gosuke Miyashita</title>
+<title>XML-Atom-0.22/lib/XML/Atom/Feed.pm - Gosuke Miyashita</title>
 <link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
 <link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
 <script type="text/javascript" src="/js/tass.js"></script>
@@ -13,208 +13,170 @@
 <div class="content autopagerize_page_element">
 
   <time>Apr 30<span>th</span>, 2007</time>
-  <h1 class="entry-title"><a href="/blog/2007/04/30/6">XML-Atom-0.22/lib/XML/Atom/Server.pm</a></h1>
+  <h1 class="entry-title"><a href="/blog/2007/04/30/6">XML-Atom-0.22/lib/XML/Atom/Feed.pm</a></h1>
 
   <div class="content">
-    <p>source:XML-Atom-0.22/lib/XML/Atom/Server.pm</p>
+    <p>source:XML-Atom-0.22/lib/XML/Atom/Feed.pm</p>
 
 <h1>NAME</h1>
 
-<p>XML::Atom::Server - A server for the Atom API</p>
+<p>XML::Atom::Feed - Atom feed</p>
 
 <h1>SYNOPSIS</h1>
 
-<pre><code>    package My::Server;
-    use base qw( XML::Atom::Server );
-    sub handle_request {
-        my $server = shift;
-        $server-&gt;authenticate or return;
-        my $method = $server-&gt;request_method;
-        if ($method eq &#39;POST&#39;) {
-            return $server-&gt;new_post;
-        }
-        ...
-    }
+<pre><code>    use XML::Atom::Feed;
+    use XML::Atom::Entry;
+    my $feed = XML::Atom::Feed-&gt;new;
+    $feed-&gt;title(&#39;My Weblog&#39;);
+    my $entry = XML::Atom::Entry-&gt;new;
+    $entry-&gt;title(&#39;First Post&#39;);
+    $entry-&gt;content(&#39;Post Body&#39;);
+    $feed-&gt;add_entry($entry);
+    $feed-&gt;add_entry($entry, { mode =&gt; &#39;insert&#39; });
 
-    my %Passwords;
-    sub password_for_user {
-        my $server = shift;
-        my($username) = @_;
-        $Passwords{$username};
-    }
+    my @entries = $feed-&gt;entries;
+    my $xml = $feed-&gt;as_xml;
 
-    sub new_post {
-        my $server = shift;
-        my $entry = $server-&gt;atom_body or return;
-        ## $entry is an XML::Atom::Entry object.
-        ## ... Save the new entry ...
-    }
+    ## Get a list of the &lt;link rel=&quot;...&quot; /&gt; tags in the feed.
+    my $links = $feed-&gt;link;
 
-    package main;
-    my $server = My::Server-&gt;new;
-    $server-&gt;run;
+    ## Find all of the Atom feeds on a given page, using auto-discovery.
+    my @uris = XML::Atom::Feed-&gt;find_feeds(&#39;http://www.example.com/&#39;);
+
+    ## Use auto-discovery to load the first Atom feed on a given page.
+    my $feed = XML::Atom::Feed-&gt;new(URI-&gt;new(&#39;http://www.example.com/&#39;));
 </code></pre>
-
-<h1>DESCRIPTION</h1>
-
-<p><em>XML::Atom::Server</em> provides a base class for Atom API servers. It handles all core server processing, both the SOAP and REST formats of the protocol, and WSSE authentication. It can also run as either a mod_perl handler or as part of a CGI program.</p>
-
-<p>It does not provide functions specific to any particular implementation, such as posting an entry, retrieving a list of entries, deleting an entry, etc. Implementations should subclass <em>XML::Atom::Server&#39;&#39;, overriding the &#39;&#39;handle</em>request_ method, and handle all functions such as this themselves.</p>
-
-<h1>SUBCLASSING</h1>
-
-<h2>Request Handling</h2>
-
-<p>Subclasses of <em>XML::Atom::Server&#39;&#39; must override the &#39;&#39;handle</em>request_ method to perform all request processing. The implementation must set all response headers, including the response code and any relevant HTTP headers, and should return a scalar representing the response body to be sent back to the client.</p>
-
-<p>For example:</p>
-
-<pre><code>    sub handle_request {
-        my $server = shift;
-        my $method = $server-&gt;request_method;
-        if ($method eq &#39;POST&#39;) {
-            return $server-&gt;new_post;
-        }
-        ## ... handle GET, PUT, etc
-    }
-
-    sub new_post {
-        my $server = shift;
-        my $entry = $server-&gt;atom_body or return;
-        my $id = save_this_entry($entry);  ## Implementation-specific
-        $server-&gt;response_header(Location =&gt; $server-&gt;uri . &#39;/entry_id=&#39; . $id);
-        $server-&gt;response_code(201);
-        $server-&gt;response_content_type(&#39;application/x.atom+xml&#39;);
-        return serialize_entry($entry);    ## Implementation-specific
-    }
-</code></pre>
-
-<h2>Authentication</h2>
-
-<p>Servers that require authentication for posting or retrieving entries or feeds should override the <em>password</em>for<em>user&#39;&#39; method. Given a username (from the WSSE header), &#39;&#39;password</em>for<em>user</em> should return that user&#39;s password in plaintext. This will then be combined with the nonce and the creation time to generate the digest, which will be compared with the digest sent in the WSSE header. If the supplied username doesn&#39;t exist in your user database or alike, just return <code>undef</code>.</p>
-
-<p>For example:</p>
-
-<pre><code>    my %Passwords &gt; &#39;bar&#39; );   ## The password for &quot;foo&quot; is &quot;bar&quot;.
-    sub password_for_user {
-        my $server = shift;
-        my($username) = @_;
-        $Passwords{$username};
-    }
-</code></pre>
-
-<h1>METHODS</h1>
-
-<p><em>XML::Atom::Server</em> provides a variety of methods to be used by subclasses for retrieving headers, content, and other request information, and for setting the same on the response.</p>
-
-<h2>Client Request Parameters</h2>
-
-<ul>
-<li>$server-&gt;uri</li>
-</ul>
-
-<p>Returns the URI of the Atom server implementation.</p>
-
-<ul>
-<li>$server-&gt;request_method</li>
-</ul>
-
-<p>Returns the name of the request method sent to the server from the client (for example, <code>GET</code>, <code>POST</code>, etc). Note that if the client sent the request in a SOAP envelope, the method is obtained from the <em>SOAPAction</em> HTTP header.</p>
-
-<ul>
-<li>$server-&gt;request_header($header)</li>
-</ul>
-
-<p>Retrieves the value of the HTTP request header <em>$header</em>.</p>
-
-<ul>
-<li>$server-&gt;request_content</li>
-</ul>
-
-<p>Returns a scalar containing the contents of a POST or PUT request from the client.</p>
-
-<ul>
-<li>$server-&gt;request_param($param)</li>
-</ul>
-
-<p><em>XML::Atom::Server</em> automatically parses the PATH_INFO sent in the request and breaks it up into key-value pairs. This can be used to pass parameters. For example, in the URI</p>
-
-<pre><code>    http://localhost/atom-server/entry_id=1
-</code></pre>
-
-<p>the <em>entry</em>id_ parameter would be set to <code>1</code>.</p>
-
-<p><em>request</em>param&#39;&#39; returns the value of the value of the parameter &#39;&#39;$param_.</p>
-
-<h2>Setting up the Response</h2>
-
-<ul>
-<li>$server-&gt;response_header($header, $value)</li>
-</ul>
-
-<p>Sets the value of the HTTP response header <em>$header&#39;&#39; to &#39;&#39;$value</em>.</p>
-
-<ul>
-<li>$server-&gt;response_code([ $code ])</li>
-</ul>
-
-<p>Returns the current response code to be sent back to the client, and if <em>$code</em> is given, sets the response code.</p>
-
-<ul>
-<li>$server-&gt;response<em>content</em>type([ $type ])</li>
-</ul>
-
-<p>Returns the current <em>Content-Type&#39;&#39; header to be sent back to the client, and &#39;&#39;$type</em> is given, sets the value for that header.</p>
-
-<h2>Processing the Request</h2>
-
-<ul>
-<li>$server-&gt;authenticate</li>
-</ul>
-
-<p>Attempts to authenticate the request based on the authentication information present in the request (currently just WSSE). This will call the <em>password</em>for<em>user</em> method in the subclass to obtain the cleartext password for the username given in the request.</p>
-
-<ul>
-<li>$server-&gt;atom_body</li>
-</ul>
-
-<p>Returns an <em>XML::Atom::Entry</em> object containing the entry sent in the request.</p>
 
 <h1>USAGE</h1>
 
-<p>Once you have defined your server subclass, you can set it up either as a CGI program or as a mod_perl handler.</p>
+<h2>XML::Atom::Feed-&gt;new([ $stream ])</h2>
 
-<p>A simple CGI program would look something like this:</p>
+<p>Creates a new feed object, and if <em>$stream&#39;&#39; is supplied, fills it with the data specified by &#39;&#39;$stream</em>.</p>
 
-<pre><code>    #!/usr/bin/perl -w
-    use strict;
+<p>Automatically handles autodiscovery if <em>$stream</em> is a URI (see below).</p>
 
-    use My::Server;
-    my $server = My::Server-&gt;new;
-    $server-&gt;run;
+<p>Returns the new <em>XML::Atom::Feed</em> object. On failure, returns <code>undef</code>.</p>
+
+<p><em>$stream</em> can be any one of the following:</p>
+
+<ul>
+<li>Reference to a scalar</li>
+</ul>
+
+<p>This is treated as the XML body of the feed.</p>
+
+<ul>
+<li>Scalar</li>
+</ul>
+
+<p>This is treated as the name of a file containing the feed XML.</p>
+
+<ul>
+<li>Filehandle</li>
+</ul>
+
+<p>This is treated as an open filehandle from which the feed XML can be read.</p>
+
+<ul>
+<li>URI object</li>
+</ul>
+
+<p>This is treated as a URI, and the feed XML will be retrieved from the URI.</p>
+
+<p>If the content type returned from fetching the content at URI is <em>text/html&#39;&#39;, this method will automatically try to perform auto-discovery by looking for a &#39;&#39;<link></em> tag describing the feed URL. If such a URL is found, the feed XML will be automatically retrieved.</p>
+
+<p>If the URI is already of a feed, no auto-discovery is necessary, and the feed XML will be retrieved and parsed as normal.</p>
+
+<h2>XML::Atom::Feed-&gt;find_feeds($uri)</h2>
+
+<p>Given a URI <em>$uri&#39;&#39;, use auto-discovery to find all of the Atom feeds linked from that page (using &#39;&#39;<link></em> tags).</p>
+
+<p>Returns a list of feed URIs.</p>
+
+<h2>$feed-&gt;link</h2>
+
+<p>If called in scalar context, returns an <em>XML::Atom::Link&#39;&#39; object corresponding to the first &#39;&#39;<link></em> tag found in the feed.</p>
+
+<p>If called in list context, returns a list of <em>XML::Atom::Link&#39;&#39; objects corresponding to all of the &#39;&#39;<link></em> tags found in the feed.</p>
+
+<h2>$feed-&gt;add_link($link)</h2>
+
+<p>Adds the link <em>$link&#39;&#39;, which must be an &#39;&#39;XML::Atom::Link&#39;&#39; object, to the feed as a new &#39;&#39;<link></em> tag. For example:</p>
+
+<pre><code>    my $link = XML::Atom::Link-&gt;new;
+    $link-&gt;type(&#39;text/html&#39;);
+    $link-&gt;rel(&#39;alternate&#39;);
+    $link-&gt;href(&#39;http://www.example.com/&#39;);
+    $feed-&gt;add_link($link);
 </code></pre>
 
-<p>A simple mod_perl handler configuration would look something like this:</p>
+<h2>$feed-&gt;add_entry($entry)</h2>
 
-<pre><code>    PerlModule My::Server
-    &lt;Location /atom-server&gt;
-        SetHandler perl-script
-        PerlHandler My::Server
-    &lt;/Location&gt;
+<p>Adds the entry <em>$entry&#39;&#39;, which must be an &#39;&#39;XML::Atom::Entry</em> object, to the feed. If you want to add an entry before existent entries, you can pass optional hash reference containing <code>mode</code> value set to <code>insert</code>.</p>
+
+<pre><code>  $feed-&gt;add_entry($entry, { mode =&gt; &#39;insert&#39; });
 </code></pre>
 
-<h1>ERROR HANDLING</h1>
+<h2>$feed-&gt;entries</h2>
 
-<p>If you wish to return an error from <em>handle</em>request&#39;&#39;, you can use the built-in &#39;&#39;error_ method:</p>
+<p>Returns list of XML::Atom::Entry objects contained in the feed.</p>
 
-<pre><code>    sub handle_request {
-        my $server = shift;
-        ...
-        return $server-&gt;error(500, &quot;Something went wrong&quot;);
-    }
+<h2>$feed-&gt;language</h2>
+
+<p>Returns the language of the feed, from <em>xml:lang</em>.</p>
+
+<h2>$feed-&gt;author([ $author ])</h2>
+
+<p>Returns an <em>XML::Atom::Person</em> object representing the author of the entry, or <code>undef</code> if there is no author information present.</p>
+
+<p>If <em>$author&#39;&#39; is supplied, it should be an &#39;&#39;XML::Atom::Person</em> object representing the author. For example:</p>
+
+<pre><code>    my $author = XML::Atom::Person-&gt;new;
+    $author-&gt;name(&#39;Foo Bar&#39;);
+    $author-&gt;email(&#39;foo@bar.com&#39;);
+    $feed-&gt;author($author);
 </code></pre>
 
-<p>This will be returned to the client with a response code of 500 and an error string of <code>Something went wrong</code>. Errors are automatically serialized into SOAP faults if the incoming request is enclosed in a SOAP envelope.</p>
+<h1>UNICODE FLAGS</h1>
+
+<p>By default, XML::Atom takes off all the Unicode flag fro mthe feed content. For example,</p>
+
+<pre><code>  my $title = $feed-&gt;title;
+</code></pre>
+
+<p>the variable <code>$title</code> contains UTF-8 bytes without Unicode flag set, even if the feed title contains some multibyte chracters.</p>
+
+<p>If you don&#39;t like this behaviour and wants to andle everything as Unicode characters (rather than UTF-8 bytes), set <code>$XML::Atom::ForceUnicode</code> flag to 1.</p>
+
+<pre><code>  $XML::Atom::ForceUnicode = 1;
+</code></pre>
+
+<p>then all the data returned from XML::Atom::Feed object and XML::Atom::Entry object etc., will have Unicode flag set.</p>
+
+<p>The only exception will be <code>$entry-&gt;content-&gt;body</code>, if content type is not text/* (e.g. image/gif). In that case, the content body is still binary data, without Unicode flag set.</p>
+
+<h1>CREATING ATOM 1.0 FEEDS</h1>
+
+<p>By default, XML::Atom::Feed and other classes (Entry, Link and Content) will create entities using Atom 0.3 namespaces. In order to create 1.0 feed and entry elements, you can set <em>Version</em> as a parameter, like:</p>
+
+<pre><code>  $feed &gt; 1.0);
+  $entry &gt; 1.0);
+</code></pre>
+
+<p>Setting those Version to every element would be sometimes painful. In that case, you can override the default version number by setting <code>$XML::Atom::DefaultVersion</code> global variable to &quot;1.0&quot;.</p>
+
+<pre><code>  use XML::Atom;
+
+  $XML::Atom::DefaultVersion = &quot;1.0&quot;;
+
+  my $feed = XML::Atom::Feed-&gt;new;
+  $feed-&gt;title(&quot;blah&quot;);
+
+  my $entry = XML::Atom::Entry-&gt;new;
+  $feed-&gt;add_entry($entry);
+
+  $feed-&gt;version; # 1.0
+</code></pre>
 
 <h1>AUTHOR &amp; COPYRIGHT</h1>
 
