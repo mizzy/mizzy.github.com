@@ -1,7 +1,7 @@
 <html lang="ja">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>XML-Atom-0.22/lib/XML/Atom/Feed.pm - Gosuke Miyashita</title>
+<title>XML-Atom-0.22/lib/XML/Atom/Person.pm - Gosuke Miyashita</title>
 <link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
 <link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
 <script type="text/javascript" src="/js/tass.js"></script>
@@ -13,174 +13,36 @@
 <div class="content autopagerize_page_element">
 
   <time>Apr 30<span>th</span>, 2007</time>
-  <h1 class="entry-title"><a href="/blog/2007/04/30/6">XML-Atom-0.22/lib/XML/Atom/Feed.pm</a></h1>
+  <h1 class="entry-title"><a href="/blog/2007/04/30/6">XML-Atom-0.22/lib/XML/Atom/Person.pm</a></h1>
 
   <div class="content">
-    <p>source:XML-Atom-0.22/lib/XML/Atom/Feed.pm</p>
+    <p>source:XML-Atom-0.22/lib/XML/Atom/Person.pm</p>
 
 <h1>NAME</h1>
 
-<p>XML::Atom::Feed - Atom feed</p>
+<p>XML::Atom::Person - Author or contributor object</p>
 
 <h1>SYNOPSIS</h1>
 
-<pre><code>    use XML::Atom::Feed;
-    use XML::Atom::Entry;
-    my $feed = XML::Atom::Feed-&gt;new;
-    $feed-&gt;title(&#39;My Weblog&#39;);
-    my $entry = XML::Atom::Entry-&gt;new;
-    $entry-&gt;title(&#39;First Post&#39;);
-    $entry-&gt;content(&#39;Post Body&#39;);
-    $feed-&gt;add_entry($entry);
-    $feed-&gt;add_entry($entry, { mode =&gt; &#39;insert&#39; });
-
-    my @entries = $feed-&gt;entries;
-    my $xml = $feed-&gt;as_xml;
-
-    ## Get a list of the &lt;link rel=&quot;...&quot; /&gt; tags in the feed.
-    my $links = $feed-&gt;link;
-
-    ## Find all of the Atom feeds on a given page, using auto-discovery.
-    my @uris = XML::Atom::Feed-&gt;find_feeds(&#39;http://www.example.com/&#39;);
-
-    ## Use auto-discovery to load the first Atom feed on a given page.
-    my $feed = XML::Atom::Feed-&gt;new(URI-&gt;new(&#39;http://www.example.com/&#39;));
+<pre><code>    my $person = XML::Atom::Person-&gt;new;
+    $person-&gt;email(&#39;foo@example.com&#39;);
+    $person-&gt;name(&#39;Foo Bar&#39;);
+    $entry-&gt;author($person);
 </code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p><em>XML::Atom::Person</em> represents an author or contributor element in an Atom feed or entry.</p>
 
 <h1>USAGE</h1>
 
-<h2>XML::Atom::Feed-&gt;new([ $stream ])</h2>
+<h2>XML::Atom::Person-&gt;new</h2>
 
-<p>Creates a new feed object, and if <em>$stream&#39;&#39; is supplied, fills it with the data specified by &#39;&#39;$stream</em>.</p>
+<h2>$person-&gt;email([ $email ])</h2>
 
-<p>Automatically handles autodiscovery if <em>$stream</em> is a URI (see below).</p>
+<h2>$person-&gt;name([ $name ])</h2>
 
-<p>Returns the new <em>XML::Atom::Feed</em> object. On failure, returns <code>undef</code>.</p>
-
-<p><em>$stream</em> can be any one of the following:</p>
-
-<ul>
-<li>Reference to a scalar</li>
-</ul>
-
-<p>This is treated as the XML body of the feed.</p>
-
-<ul>
-<li>Scalar</li>
-</ul>
-
-<p>This is treated as the name of a file containing the feed XML.</p>
-
-<ul>
-<li>Filehandle</li>
-</ul>
-
-<p>This is treated as an open filehandle from which the feed XML can be read.</p>
-
-<ul>
-<li>URI object</li>
-</ul>
-
-<p>This is treated as a URI, and the feed XML will be retrieved from the URI.</p>
-
-<p>If the content type returned from fetching the content at URI is <em>text/html&#39;&#39;, this method will automatically try to perform auto-discovery by looking for a &#39;&#39;<link></em> tag describing the feed URL. If such a URL is found, the feed XML will be automatically retrieved.</p>
-
-<p>If the URI is already of a feed, no auto-discovery is necessary, and the feed XML will be retrieved and parsed as normal.</p>
-
-<h2>XML::Atom::Feed-&gt;find_feeds($uri)</h2>
-
-<p>Given a URI <em>$uri&#39;&#39;, use auto-discovery to find all of the Atom feeds linked from that page (using &#39;&#39;<link></em> tags).</p>
-
-<p>Returns a list of feed URIs.</p>
-
-<h2>$feed-&gt;link</h2>
-
-<p>If called in scalar context, returns an <em>XML::Atom::Link&#39;&#39; object corresponding to the first &#39;&#39;<link></em> tag found in the feed.</p>
-
-<p>If called in list context, returns a list of <em>XML::Atom::Link&#39;&#39; objects corresponding to all of the &#39;&#39;<link></em> tags found in the feed.</p>
-
-<h2>$feed-&gt;add_link($link)</h2>
-
-<p>Adds the link <em>$link&#39;&#39;, which must be an &#39;&#39;XML::Atom::Link&#39;&#39; object, to the feed as a new &#39;&#39;<link></em> tag. For example:</p>
-
-<pre><code>    my $link = XML::Atom::Link-&gt;new;
-    $link-&gt;type(&#39;text/html&#39;);
-    $link-&gt;rel(&#39;alternate&#39;);
-    $link-&gt;href(&#39;http://www.example.com/&#39;);
-    $feed-&gt;add_link($link);
-</code></pre>
-
-<h2>$feed-&gt;add_entry($entry)</h2>
-
-<p>Adds the entry <em>$entry&#39;&#39;, which must be an &#39;&#39;XML::Atom::Entry</em> object, to the feed. If you want to add an entry before existent entries, you can pass optional hash reference containing <code>mode</code> value set to <code>insert</code>.</p>
-
-<pre><code>  $feed-&gt;add_entry($entry, { mode =&gt; &#39;insert&#39; });
-</code></pre>
-
-<h2>$feed-&gt;entries</h2>
-
-<p>Returns list of XML::Atom::Entry objects contained in the feed.</p>
-
-<h2>$feed-&gt;language</h2>
-
-<p>Returns the language of the feed, from <em>xml:lang</em>.</p>
-
-<h2>$feed-&gt;author([ $author ])</h2>
-
-<p>Returns an <em>XML::Atom::Person</em> object representing the author of the entry, or <code>undef</code> if there is no author information present.</p>
-
-<p>If <em>$author&#39;&#39; is supplied, it should be an &#39;&#39;XML::Atom::Person</em> object representing the author. For example:</p>
-
-<pre><code>    my $author = XML::Atom::Person-&gt;new;
-    $author-&gt;name(&#39;Foo Bar&#39;);
-    $author-&gt;email(&#39;foo@bar.com&#39;);
-    $feed-&gt;author($author);
-</code></pre>
-
-<h1>UNICODE FLAGS</h1>
-
-<p>By default, XML::Atom takes off all the Unicode flag fro mthe feed content. For example,</p>
-
-<pre><code>  my $title = $feed-&gt;title;
-</code></pre>
-
-<p>the variable <code>$title</code> contains UTF-8 bytes without Unicode flag set, even if the feed title contains some multibyte chracters.</p>
-
-<p>If you don&#39;t like this behaviour and wants to andle everything as Unicode characters (rather than UTF-8 bytes), set <code>$XML::Atom::ForceUnicode</code> flag to 1.</p>
-
-<pre><code>  $XML::Atom::ForceUnicode = 1;
-</code></pre>
-
-<p>then all the data returned from XML::Atom::Feed object and XML::Atom::Entry object etc., will have Unicode flag set.</p>
-
-<p>The only exception will be <code>$entry-&gt;content-&gt;body</code>, if content type is not text/* (e.g. image/gif). In that case, the content body is still binary data, without Unicode flag set.</p>
-
-<h1>CREATING ATOM 1.0 FEEDS</h1>
-
-<p>By default, XML::Atom::Feed and other classes (Entry, Link and Content) will create entities using Atom 0.3 namespaces. In order to create 1.0 feed and entry elements, you can set <em>Version</em> as a parameter, like:</p>
-
-<pre><code>  $feed &gt; 1.0);
-  $entry &gt; 1.0);
-</code></pre>
-
-<p>Setting those Version to every element would be sometimes painful. In that case, you can override the default version number by setting <code>$XML::Atom::DefaultVersion</code> global variable to &quot;1.0&quot;.</p>
-
-<pre><code>  use XML::Atom;
-
-  $XML::Atom::DefaultVersion = &quot;1.0&quot;;
-
-  my $feed = XML::Atom::Feed-&gt;new;
-  $feed-&gt;title(&quot;blah&quot;);
-
-  my $entry = XML::Atom::Entry-&gt;new;
-  $feed-&gt;add_entry($entry);
-
-  $feed-&gt;version; # 1.0
-</code></pre>
-
-<h1>AUTHOR &amp; COPYRIGHT</h1>
-
-<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
+<h2>$person-&gt;uri([ $uri ])</h2>
 
   </div>
 

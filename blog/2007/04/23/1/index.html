@@ -1,7 +1,7 @@
 <html lang="ja">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>docs/YAPC-Assurer-ja-public.ppt - Gosuke Miyashita</title>
+<title>OpenVPN - Gosuke Miyashita</title>
 <link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
 <link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
 <script type="text/javascript" src="/js/tass.js"></script>
@@ -13,539 +13,96 @@
 <div class="content autopagerize_page_element">
 
   <time>Apr 23<span>rd</span>, 2007</time>
-  <h1 class="entry-title"><a href="/blog/2007/04/23/1">docs/YAPC-Assurer-ja-public.ppt</a></h1>
+  <h1 class="entry-title"><a href="/blog/2007/04/23/1">OpenVPN</a></h1>
 
   <div class="content">
-    <p>source:docs/YAPC-Assurer-ja-public.ppt</p>
+    <h1>ダウンロード</h1>
 
-<pre><code> Assurer – A server testing/monitoring framework
-Gosuke Miyashita
-http://mizzy.org/
-自己紹介
-(� �)paperboy&amp;co. 所属
-最近社内に Perl 仲間が増えて喜んでます
-ペパボサービスの表や裏で動いてるAPI周りの開発がメイン（Perl
-+ Catalyst）
-…のはずが、今は技術系何でも屋。最近は勤�� 管理用ウェブアプリとかつくってる
-Assurer とは？
-Plagger ライクなサーバテスト/監視用フレー�� ワーク
-プラグインメカニズ�� 
-YAMLで��定
-assetsの��在
-Test::Base によるテスト
-元々は想定通りにサーバが構築できているか、といった単発テスト用途で開発
-テストも監視も似たようなもの�� ろう、ってことで監視もカバーすることに
+<p><a href="http://openvpn.net/">http://openvpn.net/</a> からダウンロード</p>
 
-Assurer 名前の由来
-��み方は「アシュラ」
-Plagger っぽいツールはみんな er で終わる
-Archer by tokuhirom
-Observer by はてな（非公開）
-Dishuber by Yappo
-Precure by ふしはらかん
-テストのことを「Quality Assurance」とも言うので
+<h1>インストール</h1>
 
-Assurer 実行イメージ #0
-Assurer 実行イメージ #1
-Assurer の実行フェーズ
-Assurer の実行フェーズ
-Test フェーズ
-テストを実行
-Nofity フェーズ
-テスト結果を通知
-Format フェーズ
-テスト結果を整形
-Publish フェーズ
-整形されたテスト結果を出力
-各フェーズの関連
-各フェーズ詳細
-Test フェーズ
-Test フェーズ
-テストを実行するフェーズ
-以下の様なプラグインがある
-Test::HTTP
-Test::SMTP
-Test::DBI
-Test::Ping
-他
-Test フェーズのコンフィグ
-test:
-- module: HTTP
-config:
-host: www.mizzy.org
-content: It works!
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-MISS
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-Test
-Publish
-Format
-Nofity
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-publish:
-- module: Mail
-config:
-subject: Test results from Assurer
-to: someone@example.com
-from: root@example.com
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-test:
-- module: HTTP
-config:
-host: www0.mizzy.org
-
-- module: HTTP
-config:
-host: www1.mizzy.org
-
-------------------------------------------------------------------------
-
-
-test:
-- module: HTTP
-role: web
-
-hosts:
-web:
-- www0.mizzy.org
-- www1.mizzy.org
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-format:
-- module: Text
-filter:
-module: Status
-status: ok
-
-------------------------------------------------------------------------
-
-
-notify:
-- module: IRC
-filter:
-module: Status
-status: not ok
-
-------------------------------------------------------------------------
-
-
-format:
-- module: Text
-- module: HTML
-pusblish:
-- module: Term
-filter:
-module: Type
-type: text/plain
-- module: Mail
-filter:
-module: Type
-type: text/html
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-tests: # test is right
-- module: Test::HTTP
-$ ./assurer.pl -c config.yaml
-Assurer::ConfigLoader [fatal]
-- [/] Expected required key `test‘
-- [/tests] Unexpected key `tests&#39; at line 46
-
-------------------------------------------------------------------------
-
-
-test:
-- module: HTTP
-config:
-contents: XXX # content is right
-$ ./assurer.pl -c config.yaml
-Assurer::ConfigLoader [fatal]
-Config error in Test::HTTP
-- [/contents] Unexpected key `contents&#39; at line 66
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-$ ./assurer.pl --shell
-assurer&gt; uptime
-[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+<pre><code>$ tar zxvf openvpn-2.0.9.tar.gz
+$ cd openvpn-2.0.9
+$ ./configure --with-ssl-headers=/usr/local/ssl/include --with-ssl-lib=/usr/local/ssl/lib
+$ make
+$ sudo make install
 </code></pre>
 
-<p>1.16, 0.17
-    [svn.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
-1.16, 0.17
-    [ftp.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
-1.16, 0.17</p>
+<h1>サーバの設定/起動</h1>
 
-<pre><code>------------------------------------------------------------------------
+<h2>キーの生成</h2>
 
-
-$ ./assurer.pl --shell --role=web
-assurer&gt; uptime
-[www.mizzy.org] 21:48:24 up 5 days, 23:08, 2 users, load average: 0.24,
+<pre><code>$ sudo mkdir /etc/openvpn
+$ sudo /usr/local/sbin/openvpn --genkey --secret /etc/openvpn/server.key
 </code></pre>
 
-<p>1.16, 0.17</p>
+<h2>設定ファイル</h2>
 
-<pre><code>------------------------------------------------------------------------
+<p>/etc/openvpn/server.conf</p>
 
+<pre><code>proto tcp-server
 
-assurer&gt; !on app1.foo.com \
-app2.foo.com do uptime
-# app1.foo.com と app2.foo.com 上でのみ実行
-assurer&gt; !on /.*\.foo\.com/ do \
-uptime
-# .*\.foo\.com にマッチするホスト上でのみ実行
+dev tap
 
-------------------------------------------------------------------------
+ifconfig 172.16.0.1 255.255.255.0
+route 192.168.25.0 255.255.255.0 172.16.0.2
+secret /etc/openvpn/server.key
+link-mtu 1200
 
+ping 10
+ping-restart 60
+ping-timer-rem
+persist-key
+persist-tun
+verb 3     
+</code></pre>
 
-assurer&gt; !with web db do uptime
-# web ��ールと db ��ールに属するホスト上でのみ実行
+<p>デフォルトのポート番号は 1194。</p>
 
-assurer&gt; !with /web|mail/ do uptime
-# web または mail
-にマッチする��ールに属するホスト上でのみ実行
+<h2>起動</h2>
 
-------------------------------------------------------------------------
+<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;
+</code></pre>
 
+<h1>クライアントの設定/起動</h1>
 
-assurer&gt; !test HTTP
-Assurer::Plugin::Test::HTTP [info] Testing HTTP on www0.mizzy.org...
-ok 1 - HTTP status code of http://mizzy.org:80 is 200
-not ok 2 – Content of http://mizzy.org:80 matches &#39;It works!‘
-assurer&gt;
+<h2>キー</h2>
 
-------------------------------------------------------------------------
+<p>サーバで生成したものをコピー</p>
 
+<h2>設定ファイル</h2>
 
-assurer&gt; !test HTTP on app1.foo.com
-# 特定のホストにのみテスト実行
-assurer&gt; !test HTTP on /.*.foo.com/
-# ��規表現も OK
-assurer&gt; !test HTTP with web
-# 特定の��ールにのみテスト実行
-assurer&gt; !test HTTP with /web|mail/
-# こちらも��規表現 OK
+<pre><code>remote mizzy.org
+proto tcp-client
+port 1194
+dev tap
+verb 3
+ping    3600
+secret /etc/openvpn/server.key
+ifconfig 172.16.0.2 255.255.255.0
+route 192.168.10.0 255.255.255.0 172.16.0.1 
+</code></pre>
 
-------------------------------------------------------------------------
+<h2>起動</h2>
 
+<p>サーバと一緒。</p>
 
+<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/client.conf &amp;
+</code></pre>
 
-------------------------------------------------------------------------
+<h1>その他</h1>
 
+<p>Linux のルーティング設定が必要。</p>
 
-$ assurer.pl --para=20
+<p>/etc/sysconfig/network</p>
 
-------------------------------------------------------------------------
+<pre><code>FORWARD_IPV4=yes
+</code></pre>
 
+<p>即反映するなら</p>
 
-
-------------------------------------------------------------------------
-
-
-localhost
-test0.mizzy.org
-www0.mizzy.org
-www1.mizzy.org
-www2.mizzy.org
-test1.mizzy.org
-test2.mizzy.org
-��  ssh assurer_test.pl
-③ 結果をリターン
-② テスト実行
-
-------------------------------------------------------------------------
-
-
-exec_on:
-- host: test0.mizzy.org
-priority: 3
-- host: test1.mizzy.org
-priority: 2
-- host: test2.mizzy.org
-priority: 1
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-# assurer.pl --discover -c template.yaml
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-# $host と $mechは Assure コアで実行時にプリセットされる
-$mech-&gt;get_ok(&quot;http://$host&quot;, &quot;got htttp://$host&quot;);
-$mech-&gt;content_contains(&#39;It works!&#39;, &quot;Content matches &#39;It works!&#39;&quot;);
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-package Assurer::Plugin::Test::HTTP;
-use base qw( Assurer::Plugin::Test );
-use Assurer::Test;
-
-sub register {
-my $self = shift;
-$self-&gt;register_tests( qw/ status content server / );
-}
-
-sub status {
-my ( $self, $context, $args ) = @_;
-... ��略
-is( $res-&gt;code, &#39;200&#39;,
-&#39;HTTP status code of $self-&gt;{url} is 200&#39; );
-}
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-assurer.pl
-Assurer::bootstrap()
-Assurer::Dispatch::run()
-呼び出し
-直接実行 or
-ssh でリモート実行
-テストを実行
-テスト結果
-を返す
-呼び出し
-assurer_test.pl
-assurer_test.pl
-assurer_test.pl
-assurer_test.pl
-assurer_test.pl
-Assurer::Result
-Assurer::Result
-Assurer::Result
-Assurer::Result
-Assurer::Result
-結果オブジェクト
-生成
-次のフェーズへ
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-assurer_test.pl -–config=LS0tCmNvbmZpZzoKICBjb250ZW50OiBJ
-dCB3b3JrcyEKICBob3N0OiB3d3cubWl6enkub3JnCm1vZHVsZTogSFRUUApuYW1lOiBIVFRQIHRlc3QKcm9sZTogd2ViCg==
---context=LS0tICEhcGVybC9oYXNoOkFzc3VyZXIKYmFzZV9kaXI6IC9
-ob21lL21peWEvc3ZrL0Fzc3VyZXIKY29uZmlnOgogIGZvcm1hdDoKICAgIC0gY29uZmlnOiAmMSB7fQogICAgICBtb2R1bGU6IFRleHQKICBnbG9iYWw6CiAgICBob3N0OiB+CiAgICBpbnRlcnZhbDogMwogICAgbG9nOgogICAgICBsZXZlbDogZGVidWcKICAgIG5vX2RpYWc6IDAKICAgIHJldHJ5OiAzCiAgaG9zdHM6CiAgICBmdHA6CiAgICAgIC0gZnRwLm1penp5Lm9yZwogICAgc3ZuOgogICAgICAtIHN2bi5taXp6eS5vcmcKICAgIHdlYjoKICAgICAgLSB3d3cubWl6enkub3JnCiAgICAgIC0gc3ZuLm1penp5Lm9yZwogICAgICAtIHRyYWMubWl6enkub3JnCiAgbm90aWZ5OgogICAgLSBjb25maWc6CiAgICAgICAgYW5ub3VuY2U6IG5vdGljZQogICAgICAgIGNoYXJzZXQ6IGlzby0yMDIyLWpwCiAgICAgICAgZGFlbW9uX3BvcnQ6IDk5OTEKICAgICAgICBuaWNrbmFtZTogYXNzdXJlcmJvdAog
-... ま�� 続く
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-
-------------------------------------------------------------------------
-
-
-------------------------------------------------------------------------
-
-
-------------------------------------------------------------------------
-
-Created with pptHtml
+<pre><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward
 </code></pre>
 
   </div>

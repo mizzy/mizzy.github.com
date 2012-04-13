@@ -1,7 +1,7 @@
 <html lang="ja">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>XML-Atom-0.22/lib/XML/Atom.pm - Gosuke Miyashita</title>
+<title>XML-Atom-0.22/lib/XML/Atom/Util.pm - Gosuke Miyashita</title>
 <link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
 <link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
 <script type="text/javascript" src="/js/tass.js"></script>
@@ -13,35 +13,34 @@
 <div class="content autopagerize_page_element">
 
   <time>Apr 30<span>th</span>, 2007</time>
-  <h1 class="entry-title"><a href="/blog/2007/04/30/7">XML-Atom-0.22/lib/XML/Atom.pm</a></h1>
+  <h1 class="entry-title"><a href="/blog/2007/04/30/7">XML-Atom-0.22/lib/XML/Atom/Util.pm</a></h1>
 
   <div class="content">
-    <p>source:XML-Atom-0.22/lib/XML/Atom.pm</p>
+    <p>source:XML-Atom-0.22/lib/XML/Atom/Util.pm</p>
 
 <h1>NAME</h1>
 
-<p>XML::Atom - Atom feed and API implementation</p>
+<p>XML::Atom::Util - Utility functions</p>
 
 <h1>SYNOPSIS</h1>
 
-<pre><code>    use XML::Atom;
+<pre><code>    use XML::Atom::Util qw( iso2dt );
+    my $dt = iso2dt($entry-&gt;issued);
 </code></pre>
 
-<h1>DESCRIPTION</h1>
+<h1>USAGE</h1>
 
-<p>Atom is a syndication, API, and archiving format for weblogs and other data. <em>XML::Atom</em> implements the feed format as well as a client for the API.</p>
+<h2>iso2dt($iso)</h2>
 
-<h1>LICENSE</h1>
+<p>Transforms the ISO-8601 date <em>$iso&#39;&#39; into a &#39;&#39;DateTime&#39;&#39; object and returns the &#39;&#39;DateTime</em> object.</p>
 
-<p><em>XML::Atom</em> is free software; you may redistribute it and/or modify it under the same terms as Perl itself.</p>
+<h2>encode_xml($str)</h2>
+
+<p>Encodes characters with special meaning in XML into entities and returns the encoded string.</p>
 
 <h1>AUTHOR &amp; COPYRIGHT</h1>
 
-<p>Except where otherwise noted, <em>XML::Atom</em> is Copyright 2003-2005 Benjamin Trott, <a href="mailto:cpan@stupidfool.org">cpan@stupidfool.org</a>. All rights reserved.</p>
-
-<h1>CO-MAINTAINER</h1>
-
-<p>Tatsuhiko Miyagawa <a href="mailto:miyagawa@bulknews.net">miyagawa@bulknews.net</a></p>
+<p>Please see the <em>XML::Atom</em> manpage for author, copyright, and license information.</p>
 
   </div>
 
