@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-04-14T02:03:00+09:00</updated>
+  <updated>2012-04-23T01:32:00+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,21 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[stellar-site 用の Guard ファイル作ってもらった]]></title>
+    <link href="http://mizzy.org/"/>
+    <updated>2012-04-23T01:32:00+09:00</updated>
+    <id>http://mizzy.org/ </id>
+    <content type="html"><![CDATA[
+<p>同僚の <a href="https://github.com/banyan">@banyan</a> が <a href="https://github.com/mizzy/stellar-site">stellar-site</a> 用に <a href="https://github.com/mizzy/stellar-site/pull/1">Guard ファイルつくってくれた</a>。</p>
+
+<p><a href="https://github.com/guard/guard-livereload">guard-livereload</a> で、ファイル更新されたら勝手にブラウザ側でもリロードしてくれる。</p>
+
+<p>これは便利ですね。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[37歳で大学生になりました]]></title>
@@ -174,7 +189,7 @@
 <pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_link }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70</a></p>
+<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70【2sp<em>120417</em>b】</a></p>
 
 ]]></content>
   </entry>
@@ -329,99 +344,6 @@
 <p><img src="/images/2012/01/sidebar.png"></p>
 
 <p>This is the <a href="https://github.com/mizzy/octopress/commit/d564e8d468c29e9ef51858a40ab2f414b94540e7">changeset</a> for this hack.</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Webiblo - web to ebook project]]></title>
-    <link href="http://mizzy.org/"/>
-    <updated>2012-01-10T20:17:00+09:00</updated>
-    <id>http://mizzy.org/ </id>
-    <content type="html"><![CDATA[
-<p>I&#39;ve started the project <a href="https://github.com/mizzy/webiblo">webiblo</a>.This is the improved fork of <a href="https://github.com/mizzy/web-to-mobi">web-to-mobi</a>.</p>
-
-<p>This project includes the script to convert web sites into  ebook format(currently mobipocket only) data from given JSON data and gathering the JSON data for web sites.</p>
-
-<p>Currently, you can generate mobipocket format data with the URI of JSON data like this:</p>
-
-<pre><code>$ webiblo.pl http://mizzy.org/webiblo/data/Getting_Real.json
-</code></pre>
-
-<p>Or with JSON data through STDIN.</p>
-
-<pre><code>$ cat data.json | webiblo.pl
-</code></pre>
-
-<p>This script needs <a href="http://www.amazon.com/gp/feature.html?docId=1000234621">KindleGen</a>.</p>
-
-<p>JSON data is like this:</p>
-
-<pre><code>{
-    &quot;title&quot;       : &quot;Structure and Interpretation of Computer Programs&quot;,
-    &quot;authors&quot;     : [
-        &quot;Harold Abelson&quot;,
-        &quot;Gerald Jay Sussman&quot;,
-        &quot;Julie Sussman&quot;
-    ],
-    &quot;cover_image&quot;   : &quot;http://mitpress.mit.edu/sicp/full-text/book/cover.jpg&quot;,
-    &quot;content_xpath&quot; : &quot;//div[@class=\&quot;content\&quot;]&quot;, # Optional
-    &quot;exclude_xpath&quot; : &quot;//div[@class=\&quot;navigation\&quot;]&quot;, # Optional
-    &quot;chapters&quot; : [
-        {
-            &quot;title&quot; : &quot;Foreword&quot;,
-            &quot;uri&quot;   : &quot;http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-5.html#%_chap_Temp_2&quot;
-        },
-        {
-            &quot;title&quot; : &quot;1  Building Abstractions with Procedures&quot;,
-            &quot;uri&quot;  : &quot;http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-9.html#%_chap_1&quot;,
-            &quot;sections&quot; : [
-                &quot;title&quot; : &quot;1.1  The Elements of Programming&quot;,
-                &quot;uri&quot;   : &quot;http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1&quot;
-                &quot;subsections&quot; : [
-                    {
-                        &quot;title&quot; : &quot;1.1.1  Expressions&quot;,
-                        &quot;uri&quot;   : &quot;http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1.1&quot;
-                    },
-                ]
-            ]
-        }
-    ]
-}
-</code></pre>
-
-<p>Overview of the JSON data is following:</p>
-
-<ul>
-<li>Book data
-
-<ul>
-<li>Title</li>
-<li>Authors</li>
-<li>Cover Image</li>
-<li>XPath that represents the content part (Optional)</li>
-<li>XPath that represents the uneeded part of the content (Optional)</li>
-<li>Chapters
-
-<ul>
-<li>Title of the chapter</li>
-<li>URI of the chapter page</li>
-<li>Sections</li>
-<li>Title of the secion</li>
-<li>URI of the section page</li>
-<li>Subsections
-
-<ul>
-<li>Title of the subsection</li>
-<li>URI of the subsection page</li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
-
-<p>There are two JSON data for <a href="http://gettingreal.37signals.com/toc.php">Getting Real</a>  and <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">SICP</a> on [my web site(<a href="http://mizzy.org/webiblo/">http://mizzy.org/webiblo/</a>) .</p>
-
-<p>JSON data are put on the <a href="https://github.com/mizzy/webiblo/tree/gh-pages">gh-pages branch</a>.Pull requests are welcome.</p>
 
 ]]></content>
   </entry>
