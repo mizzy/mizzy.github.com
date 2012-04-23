@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-04-23T01:32:00+09:00</updated>
+  <updated>2012-04-23T19:32:00+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Git リポジトリ同期ツールつくった]]></title>
+    <link href="http://mizzy.org/"/>
+    <updated>2012-04-23T19:32:00+09:00</updated>
+    <id>http://mizzy.org/ </id>
+    <content type="html"><![CDATA[
+<p>欠勤してるのにブログを書いていて解雇された、という話があったなー、ということを思い出しながら、このエントリを書いてます。(体調悪くて会社休んだ上に、まだ回復してない。)</p>
+
+<p>最近仕事で <a href="https://github.com/">GitHub</a> を利用してるのですが、デプロイも GitHub 経由なため、GitHub がダウンしてしまうと、緊急で直さないといけないバグが発生したりすると困るなー、とか、それ以外にも、バックアップリポジトリがあればいろいろ安心かな、ということで、Git リポジトリを同期するツールをつくってみました。</p>
+
+<p><a href="https://github.com/mizzy/gitpusher">https://github.com/mizzy/gitpusher</a></p>
+
+<p>GitHub の自分のアカウント(または指定された Organization)以下のリポジトリを、すべて <a href="https://bitbucket.org/">Bitbucket</a> に同期する、という動作をします。</p>
+
+<p>今のところ、GitHub から Bitbucket への同期しか対応してませんが、逆方向の対応もそれほど難しくないと思います。</p>
+
+<p>あと、はじめて rubygems.org へアップしてみましたが、あまりにもあっさりアップできてしまったので、作法的な面で正しいのかどうか不安です。</p>
+
+<p><a href="https://rubygems.org/gems/gitpusher">https://rubygems.org/gems/gitpusher</a></p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[stellar-site 用の Guard ファイル作ってもらった]]></title>
@@ -329,21 +352,6 @@
 <p>興味のある方、もっと具体的な話が聞いてみたい、という方は、<a href="http://twitter.com/gosukenator">twitter</a> や <a href="http://www.facebook.com/gosukenator">facebook</a> などで、お気軽にお声掛けください。</p>
 
 <p>他にも、東京、京都、福岡で<a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml">様々な職種で人材募集中です</a>。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[coderwall badges on the sidebar]]></title>
-    <link href="http://mizzy.org/"/>
-    <updated>2012-01-13T02:22:00+09:00</updated>
-    <id>http://mizzy.org/ </id>
-    <content type="html"><![CDATA[
-<p>I&#39;ve hacked Octopress quickly for displaying <a href="http://coderwall.com/">coderwall</a> badges on the sidebar.</p>
-
-<p><img src="/images/2012/01/sidebar.png"></p>
-
-<p>This is the <a href="https://github.com/mizzy/octopress/commit/d564e8d468c29e9ef51858a40ab2f414b94540e7">changeset</a> for this hack.</p>
 
 ]]></content>
   </entry>
