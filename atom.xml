@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-04-24T19:52:36+09:00</updated>
+  <updated>2012-04-24T23:14:20+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,38 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[大学選びについて]]></title>
+    <link href="http://mizzy.org/blog/2012/04/24/2/" />
+    <updated>2012-04-24T23:14:20+09:00</updated>
+    <id>http://mizzy.org/blog/2012/04/24/2/</id>
+    <content type="html"><![CDATA[
+<p><a href="/blog/2012/04/14/1/">大学入学エントリ</a> のつづき。</p>
+
+<p>まず、最初に考えたのは、以下の2点。</p>
+
+<ol>
+<li>全日か？夜間か？通信か？</li>
+<li>大学か？大学院か？</li>
+</ol>
+
+<p>1 については、子供が5人いて妻は専業主婦であり、働かずに何年も暮らしていけるほどの貯蓄もないため、全日制はまず却下。夜間か通信かについては、職場か家から近くて通いやすいところであれば、夜間もありかな、とは思ったけれど、実際にそういった条件のところがなさそう、ということと、コンピュータについて学ぶ、ということであれば、曲がりなりにもプロとして15年近く IT 技術者やってるし、コンピュータは小学生の頃から触っていて、ベーマガで育った人間でもあるし、全然知らないわけではないので、決まった時間縛られるよりも、自分のペースで学びたい、ということで、通信にすることに。（どうでもいいですが、ベーマガの読者の闘技場、書籍化されたりしないですかね。）</p>
+
+<p>2 については、自分が欲しいのは情報工学の学位だけど、現在持っているのは経済学の学士なので、そこからいきなり情報工学の修士というのもハードルが高いかな、ということで、とりあえず院は選択しなかった。修士が欲しくなったら、学士を取得した後にまた考えようかと。また、自分が入学した帝京大学の通信教育課程の場合、大学であれば試験がないけれど、院は試験があり、直近の4月の入学を考えると準備が間に合わない、という理由もあったり。</p>
+
+<p>具体的にどこの大学にするかは、妻が買っておいてくれた <a href="http://www.amazon.co.jp/dp/4862073735">社会人&amp;学生のための大学・大学院選び 2012年度版</a> にひと通り目を通したところ、通信教育で情報系となると、自分が入学した <a href="http://www.riko.teikyo-u.ac.jp/_renewal/tsushin/tsushin_top.html">帝京大学</a> か、<a href="http://www.cyber-u.ac.jp/">サイバー大学</a> ぐらいしか選択肢がなさそうなんだけど、以下の理由により、帝京大学の方を選択。</p>
+
+<ul>
+<li>サイバー大学は学費が高い。単位毎にお金がかかる。（1単位21,000円。）帝京大学は単位取得数関係なく年間15万円。</li>
+<li>サイバー大学で取得できるのはIT総合学の学士だが、自分は工学の学士が欲しい。</li>
+<li>取得できる学士の違いにも表れているけれど、サイバー大学のカリキュラムはどちらかというと応用的なものが多く、自分が学びたい情報工学の基礎とは方向性が違う。</li>
+</ul>
+
+<p>というわけで、帝京大学ぐらいしか選択肢がない、という感じで、あれこれ悩むことなく大学は決まった。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[nebel で静的サイト作成]]></title>
@@ -233,6 +265,104 @@ date: 2012-04-24 19:25:34 +0900
 <p>これで、自分の環境では Octopress で50秒かかっていた再生成時間が、3秒まで短縮できた。</p>
 
 <p>とりあえず自分しか使わない前提でつくったので、色々ハードコートされてたり、使い方とかまとめてないけど、興味のある方がいれば、Pull Request なり Issue 登録なりお気軽にどうぞ。</p>
+
+]]></content>
+  </entry>
+
+  <entry>
+    <title type="html"><![CDATA[puppet-report-ikachan]]></title>
+    <link href="http://mizzy.org/blog/2012/03/31/1/" />
+    <updated>2012-03-31T22:31:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/03/31/1/</id>
+    <content type="html"><![CDATA[
+<p>I&#39;ve made a puppet module <a href="https://github.com/mizzy/puppet-report-ikachan">puppet-report-ikachan</a> to send reports to <a href="https://github.com/yappo/p5-App-Ikachan">Ikachan</a> and uploaded this module to <a href="https://forge.puppetlabs.com/users/mizzy/modules/report_ikachan">Puppet Forge</a></p>
+
+<p>This is the screenshot of showing reports sent by this module on Limechat.</p>
+
+<p><img src="/images/2012/03/ikachan.png"></p>
+
+<p>This module is very primitive, so please give me feedbak on <a href="https://github.com/mizzy/puppet-report-ikachan">GitHub</a>.</p>
+
+]]></content>
+  </entry>
+
+  <entry>
+    <title type="html"><![CDATA[Image with EXIF tag plugin]]></title>
+    <link href="http://mizzy.org/blog/2012/03/07/2/" />
+    <updated>2012-03-07T23:38:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/03/07/2/</id>
+    <content type="html"><![CDATA[
+<p>I&#39;ve modified <a href="https://github.com/imathis/octopress/blob/master/plugins/image_tag.rb">Image tag plugin</a> into <a href="https://github.com/mizzy/jekyll-plugins/blob/master/image_with_exif_tag.rb">Image with EXIF tag plugin</a> based on <a href="/blog/2012/03/07/exif-tag-plugin">the idea of mattn-san&#39;s comment</a>. (Thanks, mattn-san!)</p>
+
+<p>If you write text like this:</p>
+
+<pre><code>{% img_with_exif /images/2012/03/first_shot_orion.jpg %}
+</code></pre>
+
+<p>You will see the converted result like this:</p>
+
+<p><img src="/images/2012/03/first_shot_orion.jpg" alt="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900" title="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900"></p>
+
+<p>The title and alt attribute have EXIF data of thie image file.</p>
+
+]]></content>
+  </entry>
+
+  <entry>
+    <title type="html"><![CDATA[EXIF tag plugin]]></title>
+    <link href="http://mizzy.org/blog/2012/03/07/1/" />
+    <updated>2012-03-07T00:19:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/03/07/1/</id>
+    <content type="html"><![CDATA[
+<p>I&#39;ve wrote <a href="https://github.com/mizzy/jekyll-plugins/blob/master/exif_tag.rb">EXIF tag plugin for Jekyll</a>.</p>
+
+<p>If you write text like this:</p>
+
+<pre><code>{% img /images/2012/03/first_shot_orion.jpg %}
+
+{% exif /images/2012/03/first_shot_orion.jpg %}
+</code></pre>
+
+<p>You will see the converted result like this:</p>
+
+<p><img src="/images/2012/03/first_shot_orion.jpg"></p>
+
+<p>焦点距離 10 mm F5.6 NIKON D5000 ISO 1600 15 秒露光 2010-11-05 01:32:07 +0900</p>
+
+]]></content>
+  </entry>
+
+  <entry>
+    <title type="html"><![CDATA[Rakuten tag plugin for Jekyll]]></title>
+    <link href="http://mizzy.org/blog/2012/03/04/1/" />
+    <updated>2012-03-04T22:37:00+09:00</updated>
+    <id>http://mizzy.org/blog/2012/03/04/1/</id>
+    <content type="html"><![CDATA[
+<p>I&#39;ve wrote <a href="https://github.com/mizzy/jekyll-plugins/blob/master/rakuten_tag.rb">Rakuten tag plugin for Jekyll</a>.</p>
+
+<p>This is inspired by <a href="http://zanshin.net/2011/08/24/amazon-plugin-for-octopress/">Amazon Plugin for Octopress</a>.</p>
+
+<p>You can use this plugin like this.</p>
+
+<pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_large_image }}
+</code></pre>
+
+<p>Liquid error: </p>
+
+<pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_medium_image }}
+</code></pre>
+
+<p>Liquid error: </p>
+
+<pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_small_image }}
+</code></pre>
+
+<p>Liquid error: </p>
+
+<pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_link }}
+</code></pre>
+
+<p>Liquid error: </p>
 
 ]]></content>
   </entry>
