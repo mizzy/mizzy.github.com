@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-04-23T19:32:00+09:00</updated>
+  <updated>2012-04-24T19:52:36+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,124 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[nebel で静的サイト作成]]></title>
+    <link href="http://mizzy.org/blog/2012/04/24/1/" />
+    <updated>2012-04-24T19:52:36+09:00</updated>
+    <id>http://mizzy.org/blog/2012/04/24/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="/blog/2012/04/07/1/">stellar</a> という静的サイトジェネレータをつくっていたのですが、<a href="https://rubygems.org/gems/stellar">名前がモロ被りな gem</a> があったので、<a href="https://github.com/mizzy/nebel">nebel</a> と名前を変更しました。</p>
+
+<p>nebel の方は、静的サイト生成に利用するコマンドと、確認用のテストサーバコマンドのみを含んでいて、実際のサイト生成用のテンプレートやユーティリティツールは、<a href="https://github.com/mizzy/nebel-site">nebel-site</a> の方にあります。(Jekyll と Octopress のような関係です。)</p>
+
+<p>使い方は <a href="https://github.com/mizzy/nebel-site/blob/master/README.md">nebel-site の README</a> にまとめてあるのですが、こちらのブログに日本語でまとめておきます。</p>
+
+<h2>セットアップ</h2>
+
+<p>git clone して、必要な gems を bundle install します。nebel も一緒に入ります。</p>
+
+<pre><code>$ git clone git://github.com/mizzy/nebel-site.git
+$ cd nebel-site
+$ bundle install
+</code></pre>
+
+<h2>ファイルの修正や作成</h2>
+
+<ul>
+<li>layouts/post.html
+
+<ul>
+<li>エントリのテンプレートなので、適宜修正してください。</li>
+</ul></li>
+<li>layouts/atom.xml
+
+<ul>
+<li>Atom フィードのテンプレートなｔので、適宜修正してください。</li>
+</ul></li>
+<li>static/
+
+<ul>
+<li>静的ファイル置き場。画像、CSS、JavaScript など、好きなファイルを置いてください。サブディレクトリも作成できます。</li>
+</ul></li>
+</ul>
+
+<h2>エントリファイルの作成</h2>
+
+<p>以下のような内容でエントリファイルを作成します。ファイル名は、.md か .markdown で終わっていれば、何でもいいです。</p>
+
+<pre><code>---
+title: エントリのタイトル
+date: 2012-04-24 18:15:59 +0900
+---
+
+エントリの本文。Markdown 記法が使えます。
+</code></pre>
+
+<h2>nebel コマンドの実行</h2>
+
+<pre><code>$ bundle exec nebel
+</code></pre>
+
+<p>nebel コマンドを実行すると、posts 以下のエントリファイルを処理して、生成されたファイルを public 以下に配置します。また、static ディレクトリ以下のファイルもすべて、public 以下にコピーされます。</p>
+
+<h2>テストサーバで確認</h2>
+
+<p>以下のコマンドでテストサーバが立ち上がるので、http://localhost:5000/ にアクセスすると、生成されたコンテンツの確認ができます。</p>
+
+<pre><code>$ bundle exec nebel-server
+</code></pre>
+
+<h2>コンテンツの公開</h2>
+
+<p>public ディレクトリ以下のファイルを、お好きなサーバにアップロードしてください。</p>
+
+<h2>ユーティリティツール</h2>
+
+<p>更に便利に利用するためのユーティリティツールも同梱してます。</p>
+
+<h3>エントリファイルの作成</h3>
+
+<p>thor post:create で、エントリファイルを作成します。</p>
+
+<pre><code>$ thor post:create entry-title
+</code></pre>
+
+<p>と実行すると、posts/2012-04-24-entry-title.markdown といったファイル名で、以下の様な内容のファイルを作成し、さらにエディタで開いてくれます。(ただし Mac のみ。)</p>
+
+<pre><code>---
+title: entry-title
+date: 2012-04-24 19:25:34 +0900
+---
+</code></pre>
+
+<h3>nebel コマンドの自動実行</h3>
+
+<p>同僚の <a href="https://github.com/banyan">@banyan</a> が Guardfile をつくってくれたので、ファイルが変更されると自動的に nebel コマンドを実行して、コンテンツを再生成します。</p>
+
+<pre><code>$ bundle exec nebel-server
+</code></pre>
+
+<p><a href="https://github.com/guard/guard-livereload">guard-livereload</a> も利用しているので、ブラウザでの自動リロードにも対応してます。</p>
+
+<h3>テストサーバ起動＆諸々自動化</h3>
+
+<pre><code>$ thor server:start
+</code></pre>
+
+<p>を実行すると、以下の一連の処理が自動的に実行されます。</p>
+
+<ul>
+<li>テストサーバの起動</li>
+<li>ブラウザで http://localhost:5000/ を開く</li>
+<li>ファイル変更を検知して自動生成</li>
+<li>ブラウザの自動リロード</li>
+</ul>
+
+<p>こんな感じで、かなり便利になった。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Git リポジトリ同期ツールつくった]]></title>
@@ -197,22 +315,22 @@
 <pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_large_image }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F"><img src="http://thumbnail.image.rakuten.co.jp:80/@0_gold/nikondirect/product/img/psp00367_01.jpg" /></a></p>
+<p>Liquid error: 503 Service Unavailable</p>
 
 <pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_medium_image }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F"><img src="http://thumbnail.image.rakuten.co.jp/@0_gold/nikondirect/product/img/psp00367_01.jpg?_ex=128x128" /></a></p>
+<p>Liquid error: </p>
 
 <pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_small_image }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F"><img src="http://thumbnail.image.rakuten.co.jp/@0_gold/nikondirect/product/img/psp00367_01.jpg?_ex=64x64" /></a></p>
+<p>Liquid error: </p>
 
 <pre><code>{{ &quot;nikondirect:10000349&quot; | rakuten_link }}
 </code></pre>
 
-<p><a href="http://hb.afl.rakuten.co.jp/hgc/0f462063.619bb4f5.0f462064.c443d41a/?pc=http%3A%2F%2Fitem.rakuten.co.jp%2Fnikondirect%2Fpsp00367%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fnikondirect%2Fi%2F10000349%2F">ニッコールタンブラー 24-70【2sp<em>120417</em>b】</a></p>
+<p>Liquid error: </p>
 
 ]]></content>
   </entry>
@@ -301,57 +419,6 @@
 <p><a href="http://www.paperboy.co.jp/">ペパボ</a> という会社では、こんな感じで技術者向けの評価制度がスタートしました。</p>
 
 <p>こんなペパボは、東京、京都、福岡で <a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml">様々な職種で人材募集中です</a>。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[paperboy is hiring]]></title>
-    <link href="http://mizzy.org/blog/2012/01/17/1/" />
-    <updated>2012-01-17T20:56:00+09:00</updated>
-    <id>http://mizzy.org/blog/2012/01/17/1/</id>
-    <content type="html"><![CDATA[
-<p>今まで<a href="http://www.paperboy.co.jp/">ペパボ</a>の人事評価制度では、管理職のキャリアプランしか想定されていかったのですが、今年から導入された制度では、管理職とは別に、技術職用の等級が設けられ、能力に応じて待遇が向上する仕組みが導入されました。</p>
-
-<p>具体的には、シニア、アドバンスド・シニア、という2つの役職が設けられ、以下のような待遇となっています。</p>
-
-<ul>
-<li>シニアは年俸500万円〜。フレックスタイム。</li>
-<li>アドバンスド・シニアは年俸600万円〜。裁量労働。</li>
-</ul>
-
-<p>実運用に入るのはまだこれからなのですが、今までペパボでは技術者がステップアップしていく道がなかったので、これはペパボの技術者にとって、とても大きな一歩です。</p>
-
-<p>で、本題。</p>
-
-<p>新しい技術者の評価制度をベースに、今までペパボにはなかったポジションの技術者を、<a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml?job_code=23">東京</a>と<a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml?job_code=24">福岡</a>、両方で募集しています。</p>
-
-<p>「技術基盤整備エンジニア」という言葉でピンと来る方もいるかと思いますが、<a href="http://cookpad.com/">クックパッド</a> さんの開発基盤グループが、役割として近いと思い、名前を拝借させていただきました。</p>
-
-<p>職務内容としては、</p>
-
-<ul>
-<li>ペパボ全サービスに関わる技術基盤の整備
-
-<ul>
-<li>新しい方法論や技術の導入</li>
-<li>開発手法の整備</li>
-<li>大規模なリファクタリング、リプレース</li>
-<li>モニタリング、キャパシティプランニングの強化</li>
-<li>データ解析/ログ解析</li>
-<li>セキュリティ関連</li>
-</ul></li>
-</ul>
-
-<p>と書かれていますが、これだけに留まらず、これは絶対にやるべき、という技術的課題があれば、どんどんお任せしたいと考えています。</p>
-
-<p>待遇は新評価制度の元での、アドバンスド・シニア待遇となります。（年俸600万円はあくまでも最低ラインなので、応相談です。）</p>
-
-<p>また、自分が就いてる役職はテクニカル・マネージャーなのですが、この役職は人数制限があるわけではないので、場合によってはテクニカル・マネージャー待遇も検討させて頂きます。（特に福岡の場合。）</p>
-
-<p>興味のある方、もっと具体的な話が聞いてみたい、という方は、<a href="http://twitter.com/gosukenator">twitter</a> や <a href="http://www.facebook.com/gosukenator">facebook</a> などで、お気軽にお声掛けください。</p>
-
-<p>他にも、東京、京都、福岡で<a href="https://js01.jposting.net/paperboy/u/recruit/job.phtml">様々な職種で人材募集中です</a>。</p>
 
 ]]></content>
   </entry>
