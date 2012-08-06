@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-06-12T22:02:03+09:00</updated>
+  <updated>2012-08-07T00:05:03+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,59 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[札幌Ruby会議2012 と YAPC::Asia 2012 で登壇します]]></title>
+    <link href="http://mizzy.org/blog/2012/08/07/1/" />
+    <updated>2012-08-07T00:05:03+09:00</updated>
+    <id>http://mizzy.org/blog/2012/08/07/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://sapporo.rubykaigi.org/">札幌Ruby会議2012</a> と <a href="http://yapcasia.org/2012/">YAPC::Asia Tokyo 2012</a> で登壇することになりました。</p>
+
+<p>札幌Ruby会議と YAPC::Asia Tokyo 2012 前夜祭では、「Sqale の裏側」というタイトルで、<a href="http://www.paperboy.co.jp/">ペパボ</a> が提供する PaaS「<a href="http://sqale.jp/">Sqale</a>」のアーキテクチャなどについて話します。</p>
+
+<ul>
+<li><a href="http://sapporo.rubykaigi.org/2012/ja/schedule/details/48.html">札幌Ruby会議2012でのトークアジェンダ</a></li>
+<li><a href="http://yapcasia.org/2012/talk/show/048d468c-ab9e-11e1-a3b5-2a656aeab6a4">YAPC::Asia Tokyo 2012でのトークアジェンダ</a></li>
+</ul>
+
+<p>どちらのカンファレンスも内容的には同じ話をする予定で、Ruby/Perl 成分がほとんどなく、主に以下のようなキーワードについてお話をすることになるかと思います。</p>
+
+<ul>
+<li>Puppet/Chef</li>
+<li>Resque</li>
+<li>Unicorn</li>
+<li>AWS(EC2, ELB, RDS, Route53)</li>
+<li>Patched version of OpenSSH</li>
+<li>Patched version of Linux kernel</li>
+<li>OpenResty(ngx_openresty)</li>
+<li>Redis</li>
+<li>Git</li>
+<li>LXC</li>
+<li>etc.</li>
+</ul>
+
+<p>なので、Ruby や Perl も興味あるんだけど、PaaS の中身やミドルウェア、Linux カーネル などにより興味がある、という方はぜひ聞きに来てください。</p>
+
+<p>また、<a href="http://yapcasia.org/2012/talk/show/79991522-db79-11e1-be22-0d4e6aeab6a4">YAPC::Asia Tokyo 2012 本編でも登壇</a> します。</p>
+
+<p>こちらの方は、クロージング直前のいわゆるキーノートスピーチ的なもので、上の「Sqale の裏側」と異なり、技術的な成分はだいぶ薄めです。タイトルも「How Perl Changed My Life」と、どこかで聞いたことがある上に、時期を逸した感もありますが、タイトル通り、Perl や Perl コミュニティが自分の技術者人生に与えた影響についてお話させて頂く予定です。</p>
+
+<p>このクロージング直前の枠、過去のトークを並べてみると、</p>
+
+<ul>
+<li><a href="http://tokyo.yapcasia.org/sessions/keynote.html">Keynote</a> by Larry Wall 氏</li>
+<li><a href="http://tokyo2007.yapcasia.org/sessions/2007/02/perl_program_repair_shop_and_r.html">Perl Program Repair Shop and Red Flags</a> by Mark Jason Dominus 氏</li>
+<li><a href="http://conferences.yapcasia.org/ya2008/user/780">Perl Is unDead</a> by Michael Schwern 氏</li>
+<li><a href="http://conferences.yapcasia.org/ya2009/user/1681">Why I Stick With Perl</a> by Jonathan Rockway 氏</li>
+<li><a href="http://yapcasia.org/2010/talks/63D5EA98-BC8C-11DF-8791-B9FC0F276C45">The Tale of Plack</a> by miyagawa さん</li>
+<li><a href="http://yapcasia.org/2011/talk/66">Managing A Band Of Hackers</a> by hidek さん </li>
+</ul>
+
+<p>とまあすごい顔ぶれで、なんで自分なんかが選ばれたんだろう、という感じなんですが、気負わず自分らしい話ができればいいな、と思っています。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[「Mobageを支える技術」を献本いただいた]]></title>
@@ -375,28 +428,6 @@ date: 2012-04-24 19:25:34 +0900
 <p><img src="/images/2012/03/ikachan.png"></p>
 
 <p>This module is very primitive, so please give me feedbak on <a href="https://github.com/mizzy/puppet-report-ikachan">GitHub</a>.</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Image with EXIF tag plugin]]></title>
-    <link href="http://mizzy.org/blog/2012/03/07/2/" />
-    <updated>2012-03-07T23:38:00+09:00</updated>
-    <id>http://mizzy.org/blog/2012/03/07/2/</id>
-    <content type="html"><![CDATA[
-<p>I&#39;ve modified <a href="https://github.com/imathis/octopress/blob/master/plugins/image_tag.rb">Image tag plugin</a> into <a href="https://github.com/mizzy/jekyll-plugins/blob/master/image_with_exif_tag.rb">Image with EXIF tag plugin</a> based on <a href="/blog/2012/03/07/exif-tag-plugin">the idea of mattn-san&#39;s comment</a>. (Thanks, mattn-san!)</p>
-
-<p>If you write text like this:</p>
-
-<pre><code>{% img_with_exif /images/2012/03/first_shot_orion.jpg %}
-</code></pre>
-
-<p>You will see the converted result like this:</p>
-
-<p><img src="/images/2012/03/first_shot_orion.jpg" alt="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900" title="Focal Length 10.0 mm F5.6 NIKON D5000 ISO 1600 Exposure Time 15 second 2010-11-05 01:32:07 +0900"></p>
-
-<p>The title and alt attribute have EXIF data of thie image file.</p>
 
 ]]></content>
   </entry>
