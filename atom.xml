@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-09-30T20:47:56+09:00</updated>
+  <updated>2012-09-30T22:09:32+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,33 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[YAPC::Asia Tokyo 2012 1日目]]></title>
+    <link href="http://mizzy.org/blog/2012/09/30/2/" />
+    <updated>2012-09-30T22:09:32+09:00</updated>
+    <id>http://mizzy.org/blog/2012/09/30/2/</id>
+    <content type="html"><![CDATA[
+<p><a href="/blog/2012/09/30/1/">前夜祭</a> につづいて、1日目について。</p>
+
+<p>この日は朝は会社で、YAPC スピーカーデビューとなる同僚の <a href="http://yapcasia.org/2012/talk/show/63dbff60-b365-11e1-befb-95586aeab6a4">まつけん</a> と <a href="http://yapcasia.org/2012/talk/show/3e7acdec-db1e-11e1-90c8-0d4e6aeab6a4">のんたん</a> の発表練習につきあってから会場に向かったので、<a href="https://twitter.com/hasegawayosuke">@hasegawayosuke</a> さんの <a href="http://yapcasia.org/2012/talk/show/aaade824-abc0-11e1-8865-57a46aeab6a4">Web::Security beyond HTML5</a> から聞き始めた。話の内容に興味がある、というよりも、生 hsegawa さんのお話を聞きたかった、という感じで参加。</p>
+
+<p>午後からはりーおたんのトークが聞きたいなー、と思い、その前のトークから部屋に入ろうと思ったら満員で入れず。</p>
+
+<p>しかたなく、多目的ホールで電源確保して、仕事したり自分のスライド書いたりなどしてたら、LTソンがすごい盛り上がりで、正直言うと最初はあまり興味なかったんだけど、聞いてるうちにうずうずしてきて、飛び入り参加でトークしてきました。</p>
+
+<p>トーク内容は、技術的なことは一切話さず、Sqale クーポンあんちぽブロマイドの、撮影風景画像の紹介でした。ブロマイドに使われない写真ばかりで、その場で見られた方々は、とてもラッキーだったと思います。</p>
+
+<p>これで、前夜祭に続いて、2日連続トーク達成。</p>
+
+<p>LT ソン、本当にいい試みで、感動しました。<a href="https://twitter.com/uzulla">uzulla</a> さん、話がうまくておもしろく、場を盛り上げるのが本当にうまい。</p>
+
+<p>最終日のトークで、Plagger Conference で LT デビューした（させられた）話をしたのですが、スピーカーになることが自分にとって大きな転機のひとつだったので、誰もがスピーカーになれるこういった機会がある、というのは、本当に素晴らしいことだと思います。</p>
+
+<p>土日は家庭があるので、hajioji.pm は家から割と近いにも関わらず参加していなかったのですが、今度是非遊びに行きたいと思いました。（って書いてたら、後ろから見てた妻が、行ってきて良いよ、と言ってくれたので、今度行きます。）</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[YAPC::Asia 2012 Tokyo 前夜祭]]></title>
@@ -442,29 +469,6 @@ date: 2012-04-24 19:25:34 +0900
 </ul>
 
 <p>こんな感じで、かなり便利になった。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Git リポジトリ同期ツールつくった]]></title>
-    <link href="http://mizzy.org/blog/2012/04/23/2/" />
-    <updated>2012-04-23T19:32:00+09:00</updated>
-    <id>http://mizzy.org/blog/2012/04/23/2/</id>
-    <content type="html"><![CDATA[
-<p>欠勤してるのにブログを書いていて解雇された、という話があったなー、ということを思い出しながら、このエントリを書いてます。(体調悪くて会社休んだ上に、まだ回復してない。)</p>
-
-<p>最近仕事で <a href="https://github.com/">GitHub</a> を利用してるのですが、デプロイも GitHub 経由なため、GitHub がダウンしてしまうと、緊急で直さないといけないバグが発生したりすると困るなー、とか、それ以外にも、バックアップリポジトリがあればいろいろ安心かな、ということで、Git リポジトリを同期するツールをつくってみました。</p>
-
-<p><a href="https://github.com/mizzy/gitpusher">https://github.com/mizzy/gitpusher</a></p>
-
-<p>GitHub の自分のアカウント(または指定された Organization)以下のリポジトリを、すべて <a href="https://bitbucket.org/">Bitbucket</a> に同期する、という動作をします。</p>
-
-<p>今のところ、GitHub から Bitbucket への同期しか対応してませんが、逆方向の対応もそれほど難しくないと思います。</p>
-
-<p>あと、はじめて rubygems.org へアップしてみましたが、あまりにもあっさりアップできてしまったので、作法的な面で正しいのかどうか不安です。</p>
-
-<p><a href="https://rubygems.org/gems/gitpusher">https://rubygems.org/gems/gitpusher</a></p>
 
 ]]></content>
   </entry>
