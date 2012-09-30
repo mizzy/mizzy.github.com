@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-09-15T20:50:15+09:00</updated>
+  <updated>2012-09-30T20:47:56+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[YAPC::Asia 2012 Tokyo 前夜祭]]></title>
+    <link href="http://mizzy.org/blog/2012/09/30/1/" />
+    <updated>2012-09-30T20:47:56+09:00</updated>
+    <id>http://mizzy.org/blog/2012/09/30/1/</id>
+    <content type="html"><![CDATA[
+<p>ブログを書くまでが YAPC、ってことで、ぼちぼち書いていきます。まずは前夜祭から。</p>
+
+<p><a href="http://yapcasia.org/2012/talk/show/048d468c-ab9e-11e1-a3b5-2a656aeab6a4">Sqale の裏側</a> というタイトルで、ペパボが提供する Ruby/Rack アプリが動く PaaS <a href="http://sqale.jp/">Sqale</a> の裏側のアーキテクチャについてお話してきました。</p>
+
+<iframe src="http://www.slideshare.net/slideshow/embed_code/14492929" width="597" height="486" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="http://www.slideshare.net/mizzy/inside-sqales-backend-at-yapcasia-tokyo-2012" title="Inside Sqale&#39;s Backend at YAPC::Asia Tokyo 2012" target="_blank">Inside Sqale&#39;s Backend at YAPC::Asia Tokyo 2012</a> </strong> from <strong><a href="http://www.slideshare.net/mizzy" target="_blank">Gosuke Miyashita</a></strong> </div>
+
+<iframe width="640" height="360" src="http://www.youtube.com/embed/lxvT8mcilE4" frameborder="0" allowfullscreen></iframe>
+
+<p>YAPC で Perl がまったく出てこない話をしたのは、これがはじめてです。こんなトークを採択してくださって、本当にありがとうございます。</p>
+
+<p>内容的には、<a href="http://sapporo.rubykaigi.org/2012/ja/schedule/details/48.html">札幌 Ruby 会議 2012</a> でお話しした内容とほとんど同じで、Sqale で利用している技術のうち、主に以下の3つについてお話しました。</p>
+
+<ul>
+<li>LXC やカーネルパッチなどの OS レイヤー</li>
+<li>ウェブプロキシのダイナミックルーティングを Nginx + Lua + Redis で実現</li>
+<li>SSH のルーティングを如何に実現しているか</li>
+</ul>
+
+<p>スライドで紹介したリンクについて、こちらにもまとめておきます。</p>
+
+<ul>
+<li><a href="https://github.com/paperboy-sqale/sqale-patches">Sqale で利用しているカーネルパッチ</a></li>
+<li><a href="https://github.com/hiboma">ひろやん</a> が Nginx + Lua + Redis について書いている <a href="http://d.hatena.ne.jp/hiboma/searchdiary?word=nginx%20lua%20redis">はてダエントリ</a></li>
+<li><a href="https://github.com/mizzy/openssh-script-auth">OpenSSH Script Auth Patch</a></li>
+<li>SSH ルーティングの着想を得た <a href="https://github.com/blog/530-how-we-made-github-fast">GitHub CTO のブログエントリ</a></li>
+<li><a href="http://twitter.com/lamanotrama">@lamanotrama</a> さんによる <a href="https://docs.google.com/presentation/d/11QekgeD-ex8RWVABGWsn3VGcHWq6HDnSVZzZskPWNeg/present#slide=id.p">サーバ構築自動化(on AWS) Sqale の場合</a></li>
+</ul>
+
+<p>SSH Router 実現のためにあてている OpenSSH パッチ、似たようなパッチが実は、RedHat 系ディストリビューションで入る OpenSSH にあたっているのですが、期待している挙動と微妙に異なるため、独自にパッチをあてることにしました。</p>
+
+<p>また、Heroku では SSH Router と同じことを実現するために <a href="http://twistedmatrix.com/trac/">Twisted</a> を使っている、という情報を刺身が中の人から仕入れてきたので調べてみたところ、<a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.conch.ssh.html">twisted.conch.ssh</a>  という、SSHv2 実装がありました。</p>
+
+<p>独自パッチをあてる方式は、OpenSSH へのアップデートに追従するのがきついので、Twisted ベースに切り替えることも検討しており、そのために <a href="https://github.com/mizzy/funnel">funnel</a> というものを開発中です。（まだ API 検討中なのと、動作確認コード書いただけですが。）</p>
+
+<p>funnel という名称は、GitHub 社で Git のルーティングを実現しているライブラリの名前が Chimney で、それの類義語からとっています。アニメとかからとったわけではないです。</p>
+
+<p>札幌 Ruby 会議 2012 でも、YAPC::Asia Tokyo 2012 でも聞き逃したけど、やっぱり生で聞きたい、という方、ご安心ください。12/7, 8 に行われる、RubyConf.tw 2012 でも <a href="https://github.com/rubytaiwan/rubyconf.tw/blob/master/2012/speakers/schedule.md">同じ内容でプレゼン</a> する予定です。台湾でお待ちしています。</p>
+
+<p>札幌 Ruby 会議 2012 で登壇したペパボの同僚、<a href="https://github.com/hsbt">hsbt</a>, <a href="https://github.com/kentaro">kentaro</a>, <a href="https://github.com/kyanny">kyanny</a> も、同様に RubyConf.tw 2012 で登壇します。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[「Sqale の裏側」資料 at 札幌 Ruby 会議 2012]]></title>
@@ -416,21 +465,6 @@ date: 2012-04-24 19:25:34 +0900
 <p>あと、はじめて rubygems.org へアップしてみましたが、あまりにもあっさりアップできてしまったので、作法的な面で正しいのかどうか不安です。</p>
 
 <p><a href="https://rubygems.org/gems/gitpusher">https://rubygems.org/gems/gitpusher</a></p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[stellar-site 用の Guard ファイル作ってもらった]]></title>
-    <link href="http://mizzy.org/blog/2012/04/23/1/" />
-    <updated>2012-04-23T01:32:00+09:00</updated>
-    <id>http://mizzy.org/blog/2012/04/23/1/</id>
-    <content type="html"><![CDATA[
-<p>同僚の <a href="https://github.com/banyan">@banyan</a> が <a href="https://github.com/mizzy/stellar-site">stellar-site</a> 用に <a href="https://github.com/mizzy/stellar-site/pull/1">Guard ファイルつくってくれた</a>。</p>
-
-<p><a href="https://github.com/guard/guard-livereload">guard-livereload</a> で、ファイル更新されたら勝手にブラウザ側でもリロードしてくれる。</p>
-
-<p>これは便利ですね。</p>
 
 ]]></content>
   </entry>
