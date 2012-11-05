@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-11-02T01:09:24+09:00</updated>
+  <updated>2012-11-05T22:46:30+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Sqale + Route 53 で Naked Domain を割り当てる方法]]></title>
+    <link href="http://mizzy.org/blog/2012/11/05/1/" />
+    <updated>2012-11-05T22:46:30+09:00</updated>
+    <id>http://mizzy.org/blog/2012/11/05/1/</id>
+    <content type="html"><![CDATA[
+<p>ペパボ が提供する PaaS <a href="http://sqale.jp">Sqale</a> では ELB を利用しているため、Sqale 上でホストしているアプリに独自ドメインを割り当てる場合には CNAME を利用する必要があり、Naked Domain（ホスト名がないドメイン）を割り当てることができません。</p>
+
+<p>Amazon Route 53 が持つ A レコードの Alias 機能を利用すれば、Naked Domain の割り当ても可能になりますが、自分の管理下ではない ELB がターゲットとなるため、もし Sqale 側で ELB の再作成が行われたりすると、新たな ELB の FQDN を調べて、Alias レコードを更新する必要があり、対応が面倒です。（そもそも、ELB が再作成されても気づけない可能性が高い。）</p>
+
+<p>そこで以下のような、自動で Alias レコードを追加・修正するスクリプトを作成してみました。これを cron などで定期的に実行すれば、万が一 Sqale 側で ELB が再作成された場合でも、自動的に新しい ELB をターゲットとするようレコードを更新してくれます。（ご利用は自己責任でお願いします。）</p>
+
+<p>使い方は以下の通りです。</p>
+
+<ul>
+<li>SQALE_DOMAIN に割り当てられた sqale.jp のサブドメインを指定</li>
+<li>ORIGINAL_DOMAIN に割り当てたい Naked Domain を指定</li>
+<li>環境変数 AWS<em>ACCESS</em>KEY, AWS<em>SECRET</em>KEY に、AWS のアクセスキーと秘密キーを指定</li>
+</ul>
+
+<div><script src='https://gist.github.com/4016041.js?file=update-route-53-alisa-for-sqale.rb'></script>
+<noscript><pre><code>#!/usr/bin/env ruby
+
+require 'resolv'
+require 'route53'
+
+SQALE_DOMAIN    = 'i4pc-mizzy.sqale.jp.'
+ORIGINAL_DOMAIN = 'i4pc.net.'
+
+# This code is from
+# https://github.com/bgentry/fog/commit/26d366d3047f437154946b2bb15935c2ee34a209
+def hosted_zone_for_alias_target(dns_name)
+  k = elb_hosted_zone_mapping.keys.find do |k|
+    dns_name =~ /\A.+\.#{k}\.elb\.amazonaws\.com\.?\z/
+  end
+  elb_hosted_zone_mapping[k]
+end
+
+def elb_hosted_zone_mapping
+  @elb_hosted_zone_mapping ||= {
+    &quot;ap-northeast-1&quot; =&gt; &quot;Z2YN17T5R711GT&quot;,
+    &quot;ap-southeast-1&quot; =&gt; &quot;Z1WI8VXHPB1R38&quot;,
+    &quot;eu-west-1&quot;      =&gt; &quot;Z3NF1Z3NOM5OY2&quot;,
+    &quot;sa-east-1&quot;      =&gt; &quot;Z2ES78Y61JGQKS&quot;,
+    &quot;us-east-1&quot;      =&gt; &quot;Z3DZXE0Q79N41H&quot;,
+    &quot;us-west-1&quot;      =&gt; &quot;Z1M58G0W56PQJA&quot;,
+    &quot;us-west-2&quot;      =&gt; &quot;Z33MTJ483KN6FU&quot;,
+  }
+end
+
+elb = Resolv::DNS.new.getresources(
+  SQALE_DOMAIN,
+  Resolv::DNS::Resource::IN::CNAME
+)[0].name.to_s
+
+hosted_zone_id = hosted_zone_for_alias_target(elb)
+
+conn = Route53::Connection.new(ENV['AWS_ACCESS_KEY'], ENV['AWS_SECRET_KEY'])
+
+conn.get_zones.each do |zone|
+  next if zone.name != ORIGINAL_DOMAIN
+  found = false
+  zone.get_records.each do |record|
+    if record.name == ORIGINAL_DOMAIN and record.type == 'A'
+      record.update(nil, nil, nil, [ elb ], hosted_zone_id)
+    end
+  end
+
+  unless found
+    record = Route53::DNSRecord.new(
+      ORIGINAL_DOMAIN,
+      'A',
+      nil,
+      [ elb ],
+      zone,
+      hosted_zone_id
+    )
+    record.create
+  end
+end
+</code></pre></noscript></div>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[ペパボでの GitHub の使い方]]></title>
@@ -396,78 +481,6 @@
 <p>書評系のエントリ書くのは苦手で、薄っぺらいことしか書けないので、とりあえず宣伝＆自慢のみです。</p>
 
 <p>トランスフォーマーの被り物にはなんの意味もありません。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[37歳の大学入学 ー 出願から入学まで]]></title>
-    <link href="http://mizzy.org/blog/2012/04/25/1/" />
-    <updated>2012-04-25T22:46:53+09:00</updated>
-    <id>http://mizzy.org/blog/2012/04/25/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="/blog/2012/04/24/2/">前回</a> は大学選びについて書いたので、今回は大学に入学するまでの過程について書きます。</p>
-
-<p>大学を決めたら次にやることは、募集要項や出願書類などの資料請求ですね。自分は <a href="http://www.amazon.co.jp/dp/4862073735">社会人&amp;学生のための大学・大学院選び 2012年度版</a> に掲載されている資料請求用サイトから請求しました。複数の学校にまとめて請求ができるので便利です。（念のため、サイバー大学の資料も併せて請求しました。）1 校だけであれば、ウェブサイトに資料請求窓口がある大学もありますので、そちらを利用しても良いですね。</p>
-
-<p>資料が届いたら、出願書類を揃えていきます。自分が提出したのは、以下のようなものです。正科生なのか科目履修生なのかとか、2年次以降からの編入なのかとか、人によって多少異なります。</p>
-
-<ul>
-<li><p>資料に含まれているもので、必要事項を記入したり、写真や切手を貼付して提出したもの</p>
-
-<ul>
-<li>志望理由書（400字程度）</li>
-<li>通知カード
-
-<ul>
-<li>自分の住所氏名を書いた宛名シールですね。入学許可書などが同封された封筒に貼られます。</li>
-</ul></li>
-<li>出願書類通知書
-
-<ul>
-<li>出願書類を大学側で受け取ったあと、書類に不備がなかったかどうかを知らせてくれるハガキです。切手を貼って提出します。</li>
-</ul></li>
-<li>身上調査書および誓約書
-
-<ul>
-<li>身上調査書には、住所、氏名、学歴、緊急連絡先、家族構成といったものを記入します。</li>
-<li>誓約書には、自分の住所、氏名、捺印等の他に、保証人の住所、氏名、捺印等も必要です。保証人は近くに住む伯父にお願いしました。</li>
-</ul></li>
-<li>入学時アンケート</li>
-</ul></li>
-<li><p>お金の振込みが必要なもの</p>
-
-<ul>
-<li>志願票
-
-<ul>
-<li>振込依頼書とセットになっていて、金融機関で収納印を押してもらう必要があります。</li>
-<li>自分の場合、正科生の2年次編入学で、選考料や授業料など含めて、20 万円弱でした。入学が許可されなかったり、辞退した場合には、このうちの授業料分およそ15 万円は返却されるようです。</li>
-</ul></li>
-</ul></li>
-<li><p>自分で取り寄せたりしたもの</p>
-
-<ul>
-<li>卒業証明書</li>
-<li>成績証明書</li>
-<li>健康診断書
-
-<ul>
-<li>健康診断書は、所定の用紙があり、3ヶ月以内に発行のもの、という条件があるため、会社で受けたものは使えませんでした。また、定められた項目がどの病院でも診断してもらえる、というわけではないですし、診断には予約が必要だったりするので、これは早めに用意するのがいいですね。</li>
-</ul></li>
-<li>講義概要またはシラバス（学士入学・編入学希望者のみ）
-
-<ul>
-<li>これは、編入学の場合に、以前の大学で取得した単位を、入学する大学の単位として認定してもらうために必要になるのですが、提出しないと認定してもらえない、というわけではないです。成績証明書からわかる科目名だけでも認定してもらえます。成績証明書だけでは不足の場合に、補強するための資料として必要なようです。自分は提出していません。</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<p>これらを提出した後に、1, 2 週間ほどで出願書類通知書が返送されてきて、提出書類に特に不備はなかったことと、入学許可書等の発送は、◯月×日頃になる、ということが知らされました。無試験であり、2年次編入学の募集枠は若干名となっていて、合格基準がさっぱりわからず、書類送付してから若干不安な日々を送っていたのですが、この通知書によって、どうやら入学が許可されるらしい、ということがわかり、一安心でした。</p>
-
-<p>その後、入学許可書等が予定通り送られ、同封された紙に「単位認定を希望するものは出身大学のシラバスを送付してください」と書かれているのですが、事情により出身大学のシラバスの取得が厳しそうだったため、教務課にメールで確認してみたところ、成績証明書だけでも、上限の32単位まで認定してもらえる、ということがわかり、シラバスを送付する必要はありませんでした。</p>
-
-<p>次回は科目履修や学習計画について書く予定です。</p>
 
 ]]></content>
   </entry>
