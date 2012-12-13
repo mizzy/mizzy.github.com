@@ -1,22 +1,71 @@
-<html lang="ja">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>mod_dosdetector を Apache 2.0 系で動かすパッチ - Gosuke Miyashita</title>
-<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
-<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
-<script type="text/javascript" src="/js/tass.js"></script>
-<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title></title>
+
+  <!-- TODO: change name and description -->
+  <meta name="author" content="Zach Holman" />
+  <meta name="description" content="A fantastic blog that is fantastic." />
+
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
+
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
+  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/application.js"></script>
 </head>
+
 <body>
-<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+  <section class="sidebar">
+    <a href="/">
+      <!-- TODO: change this gravatar URL -->
+      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+    </a>
 
-<div class="content autopagerize_page_element">
+    <!-- TODO: change name -->
+    <section class="name">
+      <a href="/">
+        <span id="zach">Gosuke</span>
+        <span id="holman">Miyashita</span>
+      </a>
+    </section>
 
-  <time>Jul 26<span>th</span>, 2007</time>
-  <h1 class="entry-title"><a href="/blog/2007/07/26/1">mod_dosdetector を Apache 2.0 系で動かすパッチ</a></h1>
+    <!-- TODO: change links -->
+    <section class="meta">
+      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
+      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
+      <a href="/atom.xml"><img src="/images/rss.png" /></a>
+    </section>
 
-  <div class="content">
-    <p>&quot;mod_dosdetecter 0.2&quot;:<a href="http://sourceforge.net/projects/moddosdetector/">http://sourceforge.net/projects/moddosdetector/</a> を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、</p>
+    <!--
+    <section class="sections">
+      <ul>
+        <li><a href="/about.html">about</a></li>
+        <li><a href="/">posts</a></li>
+      </ul>
+    </section>
+    -->
+
+  </section>
+
+<section class="content autopagerize_page_element">
+  <h1>
+    <a href="/blog/2007/07/26/1">mod_dosdetector を Apache 2.0 系で動かすパッチ</a>
+  </h1>
+
+  <section class="byline">
+    
+  </section>
+
+  <p>&quot;mod_dosdetecter 0.2&quot;:<a href="http://sourceforge.net/projects/moddosdetector/">http://sourceforge.net/projects/moddosdetector/</a> を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、</p>
 
 <ul>
 <li>/usr/local/apache/include/pcreposix.h:41: error: redeclaration of enumerator `REG_BADBR&#39; といったエラーが大量に出てくるが、これは /usr/include/regex.h と宣言が重複しているため。なので、#include &lt;regex.h&gt; は削除。</li>
@@ -173,8 +222,6 @@
 
 <p>2.0 系でも 2.2 系でもどっちでも動くように修正した方がいいんだろうけど、それはまた今度。</p>
 
-  </div>
-
 
   <div class="pagination">
     
@@ -186,9 +233,6 @@
     
   </div>
 
-</div>
-
-<div class="autopagerize_insert_before"></div>
-
 </body>
+
 </html>

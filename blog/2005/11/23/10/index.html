@@ -1,22 +1,71 @@
-<html lang="ja">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>タグの関連性の可視化 #2 - Gosuke Miyashita</title>
-<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
-<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
-<script type="text/javascript" src="/js/tass.js"></script>
-<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title></title>
+
+  <!-- TODO: change name and description -->
+  <meta name="author" content="Zach Holman" />
+  <meta name="description" content="A fantastic blog that is fantastic." />
+
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
+
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
+  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/application.js"></script>
 </head>
+
 <body>
-<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+  <section class="sidebar">
+    <a href="/">
+      <!-- TODO: change this gravatar URL -->
+      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+    </a>
 
-<div class="content autopagerize_page_element">
+    <!-- TODO: change name -->
+    <section class="name">
+      <a href="/">
+        <span id="zach">Gosuke</span>
+        <span id="holman">Miyashita</span>
+      </a>
+    </section>
 
-  <time>Nov 23<span>rd</span>, 2005</time>
-  <h1 class="entry-title"><a href="/blog/2005/11/23/10">タグの関連性の可視化 #2</a></h1>
+    <!-- TODO: change links -->
+    <section class="meta">
+      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
+      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
+      <a href="/atom.xml"><img src="/images/rss.png" /></a>
+    </section>
 
-  <div class="content">
-    <p class="entryBody">
+    <!--
+    <section class="sections">
+      <ul>
+        <li><a href="/about.html">about</a></li>
+        <li><a href="/">posts</a></li>
+      </ul>
+    </section>
+    -->
+
+  </section>
+
+<section class="content autopagerize_page_element">
+  <h1>
+    <a href="/blog/2005/11/23/10">タグの関連性の可視化 #2</a>
+  </h1>
+
+  <section class="byline">
+    
+  </section>
+
+  <p class="entryBody">
 <a href="http://mizzy.org/web/tagRelationVisualization01.html" target="_blank">前回のエントリ</a>に対して、<a href="http://blog.7style.org/index.cgi/20050531130621.html" target="_blank">Blog Room  - タグのデザイン</a>で良いアイデアを頂きましたので、ちょいと実装してみました。(Blog Roomのdbさん、ありがとうございます！)
 </p>
 
@@ -37,8 +86,6 @@ Takaさんから頂いたご意見をもとに、関連のないタグは消す�
 <span onmouseover='tag_over("ajax");' onmouseout='tag_out();' style='font-size: 3.10258509299405em;cursor: pointer;' id='ajax'>ajax</span> <span onmouseover='tag_over("alpha geeks");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='alpha geeks'>alpha geeks</span> <span onmouseover='tag_over("blog");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='blog'>blog</span> <span onmouseover='tag_over("bloglines");' onmouseout='tag_out();' style='font-size: 1.89861228866811em;cursor: pointer;' id='bloglines'>bloglines</span> <span onmouseover='tag_over("blosxom");' onmouseout='tag_out();' style='font-size: 3.74443897916644em;cursor: pointer;' id='blosxom'>blosxom</span> <span onmouseover='tag_over("catalyst");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='catalyst'>catalyst</span> <span onmouseover='tag_over("category");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='category'>category</span> <span onmouseover='tag_over("cgi::application");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='cgi::application'>cgi::application</span> <span onmouseover='tag_over("daapd");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='daapd'>daapd</span> <span onmouseover='tag_over("db");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='db'>db</span> <span onmouseover='tag_over("dbx");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='dbx'>dbx</span> <span onmouseover='tag_over("del.icio.us");' onmouseout='tag_out();' style='font-size: 1.89861228866811em;cursor: pointer;' id='del.icio.us'>del.icio.us</span> <span onmouseover='tag_over("entries_in_this_page");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='entries_in_this_page'>entries_in_this_page</span> <span onmouseover='tag_over("firefox");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='firefox'>firefox</span> <span onmouseover='tag_over("greasemonkey");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='greasemonkey'>greasemonkey</span> <span onmouseover='tag_over("hackers");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='hackers'>hackers</span> <span onmouseover='tag_over("html::prototype");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='html::prototype'>html::prototype</span> <span onmouseover='tag_over("itunes");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='itunes'>itunes</span> <span onmouseover='tag_over("javascript");' onmouseout='tag_out();' style='font-size: 2.59175946922806em;cursor: pointer;' id='javascript'>javascript</span> <span onmouseover='tag_over("jkl.parsexml");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='jkl.parsexml'>jkl.parsexml</span> <span onmouseover='tag_over("json");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='json'>json</span> <span onmouseover='tag_over("linux");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='linux'>linux</span> <span onmouseover='tag_over("mac");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='mac'>mac</span> <span onmouseover='tag_over("mobile");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='mobile'>mobile</span> <span onmouseover='tag_over("perl");' onmouseout='tag_out();' style='font-size: 2.59175946922806em;cursor: pointer;' id='perl'>perl</span> <span onmouseover='tag_over("plugin");' onmouseout='tag_out();' style='font-size: 3.69037175789616em;cursor: pointer;' id='plugin'>plugin</span> <span onmouseover='tag_over("rast");' onmouseout='tag_out();' style='font-size: 1.89861228866811em;cursor: pointer;' id='rast'>rast</span> <span onmouseover='tag_over("redirect_permalink");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='redirect_permalink'>redirect_permalink</span> <span onmouseover='tag_over("relationship");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='relationship'>relationship</span> <span onmouseover='tag_over("rendezvous");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='rendezvous'>rendezvous</span> <span onmouseover='tag_over("rss");' onmouseout='tag_out();' style='font-size: 1.89861228866811em;cursor: pointer;' id='rss'>rss</span> <span onmouseover='tag_over("sack of ajax");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='sack of ajax'>sack of ajax</span> <span onmouseover='tag_over("safari");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='safari'>safari</span> <span onmouseover='tag_over("same_topic");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='same_topic'>same_topic</span> <span onmouseover='tag_over("shelf");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='shelf'>shelf</span> <span onmouseover='tag_over("sitebar");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='sitebar'>sitebar</span> <span onmouseover='tag_over("sledge");' onmouseout='tag_out();' style='font-size: 1.89861228866811em;cursor: pointer;' id='sledge'>sledge</span> <span onmouseover='tag_over("tagging");' onmouseout='tag_out();' style='font-size: 3.36494935746154em;cursor: pointer;' id='tagging'>tagging</span> <span onmouseover='tag_over("technorati");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='technorati'>technorati</span> <span onmouseover='tag_over("template toolkit");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='template toolkit'>template toolkit</span> <span onmouseover='tag_over("visualization");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='visualization'>visualization</span> <span onmouseover='tag_over("xbel");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='xbel'>xbel</span> <span onmouseover='tag_over("xml");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='xml'>xml</span> <span onmouseover='tag_over("xmlhttprequest");' onmouseout='tag_out();' style='font-size: 2.18629436111989em;cursor: pointer;' id='xmlhttprequest'>xmlhttprequest</span> <span onmouseover='tag_over("ウェブサイト");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='ウェブサイト'>ウェブサイト</span> <span onmouseover='tag_over("ウェブメール");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='ウェブメール'>ウェブメール</span> <span onmouseover='tag_over("オンラインブックマーク");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='オンラインブックマーク'>オンラインブックマーク</span> <span onmouseover='tag_over("サイドバー");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='サイドバー'>サイドバー</span> <span onmouseover='tag_over("ソーシャルブックマーク");' onmouseout='tag_out();' style='font-size: 1.89861228866811em;cursor: pointer;' id='ソーシャルブックマーク'>ソーシャルブックマーク</span> <span onmouseover='tag_over("ブログ");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='ブログ'>ブログ</span> <span onmouseover='tag_over("モジュール");' onmouseout='tag_out();' style='font-size: 1.49314718055995em;cursor: pointer;' id='モジュール'>モジュール</span> <span onmouseover='tag_over("文字化け");' onmouseout='tag_out();' style='font-size: 0.8em;cursor: pointer;' id='文字化け'>文字化け</span> 
 </p>
 
-  </div>
-
 
   <div class="pagination">
     
@@ -50,9 +97,6 @@ Takaさんから頂いたご意見をもとに、関連のないタグは消す�
     
   </div>
 
-</div>
-
-<div class="autopagerize_insert_before"></div>
-
 </body>
+
 </html>

@@ -1,22 +1,71 @@
-<html lang="ja">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>Pushmi つかってます & 技術者募集中 at 福岡 - Gosuke Miyashita</title>
-<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
-<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
-<script type="text/javascript" src="/js/tass.js"></script>
-<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title></title>
+
+  <!-- TODO: change name and description -->
+  <meta name="author" content="Zach Holman" />
+  <meta name="description" content="A fantastic blog that is fantastic." />
+
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
+
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
+  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/application.js"></script>
 </head>
+
 <body>
-<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+  <section class="sidebar">
+    <a href="/">
+      <!-- TODO: change this gravatar URL -->
+      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+    </a>
 
-<div class="content autopagerize_page_element">
+    <!-- TODO: change name -->
+    <section class="name">
+      <a href="/">
+        <span id="zach">Gosuke</span>
+        <span id="holman">Miyashita</span>
+      </a>
+    </section>
 
-  <time>Aug 3<span>rd</span>, 2007</time>
-  <h1 class="entry-title"><a href="/blog/2007/08/03/1">Pushmi つかってます & 技術者募集中 at 福岡</a></h1>
+    <!-- TODO: change links -->
+    <section class="meta">
+      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
+      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
+      <a href="/atom.xml"><img src="/images/rss.png" /></a>
+    </section>
 
-  <div class="content">
-    <p>&quot;弊社&quot;:<a href="http://www.paperboy.co.jp/">http://www.paperboy.co.jp/</a> は東京と福岡にオフィスがあり、それぞれの拠点に Subversion + Trac 環境を構築し、&quot;OpenVPN&quot;:<a href="http://openvpn.net/">http://openvpn.net/</a> により VPN 接続してお互いの開発状況を公開しています。サービス絡みの開発は基本的に、東京は東京、福岡は福岡で完結しているので、この方式で問題はないのですが、サーバ管理関連のスクリプトなんかは、東京と福岡で共通するものが多いため、別々の SVN リポジトリで管理されてると不便なんですよね。かといって、どちらかの拠点だけしかリポジトリがないと、VPN の障害発生時に、リポジトリのない拠点からはまったくアクセスができない、という困ったことになってしまいます。</p>
+    <!--
+    <section class="sections">
+      <ul>
+        <li><a href="/about.html">about</a></li>
+        <li><a href="/">posts</a></li>
+      </ul>
+    </section>
+    -->
+
+  </section>
+
+<section class="content autopagerize_page_element">
+  <h1>
+    <a href="/blog/2007/08/03/1">Pushmi つかってます & 技術者募集中 at 福岡</a>
+  </h1>
+
+  <section class="byline">
+    
+  </section>
+
+  <p>&quot;弊社&quot;:<a href="http://www.paperboy.co.jp/">http://www.paperboy.co.jp/</a> は東京と福岡にオフィスがあり、それぞれの拠点に Subversion + Trac 環境を構築し、&quot;OpenVPN&quot;:<a href="http://openvpn.net/">http://openvpn.net/</a> により VPN 接続してお互いの開発状況を公開しています。サービス絡みの開発は基本的に、東京は東京、福岡は福岡で完結しているので、この方式で問題はないのですが、サーバ管理関連のスクリプトなんかは、東京と福岡で共通するものが多いため、別々の SVN リポジトリで管理されてると不便なんですよね。かといって、どちらかの拠点だけしかリポジトリがないと、VPN の障害発生時に、リポジトリのない拠点からはまったくアクセスができない、という困ったことになってしまいます。</p>
 
 <p>そこで、SVN リポジトリレプリケーションツール &quot;Pushmi&quot;:<a href="http://search.cpan.org/dist/Pushmi/lib/Pushmi.pm">http://search.cpan.org/dist/Pushmi/lib/Pushmi.pm</a> を導入してみました。詳細は &quot;YAPC::Asia での 作者 Cl Kao によるスピーチ動画&quot;:<a href="http://video.google.com/videoplay?docid=-7181301487103062288&amp;q=yapc+asia+2007&amp;total=46&amp;start=0&amp;num=50&amp;so=1&amp;type=search&amp;plindex=13">http://video.google.com/videoplay?docid=-7181301487103062288&amp;q=yapc+asia+2007&amp;total=46&amp;start=0&amp;num=50&amp;so=1&amp;type=search&amp;plindex=13</a> を見て頂くとして、ここでは行った設定についてメモを残しておきます。ほとんど perldoc Pushmi の内容と同じですが。</p>
 
@@ -93,8 +142,6 @@ Retrieving log information from 1 to 62
 
 <p>話変わりまして、弊社福岡支社では、&quot;プログラマ&quot;:<a href="http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=1&amp;ty=0&amp;rm=0">http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=1&amp;ty=0&amp;rm=0</a> と &quot;サーバエンジニア&quot;:<a href="http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=2&amp;ty=0&amp;rm=0">http://tenshoku.mynavi.jp/jobset/index.cfm?fuseaction=mrjt_Jobinfo_form&amp;client_id=87984&amp;plan_id=1&amp;contract_id=1&amp;job_seq_no=2&amp;ty=0&amp;rm=0</a> を募集しています。Pushmi を実戦で使ってみたい！という方はぜひ。メガネ女子プログラマもいますよ。（東京本社にもいます。人妻ですが。）</p>
 
-  </div>
-
 
   <div class="pagination">
     
@@ -106,9 +153,6 @@ Retrieving log information from 1 to 62
     
   </div>
 
-</div>
-
-<div class="autopagerize_insert_before"></div>
-
 </body>
+
 </html>

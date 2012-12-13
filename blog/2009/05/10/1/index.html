@@ -1,22 +1,71 @@
-<html lang="ja">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>AddModRewriteInternalFunction - Gosuke Miyashita</title>
-<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
-<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
-<script type="text/javascript" src="/js/tass.js"></script>
-<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title></title>
+
+  <!-- TODO: change name and description -->
+  <meta name="author" content="Zach Holman" />
+  <meta name="description" content="A fantastic blog that is fantastic." />
+
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
+
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
+  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/application.js"></script>
 </head>
+
 <body>
-<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+  <section class="sidebar">
+    <a href="/">
+      <!-- TODO: change this gravatar URL -->
+      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+    </a>
 
-<div class="content autopagerize_page_element">
+    <!-- TODO: change name -->
+    <section class="name">
+      <a href="/">
+        <span id="zach">Gosuke</span>
+        <span id="holman">Miyashita</span>
+      </a>
+    </section>
 
-  <time>May 10<span>th</span>, 2009</time>
-  <h1 class="entry-title"><a href="/blog/2009/05/10/1">AddModRewriteInternalFunction</a></h1>
+    <!-- TODO: change links -->
+    <section class="meta">
+      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
+      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
+      <a href="/atom.xml"><img src="/images/rss.png" /></a>
+    </section>
 
-  <div class="content">
-    <p>Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html#rewritemap">RewriteMap</a> での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、という形なので、並列処理させることができません。これは rewrite 処理するときにデータベースへ問い合わせるなど、I/O ブロッキングが発生するような処理をさせたいときには致命的なパフォーマンス劣化を引き起こすことになります。</p>
+    <!--
+    <section class="sections">
+      <ul>
+        <li><a href="/about.html">about</a></li>
+        <li><a href="/">posts</a></li>
+      </ul>
+    </section>
+    -->
+
+  </section>
+
+<section class="content autopagerize_page_element">
+  <h1>
+    <a href="/blog/2009/05/10/1">AddModRewriteInternalFunction</a>
+  </h1>
+
+  <section class="byline">
+    
+  </section>
+
+  <p>Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html#rewritemap">RewriteMap</a> での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、という形なので、並列処理させることができません。これは rewrite 処理するときにデータベースへ問い合わせるなど、I/O ブロッキングが発生するような処理をさせたいときには致命的なパフォーマンス劣化を引き起こすことになります。</p>
 
 <p>これを解決するためには、Apache モジュールの中で望みの rewrite 処理をさせるようにすればいいのでは、と思い、RewriteMap にある int タイプに好きな internal function を追加できればいけるんじゃないないか、と考えたものの、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html">mod_rewrite のリファレンス</a> では、「you cannot create your own」とか書かれていて、追加できないっぽい。かと言って mod_rewrite.c に手を入れるのもやだなー、と思っていたところ、<a href="http://code.google.com/p/modicpquery/wiki/Internals">mod_icpquery のドキュメント</a> を見つけた。これを見ると、好きな internal function を独立したモジュールの形で追加できそう、ってことでやってみたらできた。</p>
 
@@ -91,8 +140,6 @@ RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]
 
 <p><a href="http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master">http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master</a></p>
 
-  </div>
-
 
   <div class="pagination">
     
@@ -104,9 +151,6 @@ RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]
     
   </div>
 
-</div>
-
-<div class="autopagerize_insert_before"></div>
-
 </body>
+
 </html>

@@ -1,22 +1,71 @@
-<html lang="ja">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>Cobbler - Gosuke Miyashita</title>
-<link rel="stylesheet" href="/css/fonts.css" type="text/css" charset="utf-8">
-<link rel="stylesheet/tass" type="text/x-tass" href="/css/style.tass"/>
-<script type="text/javascript" src="/js/tass.js"></script>
-<link href="/atom.xml" rel="alternate" title="Gosuke Miyashita" type="application/atom+xml">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title></title>
+
+  <!-- TODO: change name and description -->
+  <meta name="author" content="Zach Holman" />
+  <meta name="description" content="A fantastic blog that is fantastic." />
+
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
+
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
+  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/application.js"></script>
 </head>
+
 <body>
-<h1 class="site-title"><a href="/">Gosuke Miyashita</a></h1>
+  <section class="sidebar">
+    <a href="/">
+      <!-- TODO: change this gravatar URL -->
+      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+    </a>
 
-<div class="content autopagerize_page_element">
+    <!-- TODO: change name -->
+    <section class="name">
+      <a href="/">
+        <span id="zach">Gosuke</span>
+        <span id="holman">Miyashita</span>
+      </a>
+    </section>
 
-  <time>Dec 29<span>th</span>, 2007</time>
-  <h1 class="entry-title"><a href="/blog/2007/12/29/1">Cobbler</a></h1>
+    <!-- TODO: change links -->
+    <section class="meta">
+      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
+      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
+      <a href="/atom.xml"><img src="/images/rss.png" /></a>
+    </section>
 
-  <div class="content">
-    <p>ネットワークインストール環境がさくっと構築できる <a href="http://cobbler.et.redhat.com/">Cobbler</a> がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。</p>
+    <!--
+    <section class="sections">
+      <ul>
+        <li><a href="/about.html">about</a></li>
+        <li><a href="/">posts</a></li>
+      </ul>
+    </section>
+    -->
+
+  </section>
+
+<section class="content autopagerize_page_element">
+  <h1>
+    <a href="/blog/2007/12/29/1">Cobbler</a>
+  </h1>
+
+  <section class="byline">
+    
+  </section>
+
+  <p>ネットワークインストール環境がさくっと構築できる <a href="http://cobbler.et.redhat.com/">Cobbler</a> がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。</p>
 
 <ul>
 <li><a href="http://www.cafechantant.com/blog/2007/08/09/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae5/">サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）</a></li>
@@ -212,8 +261,6 @@ server          : &lt;&lt;inherit&gt;&gt;
 <pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386
 </code></pre>
 
-  </div>
-
 
   <div class="pagination">
     
@@ -225,9 +272,6 @@ server          : &lt;&lt;inherit&gt;&gt;
     
   </div>
 
-</div>
-
-<div class="autopagerize_insert_before"></div>
-
 </body>
+
 </html>
