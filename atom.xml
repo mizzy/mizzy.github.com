@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2012-11-05T22:46:30+09:00</updated>
+  <updated>2012-12-31T12:20:20+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,99 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[2012年のふりかえり]]></title>
+    <link href="http://mizzy.org/blog/2012/12/31/1/" />
+    <updated>2012-12-31T12:20:20+09:00</updated>
+    <id>http://mizzy.org/blog/2012/12/31/1/</id>
+    <content type="html"><![CDATA[
+<p>1年間のまとめ的なエントリは今まで書いたことがなかったけど、今年は色々あったし、後から振り返ってターニングポイントだったな、と思えそうな年になったので、特に印象に残ってることをまとめてみることにします。</p>
+
+<hr>
+
+<h2>ペパボでの新しい技術者評価制度のスタートと技術基盤整備エンジニアというポジションの創設</h2>
+
+<p>まずは 2012/01/06 のこの予感めいた tweet。</p>
+
+<p><blockquote class="twitter-tweet"><p>今年は転機になりそうな気がする、なんとなく。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/status/155287369682124800" data-datetime="2012-01-06T13:59:28+00:00">January 6, 2012</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>これは無根拠にこんなことを言ってたわけではなく、ペパボで新しく技術者のための評価制度ができたこと、そしてこの評価制度をベースとして、「技術基盤整備エンジニア」というポジションをつくることが承認されたこと、が背景にあっての tweet です。技術者評価制度と技術基盤整備エンジニアについては、以下のエントリにまとめています。</p>
+
+<ul>
+<li><a href="/blog/2012/01/17/1/">Paperboy is hiring</a></li>
+<li><a href="/blog/2012/02/29/1/">Paperboy&#39;s engineer evaluation system</a></li>
+<li><a href="/blog/2012/08/20/1/">Paperboy&#39;s engineer evaluation system その後</a></li>
+</ul>
+
+<hr>
+
+<h2>あんちぽさんとhsbtさんがペパボに入社</h2>
+
+<p>上で書いた技術基盤整備エンジニアとして、<a href="https://twitter.com/kentaro">あんちぽ</a> さんと <a href="https://twitter.com/hsbt">hsbt</a> さんがペパボに入社してくれました。</p>
+
+<ul>
+<li><a href="http://www.hsbt.org/diary/20120501.html">株式会社paperboy&amp;co.に入社しましたのお知らせ - HsbtDiary(2012-05-01)</a></li>
+<li><a href="http://blog.kentarok.org/entry/2012/05/01/145925">株式会社paperboy&amp;co.に入社しました - delirious thoughts</a></li>
+</ul>
+
+<p>今までペパボの技術責任者として、ペパボ全体の技術を見る立場だったのですが、自分はどちらかというと OS やミドルウェアレイヤーの技術がテリトリーで、開発についてはそれほど得意ではなく、十分にケアすることができてなかったのですが、あんちぽさん、hsbt さんにペパボの開発全般を見てもらえるようになり、とても助かっています。</p>
+
+<p>特に、自分の能力不足やリソース不足で、これはやるべきだろうと思いながらもできなかった数々のことを、二人がガンガンやってくれるので、とても頼もしく、ペパボの技術にとってなくてはならない存在になっています。</p>
+
+<hr>
+
+<h2>大学生になった</h2>
+
+<p>色々思うところがあって、<a href="/blog/2012/04/14/1/">4月から大学生になりました</a>。いまのところ、学業の方も順調に進んでいて、1年目で目標としてる単位数はなんとか取得できそうだな、という感触なのですが、大学に再入学してぶっちゃけどうか、といったエントリを、大学生活が1年経過した4月ぐらいに書く予定です。</p>
+
+<p>また、<a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol72">WEB+DB PRESS Vol.72</a> のインタビュー記事でも、このことについてとりあげて頂きました。</p>
+
+<hr>
+
+<h2>Sqale のリリース</h2>
+
+<p>ペパボ初/発の PaaS である <a href="http://sqale.jp/">Sqale</a> をリリースしました。これまでのペパボにはなかったタイプのサービスで、技術的な面でも新しいチャレンジができて、とても楽しく仕事ができました。</p>
+
+<p>過去にペパボでがっつりと関わったサービスには、<a href="http://30d.jp/">30days Album</a> や <a href="http://lolipop.jp/">ロリポップの大幅リニューアル</a>があるのですが、このどちらもアーキテクトとして技術全般を見つつも、実装もがっつりやる、という感じで、なかなか大変だったのですが、今回は頼もしいメンバーに恵まれ、アーキテクトにほぼ徹することができました。（OpenSSH や Linux カーネルのパッチ書いたり、AMIつくったり、といったこともやってましたが。）</p>
+
+<hr>
+
+<h2>札幌Ruby会議2012でスピーカーに</h2>
+
+<p>ペパボが徐々に Ruby にスイッチしてることもあり、<a href="http://sqale.jp/">Sqale</a> でもふんだんに Ruby を使っている、ということもあって、<a href="http://sapporo.rubykaigi.org/2012/ja/">札幌Ruby会議2012</a> で発表してきました。Ruby 関係の集まりで発表したのはこれが初めてです。（自分の発表ではほとんど Ruby の話はしてないですが。）</p>
+
+<iframe src="http://player.vimeo.com/video/51481486" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/51481486">[sprk2012] Inside Sqale's Backend</a> from <a href="http://vimeo.com/suzuki">suzuki</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+
+ <iframe src="http://www.slideshare.net/slideshow/embed_code/14290440" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
+
+<p>自分以外にも、<a href="https://twitter.com/kentaro">あんちぽ</a> さん、<a href="https://twitter.com/hsbt">hsbt</a> さん、<a href="https://twitter.com/kyanny">刺身</a> と、トータル4人がペパボから登壇していて、Rubyコミュニティの方々に、ペパボを印象づけることができたのではないかと思います。</p>
+
+<hr>
+
+<h2>YAPC::Asia Tokyo 2012 でゲストスピーカーに</h2>
+
+<p><a href="http://yapcasia.org/2012/">YAPC::Asia Tokyo 2012</a> でゲストスピーカーとして招いて頂き、クロージングキーノートをつとめることに。牧さんからお話を頂いたときは、びっくりするとともに、とても名誉なことで、二つ返事でOKしました。自分が今までスピーカーをやった中でも、最高の出来事です。</p>
+
+<iframe width="500" height="281" src="http://www.youtube.com/embed/wxUxFdFxd0Y" frameborder="0" allowfullscreen></iframe>
+
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/14532075" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe></p>
+
+<hr>
+
+<h2>RubyConf Taiwan 2012 で海外スピーカーデビュー</h2>
+
+<p><a href="http://rubyconf.tw/2012/">RubyConf Taiwan 2012</a> で、初めて海外でスピーカーデビューしてきました。</p>
+
+<iframe src="http://www.slideshare.net/slideshow/embed_code/15544447" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
+
+<hr>
+
+<p>今年は、仕事面でもプライベート面でも大きな変化があったけど、技術者評価制度にしても、学生になったことにしても、まだ種を蒔いただけ、という段階。技術者評価制度は、ペパボのビジネスに貢献して業績向上につながるようじゃないと意味がないし、大学も卒業しないと意味がないので、現状に甘んじることなく前に進んでいく所存。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Sqale + Route 53 で Naked Domain を割り当てる方法]]></title>
@@ -460,27 +553,6 @@ end
 </ul>
 
 <p>とまあすごい顔ぶれで、なんで自分なんかが選ばれたんだろう、という感じなんですが、気負わず自分らしい話ができればいいな、と思っています。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[「Mobageを支える技術」を献本いただいた]]></title>
-    <link href="http://mizzy.org/blog/2012/06/12/1/" />
-    <updated>2012-06-12T22:02:03+09:00</updated>
-    <id>http://mizzy.org/blog/2012/06/12/1/</id>
-    <content type="html"><![CDATA[
-<p><img src="http://distilleryimage6.s3.amazonaws.com/871bb9a0b47511e1aebc1231381b647a_7.jpg"></p>
-
-<p><a href="http://gihyo.jp/book/2012/978-4-7741-5111-3">「Mobageを支える技術 ～ソーシャルゲームの舞台裏～」</a> を <a href="http://twitter.com/nekokak">@nekokak</a> さんよりご献本いただきました。ありがとうございます！</p>
-
-<p>写真は <a href="http://kentaro.hatenablog.com/">antipop</a> (<a href="http://twitter.com/kentaro">@kentaro</a>)さん撮影。</p>
-
-<p>先週会社に届いてたのですが、福岡出張だったのと、昨日は体調不良により一回休みだったので、本日ようやく手にしました。</p>
-
-<p>書評系のエントリ書くのは苦手で、薄っぺらいことしか書けないので、とりあえず宣伝＆自慢のみです。</p>
-
-<p>トランスフォーマーの被り物にはなんの意味もありません。</p>
 
 ]]></content>
   </entry>
