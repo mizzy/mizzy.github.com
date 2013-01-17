@@ -67,26 +67,33 @@
   <p>
 /etc/sudoers を LDAP で一元管理とかできないのかなぁ、と思っていたら、<a class="ext-link" href="http://www.gratisoft.us/sudo/readme_ldap.html"><span class="icon"></span>ちゃんと対応してた</a>。
 </p>
+
 <p>
 利用方法はわりと簡単で、上記リンクの README.LDAP （ソースに同じものが同梱されてる）を見ればすぐわかるけど、一応ここにやったことをメモ。ほとんど README からの抜粋です。
 </p>
+
 <p>
 手元の Slackware に元から入っている sudo は LDAP 対応していないので、<a class="ext-link" href="http://www.gratisoft.us/sudo/download.html"><span class="icon"></span>ここからダウンロード</a> して以下の手順でインストール。
 </p>
+
 <pre class="wiki">
 $ ./configure --with-ldap
 $ make
 $ sudo make install
 </pre>
+
 <p>
 でもって /etc/ldap.conf に以下の記述を追加。（元々 LDAP は利用していて、基本的な設定はできているので、追加は一行だけ。）
 </p>
+
 <pre class="wiki">
 sudoers_base   ou=SUDOers,o=southpark
 </pre>
+
 <p>
 LDAP 側の設定はまずスキーマの追加。
 </p>
+
 <pre class="wiki">
   #
   #  schema file for sudo
@@ -131,9 +138,11 @@ LDAP 側の設定はまずスキーマの追加。
               description )
         )
 </pre>
+
 <p>
 次に sudoers 用のコンテナ ou=SUDOers, o=southpark と、デフォルト設定用の cn=defaults, ou=SUDOers, o=southpark を LDAP エントリに追加。
 </p>
+
 <pre class="wiki">
 dn: ou=SUDOers,o=southpark
 objectclass: organizationalunit
@@ -145,12 +154,15 @@ objectclass: sudorole
 cn: defaults
 sudoOption: ignore_local_sudoers
 </pre>
+
 <p>
 sudoOption: ignore_local_sudoers があると、/etc/sudoers ファイルを見なくなる。
 </p>
+
 <p>
 最後に sudo 用 role エントリを追加して準備 OK。
 </p>
+
 <pre class="wiki">
 dn: cn=role1,ou=SUDOers,o=southpark
 changetype: add
@@ -161,36 +173,46 @@ sudouser: miya
 sudohost: ALL
 sudocommand: ALL
 </pre>
+
 <p>
 sudouser, sudohost, sudocommand は複数設定可。! で否定になる。なので、特定のユーザだけ許可しない、という場合には、
 </p>
+
 <pre class="wiki">
 sudouser: ALL
 sudouser: !miya
 </pre>
+
 <p>
 なんて書き方もできる。同様に特定のホストだけ許可しない、という場合には、
 </p>
+
 <pre class="wiki">
 sudohost: ALL
 sudohost: !kenny
 </pre>
+
 <p>
 とかできるし、特定のコマンドだけ許可しない、という場合には、
 </p>
+
 <pre class="wiki">
 sudocommand: ALL
 sudocommand: !/sbin/reboot
 </pre>
+
 <p>
 とかできる。もちろんこれらの組み合わせも OK。
 </p>
+
 <p>
 あと、ユーザではなくグループで指定したい場合には
 </p>
+
 <pre class="wiki">
 sudouser: %group
 </pre>
+
 <p>
 とする。（これは README.LDAP には明記されてない。/etc/sudoers の書き方から類推すればわかるけど。）
 </p>

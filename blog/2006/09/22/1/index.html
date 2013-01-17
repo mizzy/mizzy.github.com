@@ -67,6 +67,7 @@
   <p>
 <a class="ext-link" href="http://d.hatena.ne.jp/shimibow/20060921/1158852346"><span class="icon"></span>id:shimibow さんが Filter::FFmpeg のパッチを書いてくださいました</a>。いつもありがとうございます。これを参考に、以下の様な修正を行いました。
 </p>
+
 <pre class="wiki">
 Index: lib/Plagger/Plugin/Filter/FFmpeg.pm
 ===================================================================
@@ -105,12 +106,15 @@ Index: lib/Plagger/Plugin/Filter/FFmpeg.pm
              $context->log( info => 'Converting ' . $enclosure->filename . ' ...' );
              my $result = $ff->exec();
 </pre>
+
 <p>
 extra_options で ffmpeg に渡す追加オプションを指定することができます。
 </p>
+
 <p>
 それに合わせて、FFmpeg::Command に以下の修正を加えて 0.05 として CPAN にアップしてます。
 </p>
+
 <pre class="wiki">
 Index: library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
 ===================================================================
@@ -131,6 +135,7 @@ Index: library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
      format              => '-f',
      video_codec         => '-vcodec',
 </pre>
+
 <p>
 %option を Filter::FFmpeg から参照するためなのですが、外部からオプション追加とかもできるようになって、便利なこともあるかな、と。
 </p>

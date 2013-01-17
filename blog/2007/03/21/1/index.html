@@ -67,12 +67,15 @@
   <p>
 puppet のクライアント/サーバ間通信は https + XMLRPC で、認証は SSLv3 の証明書認証が利用されています。
 </p>
+
 <p>
 通常、SSLv3 で証明書認証とかいうと、CA とか、自己署名証明書とか、色々めんどくさかったりしますが、puppet はこの辺りはほとんど自動で処理してくれるので、とても楽です。
 </p>
+
 <p>
 例えば、puppet サーバ側では、puppetmasterd をはじめて起動した時に、CA 関連ファイルや自己署名証明書などを、/etc/puppet/ssl 以下に勝手に作ってくれます。
 </p>
+
 <pre class="wiki">
 $ ls -R /etc/puppet/ssl
 /etc/puppet/ssl:
@@ -101,15 +104,19 @@ kenny.southpark.pem
 /etc/puppet/ssl/public_keys:
 kenny.southpark.pem 
 </pre>
+
 <p>
 あれ、CA 証明書っぽいものが二つある、と思ったら、ca/ca_crt.pem と certs/ca.pem はまったく同じものでした。
 </p>
+
 <p>
 また、CA 証明書とは別に、kenny.southpark.pem というものができていますが、これはおそらく、自身が puppet クライアントになる時に利用するものと思われます。
 </p>
+
 <p>
 CA 証明書の中身を覗いてみるとこんな感じ。
 </p>
+
 <pre class="wiki">
 $ sudo openssl x509 -text -in /etc/puppet/ssl/ca/ca_crt.pem
 Certificate:
@@ -169,9 +176,11 @@ Ik9SpQa9iExliZ6YTMuCzglQ4EtnWR7XJnUvbz3T1JJVeQZeVjkrFbBn2QB5CTeG
 GqEw4M7oKwoWknOjuB8WyGD3fcUkCWY=
 -----END CERTIFICATE-----    
 </pre>
+
 <p>
 次にクライアント側ですが、こちらもはじめて puppetd（クライアント側で起動するデーモン）を実行した時に、秘密鍵、公開鍵、CSR を自動的に作成し、サーバに対して CSR への署名を求めることが、起動時のメッセージから読み取れます。
 </p>
+
 <pre class="wiki">
 $ sudo /usr/sbin/puppetd --server mizzy.org --test
 err: No certificate; running with reduced functionality.
@@ -181,22 +190,28 @@ info: Requesting certificate
 warning: peer certificate won't be verified in this SSL session
 notice: Did not receive certificate
 </pre>
+
 <p>
 サーバ側では、証明書リクエストが来ていることを、次のようなコマンドで確認できます。
 </p>
+
 <pre class="wiki">
 $ sudo puppetca --list
 cartman.southpark
 </pre>
+
 <p>
 これに署名するには、
 </p>
+
 <pre class="wiki">
 $ sudo puppetca --sign cartman.southpark
 </pre>
+
 <p>
 と実行するだけです。これで puppet クライアント/サーバ間で無事通信できるようになります。
 </p>
+
 <p>
 セキュアな通信が割りと簡単に実現できていい感じ。
 </p>

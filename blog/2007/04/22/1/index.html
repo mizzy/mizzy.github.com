@@ -67,21 +67,27 @@
   <p>
 <a class="ext-link" href="http://trac.mizzy.org/public/browser/SVN-TracWiki"><span class="icon"></span>SVN::TracWiki</a> というツールをつくってみました。<a class="ext-link" href="http://svn.mizzy.org/public/SVN-TracWiki/"><span class="icon"></span>svn repos はこちら</a>。 
 </p>
+
 <p>
 何をするものかというと、Subversion の post-commit スクリプトとして動作して、コミットされたファイルからテキストを抽出、そのファイルの実体へのリンクを付加して、Trac の Wiki へ自動ポストするというもの。
 </p>
+
 <p>
 具体的な例としては、PowerPoint ファイルをコミットしたら、そのファイルからテキストのみを抽出して Wiki へ自動ポスト。<a class="ext-link" href="http://trac.mizzy.org/public/wiki/docs/YAPC-Assurer-ja-public.ppt"><span class="icon"></span>こんな感じで</a>。
 </p>
+
 <p>
 これで何がうれしいかというと、Subversion で管理している PowerPoint ファイルを、Trac 上で検索ができるようになります。<a class="ext-link" href="http://trac.mizzy.org/public/search?q=%E8%87%AA%E5%B7%B1%E7%B4%B9%E4%BB%8B&wiki=on&changeset=on&ticket=on"><span class="icon"></span>こんな感じですね</a>。元ファイルへのリンクもあるので、検索して元ファイルを開いて読む、ってことが簡単にできます。
 </p>
+
 <p>
 例によって YAMLで設定 and プラガブル。ファイルからテキストを抽出する部分がプラグインになっていて、簡単に拡張できるようにしています。
 </p>
+
 <p>
 現在は PowerPoint 用フィルタプラグインしかないのですが、以下の様なコードになっていて、フィルタ対象ファイルの MIME タイプを register() で指定、テキスト抽出ルーチンを filter() に記述、という感じで書きます。
 </p>
+
 <pre class="wiki">
 package SVN::TracWiki::Plugin::Filter::PowerPoint;
 
@@ -108,6 +114,7 @@ sub filter {
 
 1;
 </pre>
+
 <p>
 とりあえず動くようになっただけで、いけてない部分盛りだくさんですが、こんなのつくってみました、ってことで。
 </p>

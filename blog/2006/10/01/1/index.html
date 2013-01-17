@@ -68,9 +68,11 @@
 <strong>2006/10/01 18:22 追記</strong><br />
 <a class="ext-link" href="http://rt.cpan.org/Public/Bug/Display.html?id=21797"><span class="icon"></span>早速対応してくれました</a>。「Domou Arigato」と書いてるのに笑った。<a class="ext-link" href="http://pause.perl.org/incoming/"><span class="icon"></span>http://pause.perl.org/incoming/</a> を見るとアップ済みのようなので、もうすぐ CPAN へ反映されると思います。
 </p>
+
 <p>
 <a class="ext-link" href="http://search.cpan.org/~simonw/Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm"><span class="icon"></span>Net::Google::Calendar</a> がまともに動かないので、パッチ書いた。
 </p>
+
 <pre class="wiki">
 Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm
 ===================================================================
@@ -117,6 +119,7 @@ Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm
     return $node unless defined $node &amp;&amp; defined $attr;
     my $val;
 </pre>
+
 <p>
 <a class="ext-link" href="http://rt.cpan.org/"><span class="icon"></span>rt.cpan.org</a> でレポートしておいた。
 </p>

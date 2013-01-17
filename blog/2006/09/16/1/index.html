@@ -67,6 +67,7 @@
   <p>
 <a class="ext-link" href="http://mizzy.org/program/dedeuped.html"><span class="icon"></span>前回のエントリ</a>について、宮川さんから「AnyDBM_File をつかうといいかも」というアドバイスを頂いたので、Deduped::AnyDBM_File を書いてみた。
 </p>
+
 <pre class="wiki">
 package Plagger::Rule::Deduped::AnyDBM_File;
 use strict;
@@ -112,17 +113,21 @@ sub DESTROY {
 
 1;
 </pre>
+
 <p>
 以下の様な感じで、利用するモジュールを NDBM_File, DB_File, GDBM_File, SDBM_File, ODBM_File の中から選べます。（何も指定しなければ DB_File が使われる。_File は省略する。）
 </p>
+
 <pre class="wiki">
     rule:
       module: Deduped
       engine: GDBM
 </pre>
+
 <p>
 また、現在の Rule::Deduped では、Rule::Deduped::$self->{engine} を呼び出すようになっているけれど、上記 NDBM, DB, GDBM, SDBM, ODBM のいずれかが指定された場合には、Rule::Deduped::AnyDBM_File を呼び出す必要があるため、Rule::Deduped も少しいじってみた。
 </p>
+
 <pre class="wiki">
 Index: lib/Plagger/Rule/Deduped.pm
 ===================================================================
@@ -152,6 +157,7 @@ Index: lib/Plagger/Rule/Deduped.pm
      my $deduper = $class->new($self);
      $self->{deduper} = $deduper;
 </pre>
+
 <p>
 こうすると現在の Deduped::DB_File も、Deduped::AnyDBM_File で吸収できます。
 </p>

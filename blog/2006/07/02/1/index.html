@@ -67,19 +67,25 @@
   <p>
 IRC で miyagawa さんが貼っていた URL 経由で見つけたのですが、<a class="ext-link" href="http://www.ietf.org/internet-drafts/draft-snell-atompub-feed-thread-12.txt"><span class="icon"></span>Atom Threading Extensions</a> なんてものがあったのですね。
 </p>
+
 <p>
 要するに、Atom Syndication Format で、メーリングリストや掲示板の様なスレッドを表現するための仕組みです。
 </p>
+
 <p>
 コメントやトラックバックの関連を視覚化、というアイデアは色んな人達が考えていると思うのですが、それをサポートするような規格が既にあったとは知りませんでした。
 </p>
+
 <p>
 ここではざっと要点だけご紹介します。詳細知りたい方は原文をお読みください。そんなにボリュームないですし。（このエントリも間違っている可能性があるので、できれば原文読んで頂いた方が良いかと。）
 </p>
+
 <h3 id="in-reply-to拡張要素">'in-reply-to' 拡張要素</h3>
+
 <p>
 entry 要素の子要素として指定するもので、そのエントリが、どのエントリに対する reply なのかを示す要素です。
 </p>
+
 <pre class="wiki">
 &lt;feed xmlns="http://www.w3.org/2005/Atom"
     xmlns:thr="http://purl.org/syndication/thread/1.0"&gt;
@@ -110,9 +116,11 @@ entry 要素の子要素として指定するもので、そのエントリが�
     &lt;/entry&gt;
 &lt;/feed&gt;
 </pre>
+
 <p>
 この例では、2番目の entry が最初の entry に対する reply となっています。各属性の意味は以下の通りです。
 </p>
+
 <dl>
 <dt>ref</dt>
 <dd>
@@ -131,10 +139,13 @@ entry 要素の子要素として指定するもので、そのエントリが�
 元エントリが含まれる Atom Feed または Entry の IRI。
 </dd>
 </dl>
+
 <h3 id="replieslinkrelation">'replies' link relation</h3>
+
 <p>
 link 要素の rel 属性として replies を指定することで、その entry に対する reply が含まれている（かもしれない）リソースを参照します。
 </p>
+
 <pre class="wiki">
 &lt;feed xmlns="http://www.w3.org/2005/Atom"
       xmlns:thr="http://purl.org/syndication/thread/1.0"&gt;
@@ -156,9 +167,11 @@ link 要素の rel 属性として replies を指定することで、その ent
     &lt;/entry&gt;
 &lt;/feed&gt;
 </pre>
+
 <p>
 この link 要素は thr:count 属性と thr:updated 属性を持つことができます。各属性の意味は以下の通りです。
 </p>
+
 <dl>
 <dt>thr:count</dt>
 <dd>
@@ -169,13 +182,17 @@ href で示されるリソースに含まれている reply の数。
 href で示されるリソース内の reply の最終更新日時。
 </dd>
 </dl>
+
 <p>
 どちらの属性も補助的なものであって、正確な数値でなくとも良い、という点には注意が必要です。
 </p>
+
 <h3 id="total拡張要素">'total' 拡張要素</h3>
+
 <p>
 entry に対する reply の総数です。ドラフトにはサンプルがなかったので、以下の例は適当です。間違ってたらごめんなさい。
 </p>
+
 <pre class="wiki">
 &lt;feed xmlns="http://www.w3.org/2005/Atom"
     xmlns:thr="http://purl.org/syndication/thread/1.0"&gt;
@@ -197,9 +214,11 @@ entry に対する reply の総数です。ドラフトにはサンプルがな�
     &lt;/entry&gt;
 &lt;/feed&gt;
 </pre>
+
 <p>
 これもやはり補助的な数値なので、正確な数値だと期待してはいけないようです。
 </p>
+
 <p>
 thr:count, thr:updated, total の数値が正確なものでなくて良い理由については、ドラフトの「6.  Considerations for using thr:count, thr:updated and total」について書かれていますので、ここでは省略します。（書くのめんどくさくなった。）
 </p>

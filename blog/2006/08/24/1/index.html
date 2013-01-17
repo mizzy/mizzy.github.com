@@ -67,15 +67,19 @@
   <p>
 <a class="ext-link" href="http://mizzy.org/program/plagger_and_ffmpeg02.html#comments"><span class="icon"></span>このエントリのコメント</a> にて sumikawa さんより指摘があった点について修正しました。
 </p>
+
 <p>
 というか、気づいてはいたのですが以下の理由から放置してました。
 </p>
+
 <ol start="1"><li>今のところ特に実害がない。</li>
 <li>Plagger::Util::mime_type_of (というか MIME::Types::mimeTypeOf ) が mp4 という拡張子は video/vnd.objectvideo と返す。m4v だと何も返さない。video/mp4 が一般的っぽいので、これは何か気持ち悪い。</li>
 <li>$Plagger::Util::mimetypes->addType で mp4 と m4v を追加してやればいいんだけど、本来なら Plagger::Util 内でやる方が良さそう。既にいくつか Plagger::Util 内で追加されてるので。でも、Filter::FFmpeg は野良プラグインなので、Plagger::Util をいじるべきではない。かといって、Filter::FFmpeg 内でやるのも、分散してしまって良くない。</li></ol>
+
 <p>
 とは言うものの、指摘があったものを放置しておくのもなんなので、3番目については妥協することにしました。
 </p>
+
 <pre class="wiki">
 Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
 ===================================================================
@@ -98,9 +102,11 @@ Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
 +    $e->enclosure->type( Plagger::Util::mime_type_of($ext) );
  }
 </pre>
+
 <p>
 <a class="ext-link" href="http://trac.mizzy.org/public/changeset/234"><span class="icon"></span>trac のチェンジセットはこちら</a>。
 </p>
+
 <p>
 <strong>追記</strong><br />
 宮川さんが <a class="ext-link" href="http://plagger.org/trac/changeset/1593"><span class="icon"></span>Changeset 1593</a> にて早速対応してくれました。はやっ。<br />

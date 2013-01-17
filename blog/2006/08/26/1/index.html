@@ -67,9 +67,11 @@
   <p>
 <a class="ext-link" href="http://mizzy.org/?topic=/program/amazon2ical"><span class="icon"></span>Amazon2iCal</a> で、本やCDなんかの発売日に Google Calendar でメール通知してもらおうと思って設定したのだけど、Google Calendar が通知してくれない。
 </p>
+
 <p>
 これはもしかして、Publish::iCal で生成した iCalendar データに時刻が入ってないせいかな、と思い時刻も入れようと思ったんだけど、どうせなら Plagger::Event とか作って、イベントハンドリングしやすくしてしまえ、ってことで、Plagger::Enclosure の様な感じで作ってみた。たったこれだけだけど。
 </p>
+
 <pre class="wiki">
 package Plagger::Event;
 
@@ -80,12 +82,15 @@ __PACKAGE__->mk_accessors(qw( dtstart dtend summary description location organiz
 
 1;
 </pre>
+
 <p>
 Event だと色んな意味があって曖昧な気がするから Plagger::iCal::Event とかの方がいいかな、と思ったけど、とりあえずの実装なのでまあいいか、と。
 </p>
+
 <p>
 でもってこれに合わせて Plagger::Entry も修正。
 </p>
+
 <pre class="wiki">
 Index: plagger/trunk/lib/Plagger/Entry.pm
 ===================================================================
@@ -122,9 +127,11 @@ Index: plagger/trunk/lib/Plagger/Entry.pm
 +
  1;
 </pre>
+
 <p>
 更にこれに合わせて、Publish::iCal と CustomFeed::AmazonWebService も修正。
 </p>
+
 <pre class="wiki">
 Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
 ===================================================================
@@ -160,6 +167,7 @@ Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
          );
          $ical->add_entry($event);
 </pre>
+
 <pre class="wiki">
 --- plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm (revision 232)
 +++ plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm (revision 241)
@@ -189,9 +197,11 @@ Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
  
  1;
 </pre>
+
 <p>
 あと、どうも意図したタイムゾーン通りの時刻にならないと思ったら、Plagger::Date::strptime で使われている DateTime::Format::Strptime は、time_zone を指定しないと、floating になってしまうみたい。なので、config.yaml で指定しているタイムゾーンを使うように修正してみました。
 </p>
+
 <pre class="wiki">
 Index: plagger/trunk/lib/Plagger/Date.pm
 ===================================================================
@@ -208,9 +218,11 @@ Index: plagger/trunk/lib/Plagger/Date.pm
      $class->parse($format, $date);
  }
 </pre>
+
 <p>
 <a class="ext-link" href="http://trac.mizzy.org/public/changeset/241"><span class="icon"></span>trac のチェンジセットはこちら</a>。
 </p>
+
 <p>
 <strong>追記</strong><br />
 floating になってるのは <a class="ext-link" href="http://plagger.org/trac/ticket/211"><span class="icon"></span>こういう理由がある</a> ということで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/242"><span class="icon"></span>CustomFeed::AmazonWebService の方で global: timezone の値を見て、set_time_zone するように修正しました</a>。

@@ -67,15 +67,19 @@
   <p>
 perl で ffmpeg を扱うモジュールには、<a class="ext-link" href="http://search.cpan.org/~allenday/FFmpeg-5704/FFmpeg.pm"><span class="icon"></span>FFmpeg</a> というものがあるのですが、XS モジュールで make するのに ffmpeg 本体のソースが必要だし、使い方よくわかんないし、ポータビリティ考えるとコマンドラッパーの方がいいよね、という miyagawa さんの意見があったりで、じゃあラッパー作ろうと思ったら、ボンヌさんも作っているということで待っていたのですが、音沙汰がないのと、早急に必要なのもあって、とりあえず作ってみました。
 </p>
+
 <p>
 <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"><span class="icon"></span>FFmpeg::Command</a>
 </p>
+
 <p>
 まだ pod が不完全ですが、とりあえず YouTube から拾った flv 動画を mpeg4 に変換して iTunes で観たり、サムネイルを JPEG で切り出したり、といったことができることを確認しました。
 </p>
+
 <p>
 使い方は SYNOPSYS にも書いてますが、動画の変換であればこんな感じで。
 </p>
+
 <pre class="wiki">
 my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
 
@@ -96,9 +100,11 @@ $ffmpeg->output_options({
 
 $ffmpeg->exec();
 </pre>
+
 <p>
 サムネイルの切り出しはこんな感じ。（任意のオプションで実行する機能。）
 </p>
+
 <pre class="wiki">
 my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
 
@@ -117,9 +123,11 @@ $ffmpeg->options(
 
 $ffmpeg->exec();
 </pre>
+
 <p>
 これから実装したいと思っている機能は、以下の様な指定をすれば、iPod や PSP に適切なパラメータを勝手に設定して変換してくれる、というもの。もちろん、自分の好きな値でパラメータを上書きすることも可能な感じで。
 </p>
+
 <pre class="wiki">
 my $ffmpeg = FFmpeg::Command->new('/usr/local/bin/ffmpeg');
 
@@ -134,6 +142,7 @@ $ffmpeg->output_options({
 
 $ffmpeg->exec();
 </pre>
+
 <p>
 ボンヌさんが作られているものと統合して、いいものになるといいな。
 </p>

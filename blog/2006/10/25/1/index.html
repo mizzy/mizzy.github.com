@@ -67,9 +67,11 @@
   <p>
 <a class="ext-link" href="http://mizzy.org/program/html-widget-kwalify01.html"><span class="icon"></span>先日のエントリ</a>で、「HTML::Widget が文字化けする」とか書いたのですが、<a class="ext-link" href="http://rt.cpan.org/Public/Bug/Display.html?id=14260"><span class="icon"></span>HTML::Element の _xml_escape メソッドの問題</a> でした。
 </p>
+
 <p>
 チケットは切られているので、とりあえず修正されるのを待つしかないのですが、2ヶ月以上放置されていて、早い対応は期待できなさそうなので、<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify"><span class="icon"></span>HTML::Widget::Kwalify</a> に以下のコードを入れて強引に対処してます。
 </p>
+
 <pre class="wiki">
 {
     no warnings 'redefine';
@@ -81,6 +83,7 @@
     };
 }
 </pre>
+
 <p>
 あと、テスト追加したり、色々修正。ちょっとずつですが、形になってきてます。
 </p>

@@ -65,6 +65,7 @@
   </section>
 
   <h3>changelog</h3>
+
 <p class="entryBody">
 <ul class="entryBody">
 <li>typoを修正。positionの説明で「4通り」を「44通り」と書いていたので。そんなにあるわけない。(2005/05/13)</li>
@@ -83,7 +84,6 @@
 <p class="entryBody">
 で、Catalyst::Plugin::Prototype自体は、<a href="http://search.cpan.org/~sri/HTML-Prototype/Prototype.pm" target="_blank">HTML::Prototype</a>のメソッドをCatalystのビューから呼び出せる様にするものです。なので、Catalyst::Plugin::Prototypeの使い方を知るためには、まずはHTML::Prototypeの使い方を知る必要があります。
 </p>
-
 
 <p class="entryBody">
 このHTML::Protoytypeは何をするものなのかというと、prototype.js内のajax関連の関数を呼び出すようなHTMLを手軽に生成するためのもの、ということになります。以下、HTML::Prototypeの使い方と、Catalystから呼び出す方法についてHTML::Prototypeのドキュメントを参考にしながら、実行例も交えて順に見ていきます。また、ドキュメントに載っていないものの、ソースコードから読みとれるものもできる限り記述したいと思います。
@@ -468,9 +468,10 @@ print $prototype->submit_to_remote(
 というHTMLコードを吐きます。
 </p>
 
-<p><h3>Catalystのビューから呼び出す方法</h3>
+<h3>Catalystのビューから呼び出す方法</h3>
+
 <p class="entryBody">
-HTML::Prototypeのメソッドを、Catalystのビューから呼び出すためには、テンプレートに以下の様に記述します。</p></p>
+HTML::Prototypeのメソッドを、Catalystのビューから呼び出すためには、テンプレートに以下の様に記述します。</p>
 
 <pre class="code">
 &#x5b;% c.prototype.observe_field( 'editor', {

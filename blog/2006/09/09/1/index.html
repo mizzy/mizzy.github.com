@@ -67,25 +67,33 @@
   <p>
 OpenSSL で クライアント証明書を発行する手順メモ。
 </p>
+
 <h3 id="openssl.cnfの修正">openssl.cnf の修正</h3>
+
 <p>
 パスは環境によって違うでしょうが、うちの場合は /usr/local/ssl/openssl.cnf 。
 </p>
+
 <pre class="wiki">
 # For normal client use this is typical
 # nsCertType = client, email
 </pre>
+
 <p>
 を以下の様に変えとく。
 </p>
+
 <pre class="wiki">
 # For normal client use this is typical
 nsCertType = client, email
 </pre>
+
 <h3 id="CA用ファイルの作成">CA 用ファイルの作成</h3>
+
 <p>
 直接 openssl コマンド叩くよりも、OpenSSL 付属の CA.sh や CA.pl を使うほうが楽。どちらもやれることは一緒っぽいので、ここでは CA.pl の方を使ってみる。
 </p>
+
 <pre class="wiki">
 $ mkdir cert
 $ cd cert
@@ -118,13 +126,17 @@ Email Address []:
 $ ls
 demoCA/
 </pre>
+
 <p>
 CA のキーや証明書やらシリアル番号管理用ファイルやら、諸々作ってくれます。
 </p>
+
 <h3 id="リクエスト生成">リクエスト生成</h3>
+
 <p>
 クライアント証明書用リクエスト作成。
 </p>
+
 <pre class="wiki">
 $ /usr/local/ssl/misc/CA.pl -newreq
 Generating a 1024 bit RSA private key
@@ -156,9 +168,11 @@ A challenge password []:
 An optional company name []:
 Request (and private key) is in newreq.pem
 </pre>
+
 <p>
 以下の様な キーと CSR を含んだ newreq.pem ができあがる。
 </p>
+
 <pre class="wiki">
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
@@ -190,7 +204,9 @@ XXrA3FFBQtbzEnjXlias3g4jQcFtakdD1SIM7HoJbBQ9y4gsT/9q+ZyvyIkuCPnD
 SasVBdVklOC19BT6kw5V0sOv+Zt/4n4asrktjqSArFz6dF7ERXcjVg==
 -----END CERTIFICATE REQUEST-----
 </pre>
+
 <h3 id="CAによる署名">CA による署名</h3>
+
 <pre class="wiki">
 $ /usr/local/ssl/misc/CA.pl -sign
 Using configuration from /usr/local/ssl/openssl.cnf
@@ -231,9 +247,11 @@ Write out database with 1 new entries
 Data Base Updated
 Signed certificate is in newcert.pem
 </pre>
+
 <p>
 以下の様な newcert.pem ができる。
 </p>
+
 <pre class="wiki">
 Certificate:
     Data:
@@ -303,20 +321,26 @@ MqjgAdmZ5qvdXqgmTYXPZLdi3nRf3zb+zv3NsjfhpM5q2h4+94kkzd7znzlfAXg8
 MK5X4ZQH/WBRZvibZmAcuw==
 -----END CERTIFICATE-----
 </pre>
+
 <h3 id="PEMからPKCS12へ">PEM から PKCS12 へ</h3>
+
 <p>
 PEM のままではブラウザにインポートできないので、PKCS12 へ変換。
 </p>
+
 <pre class="wiki">
 $ openssl pkcs12 -export -in newcert.pem -inkey newreq.pem -certfile demoCA/cacert.pem -out newcert.p12
 Enter pass phrase for newreq.pem:
 Enter Export Password:
 Verifying - Enter Export Password:
 </pre>
+
 <h3 id="newcert.p12をブラウザにインポート">newcert.p12 をブラウザにインポート</h3>
+
 <p>
 手順は省略。Firefox だとこんな感じで入る。
 </p>
+
 <p>
 <img src="http://mizzy.org/img/client_certificate.jpg" alt="http://mizzy.org/img/client_certificate.jpg" />
 </p>

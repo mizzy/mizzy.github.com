@@ -67,9 +67,11 @@
   <p>
 <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/"><span class="icon"></span>id:tokuhirom</a> さん作のデプロイツール <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> を最近使い始めたのですが、これがすげーいいっす。
 </p>
+
 <p>
 で、この週末は更に便利に使えるように、Archer 用のプラグイン書いたりしてました。
 </p>
+
 <ul><li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Log.pm"><span class="icon"></span>Archer::Plugin::SVN::Log</a></li>
 <li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Diff.pm"><span class="icon"></span>Archer::Plugin::SVN::Diff</a></li>
 <li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Update.pm"><span class="icon"></span>Archer::Plugin::SVN::Update</a></li>
@@ -119,7 +121,8 @@ $ archer.pl Assurer -c assurer.yaml
 <li>実際にデプロイするか、プロンプトを表示。</li>
 <li>ローカルの /home/miya/work/Assurer から リモートサーバ上の /home/miya/assurer へ rsync でファイルコピー。</li>
 </ul>
-</p>
+
+<p></p>
 <p>
 といった動作になります。
 </p>
@@ -135,12 +138,12 @@ tasks:
     - module: Shell
       config:
         role: app
-        para: 1
+        para: 1</p>
 
-projects:
+<p>projects:
   mizzy.org:
     app:
-      - www.mizzy.org
+      - <a href="http://www.mizzy.org">www.mizzy.org</a>
       - svn.mizzy.org
       - ftp.mizzy.org
 </pre>
@@ -152,15 +155,15 @@ $ ./archer.pl -c shell.yaml mizzy.org
 [info] run hook init
 [debug] load Archer::Plugin::Shell
 [info] run Archer::Plugin::Shell
-shell> uptime
-[www.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+shell&gt; uptime
+[<a href="http://www.mizzy.org">www.mizzy.org</a>]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
 [svn.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
 [ftp.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
-shell> 
+shell&gt; 
 </pre>
 <p>
 <a class="ext-link" href="http://code.mfac.jp/svn/Archer/"><span class="icon"></span>Archer はこちらから</a>入手できます。また、俺が書いたプラグインなんかは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Archer/"><span class="icon"></span>ここに置いてあります</a>。
-</p>
+</p></p>
 
 
   <div class="pagination">
