@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-01-10T22:39:30+09:00</updated>
+  <updated>2013-01-17T18:05:44+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,129 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[RPM パッケージを Git で管理する方法（案）]]></title>
+    <link href="http://mizzy.org/blog/2013/01/17/1/" />
+    <updated>2013-01-17T18:05:44+09:00</updated>
+    <id>http://mizzy.org/blog/2013/01/17/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="https://twitter.com/trombik">@trombik</a> さんの</p>
+
+<blockquote class="twitter-tweet"><p>弊社ではtinderbox+gitですべて統一させてる</p>&mdash; trombik (@trombik) <a href="https://twitter.com/trombik/status/284200636021608449" data-datetime="2012-12-27T07:34:46+00:00">December 27, 2012</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>という tweet を見て気になったので調べてみたところ、 <a href="https://wiki.freebsd.org/Tinderbox">Tinderbox</a> はどうやら FreeBSD の ports を自動ビルドするためのシステムのようで、RPM でもこんなのないのかなー、と探してみたものの見つけられなかったし、Tinderbox が自分が求めてるものなのかどうかもいまいちピンと来なかったので、プロトタイプ的なものをつくってみることに。</p>
+
+<p>現在 RPM パッケージの管理は、<a href="https://github.com/paperboy-sqale/sqale-yum">こんな感じで</a> ソース/バイナリパッケージを直接リポジトリに突っ込んじゃってるんだけど、これだと以下のような問題がある。</p>
+
+<ul>
+<li>バイナリパッケージのファイルサイズが大きすぎて、git clone や push や pull に時間がかかる</li>
+<li>パッケージ丸ごと突っ込んでるので、ファイル個別の差分が確認できない
+
+<ul>
+<li>そもそも差分確認できないものを突っ込むのは git を使う意義がだいぶ削がれる</li>
+</ul></li>
+</ul>
+
+<p>それをこんな風にしたい。</p>
+
+<ul>
+<li>必要最小限のファイルだけを git リポジトリに突っ込んでファイル個別に差分確認できるように</li>
+<li>パッケージは突っ込まず、git で管理してるファイルからパッケージビルドする
+
+<ul>
+<li>ただしソースパッケージは必要なら突っ込んでもOK</li>
+</ul></li>
+</ul>
+
+<p>で、プロトタイプ的なものをつくってみたのがこれ。</p>
+
+<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git">mizzy/how-to-manage-rpm-packages-with-git</a></p>
+
+<p>このリポジトリの構成はこんな感じ。</p>
+
+<pre><code>|-- build.rb
+|-- ffmpeg
+|   |-- ffmpeg-github-0.8.2.spec
+|   |-- libavformat-muxer.paperboy.patch
+|   |-- libx264-superfast_firstpass.ffpreset
+|   `-- libx264-veryfast_firstpass.ffpreset
+|-- memcached
+|   |-- memcached-1.4.15-1.el6.src.rpm
+|   `-- memcached.spec
+`-- ngx_openresty
+    `-- ngx_openresty.spec
+</code></pre>
+
+<p>build.rb がビルド用のスクリプトで、それ以外に各パッケージ用のディレクトリがある。で、どのファイルをバージョン管理するかは、パッケージによって異なるだろうな、ってことで、あり得そうなパターンをいくつか用意してみた。</p>
+
+<hr>
+
+<h2>パターン1: ngx_openresty</h2>
+
+<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ngx_openresty">これ</a> は spec ファイルだけを管理するパターン。spec の中に</p>
+
+<pre><code>Source0: http://agentzh.org/misc/nginx/ngx_openresty-%{version}.tar.gz
+</code></pre>
+
+<p>という記述があるので、こいつをダウンロードして ~/rpmbuild/SOURCES に置き、ソースパッケージとバイナリパッケージをビルド、という一番シンプルなパターン。</p>
+
+<p>configure オプションぐらいをカスタマイズできればOK、という場合はこのパターンになるはず。</p>
+
+<hr>
+
+<h2>パターン2: ffpmeg</h2>
+
+<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ffmpeg">これ</a> は spec ファイル＋パッチ（＋α）な構成。独自にパッチをあてて、パッチもバージョン管理したい、といったパターン。これも spec ファイルに</p>
+
+<pre><code>Source: http://www.ffmpeg.org/releases/ffmpeg-%{version}.tar.bz2
+</code></pre>
+
+<p>という記述があるので、こいつをダウンロードし、他のパッチファイル等とともに ~/rpmbuild/SOURCES に置いて、ソースパッケージとバイナリパッケージをビルドする。</p>
+
+<hr>
+
+<h2>パターン3: memcached</h2>
+
+<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/memcached">こいつ</a> は既存のソースパッケージのビルドオプションだけを変えたいんだけど、spec ファイル中のソースが</p>
+
+<pre><code>Source0:        http://memcached.googlecode.com/files/%{name}-%{version}.tar.gz
+Source1:        memcached.sysv
+</code></pre>
+
+<p>となっていて、memcached.sysv をネットワーク越しに取得できない、かといって、このファイルは既存ソースパッケージに入ってるものをそのまま使うので、特にバージョン管理の必要はない、といったケース。</p>
+
+<p>このケースであれば、既存ソースパッケージ内のファイルは、spec 以外は修正することはないからバージョン管理の必要はないし、バイナリパッケージと比べればサイズは小さいから、そのまま突っ込んじゃう方が楽だろう、ということで、src.rpm ファイルをリポジトリにそのまま突っ込んでる。（別に memcached.sysv だけ取り出して置いといてもいいんだけど、memcached.sysv 以外にも付随するソースやパッチがもっとたくさんある場合は、この方が楽だろう、という判断。）</p>
+
+<hr>
+
+<p>今のところこれぐらいのパターンを網羅できれば大丈夫かなー、と。いずれのパターンでも、ファイル個別に差分の確認ができるし、管理すべきファイルのサイズも最小限に抑えられているし、ビルドに必要なファイルは一通り揃っている。</p>
+
+<hr>
+
+<h2>パッケージのビルド</h2>
+
+<p>で、これらのファイルを git clone してきて、<a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/blob/master/build.rb">build.rb</a> みたいなスクリプトでビルド＆yum サーバへのデプロイ、ってなことができればいいなー、というのが最終的な目論見。</p>
+
+<hr>
+
+<h2>その他</h2>
+
+<p>とりあえず自分のアイデアを形にしてみて、意見をもらったりとか、それ○○でできるよ、みたいな反応がもらえるといいな、というのがこのブログエントリを書いた目的。</p>
+
+<p>あと、こんなのできればいいなー、と思っているのは、Ruby の Bundler みたいに、</p>
+
+<pre><code>Source: git://github.com/torvalds/linux.git, ref: dfdeb
+</code></pre>
+
+<p>とか spec に書いておくと、git clone して tar ball 作成して、そいつを使ってパッケージビルドできたりするといいなー、とか。</p>
+
+<p>また、@trombik さんと twitter でやりとりしてる中で、<a href="https://fedorahosted.org/koji/wiki">koji</a> という RPM ビルドシステムを見つけたんだけど、これも使えないか調べてみる。（が、自分がやりたいこととはちょっと違う感じ。）</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[サーバエンジニアが「開発力」を持つ意味]]></title>
@@ -156,8 +279,9 @@
 
 <p>まずは 2012/01/06 のこの予感めいた tweet。</p>
 
-<p><blockquote class="twitter-tweet"><p>今年は転機になりそうな気がする、なんとなく。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/status/155287369682124800" data-datetime="2012-01-06T13:59:28+00:00">January 6, 2012</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<blockquote class="twitter-tweet"><p>今年は転機になりそうな気がする、なんとなく。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/status/155287369682124800" data-datetime="2012-01-06T13:59:28+00:00">January 6, 2012</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 <p>これは無根拠にこんなことを言ってたわけではなく、ペパボで新しく技術者のための評価制度ができたこと、そしてこの評価制度をベースとして、「技術基盤整備エンジニア」というポジションをつくることが承認されたこと、が背景にあっての tweet です。技術者評価制度と技術基盤整備エンジニアについては、以下のエントリにまとめています。</p>
 
@@ -601,34 +725,6 @@ end
 <p><img src="https://raw.github.com/mizzy/screenshots/master/shot-20120826011222.png"></p>
 
 <p><img src="https://raw.github.com/mizzy/screenshots/master/shot.png"></p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Paperboy's engineer evaluation system その後]]></title>
-    <link href="http://mizzy.org/blog/2012/08/20/1/" />
-    <updated>2012-08-20T23:59:43+09:00</updated>
-    <id>http://mizzy.org/blog/2012/08/20/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="/blog/2012/02/29/1/">Paperboy&#39;s engineer evaluation system</a> で書いた、ペパボの技術者評価制度、2回目の評価が完了しました。</p>
-
-<p>前回は、</p>
-
-<ol>
-<li>シニア、またはアドバンスドシニアに上がりたい人には、自ら立候補してもらう。</li>
-<li>立候補する人は、定められたフォーマットにしたがって、自分がそのポジションにふさわしいと思う理由や実績について Markdown で書き、指定した Git リポジトリに push する。（「定められたフォーマット」と言っても、最初に名前、次に希望のポジションを書いてもらうだけで、それ以外は自由。）</li>
-<li>文書提出後、一人一人と面談を行う。</li>
-<li>文書の内容と面談の結果にもとづいて、各人が提出した文書の末尾に、結果（通過 or 不通過）、評価ポイント、今後期待すること、を評価者が追記し、git push する。</li>
-</ol>
-
-<p>といった流れで、今回も基本的には同じ流れなのですが、2. の部分のやり方を変え、社内の Git リポジトリに push してもらう代わりに、GitHub 上にある文書提出用プライベートリポジトリを fork して、pull request を送ってもらう形にしました。</p>
-
-<p>pull request をもらったら、一次評価者である自分が内容を確認し、ここをもう少し詳しく書いて、とか、こういうこともやってたから、盛り込んだらいいんじゃない、的なことを、pull request のコメントでやりとりして、修正してもらったらまた push、ってなことをやって、提出文書をブラッシュアップしてもらい、面談が終わったらマージ、fork 元のリポジトリにマージされた各人の提出文書に対して、評価結果とコメントを書き込む、という流れでした。</p>
-
-<p>この、いったん提出してもらって、こちらから指摘して直してもらう、というのを、前回は個別に IRC とか口頭で話して、といった形でやってたんですが、今回は GitHub を利用することで、コミットの特定の行に対してピンポイントでコメントをつけることができて、すべて GitHub 上で完結できて便利でした。</p>
-
-<p>また、GitHub のタイムラインを IRC にも流していたりするので、そのやりとりもすべて全社員が見る IRC チャンネルに流れる、という形で、よりオープンな評価ができたかな、と思っています。</p>
 
 ]]></content>
   </entry>
