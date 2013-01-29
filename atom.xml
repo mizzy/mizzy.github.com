@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-01-19T17:52:35+09:00</updated>
+  <updated>2013-01-30T01:04:31+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[GitHub に coderwall の Organizations ができてる]]></title>
+    <link href="http://mizzy.org/blog/2013/01/30/1/" />
+    <updated>2013-01-30T01:04:31+09:00</updated>
+    <id>http://mizzy.org/blog/2013/01/30/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://github.com/">GitHub</a> の <a href="https://github.com/mizzy">自分のプロフィールページ</a> の Organizations のところに、<a href="http://coderwall.com/">coderwall</a> のバッヂが表示されてることに少し前に気づいていて、これは各バッヂに対応した組織アカウントのメンバーに自分が入れらてるから、なわけですが、デフォルトでは Publicize されてないので、他の人からは見ることができません。Publicize してあげると、他の人からもこんな風に見えるようになります。</p>
+
+<p><img src="/images/2013/01/coderwall-organizations.png"></p>
+
+<p>Publicize するには、各組織アカウントのページで「Members」タブを選択し、自分のアカウントの横の「Publicize membership」をクリックすれば良いです。</p>
+
+<p><img src="/images/2013/01/publicize.png"></p>
+
+<p>上の画像は、Publicize した後のものです。</p>
+
+<p>Publicize は手動でやるのはだるいので、スクリプトをつくってみました。</p>
+
+<div><script src='https://gist.github.com/4665462.js?file='></script>
+<noscript><pre><code>#!/usr/bin/env ruby
+
+require 'pit'
+require 'octokit'
+
+user = 'mizzy'
+
+def octokit
+  config = Pit.get('github', :require =&gt; {
+                     'username' =&gt; 'Your user name of GitHub',
+                     'password' =&gt; 'Your password of GitHub',
+                   })
+  Octokit::Client.new(:login =&gt; config['username'], :password =&gt; config['password'])
+end
+
+octokit.orgs.each do |org|
+  org = org.login
+  next unless org.match(/^coderwall/)
+  unless octokit.organization_public_member?(org, user)
+    puts &quot;Publicize membership of user #{user} in #{org} ..&quot;
+    octokit.publicize_membership(org, user)
+  end
+end
+</code></pre></noscript></div>
+
+<p>余談ですが、<a href="https://github.com/pengwynn/octokit">octokit</a> で Publicize Membership するコードは、<a href="https://github.com/pengwynn/octokit/pull/89">自分がコントリビュートしたものです</a> 。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[How to manage RPM packages with Git]]></title>
@@ -774,27 +823,6 @@ end
 <p>札幌 Ruby 会議 2012 でも、YAPC::Asia Tokyo 2012 でも聞き逃したけど、やっぱり生で聞きたい、という方、ご安心ください。12/7, 8 に行われる、RubyConf.tw 2012 でも <a href="https://github.com/rubytaiwan/rubyconf.tw/blob/master/2012/speakers/schedule.md">同じ内容でプレゼン</a> する予定です。台湾でお待ちしています。</p>
 
 <p>札幌 Ruby 会議 2012 で登壇したペパボの同僚、<a href="https://github.com/hsbt">hsbt</a>, <a href="https://github.com/kentaro">kentaro</a>, <a href="https://github.com/kyanny">kyanny</a> も、同様に RubyConf.tw 2012 で登壇します。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[「Sqale の裏側」資料 at 札幌 Ruby 会議 2012]]></title>
-    <link href="http://mizzy.org/blog/2012/09/15/1/" />
-    <updated>2012-09-15T20:50:15+09:00</updated>
-    <id>http://mizzy.org/blog/2012/09/15/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://sapporo.rubykaigi.org/2012/ja/">札幌 Ruby 会議 2012</a> 、まだ会期中ですが、一足お先に帰ってきました。（大学の必修科目である、基礎数学のスクーリング授業が今日から3日間あるため。）</p>
-
-<p>YAPC::Asia 2011 の個人スポンサーTシャツを着て参加したのですが、Rubyist の皆さんの心が広いためか、宮川神のご加護があったからか、殴られたりせずに済んで一安心。</p>
-
-<p><a href="http://www.paperboy.co.jp/">ペパボ</a> は徐々に Ruby にスイッチしてきており、Ruby が動く PaaS である <a href="http://sqale.jp/">Sqale</a> もリリースされたことから、宣伝も兼ねて <a href="http://www.slideshare.net/mizzy/inside-sqales-backend-at-sapporo-ruby-kaigi-2012">Sqale の裏側</a> というタイトルで発表させてもらいました。</p>
-
-<p>Sqale は、 Ruby が動く PaaS でもあるし、Sqale 自体の開発も、フロントもバックもバリバリ Ruby が使われているのですが、Ruby の話はほとんどしない、出てくるコードも Lua と C の方が Ruby よりも多い、というトーク内容でしたが、技術的にはなかなかおもしろい内容になってると思いますので、PaaS の裏側、特にインフラ寄りの部分ってどうなってるんだろう、と興味のある方は、ぜひ資料をご覧になってみてください。</p>
-
-<p>発表の会場には、Sqale の競合である Heroku の中の人でもあり、Ruby のパパでもある Matz さんがいらっしゃったので、ノートPCに張った Heroku ステッカーを見せて、しっかりと媚びを売ることも忘れませんでした。</p>
-
-<p><a href="http://yapcasia.org/2012/">YAPC::Asia Tokyo 2012</a> の前夜祭でも、同じ内容でお話させていただきます。Perl の方は Ruby 以上に関係がなく、Perl の話はまったくしませんし、基本的には札幌 Ruby 会議で話した内容とほとんど同じですので、みなさん僕の話は聞かずに、Perl Mongers との交流を楽しむことをお勧めします。</p>
 
 ]]></content>
   </entry>
