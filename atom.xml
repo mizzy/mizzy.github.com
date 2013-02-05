@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-01-30T01:04:31+09:00</updated>
+  <updated>2013-02-06T01:50:17+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,233 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[MHA for MySQL の概要]]></title>
+    <link href="http://mizzy.org/blog/2013/02/06/1/" />
+    <updated>2013-02-06T01:50:17+09:00</updated>
+    <id>http://mizzy.org/blog/2013/02/06/1/</id>
+    <content type="html"><![CDATA[
+<p>MHA for MySQL の導入を検討していて、まずは社内の技術者向けに、MHA for MySQL の概要を伝えようと、主に <a href="http://code.google.com/p/mysql-master-ha/wiki/TableOfContents?tm=6">オフィシャルなドキュメント</a> からポイントを抜粋して社内向けの Wiki に書いてみた。本当なら、オフィシャルドキュメント全体に目を通してもらうのがいいんだけど、英語なので、はじめの一歩としては敷居が高く感じる人もいるだろう、ということで。</p>
+
+<p>特に外に出してまずい情報があるわけでもないので、このブログでも曝しておきます。</p>
+
+<hr>
+
+<h2>MHA の概要</h2>
+
+<p>MySQL エキスパートとして世界的にも著名な松信嘉範氏による、MySQL マスターの HA 化を行うためのツール。Perl 製。</p>
+
+<p>最小限のダウンタイムで、データの不整合を防ぎつつ、マスターのフェイルオーバーを行う、というのが主な機能。</p>
+
+<p>また、既に動作している MySQL に影響を与えることなく導入できる。</p>
+
+<p>機能は大きくわけると以下の4つ。</p>
+
+<ul>
+<li>自動的なマスターの監視とフェイルオーバー
+
+<ul>
+<li>トータルダウンタイム10〜30秒ぐらいで切り替え可能</li>
+</ul></li>
+<li>手動によるマスターフェイルオーバー</li>
+<li>自動的なマスターのフェイルオーバー（監視はしない）
+
+<ul>
+<li>監視を既存ソフトウェア（Pacemaker など）で行う場合に有用</li>
+</ul></li>
+<li>オンラインでマスターを別ホストに切り替え
+
+<ul>
+<li>マスターは動作してるが、ハードウェア的に怪しい兆候が見られるので、別ホストに事前に切り替えたい、などといった場合に有用</li>
+<li>0.5〜2秒ほど書き込みブロックされるだけで切り替え可能</li>
+</ul></li>
+</ul>
+
+<hr>
+
+<h2>MHA のコンポーネントと動作概要</h2>
+
+<p>マスターの監視とフェイルオーバーを MHA で自動的に行う場合の構成は以下のようになる。</p>
+
+<p><img src="/images/2013/02/components_of_mha.png" title="Components of MHA" ></p>
+
+<p>動作の流れは以下の通り。</p>
+
+<ul>
+<li>Manager が MySQL Master を監視</li>
+<li>ダウンを検知すると、以下を実行
+
+<ul>
+<li>Master の最新のバイナリログを各 Slave に保存（可能であれば）</li>
+<li>新マスターのリカバリ
+
+<ul>
+<li>スレーブのうちのひとつを新マスターにする</li>
+<li>デフォルトでは一番新しいポジションまで進んでいるスレーブが選ばれる。設定で、このスレーブを次のマスターにする、といったこともできる。</li>
+<li>新マスターにバイナリログの最新のポジションまでのデータを反映させる</li>
+</ul></li>
+<li>その他のスレーブのリカバリ 
+
+<ul>
+<li>バイナリログの最新のポジションまでのデータを反映させる</li>
+<li>新マスターからレプリケーションを開始</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>動作の詳細についてはオフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Sequences_of_MHA">Sequences of MHA</a> を参照。</p>
+
+<hr>
+
+<h2>Manager の拡張</h2>
+
+<p>Manager の本体である masterha_manager には拡張ポイントがいくつかあり、設定ファイル中で以下のパラメータに対してスクリプトを指定することで、動作を拡張することができる。拡張ポイントは以下の通り。</p>
+
+<ul>
+<li>secondary_check_script</li>
+<li>master_ip_failover_script</li>
+<li>shutdown_script</li>
+<li>report_script</li>
+<li>init_conf_load_script</li>
+<li>master_ip_online_change_script</li>
+</ul>
+
+<p>例えば、MHA 自体には、マスターがフェイルオーバーした時に VIP を付け替える機能はないが、以下のように VIP 付け替え用のスクリプトを設定ファイルで指定すると、フェイルオーバー時に VIP の付け替えをしてくれる。（スクリプトは自分で用意する。）</p>
+
+<pre><code>master_ip_failover_script=/usr/local/sample/bin/master_ip_failover
+</code></pre>
+
+<p>詳細は <a href="http://code.google.com/p/mysql-master-ha/wiki/Architecture#Custom_Extensions">Custom Extensions</a> を参照。</p>
+
+<hr>
+
+<h2>Manager の設定例</h2>
+
+<p>拡張スクリプトの設定など、必須ではないものも含む。</p>
+
+<pre><code>[server default]
+# mysql user and password
+user=root
+password=mysqlpass
+# working directory on the manager
+manager_workdir=/var/log/masterha/app1
+# manager log file
+manager_log=/var/log/masterha/app1/app1.log
+# working directory on MySQL servers
+remote_workdir=/var/log/masterha/app1
+secondary_check_script= masterha_secondary_check -s remote_host1 -s remote_host2
+ping_interval=3
+master_ip_failover_script=/script/masterha/master_ip_failover
+shutdown_script=/script/masterha/power_manager
+report_script=/script/masterha/send_master_failover_mail
+
+[server1]
+hostname=host1
+candidate_master=1 # 次のマスター候補
+
+[server2]
+hostname=host2
+
+[server3]
+hostname=host3
+no_master=1 # このホストはマスターにしない
+</code></pre>
+
+<p>以下のように設定ファイルを指定して起動する。</p>
+
+<pre><code class="text"># masterha_manager --conf=/etc/mha.cnf
+</code></pre>
+
+<p>設定パラメータ一覧はオフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters">Parameters</a> を参照。</p>
+
+<hr>
+
+<h2>チュートリアル</h2>
+
+<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Tutorial">Tutorial</a> を参照。</p>
+
+<hr>
+
+<h2>FAQ</h2>
+
+<p><a href="http://code.google.com/p/mysql-master-ha/wiki/FAQ">FAQ</a> からいくつかピックアップ。超意訳。</p>
+
+<ul>
+<li>サポートされている MySQL のバージョンは？
+
+<ul>
+<li>5.0 以降がサポートされている。4.1 以下はサポート対象外。</li>
+</ul></li>
+<li>特定のスレーブホストをマスターに昇格したり、逆に特定のホストはマスターに昇格しない、といったことは可能か？
+
+<ul>
+<li><a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#candidate_master">cadidate_master</a> や <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#no_master">no_master</a> といったパラメータで設定可能。</li>
+</ul></li>
+<li>インタラクティブ/手動でのフェイルオーバーは可能？
+
+<ul>
+<li><a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_master_switch">masterha<em>master</em>switch</a> 使えばOK。</li>
+</ul></li>
+<li>MHA Manager 自体の冗長化は？
+
+<ul>
+<li>Pacemaker とか使っとけ。</li>
+</ul></li>
+</ul>
+
+<hr>
+
+<h2>よくあるエラーと対処方法</h2>
+
+<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/TypicalErrors">TypicalErrors</a> を参照。</p>
+
+<hr>
+
+<h2>必要条件</h2>
+
+<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Requirements">Requirements</a> からいくつかピックアップして超意訳。</p>
+
+<p>MHA を動作させるためには、以下の設定が必要。<a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_manager">masterha_manager</a> や <a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_check_repl">masterha<em>check</em>repl</a> 実行時に自動的にチェックしてくれる。</p>
+
+<ul>
+<li>root で各ノード間での SSH 公開鍵認証ができること
+
+<ul>
+<li>masterha_check_ssh コマンドでチェックできる</li>
+</ul></li>
+<li>MySQL 5.0 以降のみサポート</li>
+<li>マスター昇格候補のサーバで log-bin が enable になってること </li>
+<li>マスター昇格候補サーバにレプリケーション用ユーザが存在すること</li>
+<li>ステートメントベースのレプリケーションでは LOAD DATA INFILE を使用してはいけない</li>
+</ul>
+
+<hr>
+
+<h2>その他</h2>
+
+<ul>
+<li>Semi-Synchronous Replication と組み合わせることで、マスターのハードウェア故障等によるデータロスのリスクを抑えることができる
+
+<ul>
+<li>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/UseCases#Using_together_with_Semi-Synchronous_Replication">Using together with Semi-Synchronous Replication</a> を参照</li>
+<li>Semi-Synchronous Replication については <a href="http://nippondanji.blogspot.jp/2009/03/mysql-ha-semi-synchronous-replication.html">漢(オトコ)のコンピュータ道: 最強のMySQL HA化手法 - Semi-Synchronous Replication</a> が詳しい</li>
+</ul></li>
+</ul>
+
+<hr>
+
+<h2>参考 URL</h2>
+
+<ul>
+<li><a href="http://www.slideshare.net/matsunobu/mha-for-mysqldena">MHA for MySQL と DeNA のオープンソースの話</a></li>
+<li><a href="http://code.google.com/p/mysql-master-ha/"> mysql-master-ha - MHA for MySQL: Master High Availability Manager and tools for MySQL - Google Project Hosting</a></li>
+<li><a href="https://github.com/yoshinorim/mha4mysql-node">yoshinorim/mha4mysql-node on GitHub</a></li>
+<li><a href="https://github.com/yoshinorim/mha4mysql-manager">yoshinorim/mha4mysql-manager on GitHub</a></li>
+</ul>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[GitHub に coderwall バッヂの Organizations ができてる]]></title>
@@ -774,55 +1001,6 @@ end
 <p>最終日のトークで、Plagger Conference で LT デビューした（させられた）話をしたのですが、スピーカーになることが自分にとって大きな転機のひとつだったので、誰もがスピーカーになれるこういった機会がある、というのは、本当に素晴らしいことだと思います。</p>
 
 <p>土日は家庭があるので、hajioji.pm は家から割と近いにも関わらず参加していなかったのですが、今度是非遊びに行きたいと思いました。（って書いてたら、後ろから見てた妻が、行ってきて良いよ、と言ってくれたので、今度行きます。）</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[YAPC::Asia Tokyo 2012 前夜祭]]></title>
-    <link href="http://mizzy.org/blog/2012/09/30/1/" />
-    <updated>2012-09-30T20:47:56+09:00</updated>
-    <id>http://mizzy.org/blog/2012/09/30/1/</id>
-    <content type="html"><![CDATA[
-<p>ブログを書くまでが YAPC、ってことで、ぼちぼち書いていきます。まずは前夜祭から。</p>
-
-<p><a href="http://yapcasia.org/2012/talk/show/048d468c-ab9e-11e1-a3b5-2a656aeab6a4">Sqale の裏側</a> というタイトルで、ペパボが提供する Ruby/Rack アプリが動く PaaS <a href="http://sqale.jp/">Sqale</a> の裏側のアーキテクチャについてお話してきました。</p>
-
-<iframe src="http://www.slideshare.net/slideshow/embed_code/14492929" width="597" height="486" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="http://www.slideshare.net/mizzy/inside-sqales-backend-at-yapcasia-tokyo-2012" title="Inside Sqale&#39;s Backend at YAPC::Asia Tokyo 2012" target="_blank">Inside Sqale&#39;s Backend at YAPC::Asia Tokyo 2012</a> </strong> from <strong><a href="http://www.slideshare.net/mizzy" target="_blank">Gosuke Miyashita</a></strong> </div>
-
-<iframe width="640" height="360" src="http://www.youtube.com/embed/lxvT8mcilE4" frameborder="0" allowfullscreen></iframe>
-
-<p>YAPC で Perl がまったく出てこない話をしたのは、これがはじめてです。こんなトークを採択してくださって、本当にありがとうございます。</p>
-
-<p>内容的には、<a href="http://sapporo.rubykaigi.org/2012/ja/schedule/details/48.html">札幌 Ruby 会議 2012</a> でお話しした内容とほとんど同じで、Sqale で利用している技術のうち、主に以下の3つについてお話しました。</p>
-
-<ul>
-<li>LXC やカーネルパッチなどの OS レイヤー</li>
-<li>ウェブプロキシのダイナミックルーティングを Nginx + Lua + Redis で実現</li>
-<li>SSH のルーティングを如何に実現しているか</li>
-</ul>
-
-<p>スライドで紹介したリンクについて、こちらにもまとめておきます。</p>
-
-<ul>
-<li><a href="https://github.com/paperboy-sqale/sqale-patches">Sqale で利用しているカーネルパッチ</a></li>
-<li><a href="https://github.com/hiboma">ひろやん</a> が Nginx + Lua + Redis について書いている <a href="http://d.hatena.ne.jp/hiboma/searchdiary?word=nginx%20lua%20redis">はてダエントリ</a></li>
-<li><a href="https://github.com/mizzy/openssh-script-auth">OpenSSH Script Auth Patch</a></li>
-<li>SSH ルーティングの着想を得た <a href="https://github.com/blog/530-how-we-made-github-fast">GitHub CTO のブログエントリ</a></li>
-<li><a href="http://twitter.com/lamanotrama">@lamanotrama</a> さんによる <a href="https://docs.google.com/presentation/d/11QekgeD-ex8RWVABGWsn3VGcHWq6HDnSVZzZskPWNeg/present#slide=id.p">サーバ構築自動化(on AWS) Sqale の場合</a></li>
-</ul>
-
-<p>SSH Router 実現のためにあてている OpenSSH パッチ、似たようなパッチが実は、RedHat 系ディストリビューションで入る OpenSSH にあたっているのですが、期待している挙動と微妙に異なるため、独自にパッチをあてることにしました。</p>
-
-<p>また、Heroku では SSH Router と同じことを実現するために <a href="http://twistedmatrix.com/trac/">Twisted</a> を使っている、という情報を刺身が中の人から仕入れてきたので調べてみたところ、<a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.conch.ssh.html">twisted.conch.ssh</a>  という、SSHv2 実装がありました。</p>
-
-<p>独自パッチをあてる方式は、OpenSSH へのアップデートに追従するのがきついので、Twisted ベースに切り替えることも検討しており、そのために <a href="https://github.com/mizzy/funnel">funnel</a> というものを開発中です。（まだ API 検討中なのと、動作確認コード書いただけですが。）</p>
-
-<p>funnel という名称は、GitHub 社で Git のルーティングを実現しているライブラリの名前が Chimney で、それの類義語からとっています。アニメとかからとったわけではないです。</p>
-
-<p>札幌 Ruby 会議 2012 でも、YAPC::Asia Tokyo 2012 でも聞き逃したけど、やっぱり生で聞きたい、という方、ご安心ください。12/7, 8 に行われる、RubyConf.tw 2012 でも <a href="https://github.com/rubytaiwan/rubyconf.tw/blob/master/2012/speakers/schedule.md">同じ内容でプレゼン</a> する予定です。台湾でお待ちしています。</p>
-
-<p>札幌 Ruby 会議 2012 で登壇したペパボの同僚、<a href="https://github.com/hsbt">hsbt</a>, <a href="https://github.com/kentaro">kentaro</a>, <a href="https://github.com/kyanny">kyanny</a> も、同様に RubyConf.tw 2012 で登壇します。</p>
 
 ]]></content>
   </entry>
