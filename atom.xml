@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-02-11T00:54:51+09:00</updated>
+  <updated>2013-02-24T12:29:37+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,32 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[最小手順のVMイメージの作り方]]></title>
+    <link href="http://mizzy.org/blog/2013/02/24/1/" />
+    <updated>2013-02-24T12:29:37+09:00</updated>
+    <id>http://mizzy.org/blog/2013/02/24/1/</id>
+    <content type="html"><![CDATA[
+<p>先日カヤックさんの社内勉強会にお邪魔して話してきた <a href="http://www.slideshare.net/mizzy/maglica-techkayac">Maglica</a> は、既に作成済みの VM イメージを元にクローンをつくって必要な設定（root パスワードの設定やネットワーク設定など）を行う、といったことが簡単にできるが、元の VM イメージつくるのがめんどくさいことには変わりなくて、ここをなんとかしたいなー、と常々思ってた。</p>
+
+<p>VM イメージをつくる手段としては、RedHat 系の場合は virt-manager, virt-install, Cobbler/Koan などがあるが、どれもインストーラを実行する形式であり、kickstart を利用すれば自動化できるとは言え、kickstart は問題が起きた場合の調査がやりにくい。（自分が効果的なやり方知らないだけかもしれないけど。）</p>
+
+<p>また、virt-install はオプション覚えられないし、Cobbler は初期のセットアップとか、profile の設定とかめんどくさい。</p>
+
+<p>そもそも、インストーラを実行しなくても、しかるべきファイルが含まれたイメージをつくればいいだけなので、インストーラの実行はとても無駄に思える。</p>
+
+<p>そこで、<a href="https://twitter.com/hansode">@hansode</a> さんの <a href="https://github.com/hansode/vmbuilder">vmbuilder</a> の存在を思い出して、これを使ってみようと思ったんだけど、単に使うだけじゃなく、具体的にどういったことをやってるのか理解したくて、ソースコードを読んで手順を追い、単純化したスクリプトに落とし込んでみたのがこれ。</p>
+
+<div><script src='https://gist.github.com/5020611.js?file='></script>
+<noscript><pre><code></code></pre></noscript></div>
+
+<p>以前 AMI(Amazon Machine Image) をつくった時と基本的には同じだけど、AMI では 1 イメージファイル 1 パーティションだったのが、この手順では 1 イメージファイルにパーティンションが 2 つあるのが大きな違い。kpartx をつかって パーティション毎に loopback device を割り当てるやり方をはじめて知ったので、とても参考になった。</p>
+
+<p>スクリプトの解説も書こうかと思ったけど、ここまで単純化されてれば、あとは man なり Google なりで調べればわかるはずなのでやめた。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[すぐにハッブル宇宙望遠鏡撮影画像を見れるGoogle Chromeの拡張作った。]]></title>
@@ -957,54 +983,6 @@ end
 <p><a href="http://atnd.org/event/peparty1210">PAPARTY!</a> というイベントが 10/27(土) に大阪で開催され、また、<a href="https://www.facebook.com/events/544148265612094/">福岡でも 11/24(土)に開催予定</a> なんですが、これに関するアイデアだし、ミーティング議事録、TODO 管理なども、GitHub の Issues を活用して行われています。</p>
 
 <p>こういった感じで、ペパボでは開発以外にも、様々な形で GitHub を活用しています。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[YAPC::Asia Tokyo 2012 2日目]]></title>
-    <link href="http://mizzy.org/blog/2012/10/01/1/" />
-    <updated>2012-10-01T20:18:46+09:00</updated>
-    <id>http://mizzy.org/blog/2012/10/01/1/</id>
-    <content type="html"><![CDATA[
-<p>YAPC::Asia Tokyo 2012 最終日の感想文です。</p>
-
-<p>この日は、同僚である <a href="https://twitter.com/kentaro">あんちぽさん</a> のトークに間に合えばいいかなー、ぐらいなつもりで家を出たのですが、朝一のトークに間に合ったので、<a href="https://twitter.com/kazeburo">@kazeburo</a> さんの <a href="http://yapcasia.org/2012/talk/show/08930a0c-b132-11e1-885d-564e6aeab6a4">1台から500台までのMySQL運用(YAPC::Asia編)</a> を聞きに 3F へ。</p>
-
-<p>確か、kazeburo さんとはじめてお会いしたのは、YAPC::Asia Tokyo 2006 で、京都から東京に移るか移らないかぐらいの頃だったよなー、と懐かしく思いながらトークを拝聴してました。あの頃は Femo というサービスを運営してたりして、ウェブ開発者のイメージが強かったのが、今やすっかりウェブオペレータ といった感じで、僕も当時はペパボに入ったばかりで、技術責任者にはなっておらず、社内では開発者という肩書きだったので、お互いすっかり変わったなー、と、時の流れを激しく感じました。（トークの内容全然関係ない。）</p>
-
-<p>次はそのまま同じ部屋で、<a href="https://twitter.com/maka2_donzoko">@maka2_donzoko</a> さんの <a href="http://yapcasia.org/2012/talk/show/5f1aa8b2-da18-11e1-b614-0d4e6aeab6a4">YAPC::Asiaきたつもり同人ボードゲーム「やっぱしぃYAPC」の考案と実践</a> を拝聴。期待を裏切らないクオリティと面白さ。どこからどう見ても YAPC でしたね。Acme 大全が分厚くなってることにも驚きました。（買うの忘れてた。）</p>
-
-<p>そして、ペパボ公式コンテンツ、我らがアイドルあんちぽさんの <a href="http://yapcasia.org/2012/talk/show/9fba79a8-b3ce-11e1-b82e-92b46aeab6a4">Rubyistの国のPerl使い</a> 。社内であんちぽさんのプレゼンは何度か拝見したけど、外でのプレゼンは実ははじめて。すばらしいコンテンツっぷりを発揮していて、さすがだなー、と。</p>
-
-<p>あんちぽさんがプレゼンでも話していたように、ペパボでは <a href="https://twitter.com/hsbt">@hsbt</a> さんとともに、主に開発プロセスのテコ入れをやってもらっていて、本当に助かっています。特に僕は、基本的にはプログラマではないので、この辺りはそれほど得意でもなく、以前からこういったことやらなきゃなー、と思っていながらできなかったことを、二人でガンガン進めてくれるので、本当にありがたいです。</p>
-
-<p>お昼休憩あたりからは、後に控えた自分のトークのことで頭がいっぱいなのと緊張しまくりで心ここにあらず状態。緊張のあまり昼飯食えませんでした。</p>
-
-<p>なので、基本的にはメインルームにいたものの、その後のトークの内容がほとんど頭に入ってません。LT は若干リラックスして聞けたものの、トリの <a href="http://yapcasia.org/2012/talk/show/42f3fba2-f8e0-11e1-8b29-beab6aeab6a4">竹迫さんのトーク</a> で緊張がピークに。</p>
-
-<p>で、いよいよ自分の出番である クロージングキーノート <a href="http://yapcasia.org/2012/talk/show/79991522-db79-11e1-be22-0d4e6aeab6a4">How Perl Changed My Life</a> を話すことに。こちら、スライドは公開済みですが、キーワードが散りばめられてるだけですので、興味ある方は動画の公開をお待ちください。</p>
-
-<p>内容を簡単にまとめると、</p>
-
-<ul>
-<li>今の会社（ペパボ）に入って、責任あるポジションを任されて、やりがいのある仕事ができ、仕事仲間にも恵まれてるのは Perl のおかげ</li>
-<li>Perl から得た教訓を短い言葉でまとめると
-
-<ul>
-<li>Shut the fuck up and write some code</li>
-<li>Openess is our driver for excellence</li>
-<li>知之者不如好之者、好之者不如樂之者（これを知る者はこれを好む者に如かず、これを好む者はこれを楽しむ者に如かず）</li>
-</ul></li>
-</ul>
-
-<p>といった感じです。</p>
-
-<p>壇上からラリーに英語でお礼を述べるのは、以前から考えていたのですが、初日は最前列ど真ん中にいたラリーが2日目はいなくて、あれ、想定と違う、と思ったら、トークの途中で最前列壇上から見て左手にいるのを発見して、無事お礼を述べることができました。ラリーから「どういたしまして」という言葉が返ってきたときは、ちょっと泣きそうになりました。</p>
-
-<p>Perl がなければ今の自分はなく、そんな自分にとって YAPC は本当に特別な場所で、そんな特別な場所で、クロージングキーノートを任されたのは大変名誉なことで、指名してくださった、牧さんをはじめとした JPA スタッフのみなさんには、本当に感謝しています。</p>
-
-<p>プライベートでも仕事でも、Perl を使う機会は少なくなってしまいましたが、YAPC にはこれからもずっと参加するつもりですし、ネタがあれば積極的にトークもしたいと思います。</p>
 
 ]]></content>
   </entry>
