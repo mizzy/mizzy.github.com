@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-02-24T22:53:17+09:00</updated>
+  <updated>2013-03-11T22:28:50+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,38 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[最小手順の Vagrant base box の作り方]]></title>
+    <link href="http://mizzy.org/blog/2013/03/11/1/" />
+    <updated>2013-03-11T22:28:50+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/11/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://www.vagrantup.com/">Vagrant</a> の base box をつくるためのツールとして <a href="https://github.com/jedi4ever/veewee">VeeWee</a> があって、これはこれで素晴らしいツールなんだけど、VeeWee は裏で ISO イメージをダウンロードしたり、インストーラを走らせたりで、時間もかかるし大げさな感じがするので、もっと簡略化できないか、ってことでやってみた。</p>
+
+<p><a href="blog/2013/02/24/1/">最小手順のVMイメージの作り方</a> で紹介したシェルスクリプトで作成した VM イメージに対して、以下のようにコマンドを実行するだけで、package.box ができあがる。</p>
+
+<pre><code class="text"># VBoxManage convertfromraw --format vmdk /tmp/sl63.img /tmp/sl63.vmdk
+# VBoxManage createvm --name SL6.3-x86_64 --register
+# VBoxManage modifyvm SL6.3-x86_64 --memory 512 --acpi on --nic1 nat
+# VBoxManage storagectl SL6.3-x86_64 --name &quot;IDE Controller&quot; --add ide
+# VBoxManage modifyvm SL6.3-x86_64 --hda /tmp/sl63.vmdk
+# vagrant package --base SL6.3-x86_64
+</code></pre>
+
+<p>できあがった package.box に対して以下のようにすれば、VM が起動する。</p>
+
+<pre><code class="text">$ vagrant box add sl63-x86_64 package.box
+$ vagrant init sl63-x86_64
+$ vagrant up
+</code></pre>
+
+<p>ただし、<a href="http://docs-v1.vagrantup.com/v1/docs/base_boxes.html">Vagrant Documentation - Documentation - Base Boxes</a> にあるような、vagrant ユーザの作成とか、鍵の設定なんかはしてないため、<code>vagrant ssh</code> ではログインできないので、<code>ssh root@localhost -p 2222</code> で、パスワードは root でログインする。</p>
+
+<p>この辺の設定もシェルスクリプトに組み込んじゃえばいいんだろうけど、まずは base box を簡単に作れるかどうかだけ確かめたかったので、今日はここまで。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[最小手順のVMイメージの作り方（LVM 編）]]></title>
@@ -813,91 +845,6 @@ Source1:        memcached.sysv
 <hr>
 
 <p>今年は、仕事面でもプライベート面でも大きな変化があったけど、技術者評価制度にしても、学生になったことにしても、まだ種を蒔いただけ、という段階。技術者評価制度は、ペパボのビジネスに貢献して業績向上につながるようじゃないと意味がないし、大学も卒業しないと意味がないので、現状に甘んじることなく前に進んでいく所存。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Sqale + Route 53 で Naked Domain を割り当てる方法]]></title>
-    <link href="http://mizzy.org/blog/2012/11/05/1/" />
-    <updated>2012-11-05T22:46:30+09:00</updated>
-    <id>http://mizzy.org/blog/2012/11/05/1/</id>
-    <content type="html"><![CDATA[
-<p>ペパボ が提供する PaaS <a href="http://sqale.jp">Sqale</a> では ELB を利用しているため、Sqale 上でホストしているアプリに独自ドメインを割り当てる場合には CNAME を利用する必要があり、Naked Domain（ホスト名がないドメイン）を割り当てることができません。</p>
-
-<p>Amazon Route 53 が持つ A レコードの Alias 機能を利用すれば、Naked Domain の割り当ても可能になりますが、自分の管理下ではない ELB がターゲットとなるため、もし Sqale 側で ELB の再作成が行われたりすると、新たな ELB の FQDN を調べて、Alias レコードを更新する必要があり、対応が面倒です。（そもそも、ELB が再作成されても気づけない可能性が高い。）</p>
-
-<p>そこで以下のような、自動で Alias レコードを追加・修正するスクリプトを作成してみました。これを cron などで定期的に実行すれば、万が一 Sqale 側で ELB が再作成された場合でも、自動的に新しい ELB をターゲットとするようレコードを更新してくれます。（ご利用は自己責任でお願いします。）</p>
-
-<p>使い方は以下の通りです。</p>
-
-<ul>
-<li>SQALE_DOMAIN に割り当てられた sqale.jp のサブドメインを指定</li>
-<li>ORIGINAL_DOMAIN に割り当てたい Naked Domain を指定</li>
-<li>環境変数 AWS<em>ACCESS</em>KEY, AWS<em>SECRET</em>KEY に、AWS のアクセスキーと秘密キーを指定</li>
-</ul>
-
-<div><script src='https://gist.github.com/4016041.js?file=update-route-53-alisa-for-sqale.rb'></script>
-<noscript><pre><code>#!/usr/bin/env ruby
-
-require 'resolv'
-require 'route53'
-
-SQALE_DOMAIN    = 'i4pc-mizzy.sqale.jp.'
-ORIGINAL_DOMAIN = 'i4pc.net.'
-
-# This code is from
-# https://github.com/bgentry/fog/commit/26d366d3047f437154946b2bb15935c2ee34a209
-def hosted_zone_for_alias_target(dns_name)
-  k = elb_hosted_zone_mapping.keys.find do |k|
-    dns_name =~ /\A.+\.#{k}\.elb\.amazonaws\.com\.?\z/
-  end
-  elb_hosted_zone_mapping[k]
-end
-
-def elb_hosted_zone_mapping
-  @elb_hosted_zone_mapping ||= {
-    &quot;ap-northeast-1&quot; =&gt; &quot;Z2YN17T5R711GT&quot;,
-    &quot;ap-southeast-1&quot; =&gt; &quot;Z1WI8VXHPB1R38&quot;,
-    &quot;eu-west-1&quot;      =&gt; &quot;Z3NF1Z3NOM5OY2&quot;,
-    &quot;sa-east-1&quot;      =&gt; &quot;Z2ES78Y61JGQKS&quot;,
-    &quot;us-east-1&quot;      =&gt; &quot;Z3DZXE0Q79N41H&quot;,
-    &quot;us-west-1&quot;      =&gt; &quot;Z1M58G0W56PQJA&quot;,
-    &quot;us-west-2&quot;      =&gt; &quot;Z33MTJ483KN6FU&quot;,
-  }
-end
-
-elb = Resolv::DNS.new.getresources(
-  SQALE_DOMAIN,
-  Resolv::DNS::Resource::IN::CNAME
-)[0].name.to_s
-
-hosted_zone_id = hosted_zone_for_alias_target(elb)
-
-conn = Route53::Connection.new(ENV['AWS_ACCESS_KEY'], ENV['AWS_SECRET_KEY'])
-
-conn.get_zones.each do |zone|
-  next if zone.name != ORIGINAL_DOMAIN
-  found = false
-  zone.get_records.each do |record|
-    if record.name == ORIGINAL_DOMAIN and record.type == 'A'
-      record.update(nil, nil, nil, [ elb ], hosted_zone_id)
-    end
-  end
-
-  unless found
-    record = Route53::DNSRecord.new(
-      ORIGINAL_DOMAIN,
-      'A',
-      nil,
-      [ elb ],
-      zone,
-      hosted_zone_id
-    )
-    record.create
-  end
-end
-</code></pre></noscript></div>
 
 ]]></content>
   </entry>
