@@ -21,7 +21,7 @@
     <content type="html"><![CDATA[
 <p><a href="http://www.vagrantup.com/">Vagrant</a> の base box をつくるためのツールとして <a href="https://github.com/jedi4ever/veewee">VeeWee</a> があって、これはこれで素晴らしいツールなんだけど、VeeWee は裏で ISO イメージをダウンロードしたり、インストーラを走らせたりで、時間もかかるし大げさな感じがするので、もっと簡略化できないか、ってことでやってみた。</p>
 
-<p><a href="blog/2013/02/24/1/">最小手順のVMイメージの作り方</a> で紹介したシェルスクリプトで作成した VM イメージに対して、以下のようにコマンドを実行するだけで、package.box ができあがる。</p>
+<p><a href="/blog/2013/02/24/1/">最小手順のVMイメージの作り方</a> で紹介したシェルスクリプトで作成した VM イメージに対して、以下のようにコマンドを実行するだけで、package.box ができあがる。</p>
 
 <pre><code class="text"># VBoxManage convertfromraw --format vmdk /tmp/sl63.img /tmp/sl63.vmdk
 # VBoxManage createvm --name SL6.3-x86_64 --register
