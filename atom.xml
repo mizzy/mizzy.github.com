@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-11T22:28:50+09:00</updated>
+  <updated>2013-03-22T02:19:00+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,65 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[puppet-lxc-test-box]]></title>
+    <link href="http://mizzy.org/blog/2013/03/22/1/" />
+    <updated>2013-03-22T02:19:00+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/22/1/</id>
+    <content type="html"><![CDATA[
+<p>新たな Puppet のベストプラクティスを求めて、マニフェストの大規模なリファクタリングを行っています。</p>
+
+<p>で、リファクタリングするからにはテストが必要だよね、ってことで、<a href="http://rspec-puppet.com/">rspec-puppet</a> でテストを書いてるんだけど、rspec-puppet はマニフェストがコンパイルされた「カタログ」というものに対してテストするもので、実際にマニフェストを流し込んだ状態が正しいかテストするわけではないので、これだとテストとしては不完全。</p>
+
+<p>というわけで、<a href="https://github.com/opscode/test-kitchen">Test Kitchen</a> みたいに、同時にいくつも VM を立ててテストを走らせる、ってなことをやりたいんだけど、会社では KVM ベースの VM を利用してるので、VirtualBox ベースの Vagrant は使えないし、そもそもテストを動かす大元のホストも VM なので、VirtualBox どころか KVM も利用できない。</p>
+
+<p>なので、まずは LXC のシステムコンテナをさくさくと作るための Puppet モジュールを書いてみた。</p>
+
+<p><a href="https://github.com/mizzy/puppet-lxc-test-box">puppet-lxc-test-box</a></p>
+
+<p>( <a href="https://github.com/fgrehm/vagrant-lxc">vagrant-lxc</a> というのもあるけど、&quot;Vagrant &gt;= 1.1.0, the lxc package and a Kernel higher than 3.5.0-17.28, which on Ubuntu 12.10 means something like&quot; ってなことが書かれていて、メインで使ってる RedHat 系 OS では動く気がしないのでスルー。)</p>
+
+<p>使い方は次のような感じ。まず lxc-test-box モジュールと sysctl モジュールを持ってくる。</p>
+
+<pre><code>$ git clone git://github.com/mizzy/puppet-lxc-test-box.git lxc-test-box
+$ git clone git://github.com/duritong/puppet-sysctl.git sysctl
+</code></pre>
+
+<p>sysctl モジュールそのままだとエラーになるので、sysctl/manifests/value.pp の適当な位置に以下を書いておく。</p>
+
+<pre><code>Exec {
+  path =&gt; &#39;/sbin:/usr/sbin&#39;,
+}
+</code></pre>
+
+<p><a href="https://github.com/mizzy/puppet-lxc-test-box/blob/master/manifests/init.pp">lxc-test-box/manifets/init.pp</a> に以下のように、システムコンテナのホスト名と IP アドレスを書いておく。</p>
+
+<pre><code>  lxc::setup { &#39;base&#39;:   ipaddress =&gt; &#39;172.16.0.2&#39; }
+  lxc::setup { &#39;manage&#39;: ipaddress =&gt; &#39;172.16.0.3&#39; }
+  lxc::setup { &#39;smtp&#39;:   ipaddress =&gt; &#39;172.16.0.4&#39; }
+</code></pre>
+
+<p>マニフェストを流し込む。</p>
+
+<pre><code>$ sudo puppet apply --modulepath=. -e &#39;include lxc-test-box&#39;
+</code></pre>
+
+<p>これで、ホスト OS への lxc パッケージのインストール、ブリッジインターフェース br0 の作成、IP マスカレードの設定を行い、指定されたホスト名と IP アドレスでシステムコンテナを作成し、コンテナの起動までしてくれる。所要時間は、コンテナひとつあたり5分ぐらい。</p>
+
+<p>起動したら、</p>
+
+<pre><code>$ ssh root@172.16.0.2
+</code></pre>
+
+<p>で、パスワードは root でログインできる。テスト目的なのでホストOSとは通信できるけど、外部からは通信できない。ただし、ホスト OS で IP マスカレードの設定はしてあるので、コンテナから外部への通信は可能。</p>
+
+<p>同梱している lxc パッケージは Scientifix Linux 6.2 + Kernel 2.6.32-358.2.1.el6.x86_64 上でビルドしたものなので、RedHat 6 系以外ではたぶん動かないし、カーネルバージョンが違うと動かないかもしれない。</p>
+
+<p>これでテスト用のシステムコンテナを量産できるようになったので、次は実際にテストする仕組みを作り込む。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[最小手順の Vagrant base box の作り方]]></title>
@@ -751,100 +810,6 @@ Source1:        memcached.sysv
 <p>現在では「サーバエンジニア」ではなく「インフラエンジニア」の方がおそらく一般的な呼び方でしょうね。（それも変わりつつあるようですが。）</p>
 
 <p>なおこの記事は <a href="http://gihyo.jp/book/2011/978-4-7741-4600-3">サーバ/インフラエンジニア養成読本</a> にも掲載されています。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[2012年のふりかえり]]></title>
-    <link href="http://mizzy.org/blog/2012/12/31/1/" />
-    <updated>2012-12-31T12:20:20+09:00</updated>
-    <id>http://mizzy.org/blog/2012/12/31/1/</id>
-    <content type="html"><![CDATA[
-<p>1年間のまとめ的なエントリは今まで書いたことがなかったけど、今年は色々あったし、後から振り返ってターニングポイントだったな、と思えそうな年になったので、特に印象に残ってることをまとめてみることにします。</p>
-
-<hr>
-
-<h2>ペパボでの新しい技術者評価制度のスタートと技術基盤整備エンジニアというポジションの創設</h2>
-
-<p>まずは 2012/01/06 のこの予感めいた tweet。</p>
-
-<blockquote class="twitter-tweet"><p>今年は転機になりそうな気がする、なんとなく。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/status/155287369682124800" data-datetime="2012-01-06T13:59:28+00:00">January 6, 2012</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>これは無根拠にこんなことを言ってたわけではなく、ペパボで新しく技術者のための評価制度ができたこと、そしてこの評価制度をベースとして、「技術基盤整備エンジニア」というポジションをつくることが承認されたこと、が背景にあっての tweet です。技術者評価制度と技術基盤整備エンジニアについては、以下のエントリにまとめています。</p>
-
-<ul>
-<li><a href="/blog/2012/01/17/1/">Paperboy is hiring</a></li>
-<li><a href="/blog/2012/02/29/1/">Paperboy&#39;s engineer evaluation system</a></li>
-<li><a href="/blog/2012/08/20/1/">Paperboy&#39;s engineer evaluation system その後</a></li>
-</ul>
-
-<hr>
-
-<h2>あんちぽさんとhsbtさんがペパボに入社</h2>
-
-<p>上で書いた技術基盤整備エンジニアとして、<a href="https://twitter.com/kentaro">あんちぽ</a> さんと <a href="https://twitter.com/hsbt">hsbt</a> さんがペパボに入社してくれました。</p>
-
-<ul>
-<li><a href="http://www.hsbt.org/diary/20120501.html">株式会社paperboy&amp;co.に入社しましたのお知らせ - HsbtDiary(2012-05-01)</a></li>
-<li><a href="http://blog.kentarok.org/entry/2012/05/01/145925">株式会社paperboy&amp;co.に入社しました - delirious thoughts</a></li>
-</ul>
-
-<p>今までペパボの技術責任者として、ペパボ全体の技術を見る立場だったのですが、自分はどちらかというと OS やミドルウェアレイヤーの技術がテリトリーで、開発についてはそれほど得意ではなく、十分にケアすることができてなかったのですが、あんちぽさん、hsbt さんにペパボの開発全般を見てもらえるようになり、とても助かっています。</p>
-
-<p>特に、自分の能力不足やリソース不足で、これはやるべきだろうと思いながらもできなかった数々のことを、二人がガンガンやってくれるので、とても頼もしく、ペパボの技術にとってなくてはならない存在になっています。</p>
-
-<hr>
-
-<h2>大学生になった</h2>
-
-<p>色々思うところがあって、<a href="/blog/2012/04/14/1/">4月から大学生になりました</a>。いまのところ、学業の方も順調に進んでいて、1年目で目標としてる単位数はなんとか取得できそうだな、という感触なのですが、大学に再入学してぶっちゃけどうか、といったエントリを、大学生活が1年経過した4月ぐらいに書く予定です。</p>
-
-<p>また、<a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol72">WEB+DB PRESS Vol.72</a> のインタビュー記事でも、このことについてとりあげて頂きました。</p>
-
-<hr>
-
-<h2>Sqale のリリース</h2>
-
-<p>ペパボ初/発の PaaS である <a href="http://sqale.jp/">Sqale</a> をリリースしました。これまでのペパボにはなかったタイプのサービスで、技術的な面でも新しいチャレンジができて、とても楽しく仕事ができました。</p>
-
-<p>過去にペパボでがっつりと関わったサービスには、<a href="http://30d.jp/">30days Album</a> や <a href="http://lolipop.jp/">ロリポップの大幅リニューアル</a>があるのですが、このどちらもアーキテクトとして技術全般を見つつも、実装もがっつりやる、という感じで、なかなか大変だったのですが、今回は頼もしいメンバーに恵まれ、アーキテクトにほぼ徹することができました。（OpenSSH や Linux カーネルのパッチ書いたり、AMIつくったり、といったこともやってましたが。）</p>
-
-<hr>
-
-<h2>札幌Ruby会議2012でスピーカーに</h2>
-
-<p>ペパボが徐々に Ruby にスイッチしてることもあり、<a href="http://sqale.jp/">Sqale</a> でもふんだんに Ruby を使っている、ということもあって、<a href="http://sapporo.rubykaigi.org/2012/ja/">札幌Ruby会議2012</a> で発表してきました。Ruby 関係の集まりで発表したのはこれが初めてです。（自分の発表ではほとんど Ruby の話はしてないですが。）</p>
-
-<iframe src="http://player.vimeo.com/video/51481486" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/51481486">[sprk2012] Inside Sqale's Backend</a> from <a href="http://vimeo.com/suzuki">suzuki</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
-
- <iframe src="http://www.slideshare.net/slideshow/embed_code/14290440" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
-
-<p>自分以外にも、<a href="https://twitter.com/kentaro">あんちぽ</a> さん、<a href="https://twitter.com/hsbt">hsbt</a> さん、<a href="https://twitter.com/kyanny">刺身</a> と、トータル4人がペパボから登壇していて、Rubyコミュニティの方々に、ペパボを印象づけることができたのではないかと思います。</p>
-
-<hr>
-
-<h2>YAPC::Asia Tokyo 2012 でゲストスピーカーに</h2>
-
-<p><a href="http://yapcasia.org/2012/">YAPC::Asia Tokyo 2012</a> でゲストスピーカーとして招いて頂き、クロージングキーノートをつとめることに。牧さんからお話を頂いたときは、びっくりするとともに、とても名誉なことで、二つ返事でOKしました。自分が今までスピーカーをやった中でも、最高の出来事です。</p>
-
-<iframe width="500" height="281" src="http://www.youtube.com/embed/wxUxFdFxd0Y" frameborder="0" allowfullscreen></iframe>
-
-<p><iframe src="http://www.slideshare.net/slideshow/embed_code/14532075" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe></p>
-
-<hr>
-
-<h2>RubyConf Taiwan 2012 で海外スピーカーデビュー</h2>
-
-<p><a href="http://rubyconf.tw/2012/">RubyConf Taiwan 2012</a> で、初めて海外でスピーカーデビューしてきました。</p>
-
-<iframe src="http://www.slideshare.net/slideshow/embed_code/15544447" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
-
-<hr>
-
-<p>今年は、仕事面でもプライベート面でも大きな変化があったけど、技術者評価制度にしても、学生になったことにしても、まだ種を蒔いただけ、という段階。技術者評価制度は、ペパボのビジネスに貢献して業績向上につながるようじゃないと意味がないし、大学も卒業しないと意味がないので、現状に甘んじることなく前に進んでいく所存。</p>
 
 ]]></content>
   </entry>
