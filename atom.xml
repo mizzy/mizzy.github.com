@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-24T01:47:23+09:00</updated>
+  <updated>2013-03-24T02:29:42+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,51 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Testing servers provisioned by Puppet or Chef with RSpec]]></title>
+    <link href="http://mizzy.org/blog/2013/03/24/2/" />
+    <updated>2013-03-24T02:29:42+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/24/2/</id>
+    <content type="html"><![CDATA[
+<p><a href="/blog/2013/03/24/1/">I&#39;ve made a Puppet module for creating LXC system containers</a>.Next I&#39;ve tried to the basis for writing test code easily.</p>
+
+<p>With <a href="https://github.com/mizzy/rspec-lxc-test-box">rspec-lxc-test-box</a>, you can write code for testing server status like this.</p>
+
+<pre><code class="ruby">require &#39;container_spec_helper&#39;
+
+describe &#39;nrpe&#39; do
+  it { should be_installed }
+  it { should be_enabled   }
+  it { should be_running   }
+end
+
+describe &#39;nagios-plugins-all&#39; do
+  it { should be_installed }
+end
+
+describe &#39;/etc/nagios/nrpe.cfg&#39; do
+  it { should be_file }
+  it { should contain &#39;server_port=5666&#39; }
+end
+
+describe &#39;/etc/nrpe.d/01base.cfg&#39; do
+  it { should be_file }
+end
+
+describe &#39;port 5666&#39; do
+  it { should be_listening }
+end
+</code></pre>
+
+<p>This code accesses to a container through SSH and execute commands to check whether files exist, packages are installed, files contain some strings, services run, some ports listen and so on.Very simple.(But code base are specific for Red Hat and its clone OS.)</p>
+
+<p>You can see how I make it simply <a href="https://github.com/mizzy/rspec-lxc-test-box/tree/master/spec/support/matchers">with these codes</a>.</p>
+
+<p>This test code works with any servers provisioned by any tools(Puppet, Chef, CFEngine, Shell Script, Hands and so on).</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Create LXC system containers easily with Puppet]]></title>
@@ -566,115 +611,6 @@ end
 </code></pre></noscript></div>
 
 <p>余談ですが、<a href="https://github.com/pengwynn/octokit">octokit</a> で Publicize Membership するコードは、<a href="https://github.com/pengwynn/octokit/pull/89">自分がコントリビュートしたものです</a> 。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[How to manage RPM packages with Git]]></title>
-    <link href="http://mizzy.org/blog/2013/01/19/1/" />
-    <updated>2013-01-19T17:52:35+09:00</updated>
-    <id>http://mizzy.org/blog/2013/01/19/1/</id>
-    <content type="html"><![CDATA[
-<p>Now I manage RPM packages like <a href="https://github.com/paperboy-sqale/sqale-yum">this repo</a>. I put source and binary packages in this repo.But this way has these problems.</p>
-
-<ul>
-<li>Binary packages&#39; size is too big.It takes long time to git clone, push, pull and so on.</li>
-<li>I cannot see the history of each file in the packages.
-
-<ul>
-<li>It&#39;s not very meaningful to use Git.</li>
-</ul></li>
-</ul>
-
-<p>I&#39;d like to change like this.</p>
-
-<ul>
-<li>Put the requisite minumum files to see the hisotory of each file.
-
-<ul>
-<li>Not put binary packages.(Source packages are OK if needed.)</li>
-</ul></li>
-<li>Build packages with files managed with Git.</li>
-</ul>
-
-<p>And I made the prototype of this idea like this.</p>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git">mizzy/how-to-manage-rpm-packages-with-git</a></p>
-
-<p>The file/directory strucure in this repo is like this.</p>
-
-<pre><code>|-- build.rb
-|-- ffmpeg
-|   |-- ffmpeg-github-0.8.2.spec
-|   |-- libavformat-muxer.paperboy.patch
-|   |-- libx264-superfast_firstpass.ffpreset
-|   `-- libx264-veryfast_firstpass.ffpreset
-|-- memcached
-|   |-- memcached-1.4.15-1.el6.src.rpm
-|   `-- memcached.spec
-`-- ngx_openresty
-    `-- ngx_openresty.spec
-</code></pre>
-
-<p>Build rb is the package build script, and others are directories for each package.Which files should be managed is vary from package to package, so I arrange several patterns.</p>
-
-<hr>
-
-<h2>Pattern 1: ngx_openresty</h2>
-
-<p>With <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ngx_openresty">this pattern</a>, all I have to manage is spec file.In this spec file,</p>
-
-<pre><code>Source0: http://agentzh.org/misc/nginx/ngx_openresty-%{version}.tar.gz
-</code></pre>
-
-<p>You can see this line.Build.rb gets this file, pust under ~/rpmbuild/SOURCES and build source and binary packages.This is the simplest pattern.</p>
-
-<hr>
-
-<h2>Pattern2: ffpmeg</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ffmpeg">This pattern</a> has a spec file, patch files and other files.If you need original patches and manage patch files with Git, this pattern is suitable.</p>
-
-<pre><code>Source: http://www.ffmpeg.org/releases/ffmpeg-%{version}.tar.bz2
-</code></pre>
-
-<p>Build.rb get this source file in spec, put this source, patches and other files under ~/rpmbuild/SOURCE and build source and binary packages.</p>
-
-<hr>
-
-<h2>Pattern 3: memcached</h2>
-
-<p>With <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/memcached">this pattern</a>, You&#39;d like to change the build options of the existence source package, but the sources in spec file is like this.</p>
-
-<pre><code>Source0:        http://memcached.googlecode.com/files/%{name}-%{version}.tar.gz
-Source1:        memcached.sysv
-</code></pre>
-
-<p>So you can&#39;t get the memcached.sysv through the network.But this file is included in the existence source package and you don&#39;t need to manage it with Git.</p>
-
-<p>In this case, it&#39;s easy to put the existence source package under the Gir repo.</p>
-
-<hr>
-
-<p>With any of these patterns, you can see the history of each file, total file size in the repo is minimum and all files needed to build package are found in the repo.</p>
-
-<hr>
-
-<h2>Package Building and Deploying</h2>
-
-<p>My final goal is, git clone these files, build packages with the script <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/blob/master/build.rb">like this</a> and deploy the packages to yum servers automatically.</p>
-
-<hr>
-
-<h2>Other featuer</h2>
-
-<p>Also I&#39;d like to write git url as source in the spec file like this.</p>
-
-<pre><code>Source: git://github.com/torvalds/linux.git, ref: dfdeb
-</code></pre>
-
-<p>Build script will clone source files from this git url, build tar ball from these and build package.This idea is inspired by <a href="http://gembundler.com/">Bundler</a>.</p>
 
 ]]></content>
   </entry>
