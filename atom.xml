@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-23T22:34:15+09:00</updated>
+  <updated>2013-03-24T01:47:23+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,59 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Create LXC system containers easily with Puppet]]></title>
+    <link href="http://mizzy.org/blog/2013/03/24/1/" />
+    <updated>2013-03-24T01:47:23+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/24/1/</id>
+    <content type="html"><![CDATA[
+<h2>Overview</h2>
+
+<p>I&#39;m refactoring <a href="https://puppetlabs.com/">Puppet</a> manifests and refactoring requires automated testing.</p>
+
+<p><a href="http://rspec-puppet.com/">rspec-puppet</a> and <a href="http://projects.puppetlabs.com/projects/cucumber-puppet/wiki">cucumber-puppet</a> test Puppet catalog, but I need to test actual server status that Puppet manifests applied to.</p>
+
+<p>For actual testing, several virtual machines are needed. <a href="http://www.vagrantup.com/">Vagrant</a> is the one for creating virtual machines for testing easily.</p>
+
+<p>But I&#39;m using <a href="http://www.linux-kvm.org/page/Main_Page">KVM</a> mainly and would like to create virtual machines for testing on a KVM based virtual machine.</p>
+
+<p><a href="http://lxc.sourceforge.net/">LXC</a> suits that purpose.</p>
+
+<p>For testing purpose, how to create LXC system containers easily is important. So I&#39;ve created a Puppet module to create LXC system containers easily.</p>
+
+<p><a href="https://github.com/mizzy/puppet-lxc-test-box">mizzy/puppet-lxc-test-box</a></p>
+
+<hr>
+
+<h2>How To Use</h2>
+
+<p>First, git clone puppet-lxc-test-box module and puppet-sysctl module.</p>
+
+<pre><code>$ git clone git://github.com/mizzy/puppet-lxc-test-box.git lxc-test-box
+$ git clone git://github.com/duritong/puppet-sysctl.git sysctl
+</code></pre>
+
+<p>Next, write a manifest to create system containers.</p>
+
+<pre><code>include lxc-test-box
+
+Exec { path =&gt; &#39;/sbin:/usr/sbin:/bin:/usr/bin&#39; }
+
+lxc-test-box::lxc::setup { &#39;proxy&#39;: ipaddress =&gt; &#39;172.16.0.2&#39; }
+lxc-tets-box::lxc::setup { &#39;www&#39;:   ipaddress =&gt; &#39;172.16.0.3&#39; }
+lxc-test-box::lxc::setup { &#39;db&#39;:    ipaddress =&gt; &#39;172.16.0.4&#39; }
+</code></pre>
+
+<p>Apply this manifest.</p>
+
+<pre><code>$ sudo puppet apply --modulepath=. lxc-test-box.pp
+</code></pre>
+
+<p>3 containers will be created.</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Puppet や Chef で構築したサーバを RSpec でテストする]]></title>
@@ -622,129 +675,6 @@ Source1:        memcached.sysv
 </code></pre>
 
 <p>Build script will clone source files from this git url, build tar ball from these and build package.This idea is inspired by <a href="http://gembundler.com/">Bundler</a>.</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[RPM パッケージを Git で管理する方法（案）]]></title>
-    <link href="http://mizzy.org/blog/2013/01/17/1/" />
-    <updated>2013-01-17T18:05:44+09:00</updated>
-    <id>http://mizzy.org/blog/2013/01/17/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="https://twitter.com/trombik">@trombik</a> さんの</p>
-
-<blockquote class="twitter-tweet"><p>弊社ではtinderbox+gitですべて統一させてる</p>&mdash; trombik (@trombik) <a href="https://twitter.com/trombik/status/284200636021608449" data-datetime="2012-12-27T07:34:46+00:00">December 27, 2012</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>という tweet を見て気になったので調べてみたところ、 <a href="http://tinderbox.marcuscom.com/">Tinderbox</a> はどうやら FreeBSD の ports を自動ビルドするためのシステムのようで、RPM でもこんなのないのかなー、と探してみたものの見つけられなかったし、Tinderbox が自分が求めてるものなのかどうかもいまいちピンと来なかったので、プロトタイプ的なものをつくってみることに。</p>
-
-<p>現在 RPM パッケージの管理は、<a href="https://github.com/paperboy-sqale/sqale-yum">こんな感じで</a> ソース/バイナリパッケージを直接リポジトリに突っ込んじゃってるんだけど、これだと以下のような問題がある。</p>
-
-<ul>
-<li>バイナリパッケージのファイルサイズが大きすぎて、git clone や push や pull に時間がかかる</li>
-<li>パッケージ丸ごと突っ込んでるので、ファイル個別の差分が確認できない
-
-<ul>
-<li>そもそも差分確認できないものを突っ込むのは git を使う意義がだいぶ削がれる</li>
-</ul></li>
-</ul>
-
-<p>それをこんな風にしたい。</p>
-
-<ul>
-<li>必要最小限のファイルだけを git リポジトリに突っ込んでファイル個別に差分確認できるように</li>
-<li>パッケージは突っ込まず、git で管理してるファイルからパッケージビルドする
-
-<ul>
-<li>ただしソースパッケージは必要なら突っ込んでもOK</li>
-</ul></li>
-</ul>
-
-<p>で、プロトタイプ的なものをつくってみたのがこれ。</p>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git">mizzy/how-to-manage-rpm-packages-with-git</a></p>
-
-<p>このリポジトリの構成はこんな感じ。</p>
-
-<pre><code>|-- build.rb
-|-- ffmpeg
-|   |-- ffmpeg-github-0.8.2.spec
-|   |-- libavformat-muxer.paperboy.patch
-|   |-- libx264-superfast_firstpass.ffpreset
-|   `-- libx264-veryfast_firstpass.ffpreset
-|-- memcached
-|   |-- memcached-1.4.15-1.el6.src.rpm
-|   `-- memcached.spec
-`-- ngx_openresty
-    `-- ngx_openresty.spec
-</code></pre>
-
-<p>build.rb がビルド用のスクリプトで、それ以外に各パッケージ用のディレクトリがある。で、どのファイルをバージョン管理するかは、パッケージによって異なるだろうな、ってことで、あり得そうなパターンをいくつか用意してみた。</p>
-
-<hr>
-
-<h2>パターン1: ngx_openresty</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ngx_openresty">これ</a> は spec ファイルだけを管理するパターン。spec の中に</p>
-
-<pre><code>Source0: http://agentzh.org/misc/nginx/ngx_openresty-%{version}.tar.gz
-</code></pre>
-
-<p>という記述があるので、こいつをダウンロードして ~/rpmbuild/SOURCES に置き、ソースパッケージとバイナリパッケージをビルド、という一番シンプルなパターン。</p>
-
-<p>configure オプションぐらいをカスタマイズできればOK、という場合はこのパターンになるはず。</p>
-
-<hr>
-
-<h2>パターン2: ffpmeg</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ffmpeg">これ</a> は spec ファイル＋パッチ（＋α）な構成。独自にパッチをあてて、パッチもバージョン管理したい、といったパターン。これも spec ファイルに</p>
-
-<pre><code>Source: http://www.ffmpeg.org/releases/ffmpeg-%{version}.tar.bz2
-</code></pre>
-
-<p>という記述があるので、こいつをダウンロードし、他のパッチファイル等とともに ~/rpmbuild/SOURCES に置いて、ソースパッケージとバイナリパッケージをビルドする。</p>
-
-<hr>
-
-<h2>パターン3: memcached</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/memcached">こいつ</a> は既存のソースパッケージのビルドオプションだけを変えたいんだけど、spec ファイル中のソースが</p>
-
-<pre><code>Source0:        http://memcached.googlecode.com/files/%{name}-%{version}.tar.gz
-Source1:        memcached.sysv
-</code></pre>
-
-<p>となっていて、memcached.sysv をネットワーク越しに取得できない、かといって、このファイルは既存ソースパッケージに入ってるものをそのまま使うので、特にバージョン管理の必要はない、といったケース。</p>
-
-<p>このケースであれば、既存ソースパッケージ内のファイルは、spec 以外は修正することはないからバージョン管理の必要はないし、バイナリパッケージと比べればサイズは小さいから、そのまま突っ込んじゃう方が楽だろう、ということで、src.rpm ファイルをリポジトリにそのまま突っ込んでる。（別に memcached.sysv だけ取り出して置いといてもいいんだけど、memcached.sysv 以外にも付随するソースやパッチがもっとたくさんある場合は、この方が楽だろう、という判断。）</p>
-
-<hr>
-
-<p>今のところこれぐらいのパターンを網羅できれば大丈夫かなー、と。いずれのパターンでも、ファイル個別に差分の確認ができるし、管理すべきファイルのサイズも最小限に抑えられているし、ビルドに必要なファイルは一通り揃っている。</p>
-
-<hr>
-
-<h2>パッケージのビルド</h2>
-
-<p>で、これらのファイルを git clone してきて、<a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/blob/master/build.rb">build.rb</a> みたいなスクリプトでビルド＆yum サーバへのデプロイ、ってなことができればいいなー、というのが最終的な目論見。</p>
-
-<hr>
-
-<h2>その他</h2>
-
-<p>とりあえず自分のアイデアを形にしてみて、意見をもらったりとか、それ○○でできるよ、みたいな反応がもらえるといいな、というのがこのブログエントリを書いた目的。</p>
-
-<p>あと、こんなのできればいいなー、と思っているのは、Ruby の Bundler みたいに、</p>
-
-<pre><code>Source: git://github.com/torvalds/linux.git, ref: dfdeb
-</code></pre>
-
-<p>とか spec に書いておくと、git clone して tar ball 作成して、そいつを使ってパッケージビルドできたりするといいなー、とか。</p>
-
-<p>また、@trombik さんと twitter でやりとりしてる中で、<a href="https://fedorahosted.org/koji/wiki">koji</a> という RPM ビルドシステムを見つけたんだけど、これも使えないか調べてみる。（が、自分がやりたいこととはちょっと違う感じ。）</p>
 
 ]]></content>
   </entry>
