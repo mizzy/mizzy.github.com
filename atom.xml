@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-24T18:55:10+09:00</updated>
+  <updated>2013-03-25T01:52:46+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,112 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec が Debian 対応した（してもらった）]]></title>
+    <link href="http://mizzy.org/blog/2013/03/25/1/" />
+    <updated>2013-03-25T01:52:46+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/25/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="/blog/2013/03/24/3/">構築済みサーバを RSpec でテストする serverspec という gem をつくった</a> で、「Red Hat 系 Linux 前提のつくりになってしまっているので、他のディストリビューションや OS で利用したい、という方は、ぜひプルリクエストください」と書いていたら、早速 <a href="https://github.com/mizzy/serverspec/pull/1">Debian 系 OS 対応のプルリクエスト</a> をいただきました。ありがとうございます！</p>
+
+<p>単に Debian 系 OS に対応するだけではなく、他の OS にも対応できるよう拡張しやすい形に書き換えていただいたり、serverspec 自体の spec も追加していただいたりと、至れり尽くせりで感謝感謝です。</p>
+
+<pre><code class="ruby">c.include(Serverspec::DebianHelper, :os =&gt; :debian)
+</code></pre>
+
+<p>みたいな書き方も知らなかったので、大変参考になりました。</p>
+
+<p><a href="https://github.com/mizzy/serverspec/blob/master/README.md">README</a> にも書いてありますが、こんな感じで OS を指定します。</p>
+
+<pre><code class="ruby">require &#39;spec_helper&#39;
+
+describe &#39;httpd&#39;, :os =&gt; :debian do
+  it { should be_installed }
+  it { should be_enabled   }
+  it { should be_running   }
+end
+
+describe &#39;port 80&#39;, :os =&gt; :debian do
+  it { should be_listening }
+end
+
+describe &#39;/etc/httpd/conf/httpd.conf&#39;, :os =&gt; :debian do
+  it { should be_file }
+  it { should contain &quot;ServerName www.example.jp&quot; }
+end
+</code></pre>
+
+<p><code>:os =&gt; :debian</code> と何度も書くのが面倒なら、</p>
+
+<pre><code class="ruby">require &#39;spec_helper&#39;
+
+describe &#39;www.example.jp&#39;, :os =&gt; :debian do
+  it do
+    &#39;httpd&#39;.should be_installed
+  end
+  it do
+    &#39;httpd&#39;.should be_enabled
+  end
+  it do
+    &#39;httpd&#39;.should be_running
+  end
+
+  it do
+    &#39;port 80&#39;.should be_listening
+  end
+
+  conf = &#39;/etc/httpd/conf/httpd.conf&#39;
+  it do
+    conf.should be_file
+  end
+  it do
+    conf.should contain &quot;ServerName www.example.jp&quot;
+  end
+end
+</code></pre>
+
+<p>とか書いてもいいですし、</p>
+
+<p><code>serverspec-init</code> で生成される spec/spec_helper.rb に</p>
+
+<pre><code class="ruby">require &#39;serverspec&#39;
+require &#39;pathname&#39;
+
+RSpec.configure do |c|
+  c.include(Serverspec::DebianHelper)
+  c.before do
+    c.host = File.basename(Pathname.new(example.metadata[:location]).dirname)
+  end
+end
+</code></pre>
+
+<p>な感じで <code>c.include(Serverspec::DebianHelper)</code> を追加して、</p>
+
+<pre><code class="ruby">require &#39;spec_helper&#39;
+
+describe &#39;httpd&#39; do
+  it { should be_installed }
+  it { should be_enabled   }
+  it { should be_running   }
+end
+
+describe &#39;port 80&#39; do
+  it { should be_listening }
+end
+
+describe &#39;/etc/httpd/conf/httpd.conf&#39; do
+  it { should be_file }
+  it { should contain &quot;ServerName www.example.jp&quot; }
+end
+</code></pre>
+
+<p>といった感じで、spec 内では OS は指定しない、といった書き方もできます。</p>
+
+<p>好きなスタイルを選んでください。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[serverspec - a rubygem for testing provisioned servers with RSpec]]></title>
@@ -442,37 +548,6 @@ $ vagrant up
 <p>以前 AMI(Amazon Machine Image) をつくった時と基本的には同じだけど、AMI では 1 イメージファイル 1 パーティションだったのが、この手順では 1 イメージファイルにパーティンションが 2 つあるのが大きな違い。kpartx をつかって パーティション毎に loopback device を割り当てるやり方をはじめて知ったので、とても参考になった。</p>
 
 <p>スクリプトの解説も書こうかと思ったけど、ここまで単純化されてれば、あとは man なり Google なりで調べればわかるはずなのでやめた。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[すぐにハッブル宇宙望遠鏡撮影画像を見れるGoogle Chromeの拡張作った。]]></title>
-    <link href="http://mizzy.org/blog/2013/02/11/1/" />
-    <updated>2013-02-11T00:54:51+09:00</updated>
-    <id>http://mizzy.org/blog/2013/02/11/1/</id>
-    <content type="html"><![CDATA[
-<p>生きていればつらいことがある。
-しかし、つらいからと言って簡単に投げ出す事は出来ないということも多い。</p>
-
-<p>みなさんもつらまってる時、よくハッブル宇宙望遠鏡が撮影した画像を見ると思う。
-当然のごとく僕もそうである。</p>
-
-<p>最近つらい事がよくある。
-そんな時のために、ハッブル宇宙望遠鏡撮影画像を素早く表示する必要があった。
-なので、ハッブル宇宙望遠鏡撮影画像をすぐ見れるGoogle Chromeの拡張を作った。</p>
-
-<p><a href="https://github.com/mizzy/chrome-hst-images">mizzy/chrome-hst-images - GitHub</a></p>
-
-<p>「だめだ。もうやってらねー」って時は、空の tab を表示すればすぐハッブル宇宙望遠鏡撮影画像に会える。最高。結婚したい。</p>
-
-<p><img src="/images/2013/02/chrome-hst-image.jpg"></p>
-
-<h2>合わせて読みたい</h2>
-
-<p><a href="http://blog.hisaichi5518.com/entry/2013/02/01/003820">すぐに吉高由里子を見れるGoogle Chromeの拡張作った。 - パルカワ2</a></p>
-
-<p><a href="http://soh335.hatenablog.com/entry/2013/02/10/011039">すぐに宮崎あおいを見れるGoogle Chromeの拡張作った。- soh335 memo</a></p>
 
 ]]></content>
   </entry>
