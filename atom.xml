@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-24T17:35:20+09:00</updated>
+  <updated>2013-03-24T18:55:10+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,75 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec - a rubygem for testing provisioned servers with RSpec]]></title>
+    <link href="http://mizzy.org/blog/2013/03/24/4/" />
+    <updated>2013-03-24T18:55:10+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/24/4/</id>
+    <content type="html"><![CDATA[
+<p>In <a href="/blog/2013/03/24/2/">Testing servers provisioned by Puppet or Chef with RSpec</a>, I wrote how to test provisioned servers with RSpec.</p>
+
+<p>I&#39;ve created a rubygem <a href="https://rubygems.org/gems/serverspec">serverspec</a> for that purpose.</p>
+
+<p><a href="https://github.com/mizzy/serverspec">mizzy/serverspec</a></p>
+
+<p>You can install serverspec with gem install.</p>
+
+<pre><code>$ gem install serverspec
+</code></pre>
+
+<p>serverspec-init command creates template files and directories.</p>
+
+<pre><code>$ serverspec-init
+ + spec/
+ + spec/www.example.jp/
+ + spec/www.example.jp/httpd_spec.rb
+ + spec/spec_helper.rb
+ + Rakefile
+</code></pre>
+
+<p>spec/<a href="http://www.example.jp/httpd_spec.rb">www.example.jp/httpd_spec.rb</a> contains example spec code.</p>
+
+<pre><code>require &#39;spec_helper&#39;
+
+describe &#39;httpd&#39; do
+  it { should be_installed }
+  it { should be_enabled   }
+  it { should be_running   }
+end
+
+describe &#39;port 80&#39; do
+  it { should be_listening }
+end
+
+describe &#39;/etc/httpd/conf/httpd.conf&#39; do
+  it { should be_file }
+  it { should contain &quot;ServerName www.example.jp&quot; }
+end
+</code></pre>
+
+<p>You can write test code like this.</p>
+
+<p>You may need some settings in ~/.ssh/config and ssh-agent for logging into the target server without the password/passphrase.</p>
+
+<pre><code>Host *.example.jp
+   User root
+   IdentityFile ~/.ssh/for_serverspec_rsa
+</code></pre>
+
+<p>Run tests with rake spec.</p>
+
+<pre><code>$ rake spec
+/usr/bin/ruby -S rspec spec/www.example.jp/httpd_spec.rb
+......
+
+Finished in 0.99715 seconds
+6 examples, 0 failures
+</code></pre>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[構築済みサーバを RSpec でテストする serverspec という gem をつくった]]></title>
@@ -402,233 +471,6 @@ $ vagrant up
 <p><a href="http://blog.hisaichi5518.com/entry/2013/02/01/003820">すぐに吉高由里子を見れるGoogle Chromeの拡張作った。 - パルカワ2</a></p>
 
 <p><a href="http://soh335.hatenablog.com/entry/2013/02/10/011039">すぐに宮崎あおいを見れるGoogle Chromeの拡張作った。- soh335 memo</a></p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[MHA for MySQL の概要]]></title>
-    <link href="http://mizzy.org/blog/2013/02/06/1/" />
-    <updated>2013-02-06T01:50:17+09:00</updated>
-    <id>http://mizzy.org/blog/2013/02/06/1/</id>
-    <content type="html"><![CDATA[
-<p>MHA for MySQL の導入を検討していて、まずは社内の技術者向けに、MHA for MySQL の概要を伝えようと、主に <a href="http://code.google.com/p/mysql-master-ha/wiki/TableOfContents?tm=6">オフィシャルなドキュメント</a> からポイントを抜粋して社内向けの Wiki に書いてみた。本当なら、オフィシャルドキュメント全体に目を通してもらうのがいいんだけど、英語なので、はじめの一歩としては敷居が高く感じる人もいるだろう、ということで。</p>
-
-<p>特に外に出してまずい情報があるわけでもないので、このブログでも曝しておきます。</p>
-
-<hr>
-
-<h2>MHA の概要</h2>
-
-<p>MySQL エキスパートとして世界的にも著名な松信嘉範氏による、MySQL マスターの HA 化を行うためのツール。Perl 製。</p>
-
-<p>最小限のダウンタイムで、データの不整合を防ぎつつ、マスターのフェイルオーバーを行う、というのが主な機能。</p>
-
-<p>また、既に動作している MySQL に影響を与えることなく導入できる。</p>
-
-<p>機能は大きくわけると以下の4つ。</p>
-
-<ul>
-<li>自動的なマスターの監視とフェイルオーバー
-
-<ul>
-<li>トータルダウンタイム10〜30秒ぐらいで切り替え可能</li>
-</ul></li>
-<li>手動によるマスターフェイルオーバー</li>
-<li>自動的なマスターのフェイルオーバー（監視はしない）
-
-<ul>
-<li>監視を既存ソフトウェア（Pacemaker など）で行う場合に有用</li>
-</ul></li>
-<li>オンラインでマスターを別ホストに切り替え
-
-<ul>
-<li>マスターは動作してるが、ハードウェア的に怪しい兆候が見られるので、別ホストに事前に切り替えたい、などといった場合に有用</li>
-<li>0.5〜2秒ほど書き込みブロックされるだけで切り替え可能</li>
-</ul></li>
-</ul>
-
-<hr>
-
-<h2>MHA のコンポーネントと動作概要</h2>
-
-<p>マスターの監視とフェイルオーバーを MHA で自動的に行う場合の構成は以下のようになる。</p>
-
-<p><img src="/images/2013/02/components_of_mha.png" title="Components of MHA" ></p>
-
-<p>動作の流れは以下の通り。</p>
-
-<ul>
-<li>Manager が MySQL Master を監視</li>
-<li>ダウンを検知すると、以下を実行
-
-<ul>
-<li>Master の最新のバイナリログを各 Slave に保存（可能であれば）</li>
-<li>新マスターのリカバリ
-
-<ul>
-<li>スレーブのうちのひとつを新マスターにする</li>
-<li>デフォルトでは一番新しいポジションまで進んでいるスレーブが選ばれる。設定で、このスレーブを次のマスターにする、といったこともできる。</li>
-<li>新マスターにバイナリログの最新のポジションまでのデータを反映させる</li>
-</ul></li>
-<li>その他のスレーブのリカバリ 
-
-<ul>
-<li>バイナリログの最新のポジションまでのデータを反映させる</li>
-<li>新マスターからレプリケーションを開始</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<p>動作の詳細についてはオフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Sequences_of_MHA">Sequences of MHA</a> を参照。</p>
-
-<hr>
-
-<h2>Manager の拡張</h2>
-
-<p>Manager の本体である masterha_manager には拡張ポイントがいくつかあり、設定ファイル中で以下のパラメータに対してスクリプトを指定することで、動作を拡張することができる。拡張ポイントは以下の通り。</p>
-
-<ul>
-<li>secondary_check_script</li>
-<li>master_ip_failover_script</li>
-<li>shutdown_script</li>
-<li>report_script</li>
-<li>init_conf_load_script</li>
-<li>master_ip_online_change_script</li>
-</ul>
-
-<p>例えば、MHA 自体には、マスターがフェイルオーバーした時に VIP を付け替える機能はないが、以下のように VIP 付け替え用のスクリプトを設定ファイルで指定すると、フェイルオーバー時に VIP の付け替えをしてくれる。（スクリプトは自分で用意する。）</p>
-
-<pre><code>master_ip_failover_script=/usr/local/sample/bin/master_ip_failover
-</code></pre>
-
-<p>詳細は <a href="http://code.google.com/p/mysql-master-ha/wiki/Architecture#Custom_Extensions">Custom Extensions</a> を参照。</p>
-
-<hr>
-
-<h2>Manager の設定例</h2>
-
-<p>拡張スクリプトの設定など、必須ではないものも含む。</p>
-
-<pre><code>[server default]
-# mysql user and password
-user=root
-password=mysqlpass
-# working directory on the manager
-manager_workdir=/var/log/masterha/app1
-# manager log file
-manager_log=/var/log/masterha/app1/app1.log
-# working directory on MySQL servers
-remote_workdir=/var/log/masterha/app1
-secondary_check_script= masterha_secondary_check -s remote_host1 -s remote_host2
-ping_interval=3
-master_ip_failover_script=/script/masterha/master_ip_failover
-shutdown_script=/script/masterha/power_manager
-report_script=/script/masterha/send_master_failover_mail
-
-[server1]
-hostname=host1
-candidate_master=1 # 次のマスター候補
-
-[server2]
-hostname=host2
-
-[server3]
-hostname=host3
-no_master=1 # このホストはマスターにしない
-</code></pre>
-
-<p>以下のように設定ファイルを指定して起動する。</p>
-
-<pre><code class="text"># masterha_manager --conf=/etc/mha.cnf
-</code></pre>
-
-<p>設定パラメータ一覧はオフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters">Parameters</a> を参照。</p>
-
-<hr>
-
-<h2>チュートリアル</h2>
-
-<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Tutorial">Tutorial</a> を参照。</p>
-
-<hr>
-
-<h2>FAQ</h2>
-
-<p><a href="http://code.google.com/p/mysql-master-ha/wiki/FAQ">FAQ</a> からいくつかピックアップ。超意訳。</p>
-
-<ul>
-<li>サポートされている MySQL のバージョンは？
-
-<ul>
-<li>5.0 以降がサポートされている。4.1 以下はサポート対象外。</li>
-</ul></li>
-<li>特定のスレーブホストをマスターに昇格したり、逆に特定のホストはマスターに昇格しない、といったことは可能か？
-
-<ul>
-<li><a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#candidate_master">cadidate_master</a> や <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#no_master">no_master</a> といったパラメータで設定可能。</li>
-</ul></li>
-<li>インタラクティブ/手動でのフェイルオーバーは可能？
-
-<ul>
-<li><a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_master_switch">masterha<em>master</em>switch</a> 使えばOK。</li>
-</ul></li>
-<li>MHA Manager 自体の冗長化は？
-
-<ul>
-<li>Pacemaker とか使っとけ。</li>
-</ul></li>
-</ul>
-
-<hr>
-
-<h2>よくあるエラーと対処方法</h2>
-
-<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/TypicalErrors">TypicalErrors</a> を参照。</p>
-
-<hr>
-
-<h2>必要条件</h2>
-
-<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Requirements">Requirements</a> からいくつかピックアップして超意訳。</p>
-
-<p>MHA を動作させるためには、以下の設定が必要。<a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_manager">masterha_manager</a> や <a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_check_repl">masterha_check_repl</a> 実行時に自動的にチェックしてくれる。</p>
-
-<ul>
-<li>root で各ノード間での SSH 公開鍵認証ができること
-
-<ul>
-<li>masterha_check_ssh コマンドでチェックできる</li>
-</ul></li>
-<li>MySQL 5.0 以降のみサポート</li>
-<li>マスター昇格候補のサーバで log-bin が enable になってること </li>
-<li>マスター昇格候補サーバにレプリケーション用ユーザが存在すること</li>
-<li>ステートメントベースのレプリケーションでは LOAD DATA INFILE を使用してはいけない</li>
-</ul>
-
-<hr>
-
-<h2>その他</h2>
-
-<ul>
-<li>Semi-Synchronous Replication と組み合わせることで、マスターのハードウェア故障等によるデータロスのリスクを抑えることができる
-
-<ul>
-<li>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/UseCases#Using_together_with_Semi-Synchronous_Replication">Using together with Semi-Synchronous Replication</a> を参照</li>
-<li>Semi-Synchronous Replication については <a href="http://nippondanji.blogspot.jp/2009/03/mysql-ha-semi-synchronous-replication.html">漢(オトコ)のコンピュータ道: 最強のMySQL HA化手法 - Semi-Synchronous Replication</a> が詳しい</li>
-</ul></li>
-</ul>
-
-<hr>
-
-<h2>参考 URL</h2>
-
-<ul>
-<li><a href="http://www.slideshare.net/matsunobu/mha-for-mysqldena">MHA for MySQL と DeNA のオープンソースの話</a></li>
-<li><a href="http://code.google.com/p/mysql-master-ha/"> mysql-master-ha - MHA for MySQL: Master High Availability Manager and tools for MySQL - Google Project Hosting</a></li>
-<li><a href="https://github.com/yoshinorim/mha4mysql-node">yoshinorim/mha4mysql-node on GitHub</a></li>
-<li><a href="https://github.com/yoshinorim/mha4mysql-manager">yoshinorim/mha4mysql-manager on GitHub</a></li>
-</ul>
 
 ]]></content>
   </entry>
