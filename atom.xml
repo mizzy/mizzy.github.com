@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-24T02:29:42+09:00</updated>
+  <updated>2013-03-24T17:35:20+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,73 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[構築済みサーバを RSpec でテストする serverspec という gem をつくった]]></title>
+    <link href="http://mizzy.org/blog/2013/03/24/3/" />
+    <updated>2013-03-24T17:35:20+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/24/3/</id>
+    <content type="html"><![CDATA[
+<p><a href="/blog/2013/03/23/1/">Puppet や Chef で構築したサーバを RSpec でテストする</a> で書いた仕組みを使いやすくするために <a href="https://github.com/mizzy/serverspec">serverspec</a> という名前で gem 化してみた。</p>
+
+<p>rubygems.org にも登録してあるので、gem install でインストールできる。</p>
+
+<pre><code>$ gem install serverspec
+</code></pre>
+
+<p>インストールしたら、適当なディレクトリで serverspec-init を実行。すると、雛形となるディレクトリやファイルを生成する。</p>
+
+<pre><code>$ serverspec-init
+ + spec/
+ + spec/www.example.jp/
+ + spec/www.example.jp/httpd_spec.rb
+ + spec/spec_helper.rb
+ + Rakefile
+</code></pre>
+
+<p>spec/<a href="http://www.example.jp/httpd_spec.rb">www.example.jp/httpd_spec.rb</a> がサンプルテストコードで、こんな感じになってる。</p>
+
+<pre><code>require &#39;spec_helper&#39;
+
+describe &#39;httpd&#39; do
+  it { should be_installed }
+  it { should be_enabled   }
+  it { should be_running   }
+end
+
+describe &#39;port 80&#39; do
+  it { should be_listening }
+end
+
+describe &#39;/etc/httpd/conf/httpd.conf&#39; do
+  it { should be_file }
+  it { should contain &quot;ServerName www.example.jp&quot; }
+end
+</code></pre>
+
+<p>これに倣って spec/target.example.jp/xxxxx_spec.rb というファイルをつくって、テストを書いていく。</p>
+
+<p>テスト対象のホストには SSH でアクセスするので、パスワード入力しなくて良いように、~/.ssh/config を書いたり、ssh-agent を利用したりすると良いでしょう。</p>
+
+<pre><code>Host *.example.jp
+   User root
+   IdentityFile ~/.ssh/for_serverspec_rsa
+</code></pre>
+
+<p>rake spec でテストを実行。</p>
+
+<pre><code>$ rake spec
+/usr/bin/ruby -S rspec spec/www.example.jp/httpd_spec.rb
+......
+
+Finished in 0.99715 seconds
+6 examples, 0 failures
+</code></pre>
+
+<p>Red Hat 系 Linux 前提のつくりになってしまっているので、他のディストリビューションや OS で利用したい、という方は、ぜひプルリクエストください。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Testing servers provisioned by Puppet or Chef with RSpec]]></title>
@@ -562,55 +629,6 @@ no_master=1 # このホストはマスターにしない
 <li><a href="https://github.com/yoshinorim/mha4mysql-node">yoshinorim/mha4mysql-node on GitHub</a></li>
 <li><a href="https://github.com/yoshinorim/mha4mysql-manager">yoshinorim/mha4mysql-manager on GitHub</a></li>
 </ul>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[GitHub に coderwall バッヂの Organizations ができてる]]></title>
-    <link href="http://mizzy.org/blog/2013/01/30/1/" />
-    <updated>2013-01-30T01:04:31+09:00</updated>
-    <id>http://mizzy.org/blog/2013/01/30/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://github.com/">GitHub</a> の <a href="https://github.com/mizzy">自分のプロフィールページ</a> の Organizations のところに、<a href="http://coderwall.com/">coderwall</a> のバッヂが表示されてることに少し前に気づいていて、これは各バッヂに対応した組織アカウントのメンバーに自分が入れらてるから、なわけですが、デフォルトでは Publicize されてないので、他の人からは見ることができません。Publicize してあげると、他の人からもこんな風に見えるようになります。</p>
-
-<p><img src="/images/2013/01/coderwall-organizations.png"></p>
-
-<p>Publicize するには、各組織アカウントのページで「Members」タブを選択し、自分のアカウントの横の「Publicize membership」をクリックすれば良いです。</p>
-
-<p><img src="/images/2013/01/publicize.png"></p>
-
-<p>上の画像は、Publicize した後のものです。</p>
-
-<p>Publicize は手動でやるのはだるいので、スクリプトをつくってみました。</p>
-
-<div><script src='https://gist.github.com/4665462.js?file='></script>
-<noscript><pre><code>#!/usr/bin/env ruby
-
-require 'pit'
-require 'octokit'
-
-user = 'mizzy'
-
-def octokit
-  config = Pit.get('github', :require =&gt; {
-                     'username' =&gt; 'Your user name of GitHub',
-                     'password' =&gt; 'Your password of GitHub',
-                   })
-  Octokit::Client.new(:login =&gt; config['username'], :password =&gt; config['password'])
-end
-
-octokit.orgs.each do |org|
-  org = org.login
-  next unless org.match(/^coderwall/)
-  unless octokit.organization_public_member?(org, user)
-    puts &quot;Publicize membership of user #{user} in #{org} ..&quot;
-    octokit.publicize_membership(org, user)
-  end
-end
-</code></pre></noscript></div>
-
-<p>余談ですが、<a href="https://github.com/pengwynn/octokit">octokit</a> で Publicize Membership するコードは、<a href="https://github.com/pengwynn/octokit/pull/89">自分がコントリビュートしたものです</a> 。</p>
 
 ]]></content>
   </entry>
