@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-25T01:52:46+09:00</updated>
+  <updated>2013-03-27T21:38:39+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Ukigumo と serverspec で Puppet の継続的インテグレーション]]></title>
+    <link href="http://mizzy.org/blog/2013/03/27/1/" />
+    <updated>2013-03-27T21:38:39+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/27/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://blog.64p.org/">tokuhirom</a> さんにより開発されている <a href="http://ukigumo.github.com/ukigumo/">Ukigumo</a> を利用して、Puppet の CI 環境を構築してみた。やってることは以下の通り。</p>
+
+<ul>
+<li>Puppet マニフェストを Git リポジトリで管理</li>
+<li><a href="http://ukigumo.github.com/Ukigumo-Server/">Ukigumo Server</a> を立てる</li>
+<li><a href="/blog/2013/03/22/1/">puppet-lxc-test-box</a> で Puppet マニフェストを流し込むシステムコンテナを必要なロールの分だけ用意</li>
+<li><a href="https://gist.github.com/mizzy/5252543">自前の Ukigumo クライアントスクリプト</a> を cron で定期的に走らせ以下を実行
+
+<ul>
+<li>Puppet マニフェストリポジトリの master ブランチが更新されていたら、git pull して Puppet マニフェストをシステムコンテナに適用し、適用結果を Ukigumo サーバに投げる</li>
+<li><a href="/blog/2013/03/24/3/">serverspec</a> によるテストをシステムコンテナに対して実行し、結果を Ukigumo サーバに投げる</li>
+</ul></li>
+</ul>
+
+<p>Ukigumo のトップ画面はこんな感じ。最新の結果一覧が表示されている。</p>
+
+<p><img src="/images/2013/03/ukigumo-top.jpg"></p>
+
+<p>Puppet マニフェストの適用結果の詳細はこんな感じ。</p>
+
+<p><img src="/images/2013/03/ukigumo-puppet.jpg"></p>
+
+<p>serverspec によるテスト結果の詳細はこんな感じ。</p>
+
+<p><img src="/images/2013/03/ukigumo-serverspec.jpg"></p>
+
+<p>結果は <a href="http://blog.yappo.jp/yappo/archives/000760.html">Ikachan</a> に投げて IRC で通知してる。</p>
+
+<p><img src="/images/2013/03/ukigumo-irc.jpg"></p>
+
+<p>これで Puppet マニフェストをガリガリとリファクタリングするための準備が整った。</p>
+
+<p><a href="/blog/2013/03/22/1/">puppet-lxc-test-box</a> や <a href="/blog/2013/03/24/3/">serverspec</a> をつくったのは、こういうことがやりたかったから、ってなことを社内 IRC に書いたら、<a href="https://twitter.com/search/realtime?q=%233%E5%88%86%E3%81%A7%E5%B8%B8%E6%9D%BE&amp;src=typd">#3分で常松</a> くんを濡らすことに成功した。</p>
+
+<blockquote class="twitter-tweet"><p>「15:00 mizzy: 最近ブログに書いてたことは、すべてこれへの布石」のカッコイイ感はんぱなくて濡れる</p>&mdash; TSUNEMATSU Shinya (@tnmt) <a href="https://twitter.com/tnmt/status/316792813712977920">March 27, 2013</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>Ukigumo もとてもシンプルでいいですね。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[serverspec が Debian 対応した（してもらった）]]></title>
@@ -261,7 +310,7 @@ Finished in 0.99715 seconds
     <updated>2013-03-24T02:29:42+09:00</updated>
     <id>http://mizzy.org/blog/2013/03/24/2/</id>
     <content type="html"><![CDATA[
-<p><strong>note</strong> I made <a href="https://github.com/mizzy/serverspec">serverspec</a> gem for this purpose. Please see the entry <a href="/blog/2013/03/24/4/">serverspec - a rubygem for testing provisioned servers with RSpec</a>.</p>
+<p><strong>Note:</strong> I made <a href="https://github.com/mizzy/serverspec">serverspec</a> gem for this purpose. Please see the entry <a href="/blog/2013/03/24/4/">serverspec - a rubygem for testing provisioned servers with RSpec</a>.</p>
 
 <p><a href="/blog/2013/03/24/1/">I&#39;ve made a Puppet module for creating LXC system containers</a>.Next I&#39;ve tried to the basis for writing test code easily.</p>
 
@@ -524,32 +573,6 @@ $ vagrant up
 <noscript><pre><code></code></pre></noscript></div>
 
 <p>あとはディストリビューションを選択できるようにとか、指定したホスト名を設定する、とかもやりたいけど、シェルスクリプトは大きくなってくるとメンテナンス厳しいので、Ruby で書き直す。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[最小手順のVMイメージの作り方]]></title>
-    <link href="http://mizzy.org/blog/2013/02/24/1/" />
-    <updated>2013-02-24T12:29:37+09:00</updated>
-    <id>http://mizzy.org/blog/2013/02/24/1/</id>
-    <content type="html"><![CDATA[
-<p>先日カヤックさんの社内勉強会にお邪魔して話してきた <a href="http://www.slideshare.net/mizzy/maglica-techkayac">Maglica</a> は、既に作成済みの VM イメージを元にクローンをつくって必要な設定（root パスワードの設定やネットワーク設定など）を行う、といったことが簡単にできるが、元の VM イメージつくるのがめんどくさいことには変わりなくて、ここをなんとかしたいなー、と常々思ってた。</p>
-
-<p>VM イメージをつくる手段としては、RedHat 系の場合は virt-manager, virt-install, Cobbler/Koan などがあるが、どれもインストーラを実行する形式であり、kickstart を利用すれば自動化できるとは言え、kickstart は問題が起きた場合の調査がやりにくい。（自分が効果的なやり方知らないだけかもしれないけど。）</p>
-
-<p>また、virt-install はオプション覚えられないし、Cobbler は初期のセットアップとか、profile の設定とかめんどくさい。</p>
-
-<p>そもそも、インストーラを実行しなくても、しかるべきファイルが含まれたイメージをつくればいいだけなので、インストーラの実行はとても無駄に思える。</p>
-
-<p>そこで、<a href="https://twitter.com/hansode">@hansode</a> さんの <a href="https://github.com/hansode/vmbuilder">vmbuilder</a> の存在を思い出して、これを使ってみようと思ったんだけど、単に使うだけじゃなく、具体的にどういったことをやってるのか理解したくて、ソースコードを読んで手順を追い、単純化したスクリプトに落とし込んでみたのがこれ。</p>
-
-<div><script src='https://gist.github.com/5020611.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-<p>以前 AMI(Amazon Machine Image) をつくった時と基本的には同じだけど、AMI では 1 イメージファイル 1 パーティションだったのが、この手順では 1 イメージファイルにパーティンションが 2 つあるのが大きな違い。kpartx をつかって パーティション毎に loopback device を割り当てるやり方をはじめて知ったので、とても参考になった。</p>
-
-<p>スクリプトの解説も書こうかと思ったけど、ここまで単純化されてれば、あとは man なり Google なりで調べればわかるはずなのでやめた。</p>
 
 ]]></content>
   </entry>
