@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-27T21:38:39+09:00</updated>
+  <updated>2013-03-27T22:36:46+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Continuous Integration of Puppet with Ukigumo and serverspec]]></title>
+    <link href="http://mizzy.org/blog/2013/03/27/2/" />
+    <updated>2013-03-27T22:36:46+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/27/2/</id>
+    <content type="html"><![CDATA[
+<p>I made Puppet CI enviroment with <a href="http://ukigumo.github.com/ukigumo/">Ukigumo</a> . I realize following things.</p>
+
+<ul>
+<li>Manage Puppet manifests by Git repository</li>
+<li>Set up <a href="http://ukigumo.github.com/Ukigumo-Server/">Ukigumo Server</a> </li>
+<li>Make LXC system containers with <a href="/blog/2013/03/24/1">puppet-lxc-test-box</a></li>
+<li>Run <a href="https://gist.github.com/mizzy/5252543">my own Ukigumo Client script</a> periodically by cron
+
+<ul>
+<li>If master branch of Puppet manifests repository is updated, pull manifests, apply them to LXC system containers and post results to Ukigumo Server.</li>
+<li>Run <a href="/blog/2013/03/24/4">serverspec</a> tests to LXC system containers and post results to Ukigumo Server.</li>
+</ul></li>
+</ul>
+
+<p>This is Ukigumo Server&#39;s top page. Latest results are listed up.</p>
+
+<p><img src="/images/2013/03/ukigumo-top.jpg"></p>
+
+<p>This is the detail of the result of applying Puppet manifests.</p>
+
+<p><img src="/images/2013/03/ukigumo-puppet.jpg"></p>
+
+<p>This is the detail of the results of serverspec tests.</p>
+
+<p><img src="/images/2013/03/ukigumo-serverspec.jpg"></p>
+
+<p>Alaso results are posted to IRC through <a href="http://search.cpan.org/%7Eyappo/App-Ikachan-0.11/lib/App/Ikachan.pm">Ikachan</a>.</p>
+
+<p><img src="/images/2013/03/ukigumo-irc.jpg"></p>
+
+<p>I will refactor Puppet manifests upon this CI environment.</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Ukigumo と serverspec で Puppet の継続的インテグレーション]]></title>
@@ -496,7 +537,7 @@ $ git clone git://github.com/duritong/puppet-sysctl.git sysctl
 Exec { path =&gt; &#39;/sbin:/usr/sbin:/bin:/usr/bin&#39; }
 
 lxc-test-box::lxc::setup { &#39;base&#39;:   ipaddress =&gt; &#39;172.16.0.2&#39; }
-lxc-tets-box::lxc::setup { &#39;manage&#39;: ipaddress =&gt; &#39;172.16.0.3&#39; }
+lxc-test-box::lxc::setup { &#39;manage&#39;: ipaddress =&gt; &#39;172.16.0.3&#39; }
 lxc-test-box::lxc::setup { &#39;smtp&#39;:   ipaddress =&gt; &#39;172.16.0.4&#39; }
 </code></pre>
 
@@ -557,22 +598,6 @@ $ vagrant up
 <p>ただし、<a href="http://docs-v1.vagrantup.com/v1/docs/base_boxes.html">Vagrant Documentation - Documentation - Base Boxes</a> にあるような、vagrant ユーザの作成とか、鍵の設定なんかはしてないため、<code>vagrant ssh</code> ではログインできないので、<code>ssh root@localhost -p 2222</code> で、パスワードは root でログインする。</p>
 
 <p>この辺の設定もシェルスクリプトに組み込んじゃえばいいんだろうけど、まずは base box を簡単に作れるかどうかだけ確かめたかったので、今日はここまで。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[最小手順のVMイメージの作り方（LVM 編）]]></title>
-    <link href="http://mizzy.org/blog/2013/02/24/2/" />
-    <updated>2013-02-24T22:53:17+09:00</updated>
-    <id>http://mizzy.org/blog/2013/02/24/2/</id>
-    <content type="html"><![CDATA[
-<p>開発や検証で利用する VM は、最初はディスクサイズを小さくして、後から必要に応じて大きくする、といったことをよくやるので、<a href="/blog/2013/02/24/1/">最小手順のVMイメージの作り方</a> のスクリプトを、/ と swap を LVM にするように変えてみた。</p>
-
-<div><script src='https://gist.github.com/5023926.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-<p>あとはディストリビューションを選択できるようにとか、指定したホスト名を設定する、とかもやりたいけど、シェルスクリプトは大きくなってくるとメンテナンス厳しいので、Ruby で書き直す。</p>
 
 ]]></content>
   </entry>
