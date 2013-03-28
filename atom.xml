@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-27T22:36:46+09:00</updated>
+  <updated>2013-03-28T23:09:20+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,24 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec で同一ホストへの SSH 接続を再利用するようにしました]]></title>
+    <link href="http://mizzy.org/blog/2013/03/28/1/" />
+    <updated>2013-03-28T23:09:20+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/28/1/</id>
+    <content type="html"><![CDATA[
+<p>今まで <a href="https://github.com/mizzy/serverspec">serverspec</a> では、テストをひとつ実行するたびに、ホストへの SSH 接続/切断を繰り返していたのですが、バージョン 0.0.13 では、同一ホストへの SSH 接続を再利用することで、テスト時間を短縮できるようにしました。</p>
+
+<p>接続の管理は serverspec-init 実行時に生成される spec/spec_helper.rb で行っているため、0.0.12 以前から利用している方は、一度 spec/spec_helper.rb を削除して、再度 serverspec-init を実行して再作成してください。</p>
+
+<pre><code>$ rm spec/spec_helper.rb
+$ serverspec-init
+ + spec/spec_helper.rb
+</code></pre>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Continuous Integration of Puppet with Ukigumo and serverspec]]></title>
@@ -566,38 +584,6 @@ lxc-test-box::lxc::setup { &#39;smtp&#39;:   ipaddress =&gt; &#39;172.16.0.4&#39
 <blockquote class="twitter-tweet"><p>@<a href="https://twitter.com/gosukenator">gosukenator</a> 最近のカーネルであれば KVM のネストはできるはずです <a href="http://t.co/HZf5HhhUYs" title="http://networkstatic.net/nested-kvm-hypervisor-support/">networkstatic.net/nested-kvm-hyp…</a></p>&mdash; Keita Urashima (@ursm) <a href="https://twitter.com/ursm/status/314802865313042432">March 21, 2013</a></blockquote>
 
 <p>とても有益な情報ありがとうございます！今度試してみよう。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[最小手順の Vagrant base box の作り方]]></title>
-    <link href="http://mizzy.org/blog/2013/03/11/1/" />
-    <updated>2013-03-11T22:28:50+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/11/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://www.vagrantup.com/">Vagrant</a> の base box をつくるためのツールとして <a href="https://github.com/jedi4ever/veewee">VeeWee</a> があって、これはこれで素晴らしいツールなんだけど、VeeWee は裏で ISO イメージをダウンロードしたり、インストーラを走らせたりで、時間もかかるし大げさな感じがするので、もっと簡略化できないか、ってことでやってみた。</p>
-
-<p><a href="/blog/2013/02/24/1/">最小手順のVMイメージの作り方</a> で紹介したシェルスクリプトで作成した VM イメージに対して、以下のようにコマンドを実行するだけで、package.box ができあがる。</p>
-
-<pre><code class="text"># VBoxManage convertfromraw --format vmdk /tmp/sl63.img /tmp/sl63.vmdk
-# VBoxManage createvm --name SL6.3-x86_64 --register
-# VBoxManage modifyvm SL6.3-x86_64 --memory 512 --acpi on --nic1 nat
-# VBoxManage storagectl SL6.3-x86_64 --name &quot;IDE Controller&quot; --add ide
-# VBoxManage modifyvm SL6.3-x86_64 --hda /tmp/sl63.vmdk
-# vagrant package --base SL6.3-x86_64
-</code></pre>
-
-<p>できあがった package.box に対して以下のようにすれば、VM が起動する。</p>
-
-<pre><code class="text">$ vagrant box add sl63-x86_64 package.box
-$ vagrant init sl63-x86_64
-$ vagrant up
-</code></pre>
-
-<p>ただし、<a href="http://docs-v1.vagrantup.com/v1/docs/base_boxes.html">Vagrant Documentation - Documentation - Base Boxes</a> にあるような、vagrant ユーザの作成とか、鍵の設定なんかはしてないため、<code>vagrant ssh</code> ではログインできないので、<code>ssh root@localhost -p 2222</code> で、パスワードは root でログインする。</p>
-
-<p>この辺の設定もシェルスクリプトに組み込んじゃえばいいんだろうけど、まずは base box を簡単に作れるかどうかだけ確かめたかったので、今日はここまで。</p>
 
 ]]></content>
   </entry>
