@@ -91,7 +91,7 @@ $ git clone git://github.com/duritong/puppet-sysctl.git sysctl
 Exec { path =&gt; &#39;/sbin:/usr/sbin:/bin:/usr/bin&#39; }
 
 lxc-test-box::lxc::setup { &#39;base&#39;:   ipaddress =&gt; &#39;172.16.0.2&#39; }
-lxc-tets-box::lxc::setup { &#39;manage&#39;: ipaddress =&gt; &#39;172.16.0.3&#39; }
+lxc-test-box::lxc::setup { &#39;manage&#39;: ipaddress =&gt; &#39;172.16.0.3&#39; }
 lxc-test-box::lxc::setup { &#39;smtp&#39;:   ipaddress =&gt; &#39;172.16.0.4&#39; }
 </code></pre>
 
