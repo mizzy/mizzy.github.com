@@ -57,26 +57,25 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2013/03/28/1">serverspec で同一ホストへの SSH 接続を再利用するようにしました</a>
+    <a href="/blog/2013/03/30/1">serverspec のサイトつくりました</a>
   </h1>
 
   <section class="byline">
     
   </section>
 
-  <p>今まで <a href="https://github.com/mizzy/serverspec">serverspec</a> では、テストをひとつ実行するたびに、ホストへの SSH 接続/切断を繰り返していたのですが、バージョン 0.0.13 では、同一ホストへの SSH 接続を再利用することで、テスト時間を短縮できるようにしました。</p>
+  <p>GitHub Pages で <a href="http://serverspec.org/">serverspec のサイト</a> をつくりました。</p>
 
-<p>接続の管理は serverspec-init 実行時に生成される spec/spec_helper.rb で行っているため、0.0.12 以前から利用している方は、一度 spec/spec_helper.rb を削除して、再度 serverspec-init を実行して再作成してください。</p>
+<p><a href="http://serverspec.org/matchers.html">マッチャの一覧ページ</a> もつくったので、これを見てもらえれば、現状どういったテストができるのか一通り把握できるかと思います。</p>
 
-<pre><code>$ rm spec/spec_helper.rb
-$ serverspec-init
- + spec/spec_helper.rb
-</code></pre>
+<p>他にもこういったテストが欲しい、など要望があれば、<a href="https://github.com/mizzy/serverspec">こちら</a> までプルリク送ってください。</p>
+
+<p>次は serverspec 自体の spec を充実させる予定。</p>
 
 
   <div class="pagination">
     
-    <a href="/blog/2013/03/27/2" rel="next">next post</a>
+    <a href="/blog/2013/03/28/1" rel="next">next post</a>
     
     
     

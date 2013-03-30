@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-03-28T23:09:20+09:00</updated>
+  <updated>2013-03-30T21:38:46+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,23 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec のサイトつくりました]]></title>
+    <link href="http://mizzy.org/blog/2013/03/30/1/" />
+    <updated>2013-03-30T21:38:46+09:00</updated>
+    <id>http://mizzy.org/blog/2013/03/30/1/</id>
+    <content type="html"><![CDATA[
+<p>GitHub Pages で <a href="http://serverspec.org/">serverspec のサイト</a> をつくりました。</p>
+
+<p><a href="http://serverspec.org/matchers.html">マッチャの一覧ページ</a> もつくったので、これを見てもらえれば、現状どういったテストができるのか一通り把握できるかと思います。</p>
+
+<p>他にもこういったテストが欲しい、など要望があれば、<a href="https://github.com/mizzy/serverspec">こちら</a> までプルリク送ってください。</p>
+
+<p>次は serverspec 自体の spec を充実させる予定。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[serverspec で同一ホストへの SSH 接続を再利用するようにしました]]></title>
@@ -518,72 +535,6 @@ end
 <p>ただ Assurer は、最初から汎用的にしようと意識しすぎて、プラガブルにしたり、複数の OS にも対応できる仕組みを入れたり、といった感じで、構想がでかすぎて自分の手に負えないものになってしまって、使わなくなってしまった。（余談。ツールとしては失敗だったけど、これきっかけで <a href="https://twitter.com/lamanotrama">@lamanotrama</a> とメールのやりとりがあって、その後ペパボに入社してくれたので、ある意味成功だったと言える。）</p>
 
 <p>これで Puppet マニフェストをリファクタリングするためのベースとなる仕組みはできたので、次は実際にガリガリとテストコードを書いていく予定。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[puppet-lxc-test-box]]></title>
-    <link href="http://mizzy.org/blog/2013/03/22/1/" />
-    <updated>2013-03-22T02:19:00+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/22/1/</id>
-    <content type="html"><![CDATA[
-<p>新たな Puppet のベストプラクティスを求めて、マニフェストの大規模なリファクタリングを行っています。</p>
-
-<p>で、リファクタリングするからにはテストが必要だよね、ってことで、<a href="http://rspec-puppet.com/">rspec-puppet</a> でテストを書いてるんだけど、rspec-puppet はマニフェストがコンパイルされた「カタログ」というものに対してテストするもので、実際にマニフェストを流し込んだ状態が正しいかテストするわけではないので、これだとテストとしては不完全。</p>
-
-<p>というわけで、<a href="https://github.com/opscode/test-kitchen">Test Kitchen</a> みたいに、同時にいくつも VM を立ててテストを走らせる、ってなことをやりたいんだけど、会社では KVM ベースの VM を利用してるので、VirtualBox ベースの Vagrant は使えないし、そもそもテストを動かす大元のホストも VM なので、VirtualBox どころか KVM も利用できない。</p>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>なので、まずは LXC のシステムコンテナをさくさくと作るための Puppet モジュールを書いてみた。</p>
-
-<p><a href="https://github.com/mizzy/puppet-lxc-test-box">puppet-lxc-test-box</a></p>
-
-<p>( <a href="https://github.com/fgrehm/vagrant-lxc">vagrant-lxc</a> というのもあるけど、&quot;Vagrant &gt;= 1.1.0, the lxc package and a Kernel higher than 3.5.0-17.28, which on Ubuntu 12.10 means something like&quot; ってなことが書かれていて、メインで使ってる RedHat 系 OS では動く気がしないのでスルー。)</p>
-
-<p>使い方は次のような感じ。まず lxc-test-box モジュールと sysctl モジュールを持ってくる。</p>
-
-<pre><code>$ git clone git://github.com/mizzy/puppet-lxc-test-box.git lxc-test-box
-$ git clone git://github.com/duritong/puppet-sysctl.git sysctl
-</code></pre>
-
-<p>以下のように、Exec リソースのデフォルト値と、システムコンテナのホスト名と IP アドレスを書いたマニフェスト lxc-test-box.pp を作成。</p>
-
-<pre><code>include lxc-test-box
-
-Exec { path =&gt; &#39;/sbin:/usr/sbin:/bin:/usr/bin&#39; }
-
-lxc-test-box::lxc::setup { &#39;base&#39;:   ipaddress =&gt; &#39;172.16.0.2&#39; }
-lxc-test-box::lxc::setup { &#39;manage&#39;: ipaddress =&gt; &#39;172.16.0.3&#39; }
-lxc-test-box::lxc::setup { &#39;smtp&#39;:   ipaddress =&gt; &#39;172.16.0.4&#39; }
-</code></pre>
-
-<p>マニフェストを流し込む。</p>
-
-<pre><code>$ sudo puppet apply --modulepath=. lxc-test-box.pp
-</code></pre>
-
-<p>これで、ホスト OS への lxc パッケージのインストール、ブリッジインターフェース br0 の作成、IP マスカレードの設定を行い、指定されたホスト名と IP アドレスでシステムコンテナを作成し、コンテナの起動までしてくれる。所要時間は、コンテナひとつあたり5分ぐらい。</p>
-
-<p>起動したら、</p>
-
-<pre><code>$ ssh root@base.lxc-test-box
-</code></pre>
-
-<p>で、ログインできる。ログイン用の鍵は Puppet で設定済み。（ただし、鍵は /root/.ssh 以下に置いてあるので、必要ならそこからコピーを。）テスト目的なのでホストOSとは通信できるけど、外部からは通信できない。ただし、ホスト OS で IP マスカレードの設定はしてあるので、コンテナから外部への通信は可能。</p>
-
-<p>同梱している lxc パッケージは Scientifix Linux 6.2 + Kernel 2.6.32-358.2.1.el6.x86_64 上でビルドしたものなので、RedHat 6 系以外ではたぶん動かないし、カーネルバージョンが違うと動かないかもしれない。</p>
-
-<p>これでテスト用のシステムコンテナを量産できるようになったので、次は実際にテストする仕組みを作り込む。</p>
-
-<hr>
-
-<p>KVM な VM の上で KVM な VM は動かせない、と思っていたら、<a href="https://twitter.com/ursm">@usrm</a> さんから、最近のカーネルであればネストできるはず、という情報をいただきました。</p>
-
-<blockquote class="twitter-tweet"><p>@<a href="https://twitter.com/gosukenator">gosukenator</a> 最近のカーネルであれば KVM のネストはできるはずです <a href="http://t.co/HZf5HhhUYs" title="http://networkstatic.net/nested-kvm-hypervisor-support/">networkstatic.net/nested-kvm-hyp…</a></p>&mdash; Keita Urashima (@ursm) <a href="https://twitter.com/ursm/status/314802865313042432">March 21, 2013</a></blockquote>
-
-<p>とても有益な情報ありがとうございます！今度試してみよう。</p>
 
 ]]></content>
   </entry>
