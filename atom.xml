@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-05-12T03:06:48+09:00</updated>
+  <updated>2013-05-12T22:05:26+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec でホスト固有の属性値を扱う方法]]></title>
+    <link href="http://mizzy.org/blog/2013/05/12/2/" />
+    <updated>2013-05-12T22:05:26+09:00</updated>
+    <id>http://mizzy.org/blog/2013/05/12/2/</id>
+    <content type="html"><![CDATA[
+<p><strong>注意！ ここで解説する方法は、現在の最新リリースである v0.2.26 ではまだ利用できません。<a href="https://github.com/mizzy/serverspec/tree/host-attributes">host-attributes ブランチ</a> にあるバージョンでのみ利用できます。</strong></p>
+
+<p><a href="http://blog.takus.me/2013/05/12/provisioning-frameworks-casual-talks-001/">Provisioning Frameworks Casual Talks vol.1 に行ってきた #pfcasual - TAKUMI SAKAMOTO&#39;S BLOG</a> で触れられている attributes 周りについて、この辺は必要になるだろうなー、と前から思ってはいたので、それを実現するための極々簡単な仕組みを <a href="https://github.com/mizzy/serverspec/pull/98">試験的に実装してみた</a> 。</p>
+
+<p>これは単に <code>attr_set</code> と <code>attr</code> という2つのヘルパーメソッドを使えるようにしただけのものなんだけど、以下のような感じで使える。</p>
+
+<p>今回は例として、ホスト毎に MySQL の server-id が外部ファイルで定義されていて、各サーバの /etc/my.cnf で正しく server-id が設定されているかをテストする、という状況を想定する。</p>
+
+<p>属性値の定義は、今回は YAML ファイルで行うので、以下のような YAML ファイルを用意する。</p>
+
+<div><script src='https://gist.github.com/5563530.js?file='></script>
+<noscript><pre><code></code></pre></noscript></div>
+
+<p>次に、<a href="/blog/2013/05/12/1/">serverspec のテストをホスト間で共有する方法</a> と似たような感じで、YAML で定義されたロールに応じて適切なテストを行うような <code>Rakefile</code> を書く。</p>
+
+<div><script src='https://gist.github.com/5563531.js?file='></script>
+<noscript><pre><code></code></pre></noscript></div>
+
+<p>そして <code>spec_helper.rb</code> を以下のように書く。</p>
+
+<div><script src='https://gist.github.com/5563533.js?file='></script>
+<noscript><pre><code></code></pre></noscript></div>
+
+<p><code>attr_set attributes[c.host]</code> で属性値のセットを行っている。</p>
+
+<p>最後に、属性値を参照して <code>attr[:server_id]</code> が <code>/etc/my.cnf</code> で定義されているかどうかをテストする spec を書く。</p>
+
+<div><script src='https://gist.github.com/5563537.js?file='></script>
+<noscript><pre><code></code></pre></noscript></div>
+
+<p>仕組みは単純なので、<code>YAML.load_file</code> している部分を好きなように変えれば、自身の環境に合った使い方ができるでしょう。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[serverspec のテストをホスト間で共有する方法]]></title>
@@ -500,59 +541,6 @@ end
 <p>You can see how I make it simply <a href="https://github.com/mizzy/rspec-lxc-test-box/tree/master/spec/support/matchers">with these codes</a>.</p>
 
 <p>This test code works with any servers provisioned by any tools(Puppet, Chef, CFEngine, Shell Script, Hands and so on).</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Create LXC system containers easily with Puppet]]></title>
-    <link href="http://mizzy.org/blog/2013/03/24/1/" />
-    <updated>2013-03-24T01:47:23+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/24/1/</id>
-    <content type="html"><![CDATA[
-<h2>Overview</h2>
-
-<p>I&#39;m refactoring <a href="https://puppetlabs.com/">Puppet</a> manifests and refactoring requires automated testing.</p>
-
-<p><a href="http://rspec-puppet.com/">rspec-puppet</a> and <a href="http://projects.puppetlabs.com/projects/cucumber-puppet/wiki">cucumber-puppet</a> test Puppet catalog, but I need to test actual server status that Puppet manifests applied to.</p>
-
-<p>For actual testing, several virtual machines are needed. <a href="http://www.vagrantup.com/">Vagrant</a> is the one for creating virtual machines for testing easily.</p>
-
-<p>But I&#39;m using <a href="http://www.linux-kvm.org/page/Main_Page">KVM</a> mainly and would like to create virtual machines for testing on a KVM based virtual machine.</p>
-
-<p><a href="http://lxc.sourceforge.net/">LXC</a> suits that purpose.</p>
-
-<p>For testing purpose, how to create LXC system containers easily is important. So I&#39;ve created a Puppet module to create LXC system containers easily.</p>
-
-<p><a href="https://github.com/mizzy/puppet-lxc-test-box">mizzy/puppet-lxc-test-box</a></p>
-
-<hr>
-
-<h2>How To Use</h2>
-
-<p>First, git clone puppet-lxc-test-box module and puppet-sysctl module.</p>
-
-<pre><code>$ git clone git://github.com/mizzy/puppet-lxc-test-box.git lxc-test-box
-$ git clone git://github.com/duritong/puppet-sysctl.git sysctl
-</code></pre>
-
-<p>Next, write a manifest to create system containers.</p>
-
-<pre><code>include lxc-test-box
-
-Exec { path =&gt; &#39;/sbin:/usr/sbin:/bin:/usr/bin&#39; }
-
-lxc-test-box::lxc::setup { &#39;proxy&#39;: ipaddress =&gt; &#39;172.16.0.2&#39; }
-lxc-tets-box::lxc::setup { &#39;www&#39;:   ipaddress =&gt; &#39;172.16.0.3&#39; }
-lxc-test-box::lxc::setup { &#39;db&#39;:    ipaddress =&gt; &#39;172.16.0.4&#39; }
-</code></pre>
-
-<p>Apply this manifest.</p>
-
-<pre><code>$ sudo puppet apply --modulepath=. lxc-test-box.pp
-</code></pre>
-
-<p>3 containers will be created.</p>
 
 ]]></content>
   </entry>
