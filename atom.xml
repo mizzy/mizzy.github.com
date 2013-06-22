@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-05-12T22:05:26+09:00</updated>
+  <updated>2013-06-22T23:44:52+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,72 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec の並列処理]]></title>
+    <link href="http://mizzy.org/blog/2013/06/22/1/" />
+    <updated>2013-06-22T23:44:52+09:00</updated>
+    <id>http://mizzy.org/blog/2013/06/22/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://connpass.com/event/2580/">hbstudy #45</a> や <a href="http://podcast.bulknews.net/post/53587224871/ep14-docker-naoya-mizzy">Tatsuhiko Miyagawa&#39;s Podcast ep14</a> なんかで、serverspec の並列処理が課題、ってな話をしていて、<a href="http://net-ssh.rubyforge.org/">Net::SSH</a> がイベントドリブンな処理になってるのがネックになりそうだなー、どうしようかなー、と悩んでたんですが、とりあえず試してみた方が早いだろう、ってことで <a href="https://github.com/grosser/parallel_tests">parallel_tests</a> を試してみた。</p>
+
+<p>6つの VM に対して 311 examples を実行した結果で比較。</p>
+
+<p>parallel_tests を使わない場合。</p>
+
+<pre><code>$ rspec spec
+.......................................................................................................................................................................................................................................................................................................................
+
+Finished in 50.28 seconds
+311 examples, 0 failures
+</code></pre>
+
+<p>parallel_tests を使った場合。</p>
+
+<pre><code>$ parallel_rspec spec
+8 processes for 42 specs, ~ 5 specs per process
+.............................................................................................................................................................................................................................................
+.....
+Finished in 14.69 seconds
+33 examples, 0 failures
+...........
+
+Finished in 15.32 seconds
+37 examples, 0 failures
+..............
+
+Finished in 16.38 seconds
+38 examples, 0 failures
+................
+
+Finished in 17.99 seconds
+32 examples, 0 failures
+.....
+
+Finished in 17.74 seconds
+38 examples, 0 failures
+...........
+
+Finished in 18.99 seconds
+41 examples, 0 failures
+...
+
+Finished in 18.97 seconds
+52 examples, 0 failures
+.........
+
+Finished in 21.49 seconds
+40 examples, 0 failures
+
+311 examples, 0 failures
+
+Took 24.075618 seconds
+</code></pre>
+
+<p>実行時間は約50秒から約24秒と、半分ほどになった。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[serverspec でホスト固有の属性値を扱う方法]]></title>
@@ -494,53 +560,6 @@ Finished in 0.99715 seconds
 </code></pre>
 
 <p><strike>Red Hat 系 Linux 前提のつくりになってしまっているので、他のディストリビューションや OS で利用したい、という方は、ぜひプルリクエストください。</strike> → <a href="https://github.com/mizzy/serverspec/pull/1">Debian 系 OS 対応プルリクエスト</a> をいただいたので、マージして対応しました！</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Testing servers provisioned by Puppet or Chef with RSpec]]></title>
-    <link href="http://mizzy.org/blog/2013/03/24/2/" />
-    <updated>2013-03-24T02:29:42+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/24/2/</id>
-    <content type="html"><![CDATA[
-<p><strong>Note:</strong> I made <a href="https://github.com/mizzy/serverspec">serverspec</a> gem for this purpose. Please see the entry <a href="/blog/2013/03/24/4/">serverspec - a rubygem for testing provisioned servers with RSpec</a>.</p>
-
-<p><a href="/blog/2013/03/24/1/">I&#39;ve made a Puppet module for creating LXC system containers</a>.Next I&#39;ve tried to the basis for writing test code easily.</p>
-
-<p>With <a href="https://github.com/mizzy/rspec-lxc-test-box">rspec-lxc-test-box</a>, you can write code for testing server status like this.</p>
-
-<pre><code class="ruby">require &#39;container_spec_helper&#39;
-
-describe &#39;nrpe&#39; do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;nagios-plugins-all&#39; do
-  it { should be_installed }
-end
-
-describe &#39;/etc/nagios/nrpe.cfg&#39; do
-  it { should be_file }
-  it { should contain &#39;server_port=5666&#39; }
-end
-
-describe &#39;/etc/nrpe.d/01base.cfg&#39; do
-  it { should be_file }
-end
-
-describe &#39;port 5666&#39; do
-  it { should be_listening }
-end
-</code></pre>
-
-<p>This code accesses to a container through SSH and execute commands to check whether files exist, packages are installed, files contain some strings, services run, some ports listen and so on.Very simple.(But code base are specific for Red Hat and its clone OS.)</p>
-
-<p>You can see how I make it simply <a href="https://github.com/mizzy/rspec-lxc-test-box/tree/master/spec/support/matchers">with these codes</a>.</p>
-
-<p>This test code works with any servers provisioned by any tools(Puppet, Chef, CFEngine, Shell Script, Hands and so on).</p>
 
 ]]></content>
   </entry>
