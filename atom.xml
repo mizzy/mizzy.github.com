@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-06-22T23:44:52+09:00</updated>
+  <updated>2013-09-21T21:59:02+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,49 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[自分のプロダクトを海外でも認知してもらうには]]></title>
+    <link href="http://mizzy.org/blog/2013/09/21/1/" />
+    <updated>2013-09-21T21:59:02+09:00</updated>
+    <id>http://mizzy.org/blog/2013/09/21/1/</id>
+    <content type="html"><![CDATA[
+<p>ブログを書くまでがYAPC、ってことなので書きます。</p>
+
+<p>YAPC 懇親会で <a href="https://twitter.com/hirose31">@hirose31</a> さんと「日本人の作ったプロダクトでとても優れていて日本では知名度抜群なのに、海外では全然知られてない、みたいの割とあるけど、どうやったら serverspec みたいに海外でも認知されるようになるんですかね」みたいな話をしました。</p>
+
+<p>serverspec の海外での知名度、といっても、日本での知名度と比較すればまだまだ全然、という感じですが、たまに海外の方の tweet を見かけたり、<a href="http://jjasghar.github.io/blog/2013/07/12/serverspec-the-new-best-way-to-learn-and-audit-your-infrastructure/">Serverspec the New Best Way to Learn and Audit Your Infrastructure</a> というブログエントリを書いてくださった方がいたり、<a href="http://foodfightshow.org/2013/05/testing-in-practice.html">Food Fight という Podcast で取り上げられたり</a>、<a href="http://shop.oreilly.com/product/0636920030973.do">O&#39;Reilly の Test-Driven Infrastructure with Chef 2nd Edition</a> で取り上げられたり、<a href="https://github.com/serverspec/serverspec/pull/128">Puppet Labs の中の人が Vagrant 対応パッチを送ってくれたり</a>、<a href="https://github.com/serverspec/serverspec/issues/239">Opscode の中の人が issue open してくれたり</a>、といった感じで、そこそこ海外の方にも知られる存在になっていて、そうなるように意識してやったことがいくつかあるので、それについて簡単に整理してみます。</p>
+
+<h2>英語でドキュメントを書く</h2>
+
+<p>これは当たり前、というか、大前提なので、特に説明の必要はないですね。</p>
+
+<h2>メジャーなキーワードを散りばめる</h2>
+
+<p><a href="https://github.com/serverspec/serverspec">GitHub の description</a> や <a href="http://serverspec.org/">serverspec.org</a> には serverspec の説明として <strong>&quot;RSpec tests for your servers configured by Puppet, Chef or anything else&quot;</strong> といった言葉があるのですが、<strong>&quot;Puppet&quot;</strong> や <strong>&quot;Chef&quot;</strong> といったワードがあるために、辿り着いて興味を持った人が多いのではないかと思います。特に、Puppet Labs や Opscode の中の人は、Puppet や Chef でエゴサーチしてるでしょうし、そういった方々にリーチして、tweet してもらったりすることで、認知度が高まったのではないかと。</p>
+
+<h2>ぱっと見てどんなものかわかりやすくする</h2>
+
+<p>検索等で辿り着いたとしても、ぱっと見て何をするものなのかがわからないと、すぐに興味を失って二度と訪れてくれなくなるので、<a href="http://serverspec.org/">serverspec.org</a> のトップページは、ざっと見ただけで何をするものなのかがすぐに理解できる、ということ意識しています。</p>
+
+<h2>名前が覚えやすい</h2>
+
+<p><strong>serverspec = server + rspec</strong> ととても安直ですが、それが故に覚えやすく、名前から何をするものなのかが連想しやすいし、tweet 等する時に書きやすいので、それも良かったのではないかと。</p>
+
+<hr>
+
+<p>とまあこんな感じで、そんな大したことやってないですが、他にも要因は色々あるんでしょうね。例えば、Test-Driven Infrastructure という考え方が浸透してきたけど、serverspec ほどシンプルで敷居の低いツールが他になかった、とか、いわゆる開発者と呼ばれる人たちに Puppet や Chef が浸透してきて、そういった人たちに「サーバのテストを RSpec でやる」というコンセプトが響いた、とか、時代の流れ的なものにうまく嵌まったのかなー、と。</p>
+
+<hr>
+
+<p>あと、この話は、serverspec のような、技術者向けのツールとかライブラリにはある程度あてはまるでしょうけど、そうじゃないものだと、言語や文化の壁が大きくて、こうはいかないでしょうね。</p>
+
+<hr>
+
+<p>というわけで、ブログ書くまでが YAPC と言っておきながら、YAPC 全然関係ないエントリをお送りしました。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[serverspec の並列処理]]></title>
@@ -96,24 +139,24 @@ Took 24.075618 seconds
 <p>属性値の定義は、今回は YAML ファイルで行うので、以下のような YAML ファイルを用意する。</p>
 
 <div><script src='https://gist.github.com/5563530.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563530&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>次に、<a href="/blog/2013/05/12/1/">serverspec のテストをホスト間で共有する方法</a> と似たような感じで、YAML で定義されたロールに応じて適切なテストを行うような <code>Rakefile</code> を書く。</p>
 
 <div><script src='https://gist.github.com/5563531.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563531&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>そして <code>spec_helper.rb</code> を以下のように書く。</p>
 
 <div><script src='https://gist.github.com/5563533.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563533&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p><code>attr_set attributes[c.host]</code> で属性値のセットを行っている。</p>
 
 <p>最後に、属性値を参照して <code>attr[:server_id]</code> が <code>/etc/my.cnf</code> で定義されているかどうかをテストする spec を書く。</p>
 
 <div><script src='https://gist.github.com/5563537.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563537&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>仕組みは単純なので、<code>YAML.load_file</code> している部分を好きなように変えれば、自身の環境に合った使い方ができるでしょう。</p>
 
@@ -176,7 +219,7 @@ Took 24.075618 seconds
 <p>次に、以下のような <code>Rakefile</code> と <code>spec/spec_helper.rb</code> を置きます。</p>
 
 <div><script src='https://gist.github.com/5560916.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5560916&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p><code>rake -T</code> を実行すると以下のように表示され、<code>rake serverspec</code> ですべてのホストに対して実行したり、<code>rake serverspec:host</code> で特定のホストに対して実行したりできることがわかります。</p>
 
@@ -493,73 +536,6 @@ end
 Finished in 0.99715 seconds
 6 examples, 0 failures
 </code></pre>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[構築済みサーバを RSpec でテストする serverspec という gem をつくった]]></title>
-    <link href="http://mizzy.org/blog/2013/03/24/3/" />
-    <updated>2013-03-24T17:35:20+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/24/3/</id>
-    <content type="html"><![CDATA[
-<p><a href="/blog/2013/03/23/1/">Puppet や Chef で構築したサーバを RSpec でテストする</a> で書いた仕組みを使いやすくするために <a href="https://github.com/mizzy/serverspec">serverspec</a> という名前で gem 化してみた。</p>
-
-<p>rubygems.org にも登録してあるので、gem install でインストールできる。</p>
-
-<pre><code>$ gem install serverspec
-</code></pre>
-
-<p>インストールしたら、適当なディレクトリで serverspec-init を実行。すると、雛形となるディレクトリやファイルを生成する。</p>
-
-<pre><code>$ serverspec-init
- + spec/
- + spec/www.example.jp/
- + spec/www.example.jp/httpd_spec.rb
- + spec/spec_helper.rb
- + Rakefile
-</code></pre>
-
-<p>spec/<a href="http://www.example.jp/httpd_spec.rb">www.example.jp/httpd_spec.rb</a> がサンプルテストコードで、こんな感じになってる。</p>
-
-<pre><code>require &#39;spec_helper&#39;
-
-describe &#39;httpd&#39; do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;port 80&#39; do
-  it { should be_listening }
-end
-
-describe &#39;/etc/httpd/conf/httpd.conf&#39; do
-  it { should be_file }
-  it { should contain &quot;ServerName www.example.jp&quot; }
-end
-</code></pre>
-
-<p>これに倣って spec/target.example.jp/xxxxx_spec.rb というファイルをつくって、テストを書いていく。</p>
-
-<p>テスト対象のホストには SSH でアクセスするので、パスワード入力しなくて良いように、~/.ssh/config を書いたり、ssh-agent を利用したりすると良いでしょう。</p>
-
-<pre><code>Host *.example.jp
-   User root
-   IdentityFile ~/.ssh/for_serverspec_rsa
-</code></pre>
-
-<p>rake spec でテストを実行。</p>
-
-<pre><code>$ rake spec
-/usr/bin/ruby -S rspec spec/www.example.jp/httpd_spec.rb
-......
-
-Finished in 0.99715 seconds
-6 examples, 0 failures
-</code></pre>
-
-<p><strike>Red Hat 系 Linux 前提のつくりになってしまっているので、他のディストリビューションや OS で利用したい、という方は、ぜひプルリクエストください。</strike> → <a href="https://github.com/mizzy/serverspec/pull/1">Debian 系 OS 対応プルリクエスト</a> をいただいたので、マージして対応しました！</p>
 
 ]]></content>
   </entry>
