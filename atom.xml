@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-09-21T21:59:02+09:00</updated>
+  <updated>2013-10-29T03:01:13+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,139 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[インフラ系技術の流れ]]></title>
+    <link href="http://mizzy.org/blog/2013/10/29/1/" />
+    <updated>2013-10-29T03:01:13+09:00</updated>
+    <id>http://mizzy.org/blog/2013/10/29/1/</id>
+    <content type="html"><![CDATA[
+<p>ここ最近のインフラ系技術の流れがおもしろいなー、と思ったので、Puppet が出た辺りぐらいから、振り返って整理してみる。殴り書きなので、後から修正したり書き加えたりするかも。特に後半の方は、あまり考えが整理できてない。</p>
+
+<p>最近のウェブ界隈での「インフラ」という用語の使われ方には、色々異論もあるようだけど、ここではごく最近使われるようになってきた、OS からミドルウェアといったソフトウェアレイヤーを指す言葉してしてのインフラについて触れる。（英語圏でも同様の意味で使われているようなので、ある程度市民権を得たと言っても良さそうだし。）</p>
+
+<h2>プロビジョニングレイヤー</h2>
+
+<p>まず、前提知識としてプロビジョングレイやーと自分が勝手に呼んでるものついて整理。</p>
+
+<p>Chef や Puppet は「プロビジョニングフレームワーク」とも呼ばれているが、以下の議論をより厳密にするために、<a href="http://en.oreilly.com/velocity-mar2010/public/schedule/detail/14180">Lee Thompson 氏による Velocity 2010 での Provisioning Toolchain というタイトルのプレゼン</a> に基づき、プロビジョニングを以下の3つのレイヤーにわけて考える。（イメージしやすいように、それぞれに該当するツールやサービスを当て込んでみた。）</p>
+
+<ul>
+<li>Orchestration
+
+<ul>
+<li>Fabric, Capistrano, MCollective</li>
+</ul></li>
+<li>Configuration
+
+<ul>
+<li>Puppet, Chef, AWS OpsWorks</li>
+</ul></li>
+<li>Bootstrapping
+
+<ul>
+<li>Kickstart, Cobbler, OpenStack, AWS</li>
+</ul></li>
+</ul>
+
+<p>下の方から見ていくと、Bootstrapping はいわゆる OS インストールにあたる領域。Configuration はミドルウェアレベルまでの設定、Orchestration はアプリケーションデプロイなどを行って、個別のシステムをひとつのサービスとして協調動作させる、といった感じか。</p>
+
+<p>この分類では、Puppet や Chef は Configuration 領域に属するものであり、プロビジョニングフレームワークという呼び方は適切ではなく、Configuration Management Tool とでも呼ぶべきものであるが、まあそこは些末なことなのでどうでもいい。</p>
+
+<p>また、これらは厳密に区別できるものでもない。たとえば、Kickstart ファイルの中で Puppet を呼び出すなんてこともできるし、Puppet をアプリケーションデプロイにも利用するはめになって辛い、といった話を聞いたことがあったり、Capistrano でミドルウェアのインストールや設定なんかをやる、なんて事例も聞いたことがある。</p>
+
+<p>最近出てきた Ansible なんかも、Orchstration と Configuration の中間に位置するような存在に見える。</p>
+
+<h2>Puppet 以前</h2>
+
+<p>ここから、ある程度時間の流れにそって、プロビジョニングにまつわる技術の流れを振り返ってみたい。といっても、項目毎に、時間軸がオーバーラップしてたり、前後してたりするので、あまり厳密ではない。</p>
+
+<p>いわゆる「Configuration Management Tool」としては、Puppet より前は、CFEngine, LCFG, BCFG といったものがあったようだが、どれもきちんと触ったことがないので、この辺はあまりよく知らない。この中では CFEngine が一番有名か。</p>
+
+<p>システム管理自動化の走りがこの辺のツールなのかな。</p>
+
+<h2>Puppet</h2>
+
+<p>Puppet が出てきたのは 2006 年あたり。Infrastructure as Code の流れの最初のきっかけを作ったのが Puppet なんじゃないかと。</p>
+
+<p>LISA &#39;07 では <a href="https://www.usenix.org/conference/lisa-07/panel-configuration-tools-lcfg-cfengine-bcfg-and-puppet">CFEngine や Puppet 等の開発者のパネルディスカッションが行われていた</a> 。</p>
+
+<h2>AWS EC2</h2>
+
+<p>これも登場は Puppet と同じく 2006 年あたりだった気がする。</p>
+
+<p>Puppet での Infrastructure as Code はインフラをコードで記述するという意味であり、EC2 での Infrastracture as Code は、インフラをコードで操作する、という意味合いになる。</p>
+
+<p>こんな形で、Infrastructure as Code を意味づける2つの技術が、2006年あたりに登場してる。</p>
+
+<h2>Chef</h2>
+
+<p>Chef が出てきたのは 2009 年ぐらいかな？Puppet をベースに、さらにインフラをプログラマブルに扱う、という思想を推し進めたツールが Chef だと思う。これが IaaS の台頭により、開発者がインフラを触る機会が多くなり、そういった人たちに受け入れられたのが、今の Chef 人気の背景にはあるんじゃないかと。</p>
+
+<h2>テスト駆動インフラ</h2>
+
+<p>これはここ数年で出てきた言葉で、認知されてきたのはごく最近のような気もするし、まだまだ認知されてないような気もする。</p>
+
+<p>概念自体は 2007 年ぐらいから実は考えていて、その当時はインフラという言葉は今のような使われ方をしていなかったので、<a href="http://mizzy.tumblr.com/post/46834223858">テスト駆動サーバ構築</a> という呼び方をしていた。</p>
+
+<p>これを考え始めたきっかけは Puppet を使い始めたことで、構築は自動化できたけど、その確認作業を従来通り、目視の手動チェックでやるのはいけてないな、と考えたから。で、<a href="http://tokyo2007.yapcasia.org/sessions/2007/02/assurer_a_pluggable_server_tes.html">Assurer というツール</a> でこれを実現しようとしてたんだけど、いろいろ夢が膨らみ、詰め込みすぎてすごく複雑になったり、自分の技術力もなかったりで、使わないまま消え去った。</p>
+
+<p>書籍としては 2011 年に <a href="http://shop.oreilly.com/product/0636920020042.do">Test-Driven Infrastructure with Chef</a> が出ていて、最近 <a href="http://shop.oreilly.com/product/0636920030973.do">これの第2版</a> が出た。with Chef とタイトルにあるように、この辺りは Chef とその周辺ツールが色々と充実してる印象。</p>
+
+<p>でも、自分は Chef 使ってないし、特定の Configuration Management Tool に縛られるのってどうなんだろう、と思って、もっと汎用的にシンプルにインフラのテストをしたい、と思って開発したのが <a href="http://serverspec.org/">serverspec</a> 。2007年から考えていたテスト駆動インフラが、6年かかってようやく実現できた。長かった。</p>
+
+<p>上で書いたように、この辺りのツールは Chef まわりが充実してるものの、テスト駆動インフラという考え方は、いまいち認知されてなかったように感じる。（特に日本では。海外はよくわからない。）</p>
+
+<p>それが serverspec が登場することによって、だいぶ認知されてきたんじゃないかと自画自賛してる。</p>
+
+<h2>インフラCI</h2>
+
+<p>アプリケーション開発と同じように、テスト駆動したら次は CI だ、というのは自然な流れだと思う。serverspec もこれがやりたいがために開発した。</p>
+
+<p>インフラCIについては、実は <a href="http://blog.riywo.com/2012/05/27/145310">@riywo くんが昨年ブログエントリを書いている</a> 。彼は現状を把握し、先を見通し、やるべきことを考え、それを実現する技術力がある、希有なエンジニアだと思う。</p>
+
+<p>ペパボではちいさなプロジェクトで、Docker + Puppet + serverspec + Jenkins でのインフラ CI を最近やりはじめたところ。</p>
+
+<h2>Immutable Infrastructure</h2>
+
+<p><a href="http://chadfowler.com/blog/2013/06/23/immutable-deployments/">Trash Your Servers and Burn Your Code: Immutable Infrastructure and Disposable Components - Chad Fowler</a> というブログエントリで知った言葉。</p>
+
+<p>おおざっぱに言うと、システムを変更する際に、既に動いているサーバに対して変更を加えるのではなく、新しく別にシステムを構築し、古いシステムと差し替える、ってなことをやる。</p>
+
+<p>日本語での解説は <a href="http://apatheia.info/blog/2013/08/10/immutable-infrastructure/">Immutable Infrastracture について - apatheia.info</a> にあるのでこちらを参照してください。</p>
+
+<p>オンプレな環境でもできないことはないんだろうけど、EC2 みたいに仮想マシンをプログラマブルに扱え、作ったり破棄したりすることが容易にできる環境があるからこそのテクニック。</p>
+
+<p>これができるようになると、Chef や Puppet が謳う冪等性ってのはどうでもよくなってくる。ひとつのシステムにマニフェストやレシピを何度も何度も適用することがなくなるから。なので、Chef や Puppet に変わって、Immutable Infrastructure に適した Configuration Management Tool が今後出てくると思う。よりシンプルで、実行順序がわかりやすく制御しやすいものが。</p>
+
+<h2>Container Base Deployment</h2>
+
+<p>Immutable Infrastructure は EC2 のような、ハイパーバイザー型仮想マシンでの話が主流だと思われるが、今後はコンテナ型仮想マシンで同じようなことをやる、という話が増えてくると思う。</p>
+
+<p>ハイパーバイザー型仮想マシンによる Immutable Infrastructure では、リモートの本番環境に仮想マシンをつくって、それと古い仮想マシンを差し替える形になるが、コンテナの場合には、ローカルでコンテナをつくって、それをまるっとリモートに送り込む形のデプロイになるのではないだろうか。</p>
+
+<p>コンテナの持つポータビリティの高さによって、こういうことが実現できるようになると思う。これができると何がうれしいかというと、既にペパボの一部でもやっているような、Docker でコンテナを作成、Puppet マニフェストを流し込んで serverspec でテスト、をした後に、現在であればコンテナをそのまま破棄してるけど、破棄せずにそのまままるっと本番にデプロイ、なんてことができるようになるんじゃないか、と妄想してる。</p>
+
+<p>もちろん、ハイパーバイザー型仮想マシンの場合でも、Packer のようにローカル（Vagrant VM等）とリモート（EC2インスタンス）を抽象化して同じように扱えるような仕組みはあるが、コンテナの場合には「同じように扱える」ではなく「まったく同じもの」になるので、ローカルでコンテナをつくって十分にテストし、それを本番にデプロイしても、同じようにちゃんと動くだろう、という安心感はより高いと言えそう。</p>
+
+<h2>Docker</h2>
+
+<p>上のインフラ CI や Container Base Deployment の項には何の説明もなく Docker が出てきてるが、これについては <a href="http://d.hatena.ne.jp/naoya/20130620/1371729625">naoya さんのエントリ</a> や 　<a href="http://rebuild.fm/14/">Rebuild: 14: DevOps with Docker, chef and serverspec (naoya, mizzy)</a> を参照。</p>
+
+<h2>Serf</h2>
+
+<p>最近出てきた Serf。現在の Puppet や Chef をメインとしたプロビジョニングにおいては、サーバ毎に微妙に異なる設定（ホスト名やIPアドレスにひもづいた設定）や、サーバの増減によって動的に変わるような設定（ロードバランサや Nagios の監視対象など）なんかも、Puppet や Chef で管理しているが、これは Immutable Infrastructure のようなやり方とはあまり相性がよくなさそう。</p>
+
+<p>特に動的に変わるような設定は、プロビジョニングの中でも、Configuration ではなく Orchestration の範疇になるので、最初の分類にしたがうと、Puppet や Chef はあまり向いてない領域とも言える。</p>
+
+<p>これを解決するための手段のひとつが Serf で、Puppet や Chef でやってしまっている Orchestration 領域の仕事を Serf の方に任せることによって、良い感じのプロビジョニングができそう。<a href="http://www.serfdom.io/intro/vs-chef-puppet.html">Serf vs. Chef, Puppet, etc.</a> に書いてあることは、そういうことだと理解した。</p>
+
+<p>とはいえ、Serf 自体はゴシップベースプロトコルによるクラスタリングとイベントプロパゲーションが主な仕事で、その上で Orchestration するような仕組みを自分で作らないといけなさそう、今のところは。</p>
+
+<p>Serf の次はその辺を解決するようなプロダクトを Mitchell Hashimoto 氏は出してくるのかな。（または、Serf にはプラグインの仕組みがあるようなので、プラグインで解決するのかもしれない。）</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[自分のプロダクトを海外でも認知してもらうには]]></title>
@@ -475,75 +608,6 @@ end
 <p>といった感じで、spec 内では OS は指定しない、といった書き方もできます。</p>
 
 <p>好きなスタイルを選んでください。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[serverspec - a rubygem for testing provisioned servers with RSpec]]></title>
-    <link href="http://mizzy.org/blog/2013/03/24/4/" />
-    <updated>2013-03-24T18:55:10+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/24/4/</id>
-    <content type="html"><![CDATA[
-<p>In <a href="/blog/2013/03/24/2/">Testing servers provisioned by Puppet or Chef with RSpec</a>, I wrote how to test provisioned servers with RSpec.</p>
-
-<p>I&#39;ve created a rubygem <a href="https://rubygems.org/gems/serverspec">serverspec</a> for that purpose.</p>
-
-<p><a href="https://github.com/mizzy/serverspec">mizzy/serverspec</a></p>
-
-<p>You can install serverspec with gem install.</p>
-
-<pre><code>$ gem install serverspec
-</code></pre>
-
-<p>serverspec-init command creates template files and directories.</p>
-
-<pre><code>$ serverspec-init
- + spec/
- + spec/www.example.jp/
- + spec/www.example.jp/httpd_spec.rb
- + spec/spec_helper.rb
- + Rakefile
-</code></pre>
-
-<p>spec/<a href="http://www.example.jp/httpd_spec.rb">www.example.jp/httpd_spec.rb</a> contains example spec code.</p>
-
-<pre><code>require &#39;spec_helper&#39;
-
-describe &#39;httpd&#39; do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;port 80&#39; do
-  it { should be_listening }
-end
-
-describe &#39;/etc/httpd/conf/httpd.conf&#39; do
-  it { should be_file }
-  it { should contain &quot;ServerName www.example.jp&quot; }
-end
-</code></pre>
-
-<p>You can write test code like this.</p>
-
-<p>You may need some settings in ~/.ssh/config and ssh-agent for logging into the target server without the password/passphrase.</p>
-
-<pre><code>Host *.example.jp
-   User root
-   IdentityFile ~/.ssh/for_serverspec_rsa
-</code></pre>
-
-<p>Run tests with rake spec.</p>
-
-<pre><code>$ rake spec
-/usr/bin/ruby -S rspec spec/www.example.jp/httpd_spec.rb
-......
-
-Finished in 0.99715 seconds
-6 examples, 0 failures
-</code></pre>
 
 ]]></content>
   </entry>
