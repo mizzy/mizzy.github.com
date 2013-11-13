@@ -64,7 +64,9 @@
     
   </section>
 
-  <p><strong>注意！ ここで解説する方法は v0.3.0 から利用できます。</strong></p>
+  <p>*<em>注意！ v0.11.0 からは attr, attr_set ではなく、property, set<em>property とメソッド名が変更になります。attr, attr\</em>set は近い将来使えなくなります。 <a href="http://serverspec.org/advanced_tips.html">詳しくはこちら</a>。 *</em></p>
+
+<p><strong>注意！ ここで解説する方法は v0.3.0 から利用できます。</strong></p>
 
 <p><a href="http://blog.takus.me/2013/05/12/provisioning-frameworks-casual-talks-001/">Provisioning Frameworks Casual Talks vol.1 に行ってきた #pfcasual - TAKUMI SAKAMOTO&#39;S BLOG</a> で触れられている attributes 周りについて、この辺は必要になるだろうなー、と前から思ってはいたので、それを実現するための極々簡単な仕組みを <a href="https://github.com/mizzy/serverspec/pull/98">試験的に実装してみた</a> 。</p>
 
@@ -75,24 +77,24 @@
 <p>属性値の定義は、今回は YAML ファイルで行うので、以下のような YAML ファイルを用意する。</p>
 
 <div><script src='https://gist.github.com/5563530.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563530&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>次に、<a href="/blog/2013/05/12/1/">serverspec のテストをホスト間で共有する方法</a> と似たような感じで、YAML で定義されたロールに応じて適切なテストを行うような <code>Rakefile</code> を書く。</p>
 
 <div><script src='https://gist.github.com/5563531.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563531&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>そして <code>spec_helper.rb</code> を以下のように書く。</p>
 
 <div><script src='https://gist.github.com/5563533.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563533&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p><code>attr_set attributes[c.host]</code> で属性値のセットを行っている。</p>
 
 <p>最後に、属性値を参照して <code>attr[:server_id]</code> が <code>/etc/my.cnf</code> で定義されているかどうかをテストする spec を書く。</p>
 
 <div><script src='https://gist.github.com/5563537.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5563537&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>仕組みは単純なので、<code>YAML.load_file</code> している部分を好きなように変えれば、自身の環境に合った使い方ができるでしょう。</p>
 

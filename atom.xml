@@ -269,6 +269,8 @@ Took 24.075618 seconds
     <updated>2013-05-12T22:05:26+09:00</updated>
     <id>http://mizzy.org/blog/2013/05/12/2/</id>
     <content type="html"><![CDATA[
+<p>*<em>注意！ v0.11.0 からは attr, attr_set ではなく、property, set<em>property とメソッド名が変更になります。attr, attr\</em>set は近い将来使えなくなります。 <a href="http://serverspec.org/advanced_tips.html">詳しくはこちら</a>。 *</em></p>
+
 <p><strong>注意！ ここで解説する方法は v0.3.0 から利用できます。</strong></p>
 
 <p><a href="http://blog.takus.me/2013/05/12/provisioning-frameworks-casual-talks-001/">Provisioning Frameworks Casual Talks vol.1 に行ってきた #pfcasual - TAKUMI SAKAMOTO&#39;S BLOG</a> で触れられている attributes 周りについて、この辺は必要になるだろうなー、と前から思ってはいたので、それを実現するための極々簡単な仕組みを <a href="https://github.com/mizzy/serverspec/pull/98">試験的に実装してみた</a> 。</p>
