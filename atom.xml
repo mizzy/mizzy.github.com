@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-10-29T03:01:13+09:00</updated>
+  <updated>2013-11-25T23:28:50+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[configspec という Immutable Infrastructure 用 Configuration Management Tool をつくってみた]]></title>
+    <link href="http://mizzy.org/blog/2013/11/25/1/" />
+    <updated>2013-11-25T23:28:50+09:00</updated>
+    <id>http://mizzy.org/blog/2013/11/25/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://togetter.com/li/594684">Immutable Infrastructure の有用性 - Togetter</a> の流れの勢いで、<a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ</a> とか <a href="http://rebuild.fm/25/">Rebuild: 25: Immutable Infrastructure (Naoya Ito, Gosuke Miyashita)</a> とかで言ってたような、冪等性とか依存関係とかを考慮しないシンプルな Configuratin Management Tool である <a href="https://github.com/mizzy/configspec">configspec</a> をつくってみた。</p>
+
+<p>この手のツールに自分が望む要件は以下の様な感じ。</p>
+
+<ul>
+<li>冪等性とかどうでもいい
+
+<ul>
+<li>まっさらな状態からのセットアップでしか使わない</li>
+</ul></li>
+<li>依存関係とかどうでもいい
+
+<ul>
+<li>ファイル名順、上から書いた順で実行してく </li>
+</ul></li>
+<li>対象サーバに余分なものをインストールしたくない
+
+<ul>
+<li>対象サーバに SSH さえできれば OK</li>
+</ul></li>
+<li>シェルスクリプトよりは抽象度を高めたい
+
+<ul>
+<li>今さらシェルスクリプトでのセットアップには戻りたくない…</li>
+</ul></li>
+</ul>
+
+<p>使い方はこんな感じ。</p>
+
+<pre><code>$ configspec-init
+Select a backend type:
+
+  1) SSH
+  2) Exec (local)
+
+Select number: 1
+
+Vagrant instance y/n: y
+Auto-configure Vagrant from Vagrantfile? y/n: n
+Input vagrant instance name: www
+ + spec/
+ + spec/www/
+ + spec/www/001_httpd_spec.rb
+ + spec/spec_helper.rb
+ + Rakefile
+
+ ~/tmp/configspec/spec
+$ rake spec
+/opt/boxen/rbenv/versions/2.0.0-p247/bin/ruby -S rspec spec/www/001_httpd_spec.rb
+
+Package &quot;httpd&quot;
+  should be installed
+
+Finished in 3.44 seconds
+1 example, 0 failures
+</code></pre>
+
+<p>サンプルとして生成される <code>001_httpd_spec.rb</code> の中身はこんな感じ。</p>
+
+<pre><code class="ruby">require &#39;spec_helper&#39;
+
+describe package(&#39;httpd&#39;) do
+  it { should be_installed }
+end
+</code></pre>
+
+<p>これによって、<code>rake spec</code> を実行すると、裏では <code>yum -y install httpd</code> が実行される。</p>
+
+<p>これを見て、serverspec とほぼ同じだ、と思った方、正解です。コードも serverspec からとほんどコピペしてます。違いは、<code>be_installed</code> で実行されるのが、serverspec の場合は <code>rpm -q</code> で、configspec では <code>yum install -y</code> といったところぐらいですね。</p>
+
+<p>この configspec は、とりあえず proof of concept として作ってみただけで、RedHat 系 OS でパッケージインストールしかできないので、まだまだ実用には耐えませんが、つくりが serverspec とまんま一緒なので、同じような感じで拡張していけます。</p>
+
+<p>serverspec にこういった機能を組み込むことも考えましたが、serverspec のようにサーバの状態をテストするのと、configspec のようにサーバに副作用のある何かを実行するのでは、書くべき内容が異なってくるだろう、と考えて、別プロダクトにしました。</p>
+
+<p>RSpec の副産物として副作用のある何かが実行されるというのは、もちろん <a href="http://r7kamura.github.io/2013/11/18/sitespec.html">Sitespec</a> の影響受けてます。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[インフラ系技術の流れ]]></title>
@@ -504,112 +589,6 @@ $ serverspec-init
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 <p>Ukigumo もとてもシンプルでいいですね。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[serverspec が Debian 対応した（してもらった）]]></title>
-    <link href="http://mizzy.org/blog/2013/03/25/1/" />
-    <updated>2013-03-25T01:52:46+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/25/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="/blog/2013/03/24/3/">構築済みサーバを RSpec でテストする serverspec という gem をつくった</a> で、「Red Hat 系 Linux 前提のつくりになってしまっているので、他のディストリビューションや OS で利用したい、という方は、ぜひプルリクエストください」と書いていたら、早速 <a href="https://github.com/mizzy/serverspec/pull/1">Debian 系 OS 対応のプルリクエスト</a> をいただきました。ありがとうございます！</p>
-
-<p>単に Debian 系 OS に対応するだけではなく、他の OS にも対応できるよう拡張しやすい形に書き換えていただいたり、serverspec 自体の spec も追加していただいたりと、至れり尽くせりで感謝感謝です。</p>
-
-<pre><code class="ruby">c.include(Serverspec::DebianHelper, :os =&gt; :debian)
-</code></pre>
-
-<p>みたいな書き方も知らなかったので、大変参考になりました。</p>
-
-<p><a href="https://github.com/mizzy/serverspec/blob/master/README.md">README</a> にも書いてありますが、こんな感じで OS を指定します。</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe &#39;httpd&#39;, :os =&gt; :debian do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;port 80&#39;, :os =&gt; :debian do
-  it { should be_listening }
-end
-
-describe &#39;/etc/httpd/conf/httpd.conf&#39;, :os =&gt; :debian do
-  it { should be_file }
-  it { should contain &quot;ServerName www.example.jp&quot; }
-end
-</code></pre>
-
-<p><code>:os =&gt; :debian</code> と何度も書くのが面倒なら、</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe &#39;www.example.jp&#39;, :os =&gt; :debian do
-  it do
-    &#39;httpd&#39;.should be_installed
-  end
-  it do
-    &#39;httpd&#39;.should be_enabled
-  end
-  it do
-    &#39;httpd&#39;.should be_running
-  end
-
-  it do
-    &#39;port 80&#39;.should be_listening
-  end
-
-  conf = &#39;/etc/httpd/conf/httpd.conf&#39;
-  it do
-    conf.should be_file
-  end
-  it do
-    conf.should contain &quot;ServerName www.example.jp&quot;
-  end
-end
-</code></pre>
-
-<p>とか書いてもいいですし、</p>
-
-<p><code>serverspec-init</code> で生成される spec/spec_helper.rb に</p>
-
-<pre><code class="ruby">require &#39;serverspec&#39;
-require &#39;pathname&#39;
-
-RSpec.configure do |c|
-  c.include(Serverspec::DebianHelper)
-  c.before do
-    c.host = File.basename(Pathname.new(example.metadata[:location]).dirname)
-  end
-end
-</code></pre>
-
-<p>な感じで <code>c.include(Serverspec::DebianHelper)</code> を追加して、</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe &#39;httpd&#39; do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;port 80&#39; do
-  it { should be_listening }
-end
-
-describe &#39;/etc/httpd/conf/httpd.conf&#39; do
-  it { should be_file }
-  it { should contain &quot;ServerName www.example.jp&quot; }
-end
-</code></pre>
-
-<p>といった感じで、spec 内では OS は指定しない、といった書き方もできます。</p>
-
-<p>好きなスタイルを選んでください。</p>
 
 ]]></content>
   </entry>
