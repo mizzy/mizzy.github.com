@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-11-25T23:28:50+09:00</updated>
+  <updated>2013-11-26T14:47:38+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,66 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[configspec で Dockerfile を生成できるようにした]]></title>
+    <link href="http://mizzy.org/blog/2013/11/26/1/" />
+    <updated>2013-11-26T14:47:38+09:00</updated>
+    <id>http://mizzy.org/blog/2013/11/26/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://mizzy.org/blog/2013/11/25/1/">configspec</a> とか Immutable Infrastructure について、<a href="https://twitter.com/kazuho">@kazuho</a> さんから色々とありがたいツッコミをいただきまして、その中で</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>個人的にはSCMあるいはLVMの管理下において、record-cmd yum -y install httpd とかすると、コマンドがSCMのコメントに残りつつ、ファイルシステムに発生した差分が変更履歴として保存されるくらいでいいんじゃないかと思う</p>&mdash; Kazuho Oku (@kazuho) <a href="https://twitter.com/kazuho/statuses/405183158674403329">November 26, 2013</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>といった tweet があり、それは Docker でやれるけど、configspec でやることではないなー、と思っていたところ、ふと</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>configspec から Dockerfile を生成する、というアプローチもありな気がしてきた。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/statuses/405184497550782464">November 26, 2013</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>ってなことを思いつき、時同じくして <a href="https://twitter.com/naoya_ito">@naoya_ito</a> さんからも</p>
+
+<blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/gosukenator">@gosukenator</a> configspecみたいなのがDockerfileを出力すればいいと思います</p>&mdash; Naoya Ito (@naoya_ito) <a href="https://twitter.com/naoya_ito/statuses/405185262411460608">November 26, 2013</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>とリプライいただいたので、早速実装してみた。v0.0.5 では、以下の様に Dockerfile の生成ができます。</p>
+
+<pre><code>$ configspec-init
+Select a backend type:
+
+  1) SSH
+  2) Exec (local)
+  3) Dockerfile
+
+Select number: 3
+
+ + spec/
+ + spec/001_httpd_spec.rb
+ + spec/spec_helper.rb
+ + Rakefile
+
+$ rake spec
+/opt/boxen/rbenv/versions/2.0.0-p247/bin/ruby -S rspec
+
+Package &quot;httpd&quot;
+  should be installed
+
+Finished in 0.00229 seconds
+1 example, 0 failures
+
+$ cat Dockerfile
+RUN yum -y install httpd
+</code></pre>
+
+<p>まだ RedHat 系のパッケージインストールしか対応してないので、<code>RUN yum -y install</code> しか出力できないけど、おいおい対応していきます。</p>
+
+<p>（というか、RSpec で副作用のある何かするの、<a href="https://twitter.com/r7kamura">@r7kamura</a> 氏のネタに乗っかった側面が強いんだけど、本当にこの方向性でいいの？って気がしなくもない。）</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[configspec という Immutable Infrastructure 用 Configuration Management Tool をつくってみた]]></title>
@@ -540,55 +600,6 @@ $ serverspec-init
 <p><img src="/images/2013/03/ukigumo-irc.jpg"></p>
 
 <p>I will refactor Puppet manifests upon this CI environment.</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Ukigumo と serverspec で Puppet の継続的インテグレーション]]></title>
-    <link href="http://mizzy.org/blog/2013/03/27/1/" />
-    <updated>2013-03-27T21:38:39+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/27/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://blog.64p.org/">tokuhirom</a> さんにより開発されている <a href="http://ukigumo.github.com/ukigumo/">Ukigumo</a> を利用して、Puppet の CI 環境を構築してみた。やってることは以下の通り。</p>
-
-<ul>
-<li>Puppet マニフェストを Git リポジトリで管理</li>
-<li><a href="http://ukigumo.github.com/Ukigumo-Server/">Ukigumo Server</a> を立てる</li>
-<li><a href="/blog/2013/03/22/1/">puppet-lxc-test-box</a> で Puppet マニフェストを流し込むシステムコンテナを必要なロールの分だけ用意</li>
-<li><a href="https://gist.github.com/mizzy/5252543">自前の Ukigumo クライアントスクリプト</a> を cron で定期的に走らせ以下を実行
-
-<ul>
-<li>Puppet マニフェストリポジトリの master ブランチが更新されていたら、git pull して Puppet マニフェストをシステムコンテナに適用し、適用結果を Ukigumo サーバに投げる</li>
-<li><a href="/blog/2013/03/24/3/">serverspec</a> によるテストをシステムコンテナに対して実行し、結果を Ukigumo サーバに投げる</li>
-</ul></li>
-</ul>
-
-<p>Ukigumo のトップ画面はこんな感じ。最新の結果一覧が表示されている。</p>
-
-<p><img src="/images/2013/03/ukigumo-top.jpg"></p>
-
-<p>Puppet マニフェストの適用結果の詳細はこんな感じ。</p>
-
-<p><img src="/images/2013/03/ukigumo-puppet.jpg"></p>
-
-<p>serverspec によるテスト結果の詳細はこんな感じ。</p>
-
-<p><img src="/images/2013/03/ukigumo-serverspec.jpg"></p>
-
-<p>結果は <a href="http://blog.yappo.jp/yappo/archives/000760.html">Ikachan</a> に投げて IRC で通知してる。</p>
-
-<p><img src="/images/2013/03/ukigumo-irc.jpg"></p>
-
-<p>これで Puppet マニフェストをガリガリとリファクタリングするための準備が整った。</p>
-
-<p><a href="/blog/2013/03/22/1/">puppet-lxc-test-box</a> や <a href="/blog/2013/03/24/3/">serverspec</a> をつくったのは、こういうことがやりたかったから、ってなことを社内 IRC に書いたら、<a href="https://twitter.com/search/realtime?q=%233%E5%88%86%E3%81%A7%E5%B8%B8%E6%9D%BE&amp;src=typd">#3分で常松</a> くんを濡らすことに成功した。</p>
-
-<blockquote class="twitter-tweet"><p>「15:00 mizzy: 最近ブログに書いてたことは、すべてこれへの布石」のカッコイイ感はんぱなくて濡れる</p>&mdash; TSUNEMATSU Shinya (@tnmt) <a href="https://twitter.com/tnmt/status/316792813712977920">March 27, 2013</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>Ukigumo もとてもシンプルでいいですね。</p>
 
 ]]></content>
   </entry>
