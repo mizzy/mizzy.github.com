@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-11-30T23:34:48+09:00</updated>
+  <updated>2013-12-01T00:08:16+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,46 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[configspec の Dockerfile バックエンドで FROM をサポートした]]></title>
+    <link href="http://mizzy.org/blog/2013/12/01/1/" />
+    <updated>2013-12-01T00:08:16+09:00</updated>
+    <id>http://mizzy.org/blog/2013/12/01/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://mizzy.org/blog/2013/11/26/1/">configspec で Dockerfile を生成できるようにした</a> のだけど、Dockerfile 生成するなら、<code>FROM</code> の定義は外せないだろう、ってことで、<a href="https://github.com/mizzy/configspec/pull/4">できるようにした</a> 。</p>
+
+<pre><code class="ruby">require &quot;configspec&quot;
+
+include Configspec::Helper::Dockerfile
+include SpecInfra::Helper::RedHat
+</code></pre>
+
+<p>こんな spec_helper.rb を用意して、</p>
+
+<pre><code class="ruby">require &#39;spec_helper&#39;
+
+describe dockerfile do
+  it { should be_from &#39;centos&#39; }
+end
+
+describe package(&#39;httpd&#39;) do
+  it { should be_installed }
+end
+</code></pre>
+
+<p>ってな spec を書いて実行したら、</p>
+
+<pre><code>FROM centos
+RUN yum -y install httpd
+</code></pre>
+
+<p>という内容の Dockerfile を生成してくれる。</p>
+
+<p>Dockerfile バックエンドは specinfra の方で実装しても良かったんだけど、serverspec では使い道ないな、と思ったので、configspec の方で実装した。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[specinfra という serverspec/configspec に共通する処理を抜き出した gem をつくった]]></title>
@@ -570,24 +610,6 @@ rake serverspec:proxy002  # Run serverspec to proxy002.example.jp
 <p>他にもこういったテストが欲しい、など要望があれば、<a href="https://github.com/mizzy/serverspec">こちら</a> までプルリク送ってください。</p>
 
 <p>次は serverspec 自体の spec を充実させる予定。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[serverspec で同一ホストへの SSH 接続を再利用するようにしました]]></title>
-    <link href="http://mizzy.org/blog/2013/03/28/1/" />
-    <updated>2013-03-28T23:09:20+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/28/1/</id>
-    <content type="html"><![CDATA[
-<p>今まで <a href="https://github.com/mizzy/serverspec">serverspec</a> では、テストをひとつ実行するたびに、ホストへの SSH 接続/切断を繰り返していたのですが、バージョン 0.0.13 では、同一ホストへの SSH 接続を再利用することで、テスト時間を短縮できるようにしました。</p>
-
-<p>接続の管理は serverspec-init 実行時に生成される spec/spec_helper.rb で行っているため、0.0.12 以前から利用している方は、一度 spec/spec_helper.rb を削除して、再度 serverspec-init を実行して再作成してください。</p>
-
-<pre><code>$ rm spec/spec_helper.rb
-$ serverspec-init
- + spec/spec_helper.rb
-</code></pre>
 
 ]]></content>
   </entry>
