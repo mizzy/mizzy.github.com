@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-12-01T00:08:16+09:00</updated>
+  <updated>2013-12-01T00:20:31+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,104 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[configspec/serverspec でシェルスクリプトを生成できるようにした]]></title>
+    <link href="http://mizzy.org/blog/2013/12/01/2/" />
+    <updated>2013-12-01T00:20:31+09:00</updated>
+    <id>http://mizzy.org/blog/2013/12/01/2/</id>
+    <content type="html"><![CDATA[
+<p>specinfra で <a href="https://github.com/mizzy/specinfra/pull/1">ShellScript backend に対応</a> したので、configspec や serverspec で実行されるコマンドをシェルスクリプト形式でダンプできるようになった。</p>
+
+<p>例えば configspec の場合</p>
+
+<pre><code class="ruby">require &#39;configspec&#39;
+
+include SpecInfra::Helper::ShellScript
+include SpecInfra::Helper::RedHat
+</code></pre>
+
+<p>といった spec_helper.rb を用意して</p>
+
+<pre><code class="ruby">require &#39;spec_helper&#39;
+
+describe package(&#39;httpd&#39;) do
+  it { should be_installed }
+end
+</code></pre>
+
+<p>といった内容の spec を書いて実行すると</p>
+
+<pre><code class="sh">#!/bin/sh
+
+yum -y install httpd
+</code></pre>
+
+<p>こんな内容の spec.sh というファイルを生成してくれる。</p>
+
+<p>また、serverspec の場合</p>
+
+<pre><code class="ruby">require &#39;serverspec&#39;
+
+include SpecInfra::Helper::ShellScript
+include SpecInfra::Helper::RedHat
+</code></pre>
+
+<p>といった spec_helper.rb を用意して</p>
+
+<pre><code class="ruby">require &#39;spec_helper&#39;
+
+describe package(&#39;httpd&#39;) do
+  it { should be_installed }
+end
+
+describe service(&#39;httpd&#39;) do
+  it { should be_enabled   }
+  it { should be_running   }
+end
+
+describe port(80) do
+  it { should be_listening }
+end
+
+describe file(&#39;/etc/httpd/conf/httpd.conf&#39;) do
+  it { should be_file }
+  it { should contain &quot;ServerName users501&quot; }
+end
+</code></pre>
+
+<p>という serverspec-init で生成されるサンプルの spec を実行すると</p>
+
+<pre><code class="sh">#!/bin/sh
+
+rpm -q httpd
+chkconfig --list httpd | grep 3:on
+service httpd status
+netstat -tunl | grep -- :80\
+test -f /etc/httpd/conf/httpd.conf
+grep -q -- ServerName\ users501 /etc/httpd/conf/httpd.conf || grep -qF -- ServerName\ users501 /etc/httpd/conf/httpd.conf
+</code></pre>
+
+<p>こんな内容の spec.sh を吐き出してくれる。</p>
+
+<p>さらに <code>include SpecInfra::Helper::RedHat</code> を <code>include SpecInfra::Helper::Solaris11</code> に変えると</p>
+
+<pre><code class="sh">#!/bin/sh
+
+pkg list -H httpd 2&gt; /dev/null
+svcs -l httpd 2&gt; /dev/null | egrep &#39;^enabled *true$&#39;
+svcs -l httpd status 2&gt; /dev/null | egrep &#39;^state *online$&#39;
+netstat -an 2&gt; /dev/null | grep -- LISTEN | grep -- \\.80\
+test -f /etc/httpd/conf/httpd.conf
+grep -q -- ServerName\ users501 /etc/httpd/conf/httpd.conf || grep -qF -- ServerName\ users501 /etc/httpd/conf/httpd.conf
+</code></pre>
+
+<p>といった感じで、Solaris 11 用のシェルスクリプトを吐き出してくれる。（実際にはパッケージ名が違ってそのままでは使えないだろうけど。）</p>
+
+<p>serverspec の場合は、シェルコマンドだけじゃなく Ruby で処理してる部分もあるので、ダンプされるシェルスクリプトで serverspec がやってることをそのまま再現できるわけではないし、そもそもシェルスクリプトでダンプすることに意味があるのか、という感じだけど、specinfra 側で対応するだけで、configspec と serverspec 両方で使えるようになる、という実例として挙げてみた。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[configspec の Dockerfile バックエンドで FROM をサポートした]]></title>
@@ -593,23 +691,6 @@ rake serverspec:proxy002  # Run serverspec to proxy002.example.jp
 <p><code>Rakefile</code> 内で定義しているホストとロールのひもづけは、外部から JSON などで取得してきてもいいですし、工夫すれば、特定のロールに属するホスト群に対してのみ実行、といったこともできるでしょう。</p>
 
 <p>こんな形で、どのホストに対してどのテストを実行するのか、というのは、serverspec 本体の仕様とは疎になってるので、<code>Rakefile</code> と <code>spec_helper.rb</code> をカスタマイズすることで、各自の環境や目的にあったファイル構成にしたり、対象のホストに関する情報を外部から引っ張ってきたり、といったことも可能です。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[serverspec のサイトつくりました]]></title>
-    <link href="http://mizzy.org/blog/2013/03/30/1/" />
-    <updated>2013-03-30T21:38:46+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/30/1/</id>
-    <content type="html"><![CDATA[
-<p>GitHub Pages で <a href="http://serverspec.org/">serverspec のサイト</a> をつくりました。</p>
-
-<p><a href="http://serverspec.org/matchers.html">マッチャの一覧ページ</a> もつくったので、これを見てもらえれば、現状どういったテストができるのか一通り把握できるかと思います。</p>
-
-<p>他にもこういったテストが欲しい、など要望があれば、<a href="https://github.com/mizzy/serverspec">こちら</a> までプルリク送ってください。</p>
-
-<p>次は serverspec 自体の spec を充実させる予定。</p>
 
 ]]></content>
   </entry>
