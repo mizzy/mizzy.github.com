@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-11-26T14:47:38+09:00</updated>
+  <updated>2013-11-30T23:34:48+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,35 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[specinfra という serverspec/configspec に共通する処理を抜き出した gem をつくった]]></title>
+    <link href="http://mizzy.org/blog/2013/11/30/1/" />
+    <updated>2013-11-30T23:34:48+09:00</updated>
+    <id>http://mizzy.org/blog/2013/11/30/1/</id>
+    <content type="html"><![CDATA[
+<blockquote class="twitter-tweet" lang="en"><p>The backend of serverspec/configspec might have to be extracted to a gem to accommodate people&#39;s preferences to abstraction level.</p>&mdash; kentaro (@kentaro) <a href="https://twitter.com/kentaro/statuses/405342692856451072">November 26, 2013</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>とあんちぽさんからごもっともな指摘をいただいたし、実際に <a href="http://mizzy.org/blog/2013/11/25/1/">configspec</a> を書いてて、ほとんどが serverspec からのコピペで、今後開発をつづけるのであれば、共通部分を抜き出した gem をつくるべきだな、と思ったので、<a href="http://github.com/mizzy/specinfra">specinfra</a> という gem をつくった。</p>
+
+<p>specinfra で抜き出した処理は以下の部分。</p>
+
+<ul>
+<li>SSH, ローカル、WinRM などの実行形式を抽象化している backend と呼んでいるレイヤー</li>
+<li>OS を自動判別し、OS に適したコマンドを返す commands と呼んでいるレイヤー</li>
+<li>properties, configuration といったヘルパーメソッド</li>
+</ul>
+
+<p>こんな感じで、実行形式の違いや OS の違いを吸収してくれるレイヤーとして specinfra を利用し、serverspec や configspec では、RSpec のマッチャに応じた具体的なコマンドを定義していくだけ、といった感じにした。</p>
+
+<p>serverspec v0.12.0 や configspec v0.0.6 からは specinfra ベースになってる。serverspec は従来の spec_helper の書き方でも問題なく動くようにしてあるし、CI でヘビーに使ってる環境で問題なかったのでたぶん大丈夫だけど、何か問題とかあったらお知らせください。</p>
+
+<p>specinfra を使うと、serverspec や configspec のような、RSpec でテスト書いたら裏で何かコマンドが実行される、みたいなものが比較的簡単につくれるはず。（つくりたい人が他にいるかどうか知らんけど。）</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[configspec で Dockerfile を生成できるようにした]]></title>
@@ -559,47 +588,6 @@ rake serverspec:proxy002  # Run serverspec to proxy002.example.jp
 $ serverspec-init
  + spec/spec_helper.rb
 </code></pre>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[Continuous Integration of Puppet with Ukigumo and serverspec]]></title>
-    <link href="http://mizzy.org/blog/2013/03/27/2/" />
-    <updated>2013-03-27T22:36:46+09:00</updated>
-    <id>http://mizzy.org/blog/2013/03/27/2/</id>
-    <content type="html"><![CDATA[
-<p>I made Puppet CI enviroment with <a href="http://ukigumo.github.com/ukigumo/">Ukigumo</a> . I realize following things.</p>
-
-<ul>
-<li>Manage Puppet manifests by Git repository</li>
-<li>Set up <a href="http://ukigumo.github.com/Ukigumo-Server/">Ukigumo Server</a> </li>
-<li>Make LXC system containers with <a href="/blog/2013/03/24/1">puppet-lxc-test-box</a></li>
-<li>Run <a href="https://gist.github.com/mizzy/5252543">my own Ukigumo Client script</a> periodically by cron
-
-<ul>
-<li>If master branch of Puppet manifests repository is updated, pull manifests, apply them to LXC system containers and post results to Ukigumo Server.</li>
-<li>Run <a href="/blog/2013/03/24/4">serverspec</a> tests to LXC system containers and post results to Ukigumo Server.</li>
-</ul></li>
-</ul>
-
-<p>This is Ukigumo Server&#39;s top page. Latest results are listed up.</p>
-
-<p><img src="/images/2013/03/ukigumo-top.jpg"></p>
-
-<p>This is the detail of the result of applying Puppet manifests.</p>
-
-<p><img src="/images/2013/03/ukigumo-puppet.jpg"></p>
-
-<p>This is the detail of the results of serverspec tests.</p>
-
-<p><img src="/images/2013/03/ukigumo-serverspec.jpg"></p>
-
-<p>Alaso results are posted to IRC through <a href="http://search.cpan.org/%7Eyappo/App-Ikachan-0.11/lib/App/Ikachan.pm">Ikachan</a>.</p>
-
-<p><img src="/images/2013/03/ukigumo-irc.jpg"></p>
-
-<p>I will refactor Puppet manifests upon this CI environment.</p>
 
 ]]></content>
   </entry>
