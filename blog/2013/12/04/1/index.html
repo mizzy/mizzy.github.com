@@ -64,7 +64,7 @@
     
   </section>
 
-  <p><a href="https://github.com/serverspec/specinfra">specinfra</a> v0.0.6 では、<a href="https://github.com/serverspec/serverspec">serverspec</a>/<a href="https://github.com/serverspec/configspec">configspec</a>/<a href="https://github.com/serverspec/syllabus">Syllabus</a> で実行する具体的なコマンドを SpecInfra::Command::* に統合しました。</p>
+  <p><a href="http://mizzy.org/blog/2013/11/30/1/">specinfra</a> v0.0.6 では、<a href="https://github.com/serverspec/serverspec">serverspec</a>/<a href="https://github.com/serverspec/configspec">configspec</a>/<a href="https://github.com/serverspec/syllabus">Syllabus</a> で実行する具体的なコマンドを SpecInfra::Command::* に統合しました。</p>
 
 <p>以前のバージョンまでは「OS を自動判別し、OS に適したコマンドクラスを返す commands と呼んでいるレイヤー」を specinfra で提供していましたが、コマンドクラスは各プロダクト側で実装していました。</p>
 
@@ -72,7 +72,7 @@
 
 <p>これで何がうれしいのかというと、オレオレ Configuration Management Tool が簡単に実装できるようになる、ということです。</p>
 
-<p>Exec/SSH といったバックエンドの実行形式/出力形式の切り替えや、OSを自動判別して適切なコマンドを実行する部分はすべて specinfra 側に任せられるので、CMT を新たに実装する人は、DSL 的な部分と、その DSL から呼び出すメソッドを定義するだけで良い、ということになります。（とはいえ、CMT で使えるコマンドは specinfra 側で出そろってないので、まだまだこれからではありますが。）</p>
+<p>Exec/SSH といったバックエンド実行形式の切り替えや、OSを自動判別して適切なコマンドを実行する部分はすべて specinfra 側に任せられるので、CMT を新たに実装する人は、DSL 的な部分と、その DSL から呼び出すメソッドを定義するだけで良い、ということになります。（とはいえ、CMT で使えるコマンドは specinfra 側で出そろってないので、まだまだこれからではありますが。）</p>
 
 <p>configspec では RSpec ベースな DSL、Syllabus では手続き的な DSL を採用していますが、これらが好みではない人は、自分の好きな DSL を持った CMT を容易に実装することができるようになります。</p>
 
