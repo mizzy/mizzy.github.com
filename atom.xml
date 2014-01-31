@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2013-12-31T01:45:45+09:00</updated>
+  <updated>2014-01-31T22:57:06+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,25 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec が Open Source Rookies of the Year 2013 に選ばれた]]></title>
+    <link href="http://mizzy.org/blog/2014/01/31/1/" />
+    <updated>2014-01-31T22:57:06+09:00</updated>
+    <id>http://mizzy.org/blog/2014/01/31/1/</id>
+    <content type="html"><![CDATA[
+<p>拙作の serverspec が <a href="http://www.blackducksoftware.com/open-source-rookies">Open Source Rookies of the Year 2013</a> の 10 プロダクトのうちのひとつに選ばれました。</p>
+
+<p>昨年末に、候補が20まで絞り込まれた段階で一度連絡があって、その後、今月中旬ぐらいに、選ばれたよ、おめでとう、という連絡が来ました。最初の連絡が来るまで、そもそもこの賞の存在を知らなかったので、どの程度影響力がある賞なのかはよくわかりませんが、Docker とか超有名どころと一緒に並んでるのは、嬉しいというよりもむしろ恐れ多いですね。</p>
+
+<p><a href="http://sourceforge.jp/magazine/14/01/29/190000">SourceForge.JP Magazine の日本語記事では、タイトルにも serverspec を含めて</a> くれていてありがたいです。</p>
+
+<p>それから、<a href="http://www.thoughtworks.com/radar/#/Techniques/710">Thought Works Technology Radar January 2014</a> にも serverspec の文字が見えていて、すごいなー、これ本当に俺がつくったのかなー、とか思ったりしてます。</p>
+
+<p>serverspec で一財産築いて寿司を食べに行きたい。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[2013年の振り返り]]></title>
@@ -700,72 +719,6 @@ end
 <hr>
 
 <p>というわけで、ブログ書くまでが YAPC と言っておきながら、YAPC 全然関係ないエントリをお送りしました。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[serverspec の並列処理]]></title>
-    <link href="http://mizzy.org/blog/2013/06/22/1/" />
-    <updated>2013-06-22T23:44:52+09:00</updated>
-    <id>http://mizzy.org/blog/2013/06/22/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://connpass.com/event/2580/">hbstudy #45</a> や <a href="http://podcast.bulknews.net/post/53587224871/ep14-docker-naoya-mizzy">Tatsuhiko Miyagawa&#39;s Podcast ep14</a> なんかで、serverspec の並列処理が課題、ってな話をしていて、<a href="http://net-ssh.rubyforge.org/">Net::SSH</a> がイベントドリブンな処理になってるのがネックになりそうだなー、どうしようかなー、と悩んでたんですが、とりあえず試してみた方が早いだろう、ってことで <a href="https://github.com/grosser/parallel_tests">parallel_tests</a> を試してみた。</p>
-
-<p>6つの VM に対して 311 examples を実行した結果で比較。</p>
-
-<p>parallel_tests を使わない場合。</p>
-
-<pre><code>$ rspec spec
-.......................................................................................................................................................................................................................................................................................................................
-
-Finished in 50.28 seconds
-311 examples, 0 failures
-</code></pre>
-
-<p>parallel_tests を使った場合。</p>
-
-<pre><code>$ parallel_rspec spec
-8 processes for 42 specs, ~ 5 specs per process
-.............................................................................................................................................................................................................................................
-.....
-Finished in 14.69 seconds
-33 examples, 0 failures
-...........
-
-Finished in 15.32 seconds
-37 examples, 0 failures
-..............
-
-Finished in 16.38 seconds
-38 examples, 0 failures
-................
-
-Finished in 17.99 seconds
-32 examples, 0 failures
-.....
-
-Finished in 17.74 seconds
-38 examples, 0 failures
-...........
-
-Finished in 18.99 seconds
-41 examples, 0 failures
-...
-
-Finished in 18.97 seconds
-52 examples, 0 failures
-.........
-
-Finished in 21.49 seconds
-40 examples, 0 failures
-
-311 examples, 0 failures
-
-Took 24.075618 seconds
-</code></pre>
-
-<p>実行時間は約50秒から約24秒と、半分ほどになった。</p>
 
 ]]></content>
   </entry>
