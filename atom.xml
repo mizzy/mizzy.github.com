@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2014-01-31T22:57:06+09:00</updated>
+  <updated>2014-01-31T23:15:41+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,48 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[octorelease という gem をつくった]]></title>
+    <link href="http://mizzy.org/blog/2014/01/31/2/" />
+    <updated>2014-01-31T23:15:41+09:00</updated>
+    <id>http://mizzy.org/blog/2014/01/31/2/</id>
+    <content type="html"><![CDATA[
+<p>serverspec とか specinfra の <a href="http://serverspec.org/changes.html">Changes</a> を手で書くのがだるくなってきたので、自動化するために <a href="https://github.com/mizzy/octorelease">octorelease</a> という gem をつくりました。</p>
+
+<p>rubygems.org にもあげてあるので、gem install で入ります。</p>
+
+<p>Rakefile の中に</p>
+
+<pre><code class="ruby">require &quot;bundler/gem_tasks&quot;
+require &quot;octorelease&quot;
+</code></pre>
+
+<p>みたいに書いて、</p>
+
+<pre><code>$ rake octorelease
+</code></pre>
+
+<p>すると、 こんな感じになります。</p>
+
+<p><img src="/images/2014/01/rake-octorelease.png"></p>
+
+<p>何をしてるかというと、<code>rake release</code> した後に、前のバージョンとリリースするバージョンの間に含まれるプルリクエストを<code>git log</code>で拾って、各プルリクエストに <code>Released as vX.X.X.</code> とコメントをつけ、GitHub 上にリリースを作成し、リリースの本文にはプルリクエストへリンクを張る、ってなことをやってます。</p>
+
+<p>プルリクへのコメントはこんな感じでつきます。</p>
+
+<p><img src="/images/2014/01/octorelease-comment.png"></p>
+
+<p>これは、プルリクしてくれた人に対して、リリースしたよ、ということを知らせるために、以前から手動でコメントしてたんですが、ルーチンワークなので自動でやるようしました。</p>
+
+<p>リリースはこんな感じで作られます。</p>
+
+<p><img src="/images/2014/01/octorelease-releases.png"></p>
+
+<p>同僚の <a href="https://github.com/linyows">linyows</a> 作の <a href="https://github.com/linyows/capistrano-github-releases">capistrano-github-releases</a> インスパイアです。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[serverspec が Open Source Rookies of the Year 2013 に選ばれた]]></title>
@@ -668,57 +710,6 @@ end
 <p>とはいえ、Serf 自体はゴシップベースプロトコルによるクラスタリングとイベントプロパゲーションが主な仕事で、その上で Orchestration するような仕組みを自分で作らないといけなさそう、今のところは。</p>
 
 <p>Serf の次はその辺を解決するようなプロダクトを Mitchell Hashimoto 氏は出してくるのかな。（または、Serf にはプラグインの仕組みがあるようなので、プラグインで解決するのかもしれない。）</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[自分のプロダクトを海外でも認知してもらうには]]></title>
-    <link href="http://mizzy.org/blog/2013/09/21/1/" />
-    <updated>2013-09-21T21:59:02+09:00</updated>
-    <id>http://mizzy.org/blog/2013/09/21/1/</id>
-    <content type="html"><![CDATA[
-<p>ブログを書くまでが YAPC、ってことなので書きます。</p>
-
-<p>YAPC 懇親会で <a href="https://twitter.com/hirose31">@hirose31</a> さんと「日本人の作ったプロダクトでとても優れていて日本では知名度抜群なのに、海外では全然知られてない、みたいの割とあるけど、どうやったら serverspec みたいに海外でも認知されるようになるんですかね」みたいな話をしました。</p>
-
-<p>serverspec の海外での知名度、といっても、日本での知名度と比較すればまだまだ全然、という感じですが、たまに海外の方の tweet を見かけたり、<a href="http://jjasghar.github.io/blog/2013/07/12/serverspec-the-new-best-way-to-learn-and-audit-your-infrastructure/">Serverspec the New Best Way to Learn and Audit Your Infrastructure</a> というブログエントリを書いてくださった方がいたり、<a href="http://foodfightshow.org/2013/05/testing-in-practice.html">Food Fight という Podcast で取り上げられたり</a>、<a href="http://shop.oreilly.com/product/0636920030973.do">O&#39;Reilly の Test-Driven Infrastructure with Chef 2nd Edition</a> で取り上げられたり、<a href="https://github.com/serverspec/serverspec/pull/128">Puppet Labs の中の人が Vagrant 対応パッチを送ってくれたり</a>、<a href="https://github.com/serverspec/serverspec/issues/239">Opscode の中の人が issue open してくれたり</a>、といった感じで、そこそこ海外の方にも知られる存在になっていて、そうなるように意識してやったことがいくつかあるので、それについて簡単に整理してみます。</p>
-
-<h2>英語でドキュメントを書く</h2>
-
-<p>これは当たり前、というか、大前提なので、特に説明の必要はないですね。</p>
-
-<h2>メジャーなキーワードを散りばめる</h2>
-
-<p><a href="https://github.com/serverspec/serverspec">GitHub の description</a> や <a href="http://serverspec.org/">serverspec.org</a> には serverspec の説明として <strong>&quot;RSpec tests for your servers configured by Puppet, Chef or anything else&quot;</strong> といった言葉があるのですが、<strong>&quot;Puppet&quot;</strong> や <strong>&quot;Chef&quot;</strong> といったワードがあるために、辿り着いて興味を持った人が多いのではないかと思います。特に、Puppet Labs や Opscode の中の人は、Puppet や Chef でエゴサーチしてるでしょうし、そういった方々にリーチして、tweet してもらったりすることで、認知度が高まったのではないかと。</p>
-
-<h2>ぱっと見てどんなものかわかりやすくする</h2>
-
-<p>検索等で辿り着いたとしても、ぱっと見て何をするものなのかがわからないと、すぐに興味を失って二度と訪れてくれなくなるので、<a href="http://serverspec.org/">serverspec.org</a> のトップページは、ざっと見ただけで何をするものなのかがすぐに理解できる、ということ意識しています。</p>
-
-<h2>名前が覚えやすい</h2>
-
-<p><strong>serverspec = server + rspec</strong> ととても安直ですが、それが故に覚えやすく、名前から何をするものなのかが連想しやすいし、tweet 等する時に書きやすいので、それも良かったのではないかと。</p>
-
-<h2>簡単に試せる</h2>
-
-<p>どんなに優れたプロダクトでも、動かすまでの敷居が高いと、途中で挫折して、もういいや、と離脱されて忘れ去られてしまうし、実際に動かしてみることで、はじめてそのプロダクトの価値がわかる、ということもよくあるので、いかに敷居を低くして、実際に動かして体験してもらうか、ということも意識しています。（これは海外向けに意識したこと、というわけではないですが、広く利用してもらうために意識したことなので、追記。）</p>
-
-<hr>
-
-<p>とまあこんな感じで、そんな大したことやってないですが、他にも要因は色々あるんでしょうね。例えば、Test-Driven Infrastructure という考え方が浸透してきたけど、serverspec ほどシンプルで敷居の低いツールが他になかった、とか、いわゆる開発者と呼ばれる人たちに Puppet や Chef が浸透してきて、そういった人たちに「サーバのテストを RSpec でやる」というコンセプトが響いた、とか、時代の流れ的なものにうまく嵌まったのかなー、と。</p>
-
-<hr>
-
-<p>あと、この話は、serverspec のような、技術者向けのツールとかライブラリにはある程度あてはまるでしょうけど、そうじゃないものだと、言語や文化の壁が大きくて、こうはいかないでしょうね。</p>
-
-<hr>
-
-<p>とはいえ、海外で認知してもらう前に、そもそも国内で認知してもらえるような良いプロダクトを作らないといけないわけだけど、その方法については自分は知りません。むしろ教えて欲しいです。</p>
-
-<hr>
-
-<p>というわけで、ブログ書くまでが YAPC と言っておきながら、YAPC 全然関係ないエントリをお送りしました。</p>
 
 ]]></content>
   </entry>

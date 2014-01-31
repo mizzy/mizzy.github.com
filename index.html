@@ -57,27 +57,50 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2014/01/31/1">serverspec が Open Source Rookies of the Year 2013 に選ばれた</a>
+    <a href="/blog/2014/01/31/2">octorelease という gem をつくった</a>
   </h1>
 
   <section class="byline">
     
   </section>
 
-  <p>拙作の serverspec が <a href="http://www.blackducksoftware.com/open-source-rookies">Open Source Rookies of the Year 2013</a> の 10 プロダクトのうちのひとつに選ばれました。</p>
+  <p>serverspec とか specinfra の <a href="http://serverspec.org/changes.html">Changes</a> を手で書くのがだるくなってきたので、自動化するために <a href="https://github.com/mizzy/octorelease">octorelease</a> という gem をつくりました。</p>
 
-<p>昨年末に、候補が20まで絞り込まれた段階で一度連絡があって、その後、今月中旬ぐらいに、選ばれたよ、おめでとう、という連絡が来ました。最初の連絡が来るまで、そもそもこの賞の存在を知らなかったので、どの程度影響力がある賞なのかはよくわかりませんが、Docker とか超有名どころと一緒に並んでるのは、嬉しいというよりもむしろ恐れ多いですね。</p>
+<p>rubygems.org にもあげてあるので、gem install で入ります。</p>
 
-<p><a href="http://sourceforge.jp/magazine/14/01/29/190000">SourceForge.JP Magazine の日本語記事では、タイトルにも serverspec を含めて</a> くれていてありがたいです。</p>
+<p>Rakefile の中に</p>
 
-<p>それから、<a href="http://www.thoughtworks.com/radar/#/Techniques/710">Thought Works Technology Radar January 2014</a> にも serverspec の文字が見えていて、すごいなー、これ本当に俺がつくったのかなー、とか思ったりしてます。</p>
+<pre><code class="ruby">require &quot;bundler/gem_tasks&quot;
+require &quot;octorelease&quot;
+</code></pre>
 
-<p>serverspec で一財産築いて寿司を食べに行きたい。</p>
+<p>みたいに書いて、</p>
+
+<pre><code>$ rake octorelease
+</code></pre>
+
+<p>すると、 こんな感じになります。</p>
+
+<p><img src="/images/2014/01/rake-octorelease.png"></p>
+
+<p>何をしてるかというと、<code>rake release</code> した後に、前のバージョンとリリースするバージョンの間に含まれるプルリクエストを<code>git log</code>で拾って、各プルリクエストに <code>Released as vX.X.X.</code> とコメントをつけ、GitHub 上にリリースを作成し、リリースの本文にはプルリクエストへリンクを張る、ってなことをやってます。</p>
+
+<p>プルリクへのコメントはこんな感じでつきます。</p>
+
+<p><img src="/images/2014/01/octorelease-comment.png"></p>
+
+<p>これは、プルリクしてくれた人に対して、リリースしたよ、ということを知らせるために、以前から手動でコメントしてたんですが、ルーチンワークなので自動でやるようしました。</p>
+
+<p>リリースはこんな感じで作られます。</p>
+
+<p><img src="/images/2014/01/octorelease-releases.png"></p>
+
+<p>同僚の <a href="https://github.com/linyows">linyows</a> 作の <a href="https://github.com/linyows/capistrano-github-releases">capistrano-github-releases</a> インスパイアです。</p>
 
 
   <div class="pagination">
     
-    <a href="/blog/2013/12/31/1" rel="next">next post</a>
+    <a href="/blog/2014/01/31/1" rel="next">next post</a>
     
     
     
