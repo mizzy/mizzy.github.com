@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2014-02-14T01:33:52+09:00</updated>
+  <updated>2014-03-11T21:42:00+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,27 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[serverspec の論文公開します]]></title>
+    <link href="http://mizzy.org/blog/2014/03/11/1/" />
+    <updated>2014-03-11T21:42:00+09:00</updated>
+    <id>http://mizzy.org/blog/2014/03/11/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="http://serverspec.org">serverspec</a> に関する論文を、<a href="http://twitter.com/kentaro">あんちぽ</a> さん 、<a href="http://twitter.com/matsumotory">@matsumotory</a> さんと共著で書きましたので、<a href="https://github.com/mizzy/serverspec-thesis">GitHubリポジトリ</a> ごと公開しておきます。</p>
+
+<p><a href="https://github.com/mizzy/serverspec-thesis/blob/master/serverspec.pdf?raw=true">論文のPDF</a> だけではなく、PDF 生成前の TeX ファイルとかもありますし、<a href="https://github.com/mizzy/serverspec-thesis/issues">Issues</a> を見ると、どんな風に執筆を進めていったのかが垣間見えます。</p>
+
+<p>また、事情により研究会発表は欠席してしまったのですが、発表用スライドは作成したので、せっかくなのでアップしておきます。</p>
+
+<div style="width: 65%">
+<script async class="speakerdeck-embed" data-id="282f60708b4a0131b08432e8da2a7164" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+</div>
+
+<p>ご意見などありましたら、ブログ、はてブコメント、Twitter、GitHub Issue などでお聞かせ頂けると大変うれしいです。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました]]></title>
@@ -532,91 +553,6 @@ RUN yum -y install httpd
 <p>まだ RedHat 系のパッケージインストールしか対応してないので、<code>RUN yum -y install</code> しか出力できないけど、おいおい対応していきます。</p>
 
 <p>（というか、RSpec で副作用のある何かするの、<a href="https://twitter.com/r7kamura">@r7kamura</a> 氏のネタに乗っかった側面が強いんだけど、本当にこの方向性でいいの？って気がしなくもない。）</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[configspec という Immutable Infrastructure 用 Configuration Management Tool をつくってみた]]></title>
-    <link href="http://mizzy.org/blog/2013/11/25/1/" />
-    <updated>2013-11-25T23:28:50+09:00</updated>
-    <id>http://mizzy.org/blog/2013/11/25/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://togetter.com/li/594684">Immutable Infrastructure の有用性 - Togetter</a> の流れの勢いで、<a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ</a> とか <a href="http://rebuild.fm/25/">Rebuild: 25: Immutable Infrastructure (Naoya Ito, Gosuke Miyashita)</a> とかで言ってたような、冪等性とか依存関係とかを考慮しないシンプルな Configuratin Management Tool である <a href="https://github.com/mizzy/configspec">configspec</a> をつくってみました。<a href="https://rubygems.org/gems/configspec">rubygems.org</a> にもアップしてます。</p>
-
-<p>この手のツールに自分が望む要件は以下の様な感じ。</p>
-
-<ul>
-<li>冪等性とかどうでもいい
-
-<ul>
-<li>まっさらな状態からのセットアップでしか使わない</li>
-</ul></li>
-<li>依存関係とかどうでもいい
-
-<ul>
-<li>ファイル名順、上から書いた順で実行してく </li>
-</ul></li>
-<li>対象サーバに余分なものをインストールしたくない
-
-<ul>
-<li>対象サーバに SSH さえできれば OK</li>
-</ul></li>
-<li>シェルスクリプトよりは抽象度を高めたい
-
-<ul>
-<li>今さらシェルスクリプトでのセットアップには戻りたくない…</li>
-</ul></li>
-</ul>
-
-<p>使い方はこんな感じ。</p>
-
-<pre><code>$ configspec-init
-Select a backend type:
-
-  1) SSH
-  2) Exec (local)
-
-Select number: 1
-
-Vagrant instance y/n: y
-Auto-configure Vagrant from Vagrantfile? y/n: n
-Input vagrant instance name: www
- + spec/
- + spec/www/
- + spec/www/001_httpd_spec.rb
- + spec/spec_helper.rb
- + Rakefile
-
- ~/tmp/configspec/spec
-$ rake spec
-/opt/boxen/rbenv/versions/2.0.0-p247/bin/ruby -S rspec spec/www/001_httpd_spec.rb
-
-Package &quot;httpd&quot;
-  should be installed
-
-Finished in 3.44 seconds
-1 example, 0 failures
-</code></pre>
-
-<p>サンプルとして生成される <code>001_httpd_spec.rb</code> の中身はこんな感じ。</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe package(&#39;httpd&#39;) do
-  it { should be_installed }
-end
-</code></pre>
-
-<p>これによって、<code>rake spec</code> を実行すると、裏では <code>yum -y install httpd</code> が実行される。</p>
-
-<p>これを見て、serverspec とほぼ同じだ、と思った方、正解です。コードも serverspec からとほんどコピペしてます。違いは、<code>be_installed</code> で実行されるのが、serverspec の場合は <code>rpm -q</code> で、configspec では <code>yum install -y</code> といったところぐらいですね。</p>
-
-<p>この configspec は、とりあえず proof of concept として作ってみただけで、RedHat 系 OS でパッケージインストールしかできないので、まだまだ実用には耐えませんが、つくりが serverspec とまんま一緒なので、同じような感じで拡張していけます。</p>
-
-<p>serverspec にこういった機能を組み込むことも考えましたが、serverspec のようにサーバの状態をテストするのと、configspec のようにサーバに副作用のある何かを実行するのでは、書くべき内容が異なってくるだろう、と考えて、別プロダクトにしました。</p>
-
-<p>RSpec の副産物として副作用のある何かが実行されるというのは、もちろん <a href="http://r7kamura.github.io/2013/11/18/sitespec.html">Sitespec</a> の影響受けてます。</p>
 
 ]]></content>
   </entry>
