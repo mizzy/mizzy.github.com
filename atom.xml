@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2014-04-13T15:01:04+09:00</updated>
+  <updated>2014-04-17T10:22:04-07:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -14,10 +14,43 @@
 
 
   <entry>
+    <title type="html"><![CDATA[ChefConf 2014 に来てます]]></title>
+    <link href="http://mizzy.org/blog/2014/04/17/1/" />
+    <updated>2014-04-17T10:22:04-07:00</updated>
+    <id>http://mizzy.org/blog/2014/04/17/1/</id>
+    <content type="html"><![CDATA[
+<p>今日は最終日で、昨日は Serverspec: The Simplest Server Testing Tool Ever というタイトルでプレゼンしてきました。海外でははじめての serverspec プレゼンなので、もっと基本的な、具体的な使い方とかデモといった内容にした方がいいのかなー、と思いつつも、そういうのはオフィシャルサイトとか見れば割と十分だし、自分以外の人でも話せる内容なので、開発者ならではの、開発をはじめたきっかけとか、開発する上での哲学とか、今後どうしていきたいのか、みたいな話をしました。(<a href="http://memo.sanographix.net/post/82160791768">大体いい感じになるKeynoteテンプレート「Azusa」</a> を使わせてもらいました。ありがとうございます。あと、mirakui さんの真似して entypo や fontawesome も使ってみました。)</p>
+
+<div style="width: 65%">
+<script async class="speakerdeck-embed" data-id="32f62ac0a7db0131c1eb06aa2e69a5d0" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+</div>
+
+<p>英語台本棒読みだし、Splunk の方から質問された内容が、なんかテストカバレッジのことを聞かれてるんだけど、全然理解できなくて若干へこんでいたら、<a href="https://twitter.com/yumano">@yumano</a> さんに間に入っていただいて話を聞いてみると、serverspec そのもののテストカバレッジの話かと思ってたら、Chef レシピに対するカバレッジ、という話で、言ってることはまあわかるようなわからないような、という感じで、日本語で聞かれたとしてもすぐに把握できなさそうな内容だなー、みたいなことがあったりしつつも、プレゼン中に serverspec を知ってる人、使ってる人に手を挙げてもらったら、ちらほらいらっしゃったり、プレゼン後も何人かの方が、serverspec 使ってるよ、いいツールだね、と声をかけてくれたり、握手したり、一緒に写真を撮ったり、他の方のプレゼンでも serverspec について言及されたりで、海外でも使われてるなー、というのは以前からわかってはいたけど、それを強く実感しました。</p>
+
+<p>特に今回一番お会いしたかった、<a href="http://kitchen.ci/">Test Kitchen</a> Author の <a href="https://twitter.com/fnichol">@fnichol</a> さんとお話しすることができて、serverspec のステッカーを渡したらとても喜んでくれ、代わりに Test Kitchen や Sensu のステッカーをもらうことができました。（Sensu Author の <a href="https://twitter.com/portertech">@portertech</a> さんは、@fnichol さんと同じ <a href="http://hw-ops.com/">Heavy Water Operations, LLC</a> 所属）</p>
+
+<p><img src="https://pbs.twimg.com/media/BlYRAFjCcAAO1NL.jpg" alt="stickers"></p>
+
+<p>（この並びだと、mirakui さんが便利 DevOps ツール四天王の一角を占めてるような感じになってる。）</p>
+
+<p>今日もカンファレンス会場をふらふらしていて、@fnichol さんが何人かの方と話しているところに通りがかったら、今ちょうど serverspec の話をしてたんだよ、みたいなことがあって、その場にいた方にステッカー渡したりしてました。</p>
+
+<p>それから、Chef Original Author で CTO でもある <a href="https://twitter.com/adamhjk">@adamhjk</a> 氏と一緒に写真を撮りました。（しかも撮ってくれたのが CEO の <a href="https://twitter.com/barry_crist">@barry_crist</a> 氏）</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>With .<a href="https://twitter.com/adamhjk">@adamhjk</a> taken by .<a href="https://twitter.com/barry_crist">@barry_crist</a> . Thanks a lot! <a href="http://t.co/emSqlVrvZM">pic.twitter.com/emSqlVrvZM</a></p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/statuses/456861368751124480">April 17, 2014</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>カンファレンス以外にも、初日は Oracle Arena に NBA を観に行ったり、<a href="https://twitter.com/kosaki55tea">@kosaki55tea</a> さんに誘って頂いておいしいお肉を食べに行ったり、前々職時代に大変お世話になった方に蟹をごちそうしてもらったり、今日の夕方は <a href="https://twitter.com/niw">@niw</a> さんからお誘い頂いたので Twitter 社に遊びに行く予定だったりと、明日帰国という短いサンフランシスコ滞在期間だけど、とても満喫しています。（<a href="https://twitter.com/miyagawa">@miyagawa</a> さんとはすれ違いになってしまってお会いできなかったのは残念でしたが。）</p>
+
+]]></content>
+  </entry>
+
+  <entry>
     <title type="html"><![CDATA[ChefConf 2014 で serverspec の話をします]]></title>
-    <link href="http://mizzy.org/blog/2014/04/13/1/" />
-    <updated>2014-04-13T15:01:04+09:00</updated>
-    <id>http://mizzy.org/blog/2014/04/13/1/</id>
+    <link href="http://mizzy.org/blog/2014/04/12/1/" />
+    <updated>2014-04-12T23:01:04-07:00</updated>
+    <id>http://mizzy.org/blog/2014/04/12/1/</id>
     <content type="html"><![CDATA[
 <p>CFP に応募したら通ってしまったので、4/15-17 にサンフランシスコで開催される <a href="http://chefconf.opscode.com/">#ChefConf 2014</a> で <a href="http://chefconf2014.busyconf.com/schedule#activity_52d53866080f0e0010000242">Serverspec: The Simplest Server Testing Tool Ever</a> というタイトルでプレゼンします。</p>
 
@@ -32,9 +65,9 @@
 
   <entry>
     <title type="html"><![CDATA[4月からクックパッドで仕事してます]]></title>
-    <link href="http://mizzy.org/blog/2014/04/01/1/" />
-    <updated>2014-04-01T00:12:43+09:00</updated>
-    <id>http://mizzy.org/blog/2014/04/01/1/</id>
+    <link href="http://mizzy.org/blog/2014/03/31/1/" />
+    <updated>2014-03-31T08:12:43-07:00</updated>
+    <id>http://mizzy.org/blog/2014/03/31/1/</id>
     <content type="html"><![CDATA[
 <blockquote class="twitter-tweet" lang="en"><p>株式会社はてなに入社しました。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/statuses/450665235200753665">March 31, 2014</a></blockquote>
 
@@ -138,7 +171,7 @@
   <entry>
     <title type="html"><![CDATA[serverspec の論文公開します]]></title>
     <link href="http://mizzy.org/blog/2014/03/11/1/" />
-    <updated>2014-03-11T21:42:00+09:00</updated>
+    <updated>2014-03-11T05:42:00-07:00</updated>
     <id>http://mizzy.org/blog/2014/03/11/1/</id>
     <content type="html"><![CDATA[
 <p><a href="http://serverspec.org">serverspec</a> に関する論文を、<a href="http://twitter.com/kentaro">あんちぽ</a> さん 、<a href="http://twitter.com/matsumotory">@matsumotory</a> さんと共著で書きましたので、<a href="https://github.com/mizzy/serverspec-thesis">GitHubリポジトリ</a> ごと公開しておきます。</p>
@@ -158,9 +191,9 @@
 
   <entry>
     <title type="html"><![CDATA[Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました]]></title>
-    <link href="http://mizzy.org/blog/2014/02/14/1/" />
-    <updated>2014-02-14T01:33:52+09:00</updated>
-    <id>http://mizzy.org/blog/2014/02/14/1/</id>
+    <link href="http://mizzy.org/blog/2014/02/13/1/" />
+    <updated>2014-02-13T08:33:52-08:00</updated>
+    <id>http://mizzy.org/blog/2014/02/13/1/</id>
     <content type="html"><![CDATA[
 <div style="width: 65%">
 <script async class="speakerdeck-embed" data-id="3fc5c5d07684013148646268bd6e389b" data-ratio="1.3333333333333333" src="//speakerdeck.com/assets/embed.js"></script>
@@ -199,7 +232,7 @@
   <entry>
     <title type="html"><![CDATA[octorelease という gem をつくった]]></title>
     <link href="http://mizzy.org/blog/2014/01/31/2/" />
-    <updated>2014-01-31T23:15:41+09:00</updated>
+    <updated>2014-01-31T06:15:41-08:00</updated>
     <id>http://mizzy.org/blog/2014/01/31/2/</id>
     <content type="html"><![CDATA[
 <p>serverspec とか specinfra の <a href="http://serverspec.org/changes.html">Changes</a> を手で書くのがだるくなってきたので、自動化するために <a href="https://github.com/mizzy/octorelease">octorelease</a> という gem をつくりました。</p>
@@ -241,7 +274,7 @@ require &quot;octorelease&quot;
   <entry>
     <title type="html"><![CDATA[serverspec が Open Source Rookies of the Year 2013 に選ばれた]]></title>
     <link href="http://mizzy.org/blog/2014/01/31/1/" />
-    <updated>2014-01-31T22:57:06+09:00</updated>
+    <updated>2014-01-31T05:57:06-08:00</updated>
     <id>http://mizzy.org/blog/2014/01/31/1/</id>
     <content type="html"><![CDATA[
 <p>拙作の serverspec が <a href="http://www.blackducksoftware.com/open-source-rookies">Open Source Rookies of the Year 2013</a> の 10 プロダクトのうちのひとつに選ばれました。</p>
@@ -259,9 +292,9 @@ require &quot;octorelease&quot;
 
   <entry>
     <title type="html"><![CDATA[2013年の振り返り]]></title>
-    <link href="http://mizzy.org/blog/2013/12/31/1/" />
-    <updated>2013-12-31T01:45:45+09:00</updated>
-    <id>http://mizzy.org/blog/2013/12/31/1/</id>
+    <link href="http://mizzy.org/blog/2013/12/30/1/" />
+    <updated>2013-12-30T08:45:45-08:00</updated>
+    <id>http://mizzy.org/blog/2013/12/30/1/</id>
     <content type="html"><![CDATA[
 <p>2012年はターニングポイント的な年だったし、自分自身注目を浴びることも多く、エンジニアとしてピークで後は落ちていくだけなんじゃないかと思ったので、珍しく<a href="http://mizzy.org/blog/2012/12/31/1/">振り返りエントリ</a> を書いてみたわけですが、どうやらピークは今年だったようなので、また振り返りエントリを書いてみます。</p>
 
@@ -427,9 +460,9 @@ require &quot;octorelease&quot;
 
   <entry>
     <title type="html"><![CDATA[specinfra をベースとしたオレオレ Configuration Management Tool/オレオレ serverspec 構想]]></title>
-    <link href="http://mizzy.org/blog/2013/12/04/1/" />
-    <updated>2013-12-04T00:32:14+09:00</updated>
-    <id>http://mizzy.org/blog/2013/12/04/1/</id>
+    <link href="http://mizzy.org/blog/2013/12/03/1/" />
+    <updated>2013-12-03T07:32:14-08:00</updated>
+    <id>http://mizzy.org/blog/2013/12/03/1/</id>
     <content type="html"><![CDATA[
 <p><a href="http://mizzy.org/blog/2013/11/30/1/">specinfra</a> v0.0.6 では、<a href="https://github.com/serverspec/serverspec">serverspec</a>/<a href="https://github.com/serverspec/configspec">configspec</a>/<a href="https://github.com/serverspec/syllabus">Syllabus</a> で実行する具体的なコマンドを SpecInfra::Command::* に統合しました。</p>
 
@@ -454,9 +487,9 @@ require &quot;octorelease&quot;
 
   <entry>
     <title type="html"><![CDATA[configspec/serverspec でシェルスクリプトを生成できるようにした]]></title>
-    <link href="http://mizzy.org/blog/2013/12/01/2/" />
-    <updated>2013-12-01T00:20:31+09:00</updated>
-    <id>http://mizzy.org/blog/2013/12/01/2/</id>
+    <link href="http://mizzy.org/blog/2013/11/30/3/" />
+    <updated>2013-11-30T07:20:31-08:00</updated>
+    <id>http://mizzy.org/blog/2013/11/30/3/</id>
     <content type="html"><![CDATA[
 <p>specinfra で <a href="https://github.com/mizzy/specinfra/pull/1">ShellScript backend に対応</a> したので、configspec や serverspec で実行されるコマンドをシェルスクリプト形式でダンプできるようになった。</p>
 
@@ -546,46 +579,6 @@ grep -q -- ServerName\ users501 /etc/httpd/conf/httpd.conf || grep -qF -- Server
 <p>といった感じで、Solaris 11 用のシェルスクリプトを吐き出してくれる。（実際にはパッケージ名が違ってそのままでは使えないだろうけど。）</p>
 
 <p>serverspec の場合は、シェルコマンドだけじゃなく Ruby で処理してる部分もあるので、ダンプされるシェルスクリプトで serverspec がやってることをそのまま再現できるわけではないし、そもそもシェルスクリプトでダンプすることに意味があるのか、という感じだけど、specinfra 側で対応するだけで、configspec と serverspec 両方で使えるようになる、という実例として挙げてみた。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[configspec の Dockerfile バックエンドで FROM をサポートした]]></title>
-    <link href="http://mizzy.org/blog/2013/12/01/1/" />
-    <updated>2013-12-01T00:08:16+09:00</updated>
-    <id>http://mizzy.org/blog/2013/12/01/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://mizzy.org/blog/2013/11/26/1/">configspec で Dockerfile を生成できるようにした</a> のだけど、Dockerfile 生成するなら、<code>FROM</code> の定義は外せないだろう、ってことで、<a href="https://github.com/mizzy/configspec/pull/4">できるようにした</a> 。</p>
-
-<pre><code class="ruby">require &quot;configspec&quot;
-
-include Configspec::Helper::Dockerfile
-include SpecInfra::Helper::RedHat
-</code></pre>
-
-<p>こんな spec_helper.rb を用意して、</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe dockerfile do
-  it { should be_from &#39;centos&#39; }
-end
-
-describe package(&#39;httpd&#39;) do
-  it { should be_installed }
-end
-</code></pre>
-
-<p>ってな spec を書いて実行したら、</p>
-
-<pre><code>FROM centos
-RUN yum -y install httpd
-</code></pre>
-
-<p>という内容の Dockerfile を生成してくれる。</p>
-
-<p>Dockerfile バックエンドは specinfra の方で実装しても良かったんだけど、serverspec では使い道ないな、と思ったので、configspec の方で実装した。</p>
 
 ]]></content>
   </entry>
