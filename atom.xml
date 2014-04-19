@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2014-04-18T13:17:46+09:00</updated>
+  <updated>2014-04-19T23:35:00+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,37 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた]]></title>
+    <link href="http://mizzy.org/blog/2014/04/19/1/" />
+    <updated>2014-04-19T23:35:00+09:00</updated>
+    <id>http://mizzy.org/blog/2014/04/19/1/</id>
+    <content type="html"><![CDATA[
+<p>最初に書いておくと、発売は4/24(木)です。（こういうエントリを見て、お、もう出たのか、と思って書店に行ったらまだだった、みたいな経験よくあるのであらかじめ。）</p>
+
+<p>Software Design 誌では何度か書かせてもらっていたのですが、WEB+DB PRESS は初めてです。（<a href="http://gihyo.jp/lifestyle/serial/01/shukatsu_joshi/0004">インタビュー記事</a>が載ったり、他の方の記事で<a href="https://gihyo.jp/dev/feature/01/webservice-guide/0002">自分の名前が出たり</a>、<a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol76">自分が開発してるソフトウェアをとりあげてもらったり</a>はしましたが。）</p>
+
+<p>で、内容は読んでもらうとして、補足を。</p>
+
+<h2>サンプルで利用してる CentOS がなぜ最新ではなく 6.4 なのか</h2>
+
+<p>執筆当初は、最新バージョンである 6.5 で進めていたのですが、DigitalOcean 上にある 6.5 のイメージには rsync が入っておらず、Vagrant によるプロビジョニングがエラーになる、ということが起きたため、rsync が入っている 6.4 に変更しました。</p>
+
+<p>6.5 のままで行くためには、元のイメージに rsync を入れて、そのスナップショットをとって…みたいな作業が必要になって、それは本特集の趣旨から脱線するので、6.4 で行くことにしました。</p>
+
+<p>Vagrant 1.5 からは Box に rsync が入っていない場合に自動で入れてくれる機能があるのですが、<a href="https://github.com/smdahlen/vagrant-digitalocean">vagrant-digitalocean</a> を利用していると、この機能が発動しないんですよね。で、vagrant-digitalocean 利用時も自動で rsync を入れるための<a href="https://github.com/smdahlen/vagrant-digitalocean/pull/103">プルリクエスト</a> を送っていて、+1 がいくつかついてるけど、まだマージされてないです。これがマージされてリリースされれば、rsync が入っていないイメージであっても、本特集に書いた手順そのままでいけるようになるはずです。</p>
+
+<h2>サンプルコード</h2>
+
+<p><a href="http://gihyo.jp/magazine/wdpress/archive/2014/vol80/support#supportDownload">gihyo.jp のサポートページ</a> でも公開されてますが、<a href="https://github.com/mizzy/test-driven-infra">GitHub 上にも置いておきます</a>。本特集通りに操作した履歴になっていますし、<a href="https://github.com/mizzy/test-driven-infra/releases">章ごとにタグを打ってあります</a>。</p>
+
+<h2>その他</h2>
+
+<p>その他、読んでいて何か気になる点、お気づきの点などありましたら、<a href="https://twitter.com/gosukenator">@gosukenator</a> までお知らせください。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[フリーになったので開業してみた]]></title>
@@ -477,33 +508,6 @@ require &quot;octorelease&quot;
 <p>また、論文執筆という、今まで考えたこともなかった道が開けたので、きっかけをつくってくださった matsumotory さんに感謝しつつ、新しい可能性を模索していけたらと思います。</p>
 
 <p>もうすぐ39歳、40歳一歩手前だけど、エンジニアとしてまだまだやれそうだ。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[specinfra をベースとしたオレオレ Configuration Management Tool/オレオレ serverspec 構想]]></title>
-    <link href="http://mizzy.org/blog/2013/12/04/1/" />
-    <updated>2013-12-04T00:32:14+09:00</updated>
-    <id>http://mizzy.org/blog/2013/12/04/1/</id>
-    <content type="html"><![CDATA[
-<p><a href="http://mizzy.org/blog/2013/11/30/1/">specinfra</a> v0.0.6 では、<a href="https://github.com/serverspec/serverspec">serverspec</a>/<a href="https://github.com/serverspec/configspec">configspec</a>/<a href="https://github.com/serverspec/syllabus">Syllabus</a> で実行する具体的なコマンドを SpecInfra::Command::* に統合しました。</p>
-
-<p>以前のバージョンまでは「OS を自動判別し、OS に適したコマンドクラスを返す commands と呼んでいるレイヤー」を specinfra で提供していましたが、コマンドクラスは各プロダクト側で実装していました。</p>
-
-<p>specinfra v0.0.6 では、コマンドクラスも specinfra 側で持つようになりました。</p>
-
-<p>これで何がうれしいのかというと、オレオレ Configuration Management Tool が簡単に実装できるようになる、ということです。</p>
-
-<p>Exec/SSH といったバックエンド実行形式の切り替えや、OSを自動判別して適切なコマンドを実行する部分はすべて specinfra 側に任せられるので、CMT を新たに実装する人は、DSL 的な部分と、その DSL から呼び出すメソッドを定義するだけで良い、ということになります。（とはいえ、CMT で使えるコマンドは specinfra 側で出そろってないので、まだまだこれからではありますが。）</p>
-
-<p>configspec では RSpec ベースな DSL、Syllabus では手続き的な DSL を採用していますが、これらが好みではない人は、自分の好きな DSL を持った CMT を容易に実装することができるようになります。</p>
-
-<p>また、serverspec のコマンドも specinfra に統合されたので、オレオレ serverspec の実装も簡単にできるようになります。例えば、RSpec は好みじゃないから minitest ベースの serverspec を実装する、みたいなことが容易にできるはずです。</p>
-
-<p>というわけで、みんなでオレオレ Configuration Management Tool/オレオレ serverspec をつくってみましょう。</p>
-
-<p>（コマンドを specinfra に統合する、というアイデアは、あんちぽさんから頂きました。いつもありがとうございます。）</p>
 
 ]]></content>
   </entry>
