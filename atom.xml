@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2014-04-21T22:08:12+09:00</updated>
+  <updated>2014-06-22T19:21:44+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,103 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Dockerコンテナに入るなら SSH より nsinit が良さそう]]></title>
+    <link href="http://mizzy.org/blog/2014/06/22/1/" />
+    <updated>2014-06-22T19:21:44+09:00</updated>
+    <id>http://mizzy.org/blog/2014/06/22/1/</id>
+    <content type="html"><![CDATA[
+<h2>tl; dr</h2>
+
+<p>タイトルまま</p>
+
+<hr>
+
+<h2>経緯</h2>
+
+<p>Docker でつくったコンテナの中に入って状態を確認するために、コンテナ内で sshd を立ち上げてアクセスする、ってなことを以前やってたんですが、コンテナ内で sshd を立ち上げる、というやり方がいまいちだし、そもそもコンテナの仕組みから考えれば、別に sshd を立ち上げなくても、コンテナと同じ namespace と rootfs に bash なりのプロセスを閉じ込めてやれば良いわけで、そういったことは既に考えている人はいるだろうし、ツールとかありそうだな、ってことで、</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>Dockerで中を見たいコンテナのPID namespaceとchrootをカレントシェルに割り当てることが簡単にできるようなツールがあれば、中でsshとか立てなくていいかな。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/statuses/479289206108217344">June 18, 2014</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>とつぶやいてみたら、</p>
+
+<blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/gosukenator">@gosukenator</a> nsenter -- chroot /bin/bash とかでいけないですかねー</p>&mdash; TenForward (@ten_forward) <a href="https://twitter.com/ten_forward/statuses/479297375115042817">June 18, 2014</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>と、nsenter なるものの存在を教えて頂いた。</p>
+
+<blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/gosukenator">@gosukenator</a> nsenter はちょっと新しい util-linux にしかないので、ソースからコンパイルする必要あると思います。&#10;RHEL/CentOS7 は知らないですけど、Ubuntu 14.04 にはありませんでした。</p>&mdash; TenForward (@ten_forward) <a href="https://twitter.com/ten_forward/statuses/479297956969869312">June 18, 2014</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>で、これを見るとちょっと面倒かな、と思ったけど、</p>
+
+<blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/gosukenator">@gosukenator</a> docker 的にはそのページに書かれている nsinit を使うのが正解かもしれませんね。docker のソースツリーに入ってるツールですし :-)&#10;(nsinit すっかり忘れてた)</p>&mdash; TenForward (@ten_forward) <a href="https://twitter.com/ten_forward/statuses/479304239584251904">June 18, 2014</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>この nsinit は golang 製なので、golang が動く環境であれば go get で入れることができて楽そうなので、nsinit を試してみることにした。</p>
+
+<hr>
+
+<h2>nsinit の使い方</h2>
+
+<p>golang 環境は既に整っていて、GOPATH が設定されていて、PATH に $GOPATH/bin が含まれている、という前提。</p>
+
+<p><code>go get</code> で <code>nsinit</code> を入れる。</p>
+
+<pre><code>$ go get github.com/docker/libcontainer/nsinit
+</code></pre>
+
+<p>こんな感じで実行。</p>
+
+<pre><code>$ sudo -s
+# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+917756ba04a2        ubuntu:14.04        /bin/bash           51 minutes ago      Up 51 minutes                           lonely_tesla
+# cd /var/lib/docker/containers/9177*/root
+# cp $GOPATH/src/github.com/docker/libcontainer/sample_configs/minimal.json ./container.json
+# nsinit exec /bin/bash
+daemon@koye:/$
+</code></pre>
+
+<p>ソースツリーに含まれる <code>minimal.json</code> をコピーして <code>config.json</code> という名前で置かないと</p>
+
+<pre><code>2014/06/22 10:33:57 open container.json: no such file or directory
+</code></pre>
+
+<p>といったエラーが出る。やり方は <a href="https://github.com/docker/libcontainer/tree/master/sample_configs">docker/libcontainer/sample_configs</a> の README に書いてあった。</p>
+
+<p>ファイルの内容はまだちゃんと見てない。</p>
+
+<p>上のように、cd して cp して nsinit、ってやるのはだるいので、シェル関数書いてみた。</p>
+
+<pre><code class="sh">docker-attach()
+{
+  id=`sudo docker inspect $1 | grep &#39;&quot;ID&quot;&#39; | awk &#39;{ print $2 }&#39; \
+        | sed -e &#39;s/\&quot;//g&#39; | sed -e &#39;s/,//&#39;`
+  rootfs=/var/lib/docker/containers/$id/root
+  sudo cp $GOPATH/src/github.com/docker/libcontainer/sample_configs/minimal.json $rootfs/container.json
+  sudo sh -c &quot;cd $rootfs &amp;&amp; $GOPATH/bin/nsinit exec $2&quot;
+}
+</code></pre>
+
+<p>この関数つかって、コンテナIDと実行するプログラムを与えれば、一発でコンテナの中に入れて便利。</p>
+
+<pre><code>vagrant@vagrant:~$ docker-attach 9177 /bin/bash
+daemon@koye:/$
+daemon@koye:/$ ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+daemon       1     0  0 10:38 ?        00:00:00 /bin/bash
+daemon      14     1  0 10:44 ?        00:00:00 ps -ef
+</code></pre>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[WEB+DB PRESS Vol.80 テスト駆動インフラ記事補足]]></title>
@@ -344,25 +441,6 @@ require &quot;octorelease&quot;
 <p><img src="/images/2014/01/octorelease-releases.png"></p>
 
 <p>同僚の <a href="https://github.com/linyows">linyows</a> 作の <a href="https://github.com/linyows/capistrano-github-releases">capistrano-github-releases</a> インスパイアです。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[serverspec が Open Source Rookies of the Year 2013 に選ばれた]]></title>
-    <link href="http://mizzy.org/blog/2014/01/31/1/" />
-    <updated>2014-01-31T22:57:06+09:00</updated>
-    <id>http://mizzy.org/blog/2014/01/31/1/</id>
-    <content type="html"><![CDATA[
-<p>拙作の serverspec が <a href="http://www.blackducksoftware.com/open-source-rookies">Open Source Rookies of the Year 2013</a> の 10 プロダクトのうちのひとつに選ばれました。</p>
-
-<p>昨年末に、候補が20まで絞り込まれた段階で一度連絡があって、その後、今月中旬ぐらいに、選ばれたよ、おめでとう、という連絡が来ました。最初の連絡が来るまで、そもそもこの賞の存在を知らなかったので、どの程度影響力がある賞なのかはよくわかりませんが、Docker とか超有名どころと一緒に並んでるのは、嬉しいというよりもむしろ恐れ多いですね。</p>
-
-<p><a href="http://sourceforge.jp/magazine/14/01/29/190000">SourceForge.JP Magazine の日本語記事では、タイトルにも serverspec を含めて</a> くれていてありがたいです。</p>
-
-<p>それから、<a href="http://www.thoughtworks.com/radar/#/Techniques/710">Thought Works Technology Radar January 2014</a> にも serverspec の文字が見えていて、すごいなー、これ本当に俺がつくったのかなー、とか思ったりしてます。</p>
-
-<p>serverspec で一財産築いて寿司を食べに行きたい。</p>
 
 ]]></content>
   </entry>
