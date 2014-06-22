@@ -64,7 +64,19 @@
     
   </section>
 
-  <h2>tl; dr</h2>
+  <h2>追記</h2>
+
+<p><a href="http://b.hatena.ne.jp/entry/mizzy.org/blog/2014/06/22/1/">はてブでつっこみもらいました</a> が、実行するカレントディレクトリは /var/lib/docker/execdriver/native/$id を使うのが正しいようです。（情報読み違えてた。）こちらには <code>container.json</code> があるので、ソースツリーからコピーしてくる必要ないですね。</p>
+
+<p>また、コンテナ ID 取得は、<code>docker ps -q --no-trunc</code> の方が良い、とも教えていただきました。</p>
+
+<p>つっこみにしたがって、最後の方の説明とシェル関数書き換えました。</p>
+
+<p>つっこみありがとうございます！</p>
+
+<hr>
+
+<h2>tl; dr</h2>
 
 <p>タイトルまま</p>
 
@@ -115,30 +127,18 @@
 # docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 917756ba04a2        ubuntu:14.04        /bin/bash           51 minutes ago      Up 51 minutes                           lonely_tesla
-# cd /var/lib/docker/containers/9177*/root
-# cp $GOPATH/src/github.com/docker/libcontainer/sample_configs/minimal.json ./container.json
+# cd /var/lib/docker/execdriver/native/9177*
 # nsinit exec /bin/bash
 daemon@koye:/$
 </code></pre>
 
-<p>ソースツリーに含まれる <code>minimal.json</code> をコピーして <code>config.json</code> という名前で置かないと</p>
+<p>cd して nsinit、ってやるのは、一般ユーザからだとパーミッションの関係でタブ補完が効かなくてだるいので、シェル関数書いてみた。</p>
 
-<pre><code>2014/06/22 10:33:57 open container.json: no such file or directory
-</code></pre>
-
-<p>といったエラーが出る。やり方は <a href="https://github.com/docker/libcontainer/tree/master/sample_configs">docker/libcontainer/sample_configs</a> の README に書いてあった。</p>
-
-<p>ファイルの内容はまだちゃんと見てない。</p>
-
-<p>上のように、cd して cp して nsinit、ってやるのはだるいので、シェル関数書いてみた。</p>
-
-<pre><code class="sh">docker-attach()
+<pre><code>docker-attach()
 {
-  id=`sudo docker inspect $1 | grep &#39;&quot;ID&quot;&#39; | awk &#39;{ print $2 }&#39; \
-        | sed -e &#39;s/\&quot;//g&#39; | sed -e &#39;s/,//&#39;`
-  rootfs=/var/lib/docker/containers/$id/root
-  sudo cp $GOPATH/src/github.com/docker/libcontainer/sample_configs/minimal.json $rootfs/container.json
-  sudo sh -c &quot;cd $rootfs &amp;&amp; $GOPATH/bin/nsinit exec $2&quot;
+  id=`sudo docker ps -q --no-trunc $1`
+  root=/var/lib/docker/execdriver/native/$id
+  sudo sh -c &quot;cd $root &amp;&amp; $GOPATH/bin/nsinit exec $2&quot;
 }
 </code></pre>
 
