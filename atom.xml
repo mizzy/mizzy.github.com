@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2015-04-01T09:00:00+09:00</updated>
+  <updated>2015-06-16T21:59:14+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,130 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Walter + Wercker + DigitalOcean による Serverspec CI]]></title>
+    <link href="http://mizzy.org/blog/2015/06/16/1/" />
+    <updated>2015-06-16T21:59:14+09:00</updated>
+    <id>http://mizzy.org/blog/2015/06/16/1/</id>
+    <content type="html"><![CDATA[
+<p><a href="/blog/2015/04/01/1/">フリーランスになって1年が経った</a> というエントリで少しだけ触れた、仕事でも絡んでいる <a href="https://github.com/walter-cd/walter">Walter</a> を自分はどう使っているのか、という話を書きます。</p>
+
+<h2>TL;DR</h2>
+
+<ul>
+<li>Serverspec/Specinfra 本体のインテグレーションテストに Walter を <a href="http://wercker.com/">Wercker</a> と組み合わせて利用している</li>
+<li>Wercker は並列実行サポートしてないけど、Walter と組み合わせることで並列実行できて便利
+
+<ul>
+<li>Docker on CoreOS, CentOS 6.5, CentOS 7.0, Ubuntu 14.04, FreeBSD 10.1 の各 VM を使ったテストを並列で実行してる</li>
+</ul></li>
+<li>ローカルでも実行できて便利 （Wercker v2 でもできるようになってるけど、Walter の場合は Docker 環境なくてもできる）</li>
+</ul>
+
+<h2>Walter + Wercker</h2>
+
+<p>Dogfooding のため、Walter を Wercker と組み合わせて <a href="https://github.com/serverspec/serverspec-integration-test">Serverspec/Specinfra 本体のインテグレーションテスト</a> に使用している。</p>
+
+<p>どのように利用しているかというと、wercker.yml で以下のように walter を実行している。</p>
+
+<pre><code>box: mizzy/serverspec-base@0.0.6
+build:
+  steps:
+    - script:
+        name: Run walter
+        code: ./$WORKING_DIR/walter -c ./$WORKING_DIR/pipeline.yml
+  after-steps:
+    - wantedly/pretty-slack-notify:
+        webhook_url: $SLACK_WEBHOOK_URL
+</code></pre>
+
+<p>Walter の設定が書かれた <a href="https://github.com/serverspec/serverspec-integration-test/blob/master/pipeline.yml">pipeline.yml</a> はこんな感じ（一部抜粋）。</p>
+
+<pre><code>  - name: Make $HOME/.ssh directory
+    type: command
+    command: mkdir -p $HOME/.ssh
+    only_if: test &quot;$WERCKER&quot; = &quot;true&quot;
+  - name: Put SSH publick key
+    type: command
+    command: echo &quot;$DIGITALOCEAN_SSH_KEY_PUBLIC&quot; &gt; $HOME/.ssh/id_rsa.pub
+    only_if: test &quot;$WERCKER&quot; = &quot;true&quot;
+</code></pre>
+
+<p>Walter を使うと、手元でも Wercker 上でも同じ処理が実行できるので、リポジトリを push しなくても設定通りに動くか確認できるので便利。とは言え、手元と Wercker 上では微妙に処理内容が異なったりするので、そいう場合は上のように <code>only_if</code> で Wercker 上かそうじゃないかを判断してコマンドを実行したりしている。</p>
+
+<p>Wercker v2 でも手元でテストできるけど Docker 使うし、Serverspec/Specinfra のインテグレーションテストは性質上 Docker 不要なので、間に入るレイヤーが一段少ない、という意味で Walter でやる方が個人的には楽。</p>
+
+<h2>並列実行</h2>
+
+<p>実際にテストを走らせるところは、DigitalOcean 上に各 OS 毎に VM を立ててテストしており、以下のように記述することで並列実行している。</p>
+
+<pre><code>  - name: Parallel builds each OSes
+    parallel:
+      - name: Build CoreOS
+        type: command
+        directory: $WORKING_DIR
+        command: vagrant up coreos --provider=digital_ocean &amp;&amp; ./apply-itamae-and-serverspec-to-docker.sh
+        only_if: test &quot;$WERCKER_GIT_REPOSITORY&quot; != &quot;serverspec&quot;
+      - name: Build CentOS 6.5
+        type: command
+        command: vagrant up centos65 --provider=digital_ocean &amp;&amp; bundle exec itamae ssh --host centos65 --vagrant recipe.rb \
+          &amp;&amp; DIGITALOCEAN=true rake spec:centos65
+        directory: $WORKING_DIR
+      - name: Build CentOS 7.0
+        type: command
+        command: vagrant up centos70 --provider=digital_ocean &amp;&amp; bundle exec itamae ssh --host centos70 --vagrant recipe.rb &amp;&amp; \
+          DIGITALOCEAN=true rake spec:centos70
+        directory: $WORKING_DIR
+      - name: Build Ubuntu 14.04
+        type: command
+        command: vagrant up ubuntu1404 --provider=digital_ocean &amp;&amp; bundle exec itamae ssh --host ubuntu1404 --vagrant recipe.rb \
+          &amp;&amp; DIGITALOCEAN=true rake spec:ubuntu1404
+        directory: $WORKING_DIR
+      - name: Build FreeBSD 10.1
+        type: command
+        command: vagrant up freebsd --provider=digital_ocean &amp;&amp; DIGITALOCEAN=true rake spec:freebsd
+        directory: $WORKING_DIR
+</code></pre>
+
+<p>CoreOS, CentOS 6.5, CentOS 7.0, Ubuntu 14.04, FreeBSD 10.1 の VM を DigitalOcean 上で起動し、<a href="http://itamae.kitchen/">Itamae</a> でプロビジョニングし、Serverspec でテストを実行している。</p>
+
+<p>直列に実行すると Wercker の制限時間内（たしか25分だったかな）に終わらないけれど、Walter を利用して並列実行することで、時間内に完了している。</p>
+
+<p>Wercker でテストしたログがどんな感じかは <a href="https://app.wercker.com/#buildstep/55801d169e5d0cdb4600d0dd">こちら</a> で参照できる。これを見てもらうとわかるように、並列実行している部分は、以下のスクショのようになっていて見づらい。</p>
+
+<p><img src="/images/2015/06/wercker.png" alt="Walter + Wercker" style="width: 100%;" /></p>
+
+<p>テストがすべて通った場合はいいけど、失敗した場合はどこで失敗してるのかが探しにくい。これは次に紹介する、Slack 通知と組み合わせることで解決している。</p>
+
+<h2>Slack 通知</h2>
+
+<p>Walter には Slack や HipChat に通知する機能が組み込まれている。</p>
+
+<p>ビルドの各フェーズを Walter では「ステージ」と呼んでいるが、以下のように、ステージ毎の結果を通知するようになっている。</p>
+
+<p><img src="/images/2015/06/walter-success.png" alt="Walter + Wercker with Slack" style="width: 50%;" /></p>
+
+<p>失敗したステージは以下のように赤く表示される。</p>
+
+<p><img src="/images/2015/06/walter-fail.png" alt="Walter with Slack" style="width: 50%;" /></p>
+
+<p>この例だと CoreOS 上の Docker コンテナに対するテストが失敗してることがわかるので、一番下の Wercker による通知のリンクを踏んでビルドページに飛び、CoreOS 部分のみに絞り込んで失敗した原因を調べることができる。</p>
+
+<h2>今後の展望</h2>
+
+<p>今のところ、Wercker との組み合わせは自分にとって十分なので、今後は Jenkins なんかと組み合わせて、必要な機能があれば追加していこうかな、などと考えている。</p>
+
+<p>また、Wercker や Jenkins との組み合わせではなく、単体でも利用できるようにしたい、と目論んでいるが、そのための機能はまだまだ不足している。</p>
+
+<p>直近では、結果を集約するサーバが必要だと感じており、walter-server 的な何かを開発しようと目論んでいるんだけど、イメージ的には <a href="https://github.com/ukigumo/Ukigumo-Server">Ukigumo-Server</a> が近い、というか、パクらせてもらおうと考えている。</p>
+
+<h2>最後に</h2>
+
+<p>Walter は <a href="https://github.com/walter-cd/walter">GitHub で公開されている</a> ので、興味ある方はぜひ。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[フリーランスになって1年が経った]]></title>
@@ -387,111 +511,6 @@ daemon      14     1  0 10:44 ?        00:00:00 ps -ef
 <p>他にも日本から行かれる方がいらっしゃると思いますが、見かけたらお気軽にお声がけください。</p>
 
 <p>また、15日の日中と17日の夜は今のところ暇なので、会ってやってもいいよ、とか、うちの会社に遊びにおいでよ、という方がいらっしゃったら、ぜひご連絡ください。（15日は発表スライドづくりでそれどころじゃないかもしれませんが。）</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[4月からクックパッドで仕事してます]]></title>
-    <link href="http://mizzy.org/blog/2014/04/01/1/" />
-    <updated>2014-04-01T00:12:43+09:00</updated>
-    <id>http://mizzy.org/blog/2014/04/01/1/</id>
-    <content type="html"><![CDATA[
-<blockquote class="twitter-tweet" lang="en"><p>株式会社はてなに入社しました。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/statuses/450665235200753665">March 31, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>↑はエイプリルフールネタですが。</p>
-
-<p>色々あって、3月に無職になって、4月からクックパッドで仕事してます。</p>
-
-<p>基本的にはフルタイムコミットなんですが、諸事情により業務委託契約なので、実質フリーランスですね。</p>
-
-<p>この機会に色々な可能性を模索したいので、何か面白そうな仕事があったら <a href="https://twitter.com/gosukenator">Twitter</a> とか <a href="https://www.facebook.com/gosukenator">Facebook</a> とか <a href="mailto:gosukenator@gmail.com">メール</a> などでご連絡ください。</p>
-
-<p>特に以下のような仕事は自分の価値を活かせるんじゃないかと思ってます。</p>
-
-<ul>
-<li>Chef, Puppet, Ansible といったサーバ構成管理ツールの導入支援</li>
-<li>serverspecをベースとしたテスト駆動インフラやインフラCIの導入支援</li>
-<li>要件に合わせた serverspec のカスタマイズ（serverspec 本体や、テストで利用する Rakefile や spec_helper など）</li>
-</ul>
-
-<p>また、以下のような経験もありますので、この経験が役立ちそうな場があれば、お気軽に声をかけてください。</p>
-
-<ul>
-<li>Netscapeサーバ製品のプリセールスエンジニア
-
-<ul>
-<li>ウェブサーバ、メールサーバ、LDAPサーバなど</li>
-<li>営業同行しての客先提案、デモや導入コンサル、構築・移行作業、保守運用等</li>
-<li>この業務の関連で1年ほど US Netscape に出向経験あり</li>
-</ul></li>
-<li>Perl, Ruby, PHP によるウェブアプリケーション開発</li>
-<li><a href="http://www.slideshare.net/mizzy/2008-30days-album-presentation">写真共有サービスの立ち上げ</a>
-
-<ul>
-<li>アーキテクト、ストレージAPIの開発など</li>
-</ul></li>
-<li><a href="http://japan.cnet.com/extra/paperboy_0907/story/0,3800098768,20394957,00.htm">個人向けレンタルサーバの大規模リニューアル</a>
-
-<ul>
-<li>アーキテクト、API仕様策定とサーバサイドのプロトタイプ開発、サーバ構築自動化など</li>
-</ul></li>
-<li><a href="http://www.slideshare.net/mizzy/inside-sqales-backend-at-rubyconf-taiwan-2012">PaaS の立ち上げ</a>
-
-<ul>
-<li>アーキテクト、プロトタイプ実装、AMIの作成、カーネルパッチ作成など</li>
-</ul></li>
-<li>技術者評価制度の導入と運用
-
-<ul>
-<li><a href="http://mizzy.org/blog/2012/01/17/1/">http://mizzy.org/blog/2012/01/17/1/</a></li>
-<li><a href="http://mizzy.org/blog/2012/02/29/1/">http://mizzy.org/blog/2012/02/29/1/</a></li>
-</ul></li>
-<li>技術基盤の整備
-
-<ul>
-<li>Subversion + Trac, IRC, Puppet 等の導入（2007年）</li>
-<li>インターナルクラウドツール <a href="http://www.slideshare.net/mizzy/maglica-techkayac">Maglica</a> の開発と導入（2011年）</li>
-<li><a href="http://mizzy.org/blog/2012/11/02/1/">GitHub の導入</a>（2012年）
-
-<ul>
-<li>その後 GitHub Enterprise の導入や運用も</li>
-</ul></li>
-<li>技術基盤チームの立ち上げ</li>
-</ul></li>
-<li>技術系イベントでの登壇
-
-<ul>
-<li><a href="http://www.slideshare.net/mizzy">SlideShare</a></li>
-<li><a href="https://speakerdeck.com/mizzy">Speaker Deck</a></li>
-<li>海外での登壇経験あり
-
-<ul>
-<li><a href="http://vimeo.com/groups/rubytw/videos/57571819">RubyConf Taiwan 2012</a></li>
-<li><a href="http://chefconf2014.busyconf.com/schedule#activity_52d53866080f0e0010000242">#ChefConf 2014</a>（予定）</li>
-</ul></li>
-</ul></li>
-<li>執筆
-
-<ul>
-<li><a href="http://gihyo.jp/admin/serial/01/puppet">オープンソースなシステム自動管理ツール Puppet：連載｜gihyo.jp … 技術評論社</a></li>
-<li><a href="http://gihyo.jp/magazine/SD/archive/2007/200712">Software Design 2007年12月号 Puppet 特集記事</a></li>
-<li><a href="http://gihyo.jp/magazine/SD/archive/2009/200904">Software Design 2009年4月号 第2特集 サーバエンジニアがプログラムを知る意味</a></li>
-</ul></li>
-<li>OSS 活動
-
-<ul>
-<li><a href="https://metacpan.org/author/MIZZY">CPAN</a></li>
-<li><a href="http://github.com/mizzy">GitHub</a></li>
-<li><a href="http://serverspec.org/">serverspec</a>
-
-<ul>
-<li><a href="http://sourceforge.jp/magazine/14/01/29/190000">Black Duck Open Source Rookies of the Year 2013 受賞</a></li>
-</ul></li>
-</ul></li>
-</ul>
 
 ]]></content>
   </entry>
