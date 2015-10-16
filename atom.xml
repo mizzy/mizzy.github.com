@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2015-10-01T11:20:06+09:00</updated>
+  <updated>2015-10-16T23:11:14+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[第10回 日本 OSS 奨励賞を受賞しました]]></title>
+    <link href="http://mizzy.org/blog/2015/10/16/1/" />
+    <updated>2015-10-16T23:11:14+09:00</updated>
+    <id>http://mizzy.org/blog/2015/10/16/1/</id>
+    <content type="html"><![CDATA[
+<blockquote>
+<p>昨今要求が高まっているシステム配備の自動化の実現に欠かすことができないサーバの状態を自動的にテストするツールServerspecを開発し、インフラ分野における業務の効率化に貢献した。Serverspecは日本国内だけでなく、海外でも活用されている。</p>
+
+<p><a href="http://www.ossforum.jp/ossaward10th2">「第10回 日本OSS貢献者賞・日本OSS奨励賞」受賞者を選定 | 日本OSS推進フォーラム</a></p>
+</blockquote>
+
+<p>推薦してくださった方、選考してくださった実行委員会のみなさん、ならびに Serverspec にコントリビュートしてくださったみなさん、使ってくださっているみなさん、ありがとうございます。</p>
+
+<p><a href="http://www.ossforum.jp/ossaward">「日本OSS貢献者賞・日本OSS奨励賞」 | 日本OSS推進フォーラム</a> によると、『「日本OSS奨励賞」は、… ≪中略≫ … さらなる活躍を推奨する … ≪以下省略≫』とのことで、次は貢献者賞に選んでもらえるような実績が残せるよう、精進したいと思います。</p>
+
+<p>受賞者の名に恥じないよう、<a href="http://togetter.com/li/883463">java-ja.OSS</a> で発表したような態度や行動は今後は控えよう…</p>
+
+<p>ちなみに、僕が技術顧問という肩書きをもらっている <a href="http://atl.recruit-tech.co.jp/"> 株式会社リクルートテクノロジーズ アドバンスドテクノロジーラボ</a> では、仕事として OSS の研究開発ができるので、興味がある方はぜひ <a href="http://atl.recruit-tech.co.jp/recruit/">こちらからエントリ</a> を。エントリ前に話を聞いてみたい、という方は、メール、Twitter、Facebook などで声かけてください。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[株式会社リクルートテクノロジーズ Advanced Technology Lab 技術顧問になりました]]></title>
@@ -607,39 +630,6 @@ daemon      14     1  0 10:44 ?        00:00:00 ps -ef
 <p>というわけで、セキュリティ的に望ましいのは、「手動でDigitalOceanに公開鍵を登録する」かつ「wercker.yml で id_rsa.pub ファイルを生成しない」なのですが、上記のような理由により、中途半端な感じになってしまって申し訳ないです。</p>
 
 <p>Wercker 上で生成した鍵を、CI 用の VM でしか使わないようにすれば、例え鍵が漏れたところで大きな問題にはならないと思いますが、@matsumotory さんから指摘がありましたので、こちらで補足させて頂くことにしました。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた]]></title>
-    <link href="http://mizzy.org/blog/2014/04/19/1/" />
-    <updated>2014-04-19T23:35:00+09:00</updated>
-    <id>http://mizzy.org/blog/2014/04/19/1/</id>
-    <content type="html"><![CDATA[
-<p>最初に書いておくと、発売は4/24(木)です。（こういうエントリを見て、お、もう出たのか、と思って書店に行ったらまだだった、みたいな経験よくあるのであらかじめ。）</p>
-
-<p><a href="http://gihyo.jp/magazine/wdpress/archive/2014/vol80"><img src="http://image.gihyo.co.jp/assets/images/cover/2014/thumb/TH160_9784774163987.jpg" /></a></p>
-
-<p>Software Design 誌では何度か書かせてもらっていたのですが、WEB+DB PRESS は初めてです。（<a href="http://gihyo.jp/lifestyle/serial/01/shukatsu_joshi/0004">インタビュー記事</a>が載ったり、他の方の記事で<a href="https://gihyo.jp/dev/feature/01/webservice-guide/0002">自分の名前が出たり</a>、<a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol76">自分が開発してるソフトウェアをとりあげてもらったり</a>はしましたが。）</p>
-
-<p>で、内容は読んでもらうとして、補足を。</p>
-
-<h2>サンプルで利用してる CentOS がなぜ最新ではなく 6.4 なのか</h2>
-
-<p>執筆当初は、最新バージョンである 6.5 で進めていたのですが、DigitalOcean 上にある 6.5 のイメージには rsync が入っておらず、Vagrant によるプロビジョニングがエラーになる、ということが起きたため、rsync が入っている 6.4 に変更しました。</p>
-
-<p>6.5 のままで行くためには、元のイメージに rsync を入れて、そのスナップショットをとって…みたいな作業が必要になって、それは本特集の趣旨から脱線するので、6.4 で行くことにしました。</p>
-
-<p>Vagrant 1.5 からは Box に rsync が入っていない場合に自動で入れてくれる機能があるのですが、<a href="https://github.com/smdahlen/vagrant-digitalocean">vagrant-digitalocean</a> を利用していると、この機能が発動しないんですよね。で、vagrant-digitalocean 利用時も自動で rsync を入れるための<a href="https://github.com/smdahlen/vagrant-digitalocean/pull/103">プルリクエスト</a> を送っていて、+1 がいくつかついてるけど、まだマージされてないです。これがマージされてリリースされれば、rsync が入っていないイメージであっても、本特集に書いた手順そのままでいけるようになるはずです。</p>
-
-<h2>サンプルコード</h2>
-
-<p><a href="http://gihyo.jp/magazine/wdpress/archive/2014/vol80/support#supportDownload">gihyo.jp のサポートページ</a> でも公開されてますが、<a href="https://github.com/mizzy/test-driven-infra">GitHub 上にも置いておきます</a>。本特集通りに操作した履歴になっていますし、<a href="https://github.com/mizzy/test-driven-infra/releases">章ごとにタグを打ってあります</a>。</p>
-
-<h2>その他</h2>
-
-<p>その他、読んでいて何か気になる点、お気づきの点などありましたら、<a href="https://twitter.com/gosukenator">@gosukenator</a> までお知らせください。</p>
 
 ]]></content>
   </entry>
