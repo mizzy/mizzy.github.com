@@ -57,91 +57,162 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2016/04/01/1">フリーランスになって2年が経った</a>
+    <a href="/blog/2016/04/22/1">Infrastructure as Code 再考</a>
   </h1>
 
   <section class="byline">
     
   </section>
 
-  <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">株式会社はてなに入社しました。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/status/715555225566707712">March 31, 2016</a></blockquote>
+  <p>Infrastructure as Code という言葉が現れてから少なくとも8年ほど経過しており、この言葉もすっかり定着したように見えるが、<a href="https://www.thoughtworks.com/profiles/martin-fowler">Martin Fowler</a> 氏が最近自身のブログで <a href="http://martinfowler.com/bliki/InfrastructureAsCode.html">Infrastructure as Code について触れており</a> 、また、氏の同僚である <a href="https://www.thoughtworks.com/profiles/kief-morris">Kief Morris</a> 氏が O&#39;Reilly Media から <a href="http://shop.oreilly.com/product/0636920039297.do">Infrastructure as Code という本を出す</a>（現在 Early Relase 版や <a href="https://info.thoughtworks.com/Infrastructure-as-Code-Kief-Morris.html">Free Chapters</a> が入手できる）ようなので、このタイミングで改めて Infrastructure as Code について、その歴史を振り返るとともに、現在の状況について整理してみようと思い、このエントリを書くことにした。</p>
 
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>内容的には、以前書いた <a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ</a> と若干重複してる部分もある。</p>
 
-<p>↑はちょうど2年前の <a href="http://mizzy.org/blog/2014/04/01/1/">4月からクックパッドで仕事してます</a> と同様、エイプリルフールネタです（実際にありえそうなので判断に迷った人いそうだけど）。</p>
-
-<p><a href="http://mizzy.org/blog/2015/04/01/1/">フリーランスになって1年が経った</a> というエントリを書いてからちょうど1年経ったので、この1年を振り返ってみる。</p>
+<p>そういえば日本でも最近、<a href="http://gihyo.jp/book/2016/978-4-7741-7993-3">サーバ/インフラエンジニア養成読本 DevOps編 [Infrastructure as Code を実践するノウハウが満載! ]</a> というムック本が出ていますね。</p>
 
 <hr>
 
-<h2>仕事について</h2>
+<h2>Infrastructure as Code とは</h2>
 
-<p>1年目は、元々正社員になる前提で、様子見ということでクックパッドと業務委託契約を結んでいたので、基本フルタイムコミットで決まった時間にオフィスで仕事、という形だったけど、2年目はオフィスに行く日数を減らしたり、リクルートテクノロジーズの仕事の割合を増やしたりした。</p>
+<p>Infrastructure as Code が何かについては、既に色んな人が色んなところで語っているので、ここでは詳しくは説明しない。簡単に言えば「インフラ」をコードで記述することによって、ソフトウェアシステムで既に有効であると立証されているプラクティスを、インフラにも同じように適用でき、その恩恵が受けられる、というもの。</p>
 
-<p>2年目の前半は、クックパッドの仕事が週4日で、そのうち2日はオフィスに行き、リクルートテクノロジーズの仕事は週1日リモートで、という感じだったけど、後半はクックパッドが週2日でうち1日はオフィス、リクルートテクノロジーズは週3日、そのうち隔週で（最初のうちは週1で）ミーティングのためにオフィスに行く以外はリモートで、という形になった。</p>
+<p>このプラクティスには次のようなものがある。</p>
 
-<p>リクルートテクノロジーズの方は、日数を増やしただけではなく、コミット度合いを深めるため、また、中の人として対外活動するために <a href="http://mizzy.org/blog/2015/10/01/1/">技術顧問という肩書きをもらった</a> 。</p>
+<ul>
+<li>バージョン管理</li>
+<li>繰り返し可能なビルド</li>
+<li>テスト</li>
+<li>継続的インテグレーション</li>
+<li>継続的デプロイ</li>
+</ul>
 
-<p>クックパッドとの業務委託契約はこの3月で満了となった。インフラCIをがっつりやらせてもらって知見を得ることができたし、<a href="https://github.com/itamae-kitchen/itamae">Itamae</a> の誕生にも貢献できて良かった。Itamae、ほんと良いツールなので、今後他社で仕事する時にも、隙あらば積極的に入れていきたい。</p>
-
-<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">クックパッドは契約期間満了ってことで、餞別に薄くてかっこいい財布をいただきました。mirakui さんによるチョイス。ちょうど財布欲しいと思っていたところなので超うれしい。ありがとうございます！ <a href="https://t.co/ab4a0fDPsS">pic.twitter.com/ab4a0fDPsS</a></p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/status/715559613538566148">March 31, 2016</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>リクルートテクノロジーズの方は引き続き継続して、世の中に新しい価値観をもたらすような OSS の研究・開発をメインミッションとしてやっていく予定。Walter はとりあえず最低限のものはできた、と思っているので、今後はドキュメントの充実やリファクタリングや広報活動なんかをやりつつ、別の新しいOSSについて模索していきたい。</p>
-
-<p>また、最近 <a href="https://sencorp.co.jp/">千株式会社</a> の技術顧問になった。ここは <a href="https://8122.jp/">はいチーズ！</a> という写真サービスを運営していて、お子さんをお持ちの方なら、このサービスを知っているかも。</p>
-
-<p>これら以外には、単発でテスト駆動インフラに関する講師業をやったりした。</p>
-
-<p>現在他にもいくつか、新規で話を進めている会社がある。現場感覚は鈍らないようにしたいので、実際に手を動かす仕事は今後もやっていきたいと思っている。もしそういうお仕事があればお声がけください。</p>
-
-<p><a href="http://mizzy.org/blog/2015/04/01/1/">フリーランスになって1年が経った</a>  で、「年に一度は沖縄でリゾートワークしたり、子供達の夏休みにあわせて8月はまるっと休んだり、MGSV:TPP が発売される9月も休もうか、などと計画してる」と書いた件はどうなったかというと、沖縄でリゾートワークは  <a href="http://hackers-champloo.org/2015/">ハッカーズチャンプルー2015</a> に参加することで実現したけど、8月や9月に休むのは、事情により実現できなった。詳しくは後述。</p>
+<p>とは言え、最初から Infrastructure as Code がこのように解釈されていたわけではなく、その意味合いは時が経つとともに変遷している。</p>
 
 <hr>
 
-<h2>収入について</h2>
+<h2>Infrastructure as Code の歴史と変遷</h2>
 
-<p>昨年の所得（売上ー経費）は、サラリーマン時代の最高年収の2.7倍ほどで、昨年4月時点での見通しよりも多かった。今年も同じぐらいかな、という見通しだけど、来年についてはどうなるかはさっぱりわからない。</p>
+<p>Infrastructure as Code という言葉が現れ、今のように定着するようになるまでの大まかな流れを振り返ると、その起源は1993年に登場した <a href="https://cfengine.com/">CFEngine</a> にまで遡れる。もちろん当時は Infrastructure as Code という言葉はなかったが、<a href="https://puppet.com/">Puppet</a> や <a href="https://www.chef.io/">Chef</a> といった Configuration Management Tools と呼ばれるものの元祖であり、現在の Infrastructure as Code の流れに与えた影響は大きい。</p>
+
+<p>Infrastructure as Code という言葉の大元の出自は調べてみてもわからなかったが、2005年に Puppet が登場したことが、この言葉が現れる直接のきっかけになったと思われる。</p>
+
+<p>Chef がきっかけじゃないの？と思う人がいるかもしれない。Infrastructure as Code という言葉がどのタイミングで現れたのか調べてみると、一番古い資料では、現在 Chef 社の CTO である <a href="https://twitter.com/adamhjk">Adam Jacob</a> 氏 が、2008年4月25日に公開したスライド <a href="http://www.slideshare.net/adamhjk/why-startups-need-automated-infrastructures/24-Steps_to_Launch_Configuration_Management">Why Startups Need Automated Infrastructures の 24ページ目</a> が見つかる。</p>
+
+<p>しかし、Chef のリリースは2009年であり、このスライドには Puppet は載っているけれど Chef は載っていない。また、Adam Jcob 氏の所属が HJK Solutions となっており、Chef 社の前身である Opscode 社を立ち上げる前であることが窺える。</p>
+
+<p>なので流れ的には、CFEngine の影響を受けた Puppet が登場 → Puppet が広く受け入れられる → Puppet のような Configuration Management 手法を Infrastructure as Code と呼ぼうと誰かが言った（もしかして Adam Jcob 氏？） → Puppet Alternative として Adam Jcob 氏が Chef を開発した、といった感じなのではないかと。</p>
+
+<p>Chefの <a href="https://github.com/chef/chef/commit/b5117775e86cff40399187b6292c98fba9dc5034">Initial Commit が 2008年3月6日</a> で、上記スライドを公開する少し前なので、Infrastructure as Code という言葉の発案者が Adam Jcob 氏だとすると、この言葉を思いついたのと、Chef（最初は Marionette という名前だった）の着想を得て開発を始めたのはほぼ同じ頃かもしれない。</p>
+
+<p>英語版が2010年6月、日本語版が2011年5月に出版された書籍『<a href="http://www.oreilly.co.jp/books/9784873114934/">ウェブオペレーション</a>』で、Adam Jacob 氏は Infrastructure as Code を「ソースコードリポジトリ・アプリケーションデータのバックアップ・サーバリソースからビジネスを復旧できるようにすること」と述べており、当時はディザスタリカバリ的な視点から Infrastructure as Code を捉えていたようだ。</p>
+
+<p>ちなみに、以下は ChefConf 2014 で Adam Jcob 氏と撮影したツーショット写真。</p>
+
+<p><img src="https://pbs.twimg.com/media/BxzvOikCIAEcTGR.jpg:large" alt=""></p>
+
+<p>ただ、Adam Jcob 氏のスライドのタイトルには「Automated」とある通り、Infrastructure as Code のメリットは、当初は「自動化」に焦点が当てられていたものと思われる。</p>
+
+<p>それが現在のように、ソフトウェアシステムのプラクティスをインフラに適用する、という意味合いに変化したのは、DevOps という考え方と結びついたためだろう。</p>
+
+<p>DevOps という言葉は、<a href="http://www.jedi.be/">Patrick Debois</a> 氏が主催した <a href="http://www.devopsdays.org/events/2009-ghent/">Devopsdays Ghent 2009</a> が発端であり、同氏は Agile 2008 Conference で <a href="http://www.jedi.be/presentations/IEEE-Agile-Infrastructure.pdf">Agile infrastructures and operations: how infra-gike are you? (PDF)</a> という発表を行っている。このことからも、DevOps はアジャイルの流れを汲んでいることが窺える。なので、Infrastructure as Code が DevOps と結びついてきた結果、アジャイル的なプラクティスをインフラにも適用する、という流れが生まれたのだと思われる。</p>
+
+<p>Infrastructure as Code という言葉の出始めは2008年、DevOps は2009年だが、2009年当時にすぐに Infrastructure as Code が DevOps と結びついて今のような意味合いとなったわけではない。2009年6月に公開されたスライド <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr/22-CFengineChef_BCfg2_FAI1_Automated_infrastructure">10+ Deploys Per Day: Dev and Ops Cooperation at Flickr の22ページ目</a> でも「Automated infrastructure」とあることから、この当時もまだ、主にインフラの自動化に焦点が当てられていたようだ。</p>
+
+<p>単なる自動化から、ソフトウェアシステムのプラクティス適用、という流れに変わったのは、2011年6月に O&#39;Reilly Media から出た <a href="http://shop.oreilly.com/product/0636920020042.do">Test-Driven Infrastructure with Chef</a> がきっかけだと思われる（ちなみに現在は <a href="http://shop.oreilly.com/product/0636920030973.do">第二版</a> が出ている）。この本が「Test-Driven Infrastructure」という具体的なプラクティスが認知され広まるきっかけとなったのだろう。</p>
+
+<p>「テスト駆動」という具体的なプラクティスが登場したことにより、「継続的インテグレーション」や「継続的デプロイ」といった他のプラクティスにも広がっていき、Infrastructure as Code が今のような意味合いとして捉えられるようになっていった。</p>
+
+<p>2013年3月に登場した <a href="http://serverspec.org/">Serverspec</a> もこの流れを加速するのに一役買っている。</p>
 
 <hr>
 
-<h2>家を建てた</h2>
+<h2>Infrastructure as Code の適用領域</h2>
 
-<p>フリーランス関係ないじゃん、と思われそうだけど、実は大いに関係ある。ひとつは、収入が増えたことで、頭金をつくる余裕ができたこと。会社員時代の収入、決して少なくはなかったけど、子供5人いるとカツカツで、頭金を貯める余裕はなかった（節約が苦手、というのもあるけど）。</p>
+<p><a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ</a> では、サーバプロビジョニングの領域を、次の3つにわける考え方を紹介した。</p>
 
-<p>もうひとつは、電車通勤することが減り、土地を探すのに必ずしも駅の近くである必要がなくなったので、予算内で広めの土地を買うことができたこと。</p>
+<ul>
+<li>Orchestration</li>
+<li>Configuration</li>
+<li>Bootstrapping</li>
+</ul>
 
-<p>8月9月に休むのをやめたのも、家を建てることになったからで、なるべく多く頭金に回したい、ということで、休まず働くことにした。</p>
+<p>Infrastructure as Code は元々、CFEngine の影響を受けた Puppet が登場した流れから出てきた言葉であり、CFEngine も Puppet も Configuration レイヤーに該当するツールである。したがって Infrastructure as Code の対象領域は Configuration レイヤーであり、代表的なツールと言えば Puppet や Chef であった。実際、Infrastructure as Code という言葉を聞くと、真っ先に思い浮かぶのは Chef、という方が多いのではないだろうか。</p>
 
-<p>フリーランス2年目で、過去1年分の確定申告実績しかなかったので、ローン通るかは不安だったけど、そこは大丈夫だった（その辺については <a href="http://mizzy.org/blog/2015/12/13/1/">このエントリ</a> に書いた）。</p>
+<p>ところが最近では、Bootstrapping の領域も Infrastructure as Code の対象範囲に含まれている。</p>
 
-<p>収入が今後どうなるかわからないので、月々の返済額は、収入が現在の半分になっても無理なく支払えるぐらいの金額でローンを組んだ。</p>
+<p><a href="https://aws.amazon.com/jp/ec2/">Amazon EC2</a> のような、API でプログラマブルに扱える IaaS は結構前からある（確か EC2 登場は2006年）が、インフラをコードでプログラマブルに扱えるから Infrastructure as Code だ、という見方はあまりなかったように思われる。</p>
 
-<p>家で仕事するときはこんな感じでやっている。</p>
+<p>その状況が変わったのはおそらく、<a href="https://www.terraform.io/">Terraform</a> や <a href="https://aws.amazon.com/jp/cloudformation/">CloudFormation</a> といった、API を直接操作することなく、何らかの簡易的な言語によって IaaS を操作できるツールやサービスが登場したことが影響しているだろう。</p>
 
-<p><img src="http://cdn-ak.f.st-hatena.com/images/fotolife/M/MIZZY/20160310/20160310114651.jpg" alt=""></p>
+<p>ちなみに、以下は Terraform を開発している <a href="https://www.hashicorp.com/">HashiCorp</a> 社の CEO <a href="https://twitter.com/mitchellh">Mitchell Hashimoto</a> 氏と撮影したツーショット写真。</p>
+
+<p><img src="/images/2016/04/mhashimoto.png" style="width: 600px;" /></p>
+
+<p>また、単なるインフラ管理の自動化から、ソフトウェアシステムにおけるプラクティスの応用、と意味合いが変わるにつれ、Infrastructure as Code と聞いて想起するものが、Puppet, Chef, Terraform といった、インフラをコードで記述するツールだけではなく、<a href="http://kitchen.ci/">Test Kitchen</a> や <a href="http://serverspec.org/">Serverspec</a>、<a href="https://jenkins.io/">Jenkins</a> や <a href="https://circleci.com/">CircleCI</a> といった、Infrastructure as Code のプラクティスを支えるツールやサービスなど、多岐に渡るようになってきている。</p>
+
+<p>Configuration Management を対象としていた Infrastructure as Code が、更に低いレイヤー、よりインフラと呼ぶにふさわしい領域も含むようになったことで、元々 Infrastructure as Code が対象としていた領域については、 Configuration as Code と呼び分けた方が良いのでは、といった議論も最近は出てきている。</p>
+
+<p>が、現在使われている「インフラ」という言葉の指す範囲は広く、Configuration Management が対象とする領域も含まれているし、元々 Configuration をメインの対象としてい た Infrastructure as Code を Configuration as Code に変え、その下のレイヤーだけを Infrastructure as Code と呼ぶ、というのは、混乱を招きそう。</p>
+
+<p>また、Configuration as Code の字面だけを見ると、設定内容をコードで書く（例: Nginx の設定を mruby で書く）ことを自分は想起する。</p>
+
+<p>なにより、Infrastructure as Code は、ソフトウェアシステムのプラクティスを、今まで適用範囲外だと思われていた領域に適用する、というパラダイムを表す言葉として重要でなのであって、その中でレイヤーを厳密に細分化して区別する意味合いは薄いと思われる。</p>
 
 <hr>
 
-<h2>会社を設立した</h2>
+<h2>Infrastructure as Code に関連するツールやサービスの分類</h2>
 
-<p>一定の収入を超えると、税制的に法人化した方がお得、という話をよく聞くけど、事務手続きとか色々めんどくさそうなので、多少税金を多く支払っても、楽な個人事業主で行こう、と思っていた。けれど、12月になって所得税を計算してみたら結構な額（30歳当時の年収ぐらい）になって、これは法人化して節税した方が良さそうだ、と思ったので、会社をつくることにした。</p>
+<p>書籍『<a href="http://shop.oreilly.com/product/0636920039297.do">Infrastructure as Code</a>』では、Infrastructure as Code に関連するツールやサービスを次の4つのグループに分類している。</p>
 
-<p>来年は消費税の課税対象事業者になるけど、法人化すればまた2年間は免税事業者でいられて、その点でも節税できるし。</p>
+<ul>
+<li>Dynamic Infrastructure Platforms
 
-<p>というわけで、2月に合同会社Serverspec Operationsという会社を設立した。あくまでも節税のために法人化しただけで、個人事業主の延長なので、何か新しい事業をやる、というわけではないし、人を雇うとかはまったく考えていない。</p>
+<ul>
+<li>EC2 のような IaaS や <a href="https://www.openstack.org/">OpenStack</a> のような IaaS を構成するためのツール</li>
+</ul></li>
+<li>Infrastructure Orchestration Tools
+
+<ul>
+<li>Terraform や CloudFormation のような、IaaS 上でサーバ/ネットワーク/ストレージといったリソースを制御するためのツールやサービス</li>
+<li><a href="https://www.consul.io/">Consul</a>, <a href="https://coreos.com/etcd/">etcd</a>, <a href="https://zookeeper.apache.org/">ZooKeeper</a> のような Configuration Registry</li>
+</ul></li>
+<li>Server Configuration Tools
+
+<ul>
+<li>Puppet, Chef, <a href="https://www.ansible.com/">Ansible</a>, <a href="https://github.com/itamae-kitchen/itamae">Itamae</a> といったリソースの設定を行うためのツール</li>
+</ul></li>
+<li>Infrastructure Services
+
+<ul>
+<li>プロビジョニングしたインフラを管理するためのツール</li>
+<li>モニタリング、サービスディスカバリ、プロセス・ジョブ管理、ソフトウェアデプロイメントなど</li>
+</ul></li>
+</ul>
+
+<p>前項で、Infrastructure as Code と Configuration as Code を分離する意味はあまりない、と述べたが、ツールをこのように分類するのは、各ツールの役割がイメージしやすいし、Infrastructure as Code のライフサイクルを整理したり、各フェーズについて議論したりするのには有用そうだ。</p>
+
+<p>Dynamic Infrastucture Platforms の上で、Infrastructure Orchestration Tools によりサーバ/ネットワーク/ストレージといったリソースの割り当てを行い、Server Configuration Tools でそれらリソースの設定を行う。そして Infrastructure Services によってリソースを管理する。というのがざっくりとした流れ。</p>
+
+<p>この中で Infrastructure as Code 的な手法が適用できるツールが揃っているのは、今のところ Infrastructure Orchestration Tools と Server Configuration Tools ぐらいか。</p>
+
+<p>Dynamic Infrastructure はその名の通り基盤であり、その上でリソースをコントロールするツールは Infrastructure Orchestration に属するので、Dynamic Infrastruture Tools に属する Infrastructure as Code なツールがないのはある意味当然かな、と。</p>
+
+<p>Infrastructure Services はその性質上、静的なコードを記述して制御する、というよりも、Infrastructure Orchestration Tools や Server Configuration Tools と連動して動的に何かを行う、というものが多そうなので、Infrastructure as Code なツールがあまりないのはそのためかも。今後、この辺りで Infrasturcture as Code 的なツールや手法がどう発展していくのかが気になる。あるいは発展しないかも。</p>
 
 <hr>
 
-<h2>まとめ</h2>
+<h2>Infrastructure as Code に関するイベントやります</h2>
 
-<p>相変わらず先行きわからない不安みたいのはあって、<a href="http://rebuild.fm/132/">Rebuild 132</a> のひげぽんさんのキャリアパスの話を大きく頷きながら聴いていた。とはいえ、会社員時代も、自分がやりたいことと会社でやるべきことが乖離していくことに対する不安や、いつまで技術者としてやっていけるんだろうか、という不安があったので、立場がどうなっても、不安はつきまとうものなんだろう。とりあえずは、フリーランスでやっていけなくなったら、また会社員に戻ればいいか、と考えている。</p>
+<p>最初に触れたように、Martin Fowler 氏がブログでとりあげたり、O&#39;Reilly から書籍が出る、ということもあって、改めて Infrastructure as Code について振り返って現状整理してみた。整理はしてみたものの、この先どうなっていくのか、といったことはまだ十分考察できていないし、一人で考えていても煮詰まりそうなので、Infrastructure as Code をテーマにしたイベントでもやろうかと考えている。</p>
+
+<p><a href="http://www.zusaar.com/event/11697003">Infrastructure as Code 現状確認会</a> というイベントが過去にあったので、これとは少し違う方向性で、ツールの話が主眼ではなく、もう少し大局的な視点から、Infrastructure as Code のこれまでとこれからについて語れるようなイベントを。</p>
+
+<p>もし興味があったり、こんな話が聞きたい、などあれば、ブコメや Twitter などでお知らせ頂けるとありがたいです。</p>
 
 
   <div class="pagination">
     
-    <a href="/blog/2016/01/15/1" rel="next">next post</a>
+    <a href="/blog/2016/04/01/1" rel="next">next post</a>
     
     
     

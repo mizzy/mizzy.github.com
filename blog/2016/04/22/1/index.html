@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Infrastructure as Code 再考 - Gosuke Miyashita</title>
+  <!-- TODO: change name and description -->
+  <meta name="author" content="Gosuke Miyashita" />
+  <meta name="description" content="A fantastic blog that is fantastic." />
+
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
+
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
+  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
+  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/application.js"></script>
+</head>
+
+<body>
+  <section class="sidebar">
+    <a href="/">
+      <!-- TODO: change this gravatar URL -->
+      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+    </a>
+
+    <!-- TODO: change name -->
+    <section class="name">
+      <a href="/">
+        <span id="zach">Gosuke</span>
+        <span id="holman">Miyashita</span>
+      </a>
+    </section>
+
+    <!-- TODO: change links -->
+    <section class="meta">
+      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
+      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
+      <a href="/atom.xml"><img src="/images/rss.png" /></a>
+    </section>
+
+    <!--
+    <section class="sections">
+      <ul>
+        <li><a href="/about.html">about</a></li>
+        <li><a href="/">posts</a></li>
+      </ul>
+    </section>
+    -->
+
+  </section>
+
+<section class="content autopagerize_page_element">
+  <h1>
+    <a href="/blog/2016/04/22/1">Infrastructure as Code 再考</a>
+  </h1>
+
+  <section class="byline">
+    
+  </section>
+
+  <p>Infrastructure as Code という言葉が現れてから少なくとも8年ほど経過しており、この言葉もすっかり定着したように見えるが、<a href="https://www.thoughtworks.com/profiles/martin-fowler">Martin Fowler</a> 氏が最近自身のブログで <a href="http://martinfowler.com/bliki/InfrastructureAsCode.html">Infrastructure as Code について触れており</a> 、また、氏の同僚である <a href="https://www.thoughtworks.com/profiles/kief-morris">Kief Morris</a> 氏が O&#39;Reilly Media から <a href="http://shop.oreilly.com/product/0636920039297.do">Infrastructure as Code という本を出す</a>（現在 Early Relase 版や <a href="https://info.thoughtworks.com/Infrastructure-as-Code-Kief-Morris.html">Free Chapters</a> が入手できる）ようなので、このタイミングで改めて Infrastructure as Code について、その歴史を振り返るとともに、現在の状況について整理してみようと思い、このエントリを書くことにした。</p>
+
+<p>内容的には、以前書いた <a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ</a> と若干重複してる部分もある。</p>
+
+<p>そういえば日本でも最近、<a href="http://gihyo.jp/book/2016/978-4-7741-7993-3">サーバ/インフラエンジニア養成読本 DevOps編 [Infrastructure as Code を実践するノウハウが満載! ]</a> というムック本が出ていますね。</p>
+
+<hr>
+
+<h2>Infrastructure as Code とは</h2>
+
+<p>Infrastructure as Code が何かについては、既に色んな人が色んなところで語っているので、ここでは詳しくは説明しない。簡単に言えば「インフラ」をコードで記述することによって、ソフトウェアシステムで既に有効であると立証されているプラクティスを、インフラにも同じように適用でき、その恩恵が受けられる、というもの。</p>
+
+<p>このプラクティスには次のようなものがある。</p>
+
+<ul>
+<li>バージョン管理</li>
+<li>繰り返し可能なビルド</li>
+<li>テスト</li>
+<li>継続的インテグレーション</li>
+<li>継続的デプロイ</li>
+</ul>
+
+<p>とは言え、最初から Infrastructure as Code がこのように解釈されていたわけではなく、その意味合いは時が経つとともに変遷している。</p>
+
+<hr>
+
+<h2>Infrastructure as Code の歴史と変遷</h2>
+
+<p>Infrastructure as Code という言葉が現れ、今のように定着するようになるまでの大まかな流れを振り返ると、その起源は1993年に登場した <a href="https://cfengine.com/">CFEngine</a> にまで遡れる。もちろん当時は Infrastructure as Code という言葉はなかったが、<a href="https://puppet.com/">Puppet</a> や <a href="https://www.chef.io/">Chef</a> といった Configuration Management Tools と呼ばれるものの元祖であり、現在の Infrastructure as Code の流れに与えた影響は大きい。</p>
+
+<p>Infrastructure as Code という言葉の大元の出自は調べてみてもわからなかったが、2005年に Puppet が登場したことが、この言葉が現れる直接のきっかけになったと思われる。</p>
+
+<p>Chef がきっかけじゃないの？と思う人がいるかもしれない。Infrastructure as Code という言葉がどのタイミングで現れたのか調べてみると、一番古い資料では、現在 Chef 社の CTO である <a href="https://twitter.com/adamhjk">Adam Jacob</a> 氏 が、2008年4月25日に公開したスライド <a href="http://www.slideshare.net/adamhjk/why-startups-need-automated-infrastructures/24-Steps_to_Launch_Configuration_Management">Why Startups Need Automated Infrastructures の 24ページ目</a> が見つかる。</p>
+
+<p>しかし、Chef のリリースは2009年であり、このスライドには Puppet は載っているけれど Chef は載っていない。また、Adam Jcob 氏の所属が HJK Solutions となっており、Chef 社の前身である Opscode 社を立ち上げる前であることが窺える。</p>
+
+<p>なので流れ的には、CFEngine の影響を受けた Puppet が登場 → Puppet が広く受け入れられる → Puppet のような Configuration Management 手法を Infrastructure as Code と呼ぼうと誰かが言った（もしかして Adam Jcob 氏？） → Puppet Alternative として Adam Jcob 氏が Chef を開発した、といった感じなのではないかと。</p>
+
+<p>Chefの <a href="https://github.com/chef/chef/commit/b5117775e86cff40399187b6292c98fba9dc5034">Initial Commit が 2008年3月6日</a> で、上記スライドを公開する少し前なので、Infrastructure as Code という言葉の発案者が Adam Jcob 氏だとすると、この言葉を思いついたのと、Chef（最初は Marionette という名前だった）の着想を得て開発を始めたのはほぼ同じ頃かもしれない。</p>
+
+<p>英語版が2010年6月、日本語版が2011年5月に出版された書籍『<a href="http://www.oreilly.co.jp/books/9784873114934/">ウェブオペレーション</a>』で、Adam Jacob 氏は Infrastructure as Code を「ソースコードリポジトリ・アプリケーションデータのバックアップ・サーバリソースからビジネスを復旧できるようにすること」と述べており、当時はディザスタリカバリ的な視点から Infrastructure as Code を捉えていたようだ。</p>
+
+<p>ちなみに、以下は ChefConf 2014 で Adam Jcob 氏と撮影したツーショット写真。</p>
+
+<p><img src="https://pbs.twimg.com/media/BxzvOikCIAEcTGR.jpg:large" alt=""></p>
+
+<p>ただ、Adam Jcob 氏のスライドのタイトルには「Automated」とある通り、Infrastructure as Code のメリットは、当初は「自動化」に焦点が当てられていたものと思われる。</p>
+
+<p>それが現在のように、ソフトウェアシステムのプラクティスをインフラに適用する、という意味合いに変化したのは、DevOps という考え方と結びついたためだろう。</p>
+
+<p>DevOps という言葉は、<a href="http://www.jedi.be/">Patrick Debois</a> 氏が主催した <a href="http://www.devopsdays.org/events/2009-ghent/">Devopsdays Ghent 2009</a> が発端であり、同氏は Agile 2008 Conference で <a href="http://www.jedi.be/presentations/IEEE-Agile-Infrastructure.pdf">Agile infrastructures and operations: how infra-gike are you? (PDF)</a> という発表を行っている。このことからも、DevOps はアジャイルの流れを汲んでいることが窺える。なので、Infrastructure as Code が DevOps と結びついてきた結果、アジャイル的なプラクティスをインフラにも適用する、という流れが生まれたのだと思われる。</p>
+
+<p>Infrastructure as Code という言葉の出始めは2008年、DevOps は2009年だが、2009年当時にすぐに Infrastructure as Code が DevOps と結びついて今のような意味合いとなったわけではない。2009年6月に公開されたスライド <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr/22-CFengineChef_BCfg2_FAI1_Automated_infrastructure">10+ Deploys Per Day: Dev and Ops Cooperation at Flickr の22ページ目</a> でも「Automated infrastructure」とあることから、この当時もまだ、主にインフラの自動化に焦点が当てられていたようだ。</p>
+
+<p>単なる自動化から、ソフトウェアシステムのプラクティス適用、という流れに変わったのは、2011年6月に O&#39;Reilly Media から出た <a href="http://shop.oreilly.com/product/0636920020042.do">Test-Driven Infrastructure with Chef</a> がきっかけだと思われる（ちなみに現在は <a href="http://shop.oreilly.com/product/0636920030973.do">第二版</a> が出ている）。この本が「Test-Driven Infrastructure」という具体的なプラクティスが認知され広まるきっかけとなったのだろう。</p>
+
+<p>「テスト駆動」という具体的なプラクティスが登場したことにより、「継続的インテグレーション」や「継続的デプロイ」といった他のプラクティスにも広がっていき、Infrastructure as Code が今のような意味合いとして捉えられるようになっていった。</p>
+
+<p>2013年3月に登場した <a href="http://serverspec.org/">Serverspec</a> もこの流れを加速するのに一役買っている。</p>
+
+<hr>
+
+<h2>Infrastructure as Code の適用領域</h2>
+
+<p><a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ</a> では、サーバプロビジョニングの領域を、次の3つにわける考え方を紹介した。</p>
+
+<ul>
+<li>Orchestration</li>
+<li>Configuration</li>
+<li>Bootstrapping</li>
+</ul>
+
+<p>Infrastructure as Code は元々、CFEngine の影響を受けた Puppet が登場した流れから出てきた言葉であり、CFEngine も Puppet も Configuration レイヤーに該当するツールである。したがって Infrastructure as Code の対象領域は Configuration レイヤーであり、代表的なツールと言えば Puppet や Chef であった。実際、Infrastructure as Code という言葉を聞くと、真っ先に思い浮かぶのは Chef、という方が多いのではないだろうか。</p>
+
+<p>ところが最近では、Bootstrapping の領域も Infrastructure as Code の対象範囲に含まれている。</p>
+
+<p><a href="https://aws.amazon.com/jp/ec2/">Amazon EC2</a> のような、API でプログラマブルに扱える IaaS は結構前からある（確か EC2 登場は2006年）が、インフラをコードでプログラマブルに扱えるから Infrastructure as Code だ、という見方はあまりなかったように思われる。</p>
+
+<p>その状況が変わったのはおそらく、<a href="https://www.terraform.io/">Terraform</a> や <a href="https://aws.amazon.com/jp/cloudformation/">CloudFormation</a> といった、API を直接操作することなく、何らかの簡易的な言語によって IaaS を操作できるツールやサービスが登場したことが影響しているだろう。</p>
+
+<p>ちなみに、以下は Terraform を開発している <a href="https://www.hashicorp.com/">HashiCorp</a> 社の CEO <a href="https://twitter.com/mitchellh">Mitchell Hashimoto</a> 氏と撮影したツーショット写真。</p>
+
+<p><img src="/images/2016/04/mhashimoto.png" style="width: 600px;" /></p>
+
+<p>また、単なるインフラ管理の自動化から、ソフトウェアシステムにおけるプラクティスの応用、と意味合いが変わるにつれ、Infrastructure as Code と聞いて想起するものが、Puppet, Chef, Terraform といった、インフラをコードで記述するツールだけではなく、<a href="http://kitchen.ci/">Test Kitchen</a> や <a href="http://serverspec.org/">Serverspec</a>、<a href="https://jenkins.io/">Jenkins</a> や <a href="https://circleci.com/">CircleCI</a> といった、Infrastructure as Code のプラクティスを支えるツールやサービスなど、多岐に渡るようになってきている。</p>
+
+<p>Configuration Management を対象としていた Infrastructure as Code が、更に低いレイヤー、よりインフラと呼ぶにふさわしい領域も含むようになったことで、元々 Infrastructure as Code が対象としていた領域については、 Configuration as Code と呼び分けた方が良いのでは、といった議論も最近は出てきている。</p>
+
+<p>が、現在使われている「インフラ」という言葉の指す範囲は広く、Configuration Management が対象とする領域も含まれているし、元々 Configuration をメインの対象としてい た Infrastructure as Code を Configuration as Code に変え、その下のレイヤーだけを Infrastructure as Code と呼ぶ、というのは、混乱を招きそう。</p>
+
+<p>また、Configuration as Code の字面だけを見ると、設定内容をコードで書く（例: Nginx の設定を mruby で書く）ことを自分は想起する。</p>
+
+<p>なにより、Infrastructure as Code は、ソフトウェアシステムのプラクティスを、今まで適用範囲外だと思われていた領域に適用する、というパラダイムを表す言葉として重要でなのであって、その中でレイヤーを厳密に細分化して区別する意味合いは薄いと思われる。</p>
+
+<hr>
+
+<h2>Infrastructure as Code に関連するツールやサービスの分類</h2>
+
+<p>書籍『<a href="http://shop.oreilly.com/product/0636920039297.do">Infrastructure as Code</a>』では、Infrastructure as Code に関連するツールやサービスを次の4つのグループに分類している。</p>
+
+<ul>
+<li>Dynamic Infrastructure Platforms
+
+<ul>
+<li>EC2 のような IaaS や <a href="https://www.openstack.org/">OpenStack</a> のような IaaS を構成するためのツール</li>
+</ul></li>
+<li>Infrastructure Orchestration Tools
+
+<ul>
+<li>Terraform や CloudFormation のような、IaaS 上でサーバ/ネットワーク/ストレージといったリソースを制御するためのツールやサービス</li>
+<li><a href="https://www.consul.io/">Consul</a>, <a href="https://coreos.com/etcd/">etcd</a>, <a href="https://zookeeper.apache.org/">ZooKeeper</a> のような Configuration Registry</li>
+</ul></li>
+<li>Server Configuration Tools
+
+<ul>
+<li>Puppet, Chef, <a href="https://www.ansible.com/">Ansible</a>, <a href="https://github.com/itamae-kitchen/itamae">Itamae</a> といったリソースの設定を行うためのツール</li>
+</ul></li>
+<li>Infrastructure Services
+
+<ul>
+<li>プロビジョニングしたインフラを管理するためのツール</li>
+<li>モニタリング、サービスディスカバリ、プロセス・ジョブ管理、ソフトウェアデプロイメントなど</li>
+</ul></li>
+</ul>
+
+<p>前項で、Infrastructure as Code と Configuration as Code を分離する意味はあまりない、と述べたが、ツールをこのように分類するのは、各ツールの役割がイメージしやすいし、Infrastructure as Code のライフサイクルを整理したり、各フェーズについて議論したりするのには有用そうだ。</p>
+
+<p>Dynamic Infrastucture Platforms の上で、Infrastructure Orchestration Tools によりサーバ/ネットワーク/ストレージといったリソースの割り当てを行い、Server Configuration Tools でそれらリソースの設定を行う。そして Infrastructure Services によってリソースを管理する。というのがざっくりとした流れ。</p>
+
+<p>この中で Infrastructure as Code 的な手法が適用できるツールが揃っているのは、今のところ Infrastructure Orchestration Tools と Server Configuration Tools ぐらいか。</p>
+
+<p>Dynamic Infrastructure はその名の通り基盤であり、その上でリソースをコントロールするツールは Infrastructure Orchestration に属するので、Dynamic Infrastruture Tools に属する Infrastructure as Code なツールがないのはある意味当然かな、と。</p>
+
+<p>Infrastructure Services はその性質上、静的なコードを記述して制御する、というよりも、Infrastructure Orchestration Tools や Server Configuration Tools と連動して動的に何かを行う、というものが多そうなので、Infrastructure as Code なツールがあまりないのはそのためかも。今後、この辺りで Infrasturcture as Code 的なツールや手法がどう発展していくのかが気になる。あるいは発展しないかも。</p>
+
+<hr>
+
+<h2>Infrastructure as Code に関するイベントやります</h2>
+
+<p>最初に触れたように、Martin Fowler 氏がブログでとりあげたり、O&#39;Reilly から書籍が出る、ということもあって、改めて Infrastructure as Code について振り返って現状整理してみた。整理はしてみたものの、この先どうなっていくのか、といったことはまだ十分考察できていないし、一人で考えていても煮詰まりそうなので、Infrastructure as Code をテーマにしたイベントでもやろうかと考えている。</p>
+
+<p><a href="http://www.zusaar.com/event/11697003">Infrastructure as Code 現状確認会</a> というイベントが過去にあったので、これとは少し違う方向性で、ツールの話が主眼ではなく、もう少し大局的な視点から、Infrastructure as Code のこれまでとこれからについて語れるようなイベントを。</p>
+
+<p>もし興味があったり、こんな話が聞きたい、などあれば、ブコメや Twitter などでお知らせ頂けるとありがたいです。</p>
+
+
+  <div class="pagination">
+    
+    <a href="/blog/2016/04/01/1" rel="next">next post</a>
+    
+    
+    
+  </div>
+
+</body>
+
+</html>
