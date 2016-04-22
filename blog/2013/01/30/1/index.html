@@ -77,30 +77,7 @@
 <p>Publicize は手動でやるのはだるいので、スクリプトをつくってみました。</p>
 
 <div><script src='https://gist.github.com/4665462.js?file='></script>
-<noscript><pre><code>#!/usr/bin/env ruby
-
-require 'pit'
-require 'octokit'
-
-user = 'mizzy'
-
-def octokit
-  config = Pit.get('github', :require =&gt; {
-                     'username' =&gt; 'Your user name of GitHub',
-                     'password' =&gt; 'Your password of GitHub',
-                   })
-  Octokit::Client.new(:login =&gt; config['username'], :password =&gt; config['password'])
-end
-
-octokit.orgs.each do |org|
-  org = org.login
-  next unless org.match(/^coderwall/)
-  unless octokit.organization_public_member?(org, user)
-    puts &quot;Publicize membership of user #{user} in #{org} ..&quot;
-    octokit.publicize_membership(org, user)
-  end
-end
-</code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/4665462&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>余談ですが、<a href="https://github.com/pengwynn/octokit">octokit</a> で Publicize Membership するコードは、<a href="https://github.com/pengwynn/octokit/pull/89">自分がコントリビュートしたものです</a> 。</p>
 

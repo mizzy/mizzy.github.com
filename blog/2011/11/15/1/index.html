@@ -65,39 +65,7 @@
   </section>
 
   <div><script src='https://gist.github.com/1367192.js?file='></script>
-<noscript><pre><code>diff --git a/Rakefile b/Rakefile
-index 7d7f6d8..41868ab 100644
---- a/Rakefile
-+++ b/Rakefile
-@@ -4,10 +4,10 @@ require &quot;stringex&quot;
- 
- ## -- Rsync Deploy config -- ##
- # Be sure your public key is listed in your server's ~/.ssh/authorized_keys file
--ssh_user       = &quot;user@domain.com&quot;
--ssh_port       = &quot;22&quot;
--document_root  = &quot;~/website.com/&quot;
--deploy_default = &quot;rsync&quot;
-+ssh_user       = &quot;xxx@usersXX.heteml.jp&quot;
-+ssh_port       = &quot;2222&quot;
-+document_root  = &quot;~/web/octopress&quot;
-+deploy_default = &quot;scp&quot;
- 
- # This will be configured for you when you run config_deploy
- deploy_branch  = &quot;gh-pages&quot;
-@@ -224,6 +224,12 @@ task :rsync do
-   ok_failed system(&quot;rsync -avze 'ssh -p #{ssh_port}' --delete #{public_dir}/ #{ssh_user}:#{document_root}&quot;)
- end
- 
-+desc &quot;Deploy website via scp&quot;
-+task :scp do
-+  puts &quot;## Deploying website via scp&quot;
-+  ok_failed system(&quot;scp -r -P #{ssh_port} #{public_dir}/* #{ssh_user}:#{document_root}&quot;)
-+end
-+
- desc &quot;deploy public directory to github pages&quot;
- multitask :push do
-   puts &quot;## Deploying branch to Github Pages &quot;
-</code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/1367192&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 
   <div class="pagination">

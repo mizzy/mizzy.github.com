@@ -75,7 +75,7 @@
 <p>そこで、<a href="https://twitter.com/hansode">@hansode</a> さんの <a href="https://github.com/hansode/vmbuilder">vmbuilder</a> の存在を思い出して、これを使ってみようと思ったんだけど、単に使うだけじゃなく、具体的にどういったことをやってるのか理解したくて、ソースコードを読んで手順を追い、単純化したスクリプトに落とし込んでみたのがこれ。</p>
 
 <div><script src='https://gist.github.com/5020611.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/5020611&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 <p>以前 AMI(Amazon Machine Image) をつくった時と基本的には同じだけど、AMI では 1 イメージファイル 1 パーティションだったのが、この手順では 1 イメージファイルにパーティンションが 2 つあるのが大きな違い。kpartx をつかって パーティション毎に loopback device を割り当てるやり方をはじめて知ったので、とても参考になった。</p>
 

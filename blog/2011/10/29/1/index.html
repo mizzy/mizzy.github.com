@@ -69,46 +69,7 @@
 <p>For this purpose I made this tiny script.</p>
 
 <div><script src='https://gist.github.com/1324352.js?file='></script>
-<noscript><pre><code>require &quot;rubygems&quot;
-require &quot;active_record&quot;
-
-ActiveRecord::Base.establish_connection(
-    :adapter  =&gt; &quot;mysql2&quot;,
-    :host     =&gt; &quot;192.168.10.12&quot;,
-    :user     =&gt; &quot;root&quot;,
-    :password =&gt; &quot;root&quot;,
-    :database =&gt; &quot;typo&quot;,
-    :encoding =&gt; &quot;utf8&quot;
-)
-
-class Content &lt; ActiveRecord::Base
-  Content.inheritance_column = 'foo'
-end
-
-contents = Content.all
-
-contents.each do |content|
-  dt = content.published_at
-  date = sprintf(&quot;%04s-%02d-%02d&quot;, dt.year, dt.month, dt.day)
-  datetime = date + sprintf(&quot; %02d:%02d&quot;, dt.hour, dt.min)
-  file = date + &quot;-&quot; + content.id.to_s + &quot;.markdown&quot;
-
-  body = &lt;&lt;BODY
----
-layout: post
-title: &quot;#{content.title}&quot;
-date: #{datetime}
-comments: true
-categories:
----
-#{content.body}
-BODY
-
-  File.open(file, 'w') do |file|
-    file.write(body)
-  end
-end
-</code></pre></noscript></div>
+<noscript><pre><code>&lt;html&gt;&lt;body&gt;You are being &lt;a href=&quot;https://github.com/gist/1324352&quot;&gt;redirected&lt;/a&gt;.&lt;/body&gt;&lt;/html&gt;</code></pre></noscript></div>
 
 
   <div class="pagination">
