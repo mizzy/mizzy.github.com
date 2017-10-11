@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="http://mizzy.org/atom.xml" rel="self"/>
   <link href="http://mizzy.org/"/>
-  <updated>2017-09-06T18:00:00+09:00</updated>
+  <updated>2017-10-11T12:29:40+09:00</updated>
   <id>http://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Rust で D-Bus 経由で systemd から情報を得る]]></title>
+    <link href="http://mizzy.org/blog/2017/10/11/1/" />
+    <updated>2017-10-11T12:29:40+09:00</updated>
+    <id>http://mizzy.org/blog/2017/10/11/1/</id>
+    <content type="html"><![CDATA[
+<p>色々試行錯誤したのでメモ。</p>
+
+<hr>
+
+<h2>結論</h2>
+
+<p><a href="https://crates.io/crates/dbus">dbus crate</a> を使う。</p>
+
+<hr>
+
+<h2>経緯</h2>
+
+<p>開発中の <a href="http://atl.recruit-tech.co.jp/blog/4339/">libspecinfra</a> で、systemd 配下の service の状態を取得できるようにするための provider を書こうと思い、色々調べたりコード書いて試したりした。</p>
+
+<hr>
+
+<h2>使えそうな crates を探す</h2>
+
+<p>まずは目的に合う crates がないか <a href="https://crates.io/">crates.io</a> で検索。ざっと以下のようなものが見つかる。</p>
+
+<ul>
+<li><a href="https://crates.io/crates/systemd">systemd</a></li>
+<li><a href="https://crates.io/crates/systemd-dbus">systemd-dbus</a></li>
+<li><a href="https://crates.io/crates/dbus">dbus</a></li>
+<li><a href="https://crates.io/crates/dbus-bytestream">dbus-bytestream</a></li>
+</ul>
+
+<p>systemd crate は <a href="https://github.com/systemd/systemd/tree/master/src/libsystemd">libsystemd</a> の Rust インターフェースで、<a href="https://www.freedesktop.org/software/systemd/man/sd-daemon.html">sd-daemon</a>、<a href="https://www.freedesktop.org/software/systemd/man/sd-id128.html">sd-id128</a>、<a href="https://www.freedesktop.org/software/systemd/man/sd-journal.html">sd-journal</a>、<a href="https://www.freedesktop.org/software/systemd/man/sd-login.html">sd-login </a> に対応している。が <a href="https://www.freedesktop.org/software/systemd/man/sd-bus.html">sd-bus</a> は <a href="https://github.com/jmesmon/rust-systemd/blob/aead34dcf64e90014da0fadfe54ea439a19ce8c4/src/lib.rs#L68">まだ実装が不完全</a> なようなので、目的には合わなさそう、と判断。</p>
+
+<p>systemd-dbus crate は2年半以上更新がなく、rust 1.19.0 でコンパイルが通らなかったので断念。</p>
+
+<p>他に systemd を直接扱える、目的に適いそうな crate が見当たらなかったので、D-Bus が扱える crate ってことで、dbus crate と dbus-bytestream create を試してみることにした。</p>
+
+<hr>
+
+<h2>dbus-send で D-Bus を理解する</h2>
+
+<p>dbus crate にしても dbus-bytestream crate にしても、ざっとドキュメントやコードを読んだ感じ、D-Bus でどういった形でメッセージのやりとりがなされているのかを理解しないと、使うのは無理だなこれは、と思ったので、まずは <a href="https://dbus.freedesktop.org/doc/dbus-send.1.html">dbus-send</a> コマンドで必要な情報が得られるかどうかトライしてみた。</p>
+
+<p>libspecinfra でやりたいことのひとつは、サービスが動いているかどうかを調べること。dbus-send では以下のような形で実行すれば、この情報が得られることがわかった。</p>
+
+<p>まずはユニット名(ssh.service)からオブジェクトパス(/org/freedesktop/systemd1/unit/ssh_2eservice)を取得。</p>
+
+<pre><code>$ dbus-send --system \
+   --dest=org.freedesktop.systemd1 \
+   --type=method_call \
+   --print-reply \
+   /org/freedesktop/systemd1 \
+   org.freedesktop.systemd1.Manager.GetUnit \
+   string:ssh.service
+
+method return time=1507693363.257785 sender=:1.10 -&gt; destination=:1.220 serial=3078 reply_serial=2
+   object path &quot;/org/freedesktop/systemd1/unit/ssh_2eservice&quot;
+</code></pre>
+
+<p><code>--dest=org.freedesktop.systemd1</code> で接続先のバス名を指定。<code>/org/freedesktop/systemd1</code> が操作対象のオブジェクトパス、<code>org.freedesktop.systemd1.Manager</code> がインターフェースで、それに続く <code>GetUnit</code> が呼び出すメソッド、<code>string:ssh.service</code> がメソッドに渡す引数、という形式になっている。</p>
+
+<p>このオブジェクトパスの ActiveState プロパティを取得。</p>
+
+<pre><code>$ dbus-send --system \
+   --dest=org.freedesktop.systemd1 \
+   --type=method_call \
+   --print-reply \
+   /org/freedesktop/systemd1/unit/ssh_2eservice \
+   org.freedesktop.DBus.Properties.Get \
+   string:org.freedesktop.systemd1.Unit \
+   string:ActiveState
+
+method return time=1507693392.955268 sender=:1.10 -&gt; destination=:1.221 serial=3079 reply_serial=2
+   variant       string &quot;active&quot;
+</code></pre>
+
+<p>これでサービスの状態を得ることができた。</p>
+
+<p>どのようなメソッドやプロパティがあるかは <a href="https://www.freedesktop.org/wiki/Software/systemd/dbus/">The D-Bus API of systemd/PID 1</a> に載っている。</p>
+
+<hr>
+
+<h2>Rust で dbus-send で得たのと同じ情報を得る</h2>
+
+<p>dbus crate を使って以下のようなコードを書けば良い。</p>
+
+<div><script src='https://gist.github.com/0210a1b8c56c1bf1411b1b8e310e90d8.js?file='></script>
+<noscript><pre><code></code></pre></noscript></div>
+
+<p>試したコードは Cargo.toml 等も含めて <a href="https://github.com/mizzy/rust-systemd-playground">GitHub</a> に置いてある。</p>
+
+<p>dbus crate は <a href="https://github.com/diwic/dbus-rs/tree/master/dbus/examples">サンプルコード</a> もあるし、<a href="https://github.com/diwic/dbus-rs/blob/master/dbus/examples/argument_guide.md">ドキュメント</a> もあるので、ドキュメントがほとんどない dbus-bytestream crate と比べると、比較的扱いやすいように思える（といっても、ドキュメント読めばすべてわかる、というわけではなく、コードも読んで色々試行錯誤したけど）。</p>
+
+<p>dbus-bytestream も同時に試したけど、取得した ActiveState の情報をデコードする方法がよくわからないまま、dbus crate の方が動いたので、途中で断念した。なので、GitHub 上にある dbus-bytestream を使ったコードはエラーで動かない。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[OBD-IIアダプタ経由で車両情報を Mac から取得してみる]]></title>
@@ -1024,29 +1124,6 @@ AUTO,ISO 15765-4 (CAN 11/500)
 <li>我が家は業者選定に時間かけなさすぎなので、真似しない方がいい。</li>
 <li>住宅展示場のモデルハウスだけではなく、実際に建てられた家の見学会や、建売前提のモデルハウス、宿泊体験なんかもできれば行った方がよさそう。</li>
 </ul>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[第10回 日本 OSS 奨励賞を受賞しました]]></title>
-    <link href="http://mizzy.org/blog/2015/10/16/1/" />
-    <updated>2015-10-16T23:11:14+09:00</updated>
-    <id>http://mizzy.org/blog/2015/10/16/1/</id>
-    <content type="html"><![CDATA[
-<blockquote>
-<p>昨今要求が高まっているシステム配備の自動化の実現に欠かすことができないサーバの状態を自動的にテストするツールServerspecを開発し、インフラ分野における業務の効率化に貢献した。Serverspecは日本国内だけでなく、海外でも活用されている。</p>
-
-<p><a href="http://www.ossforum.jp/ossaward10th2">「第10回 日本OSS貢献者賞・日本OSS奨励賞」受賞者を選定 | 日本OSS推進フォーラム</a></p>
-</blockquote>
-
-<p>推薦してくださった方、選考してくださった実行委員会のみなさん、ならびに Serverspec にコントリビュートしてくださったみなさん、使ってくださっているみなさん、ありがとうございます。</p>
-
-<p><a href="http://www.ossforum.jp/ossaward">「日本OSS貢献者賞・日本OSS奨励賞」 | 日本OSS推進フォーラム</a> によると、『「日本OSS奨励賞」は、… ≪中略≫ … さらなる活躍を推奨する … ≪以下省略≫』とのことで、次は貢献者賞に選んでもらえるような実績が残せるよう、精進したいと思います。</p>
-
-<p>受賞者の名に恥じないよう、<a href="http://togetter.com/li/883463">java-ja.OSS</a> で発表したような態度や行動は今後は控えよう…</p>
-
-<p>ちなみに、僕が技術顧問という肩書きをもらっている <a href="http://atl.recruit-tech.co.jp/"> 株式会社リクルートテクノロジーズ アドバンスドテクノロジーラボ</a> では、仕事として OSS の研究開発ができるので、興味がある方はぜひ <a href="http://atl.recruit-tech.co.jp/recruit/">こちらからエントリ</a> を。エントリ前に話を聞いてみたい、という方は、メール、Twitter、Facebook などで声かけてください。</p>
 
 ]]></content>
   </entry>
