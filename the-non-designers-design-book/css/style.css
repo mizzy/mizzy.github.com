@@ -1,0 +1,310 @@
+html { overflow: hidden; }
+body { font-family: 'Open Sans', sans-serif; line-height: .8; font-size: 45px; }
+
+.background {
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background: -moz-radial-gradient(50% 50%, farthest-side, #fff, #efefef);
+	background: -webkit-gradient(radial, 50% 50%, 250, 50% 50%, 750, from(#fff), to(#efefef));
+	z-index: 0;
+    opacity: 1;
+}
+
+#name-quote blockquote {
+    text-align: center;
+    font-size: 83px;
+    line-height: 1.2;
+}
+
+#four-principles, #principle1, #principle2, #principle3, #principle4 {
+    width: 1340px;
+    height: 600px;
+    text-align: left;
+}
+
+#proximity-title {
+    font-size: 150px;
+}
+
+#proximity-desc {
+    width: 970px;
+}
+
+#proximity-desc blockquote {
+    text-align: center;
+    font-size: 79px;
+}
+
+#four-principles div { font-size: 85px; }
+
+#principle1 {
+    font-size: 215px;
+}
+
+#principle2 {
+    font-size: 195px;
+}
+
+#principle3 {
+    font-size: 197px;
+}
+
+#principle4 {
+    font-size: 219px;
+}
+
+#no-proximity {
+    text-align: left;
+    line-height: 1.3;
+}
+
+#proximity {
+    text-align: left;
+    line-height: 1.1;
+}
+
+.proximity-cat {
+    margin-top: 18px;
+}
+
+#alignment-title {
+    font-size: 120px;
+}
+
+#alignment-desc {
+    width: 970px;
+}
+
+#alignment-desc blockquote {
+    text-align: center;
+    font-size: 85px;
+}
+
+
+#no-alignment {
+    line-height: 1.1;
+}
+
+#alignment {
+    text-align: left;
+    line-height: 1.1;
+    padding-left: 200px
+}
+
+#alignment2 {
+    text-align: left;
+    line-height: 1.05;
+    padding-left: 40px;
+    width: 673px;
+}
+
+#repetition-title {
+    font-size: 145px;
+}
+
+#repetition-desc {
+    width: 970px;
+}
+
+#repetition-desc blockquote {
+    text-align: center;
+    font-size: 80px;
+}
+
+#no-repetition-title {
+    font-style: italic;
+    font-size: 115px;
+}
+
+#no-repetition-desc {
+    width: 970px;
+}
+
+#no-repetition-desc blockquote {
+    text-align: left;
+    font-size: 70px;
+    font-style: normal;
+    font-weight: 500;
+    font-family: 'Open Sans';
+}
+
+#contrast-title {
+    font-size: 145px;
+}
+
+#contrast-desc {
+    width: 970px;
+}
+
+#contrast-desc blockquote {
+    text-align: center;
+    font-size: 85px;
+}
+
+#no-contrast .big {
+    font-size: 145px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+#no-contrast .bold {
+    font-weight: normal;
+}
+
+#no-contrast div {
+    width: 780px;
+    text-align: left;
+}
+
+#contrast .big {
+    font-size: 145px;
+    color: #ffffff;
+    background-color: #000000;
+    padding: 30px;
+}
+
+#contrast div {
+    width: 780px;
+    text-align: left;
+}
+
+#conclusion .big {
+    font-size: 50px;
+}
+
+#conclusion1  {
+    text-transform: uppercase;
+    margin: 0;
+    padding: 0;
+    font-size: 125px;
+}
+
+#conclusion2  {
+    text-transform: uppercase;
+    margin: 0;
+    padding: 0;
+    font-size: 115px;
+}
+
+#conclusion3  {
+    text-transform: uppercase;
+    margin: 0;
+    padding: 0;
+    font-size: 115px;
+}
+
+#conclusion4  {
+    text-transform: uppercase;
+    margin: 0;
+    padding: 0;
+    font-size: 126px;
+}
+
+#hint {
+    z-index: 9999;
+    position: fixed; top: 0; left: 20px;
+    font-size: 16px;
+    background: #ddd;
+    color: #666;
+    padding: 6px 12px 12px;
+    font-style: italic;
+    opacity: 0;
+    border-radius: 0 0 10px 10px;
+    
+    -webkit-transition: opacity 2s;
+    -moz-transition:    opacity 2s;
+    -ms-transition:     opacity 2s;
+    -o-transition:      opacity 2s;
+    transition:         opacity 2s;
+    
+    -webkit-transition-delay: 6s;
+    -moz-transition-delay: 6s;
+    -ms-transition-delay: 6s;
+    -o-transition-delay: 6s;
+    transition-delay: 6s;
+}
+
+#hint a { text-decoration: underline; font-style: italic; }
+
+#hint:hover {
+    opacity: 1;
+    -webkit-transition: opacity .25s;
+    -moz-transition:    opacity .25s;
+    -ms-transition:     opacity .25s;
+    -o-transition:      opacity .25s;
+    transition:         opacity .25s;
+}
+
+a, a:hover, a:visited {
+    text-decoration: none;
+    font-style: normal;
+    color: #666;
+    cursor: pointer;
+}
+a:hover { color: #333;}
+
+.title { font-size: 275px; }
+.big { text-transform: uppercase; margin: 0; padding: 0; }
+.bold { font-weight: 800; }
+.light { font-weight: 400; }
+.extralight { font-weight: 300; letter-spacing: .1em; }
+.small { display: block; padding: 20px; font-size: 20px; font-weight: 600; }
+
+blockquote {
+    text-align: justify;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+blockquote .author {
+    display: block;
+    text-align: right;
+    padding: 10px 40px;
+    font-weight: 600;
+    font-size: 36px;
+}
+
+.img-wrap {	margin: 0 auto; }
+.img-inline { display: inline-block; padding: 12px 3px; }
+.img-link {	text-decoration: none; }
+.img-border { border: solid 1px #aaa; }
+
+
+/* COMMON STEP STYLES */
+
+.step {
+    text-align: center;
+    width: 1000px;
+    padding: 20px;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing:    border-box;
+    -ms-box-sizing:     border-box;
+    -o-box-sizing:      border-box;
+    box-sizing:         border-box;
+    
+    -webkit-transition: opacity 1s;
+    -moz-transition:    opacity 1s;
+    -ms-transition:     opacity 1s;
+    -o-transition:      opacity 1s;
+    transition:         opacity 1s;
+    
+    text-shadow: rgba(0,0,0,.01) 0 0 1px; /* Chrome @font-face anti-aliasing fix */
+}
+
+.step:not(.active) { opacity: 0.1; }
+
+/* STEP SPECIFIC STYLES */
+#title {width: 1240px; height: 600px; text-align: left; }
+#title-text1 { font-size: 81px; }
+#title-text2 { font-size: 125px; }
+#title-text3 { font-size: 73px; }
+
+#credits { width: 1200px; padding: 0; }
+#credits .big { font-size: 150px; }
+#credits p { font-style: italic; font-size: 30px; margin: 24px; padding: 0; color: #666; }
+#credits p.first { margin-bottom: 45px; font-size: 40px; }
+#credits a { font-style: italic; font-weight: bold; text-decoration: underline; }
+
