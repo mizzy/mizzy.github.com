@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>bloglines mobile gateway - Gosuke Miyashita</title>
+  <title>Mac SafariでのxmlHttpRequest文字化け - Gosuke Miyashita</title>
   <!-- TODO: change name and description -->
   <meta name="author" content="Gosuke Miyashita" />
   <meta name="description" content="A fantastic blog that is fantastic." />
@@ -15,10 +15,10 @@
   <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
   <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
   <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
   <script type="text/javascript" src="/js/application.js"></script>
 </head>
 
@@ -26,7 +26,7 @@
   <section class="sidebar">
     <a href="/">
       <!-- TODO: change this gravatar URL -->
-      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
     </a>
 
     <!-- TODO: change name -->
@@ -57,7 +57,7 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2005/04/13/1">bloglines mobile gateway</a>
+    <a href="/blog/2005/04/13/1">Mac SafariでのxmlHttpRequest文字化け</a>
   </h1>
 
   <section class="byline">
@@ -65,23 +65,23 @@
   </section>
 
   <p class="entryBody">
-こちらもちらほらとアクセスがあるので、リンクしておく。<a href="http://mizzy.org/web/bloglines.xhtml">http://mizzy.org/web/bloglines.xhtml</a>
+このブログをカスタマイズしている過程で、Safari + xmlHttpRequestで取得したデータが文字化けする、という現象に悩んでいたのですが、&lt;?xml version="1.0" encoding="euc-jp"?&gt; という一文を入れてあげると、文字化けが解消されました。
 </p>
 
 <p class="entryBody">
-バージョンが0.02とか0.03で止まってますが、自分で使う分には十分なので、これ以上の更新はないかも。もちろん、ご要望があればできる限りの対応はさせて頂きます。
+どうやらSafariのxmlHttpRequestでは、HTTPのContent-typeヘッダのcharsetは無視されるようで、XML宣言（って呼び方でいいの?）で指定されたcharsetを解釈する模様。XML宣言がないと、iso-8859-1とみなすらしい。
 </p>
 
 <p class="entryBody">
-ついでに、<a href="http://blog.cy-vogue.biz/blog/bloglines_mobile_gateway.htm" target="_blank">Ck2 Blogger</a>のきゃーさんがこのgatewayを「素敵」とおっしゃってくださったので、トラックバックしてみる。blosxomのカスタマイズにあたって有用な情報がたくさんあり、かなり参考になったので感謝の意も込めて。
+なので、xmlHttpRequestで取得するコメントとトラックバックには、XML宣言を入れてます。なんか気色悪いけど、しかたない。
 </p>
 
 
   <div class="pagination">
     
+    <a href="/blog/2005/04/13/2">↑ newer post</a>
     
-    
-    <a href="/blog/2005/04/13/2">previous post</a>
+
     
   </div>
 

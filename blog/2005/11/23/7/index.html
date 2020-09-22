@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>feedbringerをremixin' #6 - Gosuke Miyashita</title>
+  <title>feedbringerをremixin' #5 - Gosuke Miyashita</title>
   <!-- TODO: change name and description -->
   <meta name="author" content="Gosuke Miyashita" />
   <meta name="description" content="A fantastic blog that is fantastic." />
@@ -15,10 +15,10 @@
   <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
   <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
   <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
   <script type="text/javascript" src="/js/application.js"></script>
 </head>
 
@@ -26,7 +26,7 @@
   <section class="sidebar">
     <a href="/">
       <!-- TODO: change this gravatar URL -->
-      <img src="http://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
     </a>
 
     <!-- TODO: change name -->
@@ -57,7 +57,7 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2005/11/23/7">feedbringerをremixin' #6</a>
+    <a href="/blog/2005/11/23/7">feedbringerをremixin' #5</a>
   </h1>
 
   <section class="byline">
@@ -65,33 +65,29 @@
   </section>
 
   <p class="entryBody">
-<a href="/js/feedbringer2.user.js" target="_blank">feedbringer用greasemonkeyユーザスクリプト</a>から呼び出しているcssを若干変更。
+feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.user.js" target="_blank">白黒バージョン</a>を修正しました。俺はこっちの方を常用してるので、今後は白黒バージョンしかメンテナンスしないつもりです。
 </p>
 
 <p class="entryBody">
-<a href="http://blog.feedbringer.net/feed/archives/2005/08/814_2.html" target="_blank">今日のメンテナンス</a>で、「このページのトップへ」というリンクが追加され、修正前のcssではこれが左上に表示されて邪魔なので、display: none; で消去。
+修正点のひとつは、コードを見直し、少しすっきりさせたことです。（ほんの少しですが。）
 </p>
 
 <p class="entryBody">
-たぶん、フィードを下まで読んでいって、読み終わったらページの先頭への移動がすぐにできるように追加されたんでしょうが、このcssでは全く使う必要がないので。
+それと、もうひとつ大きな修正は、titleに未読数を表示するようにしました。こうすることによって、タブに未読数が表示されるので、Notifier代わりになるかな、と。
 </p>
 
 <p class="entryBody">
-それにしても、HTMLがダメすぎ。「ああ、こういうのをdiv厨と呼ぶんだな」という典型的な例。しかも、今回追加されたリンクもに見られるように、classがalign-rightとか、nav-tab-rightとか、思いっきりレイアウトを意識したクラス名になってるし。HTMLやCSSに対して、この程度の理解しかないから、インターフェースもダメなんだろうなぁ、と妙に納得してしまった。（と、自分のことは棚に上げてみる。）
-</p>
-
-<p class="entryBody">
-なんかひどいこと言ってますが、それだけ期待してるってことで。
+こんなことやってても、そのうち本家が改善されて意味がなくなるかもしれませんが、まあJavascriptの練習ってことで。
 </p>
 
 
   <div class="pagination">
     
-    <a href="/blog/2005/11/23/6" rel="next">next post</a>
+    <a href="/blog/2005/11/23/8">↑ newer post</a>
     
+
     
-    
-    <a href="/blog/2005/11/23/8">previous post</a>
+    <a href="/blog/2005/11/23/6" rel="next">older post ↓</a>
     
   </div>
 
