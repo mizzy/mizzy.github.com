@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>feedbringerをremixin' #2 - Gosuke Miyashita</title>
+  <title>feedbringerをremixin' #1 - Gosuke Miyashita</title>
   <!-- TODO: change name and description -->
   <meta name="author" content="Gosuke Miyashita" />
   <meta name="description" content="A fantastic blog that is fantastic." />
@@ -57,7 +57,7 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2005/11/23/4">feedbringerをremixin' #2</a>
+    <a href="/blog/2005/11/23/4">feedbringerをremixin' #1</a>
   </h1>
 
   <section class="byline">
@@ -65,11 +65,23 @@
   </section>
 
   <p class="entryBody">
-<a href="/js/feedbringer.user.js" target="_blank">feedbringer用greasemonkeyユーザスクリプト</a>を修正。コンテンツ表示領域をスペース/バックスペースキーで順/逆スクロールできるようにした。
+greasemonkeyによるfeedbringer remix用のcssを色々いじってみました。cssを適用した<a href="/img/feedbringer.jpg" target="_blank">スクリーンショット</a>。オリジナルのものと見比べてもらえれば、違いは一目瞭然だと思います。
 </p>
 
 <p class="entryBody">
-まだまだ調整すべきところはあるけど、これでbloglinesから完全に乗り換えできるかな。
+オリジナルから一番大きく変えた点は、ツリーメニュー表示欄とコンテンツ表示欄をfixにして、別々にスクロールできるようしたことですね。これだけでだいぶ使いやすくなる気がします。
+</p>
+
+<p class="entryBody">
+あとは多少レイアウトを変えたり、見やすいように色を変えたりしてますが、まだまだ調整は必要な感じ。というか、自分色のセンスがないので、誰か代わりにやってくんないかなぁ…
+</p>
+
+<p class="entryBody">
+このremixによる弊害としては、スペースキーでのスクロールができなくなることですね。どうもfirefoxだと、heightを固定してoverflow: autoでスクロールさせるようにすると、スペースキーがきかなくなるようです。
+</p>
+
+<p class="entryBody">
+が、そこはgreasemonkeyなので、Javascriptでなんとでもできるでしょう。今後はその辺りに手を入れていこうと思ってます。
 </p>
 
 

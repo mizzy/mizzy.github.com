@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Mac SafariでのxmlHttpRequest文字化け - Gosuke Miyashita</title>
+  <title>ajaxなウェブメールを作る #1 - Gosuke Miyashita</title>
   <!-- TODO: change name and description -->
   <meta name="author" content="Gosuke Miyashita" />
   <meta name="description" content="A fantastic blog that is fantastic." />
@@ -57,7 +57,7 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2005/04/13/1">Mac SafariでのxmlHttpRequest文字化け</a>
+    <a href="/blog/2005/04/13/1">ajaxなウェブメールを作る #1</a>
   </h1>
 
   <section class="byline">
@@ -65,15 +65,26 @@
   </section>
 
   <p class="entryBody">
-このブログをカスタマイズしている過程で、Safari + xmlHttpRequestで取得したデータが文字化けする、という現象に悩んでいたのですが、&lt;?xml version="1.0" encoding="euc-jp"?&gt; という一文を入れてあげると、文字化けが解消されました。
+ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変えているのですが、決定的にこれがいい、というものがないわけですよ。（だからこそ気分次第、なのですが。）
 </p>
 
 <p class="entryBody">
-どうやらSafariのxmlHttpRequestでは、HTTPのContent-typeヘッダのcharsetは無視されるようで、XML宣言（って呼び方でいいの?）で指定されたcharsetを解釈する模様。XML宣言がないと、iso-8859-1とみなすらしい。
+まあ、ウェブメールなんだからしゃあないか、と妥協していたのですが、gmailが教えてくれました。ウェブメールでもJavaScriptをうまく使えば使い勝手がいいものが作れる、と。
 </p>
 
 <p class="entryBody">
-なので、xmlHttpRequestで取得するコメントとトラックバックには、XML宣言を入れてます。なんか気色悪いけど、しかたない。
+そこで、自分で作ってみようということになり、現在ちまちま作っております。目標としては、普段使っているのがWanderlustなので、それに使い勝手が近いものを作ろう、と考えています。以下の様なコンセプトで。
+</p>
+
+<ul class="entryBody">
+<li>画面遷移しない。</li>
+<li>3ペイン表示。</li>
+<li>キーボードのみで操作可能。ショートカットはWanderlust風。</li>
+<li>メッセージを先読みして待ち時間を少なく。</li>
+</ul>
+
+<p class="entryBody">
+まだ全然このコンセプト通りにはなってませんが、とりあえずメールが読める、という状態にはなってます。近いうちに動作デモを公開予定。
 </p>
 
 

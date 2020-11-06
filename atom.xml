@@ -4,7 +4,7 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="https://mizzy.org/atom.xml" rel="self"/>
   <link href="https://mizzy.org/"/>
-  <updated>2020-04-19T23:00:00+09:00</updated>
+  <updated>2020-11-06T21:40:00+09:00</updated>
   <id>https://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
@@ -12,6 +12,121 @@
   </author>
   <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Configuration Managementツールのポリシー定義用中間言語に関する考察 (WSA研#7予稿)]]></title>
+    <link href="https://mizzy.org/blog/2020/11/06/1/" />
+    <updated>2020-11-06T21:40:00+09:00</updated>
+    <id>https://mizzy.org/blog/2020/11/06/1/</id>
+    <content type="html"><![CDATA[
+<h2>概要</h2>
+
+<p>マネージドなコンテナ実行環境の普及に伴い、Configuration Managementツールを利用する必要がある現場は少なくなったが、Configuration Managementツール自体の必要性はまだ失われていない。また、モバイルコンピューティングやエッジコンピューティングの普及に伴い、Configuration Managememntツール自体のあり方も今後変化していくと考えられる。</p>
+
+<p>本予稿では、Configuration Managemantツールの役割を整理し、Configuration Managementツールの今後のあるべき姿を検討する。それにより導きだされた、Configuration Managementツールを3層で構成する方式を提案し、その中で中心的な役割を果たすポリシー定義用中間言語について考察する。</p>
+
+<h2>Configuration Managementとは</h2>
+
+<p>類する言葉してはサーバープロビジョニングという用語の方が日本語で多く見られるが、英語ではConfiguration Managementと呼ばれることが多い。</p>
+
+<p>Configuration Managementとは、Burgess、Couchらによると<sup>1</sup>、「予め定義されたポリシーとガイドラインに従い、事前に決められたビジネス上の目的を達成するよう、ネットワーク接続されたマシンの振る舞いを制御するプロセスである」と述べられている。</p>
+
+<p><small>1: <a href="https://static.usenix.org/events/lisa06/tech/full_papers/burgess/burgess.pdf">Burgess, Mark, and Alva L. Couch. 2006. “Modeling Next Generation Configuration Management Tools.” In LISA, 131–47. static.usenix.org. (PDF)</a></small></p>
+
+<h2>Configuration Managementツールとは</h2>
+
+<p>Configuration Managementツールとは、その名の通りConfiguration Managementを行うためのソフトウェアである。</p>
+
+<p>代表的なものとして、<a href="https://cfengine.com/">CFEngine</a>, <a href="https://puppet.com/">Puppet</a>, <a href="https://www.chef.io/">Chef</a>, <a href="https://www.saltstack.com/">SaltStack</a>, <a href="https://www.ansible.com/">Ansible</a>などがある。特に、後発のChef, Ansible, Puppet, SaltStackをまとめてCAPSと呼ぶこともある。</p>
+
+<h2>Configuration Managementツールに共通の役割</h2>
+
+<p>Configuration Managementツールは「予め定義されたポリシーとガイドラインに従い、事前に決められたビジネス上の目的を達成するよう、ネットワーク接続されたマシンの振る舞いを制御する」ためのツールである。このことから、Configuration Managementツールには以下の2つの役割があると捉えられる。</p>
+
+<ul>
+<li>ポリシーの定義</li>
+<li>振る舞いの制御</li>
+</ul>
+
+<p>実際、先にあげた代表的なConfiguration Managementツールは、この2つの役割を持っている。それぞれのツールの違いは、「ポリシー定義」と「振る舞いの制御」の2つに関する実装の違いとも言える。</p>
+
+<h2>ポリシー定義と言語</h2>
+
+<p>Configuration Managementツールの役割のひとつして「ポリシーの定義」を先に挙げた。ポリシーの定義は、何からの言語を用いて行うことになる。Configuration Managementツールの文脈で言語に言及する場合、ポリシー定義用言語と実装言語が混同されることがあるので注意が必要である。</p>
+
+<p>Configuration Managementツールに採用されているポリシー定義用言語は、大別すると独自言語、YAMLのような簡易言語、プログラミング言語の3つにわけられる。ポリシー定義用言語としては、YAMLが最も人気があるように見受けられる。Configuration ManagementツールではAnsibleが今でも人気があるが、YAMLを採用していることが一因と考えられる。</p>
+
+<p>また、Configuration Managementツールではないが、Infrastructure as Codeに関連するツールとしては、KubernetesもYAMLを採用している。</p>
+
+<p>従来のConfiguration Managementツールの利用対象者であったシステム管理者は、プログラミングを行わない人が多いため、YAMLのような簡易言語が好まれる傾向にあると思われる。</p>
+
+<p>また、YAMLのような簡易言語は変数やロジックがないため、記述を簡易にできメンテナンスしやすい、といった点も好まれる一因と考えられる。（ただし、変数やロジックがない、というのは欠点でもあり、それを補う手法が同時に使われているケースもある。）</p>
+
+<p>一方、クラウドの普及により、システム管理者だけではなくアプリケーション開発者もサーバーインフラを触るようになった。このような人達は、簡易言語や独自言語よりも、慣れ親しんでいるプログラミング言語を好む傾向にある。</p>
+
+<p>いずれにせよ、どの言語がポリシー定義用言語として最適なのかは、利用する人や組織が置かれている環境、利用者のスキル、好み等に依存するため、一概に決めることはできない。</p>
+
+<h2>振る舞い制御の実装</h2>
+
+<p>Configuration Managementツールのもうひとつの役割である「振る舞いの制御」を行う方法も、ポリシー定義用言語同様、様々である。</p>
+
+<p>例えば、ChefやPuppetはサーバー/エージェント型の構成をとっており、中央のサーバーで管理されたポリシーを各マシンに配布、適用して振る舞い制御を行う。また、サーバー/エージェント型としてだけではなく、スタンドアローンで実行することもできる。</p>
+
+<p>サーバー/エージェント型は、ポリシーの配布、サーバー/エージェント間の接続や認証、マシン制御の実行方法やタイミングなどをツールに任せることができる、というメリットがある。反面、サーバープロセスやエージェントプロセスの監視をどうするか、サーバーとエージェントの初期接続時の認証情報をどのように受け渡すか、などといった点を考慮する必要がある。</p>
+
+<p>一方、スタンドアローンで制御を行う場合は、常駐プロセスがないため、サーバー/エージェントのプロセス監視や接続時の認証については考える必要はない。反面、ポリシー定義コードをどのように配布し、どのようなタイミングでポリシー適用を行うのかを、自ら決める必要がある。</p>
+
+<p>Ansibleはエージェントレスで、スタンドアローンで制御したり、リモートマシンに対してSSHで接続して制御したりすることもできる。これもChefやPuppetのスタンドアローン型と同様のメリット/デメリットがある。</p>
+
+<p>また、モバイルデバイスやエッジデバイスの普及に伴い、多様なデバイスへの対応、転送容量削減、メモリ容量節約、実行速度の向上、自律制御といった観点から、別の制御実装が求められることも考えられる。</p>
+
+<p>さらに、現在のConfiguration Managementツールは、記述されたポリシーを逐次解釈して制御を行うインタプリタ型だが、制御用コードを生成して実行するコンパイラ型の方が望ましいケースも考えられる。</p>
+
+<p>このように、ポリシー定義用言語と同様、振る舞い制御の実装についても、サーバーマシンが置かれている環境や、どのように管理を行いたいか、といった前提条件によって適した制御方法が異なるため、どの振る舞い制御実装が最適かを一概に決めることはできない。</p>
+
+<h2>ポリシー定義言語と振る舞い制御実装の多様化</h2>
+
+<p>ポリシー定義用言語も振る舞い制御実装も、条件によりベストなものが異なる、という前提に立つと、様々なポリシー定義用言語や振る舞い制御実装が存在する、ということは好ましいことである。</p>
+
+<p>しかし、既存のConfiguration Managementツールは、ポリシー定義言語と振る舞い制御が密結合している。そのため、用途に適したポリシー定義用言語や振る舞い制御実装を備えたツールが存在しない場合、ポリシー定義用言語部分も振る舞い制御部分も一から実装する必要がある。また、あるツールのポリシー定義用言語だけ差し替えて振る舞い制御実装のみ利用する、といったことも不可能である。</p>
+
+<h2>ポリシー定義用言語と振る舞い制御実装の分離</h2>
+
+<p>ポリシー定義用言語と振る舞い制御実装が密結合していると、部分的に再利用できないため、開発に無駄が生じる。そこで、多様なポリシー定義用言語と振る舞い制御実装に対応しつつも、開発コストを抑えるために、ポリシー定義用言語と振る舞い制御の実装を分離することを提案する。提案方式はLLVMに着想を得ている。</p>
+
+<p>LLVMは以下の図のような3層モデルになっており、各種言語用フロントエンドが、その言語で書かれたコードをLLVM IRという中間言語に変換、その後LLVMが中間言語に最適化処理などを施し、最終的には各CPUアーキテクチャ用のバックエンドが、そのアーキテクチャで実行可能なバイナリコードを生成する。</p>
+
+<p><img src="./images/2020/11/llvm.jpg" alt=""></p>
+
+<p>LLVMの「3層モデル」「中間言語」という概念をConfiguration Managementツールに応用すると、以下の図のようになる。</p>
+
+<p><img src="./images/2020/11/cmt.jpg" alt=""></p>
+
+<p>Optimizer部分で何をするのか、という点については現在のところアイデアはないが、Optimizeする必要がなければ、そのままバックエンドに渡す形となる。また、右端の制御実行は、逐次実行型の場合は中間言語を解釈してそのまま実行することをイメージしているが、そうではなく制御実行コードを吐き出す、という形も考えられる。</p>
+
+<p>このような形にすることで、利用者は用途に適したポリシー定義言語や振る舞い制御実装を選択できる。また、用途に合うポリシー定義言語や振る舞い制御実装が存在しない場合に、ポリシー定義用言語のみ、あるいは振る舞い制御実装のみ開発する、といったことも可能となる。</p>
+
+<h2>中間言語 = ポリシー定義用言語</h2>
+
+<p>3層構造のConfiguration Managementツールにおける中間言語は、各種ポリシー定義用言語とN対1で対応するものであるので、中間言語自身もポリシー定義用言語であると言える。そのため、中間言語はポリシー定義用言語に適した性質を備えている必要がある。</p>
+
+<p>ポリシー定義用言語に適した言語とは何か、についてはまだ十分考察できていないが、今のところ考えていることをリストアップする。</p>
+
+<ul>
+<li>YAMLは機能不足である。簡易で読み書きしやすいと言われるが、複雑なコードになるとインデントが深くなり、本当に読み書きしやすいかは疑問である。</li>
+<li>汎用プログラミング言語は逆に機能が多く自由度が高すぎる。コードのメンテナンス性を考慮すると、自由度は下げたい。</li>
+<li>なので、YAMLとプログラミング言語の中間辺りが望ましい。</li>
+<li>Jsonnet、Stalark、CUEは悪くないかもしれない。</li>
+<li>ただし、これらの言語で記述されたポリシーコードは、振る舞い制御バックエンドに渡されて処理されるため、それぞれの言語処理系で処理されるわけではない。</li>
+<li>振る舞い制御バックエンドに渡されて処理されることを考えると、既存の言語を流用する場合、利用しやすい形で言語パーサーが提供されていると、実装が楽である。</li>
+<li>ただし、言語処理系をそのまま利用しないのであれば、その言語を採用する意義はないかもしれない。</li>
+<li>また、StarlarkやCUEは特定の目的に特化した言語であり、Configuration Managementのポリシー定義には向いていない可能性もある。</li>
+</ul>
+
+<p>今後、この考察を更に深めていく予定である。これらに対する意見や、こういったアプローチで考察すると良いのでは、といった助言があればぜひ頂きたい。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[言語を問わないサーバインフラ管理用汎用コマンド実行フレームワークの提案と実装 (WSA研#6予稿)]]></title>
@@ -709,120 +824,6 @@ method return time=1507693392.955268 sender=:1.10 -&gt; destination=:1.221 seria
 <p>dbus crate は <a href="https://github.com/diwic/dbus-rs/tree/master/dbus/examples">サンプルコード</a> もあるし、<a href="https://github.com/diwic/dbus-rs/blob/master/dbus/examples/argument_guide.md">ドキュメント</a> もあるので、ドキュメントがほとんどない dbus-bytestream crate と比べると、比較的扱いやすいように思える（といっても、ドキュメント読めばすべてわかる、というわけではなく、コードも読んで色々試行錯誤したけど）。</p>
 
 <p>dbus-bytestream も同時に試したけど、取得した ActiveState の情報をデコードする方法がよくわからないまま、dbus crate の方が動いたので、途中で断念した。なので、GitHub 上にある dbus-bytestream を使ったコードはエラーで動かない。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[OBD-IIアダプタ経由で車両情報を Mac から取得してみる]]></title>
-    <link href="https://mizzy.org/blog/2017/09/06/1/" />
-    <updated>2017-09-06T18:00:00+09:00</updated>
-    <id>https://mizzy.org/blog/2017/09/06/1/</id>
-    <content type="html"><![CDATA[
-<p>最近車に乗ることが多く、ほぼ毎日乗っているせいか、コネクテッドカー関連の技術に興味が沸いてきた。ので、調べたことや試したことなんかをメモしていく。</p>
-
-<p>まずは車両情報をパソコンから取得することにトライ。調べてみると、車両情報をパソコンやスマホから取得するためには、車に搭載された <a href="https://ja.wikipedia.org/wiki/%E8%87%AA%E5%8B%95%E8%BB%8A%E3%81%AE%E8%87%AA%E5%B7%B1%E8%A8%BA%E6%96%AD%E6%A9%9F%E8%83%BD#OBD2">OBD-II</a> ポートに、<a href="https://www.elmelectronics.com/">ELM Electronics 社</a> 製の ELM327 というチップを積んだアダプタを挿し、Bluetooth や Wi-Fi を経由して取得する、というやり方が一般的なようだ。</p>
-
-<p>というわけで、<a href="https://www.amazon.co.jp/gp/product/B00J7CC4T2">Bluetooth 版</a> （写真左）と <a href="https://www.amazon.co.jp/gp/product/B01IHV5VFM">Wi-Fi 版</a>（写真右）を買ってみた。 </p>
-
-<p><img src="/images/2017/09/elm327.jpg" title="ELM327" ></p>
-
-<p>まずは Bluetooth 版。macOS Sierra の場合、ペアリングすると <code>/dev/tty.OBDII-Port</code> というデバイスファイルが見えるようになるので、<code>screen</code> コマンドで接続して対話する。</p>
-
-<pre><code>$ screen /dev/tty.OBDII-Port
-&gt;ONNECTED
-</code></pre>
-
-<p>正しく改行され表示されるよう、ラインフィードをオンにする。</p>
-
-<pre><code>&gt;atl1
-OK
-</code></pre>
-
-<p>識別コードを表示させると、ELM327のバージョンが表示される。</p>
-
-<pre><code>&gt;ati
-ELM327 v1.5
-</code></pre>
-
-<p>プロトコルを表示させてみる。<a href="https://www.elmelectronics.com/products/ics/obd/">ELM327 は様々なプロトコルに対応している</a> が、この車が対応しているプロトコルは ISO 15765-4 (CAN 11/500) で、自動で認識しているようだ。</p>
-
-<pre><code>&gt;atdp
-AUTO, ISO 15765-4 (CAN 11/500)
-</code></pre>
-
-<p>他に使える AT コマンドについては、 <a href="https://www.sparkfun.com/datasheets/Widgets/ELM327_AT_Commands.pdf">ELM327 がサポートしている AT コマンド一覧（PDF）</a> を見ると良い。</p>
-
-<p>次に車両情報を取得してみる。OBD-IIポートから情報を取得するには、PID(Parameter ID) と呼ばれるコードを入力する。<a href="https://en.wikipedia.org/wiki/OBD-II_PIDs">PID の一覧はここに載っている</a>。</p>
-
-<p>ここにある PID をすべての車がサポートしているわけではないし、メーカーや車独自の PID もあるらしい。</p>
-
-<p><a href="https://en.wikipedia.org/wiki/OBD-II_PIDs#Standard_PIDs">標準で定められた PID の一覧はここに載っている</a>。</p>
-
-<p>これを見ると、PID には <a href="https://en.wikipedia.org/wiki/OBD-II_PIDs#Modes">Mode</a> という大まかなカテゴリがあり、Mode につづいて必要な情報の PID を入力するようだ。例えば、対応している PID の一覧を取得するためのコードは、Mode 01、PID 00 なので、0100 と入力する。</p>
-
-<pre><code>&gt;0100
-41 00 98 18 00 01
-41 00 BE 3E B8 13
-</code></pre>
-
-<p><a href="https://en.wikipedia.org/wiki/OBD-II_PIDs#Query">Wikipedia ページの Query の項目</a> には、先頭に「Number of additional data bytes」というのがあるけど、これはなくてもいい？よくわからない。</p>
-
-<p>レスポンスのフォーマットも <a href="https://en.wikipedia.org/wiki/OBD-II_PIDs#Response">Wikipedia に載っている</a>。こちらも先頭に「Number of additional data bytes」というのがあるけど、実際に試したレスポンスには含まれてなさそう。</p>
-
-<p>レスポンスの最初の <code>41</code> は 40 に Mode を足した値で、その次の <code>00</code> は Mode を含まない PID をそのまま返しているので、実際に読むべき値はその次の <code>98 18 00 01</code> と <code>BE 3E B8 13</code> になる。レスポンスが2行になっているのは、おそらく2つの ECU(Engine Control Unit) から値を取得しているからだろう。どうやら片方がエンジン系ECU、片方がトランスミッション系ECUらしいのだが、この辺りもよくわかってない。</p>
-
-<p>レスポンスは、PID 01〜20 の中で対応しているものをビットエンコードしたもので、読み方は <a href="https://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_1_PID_00">Wikipedia を参照</a>。</p>
-
-<p>Engine coolant temperature の取得はコード <code>0105</code> で行う。<code>41 05</code> を除いた <code>58</code> が見るべき値だが、これは 16進数なので10進数では 88 になるが、<a href="https://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_01">Wikipedia でこの PID の Formula</a> を見ると「A - 40」と書かれているので、88 - 40 = 44℃ が実際に知りたかった値となる。</p>
-
-<pre><code>&gt;0105
-41 05 58
-41 05 58
-</code></pre>
-
-<p>Wi-Fi版のものは、車に挿してイグニッションオンにすると、WiFi_OBDII という SSID が表示されるので、接続してやる。</p>
-
-<p><img src="/images/2017/09/wifi-obd2.jpg" title="WiFi_OBDII" ></p>
-
-<p>すると、192.168.0.10:35000 に繋いで対話できるので、telnet や nc コマンド等で接続して対話する。</p>
-
-<p>ATコマンドは Bluetooth 版と同様。</p>
-
-<pre><code>$ telnet 192.168.0.10 35000
-Trying 192.168.0.10...
-Connected to 192.168.0.10.
-Escape character is &#39;^]&#39;.
-atl1
-OK
-
-&gt;ati
-ELM327 v1.5
-
-&gt;atdp
-AUTO,ISO 15765-4 (CAN 11/500)
-</code></pre>
-
-<p>車両情報を取得してみると、レスポンスが Bluetooth 版と異なる。</p>
-
-<pre><code>&gt;0100
-7E8064100BE3EB813
-7E906410098180001
-
-&gt;0105
-7E903410585
-7E803410585
-
-&gt;0120
-7E8064120A007A011
-7E906412000000001
-</code></pre>
-
-<p><code>7E806</code> や <code>7E903</code> といった部分が、Bluetooth 版のレスポンスにはないが、これはどうやら <a href="https://ja.wikipedia.org/wiki/Controller_Area_Network">CAN</a> というプロトコルのデータフレームに含まれているもののようだ。 </p>
-
-<p><a href="http://monoist.atmarkit.co.jp/mn/articles/0807/09/news140.html">CAN通信におけるデータ送信の仕組みとは？ (1/3) - MONOist（モノイスト）</a> を見ると、<code>7E8</code> や <code>7E9</code> が識別のための ID、続く <code>06</code> や <code>03</code> はコントロールフィールド中のデータレングスコードで、その後に続くデータフィールドの長さを表しているようだ。</p>
-
-<p>内部的には ECU 同士や ECU と OBD-IIアダプタ間では CAN で通信していて、Bluetooth 版アダプタは、CAN のデータフレームのうち、データフィールドしか出力しないけど、Wi-Fi版アダプタは、ID やコントロールフィールドも出力している、ということなのだろう。</p>
 
 ]]></content>
   </entry>

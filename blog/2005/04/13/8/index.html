@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>blosxomでtagging #2 - Gosuke Miyashita</title>
+  <title>blosxomでtagging #1 - Gosuke Miyashita</title>
   <!-- TODO: change name and description -->
   <meta name="author" content="Gosuke Miyashita" />
   <meta name="description" content="A fantastic blog that is fantastic." />
@@ -57,7 +57,7 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2005/04/13/8">blosxomでtagging #2</a>
+    <a href="/blog/2005/04/13/8">blosxomでtagging #1</a>
   </h1>
 
   <section class="byline">
@@ -65,23 +65,19 @@
   </section>
 
   <p class="entryBody">
-taggingプラグインをアップデート。タグで絞り込んで表示することができるようになりました。ファイルはここ。<a href="/archives/tagging">taggingプラグイン</a>
+blosxomでtaggingに対応するプラグインを書いてみました。使い方とか全然書いてないし、まだ作りかけなのですが、置いておきます。<a href="/archives/tagging">taggingプラグイン</a>
 </p>
 
 <p class="entryBody">
-サイドメニューのタグリストで、各タグ毎のリンクを表示してます。
+タグづけは<a href="http://www.blosxom.com/plugins/meta/meta.htm" target="_blank">meta plugin</a>を利用して、entryファイルのタイトルの次の行に、「meta-tags: tag1, tag2, tag3, ...」といった形で記述します。
 </p>
 
 <p class="entryBody">
-QUERY_STRINGやPOSTパラメータで、tag=tag1,tag2,...と指定することにより複数タグでの絞込みができます。（ANDで絞込み。）
+$tagging::listで、このサイトのサイドにあるように、タグの一覧と出現回数をリストします。今はこれだけです。今後、タグごとにエントリを表示したり検索したり、といったことができるようにしようと思います。
 </p>
 
 <p class="entryBody">
-でも、毎回エントリファイルの中を見てタグとマッチするか調べる、ってことをやるので、ファイルが増えるととんでもないことになるなぁ…何か方法考えなきゃ。タグとファイルを対応付けるインデックスファイルをキャッシュとして作成する、って感じかな。キャッシュは任意のタイミングで更新できるようにして。
-</p>
-
-<p class="entryBody">
-blosxom 3.0+3iのTag.pmを参考にしようかと思ったら、ファイル名にタグを入れちゃってるから、あんまり美しくないしなぁ…
+このプラグインを作ろうと思ったきっかけですが、流行に追随した、ってのもあるのですが、カテゴリによる分類だけだと、どうしても後からカテゴリを見直し/変更したくなり、変更してしまうとpermalinkが変わってしまって、全然permanentじゃなくなる、という問題があるので、カテゴリは後から見直す必要がない様におおざっぱな分類にして、細かな分類はタグで行うのがいいかな、と思ったからです。
 </p>
 
 

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>feedbringerをremixin' #4 - Gosuke Miyashita</title>
+  <title>feedbringerをremixin' #6 - Gosuke Miyashita</title>
   <!-- TODO: change name and description -->
   <meta name="author" content="Gosuke Miyashita" />
   <meta name="description" content="A fantastic blog that is fantastic." />
@@ -57,7 +57,7 @@
 
 <section class="content autopagerize_page_element">
   <h1>
-    <a href="/blog/2005/11/23/6">feedbringerをremixin' #4</a>
+    <a href="/blog/2005/11/23/6">feedbringerをremixin' #6</a>
   </h1>
 
   <section class="byline">
@@ -65,15 +65,23 @@
   </section>
 
   <p class="entryBody">
-feedbringer用greasemonkeyユーザスクリプトの<a href="/js/feedbringer2.user.js" target="_blank">白黒バージョン</a>を修正しました。
+<a href="/js/feedbringer2.user.js" target="_blank">feedbringer用greasemonkeyユーザスクリプト</a>から呼び出しているcssを若干変更。
 </p>
 
 <p class="entryBody">
-白黒バージョンではアイコンを強引に入れ替えてるのですが、入れ替わるのが最初にページにアクセスした時だけで、15分毎のツリーメニューのアップデート時には、入れ替わらずにオリジナルの青いアイコンのままになってしまう、というバグを修正しました。
+<a href="http://blog.feedbringer.net/feed/archives/2005/08/814_2.html" target="_blank">今日のメンテナンス</a>で、「このページのトップへ」というリンクが追加され、修正前のcssではこれが左上に表示されて邪魔なので、display: none; で消去。
 </p>
 
 <p class="entryBody">
-feedbringerはprototype.jsを利用しているので、Ajax.Updater.prototype.updateContentをオーバーライドするという強引な方法で対処しました。もっとスマートなやり方があると思うのですが、他に思い浮かばなかったので。
+たぶん、フィードを下まで読んでいって、読み終わったらページの先頭への移動がすぐにできるように追加されたんでしょうが、このcssでは全く使う必要がないので。
+</p>
+
+<p class="entryBody">
+それにしても、HTMLがダメすぎ。「ああ、こういうのをdiv厨と呼ぶんだな」という典型的な例。しかも、今回追加されたリンクもに見られるように、classがalign-rightとか、nav-tab-rightとか、思いっきりレイアウトを意識したクラス名になってるし。HTMLやCSSに対して、この程度の理解しかないから、インターフェースもダメなんだろうなぁ、と妙に納得してしまった。（と、自分のことは棚に上げてみる。）
+</p>
+
+<p class="entryBody">
+なんかひどいこと言ってますが、それだけ期待してるってことで。
 </p>
 
 
