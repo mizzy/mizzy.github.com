@@ -8,9 +8,8 @@
   <id>https://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
-    
   </author>
-  <generator uri="https://github.com/mizzy/stellar/">Stellar</generator>
+  <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
 
 
   <entry>
@@ -19,99 +18,69 @@
     <updated>2022-03-24T12:00:00+09:00</updated>
     <id>https://mizzy.org/blog/2022/03/24/1/</id>
     <content type="html"><![CDATA[
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-
+<script type='module'>
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run({
+    querySelector: 'pre > code.language-mermaid',
+  });
+</script>
 <h2>TerraformのState</h2>
-
 <p>TerraformのStateとは、Terraformで管理しているリソースの状態をJSONで記述したものであり、ファイルとして永続化されている。</p>
-
 <p>Stateが何のためにあるのか、については<a href="https://www.terraform.io/language/state/purpose">オフィシャルな解説</a>があるので詳しく説明はしないが、Stateには主に以下の目的がある。</p>
-
 <ul>
 <li>Mapping to the Real World</li>
 <li>Metadata</li>
 <li>Performance</li>
 <li>Syncing</li>
 </ul>
-
 <p>このエントリでは、Performanceに着目する。</p>
-
-<hr>
-
+<hr />
 <h2>State Refresh</h2>
-
 <p>Terraformは、plan/applyを実行する際に、どのような変更を行う必要があるのかを決定するために、リソースの最新の状態を知る必要がある。 デフォルトの動作では、plan/applyを実行するたびに、すべてのリソースの最新の状態を取得しにいく。</p>
-
 <p>これがState Refreshである。</p>
-
 <p>State Refreshは、例えばAWS上のリソースを管理している場合は、リソースひとつひとつに対してAWSのAPIにリクエストを投げ、情報を取得する。また、リソースの種類によっては、ひとつのリソースに対して複数のAPIリクエストを投げることもある。</p>
-
 <p>そのため、Terraformで管理しているリソースの数に応じてAPIリクエストの回数が増え、Refreshにかかる時間が増える。APIにはRate Limitもあるので、並列にリクエストを投げて高速化するのも限界がある。</p>
-
 <p>管理しているリソースの数が少なければ、Refreshにかかる時間は問題にならないが、多い場合にはちょっとした変更を確認したいだけの場合でも、State Refreshで数分待たされることになる。</p>
-
-<hr>
-
+<hr />
 <h2>State Refreshを高速化する手法</h2>
-
 <p>Terraformコードをサブディレクトリに分けStateを分割することで、State Refreshを高速にする、という手法が一般的に使われている。Stateの分割によりRefreshの高速化は見込めるが、細分化しすぎると運用管理が煩雑になる。</p>
-
 <p>また、<a href="https://www.terraform.io/language/state/purpose">オフィシャルな解説</a>では、リソースの数が多い場合は、<code>-refresh=false</code>や<code>-target</code>オプションを利用することで、Refreshに時間がかかるのを回避する、といった記述がある。</p>
-
 <p><code>-refresh=false</code>オプションの場合には、ファイルに永続化されたStateを正とみなし、APIリクエストを投げて最新の情報を取得するようなことはしない。また、<code>-target</code>オプションでは、指定したリソース（と依存関係のあるリソース）のみAPIリクエストを投げて最新の情報を取得するが、それ以外のリソースについては、ファイルに永続化されたStateを正とみなす。</p>
-
 <p>しかし、<code>-refresh=false</code>は、Terraform外でリソースに変更があった場合はそれを検知できない。また、<code>-target</code>オプションはRefresh対象となるリソースをいちいち指定しないといけない上に、指定外のリソースについては、Terraform外で変更があっても検知できない。</p>
-
 <p>そこで、State Refresh高速化のための手法として、以下の手法について考えてみる。</p>
-
 <ul>
 <li>Terraform外で変更されたリソースを予め永続化されたStateに反映しておく。</li>
 <li>Terraform実行時にRefresh対象となるリソースを絞る。</li>
 </ul>
-
 <p>それぞれについて掘りさげる。</p>
-
-<hr>
-
+<hr />
 <h2>Terraform外で変更されたリソースを予め永続化されたStateに反映しておく（その1）</h2>
-
 <p>ファイルに永続化されているStateが常に最新の状態になっていれば、<code>-refresh=false</code>オプションでRefreshをスキップしても、最新の状態が得られる。これにより、terraform plan/applyのState Refreshにかかる時間を0にすることができる。</p>
-
 <p>これを実現する方法のひとつとして、以下のようなやり方が考えられる。</p>
-
 <ul>
 <li>リソースの変更を何らかの方法で検知する。</li>
 <li>変更を検知したリソースがTerraform管理対象のリソースである場合、永続化されたStateに情報を反映する。</li>
 </ul>
-
 <p>AWSのリソースをTerraformで管理している、という前提の元では、具体的には以下のような実装が考えられる。</p>
-
-<pre><code class="mermaid">flowchart LR
+<pre><code class="language-mermaid">flowchart LR
 terraform[Lambda Function]
 event[CloudWatch Events]
 s3[S3 Bucket]
 event -- 1 --&gt; terraform
 terraform -- 2 --&gt; s3
 </code></pre>
-
 <ol>
 <li>CloudWatch Eventsがリソースの変更イベントを発火</li>
 <li>Lambda Functionが変更イベントを受け取り、変更されたリソースがTerraform管理下にある場合、<code>terraform refresh -target</code>でStateを更新して保存</li>
 </ol>
-
 <p>コンセプト実装として、<a href="https://github.com/mizzy/tfrefresh">tfrefresh</a>というものをつくってみた。</p>
-
 <p>詳細は省くが、様々な面で実装や運用がかなり面倒ということがわかり、この手法はあまり実用的ではない、という判断に至った。</p>
-
-<hr>
-
+<hr />
 <h2>Terraform外で変更されたリソースを予め永続化Stateに反映しておく（その2）</h2>
-
 <p>その1のやり方は、常にリソース変更イベントを監視し、リアルタイムに最新の情報を永続化Stateに反映する、という仕組みを維持管理する必要があり、運用の手間がかかる。</p>
-
 <p>Terraformユーザから見れば、永続化Stateは常にリアルタイムに最新の状態を反映している必要はなく、Terraform実行時に最新の状態を反映していれば良い。そこで、AWSのリソースをTerraformで管理している、という前提で、次のような実装を考える。</p>
-
-<pre><code class="mermaid">flowchart LR
+<pre><code class="language-mermaid">flowchart LR
 cloudtrail[CloudTrail]
 s3[S3 Bucket]
 program[State Update Program]
@@ -119,46 +88,29 @@ program[State Update Program]
 cloudtrail -- 1 --&gt; program
 program -- 2 --&gt; s3
 </code></pre>
-
 <ol>
 <li>Terraform実行時にState Update Programが、永続化Stateの最終更新日時以降に変更されたリソースをCloudTrailログから取得。
-
 <ul>
 <li>このプログラムは、Terraformに組み込む、あるいはラッパースクリプト化するなどして、terraform plan/apply実行前に必ず動くようにする。</li>
-</ul></li>
+</ul>
+</li>
 <li>State Update Programが、1.で取得したリソースに対して<code>terraform refresh -target</code>でStateを更新して保存。その後terraform plan/applyが実行される。</li>
 </ol>
-
 <p>このようにすると、Terraform実行前に、永続化Stateが最新の状態に更新されるため、<code>-refresh=false</code>オプションを利用して、State Refreshにかかる時間を0にすることができる。</p>
-
 <p>こちらも詳細は省くが、そもそも永続化されたStateが最新更新日時を持っていないなど、Terraformの仕様上実装が困難ということがわかった。また、実装できたとしても、Terraform実行の直前にログからRefresh対象を判別し永続化Stateを更新するため、状況によってはかえって時間がかかる可能性もある。</p>
-
-<hr>
-
+<hr />
 <h2>Terraform実行時にRefresh対象となるリソースを絞る</h2>
-
 <p>先に挙げた、予め永続化Stateに最新の情報を反映しておくのとは別なやり方として、Terraform実行時にRefresh対象となるリソースを絞るやり方を考える。</p>
-
 <p>これは<a href="https://www.terraform.io/language/state/purpose">オフィシャルな解説</a>にある<code>-refresh=false</code>や<code>-target</code>オプションを利用した回避方法そのものであるが、オプションの指定を人が判断して行うのではなく、プログラムが判断する。</p>
-
 <p>Refresh対象となるリソースをどのように判別するかであるが、ここでは、Terraformコードはバージョン管理システムで管理されており、ベースブランチのTerraformコードは常にapplyされた状態である、という前提の元、ベースブランチ上のファイルとカレントディレクトリ上のファイルを比較し、差分のあるリソースを抽出してRefresh対象とする。</p>
-
 <p>これを行うためのツールとして、<a href="https://github.com/mizzy/tfdiff">tfdiff</a>というツールを実装してみた。tfdiffは、ベースブランチ上のファイルとカレントディレクトリ上のファイルを比較し、リソースに差分がない場合には<code>-refresh=false</code>という文字列を出力、差分がある場合には、該当リソースすべてについて<code>-target resource_name</code>という文字列を出力する。</p>
-
 <p>tfdiffは<code>terraform plan $(tfdiff)</code>といった形で、terraformコマンドと組み合わせて利用する。</p>
-
 <p>たとえば、tfdiffがリソースに差分がないと判断すれば、<code>terraform plan -refresh=false</code>が実行されるし、<code>aws_s3_bucket.foo</code>と<code>aws_iam_user.bar</code>に差分があると判断すれば、<code>terraform plan -target aws_s3_bucket.foo -target aws_iam_user.bar</code>が実行される。</p>
-
 <p>これにより、Refresh対象となるリソースが必要なものだけに絞り込まれるので、Refresh時間を短縮することができる。</p>
-
 <p>現在のtfdiffは250行ほどの雑なコードで、不十分なところも色々あるが、実装の労力に対して得られる効果は、先の2つの手法よりも大きく、利用のための敷居も低い。</p>
-
 <p>ただしこのやり方では、差分のあるリソース、すなわち変更対象であるリソース（と依存関係にあるリソース）の情報は最新のものが得られるが、それ以外のリソースの情報は古いままである可能性が捨てきれない。冒頭で述べた、「Terraformは、plan/applyを実行する際に、どのような変更を行う必要があるのかを決定するために、リソースの最新の状態を知る必要がある。」という目的のためには十分であるが、Terraform以外のツール（<a href="https://github.com/kayac/ecspresso">ecspresso</a>や<a href="https://github.com/fujiwara/lambroll">lambroll</a>など）からStateを参照する際には、古い情報を参照してしまう可能性がある。</p>
-
-<hr>
-
+<hr />
 <h2>まとめ</h2>
-
 <ul>
 <li>Terraform State Refreshを高速化する手法や実装について、現在考えていることを整理してみた。</li>
 <li>リアルタイム、あるいは必要なタイミング(Terraform実行時)にStateを最新の状態にする、という手法は、現在考えつく限りでは、実装や運用が困難である。</li>
@@ -175,102 +127,56 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2021/10/01/1/</id>
     <content type="html"><![CDATA[
 <p><a href="https://microservices-demo.github.io/">Microservices Demo: Sock Shop</a>の CloudFormation Templateを<a href="https://github.com/mizzy/sock-shop">TerraformとPulumiに移植</a>したので、それに関するメモを残しておく。</p>
-
-<hr>
-
+<hr />
 <h2>モチベーション</h2>
-
 <p>最近仕事ではTerraformを触っている時間が一番多いので、研究もこの辺りのツールに関連する技術を対象とした方が良いのでは、と考えた。研究を行うためには、類似ツールの比較が必要だし、比較のためには、サンプルコード程度のものではなく、実際の環境に近い状態を再現できるコードが必要、というのが移植のモチベーションになっている。</p>
-
-<hr>
-
+<hr />
 <h2>移植元コード</h2>
-
 <p><a href="https://microservices-demo.github.io/deployment/ecs.html">Deployment on Amazon EC/2 Container Service</a>にAmazon ECSへのデプロイ手順が載っているが、肝心のCloudFormation Templateは、<a href="https://github.com/microservices-demo/microservices-demo">元リポジトリ</a>ではDeplicated扱いで<a href="https://github.com/microservices-demo/microservices-demo/commit/b738dd548aae972">削除されている</a>。</p>
-
 <p>なので、<a href="https://github.com/markfink-splunk/sock-shop">markfink-splunk/sock-shop: Deployments of the Weaveworks Sock Shop application instrumented with SignalFx.</a>にあるファイル(<a href="https://github.com/markfink-splunk/sock-shop/blob/master/ecs-fargate/cfn-stack-app-only.yaml">ecs-fargate/cfn-stack-app-only.yaml</a>)を移植元コードとして使うことにした。</p>
-
-<hr>
-
+<hr />
 <h2>デプロイ環境</h2>
-
 <p>個人用に使っている検証用AWSアカウント、惰性で使っていてぐちゃぐちゃになってきたので、いったん不要なリソースを全削除して、<a href="https://aws.amazon.com/jp/organizations/">AWS Organizations</a>でマルチアカウント化、<a href="https://aws.amazon.com/jp/single-sign-on/">AWS Single Sign-On</a>で各アカウントにSSOできるようにした。</p>
-
 <p>アカウント管理用のTerraformコード、最初はprivateにしていたけど、別に見えてまずい情報もないな、と思ったので<a href="https://github.com/mizzy/aws-accounts">publicにした</a>。</p>
-
 <p>これにより、CloudFormation、Terraform、Pulumiそれぞれの検証環境をアカウントごと分離できるようにした。</p>
-
-<hr>
-
+<hr />
 <h2>CloudFormation Templateのデプロイ</h2>
-
 <p>まずは大元となるCloudFormation Templateがデプロイできるものになっていないと話にならないので、ここから着手。元ファイルのままでは動かなかったり、そのままでは不便なところなどあったので、微修正している。差分は以下の通り。</p>
-
-<div><script src='https://gist.github.com/37401088bc6e3564addf7a27d698f6fb.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-<hr>
-
+<p>{% gist 37401088bc6e3564addf7a27d698f6fb %}</p>
+<hr />
 <h2>Terraformへの移植</h2>
-
 <p>CloudFormation Templateがデプロイできたところで、Terraformへの移植を行った。移植はおおまかには以下のような手順で行った。</p>
-
 <ol>
 <li>リソースをひとつ選び、Terraformコードで必須Argumentだけ指定したリソースを定義。</li>
 <li>terraform importでCloudFormation用アカウント上のリソースをimport。</li>
 <li>terraform planでCloudFormation用アカウント上のリソースとの差分を確認し、差分がなくなるよう必須以外のArtumentsを記述。</li>
 <li>差分がなくなったらTerraform用アカウントにterraform applyしてリソースを作成。</li>
 </ol>
-
 <p>上記の作業を80ほどあるリソース全てに対して行った。</p>
-
 <p><a href="https://github.com/GoogleCloudPlatform/terraformer">Terraformer</a>はいまいち使い勝手が悪いし、ひとつひとつどのようなリソースがあるか確認しておいた方が、後々捗りそうなので、人力で移植した。</p>
-
 <p>先日行われた<a href="https://events.hashicorp.com/hashitalksjapan">HashiTalks: 日本</a>での、Quipperの鈴木さんのプレゼンで知った<a href="https://github.com/tfmigrator/tfmigrator">tfmigrator</a>を使えば、Terraformerのいまいちさを補えたっぽいので、今度機会があれば使ってみたい。</p>
-
 <p>Terraformerがどういまいち使い勝手が悪いのか、とか、tfmigratorの使い方なんかは、<a href="https://techblog.szksh.cloud/tfmigrator/">鈴木さんのブログエントリ</a>に詳しく書いてあるので、興味ある方はこちらからどうぞ。</p>
-
 <p>移植の最終確認として、Terraform用アカウントにapplyしたリソースをいったんdestroyして、最初から全リソースのapplyを行った。</p>
-
 <p>が、上記手順4で「差分がなくなるよう必須以外のArgumentsを記述」とあるが、planで差分がなくなっても、別アカウントにapplyすると、明示してないArgumentが原因でうまくapplyできないリソースがあったので、その辺りの修正を行った。</p>
-
-<hr>
-
+<hr />
 <h2>Pulumiへの移植</h2>
-
 <p>Pulumiへの移植も、Terraformへの移植と同様に、CloudFormation用アカウント上のリソースをひとつひとつインポートしながら進めていった。</p>
-
 <p><a href="https://www.pulumi.com/tf2pulumi/">tf2pulumi</a>や<a href="https://www.pulumi.com/cf2pulumi/">cf2pulumi</a>といったツールもオフィシャルに提供されているけど、自分がわかりやすいようにコードやファイルを分割したかったので、これらのツールは使わなかった。</p>
-
 <p>PulumiはTypeScript、JavaScript、Python、Go、C#から記述言語が選べるが、この中で一番慣れているGoで記述を行った。</p>
-
 <p><a href="https://www.pulumi.com/docs/guides/adopting/import/">Pulumiのリソースインポート</a>は、Terraformと違いコードの生成まで行ってくれる。</p>
-
 <p>たとえば、</p>
-
 <pre><code> $ pulumi import aws:cloudwatch/logGroup:LogGroup \
   sock_shop \
   sock-shop
 </code></pre>
-
 <p>といったコマンドでCloudWatch Logs log groupをインポートすると、以下のようなコードを吐いてくれる。</p>
-
-<div><script src='https://gist.github.com/98fa264604cfd23bee559e83499f4cda.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
-
+<p>{% gist 98fa264604cfd23bee559e83499f4cda %}</p>
 <p>ただ、<code>pulumi import</code>ではエラーになってうまくインポートできない場合もあり、そういう場合は、先に以下の様なコードを書いてから、<code>pulumi up</code>を実行してインポートした。最後の<code>pulumi.Import()</code>がポイント。</p>
-
-<div><script src='https://gist.github.com/6aad2ff46fe3045f05c5c2f9a52a5c78.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
-
+<p>{% gist 6aad2ff46fe3045f05c5c2f9a52a5c78 %}</p>
 <p>また、希に<code>pulumi import</code>が吐くコードが間違っていることもあって、そういう場合は手で修正を行った。</p>
-
 <p>Pulumi、サンプルコード程度しか触ったことがなかったけど、今回の移植作業でだいぶ把握できた気がする。</p>
-
-<hr>
-
+<hr />
 <h2>まとめ</h2>
-
 <p>最初の方でもリンクを張っているけど、移植したコードは<a href="https://github.com/mizzy/sock-shop">ここに置いてあります</a>。</p>
 
 ]]></content>
@@ -283,63 +189,34 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2021/04/01/1/</id>
     <content type="html"><![CDATA[
 <p>毎年4月1日に備忘録的にふりかえりエントリを書いてるので、今年も書いておく。</p>
-
-<hr>
-
+<hr />
 <h2>大学院に入学した</h2>
-
 <p>なんやかんやあって、今年から京都大学大学院情報学研究科博士後期課程に進むことになった。</p>
-
-<p><blockquote class="twitter-tweet"><p lang="ja" dir="ltr">京都大学大学院情報学研究科博士後期課程の入試、無事合格しました。4月から2年ぶりに学生に戻ります。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1359383193342803976?ref_src=twsrc%5Etfw">February 10, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">京都大学大学院情報学研究科博士後期課程の入試、無事合格しました。4月から2年ぶりに学生に戻ります。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1359383193342803976?ref_src=twsrc%5Etfw">February 10, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <p>これに関しては、書くと長くなるので、別エントリで書くかもしれないし、書かないかもしれない。需要がありそうなら書きます。</p>
-
 <p>仕事しながら大学に通っていた時のWEB+DB PRESSのインタビュー記事に対して、当時まだ面識がなかったまつもとりーさんからこのようなコメントをいただいていた。</p>
-
-<p><blockquote class="twitter-tweet"><p lang="ja" dir="ltr">このまま博士にもいかれるのだろうか / “第4回　宮下剛輔（mizzy）～はたらきながら大学に通う：シューカツ女子ともよの会社訪問記―知りたい！あの人のはたらきかた｜gihyo.jp … 技術評論社” <a href="http://t.co/P2DglRWD4m"><a href="http://t.co/P2DglRWD4m">http://t.co/P2DglRWD4m</a></a></p>&mdash; Ryosuke Matsumoto / まつもとりー (@matsumotory) <a href="https://twitter.com/matsumotory/status/326890708705349636?ref_src=twsrc%5Etfw">April 24, 2013</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">このまま博士にもいかれるのだろうか / “第4回　宮下剛輔（mizzy）～はたらきながら大学に通う：シューカツ女子ともよの会社訪問記―知りたい！あの人のはたらきかた｜gihyo.jp … 技術評論社” <a href="http://t.co/P2DglRWD4m">http://t.co/P2DglRWD4m</a></p>&mdash; Ryosuke Matsumoto / まつもとりー (@matsumotory) <a href="https://twitter.com/matsumotory/status/326890708705349636?ref_src=twsrc%5Etfw">April 24, 2013</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <p>まさか、その後まつもとりーさんと面識を持つことになり、まつもとりーさんの導きで博士後期課程に進学することになるとは、この当時はまったく思ってもみなかった。</p>
-
-<hr>
-
+<hr />
 <h2>仕事について</h2>
-
 <p>現在お仕事をいただいてるのは、<a href="http://www.recruit-mp.co.jp/">リクルートマーケティングパートナーズ</a> さん、<a href="https://www.talentio.co.jp/">タレンティオ</a> さん、<a href="https://aktsk.jp/">アカツキ</a> さん、<a href="https://www.honda.co.jp/">ホンダ</a> さん、<a href="https://research.sakura.ad.jp/">さくらインターネット研究所</a> さんの5社で <a href="/blog/2020/04/01/1/">昨年のエントリ</a> で書いたのと変わらず。</p>
-
 <p>仕事内容も特に大きな変化はない。</p>
-
-<hr>
-
+<hr />
 <h2>COVID-19の影響</h2>
-
 <p>元々リモートワークだったので、普段の仕事にはそれほど影響はない。ただ、ミーティングは直接顔を合わせて行っていたのが、すべてリモートで行うようになったので、外出の機会は減った。</p>
-
 <p>学会、研究会、技術カンファレンスなどもほぼすべてオンラインになった。他の家族もいる家の中で、長時間/数日間にわたって開催されるカンファレンスに集中して参加するのは難しいので、そういう場合はホテルに缶詰になって参加してる。</p>
-
 <p>ホテルに缶詰になるときは、ほぼ <a href="https://fukuokaseahawk.hiltonjapan.co.jp/">ヒルトン福岡シーホーク</a> に泊まっている。</p>
-
 <p>なぜわざわざ福岡まで行くのかについては、<a href="https://www.notion.so/mizzy/13ca725fef8f47c883e96aaa63d66a3c">この辺</a> に書いたので興味のある方はどうぞ。</p>
-
 <p>福岡以外だと、<a href="https://twitter.com/yoshidashingo">吉田真吾</a> さんにお会いするのも兼ねて、沖縄まで行ったこともある。</p>
-
 <p>ホテルで仕事するの、デスクとか椅子とかインターネット回線とかが問題になるけど、ヒルトン福岡シーホーク、今まで泊まったことのあるホテルの中では一番良い。デスクの広さは部屋にもよるけど、椅子は自分が知る限り、全室SteelcaseのThinkチェア(固定アームタイプ)が配備されている。インターネット回線も有料の方(ダイヤモンド会員は無料)であれば、fast.comで100Mbpsが安定して出る。なので、福岡で一度試しに他のホテルに泊まったけど、回線が不安定だし椅子も仕事向きではなかったので、予定より早くチェックアウトしてヒルトン福岡シーホークに移動したことがある。</p>
-
-<p><blockquote class="twitter-tweet"><p lang="ja" dir="ltr">安定したインターネット接続と快適なワークチェアを求めて、グランドハイアットからヒルトンに移動した <a href="https://t.co/a1Y15UNFOK">pic.twitter.com/a1Y15UNFOK</a></p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1357898957897097218?ref_src=twsrc%5Etfw">February 6, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">安定したインターネット接続と快適なワークチェアを求めて、グランドハイアットからヒルトンに移動した <a href="https://t.co/a1Y15UNFOK">pic.twitter.com/a1Y15UNFOK</a></p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1357898957897097218?ref_src=twsrc%5Etfw">February 6, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <p>海外カンファレンス、すべてオンラインになって参加しやすくなったけど、弊害もあってなかなか厳しい。</p>
-
-<p><blockquote class="twitter-tweet"><p lang="ja" dir="ltr">海外カンファレンス、現地開催だと強制的にそこのタイムゾーンで生活することになるけど、オンライン開催で日本にいながら参加となると、どちらのタイムゾーンにもひきずられて厳しい、ということをACM/IFIP Middleware 2020に参加して実感した。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1337281295647350785?ref_src=twsrc%5Etfw">December 11, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<hr>
-
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">海外カンファレンス、現地開催だと強制的にそこのタイムゾーンで生活することになるけど、オンライン開催で日本にいながら参加となると、どちらのタイムゾーンにもひきずられて厳しい、ということをACM/IFIP Middleware 2020に参加して実感した。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1337281295647350785?ref_src=twsrc%5Etfw">December 11, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
 <h2>売上について</h2>
-
 <p>幸いなことに、COVID-19の影響も特になく、昨年と同じ程度の売上。国内、海外含めて、予定していたカンファレンス参加のための出張がほとんどなくなったが、その分を福岡出張にあてたので、利益も昨年とほぼ同じぐらいになった。</p>
-
-<hr>
-
+<hr />
 <h2>今後について</h2>
-
 <p>大学院生になるといっても、仕事も今まで通り続けながらなので、大変なことになりそうだけど、楽しみながらやれたらいいなと。</p>
 
 ]]></content>
@@ -352,98 +229,53 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2020/11/06/1/</id>
     <content type="html"><![CDATA[
 <h2>概要</h2>
-
 <p>マネージドなコンテナ実行環境の普及に伴い、Configuration Managementツールを利用する必要がある現場は少なくなったが、Configuration Managementツール自体の必要性はまだ失われていない。また、モバイルコンピューティングやエッジコンピューティングの普及に伴い、Configuration Managememntツール自体のあり方も今後変化していくと考えられる。</p>
-
 <p>本予稿では、Configuration Managemantツールの役割を整理し、Configuration Managementツールの今後のあるべき姿を検討する。それにより導きだされた、Configuration Managementツールを3層で構成する方式を提案し、その中で中心的な役割を果たすポリシー定義用中間言語について考察する。</p>
-
 <h2>Configuration Managementとは</h2>
-
 <p>類する言葉してはサーバープロビジョニングという用語の方が日本語で多く見られるが、英語ではConfiguration Managementと呼ばれることが多い。</p>
-
 <p>Configuration Managementとは、Burgess、Couchらによると<sup>1</sup>、「予め定義されたポリシーとガイドラインに従い、事前に決められたビジネス上の目的を達成するよう、ネットワーク接続されたマシンの振る舞いを制御するプロセスである」と述べられている。</p>
-
 <p><small>1: <a href="https://static.usenix.org/events/lisa06/tech/full_papers/burgess/burgess.pdf">Burgess, Mark, and Alva L. Couch. 2006. “Modeling Next Generation Configuration Management Tools.” In LISA, 131–47. static.usenix.org. (PDF)</a></small></p>
-
 <h2>Configuration Managementツールとは</h2>
-
 <p>Configuration Managementツールとは、その名の通りConfiguration Managementを行うためのソフトウェアである。</p>
-
 <p>代表的なものとして、<a href="https://cfengine.com/">CFEngine</a>, <a href="https://puppet.com/">Puppet</a>, <a href="https://www.chef.io/">Chef</a>, <a href="https://www.saltstack.com/">SaltStack</a>, <a href="https://www.ansible.com/">Ansible</a>などがある。特に、後発のChef, Ansible, Puppet, SaltStackをまとめてCAPSと呼ぶこともある。</p>
-
 <h2>Configuration Managementツールに共通の役割</h2>
-
 <p>Configuration Managementツールは「予め定義されたポリシーとガイドラインに従い、事前に決められたビジネス上の目的を達成するよう、ネットワーク接続されたマシンの振る舞いを制御する」ためのツールである。このことから、Configuration Managementツールには以下の2つの役割があると捉えられる。</p>
-
 <ul>
 <li>ポリシーの定義</li>
 <li>振る舞いの制御</li>
 </ul>
-
 <p>実際、先にあげた代表的なConfiguration Managementツールは、この2つの役割を持っている。それぞれのツールの違いは、「ポリシー定義」と「振る舞いの制御」の2つに関する実装の違いとも言える。</p>
-
 <h2>ポリシー定義と言語</h2>
-
 <p>Configuration Managementツールの役割のひとつして「ポリシーの定義」を先に挙げた。ポリシーの定義は、何からの言語を用いて行うことになる。Configuration Managementツールの文脈で言語に言及する場合、ポリシー定義用言語と実装言語が混同されることがあるので注意が必要である。</p>
-
 <p>Configuration Managementツールに採用されているポリシー定義用言語は、大別すると独自言語、YAMLのような簡易言語、プログラミング言語の3つにわけられる。ポリシー定義用言語としては、YAMLが最も人気があるように見受けられる。Configuration ManagementツールではAnsibleが今でも人気があるが、YAMLを採用していることが一因と考えられる。</p>
-
 <p>また、Configuration Managementツールではないが、Infrastructure as Codeに関連するツールとしては、KubernetesもYAMLを採用している。</p>
-
 <p>従来のConfiguration Managementツールの利用対象者であったシステム管理者は、プログラミングを行わない人が多いため、YAMLのような簡易言語が好まれる傾向にあると思われる。</p>
-
 <p>また、YAMLのような簡易言語は変数やロジックがないため、記述を簡易にできメンテナンスしやすい、といった点も好まれる一因と考えられる。（ただし、変数やロジックがない、というのは欠点でもあり、それを補う手法が同時に使われているケースもある。）</p>
-
 <p>一方、クラウドの普及により、システム管理者だけではなくアプリケーション開発者もサーバーインフラを触るようになった。このような人達は、簡易言語や独自言語よりも、慣れ親しんでいるプログラミング言語を好む傾向にある。</p>
-
 <p>いずれにせよ、どの言語がポリシー定義用言語として最適なのかは、利用する人や組織が置かれている環境、利用者のスキル、好み等に依存するため、一概に決めることはできない。</p>
-
 <h2>振る舞い制御の実装</h2>
-
 <p>Configuration Managementツールのもうひとつの役割である「振る舞いの制御」を行う方法も、ポリシー定義用言語同様、様々である。</p>
-
 <p>例えば、ChefやPuppetはサーバー/エージェント型の構成をとっており、中央のサーバーで管理されたポリシーを各マシンに配布、適用して振る舞い制御を行う。また、サーバー/エージェント型としてだけではなく、スタンドアローンで実行することもできる。</p>
-
 <p>サーバー/エージェント型は、ポリシーの配布、サーバー/エージェント間の接続や認証、マシン制御の実行方法やタイミングなどをツールに任せることができる、というメリットがある。反面、サーバープロセスやエージェントプロセスの監視をどうするか、サーバーとエージェントの初期接続時の認証情報をどのように受け渡すか、などといった点を考慮する必要がある。</p>
-
 <p>一方、スタンドアローンで制御を行う場合は、常駐プロセスがないため、サーバー/エージェントのプロセス監視や接続時の認証については考える必要はない。反面、ポリシー定義コードをどのように配布し、どのようなタイミングでポリシー適用を行うのかを、自ら決める必要がある。</p>
-
 <p>Ansibleはエージェントレスで、スタンドアローンで制御したり、リモートマシンに対してSSHで接続して制御したりすることもできる。これもChefやPuppetのスタンドアローン型と同様のメリット/デメリットがある。</p>
-
 <p>また、モバイルデバイスやエッジデバイスの普及に伴い、多様なデバイスへの対応、転送容量削減、メモリ容量節約、実行速度の向上、自律制御といった観点から、別の制御実装が求められることも考えられる。</p>
-
 <p>さらに、現在のConfiguration Managementツールは、記述されたポリシーを逐次解釈して制御を行うインタプリタ型だが、制御用コードを生成して実行するコンパイラ型の方が望ましいケースも考えられる。</p>
-
 <p>このように、ポリシー定義用言語と同様、振る舞い制御の実装についても、サーバーマシンが置かれている環境や、どのように管理を行いたいか、といった前提条件によって適した制御方法が異なるため、どの振る舞い制御実装が最適かを一概に決めることはできない。</p>
-
 <h2>ポリシー定義言語と振る舞い制御実装の多様化</h2>
-
 <p>ポリシー定義用言語も振る舞い制御実装も、条件によりベストなものが異なる、という前提に立つと、様々なポリシー定義用言語や振る舞い制御実装が存在する、ということは好ましいことである。</p>
-
 <p>しかし、既存のConfiguration Managementツールは、ポリシー定義言語と振る舞い制御が密結合している。そのため、用途に適したポリシー定義用言語や振る舞い制御実装を備えたツールが存在しない場合、ポリシー定義用言語部分も振る舞い制御部分も一から実装する必要がある。また、あるツールのポリシー定義用言語だけ差し替えて振る舞い制御実装のみ利用する、といったことも不可能である。</p>
-
 <h2>ポリシー定義用言語と振る舞い制御実装の分離</h2>
-
 <p>ポリシー定義用言語と振る舞い制御実装が密結合していると、部分的に再利用できないため、開発に無駄が生じる。そこで、多様なポリシー定義用言語と振る舞い制御実装に対応しつつも、開発コストを抑えるために、ポリシー定義用言語と振る舞い制御の実装を分離することを提案する。提案方式はLLVMに着想を得ている。</p>
-
 <p>LLVMは以下の図のような3層モデルになっており、各種言語用フロントエンドが、その言語で書かれたコードをLLVM IRという中間言語に変換、その後LLVMが中間言語に最適化処理などを施し、最終的には各CPUアーキテクチャ用のバックエンドが、そのアーキテクチャで実行可能なバイナリコードを生成する。</p>
-
-<p><img src="./images/2020/11/llvm.jpg" alt=""></p>
-
+<p><img src="./images/2020/11/llvm.jpg" alt="" /></p>
 <p>LLVMの「3層モデル」「中間言語」という概念をConfiguration Managementツールに応用すると、以下の図のようになる。</p>
-
-<p><img src="./images/2020/11/cmt.jpg" alt=""></p>
-
+<p><img src="./images/2020/11/cmt.jpg" alt="" /></p>
 <p>Optimizer部分で何をするのか、という点については現在のところアイデアはないが、Optimizeする必要がなければ、そのままバックエンドに渡す形となる。また、右端の制御実行は、逐次実行型の場合は中間言語を解釈してそのまま実行することをイメージしているが、そうではなく制御実行コードを吐き出す、という形も考えられる。</p>
-
 <p>このような形にすることで、利用者は用途に適したポリシー定義言語や振る舞い制御実装を選択できる。また、用途に合うポリシー定義言語や振る舞い制御実装が存在しない場合に、ポリシー定義用言語のみ、あるいは振る舞い制御実装のみ開発する、といったことも可能となる。</p>
-
 <h2>中間言語 = ポリシー定義用言語</h2>
-
 <p>3層構造のConfiguration Managementツールにおける中間言語は、各種ポリシー定義用言語とN対1で対応するものであるので、中間言語自身もポリシー定義用言語であると言える。そのため、中間言語はポリシー定義用言語に適した性質を備えている必要がある。</p>
-
 <p>ポリシー定義用言語に適した言語とは何か、についてはまだ十分考察できていないが、今のところ考えていることをリストアップする。</p>
-
 <ul>
 <li>YAMLは機能不足である。簡易で読み書きしやすいと言われるが、複雑なコードになるとインデントが深くなり、本当に読み書きしやすいかは疑問である。</li>
 <li>汎用プログラミング言語は逆に機能が多く自由度が高すぎる。コードのメンテナンス性を考慮すると、自由度は下げたい。</li>
@@ -454,7 +286,6 @@ program -- 2 --&gt; s3
 <li>ただし、言語処理系をそのまま利用しないのであれば、その言語を採用する意義はないかもしれない。</li>
 <li>また、StarlarkやCUEは特定の目的に特化した言語であり、Configuration Managementのポリシー定義には向いていない可能性もある。</li>
 </ul>
-
 <p>今後、この考察を更に深めていく予定である。これらに対する意見や、こういったアプローチで考察すると良いのでは、といった助言があればぜひ頂きたい。</p>
 
 ]]></content>
@@ -467,86 +298,58 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2020/04/19/1/</id>
     <content type="html"><![CDATA[
 <p>このエントリは<a href="https://websystemarchitecture.hatenablog.jp/entry/2019/12/11/165624">第6回Web System Architecture研究会</a>の予稿です。</p>
-
-<hr>
-
+<hr />
 <h2>はじめに</h2>
-
 <p><a href="http://id.nii.ac.jp/1001/00204179/">Serverspec：宣言的記述でサーバの設定状態をテスト可能な汎用性の高いテストフレームワーク</a>では、従来手法を補うための要件を考察し、要件を満たすために以下の様にテストフレームワークを2つに分割する手法を提案した。</p>
-
 <ul>
 <li>汎用コマンド実行フレームワーク
-
 <ul>
 <li>運用業務で発生するコマンド群、特に確認業務に必要なコマンド群の体系化・抽象化を行う</li>
-</ul></li>
+</ul>
+</li>
 <li>制御テストフレームワーク
-
 <ul>
 <li>汎用コマンド実行フレームワークを宣言的な記法で操作する</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>そして、提案手法に基づき実装した汎用コマンド実行フレームワークをSpecinfra、制御テストフレームワークをServerspecと名付けた。</p>
-
 <p>Specinfraを利用したより優れたテストフレームワーク実装の登場や、確認業務以外の運用業務に必要なコマンド群を体系化することによるテストフレームワーク以外への応用、例えば構成管理ツールへの応用も期待し、いくつかの実装も登場したが、Specinfraは期待したほど広く利用されていない。</p>
-
 <p>本予稿では、Specinfraが期待ほど利用されていない要因について考察し、解決するための手法と実装について述べる。</p>
-
-<hr>
-
+<hr />
 <h2>現状の課題</h2>
-
 <p>サーバ管理系ツールを実装する場合、多くの環境をサポートしようとすると、以下の2つ違いについて考慮し、ツール内で違いを吸収するための抽象化を行うのが一般的である。</p>
-
 <ul>
 <li>サーバの操作や情報を取得するための方法の違い
-
 <ul>
 <li>例えばパッケージ管理系の操作の場合、RedHat系であればyumやrpmコマンド、Debian系であればapt-getやdpkgコマンド、といった違いがOSやディストリビューション毎にある。</li>
-</ul></li>
+</ul>
+</li>
 <li>サーバ操作や情報取得の実行形式の違い
-
 <ul>
 <li>コマンドを実行する際に、サーバ上で直接コマンドを実行するのか、SSH経由で実行するのか、Docker API経由で実行するのか、などの違い。</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>Chef, Puppet, Ansible, Itamae(Specinfra)といった似たような目的を持つサーバ構成管理ツールは、OS/ディストリビューションや実行形式の抽象化をそれぞれ独自に実装している。</p>
-
 <p>Specinfra開発の狙いは、各サーバ管理ツールで独自に実装している抽象化部分をライブラリに切り出すことによって、ツール本体の実装の手間を省き、手軽に実装できるようにすることにある。</p>
-
 <p>しかし、再利用性を考慮して開発したSpecinfraはそれほど広く使われていない。</p>
-
-<hr>
-
+<hr />
 <h2>課題を解決するための手法と実装</h2>
-
 <p>再利用性を考慮して開発したSpecinfraがそれほど広く利用されていない理由のひとつは、SpecinfraがRuby製であるため、Ruby以外のプロジェクトでは採用できない、ということである。</p>
-
 <p>この課題を解決するための手法として、OS/ディストリビューションの抽象化や実行形式の抽象化を行うためのライブラリを、SpecinfraのようなRubyGemではなく、様々な言語からも利用できる共有ライブラリという形で提供する。</p>
-
 <p>そのための実装を<a href="https://github.com/libspecinfra">libspecinfra</a>と名付けた。libspecinfraはさらに以下の実装に分類される。</p>
-
 <ol>
 <li>共有ライブラリを提供するSpecinfra本体</li>
 <li>Specinfra本体が提供する共有ライブラリを呼び出すための各言語用バインディング</li>
 </ol>
-
 <p>1は実装途中だが、現在開発を停止している。SpecinfraをRustで再実装する形で実装しているが、名前は敢えて変えずにSpecinfraとしている。</p>
-
 <p>2はRuby, mruby, Python用バインディングが存在するが、こちらも現在開発は停止している。</p>
-
 <p>GitHub上のlibspecinfra Organizationにある<a href="https://github.com/libspecinfra/examples">examples</a>リポジトリにはRuby, mruby, Rustのサンプルコードがある。</p>
-
-<hr>
-
+<hr />
 <h2>本研究を進めるにあたっての検討事項</h2>
-
 <p>PuppetやChefやServerspecについて、話題にのぼることが少なくなっている。これはコンテナが広く使われるようになり、サーバの構成管理とテストのあり方が変わってきているためである。コンテナイメージの作成は、従来のサーバプロビジョニングと比較して簡素なため、サーバ構成管理ツールの重要性が低下し、それに伴いテストの重要性も低下している。</p>
-
 <p>とはいえ、従来のようなサーバプロビジョニングがなくなったわけではなく、コンテナのプロビジョニングとコンテナ実行基盤のプロビジョニング、2つのレイヤーに分離された、と考えることができる。</p>
-
 <p>libspecinfraの適用領域はコンテナ実行基盤のプロビジョニングであると考えている。しかしその領域において、libspecinfraのような抽象度の高さは本当に必要なのか、コンテナ実行基盤のプロビジョニング以外にも応用できる領域がないか、等について検討する必要がある。</p>
 
 ]]></content>
@@ -559,55 +362,30 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2020/04/01/1/</id>
     <content type="html"><![CDATA[
 <p>会社勤めしていないと、評価制度というものがなく、自分がやったことをまとめる機会もないので、今年も軽くまとめエントリを書いておく。</p>
-
-<p><blockquote class="twitter-tweet"><p lang="ja" dir="ltr">フリーランス情報、表に色々出てくるのはとても良いんだけど、本当に人によって様々なので、色々な情報見比べた方が良い、と思ったので、リンク集的なものをつくってる。 <a href="https://t.co/GJ0HdI4LEC"><a href="https://t.co/GJ0HdI4LEC">https://t.co/GJ0HdI4LEC</a></a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1136512882198237184?ref_src=twsrc%5Etfw">June 6, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">フリーランス情報、表に色々出てくるのはとても良いんだけど、本当に人によって様々なので、色々な情報見比べた方が良い、と思ったので、リンク集的なものをつくってる。 <a href="https://t.co/GJ0HdI4LEC">https://t.co/GJ0HdI4LEC</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1136512882198237184?ref_src=twsrc%5Etfw">June 6, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <p>放置してアップデートしてないなこれ…</p>
-
-<hr>
-
+<hr />
 <h2>仕事について</h2>
-
 <p><a href="https://mizzy.org/blog/2019/04/01/1/">昨年の振り返りエントリ</a> からの変更点としては、<a href="https://corp.toreta.in/">トレタ</a> さんとは契約終了となった。2年間ありがとうございました。</p>
-
 <p><a href="http://www.recruit-mp.co.jp/">リクルートマーケティングパートナーズ</a> さん、<a href="https://www.talentio.co.jp/">タレンティオ</a> さん、<a href="https://aktsk.jp/">アカツキ</a> さん、某社さん、<a href="https://research.sakura.ad.jp/">さくらインターネット研究所</a> さん、の5社の仕事は現在も継続中。</p>
-
 <p>「某社」さん、昨年の時点では名前を出すのはNGなので伏せていたけど、今年は出して良い、むしろ積極的に出して欲しい、と言われたので明かすと、<a href="https://www.honda.co.jp/EG/">ホンダエンジニアリング</a> さんです。</p>
-
-<p><blockquote class="twitter-tweet"><p lang="ja" dir="ltr">現在、ホンダエンジニアリングさんとお仕事していて、第4世代LETというシステムを開発するお手伝いをしてます。AWSチョットデキル人とフロントエンドチョットデキル人探してるので、興味ある方、お声がけください。社員でもフリーランスでも。</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1177055880090505216?ref_src=twsrc%5Etfw">September 26, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">現在、ホンダエンジニアリングさんとお仕事していて、第4世代LETというシステムを開発するお手伝いをしてます。AWSチョットデキル人とフロントエンドチョットデキル人探してるので、興味ある方、お声がけください。社員でもフリーランスでも。</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1177055880090505216?ref_src=twsrc%5Etfw">September 26, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <p>AWSやフロントエンドに限らず、良い人がいればいつでも是非、という感じなので、興味ある方はご連絡ください。</p>
-
 <p>仕事絡みのアウトプットとしては、最近 <a href="https://github.com/aktsk/bqnotify">bqnotify</a> という、BigQueryにクエリを投げて結果をSlackに通知するシンプルなツールを、アカツキさんの仕事でつくってます。</p>
-
 <p>また、さくらインターネット研究所さんの仕事として書いた <a href="http://id.nii.ac.jp/1001/00204179/">Serverspec 論文</a> が情報処理学会論文誌ジャーナルに採録されました。</p>
-
 <p>仕事面での大きな変化は、さくらインターネット研究所さんの仕事絡みで出張が増えたこと。フリーになってから5年ぐらいはほとんど出張がなく、年に1回あるかないか、ぐらいだったのが、この1年で福岡、石狩、松江、大阪、京都、ポートランド、デービス、ブリュッセルに行っている。特に福岡は5，6回行っている。福岡に行くことが多いのは、さくらインターネットさんのオフィスが福岡にあるのと、研究所に誘ってくださった <a href="https://twitter.com/matsumotory">@matsumotory</a> さんがいらっしゃるからなんだけど、考えてみるとブリュッセル以外は全部、まつもとりーさんと現地でお会いしたり、一緒に行ったりしている。</p>
-
 <p>ただ、COVID-19の影響で、3月は <a href="https://www.ipsj.or.jp/kenkyukai/event/iot48.html">第48回IOT研究発表会</a> で名古屋、<a href="https://www.ipsj.or.jp/event/taikai/82/">情報処理学会第82回全国大会</a> で金沢に行く予定だったのが、どちらもオンライン開催になったり、7月にマドリードで行われる予定だった <a href="https://ieeecompsac.computer.org/2020/">COMPSAC 2020</a> もオンライン開催になったりで、今後しばらく出張はなさそう。</p>
-
-<p><blockquote class="twitter-tweet"><p lang="ja" dir="ltr">海外出張の機会が増えそうだからとアメックスプラチナつくったらこの有様。</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1244970463735865349?ref_src=twsrc%5Etfw">March 31, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-<hr>
-
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">海外出張の機会が増えそうだからとアメックスプラチナつくったらこの有様。</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1244970463735865349?ref_src=twsrc%5Etfw">March 31, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
 <h2>売上について</h2>
-
 <p>一昨年と比較すると、昨年は一緒にお仕事する会社が増えたので、その分売上も増えた。出張が増えたのと、時間を有効活用するためにタクシーやUberを利用することが増えたので、売上が増えた分は旅費交通費にほとんど回っているような感じ。</p>
-
 <p>今年は一社減ったけど、浮いた時間分、ホンダエンジニアリングさんの仕事時間を増やしたので、今のところ昨年と同じぐらいの売上になる見通し。</p>
-
 <p>具体的な金額については、個人法人含めて <a href="https://note.mu/mizzy/n/n09a1477891ac">hXXsyotoku.pdfを公開する｜mizzy｜note</a> という有料noteに書いている。法人の売上高はざっくりした金額しか書いてないけど。</p>
-
-<hr>
-
+<hr />
 <h2>今後について</h2>
-
 <p>今の自分の肩書きは「フリーのソフトウェアエンジニア兼研究者」だと思っているけど、ソフトウェアエンジニアとしての実績と比較して、研究者としての実績は圧倒的に足りない。なので、研究者としての実績を積み上げていきたい。</p>
-
-<hr>
-
+<hr />
 <h2>関連エントリ</h2>
-
 <ul>
 <li><a href="https://mizzy.org/blog/2019/04/01/1/">フリーランスになって5年が経った - Gosuke Miyashita</a></li>
 <li><a href="https://mizzy.org/blog/2018/04/02/1/">フリーランスになって4年が経った - Gosuke Miyashita</a></li>
@@ -626,71 +404,43 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2019/04/01/1/</id>
     <content type="html"><![CDATA[
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">世の中のフリーランス云々の話、フリーランス＝個人事業主派と、フリーランス＝働き方の一形態（個人か法人かは問わない）派にざっくり2分されていて、税金や社会保険の話になると、どちらの立場をとるかによって話が違ってかみ合わないのでややこしい。</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1041259113965998080?ref_src=twsrc%5Etfw">September 16, 2018</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="ja" dir="ltr">自分は後者の、働き方による区分派。個人事業主か法人かは、税制上の区分であって、働き方とは関係ないので。</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1041259115492700160?ref_src=twsrc%5Etfw">September 16, 2018</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <p>というわけで、自分は法人化してるフリーランスだと認識している。</p>
-
-<hr>
-
+<hr />
 <h2>仕事について</h2>
-
 <p><a href="https://mizzy.org/blog/2018/04/02/1/">昨年の振り返りエントリ</a> で書いた、<a href="http://www.recruit-mp.co.jp/">リクルートマーケティングパートナーズ</a>、<a href="https://www.talentio.co.jp/">タレンティオ</a>、<a href="https://corp.toreta.in/">トレタ</a>、<a href="https://aktsk.jp/">アカツキ</a> の4社の仕事は現在も継続中で、今年から新たに某社と <a href="https://research.sakura.ad.jp/">さくらインターネット研究所</a> の仕事もしている。なので、現在は6社と契約していることになる。</p>
-
 <p>Ref: <a href="https://mizzy.org/blog/2019/03/01/1/">さくらインターネット研究所の客員研究員になった</a></p>
-
 <p>「Openness is our driver for excellence」という言葉を <a href="https://www.youtube.com/watch?v=wxUxFdFxd0Y">YAPC::Asia Tokyo 2012 クロージングキーノート</a> や <a href="https://geek-out.jp/column/entry/2018/03/08/110000">オープンさは私のキャリアの原動力 ─ SIer、Web系、フリーランスという変遷で実感した「オープンにすること」の大切さ - GeekOutコラム</a> といったコラムなんかで紹介しているが、この言葉は自分の行動原理を構成するとても重要なパーツのひとつ。なので、フリーランスとしての仕事でやったことも、できる限りオープンにするようにしていて、会社の技術ブログに記事を書かせてもらったり、GitHubでソースを公開したりしている。</p>
-
 <ul>
 <li><a href="https://tech.recruit-mp.co.jp/infrastructure/post-16701/">Spinnakerのコードを手元で修正して動作確認する方法(その1) – PSYENCE:MEDIA</a></li>
 <li><a href="https://tech.recruit-mp.co.jp/infrastructure/post-17064/">Spinnakerのコードを手元で修正して動作確認する方法(その2) – PSYENCE:MEDIA</a></li>
 <li><a href="https://hackerslab.aktsk.jp/2019/02/06/120014">Go用HTTP APIテストコードジェネレータを開発しているというお話 - Akatsuki Hackers Lab | 株式会社アカツキ（Akatsuki Inc.)</a></li>
 <li><a href="https://github.com/aktsk/atgen">aktsk/atgen</a></li>
 </ul>
-
 <p>特に、さくらインターネット研究所の仕事は、アウトプットすることそのものがミッションとも言えるので、3月から始めたばかりの仕事だけど、早速ひとつアウトプットしてみた。</p>
-
 <ul>
 <li><a href="https://research.sakura.ad.jp/2019/03/29/hosting-casual-talks/">Hosting Casual Talks #5でコンテナランタイムや分散クエリキャッシングの発表をしました – さくらインターネット研究所</a></li>
 </ul>
-
-<hr>
-
+<hr />
 <h2>収入について</h2>
-
 <p>昨年の振り返りエントリで、「法人個人問わず事業全体の売上で言えば、2年目以降は割と安定している。今年も同じぐらいの売上になりそう」と書いていたが、実際その通りになった。今年は少し増えそう。具体的な金額については、個人法人含めて <a href="https://note.mu/mizzy/n/n09a1477891ac">hXXsyotoku.pdfを公開する｜mizzy｜note</a> という有料noteに書いた。法人の売上高はざっくりした金額しか書いてないけど。</p>
-
-<hr>
-
+<hr />
 <h2>大学について</h2>
-
 <p>7年かけて大学を卒業した。フリーランスになってからは、大学の授業をこなす時間を作りやすくなったような気がする（Serverspec本執筆時は除く）。</p>
-
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">学位を授与された <a href="https://t.co/xLrwjJHeQQ">pic.twitter.com/xLrwjJHeQQ</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1112313582186725376?ref_src=twsrc%5Etfw">March 31, 2019</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <p>入学時と卒業時に書いたエントリはこちら。</p>
-
 <ul>
 <li><a href="https://mizzy.org/blog/2012/04/14/1/">37歳で大学生になりました - Gosuke Miyashita</a></li>
 <li><a href="https://mizzy.org/blog/2019/03/15/1/">44歳で大学を卒業しました - Gosuke Miyashita</a></li>
 </ul>
-
-<hr>
-
+<hr />
 <h2>まとめ</h2>
-
 <p>フリーランスになった時に、10年ぐらいはこの働き方を続けたい、と思ったが、とりあえず目標の半分までは到達することができた。みなさんありがとうございます。</p>
-
-<hr>
-
+<hr />
 <h2>関連エントリ</h2>
-
 <ul>
 <li><a href="https://mizzy.org/blog/2018/04/02/1/">フリーランスになって4年が経った - Gosuke Miyashita</a></li>
 <li><a href="http://mizzy.org/blog/2017/04/01/1/">フリーランスになって3年が経った - Gosuke Miyashita</a></li>
@@ -708,115 +458,70 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2019/03/15/1/</id>
     <content type="html"><![CDATA[
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">大学卒業が確定した <a href="https://t.co/wEEXoUpCcY">pic.twitter.com/wEEXoUpCcY</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1105727807760424960?ref_src=twsrc%5Etfw">March 13, 2019</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <p>以前 <a href="/blog/2012/04/14/1/">37歳で大学生になりました</a> というエントリを書きましたが、7年かかってようやく卒業しました。在籍できる期間は最長8年間だけど、2年次から編入という形で入学したので、卒業できてもできなくても、今年度が最後でした。</p>
-
 <p>仕事しながらの大学生活がどんな感じだったのか、振り返ってみたいと思います。</p>
-
-<hr>
-
+<hr />
 <h2>授業や単位について</h2>
-
 <p>授業は以下の3つの形態になっています。</p>
-
 <ul>
 <li>スクーリング
-
 <ul>
 <li>実際にキャンパスに行って、2日あるいは3日間丸々授業を受ける形態。最終日は科目修得試験を受け、試験に合格できれば単位認定。</li>
-</ul></li>
+</ul>
+</li>
 <li>テキスト
-
 <ul>
 <li>LMS(学習管理サイト)にあるサブテキストと、指定された教科書を読みながら学習を進めていく形態の授業。サブテキストは15章に分かれている。レポートを2回提出する必要があり、合格すれば科目修得試験が受けられる。科目修得試験に合格すれば単位認定。</li>
-</ul></li>
+</ul>
+</li>
 <li>メディア
-
 <ul>
 <li>LMS上で学習を進めていく形態の授業。指定の教科書も併用する。授業によって多少異なるが、全部で15回に分かれていて、毎回選択式の小テストを受ける。小テストの合計点が基準を満たせば科目修得試験が受けられる。科目修得試験に合格すれば単位認定。小テスト以外にレポートが必要な授業もある。</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>卒業には124単位必要で、自分は以前卒業した大学の32単位を持ち越すことができたので、実際には92単位を取得する必要がありました。</p>
-
 <p>授業の具体的な内容は、以下のページから見ることができます。</p>
-
 <ul>
 <li><a href="https://www.e-campus.gr.jp/syllabus/current/st/cr_sy/1116_.htm">帝京大学Web講義概要 理工学部 情報科学科（通信課程）（Ⅰ・Ⅲ）</a></li>
 <li><a href="https://www.e-campus.gr.jp/syllabus/current/st/cr_sy/1117_.htm">帝京大学Web講義概要 理工学部 情報科学科（通信課程）（Ⅱ・Ⅳ）</a></li>
 </ul>
-
-<hr>
-
+<hr />
 <h2>仕事しながら授業をこなすことについて</h2>
-
 <p>最短で卒業することを想定した、年間辺りの単位取得数モデルケースは、1年次32単位、2年次32単位、3年次30単位、4年次30単位、となります。</p>
-
 <p>また、授業開始は4月中旬ぐらいからで、Ⅳ期のレポート締切が1月初旬なので、授業をこなすのにあてられる期間は、1年間のうち実質的には9ヶ月ほどしかありません。</p>
-
 <p>で、32単位取得しようとすると、16科目受ける必要があるので、大体1ヶ月に2科目こなす必要があります。テキスト授業やメディア授業は1科目が15章に分割されているので、1日に1章こなせば、最短で卒業できる計算になります。といっても、必ずしも毎日授業をこなせるわけではないですし、レポートを書くための時間も必要なので、1日1章だと時間が足りなくなります。</p>
-
 <p>1年目は32単位取得できたのですが、なかなか大変でした。平日は朝会社についてから始業時間までの30分、昼休みの1時間、家に帰ってから1,2時間、といった感じで授業に時間を割いていました。土日も2，3時間は授業をこなすのに割り当ててました。また、出張先のホテルで授業をこなしたり、年末年始関係なくレポートを書いたりもしてました。</p>
-
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">微分方程式でロケットの最大速度と到達高度を計算してる。(大学の応用数学課題レポートです。)</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/285342379853103105?ref_src=twsrc%5Etfw">December 30, 2012</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">ロケットの高度計算の積分やってたら年明けてた。おめでとうございます。</p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/285762809831227392?ref_src=twsrc%5Etfw">December 31, 2012</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <p>本業があまり忙しくなく、残業がほとんどなければ、これぐらいのペースで授業をこなすことはできるのですが、本業が忙しくて残業が多くなったり、本業以外の仕事(自分の場合は雑誌や本の執筆)が重なったりすると、並行して授業もこなすのはかなり厳しいですね。</p>
-
 <p>勤め先が提供しているサービスで大き目のインシデントが発生した時は、リカバリ作業のヘルプで徹夜対応して、そのまま試験会場に向かう、なんてこともありました。</p>
-
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">そうだ、、mizzyさん朝まで対応してから試験受けに行かれてた… <a href="https://twitter.com/hashtag/%E3%81%B6%E3%81%A4%E3%81%8B%E3%82%8A%E7%A8%BD%E5%8F%A4?src=hash&amp;ref_src=twsrc%5Etfw">#ぶつかり稽古</a></p>&mdash; Shinya Tsunematsu (@tnmt) <a href="https://twitter.com/tnmt/status/404151211110047744?ref_src=twsrc%5Etfw">November 23, 2013</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <p>試験は無事合格しましたが、その後も事後処理などで忙しかったり、対応が終わって落ち着いたら一気に気が抜けたりで、この後はまったく授業が手につきませんでした。</p>
-
 <p>また、<a href="https://www.oreilly.co.jp/books/9784873117096/">Serverspec 本</a> の執筆中も、授業どころではありませんでした。</p>
-
 <p>こんな感じで、7年かかってなんとか必要な単位数を取得できました。</p>
-
-<hr>
-
+<hr />
 <h2>受講した科目と成績について</h2>
-
 <p>以下が成績原簿です。「認定」と書かれてるのは、前の大学から持ち越して認定された単位です。</p>
-
-<p><img src="/images/2019/03/result.jpg" alt=""></p>
-
-<hr>
-
+<p><img src="/images/2019/03/result.jpg" alt="" /></p>
+<hr />
 <h2>大変だったこと</h2>
-
 <p>本業との兼ね合い以外だと、基本的には自学自習とあまり変わらないので、モチベーションの維持が一番大変でした。何度か途中で辞めようかな、と思ったこともありました。が、ここで辞めるとなんか負けた気がする、それは嫌だ、と思いながら何とか続けてこられました。</p>
-
 <p>LMS(学習管理サイト)上に掲示板があり、そこで情報交換したり、実際に集まって勉強会をしたり、といったことも行われているようなので、モチベーション維持のためには、こういったものを活用すると良いかも知れません。</p>
-
-<hr>
-
+<hr />
 <h2>入学して良かったかどうか</h2>
-
 <p>学ぶ内容は基礎的なことが多く、すぐ実践で役立つ、というものでもないので、これから仕事で役に立つかどうかはわかりません。</p>
-
 <p>入学のモチベーションのひとつに、アメリカで仕事をしたい、そのためのビザ取得にはCS(Computer Science)の学位が必要だから、というのもあったのですが、今はアメリカに行く気はあまりないので、そのために学位を役立てる機会も今のところはなさそうです。</p>
-
 <p>また、入学したときに書いたエントリに「情報工学や計算機科学なんかの学位を持ってない、といったことに、ほんの微か、あるかないかぐらいの、引け目なんだかコンプレックスだかなんだかわからないけど、そんなようなものをずっと持ち続けています。」とあります。これは今考えてみると、今後ずっとIT技術者として生きていくための、確としたバックグラウンドが欲しい、ということだったのだと思います。そういった意味では、この大学で学んだことや、最後までやりきって卒業できたことは、自分を支える確かなバックグラウンドの一部になったと思います。</p>
-
 <p>なので、入学して良かったかどうかで言えば、まあ良かったんじゃないかと思います。</p>
-
-<hr>
-
+<hr />
 <h2>今後の予定</h2>
-
 <p>学士を取得した、となると、次は修士や博士、というのが自然な流れかな、でもまあすぐにではなく、ゆっくり考えよう、と思っていたら、ちょうどタイミング良く <a href="https://twitter.com/matsumotory">matsumotory</a> さんからお声がけいただき、<a href="https://mizzy.org/blog/2019/03/01/1/">さくらインターネット研究所の客員研究員</a> になりました。ここから論文博士への道もあるかな、と考えています。</p>
-
-<p>また、<a href="https://k0kubun.hatenablog.com/entry/stanford-ndo">リモートでアメリカの大学院のCSの授業を取ってみた話 - k0kubun&#39;s blog</a> を読んで、こんな風に大学院で更に専門的な内容を学ぶのも良さそう、などと思っています。</p>
+<p>また、<a href="https://k0kubun.hatenablog.com/entry/stanford-ndo">リモートでアメリカの大学院のCSの授業を取ってみた話 - k0kubun's blog</a> を読んで、こんな風に大学院で更に専門的な内容を学ぶのも良さそう、などと思っています。</p>
 
 ]]></content>
   </entry>
@@ -828,129 +533,14 @@ program -- 2 --&gt; s3
     <id>https://mizzy.org/blog/2019/03/01/1/</id>
     <content type="html"><![CDATA[
 <p>3月1日よりさくらインターネット研究所の客員研究員になりました。</p>
-
 <p><a href="https://hb.matsumoto-r.jp/entry/2018/12/25/133835">分散型データセンターOSとリアクティブ性を持つコンテナ実行基盤技術のこれから - 人間とウェブの未来</a> を読んで、以下の様にツイートしたタイミングで、<a href="https://twitter.com/matsumotory">matsumotoryさん</a> から「一緒にさくらの研究所で研究開発しませんか？」と誘われたのがきっかけです。</p>
-
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">さくらインターネット超おもしろそう ー 分散型データセンターOSとリアクティブ性を持つコンテナ実行基盤技術のこれから - 人間とウェブの未来 <a href="https://t.co/j8OWjEEyvt">https://t.co/j8OWjEEyvt</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1077785577863270400?ref_src=twsrc%5Etfw">December 26, 2018</a></blockquote>
-
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <p>ちょうど、今年度で <a href="https://mizzy.org/blog/2012/04/14/1/">大学</a> を卒業予定で、次は修士や博士、というのも、選択肢になり得るかな、と考えていました。とは言え、すぐに具体的に動こう、と思っていたわけではなく、<a href="http://hyoshiok.hatenablog.com/entry/20180930/p1">hyoshiok さんのように定年退職後に大学院に入る</a> というのもありかな、ぐらいに、ぼんやりと検討していた程度。そんな感じで、研究者としてのキャリアについて漠然とながら考えていたところにタイミングよく声がかかったのと、それよりなにより、matsumotoryさんやさくらインターネット研究所の取り組みが、技術者としてとても面白そうなので、誘いを断る理由が一切ありませんでした。</p>
-
 <p>先日、所長の鷲北さんが <a href="https://www.slideshare.net/kenwashikita/research-and-development-review-of-ken-washikita-201902">わしきたのこれまでの研究 開発と振り返り（2019年2月版） さくらインターネット研究所 定例 2019/2/20</a> というスライドを公開されていて、その中でさくらインターネット研究所の役割を、次のように述べておられます。</p>
-
-<p><iframe src="//www.slideshare.net/slideshow/embed_code/key/3EbKseu7Kcrp9n?startSlide=24" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/kenwashikita/research-and-development-review-of-ken-washikita-201902" title="Research and Development Review of Ken Washikita, 2019/02" target="_blank">Research and Development Review of Ken Washikita, 2019/02</a> </strong> from <strong><a href="//www.slideshare.net/kenwashikita" target="_blank">Ken Washikita</a></strong> </div></p>
-
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/3EbKseu7Kcrp9n?startSlide=24" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/kenwashikita/research-and-development-review-of-ken-washikita-201902" title="Research and Development Review of Ken Washikita, 2019/02" target="_blank">Research and Development Review of Ken Washikita, 2019/02</a> </strong> from <strong><a href="//www.slideshare.net/kenwashikita" target="_blank">Ken Washikita</a></strong> </div>
 <p>また、<a href="https://research.sakura.ad.jp/2019/02/22/concept-vision-2019/">超個体型データセンターを目指す当研究所のビジョン – さくらインターネット研究所</a> という中・長期ビジョンも公開されています。</p>
-
 <p>まだ自分の研究テーマは明確になっていませんし、研究者としてはひよこにすらなれていない卵の状態ですが、matsumotoryさんをはじめ研究所の諸先輩方から学びながら、研究所の役割を念頭に置き、研究所が掲げるビジョンの実現に向けて、自分が得意な技術領域で貢献できるよう、研究開発に取り組んでいきたいと思います。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[フリーランスになって4年が経った]]></title>
-    <link href="https://mizzy.org/blog/2018/04/02/1/" />
-    <updated>2018-04-02T11:00:00+09:00</updated>
-    <id>https://mizzy.org/blog/2018/04/02/1/</id>
-    <content type="html"><![CDATA[
-<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">フリーランスとして食っていけなくなったのでアルバイト始めました <a href="https://t.co/AG92ed5xsI">pic.twitter.com/AG92ed5xsI</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/977210157024256000?ref_src=twsrc%5Etfw">March 23, 2018</a></blockquote>
-
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>このツイートは、たまたまセブンイレブンの制服を着る機会があったので着てみたついでに撮影して冗談でツイートしただけ。ツイートした後に、あ、これエイプリルフールネタにとっておけば良かった、と思った。</p>
-
-<hr>
-
-<h2>仕事について</h2>
-
-<p>昨年も一昨年と同様、<a href="http://atl.recruit-tech.co.jp/">リクルートテクノロジーズ ATL</a> での仕事がメインで、それ以外には golang でミドルウェアを実装する仕事や技術顧問的な仕事が少し、という感じだった。</p>
-
-<p>ATL の仕事としては、<a href="http://atl.recruit-tech.co.jp/blog/4339/">libspecinfra</a> の開発をしていたけど、昨年いっぱいで契約が終了した。libspecinfra の開発は続けたいと思いつつも、仕事として時間が割けなくなったので、現在開発は停止状態。</p>
-
-<p>ATL の仕事が昨年末で終了したことで、今年から仕事の仕方ががらっと変わった。昨年までは掛け持ちは多いときでも2社、大半の期間は掛け持ちせず1社だけ、という感じだったけど、現在は4社（<a href="http://www.recruit-mp.co.jp/">リクルートマーケティングパートナーズ</a>、<a href="https://www.talentio.co.jp/">タレンティオ</a>、<a href="https://corp.toreta.in/">トレタ</a>、<a href="https://aktsk.jp/">アカツキ</a>）を掛け持ちしている。また、ATL の仕事は現場から少し離れていたけど、今は割と現場に近い位置で仕事している。4社掛け持ち、コンテキストスイッチ大きそうだけど大丈夫かな、と思ったけど、ほとんどリモートでの仕事で、厳密に時間管理されているわけでもなく、曜日や時間が固定されているわけでもないので、自分の裁量で適当に時間配分しながら、今のところは無理なく回せている。</p>
-
-<p>仕事内容的には、OSS（<a href="https://github.com/aktsk/nolmandy">aktsk/nolmandy</a> と <a href="https://github.com/aktsk/kalvados">aktsk/kalvados</a>）の開発をしたり、OSやミドルウェアのアップグレードのお手伝いをしたり、監視周りの整備をしたり、ログ収集基盤の導入をお手伝いしたり、壁打ち役になったり、など様々。</p>
-
-<p>ATL の仕事をしていた頃は、収入の9割を依存していたので、契約切れて次の仕事が見つからなかったら収入がなくなる、という不安があった。昨年9月にはこんなツイートしてる。</p>
-
-<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">割と余裕どころか、来年から仕事なくなる可能性も出てきたので、仕事ください。 <a href="https://t.co/VjpP8FxL7a">https://t.co/VjpP8FxL7a</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/905662381497270274?ref_src=twsrc%5Etfw">September 7, 2017</a></blockquote>
-
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>他にもこんな職探しツイートもしてた。</p>
-
-<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">来年1月からの仕事が未定なので、これを実行する時が来たか <a href="https://t.co/Aj6EkIpJ8y">https://t.co/Aj6EkIpJ8y</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/929987306441732096?ref_src=twsrc%5Etfw">November 13, 2017</a></blockquote>
-
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>ツイートしてたら仕事がもらえた。</p>
-
-<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">ありがたいことに、色々お声がけいただいて、1月以降も妻と5人の子供を養っていけそうです。 <a href="https://t.co/20Ars6agrt">https://t.co/20Ars6agrt</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/936186019832987651?ref_src=twsrc%5Etfw">November 30, 2017</a></blockquote>
-
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>昨年12月から今年1月にかけては、お声がけいただいた企業さんを訪問して話を聞いたり、仕事の詳細を詰めるための打合せをしたりで、外出することが多かった。2月以降はほとんど家で仕事していて、仕事で外出するのは月に2，3回程度になった。花粉症の季節にあまり外に出なくて良いのはありがたい。</p>
-
-<p>4社掛け持ち、コンテキストスイッチの増大と、一社あたりにかける時間が減ることで、進捗が遅くなるというデメリットがあるけど、収入の依存先が分散されているという安心感もある。</p>
-
-<hr>
-
-<h2>名刺をつくった</h2>
-
-<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr"><a href="https://twitter.com/nagayama?ref_src=twsrc%5Etfw">@nagayama</a> 氏につくってもらったカッコいい名刺届いた。オモテ面、ロゴと名前だけなのがインパクトあって良い。 <a href="https://t.co/rw7a6GnQ6P">pic.twitter.com/rw7a6GnQ6P</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/968379806051074049?ref_src=twsrc%5Etfw">February 27, 2018</a></blockquote>
-
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>仕事上、名刺がなくて困ることはほぼないので、つくらなくてもいいか、と思っていたけど、あると便利な時もあるので、法人化してから2年経ってようやくつくった。</p>
-
-<hr>
-
-<h2>収入について</h2>
-
-<p>フリーランスになってからの収入の構成要素、3年目に法人化したのもあって、以下のように変遷している。</p>
-
-<ul>
-<li>1年目: 前職の給与収入 + 個人事業収入</li>
-<li>2年目: 個人事業収入</li>
-<li>3年目: 個人事業収入 + 役員報酬</li>
-<li>4年目: 役員報酬</li>
-</ul>
-
-<p>個人事業収入は事業売上がすべて個人の収入、役員報酬は自分の会社の売上の一部が個人の収入になっている。なので、すべての事業売上が個人の収入となっている2年目が収入のピークで、3年目、4年目と収入は下がっている。</p>
-
-<p>が、それはあくまでも個人としての収入の話で、法人個人問わず事業全体の売上で言えば、2年目以降は割と安定している。今年も同じぐらいの売上になりそう。</p>
-
-<hr>
-
-<h2>本業以外の仕事</h2>
-
-<p>昨年末から今年の初めにかけて、コラムを3本寄稿して、インタビューを1本受けた。</p>
-
-<ul>
-<li><a href="https://hikakujoho.com/manekai/entry/20171207">独立間もないフリーランス＆5人子持ちの四十男が「家」を建てた話 - マネ会</a></li>
-<li><a href="https://employment.en-japan.com/engineerhub/entry/2018/01/31/110000">「一つのことをうまくやる」に忠実たれ。Serverspec開発者mizzyが語る成功するOSSの設計 - エンジニアHub｜若手Webエンジニアのキャリアを考える！</a></li>
-<li><a href="https://geek-out.jp/column/entry/2018/03/08/110000">オープンさは私のキャリアの原動力 ─ SIer、Web系、フリーランスという変遷で実感した「オープンにすること」の大切さ - GeekOut</a></li>
-<li>まだ未公開の家の書斎に関するコラム。もうすぐ公開予定。</li>
-</ul>
-
-<p>コラムのうち2本は技術とはまったく関係ない、家のことについて書いた。</p>
-
-<hr>
-
-<h2>まとめ</h2>
-
-<p>Twitter は優秀な職探しツール。</p>
-
-<hr>
-
-<h2>関連エントリ</h2>
-
-<ul>
-<li><a href="http://mizzy.org/blog/2017/04/01/1/">フリーランスになって3年が経った - Gosuke Miyashita</a></li>
-<li><a href="http://mizzy.org/blog/2016/04/01/1/">フリーランスになって2年が経った - Gosuke Miyashita</a></li>
-<li><a href="http://mizzy.org/blog/2015/04/01/1/">フリーランスになって1年が経った - Gosuke Miyashita</a></li>
-</ul>
 
 ]]></content>
   </entry>
