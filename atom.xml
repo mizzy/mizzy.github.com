@@ -4,13 +4,40 @@
   <title><![CDATA[Gosuke Miyashita]]></title>
   <link href="https://mizzy.org/atom.xml" rel="self"/>
   <link href="https://mizzy.org/"/>
-  <updated>2022-03-24T12:00:00+09:00</updated>
+  <updated>2025-01-26T19:32:42+09:00</updated>
   <id>https://mizzy.org/</id>
   <author>
     <name><![CDATA[Gosuke Miyashita]]></name>
   </author>
   <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
 
+
+  <entry>
+    <title type="html"><![CDATA[Ruby製の静的サイトジェネレータをGoで再実装した]]></title>
+    <link href="https://mizzy.org/blog/2025/01/26/1/" />
+    <updated>2025-01-26T19:32:42+09:00</updated>
+    <id>https://mizzy.org/blog/2025/01/26/1/</id>
+    <content type="html"><![CDATA[
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ブログ3年ぐらい更新してなくて、もう少しマメに書くか、という機運になってきたので、ブログツール書き始めた。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1883311289768063332?ref_src=twsrc%5Etfw">January 26, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>このブログは、マークダウン形式で記事を書いて、<a href="https://github.com/mizzy/ruby-nebel">Nebel</a>というRubyで実装したお手製の静的サイトジェネレータでHTMLに変換してGitHub Pagesでホストしている。</p>
+<p>が、久々に書くか、と思ってNebelを動かしてみたところ、エラーで動かない。具体的には、ローカルでの確認用サーバのために利用しているeventmachine gemがビルドに失敗してインストールできない。</p>
+<p>エラーの原因を調べて直すのもよいのだけど、13年ぐらい前につくって全然メンテしてないし、今となっては不要な機能もあるので、<a href="https://github.com/mizzy/nebel">Goで再実装した</a>。</p>
+<p>といっても、Ruby版のすべての機能を実装したわけではない。Ruby版にはプラグイン機構があって、様々なプラグインが動いているが、プラグイン機構や各種プラグインは未実装。</p>
+<p>例えばgistプラグインは</p>
+<pre><code>{% gist 37401088bc6e3564addf7a27d698f6fb %}
+</code></pre>
+<p>と書いておくと</p>
+<pre><code class="language-html">&lt;div&gt;&lt;script src='https://gist.github.com/37401088bc6e3564addf7a27d698f6fb.js?file='&gt;&lt;/script&gt;
+&lt;noscript&gt;&lt;pre&gt;&lt;code&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/noscript&gt;&lt;/div&gt;
+</code></pre>
+<p>といったHTMLに変換してくれる。自分でつくっておいてなんだけど、プラグインで変換しなくてもgistのページからEmbed用コードを簡単にコピーできるので、別にいらなかったな、と思ってる。</p>
+<p>もしかしたら必要なプラグインもあるかもだけど、必要になってから実装すればいいやと思っている。</p>
+<p>プラグイン利用前提で書いた過去記事はGo版では正しく変換してくれないことになるが、過去記事を再生成する必要はいまのところないので特に問題なさそう。</p>
+<p>またRuby版には、コマンド一発で確認用のローカルサーバを立ち上げてブラウザで開き、記事を保存したら自動でHTMLに変換してブラウザも自動リロード、という、機能があるのだけど、これはあれば便利だけどなくても困らないので未実装。</p>
+<p>とりあえず最低限必要な機能は実装でき、この記事もGo版で生成している。</p>
+
+]]></content>
+  </entry>
 
   <entry>
     <title type="html"><![CDATA[Terraform State Refreshの高速化手法と実装]]></title>
@@ -522,25 +549,6 @@ program -- 2 --&gt; s3
 <h2>今後の予定</h2>
 <p>学士を取得した、となると、次は修士や博士、というのが自然な流れかな、でもまあすぐにではなく、ゆっくり考えよう、と思っていたら、ちょうどタイミング良く <a href="https://twitter.com/matsumotory">matsumotory</a> さんからお声がけいただき、<a href="https://mizzy.org/blog/2019/03/01/1/">さくらインターネット研究所の客員研究員</a> になりました。ここから論文博士への道もあるかな、と考えています。</p>
 <p>また、<a href="https://k0kubun.hatenablog.com/entry/stanford-ndo">リモートでアメリカの大学院のCSの授業を取ってみた話 - k0kubun's blog</a> を読んで、こんな風に大学院で更に専門的な内容を学ぶのも良さそう、などと思っています。</p>
-
-]]></content>
-  </entry>
-
-  <entry>
-    <title type="html"><![CDATA[さくらインターネット研究所の客員研究員になった]]></title>
-    <link href="https://mizzy.org/blog/2019/03/01/1/" />
-    <updated>2019-03-01T13:00:00+09:00</updated>
-    <id>https://mizzy.org/blog/2019/03/01/1/</id>
-    <content type="html"><![CDATA[
-<p>3月1日よりさくらインターネット研究所の客員研究員になりました。</p>
-<p><a href="https://hb.matsumoto-r.jp/entry/2018/12/25/133835">分散型データセンターOSとリアクティブ性を持つコンテナ実行基盤技術のこれから - 人間とウェブの未来</a> を読んで、以下の様にツイートしたタイミングで、<a href="https://twitter.com/matsumotory">matsumotoryさん</a> から「一緒にさくらの研究所で研究開発しませんか？」と誘われたのがきっかけです。</p>
-<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">さくらインターネット超おもしろそう ー 分散型データセンターOSとリアクティブ性を持つコンテナ実行基盤技術のこれから - 人間とウェブの未来 <a href="https://t.co/j8OWjEEyvt">https://t.co/j8OWjEEyvt</a></p>&mdash; Gosuke Miyashita (mizzy) (@gosukenator) <a href="https://twitter.com/gosukenator/status/1077785577863270400?ref_src=twsrc%5Etfw">December 26, 2018</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>ちょうど、今年度で <a href="https://mizzy.org/blog/2012/04/14/1/">大学</a> を卒業予定で、次は修士や博士、というのも、選択肢になり得るかな、と考えていました。とは言え、すぐに具体的に動こう、と思っていたわけではなく、<a href="http://hyoshiok.hatenablog.com/entry/20180930/p1">hyoshiok さんのように定年退職後に大学院に入る</a> というのもありかな、ぐらいに、ぼんやりと検討していた程度。そんな感じで、研究者としてのキャリアについて漠然とながら考えていたところにタイミングよく声がかかったのと、それよりなにより、matsumotoryさんやさくらインターネット研究所の取り組みが、技術者としてとても面白そうなので、誘いを断る理由が一切ありませんでした。</p>
-<p>先日、所長の鷲北さんが <a href="https://www.slideshare.net/kenwashikita/research-and-development-review-of-ken-washikita-201902">わしきたのこれまでの研究 開発と振り返り（2019年2月版） さくらインターネット研究所 定例 2019/2/20</a> というスライドを公開されていて、その中でさくらインターネット研究所の役割を、次のように述べておられます。</p>
-<iframe src="//www.slideshare.net/slideshow/embed_code/key/3EbKseu7Kcrp9n?startSlide=24" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/kenwashikita/research-and-development-review-of-ken-washikita-201902" title="Research and Development Review of Ken Washikita, 2019/02" target="_blank">Research and Development Review of Ken Washikita, 2019/02</a> </strong> from <strong><a href="//www.slideshare.net/kenwashikita" target="_blank">Ken Washikita</a></strong> </div>
-<p>また、<a href="https://research.sakura.ad.jp/2019/02/22/concept-vision-2019/">超個体型データセンターを目指す当研究所のビジョン – さくらインターネット研究所</a> という中・長期ビジョンも公開されています。</p>
-<p>まだ自分の研究テーマは明確になっていませんし、研究者としてはひよこにすらなれていない卵の状態ですが、matsumotoryさんをはじめ研究所の諸先輩方から学びながら、研究所の役割を念頭に置き、研究所が掲げるビジョンの実現に向けて、自分が得意な技術領域で貢献できるよう、研究開発に取り組んでいきたいと思います。</p>
 
 ]]></content>
   </entry>
