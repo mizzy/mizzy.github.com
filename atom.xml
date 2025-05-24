@@ -3,12 +3,47 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2025-02-24T21:05:24+09:00</updated>
+    <updated>2025-05-24T18:36:10+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[社会保険料額情報HTMLジェネレーター]]></title>
+        <link href="https://mizzy.org/blog/2025/05/24/1/"/>
+        <updated>2025-05-24T18:36:10+09:00</updated>
+        <id>https://mizzy.org/blog/2025/05/24/1/</id>
+        <content type="html"><![CDATA[
+<p>社会保険料額情報、電子データで受け取る申請を行って、無事受理された。</p>
+<p><a href="https://www.nenkin.go.jp/denshibenri/online_jigyousho/denshidata/tsuchisho.html">電子データで受け取れる各種情報・通知書の詳細｜日本年金機構</a></p>
+<p>申請時に、事業所整理記号をどう入力すれば良いのかよくわからず、何度かリジェクトされたけど。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">解決した。前2桁は都道府県コードを入れる必要があった。申請フォームに様式記入要領PDFへにリンクがあり、それを見ると書いてあった。 <a href="https://t.co/bfWQzaUiqL">https://t.co/bfWQzaUiqL</a></p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1926157537159610449?ref_src=twsrc%5Etfw">May 24, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>電子データはZIPファイルになっていて、中身を見るとXMLファイルとXSLファイルで構成されている。IEではそのまま閲覧できるようだが、Microsoft EdgeやSafariの場合は、ブラウザの設定変更が必要になる。</p>
+<ul>
+<li><a href="https://www.nenkin.go.jp/denshibenri/oshirase/zenpan/20220610.html">InternetExplorer以外のブラウザでの決定通知書の閲覧方法について｜日本年金機構</a></li>
+<li><a href="https://www.nenkin.go.jp/faq/denshi/e-gov/koubunsho_hirakikata.html">機構から送付されるXML形式の通知書（公文書）の開き方を教えてください。｜日本年金機構</a></li>
+</ul>
+<p>また、普段使いしてるChromeでは、そのままさくっと表示する方法がなさそうで、以下のサイトを参考に、XMLとXSLからHTMLに変換して表示する方法を試してみた。</p>
+<ul>
+<li><a href="https://gammasoft.jp/blog/convert-xml-and-xsl-to-one-html-by-python/">電子公文書の XML と XSL を Python で１つのHTMLに変換する方法 - ガンマソフト</a></li>
+<li><a href="https://zenn.dev/sora_kumo/articles/xsl-viewer-html">電子公文書(XML+XSL)をChromeで表示する</a></li>
+</ul>
+<p>この方法でばっちり表示されたのだが、PDFで保存した場合にもきれいにレイアウトしたい、と思い、<a href="https://claude.ai/">Claude</a><br />
+に社会保険料額情報HTMLジェネレーターつくってもらった。</p>
+<p>ジェネレーターはひとつのHTMLファイルで構成されていて、開くとこのような画面になる。</p>
+<p><img src="/images/2025/05/social-insurance-premium-amount-generator-0.png" alt="" /></p>
+<p>社会保険料額情報のXMLが含まれるZIPファイルをアップロードするとこのようになる。</p>
+<p><img src="/images/2025/05/social-insurance-premium-amount-generator-1.png" alt="" /></p>
+<p>プレビュー表示するとこのようになり、PDFにするとA4横一枚におさまるレイアウトになっている。</p>
+<p><img src="/images/2025/05/social-insurance-premium-amount-generator-2.png" alt="" /></p>
+<p>ソースコードはこちら → <a href="https://github.com/mizzy/social-insurance">https://github.com/mizzy/social-insurance</a></p>
+<p>こちらで実際に試せます → <a href="https://mizzy.org/social_insurance_premium_amount_generator.html">https://mizzy.org/social_insurance_premium_amount_generator.html</a></p>
+<p>社会保険料額情報だけしか対応していないので、保険料納入告知額・領収済額通知書等にも対応予定。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[長時間のパソコン作業に適したホテル一選]]></title>
@@ -302,68 +337,6 @@ program -- 2 --&gt; s3
 <li>リアルタイム、あるいは必要なタイミング(Terraform実行時)にStateを最新の状態にする、という手法は、現在考えつく限りでは、実装や運用が困難である。</li>
 <li>バージョン管理システムを活用して、Terraform実行時にRefresh対象を絞る、という手法は、前提条件はあるものの、実装や利用が比較的容易である。ただし、変更対象外のリソースはRefreshされないため、ファイルに永続化されたState上には古い情報が残る可能性がある。</li>
 </ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Sock ShopのCloudFormation TemplateをTerraformとPulumiに移植した]]></title>
-        <link href="https://mizzy.org/blog/2021/10/01/1/"/>
-        <updated>2021-10-01T23:00:00+09:00</updated>
-        <id>https://mizzy.org/blog/2021/10/01/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://microservices-demo.github.io/">Microservices Demo: Sock Shop</a>の CloudFormation Templateを<a href="https://github.com/mizzy/sock-shop">TerraformとPulumiに移植</a>したので、それに関するメモを残しておく。</p>
-<hr />
-<h2>モチベーション</h2>
-<p>最近仕事ではTerraformを触っている時間が一番多いので、研究もこの辺りのツールに関連する技術を対象とした方が良いのでは、と考えた。研究を行うためには、類似ツールの比較が必要だし、比較のためには、サンプルコード程度のものではなく、実際の環境に近い状態を再現できるコードが必要、というのが移植のモチベーションになっている。</p>
-<hr />
-<h2>移植元コード</h2>
-<p><a href="https://microservices-demo.github.io/deployment/ecs.html">Deployment on Amazon EC/2 Container Service</a>にAmazon ECSへのデプロイ手順が載っているが、肝心のCloudFormation Templateは、<a href="https://github.com/microservices-demo/microservices-demo">元リポジトリ</a>ではDeplicated扱いで<a href="https://github.com/microservices-demo/microservices-demo/commit/b738dd548aae972">削除されている</a>。</p>
-<p>なので、<a href="https://github.com/markfink-splunk/sock-shop">markfink-splunk/sock-shop: Deployments of the Weaveworks Sock Shop application instrumented with SignalFx.</a>にあるファイル(<a href="https://github.com/markfink-splunk/sock-shop/blob/master/ecs-fargate/cfn-stack-app-only.yaml">ecs-fargate/cfn-stack-app-only.yaml</a>)を移植元コードとして使うことにした。</p>
-<hr />
-<h2>デプロイ環境</h2>
-<p>個人用に使っている検証用AWSアカウント、惰性で使っていてぐちゃぐちゃになってきたので、いったん不要なリソースを全削除して、<a href="https://aws.amazon.com/jp/organizations/">AWS Organizations</a>でマルチアカウント化、<a href="https://aws.amazon.com/jp/single-sign-on/">AWS Single Sign-On</a>で各アカウントにSSOできるようにした。</p>
-<p>アカウント管理用のTerraformコード、最初はprivateにしていたけど、別に見えてまずい情報もないな、と思ったので<a href="https://github.com/mizzy/aws-accounts">publicにした</a>。</p>
-<p>これにより、CloudFormation、Terraform、Pulumiそれぞれの検証環境をアカウントごと分離できるようにした。</p>
-<hr />
-<h2>CloudFormation Templateのデプロイ</h2>
-<p>まずは大元となるCloudFormation Templateがデプロイできるものになっていないと話にならないので、ここから着手。元ファイルのままでは動かなかったり、そのままでは不便なところなどあったので、微修正している。差分は以下の通り。</p>
-<p>{% gist 37401088bc6e3564addf7a27d698f6fb %}</p>
-<hr />
-<h2>Terraformへの移植</h2>
-<p>CloudFormation Templateがデプロイできたところで、Terraformへの移植を行った。移植はおおまかには以下のような手順で行った。</p>
-<ol>
-<li>リソースをひとつ選び、Terraformコードで必須Argumentだけ指定したリソースを定義。</li>
-<li>terraform importでCloudFormation用アカウント上のリソースをimport。</li>
-<li>terraform planでCloudFormation用アカウント上のリソースとの差分を確認し、差分がなくなるよう必須以外のArtumentsを記述。</li>
-<li>差分がなくなったらTerraform用アカウントにterraform applyしてリソースを作成。</li>
-</ol>
-<p>上記の作業を80ほどあるリソース全てに対して行った。</p>
-<p><a href="https://github.com/GoogleCloudPlatform/terraformer">Terraformer</a>はいまいち使い勝手が悪いし、ひとつひとつどのようなリソースがあるか確認しておいた方が、後々捗りそうなので、人力で移植した。</p>
-<p>先日行われた<a href="https://events.hashicorp.com/hashitalksjapan">HashiTalks: 日本</a>での、Quipperの鈴木さんのプレゼンで知った<a href="https://github.com/tfmigrator/tfmigrator">tfmigrator</a>を使えば、Terraformerのいまいちさを補えたっぽいので、今度機会があれば使ってみたい。</p>
-<p>Terraformerがどういまいち使い勝手が悪いのか、とか、tfmigratorの使い方なんかは、<a href="https://techblog.szksh.cloud/tfmigrator/">鈴木さんのブログエントリ</a>に詳しく書いてあるので、興味ある方はこちらからどうぞ。</p>
-<p>移植の最終確認として、Terraform用アカウントにapplyしたリソースをいったんdestroyして、最初から全リソースのapplyを行った。</p>
-<p>が、上記手順4で「差分がなくなるよう必須以外のArgumentsを記述」とあるが、planで差分がなくなっても、別アカウントにapplyすると、明示してないArgumentが原因でうまくapplyできないリソースがあったので、その辺りの修正を行った。</p>
-<hr />
-<h2>Pulumiへの移植</h2>
-<p>Pulumiへの移植も、Terraformへの移植と同様に、CloudFormation用アカウント上のリソースをひとつひとつインポートしながら進めていった。</p>
-<p><a href="https://www.pulumi.com/tf2pulumi/">tf2pulumi</a>や<a href="https://www.pulumi.com/cf2pulumi/">cf2pulumi</a>といったツールもオフィシャルに提供されているけど、自分がわかりやすいようにコードやファイルを分割したかったので、これらのツールは使わなかった。</p>
-<p>PulumiはTypeScript、JavaScript、Python、Go、C#から記述言語が選べるが、この中で一番慣れているGoで記述を行った。</p>
-<p><a href="https://www.pulumi.com/docs/guides/adopting/import/">Pulumiのリソースインポート</a>は、Terraformと違いコードの生成まで行ってくれる。</p>
-<p>たとえば、</p>
-<pre><code> $ pulumi import aws:cloudwatch/logGroup:LogGroup \
-  sock_shop \
-  sock-shop
-</code></pre>
-<p>といったコマンドでCloudWatch Logs log groupをインポートすると、以下のようなコードを吐いてくれる。</p>
-<p>{% gist 98fa264604cfd23bee559e83499f4cda %}</p>
-<p>ただ、<code>pulumi import</code>ではエラーになってうまくインポートできない場合もあり、そういう場合は、先に以下の様なコードを書いてから、<code>pulumi up</code>を実行してインポートした。最後の<code>pulumi.Import()</code>がポイント。</p>
-<p>{% gist 6aad2ff46fe3045f05c5c2f9a52a5c78 %}</p>
-<p>また、希に<code>pulumi import</code>が吐くコードが間違っていることもあって、そういう場合は手で修正を行った。</p>
-<p>Pulumi、サンプルコード程度しか触ったことがなかったけど、今回の移植作業でだいぶ把握できた気がする。</p>
-<hr />
-<h2>まとめ</h2>
-<p>最初の方でもリンクを張っているけど、移植したコードは<a href="https://github.com/mizzy/sock-shop">ここに置いてあります</a>。</p>
 
 ]]></content>
     </entry>
