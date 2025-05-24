@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社会保険料額情報HTMLジェネレーター</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        .upload-area.dragover {
+            border-color: #007bff;
+            background-color: #e3f2fd;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .upload-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+        .file-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .result-area {
+            margin: 20px 0;
+            display: none;
+        }
+        .download-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .download-btn:hover {
+            background-color: #1e7e34;
+        }
+        .preview-btn {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .preview-btn:hover {
+            background-color: #e0a800;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #6c757d;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .instructions ul {
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧾 社会保険料額情報HTMLジェネレーター</h1>
+        
+        <div class="instructions">
+            <h3>📋 使用方法</h3>
+            <ul>
+                <li>社会保険料額情報のXMLファイルが含まれるZIPファイルをアップロードしてください</li>
+                <li>システムが自動的にXMLを解析し、A4横レイアウトのHTMLを生成します</li>
+                <li>生成されたHTMLをプレビューで確認できます</li>
+                <li>対応ファイル: .zip（XMLファイルを含む）</li>
+            </ul>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <p>📁 ZIPファイルをここにドラッグ&ドロップ<br>または</p>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                ファイルを選択
+            </button>
+            <input type="file" id="fileInput" accept=".zip" />
+        </div>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="messages"></div>
+
+        <div class="result-area" id="resultArea">
+            <h3>✅ 生成完了</h3>
+            <p>社会保険料額情報のHTMLが正常に生成されました。</p>
+            <button class="download-btn preview-btn" id="previewBtn">プレビュー表示</button>
+        </div>
+    </div>
+
+    <script>
+        let generatedHTML = '';
+        
+        // ドラッグ&ドロップ機能
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.zip')) {
+                showMessage('ZIPファイルを選択してください。', 'error');
+                return;
+            }
+
+            showProgress(0);
+            showMessage('ファイルを処理中...', 'info');
+
+            try {
+                // JSZipライブラリを動的に読み込み
+                if (typeof JSZip === 'undefined') {
+                    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+                }
+
+                showProgress(25);
+                
+                const arrayBuffer = await file.arrayBuffer();
+                const zip = new JSZip();
+                const zipContent = await zip.loadAsync(arrayBuffer);
+                
+                showProgress(50);
+
+                // XMLファイルを探す
+                let xmlFile = null;
+                let xmlContent = '';
+                
+                for (const [filename, fileObj] of Object.entries(zipContent.files)) {
+                    if (filename.toLowerCase().endsWith('.xml') && 
+                        filename.includes('社会保険料額情報')) {
+                        xmlFile = filename;
+                        xmlContent = await fileObj.async('text');
+                        break;
+                    }
+                }
+
+                if (!xmlFile) {
+                    throw new Error('社会保険料額情報のXMLファイルが見つかりません。');
+                }
+
+                showProgress(75);
+
+                // XMLを解析してHTMLを生成
+                const htmlContent = parseXMLAndGenerateHTML(xmlContent);
+                generatedHTML = htmlContent;
+
+                showProgress(100);
+                showMessage('HTMLの生成が完了しました！', 'success');
+                document.getElementById('resultArea').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage(`エラーが発生しました: ${error.message}`, 'error');
+            } finally {
+                hideProgress();
+            }
+        }
+
+        function parseXMLAndGenerateHTML(xmlContent) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+                
+                // エラーチェック
+                const parserError = xmlDoc.querySelector('parsererror');
+                if (parserError) {
+                    throw new Error('XMLの解析に失敗しました');
+                }
+
+                // XMLからデータを抽出
+                const data = extractDataFromXML(xmlDoc);
+                
+                // HTMLを生成
+                return generateHTML(data);
+                
+            } catch (error) {
+                throw new Error(`XMLの解析中にエラーが発生しました: ${error.message}`);
+            }
+        }
+
+        function extractDataFromXML(xmlDoc) {
+            const shakaiHokenList = xmlDoc.querySelector('shakaiHokenRyougakuList');
+            if (!shakaiHokenList) {
+                throw new Error('社会保険料額情報が見つかりません');
+            }
+
+            return {
+                // 事業所情報
+                jigyoshoSeiriKigo: getValue(shakaiHokenList, 'header jigyoshoSeiriKigo'),
+                jigyoshoNum: getValue(shakaiHokenList, 'header jigyoshoNum'),
+                jigyoshoName: getValue(shakaiHokenList, 'header jigyoshoName').replace(/&lt;br\/&gt;/g, '<br>'),
+                jigyoshoPostCode: getValue(shakaiHokenList, 'jigyoushoPostCode'),
+                jigyoshoShozaichi: getValue(shakaiHokenList, 'jigyoushoShozaichi').replace(/&lt;br\/&gt;/g, '<br>'),
+                
+                // 日付情報
+                nouhuMokutekiYear: getValue(shakaiHokenList, 'nouhuMokutekiYmYear'),
+                nouhuMokutekiMonth: getValue(shakaiHokenList, 'nouhuMokutekiYmMonth'),
+                nouhuKigenYear: getValue(shakaiHokenList, 'nouhuKigenYear'),
+                nouhuKigenMonth: getValue(shakaiHokenList, 'nouhuKigenMonth'),
+                nouhuKigenDate: getValue(shakaiHokenList, 'nouhuKigenDate'),
+                hakkouYear: getValue(shakaiHokenList, 'hakkouYmdYear'),
+                hakkouMonth: getValue(shakaiHokenList, 'hakkouYmdMonth'),
+                hakkouDate: getValue(shakaiHokenList, 'hakkouYmdDate'),
+                
+                // 保険料情報
+                kenkouHokenRyou: formatNumber(getValue(shakaiHokenList, 'kenkouHokenRyou')),
+                kouseiNenkinHokenRyou: formatNumber(getValue(shakaiHokenList, 'kouseiNenkinHokenRyou')),
+                kodomoKosodateKyoshutsuKin: formatNumber(getValue(shakaiHokenList, 'kodomoKosodateKyoshutsuKin')),
+                total: formatNumber(getValue(shakaiHokenList, 'total')),
+                
+                // 年金事務所
+                nenkinJimusho: getValue(shakaiHokenList, 'header nenkinJimusho1'),
+                
+                // お知らせ
+                oshirase: getValue(shakaiHokenList, 'header oshirase').replace(/&lt;br\/&gt;/g, '<br>')
+            };
+        }
+
+        function getValue(parent, selector) {
+            const elements = selector.split(' ');
+            let current = parent;
+            
+            for (const element of elements) {
+                const found = current.querySelector(element);
+                if (!found) return '';
+                current = found;
+            }
+            
+            return current.textContent || '';
+        }
+
+        function formatNumber(numStr) {
+            if (!numStr) return '0';
+            // カンマを削除してから数値に変換
+            const cleanStr = numStr.replace(/,/g, '').trim();
+            const num = parseInt(cleanStr);
+            if (isNaN(num)) return numStr; // 数値に変換できない場合は元の値を返す
+            return num.toLocaleString();
+        }
+
+        function generateHTML(data) {
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <META http-equiv="X-UA-Compatible" content="IE=11" />
+    <title>社会保険料額情報</title>
+    <style type="text/css">
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        html, body, div, span, applet, object, iframe,
+        h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+        a, abbr, acronym, address, big, cite, code,
+        del, dfn, em, img, ins, kbd, q, s, samp,
+        small, strike, strong, sub, sup, tt, var,
+        b, u, i, center,
+        dl, dt, dd, ol, ul, li,
+        fieldset, form, label, legend,
+        table, caption, tbody, tfoot, thead, tr, th, td,
+        article, aside, canvas, details, embed,
+        figure, figcaption, footer, header, hgroup,
+        menu, nav, output, ruby, section, summary,
+        time, mark, audio, video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+        }
+
+        article, aside, details, figcaption, figure,
+        footer, header, hgroup, menu, nav, section {
+            display: block;
+        }
+
+        body {
+            line-height: 1;
+            font-family: "Yu Mincho", serif;
+            word-break: break-all;
+            font-size: 14px;
+            margin: 0;
+            padding: 8px;
+        }
+
+        ol, ul {
+            list-style: none;
+        }
+
+        blockquote, q {
+            quotes: none;
+        }
+
+        blockquote:before, blockquote:after,
+        q:before, q:after {
+            content: '';
+            content: none;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        td {
+            padding-top: 1px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid #000000;
+            padding: 12px;
+        }
+
+        .container {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .left-section {
+            flex: 2;
+        }
+
+        .right-section {
+            flex: 1;
+            padding-left: 10px;
+            min-width: 0;
+        }
+
+        table.title {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        table.detail {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+            margin: 15px 0;
+        }
+
+        table.jigyosho {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+            margin: 15px 0;
+        }
+
+        table.caption {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        table.jimusho {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        td.allline {
+            border-top: 1px solid #000000;
+            border-left: 1px solid #000000;
+            border-right: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+        }
+
+        td.linetb {
+            border-top: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+        }
+
+        td.linetrb {
+            border-top: 1px solid #000000;
+            border-right: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+        }
+
+        td.linelrb {
+            border-left: 1px solid #000000;
+            border-right: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+        }
+
+        td.linerb {
+            border-right: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+        }
+
+        td.linetr {
+            border-top: 1px solid #000000;
+            border-right: 1px solid #000000;
+        }
+
+        td.linelt {
+            border-top: 1px solid #000000;
+            border-left: 1px solid #000000;
+        }
+
+        td.lineb {
+            border-bottom: 1px solid #000000;
+        }
+
+        td.jgshAddr {
+            height: auto;
+            padding: 6px;
+            line-height: 1.4;
+            vertical-align: top;
+        }
+
+        td.jgshName {
+            height: auto;
+            padding: 6px;
+            line-height: 1.3;
+            vertical-align: top;
+        }
+
+        td.title {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            color: #000000;
+            padding: 10px 0;
+        }
+
+        .midashiC {
+            height: auto;
+            padding: 8px 4px;
+            font-size: 12px;
+            text-align: center;
+            color: #000000;
+        }
+
+        .oshirase-box {
+            border: 1px solid #000000;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 9px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .normalR {
+            font-size: 14px;
+            line-height: 1.4;
+            text-align: right;
+            color: #000000;
+        }
+
+        .normalL {
+            font-size: 14px;
+            line-height: 1.4;
+            text-align: left;
+            color: #000000;
+        }
+
+        .normalTL {
+            font-size: 14px;
+            line-height: 1.4;
+            vertical-align: top;
+            text-align: left;
+            color: #000000;
+        }
+
+        .bigC {
+            height: auto;
+            padding: 8px 4px;
+            font-size: 16px;
+            text-align: center;
+            color: #000000;
+        }
+
+        .bigL {
+            height: auto;
+            padding: 6px;
+            font-size: 16px;
+            color: #000000;
+        }
+
+        .bigR {
+            height: auto;
+            padding: 8px 12px 8px 4px;
+            font-size: 16px;
+            text-align: right;
+            color: #000000;
+        }
+
+        .bigTL2 {
+            height: auto;
+            padding: 6px;
+            font-size: 16px;
+            line-height: 1.3;
+            vertical-align: top;
+            color: #000000;
+        }
+
+        @media print {
+            body {
+                font-size: 13px;
+            }
+            .main-container {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="container">
+            <div class="left-section">
+                <table class="title">
+                    <tr>
+                        <td class="title">社　 会　 保　 険　 料　 額　 情　 報</td>
+                    </tr>
+                </table>
+
+                <table class="detail" cellspacing="0" cellpadding="0">
+                    <colgroup>
+                        <col width="20%"/>
+                        <col width="15%"/>
+                        <col width="15%"/>
+                        <col width="25%"/>
+                        <col width="25%"/>
+                    </colgroup>
+                    <tr>
+                        <td class="midashiC allline">事業所整理記号</td>
+                        <td class="midashiC linetrb">事業所番号</td>
+                        <td class="midashiC linetrb">納付目的年月</td>
+                        <td class="midashiC linetrb" colspan="2">納　 付　 期　 限</td>
+                    </tr>
+                    <tr>
+                        <td class="bigC linelrb">${data.jigyoshoSeiriKigo}</td>
+                        <td class="bigC linerb">${data.jigyoshoNum}</td>
+                        <td class="bigC linerb">令和${data.nouhuMokutekiYear}年${data.nouhuMokutekiMonth}月</td>
+                        <td class="bigC linerb" colspan="2">令和${data.nouhuKigenYear}年${data.nouhuKigenMonth}月${data.nouhuKigenDate}日</td>
+                    </tr>
+                    <tr>
+                        <td class="linetb" colspan="5" height="10px"></td>
+                    </tr>
+                    <tr>
+                        <td class="midashiC allline" colspan="2">健　康　保　険　料</td>
+                        <td class="midashiC linetrb">厚生年金保険料</td>
+                        <td class="midashiC linetrb" colspan="2">子ども・子育て拠出金</td>
+                    </tr>
+                    <tr>
+                        <td class="bigR linelrb" colspan="2">${data.kenkouHokenRyou} 円</td>
+                        <td class="bigR linerb">${data.kouseiNenkinHokenRyou} 円</td>
+                        <td class="bigR linerb" colspan="2">${data.kodomoKosodateKyoshutsuKin} 円</td>
+                    </tr>
+                    <tr>
+                        <td class="linetb" colspan="5" height="10px"></td>
+                    </tr>
+                    <tr>
+                        <td class="midashiC allline" colspan="2">合　　計　　額</td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td class="bigR linelrb" colspan="2">${data.total} 円</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+
+                <table class="jigyosho">
+                    <colgroup>
+                        <col width="20%"/>
+                        <col width="60%"/>
+                        <col width="20%"/>
+                    </colgroup>
+                    <tr>
+                        <td class="bigTL2 allline jgshAddr">${data.jigyoshoPostCode}</td>
+                        <td class="bigL allline jgshAddr">${data.jigyoshoShozaichi}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="bigL allline"></td>
+                        <td class="bigL allline jgshName">${data.jigyoshoName}　様</td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                <table class="caption">
+                    <tr>
+                        <td class="normalTL">
+                            上記は、令和${data.nouhuMokutekiYear}年${data.nouhuMokutekiMonth}月分の保険料見込み額のお知らせです。<br/>
+                            別途「納入告知書」または「保険料納入告知額・領収済額通知書」を送付しますので、必ずご確認ください。
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="right-section">
+                <div class="oshirase-box">
+                    ${data.oshirase}
+                </div>
+
+                <table class="jimusho">
+                    <tr>
+                        <td class="normalL">令和</td>
+                        <td class="normalR">${data.hakkouYear}</td>
+                        <td class="normalL">年</td>
+                        <td class="normalR">${data.hakkouMonth}</td>
+                        <td class="normalL">月</td>
+                        <td class="normalR">${data.hakkouDate}</td>
+                        <td class="normalL">日</td>
+                    </tr>
+                    <tr>
+                        <td class="normalL" colspan="7">日本年金機構</td>
+                    </tr>
+                    <tr>
+                        <td class="normalL" colspan="4">${data.nenkinJimusho}</td>
+                        <td class="normalL" colspan="3">年金事務所</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+        }
+
+        // プレビュー表示
+        document.getElementById('previewBtn').addEventListener('click', () => {
+            if (generatedHTML) {
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(generatedHTML);
+                newWindow.document.close();
+            }
+        });
+
+        // ユーティリティ関数
+        function showProgress(percent) {
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        function hideProgress() {
+            setTimeout(() => {
+                document.getElementById('progressBar').style.display = 'none';
+            }, 500);
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('messages');
+            const className = type === 'error' ? 'error' : 
+                             type === 'success' ? 'success' : 
+                             'file-info';
+            
+            messageDiv.innerHTML = `<div class="${className}">${message}</div>`;
+        }
+
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+    </script>
+</body>
+</html>
