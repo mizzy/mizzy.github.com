@@ -3,12 +3,36 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2025-05-24T18:36:10+09:00</updated>
+    <updated>2025-05-29T09:04:51+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Synology NASをTailscaleのExit Nodeにして外からLANにアクセス]]></title>
+        <link href="https://mizzy.org/blog/2025/05/29/1/"/>
+        <updated>2025-05-29T09:04:51+09:00</updated>
+        <id>https://mizzy.org/blog/2025/05/29/1/</id>
+        <content type="html"><![CDATA[
+<p>外出先から自宅のLANに接続するために、Synology NASをExit Nodeとして設定した時のメモ。</p>
+<p>Tailscaleのオフィシャルドキュメントに、Synology NAS上でのインストール/設定方法がまとめられているので、基本的にはこれを見ればよい。</p>
+<p><a href="https://tailscale.com/kb/1131/synology#manual-installation-steps">Access Synology NAS from anywhere · Tailscale Docs</a></p>
+<p>ただしこのドキュメントでは、Exit Nodeとして設定してLANアクセスできるようにする方法は説明されていないので、こちらの動画も参考にした。</p>
+<p><a href="https://www.youtube.com/watch?v=F7mqVt_pUJY">Setup Your Synology NAS As A Tailscale Exit Node - YouTube</a></p>
+<p>具体的には、Synology NASにSSHでログインして、以下のコマンドを実行すれば良い。</p>
+<pre><code class="language-shell">sudo tailscale up \
+--advertise-exit-node \
+--advertise-routes=192.168.100.0/24 \
+--reset
+</code></pre>
+<p>その後、コンソール上でApproveする。</p>
+<p><img src="/images/2025/05/tailscale-exit-node.png" alt="" /></p>
+<p>これで外出先から、Tailscaleが入っていない/入れられない自宅LAN内のマシンにもアクセスできるようになった。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[社会保険料額情報HTMLジェネレーター]]></title>
@@ -228,114 +252,6 @@
 <p>プラグイン利用前提で書いた過去記事はGo版では正しく変換してくれないことになるが、過去記事を再生成する必要はいまのところないので特に問題なさそう。</p>
 <p>またRuby版には、コマンド一発で確認用のローカルサーバを立ち上げてブラウザで開き、記事を保存したら自動でHTMLに変換してブラウザも自動リロード、という、機能があるのだけど、これはあれば便利だけどなくても困らないので未実装。</p>
 <p>とりあえず最低限必要な機能は実装でき、この記事もGo版で生成している。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Terraform State Refreshの高速化手法と実装]]></title>
-        <link href="https://mizzy.org/blog/2022/03/24/1/"/>
-        <updated>2022-03-24T12:00:00+09:00</updated>
-        <id>https://mizzy.org/blog/2022/03/24/1/</id>
-        <content type="html"><![CDATA[
-<script type='module'>
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: false });
-  await mermaid.run({
-    querySelector: 'pre > code.language-mermaid',
-  });
-</script>
-<h2>TerraformのState</h2>
-<p>TerraformのStateとは、Terraformで管理しているリソースの状態をJSONで記述したものであり、ファイルとして永続化されている。</p>
-<p>Stateが何のためにあるのか、については<a href="https://www.terraform.io/language/state/purpose">オフィシャルな解説</a>があるので詳しく説明はしないが、Stateには主に以下の目的がある。</p>
-<ul>
-<li>Mapping to the Real World</li>
-<li>Metadata</li>
-<li>Performance</li>
-<li>Syncing</li>
-</ul>
-<p>このエントリでは、Performanceに着目する。</p>
-<hr />
-<h2>State Refresh</h2>
-<p>Terraformは、plan/applyを実行する際に、どのような変更を行う必要があるのかを決定するために、リソースの最新の状態を知る必要がある。 デフォルトの動作では、plan/applyを実行するたびに、すべてのリソースの最新の状態を取得しにいく。</p>
-<p>これがState Refreshである。</p>
-<p>State Refreshは、例えばAWS上のリソースを管理している場合は、リソースひとつひとつに対してAWSのAPIにリクエストを投げ、情報を取得する。また、リソースの種類によっては、ひとつのリソースに対して複数のAPIリクエストを投げることもある。</p>
-<p>そのため、Terraformで管理しているリソースの数に応じてAPIリクエストの回数が増え、Refreshにかかる時間が増える。APIにはRate Limitもあるので、並列にリクエストを投げて高速化するのも限界がある。</p>
-<p>管理しているリソースの数が少なければ、Refreshにかかる時間は問題にならないが、多い場合にはちょっとした変更を確認したいだけの場合でも、State Refreshで数分待たされることになる。</p>
-<hr />
-<h2>State Refreshを高速化する手法</h2>
-<p>Terraformコードをサブディレクトリに分けStateを分割することで、State Refreshを高速にする、という手法が一般的に使われている。Stateの分割によりRefreshの高速化は見込めるが、細分化しすぎると運用管理が煩雑になる。</p>
-<p>また、<a href="https://www.terraform.io/language/state/purpose">オフィシャルな解説</a>では、リソースの数が多い場合は、<code>-refresh=false</code>や<code>-target</code>オプションを利用することで、Refreshに時間がかかるのを回避する、といった記述がある。</p>
-<p><code>-refresh=false</code>オプションの場合には、ファイルに永続化されたStateを正とみなし、APIリクエストを投げて最新の情報を取得するようなことはしない。また、<code>-target</code>オプションでは、指定したリソース（と依存関係のあるリソース）のみAPIリクエストを投げて最新の情報を取得するが、それ以外のリソースについては、ファイルに永続化されたStateを正とみなす。</p>
-<p>しかし、<code>-refresh=false</code>は、Terraform外でリソースに変更があった場合はそれを検知できない。また、<code>-target</code>オプションはRefresh対象となるリソースをいちいち指定しないといけない上に、指定外のリソースについては、Terraform外で変更があっても検知できない。</p>
-<p>そこで、State Refresh高速化のための手法として、以下の手法について考えてみる。</p>
-<ul>
-<li>Terraform外で変更されたリソースを予め永続化されたStateに反映しておく。</li>
-<li>Terraform実行時にRefresh対象となるリソースを絞る。</li>
-</ul>
-<p>それぞれについて掘りさげる。</p>
-<hr />
-<h2>Terraform外で変更されたリソースを予め永続化されたStateに反映しておく（その1）</h2>
-<p>ファイルに永続化されているStateが常に最新の状態になっていれば、<code>-refresh=false</code>オプションでRefreshをスキップしても、最新の状態が得られる。これにより、terraform plan/applyのState Refreshにかかる時間を0にすることができる。</p>
-<p>これを実現する方法のひとつとして、以下のようなやり方が考えられる。</p>
-<ul>
-<li>リソースの変更を何らかの方法で検知する。</li>
-<li>変更を検知したリソースがTerraform管理対象のリソースである場合、永続化されたStateに情報を反映する。</li>
-</ul>
-<p>AWSのリソースをTerraformで管理している、という前提の元では、具体的には以下のような実装が考えられる。</p>
-<pre><code class="language-mermaid">flowchart LR
-terraform[Lambda Function]
-event[CloudWatch Events]
-s3[S3 Bucket]
-event -- 1 --&gt; terraform
-terraform -- 2 --&gt; s3
-</code></pre>
-<ol>
-<li>CloudWatch Eventsがリソースの変更イベントを発火</li>
-<li>Lambda Functionが変更イベントを受け取り、変更されたリソースがTerraform管理下にある場合、<code>terraform refresh -target</code>でStateを更新して保存</li>
-</ol>
-<p>コンセプト実装として、<a href="https://github.com/mizzy/tfrefresh">tfrefresh</a>というものをつくってみた。</p>
-<p>詳細は省くが、様々な面で実装や運用がかなり面倒ということがわかり、この手法はあまり実用的ではない、という判断に至った。</p>
-<hr />
-<h2>Terraform外で変更されたリソースを予め永続化Stateに反映しておく（その2）</h2>
-<p>その1のやり方は、常にリソース変更イベントを監視し、リアルタイムに最新の情報を永続化Stateに反映する、という仕組みを維持管理する必要があり、運用の手間がかかる。</p>
-<p>Terraformユーザから見れば、永続化Stateは常にリアルタイムに最新の状態を反映している必要はなく、Terraform実行時に最新の状態を反映していれば良い。そこで、AWSのリソースをTerraformで管理している、という前提で、次のような実装を考える。</p>
-<pre><code class="language-mermaid">flowchart LR
-cloudtrail[CloudTrail]
-s3[S3 Bucket]
-program[State Update Program]
-
-cloudtrail -- 1 --&gt; program
-program -- 2 --&gt; s3
-</code></pre>
-<ol>
-<li>Terraform実行時にState Update Programが、永続化Stateの最終更新日時以降に変更されたリソースをCloudTrailログから取得。
-<ul>
-<li>このプログラムは、Terraformに組み込む、あるいはラッパースクリプト化するなどして、terraform plan/apply実行前に必ず動くようにする。</li>
-</ul>
-</li>
-<li>State Update Programが、1.で取得したリソースに対して<code>terraform refresh -target</code>でStateを更新して保存。その後terraform plan/applyが実行される。</li>
-</ol>
-<p>このようにすると、Terraform実行前に、永続化Stateが最新の状態に更新されるため、<code>-refresh=false</code>オプションを利用して、State Refreshにかかる時間を0にすることができる。</p>
-<p>こちらも詳細は省くが、そもそも永続化されたStateが最新更新日時を持っていないなど、Terraformの仕様上実装が困難ということがわかった。また、実装できたとしても、Terraform実行の直前にログからRefresh対象を判別し永続化Stateを更新するため、状況によってはかえって時間がかかる可能性もある。</p>
-<hr />
-<h2>Terraform実行時にRefresh対象となるリソースを絞る</h2>
-<p>先に挙げた、予め永続化Stateに最新の情報を反映しておくのとは別なやり方として、Terraform実行時にRefresh対象となるリソースを絞るやり方を考える。</p>
-<p>これは<a href="https://www.terraform.io/language/state/purpose">オフィシャルな解説</a>にある<code>-refresh=false</code>や<code>-target</code>オプションを利用した回避方法そのものであるが、オプションの指定を人が判断して行うのではなく、プログラムが判断する。</p>
-<p>Refresh対象となるリソースをどのように判別するかであるが、ここでは、Terraformコードはバージョン管理システムで管理されており、ベースブランチのTerraformコードは常にapplyされた状態である、という前提の元、ベースブランチ上のファイルとカレントディレクトリ上のファイルを比較し、差分のあるリソースを抽出してRefresh対象とする。</p>
-<p>これを行うためのツールとして、<a href="https://github.com/mizzy/tfdiff">tfdiff</a>というツールを実装してみた。tfdiffは、ベースブランチ上のファイルとカレントディレクトリ上のファイルを比較し、リソースに差分がない場合には<code>-refresh=false</code>という文字列を出力、差分がある場合には、該当リソースすべてについて<code>-target resource_name</code>という文字列を出力する。</p>
-<p>tfdiffは<code>terraform plan $(tfdiff)</code>といった形で、terraformコマンドと組み合わせて利用する。</p>
-<p>たとえば、tfdiffがリソースに差分がないと判断すれば、<code>terraform plan -refresh=false</code>が実行されるし、<code>aws_s3_bucket.foo</code>と<code>aws_iam_user.bar</code>に差分があると判断すれば、<code>terraform plan -target aws_s3_bucket.foo -target aws_iam_user.bar</code>が実行される。</p>
-<p>これにより、Refresh対象となるリソースが必要なものだけに絞り込まれるので、Refresh時間を短縮することができる。</p>
-<p>現在のtfdiffは250行ほどの雑なコードで、不十分なところも色々あるが、実装の労力に対して得られる効果は、先の2つの手法よりも大きく、利用のための敷居も低い。</p>
-<p>ただしこのやり方では、差分のあるリソース、すなわち変更対象であるリソース（と依存関係にあるリソース）の情報は最新のものが得られるが、それ以外のリソースの情報は古いままである可能性が捨てきれない。冒頭で述べた、「Terraformは、plan/applyを実行する際に、どのような変更を行う必要があるのかを決定するために、リソースの最新の状態を知る必要がある。」という目的のためには十分であるが、Terraform以外のツール（<a href="https://github.com/kayac/ecspresso">ecspresso</a>や<a href="https://github.com/fujiwara/lambroll">lambroll</a>など）からStateを参照する際には、古い情報を参照してしまう可能性がある。</p>
-<hr />
-<h2>まとめ</h2>
-<ul>
-<li>Terraform State Refreshを高速化する手法や実装について、現在考えていることを整理してみた。</li>
-<li>リアルタイム、あるいは必要なタイミング(Terraform実行時)にStateを最新の状態にする、という手法は、現在考えつく限りでは、実装や運用が困難である。</li>
-<li>バージョン管理システムを活用して、Terraform実行時にRefresh対象を絞る、という手法は、前提条件はあるものの、実装や利用が比較的容易である。ただし、変更対象外のリソースはRefreshされないため、ファイルに永続化されたState上には古い情報が残る可能性がある。</li>
-</ul>
 
 ]]></content>
     </entry>
