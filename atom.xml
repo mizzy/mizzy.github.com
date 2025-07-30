@@ -3,12 +3,31 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2025-05-29T09:04:51+09:00</updated>
+    <updated>2025-07-31T05:26:59+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Twilog MCP Alternativeの実装]]></title>
+        <link href="https://mizzy.org/blog/2025/07/31/1/"/>
+        <updated>2025-07-31T05:26:59+09:00</updated>
+        <id>https://mizzy.org/blog/2025/07/31/1/</id>
+        <content type="html"><![CDATA[
+<p>以下のポストに対して、Twilog MCPを利用するために課金していた一ユーザーとして思うところがあり、課金をやめて代わりになる仕組みを自前実装することにした。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">まったく書く予定じゃなかったnoteを書きました！やってしまいました＆やってしまったのは仕方ない＆やるしかない<br><br>7月30日16時過ぎから発生しているTwilogのデータベース障害について｜Togetter（トゥギャッター ） <a href="https://t.co/1CqVnqUu5x">https://t.co/1CqVnqUu5x</a></p>&mdash; yositosi (@yositosi) <a href="https://twitter.com/yositosi/status/1950577394219434263?ref_src=twsrc%5Etfw">July 30, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>ググってみると、アーカイブデータをDuckDBにインポートして、MCPで閲覧する、という仕組みを構築されている方がいらっしゃった。</p>
+<p><a href="https://zenn.dev/tenkao/scraps/96996339ddf4c1">DuckDB + Claude Desktop + MCP で X（Twitter）のアーカイブデータを閲覧する</a></p>
+<p>これを参考に、TwitterのアーカイブデータをDuckDBにインポートするプログラムをClaude Codeに実装してもらった。</p>
+<p><a href="https://github.com/mizzy/tweetduck">mizzy/tweetduck: Twitter Archive to DuckDB Importer - Extract and import Twitter archive data (2025 format) into DuckDB for analysis</a></p>
+<p>これと<a href="https://github.com/ktanaka101/mcp-server-duckdb">ktanaka101/mcp-server-duckdb: A Model Context Protocol (MCP) server implementation for DuckDB, providing database interaction capabilities</a>を組み合わせたら、完全にTwilog MCP Alternativeになった。</p>
+<img src="/images/2025/07/duckdb-mcp.png" alt="" width="50%" height="50%"/>
+<p>アーカイブデータの更新は手動になってしまうが、自分の用途的には、直近のツイートが入ってなくても問題ないので、これで十分。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Synology NASをTailscaleのExit Nodeにして外からLANにアクセス]]></title>
@@ -225,33 +244,6 @@
 </ul>
 <p>プログラムの仕様上の問題で、完全には一致しない場合があるのだけど、事業の帳簿と違って完全一致させる必要はないので、満足してる。</p>
 <p>ただ、API経由の登録だと、連携の履歴には未読としては表示されないので、そこだけは少し不便だけど、致命的ではないので、当分アメックスの明細は自前プログラムで同期するつもり。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Ruby製の静的サイトジェネレータをGoで再実装した]]></title>
-        <link href="https://mizzy.org/blog/2025/01/26/1/"/>
-        <updated>2025-01-26T19:32:42+09:00</updated>
-        <id>https://mizzy.org/blog/2025/01/26/1/</id>
-        <content type="html"><![CDATA[
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ブログ3年ぐらい更新してなくて、もう少しマメに書くか、という機運になってきたので、ブログツール書き始めた。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1883311289768063332?ref_src=twsrc%5Etfw">January 26, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>このブログは、マークダウン形式で記事を書いて、<a href="https://github.com/mizzy/ruby-nebel">Nebel</a>というRubyで実装したお手製の静的サイトジェネレータでHTMLに変換してGitHub Pagesでホストしている。</p>
-<p>が、久々に書くか、と思ってNebelを動かしてみたところ、エラーで動かない。具体的には、ローカルでの確認用サーバのために利用しているeventmachine gemがビルドに失敗してインストールできない。</p>
-<p>エラーの原因を調べて直すのもよいのだけど、13年ぐらい前につくって全然メンテしてないし、今となっては不要な機能もあるので、<a href="https://github.com/mizzy/nebel">Goで再実装した</a>。</p>
-<p>といっても、Ruby版のすべての機能を実装したわけではない。Ruby版にはプラグイン機構があって、様々なプラグインが動いているが、プラグイン機構や各種プラグインは未実装。</p>
-<p>例えばgistプラグインは</p>
-<pre><code>{% gist 37401088bc6e3564addf7a27d698f6fb %}
-</code></pre>
-<p>と書いておくと</p>
-<pre><code class="language-html">&lt;div&gt;&lt;script src='https://gist.github.com/37401088bc6e3564addf7a27d698f6fb.js?file='&gt;&lt;/script&gt;
-&lt;noscript&gt;&lt;pre&gt;&lt;code&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/noscript&gt;&lt;/div&gt;
-</code></pre>
-<p>といったHTMLに変換してくれる。自分でつくっておいてなんだけど、プラグインで変換しなくてもgistのページからEmbed用コードを簡単にコピーできるので、別にいらなかったな、と思ってる。</p>
-<p>もしかしたら必要なプラグインもあるかもだけど、必要になってから実装すればいいやと思っている。</p>
-<p>プラグイン利用前提で書いた過去記事はGo版では正しく変換してくれないことになるが、過去記事を再生成する必要はいまのところないので特に問題なさそう。</p>
-<p>またRuby版には、コマンド一発で確認用のローカルサーバを立ち上げてブラウザで開き、記事を保存したら自動でHTMLに変換してブラウザも自動リロード、という、機能があるのだけど、これはあれば便利だけどなくても困らないので未実装。</p>
-<p>とりあえず最低限必要な機能は実装でき、この記事もGo版で生成している。</p>
 
 ]]></content>
     </entry>
