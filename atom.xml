@@ -3,12 +3,47 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2025-08-30T12:30:00+09:00</updated>
+    <updated>2025-08-30T21:31:14+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[RigelというAI Coding Agentを開発している]]></title>
+        <link href="https://mizzy.org/blog/2025/08/30/2/"/>
+        <updated>2025-08-30T21:31:14+09:00</updated>
+        <id>https://mizzy.org/blog/2025/08/30/2/</id>
+        <content type="html"><![CDATA[
+<h2>きっかけ</h2>
+<p>tokuhiromさんの<a href="https://blog.64p.org/entry/2025/08/29/170302">ashronというAI Coding Agentを開発している</a>というブログ記事や以下のポストを読んだ。</p>
+<!-- markdownlint-disable MD013 -->
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ashron っていう、Coding Agent を書いている - Blog::Amrta <a href="https://t.co/fKU4l0QTQq">https://t.co/fKU4l0QTQq</a></p>&mdash; tokuhirom (@tokuhirom) <a href="https://twitter.com/tokuhirom/status/1960847865967780266?ref_src=twsrc%5Etfw">August 29, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<!-- markdownlint-enable MD013 -->
+<p>Clineがいい、Cursorだ、いやClaude Codeだ、Codexだ、みたいな流行に振り回されたくないし、ローカルLLMをうまく扱えるコーディングエージェントもなかなか見つからない。</p>
+<p>なので、自分でAI Coding Agentを作るのがよいかもしれない、と考えていた。</p>
+<p>そんな状況で、tokuhiromさんの記事を読んで背中を押された感じ。</p>
+<p>というわけで、自分もRigelというAI Coding Agentを作り始めた。</p>
+<hr />
+<h2>Rigelについて</h2>
+<p><a href="https://github.com/mizzy/rigel">Rigel</a>は、Goで実装しているAI Coding Agent。</p>
+<p>主な特徴は以下の通り。</p>
+<ul>
+<li>ターミナルベースのチャットインターフェース</li>
+<li>複数のLLMプロバイダーに対応（Anthropic Claude、Ollama）</li>
+<li>サンドボックスでの安全なコード実行</li>
+</ul>
+<p>特にローカルLLMを扱えるようにOllamaに対応しているのがポイント。何も設定しない場合、デフォルトでローカルのOllama + gpt-oss:20bを利用するようになっている。エージェント実行中に、AnthropicかOllamaかを切り替えたり、モデルを切り替えたりもできる。</p>
+<p>実際に動かすとこんな感じ。</p>
+<p><img src="/images/2025/08/rigel.jpg" alt="Rigelのスクリーンショット" /></p>
+<p>ちなみにRigelという名前はオリオン座の1等星から拝借しているけど、特に意味はない。リゲルは青白い星なので、色使いもそんな感じにしている。</p>
+<hr />
+<h2>今後の開発</h2>
+<p>とりあえずベースができて会話できる程度にはなったけど、まだコーディングエージェントとして使える状態にはなっていない。今後はツール周りと、コンテキストをどう扱うか、といったあたりが開発の中心になりそう。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[ObsidianとQuartz 4でつくる雑なメモサイト]]></title>
@@ -248,23 +283,6 @@ npx quartz create
 <p><img src="/images/2025/01/hilton-odaiba.png" alt="" /></p>
 <p>同じ日程、同じ部屋タイプでも様々な料金プランがあるが、基本的にはFlexible Rateと連動してるはずなので、Flexible Rateをウォッチしておけば、価格の変動はわかるはず。</p>
 <p>より正確な情報を得ようとするならば、自分の場合、ポイント、Flexible RateにHonors Discountが適用された価格、HPCJ価格（Flexible Rate * 0.75）の3つがあれば良いので、次はこれらの料金を取得できるよう改善する予定。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[PlaywrightでGit scraping]]></title>
-        <link href="https://mizzy.org/blog/2025/01/28/1/"/>
-        <updated>2025-01-28T21:21:41+09:00</updated>
-        <id>https://mizzy.org/blog/2025/01/28/1/</id>
-        <content type="html"><![CDATA[
-<p>こちらのスライドに影響されて、Git scraping始めました。</p>
-<script defer class="speakerdeck-embed" data-id="6844b3b0badf4a13a58f6528c58394d5" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>親切なことに、テンプレートリポジトリを提供してくださっているので、さくっと始めることができました。</p>
-<p><a href="https://github.com/ohbarye/git-scraping-template"><img src="https://opengraph.githubassets.com/eec38b4a69b9284604e4880ce91d56a6dd613cfdfcd1e7af8dfaa6d6ca55d5e6/ohbarye/git-scraping-template" height="300" /></a></p>
-<p>ただ、スクレイピングしたいサイトの中にはJavaScript必須のものもあったので、そういったサイトにも対応できるよう、ohbaryeさんのテンプレートリポジトリを参考にして、PlaywrightでGit scrapingするためのテンプレートリポジトリを作成してみました。</p>
-<p><a href="https://github.com/mizzy/git-scraping-playwright-template"><img src="https://opengraph.githubassets.com/ad5e0a080d1b88539dd3bc7e562cbe6e1c7e454a415566433117ccee07e23d29/mizzy/git-scraping-playwright-template" height="300" /></a></p>
-<p>よろしければぜひご活用ください。</p>
 
 ]]></content>
     </entry>
