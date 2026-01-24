@@ -20,7 +20,7 @@
 <p>gfxさんの<a href="https://gfx.hatenablog.com/entry/2026/01/23/212644">個人が静的型付き言語のコンパイラをゼロから作れる時代が来た！</a>という記事を読んで、自分も何か、以前だったらつくろうと思っても面倒で手が出なかったようなものをつくってみよう、と思ってつくりはじめた。</p>
 <p>自分のことを知ってる方ならご存じかと思うが、自分はInfrastructure as Codeが大好きで、普段からIaCのことばかり考えている。最近だとこんなことを考えて発表した。</p>
 <script defer class="speakerdeck-embed" data-id="facd81a255fb4c32ab2d80c559f1ede1" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>Terraformは好きで、公私ともにとてもお世話になっているのだが、こうなっているといいな、と思う点が色々ある。だが、Terraformはそれなりに歴史も実績もあるツールで、とてもよくできているので、自分でいちからつくって、Terraformと同レベルで使えるようになるまで育てるのは大変すぎるな、と思っていた。が、gfxさんの記事を読んで、今ならいけそうだな、と思って、つくりはじめた。</p>
+<p>Terraformは好きで、公私ともにとてもお世話になっているのだが、こうなっているといいな、と思う点が色々ある。だが、Terraformはそれなりに歴史も実績もあるツールで、とてもよくできているので、自分でいちからつくって、Terraformと同レベルで使えるようになるまで育てるのは大変すぎるな、と思っていた。が、gfxさんの記事を読んで、今ならいけそうだな、と思ってつくりはじめた。</p>
 <hr />
 <h2>Carinaについて</h2>
 <p><a href="https://github.com/mizzy/carina">Carina</a>は、Rustで実装したTerraformライクなインフラ管理ツール。</p>
@@ -86,7 +86,7 @@ let backup = aws.s3.bucket {
 </li>
 <li>Data Sourceのことはまだ考えてなかったので、区別するためのキーワードが必要になりそうだけど、まだ決めていない</li>
 </ul>
-<p>Terraformだと、<code>resource &quot;aws_s3_bucket&quot; &quot;my_app_logs&quot;</code>のように書くが、リソースタイプがアンダースコア区切りなので、それに合わせてリソース名もアンダースコア区切りにすべきか、それともハイフン区切りにすべきか、といつも悩む。別にどちらでもいいんだけど、どちらでもいいということは、その時々で判断がぶれてしまうので、ぶれないようにしたい、このような設計にした理由の一つ。</p>
+<p>Terraformだと、<code>resource &quot;aws_s3_bucket&quot; &quot;my_app_logs&quot;</code>のように書くが、リソースタイプがアンダースコア区切りなので、それに合わせてリソース名もアンダースコア区切りにすべきか、それともハイフン区切りにすべきか、といつも悩む。別にどちらでもいいんだけど、どちらでもいいということは、その時々で判断がぶれてしまうので、ぶれないようにしたい、と思ったのがこのような設計にした理由の一つ。</p>
 <hr />
 <h2>使い方</h2>
 <p>Terraformと同様に<code>validate</code>、<code>plan</code>、<code>apply</code>というコマンドがある。</p>
