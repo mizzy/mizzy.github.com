@@ -3,12 +3,89 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-24T13:47:59+09:00</updated>
+    <updated>2026-01-24T18:40:23+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[AWS Cloud Control APIは遅い？]]></title>
+        <link href="https://mizzy.org/blog/2026/01/24/2/"/>
+        <updated>2026-01-24T18:40:23+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/24/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/mizzy/carina">Carina</a>の開発中に、AWS Cloud Control APIが遅いことに気づいた。</p>
+<hr />
+<h2>Cloud Control APIを試した背景</h2>
+<p>CarinaでAWSリソースを扱うにあたり、最初はaws-sdk-s3を使ってS3バケットの操作を実装していた。ただ、この方法だとリソースタイプごとに個別実装が必要になる。S3、EC2、IAM...とAWSのサービスは膨大にあるので、全部個別に実装するのは大変だ。生成AIがあるとはいえ、もっと楽にできないかと考えた。</p>
+<p>そこで<a href="https://docs.aws.amazon.com/cloudcontrolapi/latest/userguide/what-is-cloudcontrolapi.html">Cloud Control API</a>を使うことを考えた。Cloud Control APIは、CloudFormationと同じリソースハンドラーを使った統一的なAPIで、様々なAWSリソースをCRUD操作できる。</p>
+<p>Cloud Control APIを使う大きなメリットとして、CloudFormationのJSON Schemaが公開されていることがある。例えばS3バケットのスキーマは以下のコマンドで取得できる。</p>
+<pre><code class="language-shell">aws cloudformation describe-type --type RESOURCE \
+  --type-name AWS::S3::Bucket --query 'Schema' --output text
+</code></pre>
+<p>このスキーマを使えば、<a href="https://github.com/oxidecomputer/typify">typify</a>でRustの型を自動生成できる。生成した型を使ってバリデーションすれば、リソースごとに手動でバリデーションロジックを書く必要がなくなる。</p>
+<p>というわけで、Cloud Control APIを使うよう<a href="https://github.com/mizzy/carina/pull/2">実装してみた</a>。</p>
+<hr />
+<h2>問題発覚</h2>
+<p>S3バケットの<code>versioning_configuration</code>を変更する<code>apply</code>を実行したところ、完了までに20秒以上かかった。単純なプロパティ変更なのに遅すぎるのでは、と思って調べてみた。</p>
+<hr />
+<h2>計測結果</h2>
+<p>直接S3 APIを叩いた場合と、Cloud Control APIを叩いた場合で比較してみた。</p>
+<h3>直接S3 API</h3>
+<pre><code class="language-shell">$ time aws s3api put-bucket-versioning \
+  --bucket carina-test-logs-mizzy-2026 \
+  --versioning-configuration Status=Suspended
+</code></pre>
+<p>所要時間: <strong>約0.4〜0.5秒</strong></p>
+<h3>Cloud Control API</h3>
+<pre><code class="language-shell">RESULT=$(aws cloudcontrol update-resource \
+  --type-name &quot;AWS::S3::Bucket&quot; \
+  --identifier &quot;carina-test-logs-mizzy-2026&quot; \
+  --patch-document '[{&quot;op&quot;:&quot;replace&quot;,&quot;path&quot;:&quot;/VersioningConfiguration&quot;,&quot;value&quot;:{&quot;Status&quot;:&quot;Enabled&quot;}}]')
+
+REQUEST_TOKEN=$(echo &quot;$RESULT&quot; | jq -r '.ProgressEvent.RequestToken')
+START=$(date +%s)
+
+while true; do
+  STATUS=$(aws cloudcontrol get-resource-request-status \
+    --request-token &quot;$REQUEST_TOKEN&quot; | jq -r '.ProgressEvent.OperationStatus')
+  echo &quot;[$(( $(date +%s) - START ))s] $STATUS&quot;
+  [ &quot;$STATUS&quot; = &quot;SUCCESS&quot; ] || [ &quot;$STATUS&quot; = &quot;FAILED&quot; ] &amp;&amp; break
+  sleep 1
+done
+</code></pre>
+<p>完了までの所要時間: <strong>約23秒</strong></p>
+<hr />
+<h2>なぜ遅いのか</h2>
+<p>Cloud Control APIはCloudFormationと同じリソースハンドラーを使っており、内部的にリソースの整合性チェックや安定化待ち（resource stabilization）を行っているようだ。</p>
+<p>AWSの公式ブログ<a href="https://aws.amazon.com/blogs/devops/how-we-sped-up-aws-cloudformation-deployments-with-optimistic-stabilization/">How we sped up AWS CloudFormation deployments with optimistic stabilization</a>でも、CloudFormationのデプロイが遅い理由として「resource stabilization」に時間がかかることが説明されている。</p>
+<hr />
+<h2>まとめ</h2>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>所要時間</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>直接S3 API</td>
+<td>約0.5秒</td>
+</tr>
+<tr>
+<td>Cloud Control API</td>
+<td>約23秒</td>
+</tr>
+</tbody>
+</table>
+<p>Cloud Control APIは統一的なインターフェースで様々なリソースを扱えるメリットがあるが、個別のAPIを直接叩くより大幅に遅い。速度が重要な場合は、リソースタイプごとに直接SDKを使う方がよさそう。</p>
+<p>Carinaでの採用はやめた。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[CarinaというTerraformライクなツールをつくりはじめた]]></title>
@@ -545,18 +622,6 @@ npx quartz create
 </blockquote>
 <p>自分はスタンダードタイプの部屋には泊まったことがあるけど、Thinkチェアはなかった。</p>
 <p>ホテル検索サイト、椅子でも検索できるといいのに。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[DuckDBで課金時間の多いGitHub Actionsワークフローを抽出]]></title>
-        <link href="https://mizzy.org/blog/2025/02/15/1/"/>
-        <updated>2025-02-15T09:03:26+09:00</updated>
-        <id>https://mizzy.org/blog/2025/02/15/1/</id>
-        <content type="html"><![CDATA[
-<script src="https://gist.github.com/mizzy/774585268e81b49f38173f8e88622521.js"></script>
-<p>ChatGPTにやらせても良い。</p>
 
 ]]></content>
     </entry>
