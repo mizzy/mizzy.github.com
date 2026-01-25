@@ -3,12 +3,27 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-25T12:59:31+09:00</updated>
+    <updated>2026-01-25T15:14:36+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[carina planで依存関係を可視化]]></title>
+        <link href="https://mizzy.org/blog/2026/01/25/2/"/>
+        <updated>2026-01-25T15:14:36+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/25/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/mizzy/carina">Carina</a>の<code>plan</code>コマンドで、リソース間の依存関係をツリー構造で表示できるようにした。</p>
+<p><img src="/images/2026/01/carina-plan.png" alt="carina plan の出力" /></p>
+<p>Terraformの<code>plan</code>コマンドは、作成・変更・削除されるリソースがフラットなリストで表示される。どのリソースが作成されるかはわかるが、リソース間の依存関係は出力からは読み取れない。</p>
+<p>Carinaの<code>plan</code>では、依存関係に基づいてリソースがツリー構造で表示される。上の例だと、VPCの下にSecurity Groupがあり、その下にIngress Ruleがある、という階層構造が一目でわかる。</p>
+<p>これにより、planの出力を見るだけで、リソース間の依存関係を把握できる。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carina Modules]]></title>
@@ -607,40 +622,6 @@ npx quartz create
 <p>その後、コンソール上でApproveする。</p>
 <p><img src="/images/2025/05/tailscale-exit-node.png" alt="" /></p>
 <p>これで外出先から、Tailscaleが入っていない/入れられない自宅LAN内のマシンにもアクセスできるようになった。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[社会保険料額情報HTMLジェネレーター]]></title>
-        <link href="https://mizzy.org/blog/2025/05/24/1/"/>
-        <updated>2025-05-24T18:36:10+09:00</updated>
-        <id>https://mizzy.org/blog/2025/05/24/1/</id>
-        <content type="html"><![CDATA[
-<p>社会保険料額情報、電子データで受け取る申請を行って、無事受理された。</p>
-<p><a href="https://www.nenkin.go.jp/denshibenri/online_jigyousho/denshidata/tsuchisho.html">電子データで受け取れる各種情報・通知書の詳細｜日本年金機構</a></p>
-<p>申請時に、事業所整理記号をどう入力すれば良いのかよくわからず、何度かリジェクトされたけど。</p>
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">解決した。前2桁は都道府県コードを入れる必要があった。申請フォームに様式記入要領PDFへにリンクがあり、それを見ると書いてあった。 <a href="https://t.co/bfWQzaUiqL">https://t.co/bfWQzaUiqL</a></p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1926157537159610449?ref_src=twsrc%5Etfw">May 24, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>電子データはZIPファイルになっていて、中身を見るとXMLファイルとXSLファイルで構成されている。IEではそのまま閲覧できるようだが、Microsoft EdgeやSafariの場合は、ブラウザの設定変更が必要になる。</p>
-<ul>
-<li><a href="https://www.nenkin.go.jp/denshibenri/oshirase/zenpan/20220610.html">InternetExplorer以外のブラウザでの決定通知書の閲覧方法について｜日本年金機構</a></li>
-<li><a href="https://www.nenkin.go.jp/faq/denshi/e-gov/koubunsho_hirakikata.html">機構から送付されるXML形式の通知書（公文書）の開き方を教えてください。｜日本年金機構</a></li>
-</ul>
-<p>また、普段使いしてるChromeでは、そのままさくっと表示する方法がなさそうで、以下のサイトを参考に、XMLとXSLからHTMLに変換して表示する方法を試してみた。</p>
-<ul>
-<li><a href="https://gammasoft.jp/blog/convert-xml-and-xsl-to-one-html-by-python/">電子公文書の XML と XSL を Python で１つのHTMLに変換する方法 - ガンマソフト</a></li>
-<li><a href="https://zenn.dev/sora_kumo/articles/xsl-viewer-html">電子公文書(XML+XSL)をChromeで表示する</a></li>
-</ul>
-<p>この方法でばっちり表示されたのだが、PDFで保存した場合にもきれいにレイアウトしたい、と思い、<a href="https://claude.ai/">Claude</a>に社会保険料額情報HTMLジェネレーターつくってもらった。</p>
-<p>ジェネレーターはひとつのHTMLファイルで構成されていて、開くとこのような画面になる。</p>
-<p><img src="/images/2025/05/social-insurance-premium-amount-generator-0.png" alt="" /></p>
-<p>社会保険料額情報のXMLが含まれるZIPファイルをアップロードするとこのようになる。</p>
-<p><img src="/images/2025/05/social-insurance-premium-amount-generator-1.png" alt="" /></p>
-<p>プレビュー表示するとこのようになり、PDFにするとA4横一枚におさまるレイアウトになっている。</p>
-<p><img src="/images/2025/05/social-insurance-premium-amount-generator-2.png" alt="" /></p>
-<p>ソースコードはこちら → <a href="https://github.com/mizzy/social-insurance">https://github.com/mizzy/social-insurance</a></p>
-<p>こちらで実際に試せます → <a href="https://mizzy.org/social_insurance_premium_amount_generator.html">https://mizzy.org/social_insurance_premium_amount_generator.html</a></p>
-<p>社会保険料額情報だけしか対応していないので、保険料納入告知額・領収済額通知書等にも対応予定。</p>
 
 ]]></content>
     </entry>
