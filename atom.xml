@@ -3,12 +3,58 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-24T18:40:23+09:00</updated>
+    <updated>2026-01-25T12:59:31+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carina Modules]]></title>
+        <link href="https://mizzy.org/blog/2026/01/25/1/"/>
+        <updated>2026-01-25T12:59:31+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/25/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/01/24/1/">昨日の記事</a>で紹介した<a href="https://github.com/mizzy/carina">Carina</a>に、モジュール機能を実装した。</p>
+<hr />
+<h2>背景</h2>
+<p><a href="/blog/2025/11/17/1/">YAPC::Fukuoka 2025での発表</a>で、インフラコードのモジュール化の難しさについて話した。</p>
+<script defer class="speakerdeck-embed" data-id="facd81a255fb4c32ab2d80c559f1ede1" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<p>ここで挙げた問題のひとつが「内部構造の把握と依存関係の追跡が困難」という点。Terraformのモジュールは中身を見ないと何が作られるかわからないし、依存関係も追いづらい。planを実行してみれば、どんなリソースがつくられるかはわかるが、モジュールを呼び出すためのコードを書かないといけなくて面倒。また、つくられるリソースは表示されるが、リソース間の依存関係はplanの出力からはわからない。</p>
+<p>この問題を解決するために、Carinaには<code>module info</code>というコマンドを実装した。</p>
+<hr />
+<h2>module info コマンド</h2>
+<p><code>module info</code>コマンドを実行すると、モジュールの情報が以下のように表示される。</p>
+<p><img src="/images/2026/01/carina-module-info.png" alt="module info の出力" /></p>
+<p>3つのセクションに分かれている。</p>
+<h3>REQUIRES</h3>
+<p>モジュールが必要とする入力を表示する。</p>
+<pre><code>vpc: ref(aws.vpc)  (required)
+cidr_blocks: list(cidr)  (required)
+enable_https: bool = true
+</code></pre>
+<p>型情報と、必須かどうか、デフォルト値があるかどうかがわかる。</p>
+<h3>CREATES</h3>
+<p>モジュールが作成するリソースをツリー構造で表示する。</p>
+<pre><code>input { vpc: ref(aws.vpc) }
+└── web_sg: aws.security_group
+    ├── http: aws.security_group.ingress_rule
+    └── https: aws.security_group.ingress_rule
+</code></pre>
+<p>入力として受け取った<code>vpc</code>を起点に、どのリソースがどのリソースに依存しているかが視覚的にわかる。</p>
+<h3>EXPOSES</h3>
+<p>モジュールが外部に公開する出力を表示する。</p>
+<pre><code>security_group: ref(aws.security_group)
+  ← from: web_sg
+</code></pre>
+<p>出力の型と、その出力がモジュール内のどのリソースから来ているかがわかる。</p>
+<hr />
+<h2>今後</h2>
+<p>まだ少ないリソース数と単純な依存関係でしか試していないが、モジュールで定義されているリソース構造を把握するのに役立ちそう。リソース数が増えたり、依存関係が複雑になったりするとどうなるか、引き続き試しながら改善していきたい。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[AWS Cloud Control APIは遅い？]]></title>
@@ -595,33 +641,6 @@ npx quartz create
 <p>ソースコードはこちら → <a href="https://github.com/mizzy/social-insurance">https://github.com/mizzy/social-insurance</a></p>
 <p>こちらで実際に試せます → <a href="https://mizzy.org/social_insurance_premium_amount_generator.html">https://mizzy.org/social_insurance_premium_amount_generator.html</a></p>
 <p>社会保険料額情報だけしか対応していないので、保険料納入告知額・領収済額通知書等にも対応予定。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[長時間のパソコン作業に適したホテル一選]]></title>
-        <link href="https://mizzy.org/blog/2025/02/24/1/"/>
-        <updated>2025-02-24T21:05:24+09:00</updated>
-        <id>https://mizzy.org/blog/2025/02/24/1/</id>
-        <content type="html"><![CDATA[
-<p>三選とか十選とかいきたいところだけど、自分の少ないホテル宿泊経験では、ヒルトン福岡シーホークぐらいしか知らないので。</p>
-<p>出張の際にホテルの部屋でパソコン仕事する際、問題になるのが椅子。</p>
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">家で仕事してると、椅子のことはあまり意識しないんだけど、ホテルで仕事してるとすぐに腰や背中が痛くなってくるので、家で使ってる椅子は本当に疲れにくいんだな、ということを実感する。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1605182622703161346?ref_src=twsrc%5Etfw">December 20, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>その点、ヒルトン福岡シーホークは<a href="https://jp.steelcase.com/collections/chairs-seating/products/think">SteelcaseのThinkチェア</a>が配備されていて、長時間パソコン作業しても疲れにくい。</p>
-<p>ホテルサイトの写真を見る限りでは、和室以外のほとんどの部屋に配備されてそう。</p>
-<blockquote>
-<p><a href="https://www.hilton.com/ja/hotels/fukhihi-hilton-fukuoka-sea-hawk/rooms/">https://www.hilton.com/ja/hotels/fukhihi-hilton-fukuoka-sea-hawk/rooms/</a><br />
-<img src="/images/2025/02/seahawk-rooms.png" alt="" /></p>
-</blockquote>
-<p>実際、<a href="https://mizzy.hateblo.jp/entry/2024/05/07/115701">色々なタイプの部屋に宿泊</a>したけど、スイート和洋室以外はすべてThinkチェアだった。欲を言えば、アームレストの高さが調節できるタイプだとなお良いのだけど、まともなワークチェアがあるだけで十分ありがたい。</p>
-<p>ヒルトン福岡シーホーク以外だと、羽田エクセルホテル東急のプレミアと呼ばれるタイプの部屋にはThinkチェアがある模様。</p>
-<blockquote>
-<p><a href="https://www.tokyuhotels.co.jp/haneda-e/room/index.html">https://www.tokyuhotels.co.jp/haneda-e/room/index.html</a><br />
-<img src="/images/2025/02/haneda-excel-hotel-rooms.png" alt="" /></p>
-</blockquote>
-<p>自分はスタンダードタイプの部屋には泊まったことがあるけど、Thinkチェアはなかった。</p>
-<p>ホテル検索サイト、椅子でも検索できるといいのに。</p>
 
 ]]></content>
     </entry>
