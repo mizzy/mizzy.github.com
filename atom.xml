@@ -3,12 +3,63 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-27T09:54:37+09:00</updated>
+    <updated>2026-01-27T19:08:09+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[NebelにOGP画像自動生成機能を追加した]]></title>
+        <link href="https://mizzy.org/blog/2026/01/27/2/"/>
+        <updated>2026-01-27T19:08:09+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/27/2/</id>
+        <content type="html"><![CDATA[
+<p>tokuhiromさんの<a href="https://blog.64p.org/entry/2026/01/26/110749">ogp を設定した</a>という記事を読んで、そういえば自分もOGP対応しなきゃな、と思い出した。以前から対応しようと思いつつ、画像生成とか面倒だな、と後回しにしていた。でも今なら生成AIでシュッと対応できるな、と思ってやってみた。</p>
+<p>ちなみにこのブログ記事もClaude Codeが書いたものをそのまま出している。</p>
+<p>このブログの静的サイトジェネレータである<a href="https://github.com/mizzy/nebel">Nebel</a>に、OGP画像を自動生成する機能を追加した。</p>
+<hr />
+<h2>OGP画像とは</h2>
+<p>OGP（Open Graph Protocol）画像は、SNSでURLをシェアしたときに表示されるサムネイル画像のこと。TwitterやFacebookなどでリンクを共有すると、タイトルや説明文と一緒に画像が表示される。</p>
+<p>これまでこのブログにはOGP画像を設定していなかったので、SNSでシェアしてもデフォルトの味気ない表示になっていた。</p>
+<hr />
+<h2>実装内容</h2>
+<p><code>nebel generate</code>を実行すると、各記事のタイトルからOGP画像（1200x630px）を自動生成するようにした。</p>
+<ul>
+<li><strong>サイズ</strong>: 1200x630px（OGP推奨サイズ）</li>
+<li><strong>背景</strong>: ダークグレー（#333）</li>
+<li><strong>テキスト</strong>: 記事タイトル（白色、中央配置）</li>
+<li><strong>フォント</strong>: Noto Sans CJK JP Bold（日本語対応）</li>
+</ul>
+<p>生成される画像はこんな感じ。</p>
+<p><img src="/blog/2026/01/27/2/ogp.png" alt="OGP画像のサンプル" /></p>
+<hr />
+<h2>使用ライブラリ</h2>
+<p>Goで画像を生成するために<a href="https://github.com/fogleman/gg">fogleman/gg</a>というライブラリを使った。シンプルなAPIで2D描画ができるので、こういった用途にはちょうど良い。</p>
+<p>日本語フォントには<a href="https://fonts.google.com/noto/specimen/Noto+Sans+JP">Noto Sans CJK JP</a>を使用。CJK（中国語・日本語・韓国語）に対応しているので、日本語タイトルも問題なく描画できる。</p>
+<hr />
+<h2>テンプレートの変更</h2>
+<p>HTMLテンプレートには、OGPとTwitter Cardのメタタグを追加した。</p>
+<pre><code class="language-html">&lt;!-- OGP --&gt;
+&lt;meta property=&quot;og:title&quot; content=&quot;{{ .Title }}&quot;/&gt;
+&lt;meta property=&quot;og:type&quot; content=&quot;article&quot;/&gt;
+&lt;meta property=&quot;og:url&quot; content=&quot;https://mizzy.org{{ .Path }}/&quot;/&gt;
+&lt;meta property=&quot;og:image&quot; content=&quot;https://mizzy.org{{ .OGImagePath }}&quot;/&gt;
+&lt;meta property=&quot;og:site_name&quot; content=&quot;Gosuke Miyashita&quot;/&gt;
+
+&lt;!-- Twitter Card --&gt;
+&lt;meta name=&quot;twitter:card&quot; content=&quot;summary_large_image&quot;/&gt;
+&lt;meta name=&quot;twitter:title&quot; content=&quot;{{ .Title }}&quot;/&gt;
+&lt;meta name=&quot;twitter:image&quot; content=&quot;https://mizzy.org{{ .OGImagePath }}&quot;/&gt;
+</code></pre>
+<p>これで、SNSでシェアしたときにタイトル入りの画像が表示されるようになる。</p>
+<hr />
+<h2>今後</h2>
+<p>デザインは現状かなりシンプルなので、余裕があればもう少し凝ったものにしたい。ロゴを入れたり、グラデーション背景にしたり、といったあたりは比較的簡単にできそう。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carinaの型システムについて]]></title>
@@ -650,25 +701,6 @@ npx quartz create
 <li><a href="https://quartz.jzhao.xyz/">Quartz 4</a></li>
 <li><a href="https://hotel-memo.github.io/">ホテルメモ</a></li>
 </ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Twilog MCP Alternativeの実装]]></title>
-        <link href="https://mizzy.org/blog/2025/07/31/1/"/>
-        <updated>2025-07-31T05:26:59+09:00</updated>
-        <id>https://mizzy.org/blog/2025/07/31/1/</id>
-        <content type="html"><![CDATA[
-<p>以下のポストに対して、Twilog MCPを利用するために課金していた一ユーザーとして思うところがあり、課金をやめて代わりになる仕組みを自前実装することにした。</p>
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">まったく書く予定じゃなかったnoteを書きました！やってしまいました＆やってしまったのは仕方ない＆やるしかない<br><br>7月30日16時過ぎから発生しているTwilogのデータベース障害について｜Togetter（トゥギャッター ） <a href="https://t.co/1CqVnqUu5x">https://t.co/1CqVnqUu5x</a></p>&mdash; yositosi (@yositosi) <a href="https://twitter.com/yositosi/status/1950577394219434263?ref_src=twsrc%5Etfw">July 30, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>ググってみると、アーカイブデータをDuckDBにインポートして、MCPで閲覧する、という仕組みを構築されている方がいらっしゃった。</p>
-<p><a href="https://zenn.dev/tenkao/scraps/96996339ddf4c1">DuckDB + Claude Desktop + MCP で X（Twitter）のアーカイブデータを閲覧する</a></p>
-<p>これを参考に、TwitterのアーカイブデータをDuckDBにインポートするプログラムをClaude Codeに実装してもらった。</p>
-<p><a href="https://github.com/mizzy/tweetduck">mizzy/tweetduck: Twitter Archive to DuckDB Importer - Extract and import Twitter archive data (2025 format) into DuckDB for analysis</a></p>
-<p>これと<a href="https://github.com/ktanaka101/mcp-server-duckdb">ktanaka101/mcp-server-duckdb: A Model Context Protocol (MCP) server implementation for DuckDB, providing database interaction capabilities</a>を組み合わせたら、完全にTwilog MCP Alternativeになった。</p>
-<img src="/images/2025/07/duckdb-mcp.png" alt="" width="50%" height="50%"/>
-<p>アーカイブデータの更新は手動になってしまうが、自分の用途的には、直近のツイートが入ってなくても問題ないので、これで十分。</p>
 
 ]]></content>
     </entry>
