@@ -92,13 +92,9 @@
 </code></pre>
       <p>
         Terraformではさすがに
-        <code>
-          plan
-        </code>
+        <code>plan</code>
         は通らないが、
-        <code>
-          validate
-        </code>
+        <code>validate</code>
         は通る。
       </p>
       <pre><code class="language-shell">$ terraform validate
@@ -106,9 +102,7 @@ Success! The configuration is valid.
 </code></pre>
       <p>
         Carinaもproviderの定義はTerraformと同じように記述するが、
-        <code>
-          validate
-        </code>
+        <code>validate</code>
         で以下のようなエラーが返る。
       </p>
       <pre><code class="language-shell">Error: provider aws: Validation failed: Invalid region 'ap-northeast-1a', expected one of: ap-northeast-1, ap-northeast-2, ap-northeast-3, ap-southeast-1, ap-southeast-2, ap-south-1, us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, eu-north-1, ca-central-1, sa-east-1 or DSL format like aws.Region.ap_northeast_1
@@ -121,8 +115,7 @@ Success! The configuration is valid.
       </p>
       <pre><code>provider aws {
   region = aws.Region.ap_northeast_1
-}
-</code></pre>
+}</code></pre>
       <p>
         更にLSPもサポートしているため、IDE上で補完候補としてリージョンの一覧が表示される。
       </p>
@@ -144,16 +137,12 @@ Success! The configuration is valid.
       <pre><code>let main_vpc = aws.vpc {
     name       = &quot;main-vpc&quot;
     cidr_block = &quot;10.0.0.0/33&quot;
-}
-</code></pre>
+}</code></pre>
       <p>
-        <code>
-          carina validate
-        </code>
+        <code>carina validate</code>
         を実行すると、以下のようなエラーが返る。
       </p>
-      <pre><code>Error: vpc.main-vpc: Validation failed: Invalid prefix length '33': must be 0-32
-</code></pre>
+      <pre><code>Error: vpc.main-vpc: Validation failed: Invalid prefix length '33': must be 0-32</code></pre>
       <p>
         Terraformでもvalidateで同様のエラーが返るが、IntelliJ IDEAのTerraformプラグインではCIDR表記のフォーマットエラーが検出されない。CarinaのLSPでは、IDE上で以下のようにエラーが表示される。
       </p>
@@ -174,29 +163,17 @@ Success! The configuration is valid.
       </p>
       <p>
         さらに別の例として、S3バケットの
-        <code>
-          versioning_configuration
-        </code>
+        <code>versioning_configuration</code>
         属性を紹介する。
-        <code>
-          versioning_configuration
-        </code>
+        <code>versioning_configuration</code>
         はS3バケットのバージョニング設定を表すオブジェクト型で、
-        <code>
-          status
-        </code>
+        <code>status</code>
         フィールドには
-        <code>
-          Enabled
-        </code>
+        <code>Enabled</code>
         または
-        <code>
-          Suspended
-        </code>
+        <code>Suspended</code>
         のいずれかを文字列で指定する必要がある（
-        <code>
-          Disabled
-        </code>
+        <code>Disabled</code>
         もあるがこれはちょっと特殊な値）。誤った文字列を指定すると、validateやplanでは不正な値が検出されるが、IDE上ではエラーや補完候補が表示されないため、あれ、Enableだっけ？Enabledだっけ？と迷ったら公式ドキュメントを確認する必要がある。
       </p>
       <pre><code class="language-hcl">resource &quot;aws_s3_bucket_versioning&quot; &quot;versioning_example&quot; {
