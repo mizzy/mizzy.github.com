@@ -23,38 +23,36 @@
 <hr />
 <h2>DSL構文</h2>
 <p>バックエンド設定は以下のように記述する。ほぼTerraformと同じ。</p>
-<pre><code class="language-crn">backend s3 {
-  bucket      = &quot;my-carina-state&quot;
-  key         = &quot;prod/carina.crnstate&quot;
-  encrypt     = true
-  auto_create = true
-}
-</code></pre>
-<p><code>auto_create = true</code>はTerraformにはない機能。Terraformでは、Stateを保存するS3バケットは事前に作成しておく必要がある。Carinaでは<code>auto_create</code>を有効にすると、初回<code>apply</code>時にバケットが自動作成され、さらにそのバケットのリソース定義が<code>.crn</code>ファイルに自動で追加される。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">backend</span> <span class="nv">s3</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">bucket</span>      <span class="o">=</span> <span class="s2">&#34;my-carina-state&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">key</span>         <span class="o">=</span> <span class="s2">&#34;prod/carina.crnstate&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">encrypt</span>     <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">auto_create</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p><code>auto_create = true</code>はTerraformにはない機能。Terraformでは、Stateを保存するS3バケットは事前に作成しておく必要がある。Carinaでは<code>auto_create</code>を有効にすると、初回<code>apply</code>時にバケットが自動作成され、さらにそのバケットのリソース定義が<code>.crn</code>ファイルに自動で追加される。</p>
 <hr />
 <h2>Stateファイル</h2>
 <p>StateファイルはJSON形式で、以下のような構造になっている。とりあえずClaude Codeに適当に決めてもらった。後で色々変えることになると思う。</p>
-<pre><code class="language-json">{
-  &quot;version&quot;: 1,
-  &quot;serial&quot;: 3,
-  &quot;lineage&quot;: &quot;358893ec-5a07-49bf-acbc-940d9563c7f5&quot;,
-  &quot;carina_version&quot;: &quot;0.1.0&quot;,
-  &quot;resources&quot;: [
-    {
-      &quot;resource_type&quot;: &quot;s3.bucket&quot;,
-      &quot;name&quot;: &quot;my-bucket&quot;,
-      &quot;provider&quot;: &quot;aws&quot;,
-      &quot;attributes&quot;: {
-        &quot;name&quot;: &quot;my-bucket&quot;,
-        &quot;region&quot;: &quot;ap-northeast-1&quot;,
-        &quot;versioning&quot;: &quot;Enabled&quot;
-      },
-      &quot;protected&quot;: false
-    }
-  ]
-}
-</code></pre>
-<ul>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;serial&#34;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;lineage&#34;</span><span class="p">:</span> <span class="s2">&#34;358893ec-5a07-49bf-acbc-940d9563c7f5&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;carina_version&#34;</span><span class="p">:</span> <span class="s2">&#34;0.1.0&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;resources&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;resource_type&#34;</span><span class="p">:</span> <span class="s2">&#34;s3.bucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;my-bucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;provider&#34;</span><span class="p">:</span> <span class="s2">&#34;aws&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;my-bucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;region&#34;</span><span class="p">:</span> <span class="s2">&#34;ap-northeast-1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;versioning&#34;</span><span class="p">:</span> <span class="s2">&#34;Enabled&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;protected&#34;</span><span class="p">:</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><ul>
 <li><code>serial</code>: 変更のたびにインクリメントされる</li>
 <li><code>lineage</code>: 状態ファイルの系譜を識別するUUID（誤上書き防止）</li>
 <li><code>protected</code>: trueの場合、<code>destroy</code>で削除されない</li>
@@ -68,21 +66,19 @@
 <p>apply実行時に、Stateバケットが自動作成される。</p>
 <p><img src="/images/2026/01/carina-state-apply.png" alt="carina apply の出力" /></p>
 <p>また、backendが定義されているファイルに、Stateバケットのリソース定義が自動追加される。</p>
-<pre><code class="language-crn"># Auto-generated by carina (state bucket)
-aws.s3.bucket {
-  name       = &quot;my-carina-state&quot;
-  versioning = &quot;Enabled&quot;
-}
-</code></pre>
-<hr />
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># Auto-generated by carina (state bucket)</span>
+</span></span><span class="line"><span class="cl"><span class="nc">aws.s3.bucket</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;my-carina-state&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">versioning</span> <span class="o">=</span> <span class="s2">&#34;Enabled&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><hr />
 <h2>destroy</h2>
 <p>StateバケットはState内で<code>protected</code>フラグが設定されるため、通常の<code>destroy</code>では削除されない。</p>
 <p><img src="/images/2026/01/carina-state-destroy.png" alt="carina destroy の出力" /></p>
 <p>「⚠ s3.bucket.carina-state-test-mizzy (protected - will be skipped)」と表示され、destroy対象からスキップされる。</p>
 <p>Stateバケットを削除したい場合は、<code>state bucket-delete</code>コマンドを使う。</p>
-<pre><code class="language-bash">$ carina state bucket-delete &lt;bucket-name&gt; --force
-</code></pre>
-<hr />
+<pre class="chroma"><code><span class="line"><span class="cl">$ carina state bucket-delete &lt;bucket-name&gt; --force
+</span></span></code></pre><hr />
 <h2>state lock/unlock</h2>
 <p>チーム開発にはstate lock/unlockは必要だよね、ってことでTerraformのようなstate lock/unlock機能も実装した。</p>
 <hr />
@@ -123,19 +119,18 @@ aws.s3.bucket {
 <hr />
 <h2>テンプレートの変更</h2>
 <p>HTMLテンプレートには、OGPとTwitter Cardのメタタグを追加した。</p>
-<pre><code class="language-html">&lt;!-- OGP --&gt;
-&lt;meta property=&quot;og:title&quot; content=&quot;{{ .Title }}&quot;/&gt;
-&lt;meta property=&quot;og:type&quot; content=&quot;article&quot;/&gt;
-&lt;meta property=&quot;og:url&quot; content=&quot;https://mizzy.org{{ .Path }}/&quot;/&gt;
-&lt;meta property=&quot;og:image&quot; content=&quot;https://mizzy.org{{ .OGImagePath }}&quot;/&gt;
-&lt;meta property=&quot;og:site_name&quot; content=&quot;Gosuke Miyashita&quot;/&gt;
-
-&lt;!-- Twitter Card --&gt;
-&lt;meta name=&quot;twitter:card&quot; content=&quot;summary_large_image&quot;/&gt;
-&lt;meta name=&quot;twitter:title&quot; content=&quot;{{ .Title }}&quot;/&gt;
-&lt;meta name=&quot;twitter:image&quot; content=&quot;https://mizzy.org{{ .OGImagePath }}&quot;/&gt;
-</code></pre>
-<p>これで、SNSでシェアしたときにタイトル入りの画像が表示されるようになる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="c">&lt;!-- OGP --&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:title&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Title }}&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:type&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;article&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:url&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .Path }}/&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .OGImagePath }}&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:site_name&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;Gosuke Miyashita&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">&lt;!-- Twitter Card --&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:card&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;summary_large_image&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:title&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Title }}&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .OGImagePath }}&#34;</span><span class="p">/&gt;</span>
+</span></span></code></pre><p>これで、SNSでシェアしたときにタイトル入りの画像が表示されるようになる。</p>
 <hr />
 <h2>今後</h2>
 <p>デザインは現状かなりシンプルなので、余裕があればもう少し凝ったものにしたい。ロゴを入れたり、グラデーション背景にしたり、といったあたりは比較的簡単にできそう。</p>
@@ -154,18 +149,15 @@ aws.s3.bucket {
 <p>例えば、regionやcidr_blockのような特定のドメインに特化した型は存在しない。そのため、これらの値を扱う際には単なるstring型として扱われ、誤った値が設定される可能性がある。誤った設定をした場合、validateやplanで気づけるのであればまだ良いが、planが通ってしまい、apply時にエラーになってはじめて間違いが発覚することもある。</p>
 <p>これを防ぐために、Carinaではドメイン固有型の導入を試している。現在実装しているものとして、region型やcidr型がある。これらの型は、それぞれのドメインに特化したバリデーションロジックを持っており、不正な値が設定された場合には即座にエラーを返す。</p>
 <p>例えば、誤ってリージョンを指定すべきところにアベイラビリティゾーンを指定したとする。</p>
-<pre><code class="language-hcl">provider aws {
-  region = &quot;ap-northeast-1a&quot;
-}
-</code></pre>
-<p>Terraformではさすがに<code>plan</code>は通らないが、<code>validate</code>は通る。</p>
-<pre><code class="language-shell">$ terraform validate
-Success! The configuration is valid.
-</code></pre>
-<p>Carinaもproviderの定義はTerraformと同じように記述するが、<code>validate</code>で以下のようなエラーが返る。</p>
-<pre><code class="language-shell">Error: provider aws: Validation failed: Invalid region 'ap-northeast-1a', expected one of: ap-northeast-1, ap-northeast-2, ap-northeast-3, ap-southeast-1, ap-southeast-2, ap-south-1, us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, eu-north-1, ca-central-1, sa-east-1 or DSL format like aws.Region.ap_northeast_1
-</code></pre>
-<p>このようにCarinaでは、型システムを強化することで、より早い段階で設定ミスを検出できるようにしたい、と考えている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="k">aws</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  region</span> <span class="o">=</span> <span class="s2">&#34;ap-northeast-1a&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre><p>Terraformではさすがに<code>plan</code>は通らないが、<code>validate</code>は通る。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">$ terraform validate
+</span></span><span class="line"><span class="cl">Success! The configuration is valid.
+</span></span></code></pre><p>Carinaもproviderの定義はTerraformと同じように記述するが、<code>validate</code>で以下のようなエラーが返る。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">Error: provider aws: Validation failed: Invalid region <span class="s1">&#39;ap-northeast-1a&#39;</span>, expected one of: ap-northeast-1, ap-northeast-2, ap-northeast-3, ap-southeast-1, ap-southeast-2, ap-south-1, us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, eu-north-1, ca-central-1, sa-east-1 or DSL format like aws.Region.ap_northeast_1
+</span></span></code></pre><p>このようにCarinaでは、型システムを強化することで、より早い段階で設定ミスを検出できるようにしたい、と考えている。</p>
 <p>また、CarinaではAWSリージョンはEnum型として定義されているため、以下のようにリージョンを指定することもできる。</p>
 <pre><code>provider aws {
   region = aws.Region.ap_northeast_1
@@ -192,24 +184,22 @@ Success! The configuration is valid.
 <p>cidr型でもregion型と同様に、補完候補として一般的なCIDR表記が表示される。</p>
 <p><img src="/images/2026/01/carina-cidr-completion.png" alt="cidr_blockの補完候補" /></p>
 <p>さらに別の例として、S3バケットの<code>versioning_configuration</code>属性を紹介する。<code>versioning_configuration</code>はS3バケットのバージョニング設定を表すオブジェクト型で、<code>status</code>フィールドには<code>Enabled</code>または<code>Suspended</code>のいずれかを文字列で指定する必要がある（<code>Disabled</code>もあるがこれはちょっと特殊な値）。誤った文字列を指定すると、validateやplanでは不正な値が検出されるが、IDE上ではエラーや補完候補が表示されないため、あれ、Enableだっけ？Enabledだっけ？と迷ったら公式ドキュメントを確認する必要がある。</p>
-<pre><code class="language-hcl">resource &quot;aws_s3_bucket_versioning&quot; &quot;versioning_example&quot; {
-  bucket = aws_s3_bucket.example.id
-  versioning_configuration {
-    status = &quot;Enabled&quot;
-  }
-}
-</code></pre>
-<p>Carinaでは、このstatusフィールドをEnum型として定義しているため、以下のように補完候補として&quot;Enabled&quot;と&quot;Suspended&quot;が表示される。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_s3_bucket_versioning&#34; &#34;versioning_example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  bucket</span> <span class="o">=</span> <span class="k">aws_s3_bucket</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">id</span>
+</span></span><span class="line"><span class="cl">  <span class="k">versioning_configuration</span> {
+</span></span><span class="line"><span class="cl"><span class="n">    status</span> <span class="o">=</span> <span class="s2">&#34;Enabled&#34;</span>
+</span></span><span class="line"><span class="cl">  }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre><p>Carinaでは、このstatusフィールドをEnum型として定義しているため、以下のように補完候補として&quot;Enabled&quot;と&quot;Suspended&quot;が表示される。</p>
 <p><img src="/images/2026/01/carina-s3-versioning-completion.png" alt="S3バケットのversioning補完" /></p>
 <p>エディタ上でのエラー表示や自動補完については、今は生成AIが基本的にコードを書いてくれるのであまり気にする必要はないかもしれない。しかし、型システムが強力であればあるほど、生成AIがより正確なコードを生成できるようになり、早い段階で間違いに気づけるようになるはず。</p>
 <p>型システムを強化するためには、各リソースの属性やその型情報を正確に把握する必要がある。AWSの場合、CloudFormationのリソースタイプスキーマを利用することで、各リソースの属性情報を取得できる。例えば、以下のコマンドを実行すると、S3バケットリソースのスキーマ情報が取得できる。</p>
-<pre><code class="language-shell">aws cloudformation describe-type \
-      --type RESOURCE \
-      --type-name AWS::S3::Bucket \
-      --query &quot;Schema&quot; \
-      --output text
-</code></pre>
-<p>これを元にCarinaで型定義を自動生成するなり、AIに生成させるなりすれば、型システムの強化がより容易になると考えている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">aws cloudformation describe-type <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --type RESOURCE <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --type-name AWS::S3::Bucket <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --query <span class="s2">&#34;Schema&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --output text
+</span></span></code></pre><p>これを元にCarinaで型定義を自動生成するなり、AIに生成させるなりすれば、型システムの強化がより容易になると考えている。</p>
 
 ]]></content>
     </entry>
@@ -287,10 +277,9 @@ enable_https: bool = true
 <p>CarinaでAWSリソースを扱うにあたり、最初はaws-sdk-s3を使ってS3バケットの操作を実装していた。ただ、この方法だとリソースタイプごとに個別実装が必要になる。S3、EC2、IAM...とAWSのサービスは膨大にあるので、全部個別に実装するのは大変だ。生成AIがあるとはいえ、もっと楽にできないかと考えた。</p>
 <p>そこで<a href="https://docs.aws.amazon.com/cloudcontrolapi/latest/userguide/what-is-cloudcontrolapi.html">Cloud Control API</a>を使うことを考えた。Cloud Control APIは、CloudFormationと同じリソースハンドラーを使った統一的なAPIで、様々なAWSリソースをCRUD操作できる。</p>
 <p>Cloud Control APIを使う大きなメリットとして、CloudFormationのJSON Schemaが公開されていることがある。例えばS3バケットのスキーマは以下のコマンドで取得できる。</p>
-<pre><code class="language-shell">aws cloudformation describe-type --type RESOURCE \
-  --type-name AWS::S3::Bucket --query 'Schema' --output text
-</code></pre>
-<p>このスキーマを使えば、<a href="https://github.com/oxidecomputer/typify">typify</a>でRustの型を自動生成できる。生成した型を使ってバリデーションすれば、リソースごとに手動でバリデーションロジックを書く必要がなくなる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">aws cloudformation describe-type --type RESOURCE <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --type-name AWS::S3::Bucket --query <span class="s1">&#39;Schema&#39;</span> --output text
+</span></span></code></pre><p>このスキーマを使えば、<a href="https://github.com/oxidecomputer/typify">typify</a>でRustの型を自動生成できる。生成した型を使ってバリデーションすれば、リソースごとに手動でバリデーションロジックを書く必要がなくなる。</p>
 <p>というわけで、Cloud Control APIを使うよう<a href="https://github.com/mizzy/carina/pull/2">実装してみた</a>。</p>
 <hr />
 <h2>問題発覚</h2>
@@ -299,29 +288,27 @@ enable_https: bool = true
 <h2>計測結果</h2>
 <p>直接S3 APIを叩いた場合と、Cloud Control APIを叩いた場合で比較してみた。</p>
 <h3>直接S3 API</h3>
-<pre><code class="language-shell">$ time aws s3api put-bucket-versioning \
-  --bucket carina-test-logs-mizzy-2026 \
-  --versioning-configuration Status=Suspended
-</code></pre>
-<p>所要時間: <strong>約0.4〜0.5秒</strong></p>
+<pre class="chroma"><code><span class="line"><span class="cl">$ <span class="nb">time</span> aws s3api put-bucket-versioning <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bucket carina-test-logs-mizzy-2026 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --versioning-configuration <span class="nv">Status</span><span class="o">=</span>Suspended
+</span></span></code></pre><p>所要時間: <strong>約0.4〜0.5秒</strong></p>
 <h3>Cloud Control API</h3>
-<pre><code class="language-shell">RESULT=$(aws cloudcontrol update-resource \
-  --type-name &quot;AWS::S3::Bucket&quot; \
-  --identifier &quot;carina-test-logs-mizzy-2026&quot; \
-  --patch-document '[{&quot;op&quot;:&quot;replace&quot;,&quot;path&quot;:&quot;/VersioningConfiguration&quot;,&quot;value&quot;:{&quot;Status&quot;:&quot;Enabled&quot;}}]')
-
-REQUEST_TOKEN=$(echo &quot;$RESULT&quot; | jq -r '.ProgressEvent.RequestToken')
-START=$(date +%s)
-
-while true; do
-  STATUS=$(aws cloudcontrol get-resource-request-status \
-    --request-token &quot;$REQUEST_TOKEN&quot; | jq -r '.ProgressEvent.OperationStatus')
-  echo &quot;[$(( $(date +%s) - START ))s] $STATUS&quot;
-  [ &quot;$STATUS&quot; = &quot;SUCCESS&quot; ] || [ &quot;$STATUS&quot; = &quot;FAILED&quot; ] &amp;&amp; break
-  sleep 1
-done
-</code></pre>
-<p>完了までの所要時間: <strong>約23秒</strong></p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="nv">RESULT</span><span class="o">=</span><span class="k">$(</span>aws cloudcontrol update-resource <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --type-name <span class="s2">&#34;AWS::S3::Bucket&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --identifier <span class="s2">&#34;carina-test-logs-mizzy-2026&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --patch-document <span class="s1">&#39;[{&#34;op&#34;:&#34;replace&#34;,&#34;path&#34;:&#34;/VersioningConfiguration&#34;,&#34;value&#34;:{&#34;Status&#34;:&#34;Enabled&#34;}}]&#39;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">REQUEST_TOKEN</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$RESULT</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.ProgressEvent.RequestToken&#39;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">START</span><span class="o">=</span><span class="k">$(</span>date +%s<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> true<span class="p">;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">STATUS</span><span class="o">=</span><span class="k">$(</span>aws cloudcontrol get-resource-request-status <span class="se">\
+</span></span></span><span class="line"><span class="cl">    --request-token <span class="s2">&#34;</span><span class="nv">$REQUEST_TOKEN</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.ProgressEvent.OperationStatus&#39;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="k">$((</span> <span class="k">$(</span>date +%s<span class="k">)</span> <span class="o">-</span> START <span class="k">))</span><span class="s2">s] </span><span class="nv">$STATUS</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$STATUS</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;SUCCESS&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$STATUS</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;FAILED&#34;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">break</span>
+</span></span><span class="line"><span class="cl">  sleep <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">done</span>
+</span></span></code></pre><p>完了までの所要時間: <strong>約23秒</strong></p>
 <hr />
 <h2>なぜ遅いのか</h2>
 <p>Cloud Control APIはCloudFormationと同じリソースハンドラーを使っており、内部的にリソースの整合性チェックや安定化待ち（resource stabilization）を行っているようだ。</p>
@@ -432,34 +419,33 @@ let backup = aws.s3.bucket {
 <hr />
 <h2>使い方</h2>
 <p>Terraformと同様に<code>validate</code>、<code>plan</code>、<code>apply</code>というコマンドがある。</p>
-<pre><code class="language-bash">$ carina validate example.crn
-Validating...
-✓ 2 resources validated successfully.
-  • s3_bucket.my-app-logs
-  • s3_bucket.my-app-backup
-
-$ carina plan example.crn
-Using AWS provider (region: ap-northeast-1)
-Execution Plan:
-
-  + s3_bucket.my-app-logs
-      name: &quot;my-app-logs&quot;
-      versioning: true
-      expiration_days: 90
-  + s3_bucket.my-app-backup
-      name: &quot;my-app-backup&quot;
-
-Plan: 2 to add, 0 to change, 0 to destroy.
-
-$ carina apply example.crn
-Applying changes...
-
-  ✓ Create s3_bucket.my-app-logs
-  ✓ Create s3_bucket.my-app-backup
-
-Apply complete! 2 changes applied.
-</code></pre>
-<hr />
+<pre class="chroma"><code><span class="line"><span class="cl">$ carina validate example.crn
+</span></span><span class="line"><span class="cl">Validating...
+</span></span><span class="line"><span class="cl">✓ <span class="m">2</span> resources validated successfully.
+</span></span><span class="line"><span class="cl">  • s3_bucket.my-app-logs
+</span></span><span class="line"><span class="cl">  • s3_bucket.my-app-backup
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ carina plan example.crn
+</span></span><span class="line"><span class="cl">Using AWS provider <span class="o">(</span>region: ap-northeast-1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Execution Plan:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  + s3_bucket.my-app-logs
+</span></span><span class="line"><span class="cl">      name: <span class="s2">&#34;my-app-logs&#34;</span>
+</span></span><span class="line"><span class="cl">      versioning: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      expiration_days: <span class="m">90</span>
+</span></span><span class="line"><span class="cl">  + s3_bucket.my-app-backup
+</span></span><span class="line"><span class="cl">      name: <span class="s2">&#34;my-app-backup&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Plan: <span class="m">2</span> to add, <span class="m">0</span> to change, <span class="m">0</span> to destroy.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ carina apply example.crn
+</span></span><span class="line"><span class="cl">Applying changes...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  ✓ Create s3_bucket.my-app-logs
+</span></span><span class="line"><span class="cl">  ✓ Create s3_bucket.my-app-backup
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Apply complete! <span class="m">2</span> changes applied.
+</span></span></code></pre><hr />
 <h2>アーキテクチャ</h2>
 <pre><code>DSL (.crn) → Parser → Resources → Differ → Plan (Effects) → Interpreter → Provider → Infrastructure
 </code></pre>

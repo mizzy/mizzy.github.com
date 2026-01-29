@@ -21,7 +21,7 @@
     <meta name="twitter:image" content="https://mizzy.org/blog/2026/01/27/2/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
@@ -168,18 +168,18 @@
       <p>
         HTMLテンプレートには、OGPとTwitter Cardのメタタグを追加した。
       </p>
-      <pre><code class="language-html">&lt;!-- OGP --&gt;
-&lt;meta property=&quot;og:title&quot; content=&quot;{{ .Title }}&quot;/&gt;
-&lt;meta property=&quot;og:type&quot; content=&quot;article&quot;/&gt;
-&lt;meta property=&quot;og:url&quot; content=&quot;https://mizzy.org{{ .Path }}/&quot;/&gt;
-&lt;meta property=&quot;og:image&quot; content=&quot;https://mizzy.org{{ .OGImagePath }}&quot;/&gt;
-&lt;meta property=&quot;og:site_name&quot; content=&quot;Gosuke Miyashita&quot;/&gt;
-
-&lt;!-- Twitter Card --&gt;
-&lt;meta name=&quot;twitter:card&quot; content=&quot;summary_large_image&quot;/&gt;
-&lt;meta name=&quot;twitter:title&quot; content=&quot;{{ .Title }}&quot;/&gt;
-&lt;meta name=&quot;twitter:image&quot; content=&quot;https://mizzy.org{{ .OGImagePath }}&quot;/&gt;
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="c">&lt;!-- OGP --&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:title&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Title }}&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:type&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;article&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:url&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .Path }}/&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .OGImagePath }}&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:site_name&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;Gosuke Miyashita&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c">&lt;!-- Twitter Card --&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:card&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;summary_large_image&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:title&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Title }}&#34;</span><span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .OGImagePath }}&#34;</span><span class="p">/&gt;</span>
+</span></span></code></pre>
       <p>
         これで、SNSでシェアしたときにタイトル入りの画像が表示されるようになる。
       </p>

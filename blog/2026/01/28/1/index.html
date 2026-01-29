@@ -21,7 +21,7 @@
     <meta name="twitter:image" content="https://mizzy.org/blog/2026/01/28/1/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
@@ -96,13 +96,13 @@
       <p>
         バックエンド設定は以下のように記述する。ほぼTerraformと同じ。
       </p>
-      <pre><code class="language-crn">backend s3 {
-  bucket      = &quot;my-carina-state&quot;
-  key         = &quot;prod/carina.crnstate&quot;
-  encrypt     = true
-  auto_create = true
-}
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">backend</span> <span class="nv">s3</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">bucket</span>      <span class="o">=</span> <span class="s2">&#34;my-carina-state&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">key</span>         <span class="o">=</span> <span class="s2">&#34;prod/carina.crnstate&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">encrypt</span>     <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">auto_create</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre>
       <p>
         <code>auto_create = true</code>
         はTerraformにはない機能。Terraformでは、Stateを保存するS3バケットは事前に作成しておく必要がある。Carinaでは
@@ -120,26 +120,26 @@
       <p>
         StateファイルはJSON形式で、以下のような構造になっている。とりあえずClaude Codeに適当に決めてもらった。後で色々変えることになると思う。
       </p>
-      <pre><code class="language-json">{
-  &quot;version&quot;: 1,
-  &quot;serial&quot;: 3,
-  &quot;lineage&quot;: &quot;358893ec-5a07-49bf-acbc-940d9563c7f5&quot;,
-  &quot;carina_version&quot;: &quot;0.1.0&quot;,
-  &quot;resources&quot;: [
-    {
-      &quot;resource_type&quot;: &quot;s3.bucket&quot;,
-      &quot;name&quot;: &quot;my-bucket&quot;,
-      &quot;provider&quot;: &quot;aws&quot;,
-      &quot;attributes&quot;: {
-        &quot;name&quot;: &quot;my-bucket&quot;,
-        &quot;region&quot;: &quot;ap-northeast-1&quot;,
-        &quot;versioning&quot;: &quot;Enabled&quot;
-      },
-      &quot;protected&quot;: false
-    }
-  ]
-}
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;serial&#34;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;lineage&#34;</span><span class="p">:</span> <span class="s2">&#34;358893ec-5a07-49bf-acbc-940d9563c7f5&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;carina_version&#34;</span><span class="p">:</span> <span class="s2">&#34;0.1.0&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;resources&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;resource_type&#34;</span><span class="p">:</span> <span class="s2">&#34;s3.bucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;my-bucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;provider&#34;</span><span class="p">:</span> <span class="s2">&#34;aws&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;attributes&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;my-bucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;region&#34;</span><span class="p">:</span> <span class="s2">&#34;ap-northeast-1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;versioning&#34;</span><span class="p">:</span> <span class="s2">&#34;Enabled&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;protected&#34;</span><span class="p">:</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre>
       <ul>
         <li>
           <code>serial</code>
@@ -182,12 +182,12 @@
       <p>
         また、backendが定義されているファイルに、Stateバケットのリソース定義が自動追加される。
       </p>
-      <pre><code class="language-crn"># Auto-generated by carina (state bucket)
-aws.s3.bucket {
-  name       = &quot;my-carina-state&quot;
-  versioning = &quot;Enabled&quot;
-}
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># Auto-generated by carina (state bucket)</span>
+</span></span><span class="line"><span class="cl"><span class="nc">aws.s3.bucket</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;my-carina-state&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">versioning</span> <span class="o">=</span> <span class="s2">&#34;Enabled&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre>
       <hr />
       <h2>
         destroy
@@ -210,8 +210,8 @@ aws.s3.bucket {
         <code>state bucket-delete</code>
         コマンドを使う。
       </p>
-      <pre><code class="language-bash">$ carina state bucket-delete &lt;bucket-name&gt; --force
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">$ carina state bucket-delete &lt;bucket-name&gt; --force
+</span></span></code></pre>
       <hr />
       <h2>
         state lock/unlock
