@@ -3,7 +3,7 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-29T19:00:03+09:00</updated>
+    <updated>2026-01-29T22:07:30+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
@@ -11,9 +11,65 @@
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
 
     <entry>
+        <title type="html"><![CDATA[Carina aws providerとawscc provider]]></title>
+        <link href="https://mizzy.org/blog/2026/01/29/2/"/>
+        <updated>2026-01-29T22:07:30+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/29/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/mizzy/carina">Carina</a>に、aws providerに加えてawscc providerを実装してみた。</p>
+<hr />
+<h2>背景</h2>
+<p>以前、<a href="https://mizzy.org/blog/2026/01/24/2/">AWS Cloud Control APIは遅い？</a>という記事で、Cloud Control APIは遅いので採用をやめた、と書いた。しかし、その後考えが変わった。</p>
+<p>Cloud Control APIには以下のメリットがある。</p>
+<ul>
+<li>CloudFormationと同じリソースモデルを使っているため、リソースのスキーマが公式に定義されている</li>
+<li>新しいリソースタイプやプロパティが追加された場合、CloudFormationのスキーマが更新されれば自動的にサポートできる</li>
+<li>統一されたAPIで様々なリソースを操作できる</li>
+</ul>
+<p>確かに遅いが、遅さが許容できるユースケースもあるはずだし、もっと多くのリソースを扱ってみると、実はCloud Control APIの方が便利、という場面も出てくるかもしれない。</p>
+<p>また、両方のプロバイダを用意しておけば、ユーザーがユースケースに応じて選択できる。</p>
+<p>というわけで、aws provider（直接SDKを使う高速な方式）とawscc provider（Cloud Control APIを使う方式）の両方を実装しはじめた。</p>
+<hr />
+<h2>DSL構文</h2>
+<h3>awsプロバイダ</h3>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">aws</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nc">aws.vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>                 <span class="o">=</span> <span class="s2">&#34;example-vpc&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nc">aws.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><h3>awsccプロバイダ</h3>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">awscc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>                 <span class="o">=</span> <span class="s2">&#34;cloudcontrol-vpc&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>基本的な構文は同じだが、以下の点が異なる。</p>
+<ul>
+<li>プロバイダ名が<code>aws</code>と<code>awscc</code></li>
+<li>リソースタイプが<code>aws.vpc</code>と<code>awscc.vpc</code></li>
+<li>enum値の名前空間が<code>aws.vpc.InstanceTenancy</code>と<code>awscc.vpc.InstanceTenancy</code></li>
+</ul>
+<p><code>aws</code>と<code>awscc</code>を置換するだけで切り替えられるようになっている。今後追加するリソースタイプも、基本的には両方とも同じスキーマで定義できるようにして、簡単に切り替えられるようにする予定。そうすることで、どちらがどういうユースケースに適しているかを試しやすくなる。</p>
+
+]]></content>
+    </entry>
+
+    <entry>
         <title type="html"><![CDATA[Nebelにシンタックスハイライト機能を追加した]]></title>
         <link href="https://mizzy.org/blog/2026/01/29/1/"/>
-        <updated>2026-01-29T19:00:03+09:00</updated>
+        <updated>2026-01-29T18:55:03+09:00</updated>
         <id>https://mizzy.org/blog/2026/01/29/1/</id>
         <content type="html"><![CDATA[
 <p>最近このブログは、<a href="https://github.com/mizzy/carina">Carina</a>の開発進捗報告の場と化して更新頻度が上がっているので、ブログ自体にも手を入れていっている。</p>
@@ -517,226 +573,6 @@ let backup = aws.s3.bucket {
 <p>現状、AWSのS3バケットのみ対応している。今後、Terraformこうなっているといいのにな、と思っていることが実際に実現できるのか、を実験する場にしていこうと考えている。</p>
 <p>リポジトリはこちら。</p>
 <p><a href="https://github.com/mizzy/carina">mizzy/carina: A functional infrastructure management tool</a></p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[YAPC::Fukuoka 2025 に参加して発表してきた]]></title>
-        <link href="https://mizzy.org/blog/2025/11/17/1/"/>
-        <updated>2025-11-17T17:46:56+09:00</updated>
-        <id>https://mizzy.org/blog/2025/11/17/1/</id>
-        <content type="html"><![CDATA[
-<p>YAPC::Asiaの頃はすべて参加してきたけど、YAPC::Japanになってからはタイミングがあわず参加できていなかったので、10年ぶりの参加。</p>
-<p>久しぶりの参加だし、発表もできたらうれしいな、と思ってプロポーザルを出したら通ったので、発表してきた。</p>
-<hr />
-<h2>発表内容</h2>
-<p>「なぜインフラコードのモジュール化は難しいのか - アプリケーションコードとの本質的な違いから考える」というタイトルで発表した。</p>
-<script defer class="speakerdeck-embed" data-id="facd81a255fb4c32ab2d80c559f1ede1" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>インフラコードのモジュール化について、アプリケーションコードと比較しながら、なぜ難しいのか、どう向き合うべきか、といったあたりを整理してみた内容。</p>
-<p>インフラコードは「状態を記述」するのに対して、アプリケーションコードは「処理を記述」する、という本質的な違いがあって、そこからモジュール化設計のアプローチも変わってくる、という話。</p>
-<p>会場は結構席が埋まってたと思う。質問もいくつかいただけてよかったし、その後話しかけてくださったり、懇親会等でも触れていただいたり、Xでもスライドに対する言及が多かったりで、関心を持ってもらえたようだ。「わかる」という反応が多くて、みんな同じようなもやもやを感じていたんだな、と思った。</p>
-<p>久々の発表でペース配分がうまくできず、後半駆け足になってしまったのは反省点。もう少し内容を削っておいた方がよかったかも。</p>
-<p><a href="https://sfujiwara.hatenablog.com/entry/yapc-fukuoka-2025">fujiwaraさんのブログ記事でも触れられている</a>のだけど、タイムテーブル上、同じ部屋の次のセッションがfujiwaraさんの発表で、二人ともメインとなるテーマが「正しい抽象化」という共通点があって、セットで聞くとよい流れになっていて、運営の方々の配慮を感じた。</p>
-<script defer class="speakerdeck-embed" data-id="efb9db6a75274a6cbad76b6550c5259f" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<hr />
-<h2>印象に残ったセッション</h2>
-<p>聞いたものすべて面白かったけど、その中でも特に印象に残ったセッションを2つ紹介。本当は聞いたセッション全部について書きたいけど、長くなりすぎてしまうので。</p>
-<h3>Agentに至る道 〜なぜLLMは自動でコードを書けるようになったのか〜</h3>
-<p><a href="https://fortee.jp/yapc-fukuoka-2025/proposal/fb1e7046-74ea-4856-9311-7b7cd62a6018">mackee_w</a>さんの発表。</p>
-<script defer class="speakerdeck-embed" data-id="cd7fba011b0842d3943c66ee3a6ab829" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>今回のYAPCのセッションの中で一番聞きたいと思っていたのがこの発表で、実際に聞いてみたら期待以上の内容だった。ベストトークはこれに投票した。</p>
-<p>自分もRigelというAI Coding Agentを（まだ全然開発進んでないけど）作っているので、エージェントの理論的背景を知るために、どういった論文にあたると良いのかがわかってとても参考になった。</p>
-<p>ChatGPTが登場した当時と比べて、2025年はコーディングエージェント技術がかなり浸透してきている。その背景にある「ReAct」といった概念を論文ベースで解説しつつ、後半はPerlを使ったコーディングエージェントのライブコーディングという内容。</p>
-<p>ライブコーディング中にスペルミスを指摘させてもらって、参加してる感が得られてよかった。</p>
-<p>その後懇親会の2次会でも、この辺りについてがっつりお話させてもらえて楽しかった。</p>
-<h3>ある編集者のこれまでとこれから —— 開発者コミュニティと歩んだ四半世紀</h3>
-<p><a href="https://fortee.jp/yapc-fukuoka-2025/proposal/1a8f9acd-4729-407c-997c-f08d4eddb894">稲尾さん</a>のゲストトーク。</p>
-<script defer class="speakerdeck-embed" data-id="e44fa8d6b3c44c7f8000e1ac7b8af354" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>WEB+DB PRESSの編集者を長く務め、現在SmartHRのDevRelに従事されている稲尾さんが、開発者コミュニティとともに歩んできた四半世紀を振り返る内容。</p>
-<p>自分と稲尾さんとの最初の出会いが、いつのかは忘れたけどYAPCの懇親会だったはずで、メガネフレームが同じ<a href="https://www.spec-espace.com/">spec espace</a>のモデル名の数字部分だけ微妙に違う、見た目がよく似たメタルフレームだった。しかも、自分はもうそのフレームは使っていないが、稲尾さんはいまだにそのフレームを使い続けていてすごい。おそらく15年以上は使い続けているのでは。</p>
-<p>知り合ってから長いけれど知らなかった稲尾さんの四半世紀の歩みを知ることができてとても良かった。</p>
-<hr />
-<h2>踊り場</h2>
-<p>2日目のタイムテーブルに突如現れた「踊り場」というトラック。詳しい説明はこちら。</p>
-<p><a href="https://blog.yapcjapan.org/entry/2025/11/14/110000">YAPC::Fukuoka 2025のタイムテーブルにある「踊り場」とは何なのか #yapcjapan踊り場 #yapcjapan - YAPC::Japan 運営ブログ</a></p>
-<p>自分もこの「踊り場」の中の以下のセッションに参加してみた。</p>
-<h2>ゲストゲストトーク</h2>
-<p>タイムテーブルのタイトルからだけだと何をやるのかわからないけど、稲尾さん自らによるご説明がこちら。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">企画を頂戴し、2日目朝イチの私の登壇が終わったあと場所を #yapcjapan踊り場 に移し、 @pastak さんらと行います！ 著者さん、読者の方、現職やコミュニティでご一緒くださっている方、執筆に興味がある方などなど、みなさまお気軽にご発言ください。 私のトークへのご質問やご感想なども。 #yapcjapan</p>&mdash; 稲尾尚徳 (@inao) <a href="https://twitter.com/inao/status/1989144070070157671?ref_src=twsrc%5Etfw">November 8, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>このセッションに対する感想です。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">今回のYAPCで一番印象に残った言葉「感想のカツアゲ」 ー Day 2稲尾さんセッション後の踊り場で、その場にいた全員（セッション参加していない人含む）が稲尾さんセッションの感想を強制的に述べさせられた</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1990216621156348105?ref_src=twsrc%5Etfw">November 11, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>他にも技術書の出版の話、特にお金にまつわる生々しい話なんかも聞けてよかった。</p>
-<h2>Day 1 最速振り返り</h2>
-<p>こちらはタイトルどおり、Day 1の振り返りを最速で行うセッション。途中からの参加でマイクを振られたので、「これの趣旨って何ですか？」と聞いてから自分が話したトークについてコメントした。参加できなかったセッションの概要が聞けてよかった。特にhirataraさんのセッション、聞こうと思っていたのはずなのに、なぜか別の部屋に行ってしまったので、その内容が聞けてよかった。スライドもこれから拝見します。</p>
-<script defer class="speakerdeck-embed" data-id="a27e5888f693436da3f34377c0e096ae" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<h2>OSS開発者なら学生参加者いっぱい集められる説</h2>
-<p>水ダウの企画のようなタイトルの、わかるようなわからないようなセッション。タイムテーブル上のタイトルとmoznionのポストに書かれているタイトルが微妙に違ってそう。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">#yapcjapan踊り場、明日の13時から「OSS開発者なら学生たくさん連れてこれる説」という催しを行います！　一番多く学生さんをリクルーティングして踊り場に連れてきた開発者には名誉が授与され、学生さんにはノベルティを進呈するというイベントになっているので怪しまずに来てください！ #yapcjapan</p>&mdash; moznion (@moznion) <a href="https://twitter.com/moznion/status/1989133587749445845?ref_src=twsrc%5Etfw">November 8, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>moznionのおふざけに巻き込まれるとめんどくさそうだな、遠巻きに見るだけにしようかな、と思いつつ中に入ってみたら、割とまともなセッションで、OSS開発者と学生さん双方向のパネルディスカッション、といった感じだった。</p>
-<p>OSS開発者の人たち前に出て、とmoznionが言った時に、自分は最近それほどOSS活動してないので遠慮しようかな、と思ってたら、moznionに指名されたので前に出させてもらった。 各自自己紹介タイムがあったのだけど、Serverspecは学生さんたちは知らないだろうな、と思いつつ、「OSS Rookies of the yearをDockerとともに受賞した」という話をしたら、おー、という反応があってうれしかった。 また、どなたかがオライリー単著、というフォローも入れてくれた。</p>
-<p>というわけで、しっかりと巻き込まれてきて楽しかった。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">#yapcjapan踊り場、あきらかに見切り発車企画だったんだけどめっちゃ良い話になって良かった、参加者のみなさんありがとうございました！　急に無茶振りしたパネラーのみなさま ( @yusukebe , @songumu , @fujiwara , @pyama86 , @gosukenator ) にも感謝！！！ #yapcjapan</p>&mdash; moznion (@moznion) <a href="https://twitter.com/moznion/status/1989562085701730607?ref_src=twsrc%5Etfw">November 9, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<hr />
-<h2>クロージングキーノート</h2>
-<p>今年のYAPCのクライマックス、P山さんのクロージングキーノート。</p>
-<script defer class="speakerdeck-embed" data-id="479c0e9a98ea412b8337e011b10c8e8b" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>元々P山さんを知ったの、自分が辞めた会社になんか面白い人が入ったな、というのをTwitterで観測していて、特に<a href="https://x.com/hiboma">hiboma</a>に胸ぐら掴まれた、というエピソードを聞いて俄然興味を持った。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">「P山さん会ってみたい」「会わない方がいいっすよ」って会話してる</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/677886542279344128?ref_src=twsrc%5Etfw">December 18, 2015</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">昨夜鮨食べながら「まだP山さんに会ってないんだけど」「会わない方がいいです」ってやりとりした。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/801001467003826176?ref_src=twsrc%5Etfw">November 22, 2016</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>ファーストコンタクトはこの辺りかなー。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">福岡Ruby会議02のランチ時に行った稚加榮、行列できてたけど、ある程度進んだところで、P山氏がイケメンなので顔パスでショートカットできたし、P山氏が奢ってくれたので、P山氏マジイケメン。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/935081435165179905?ref_src=twsrc%5Etfw">November 27, 2017</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>会ってみたら、意外ととちゃんとした人だった。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">インターネットではオラオラしてるのに、あったら普通に敬語も使えるし、普通の人なんですねって言われるようになってきました。</p>&mdash; pyama (@pyama86) <a href="https://twitter.com/pyama86/status/967730170470711297?ref_src=twsrc%5Etfw">February 25, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>自分がP山さんと会う前に、他の人から聞く話で抱いていた印象は「何者かになりたくて足掻いているけど実力が足りない人」というものだった。本キーノートでは、その頃のP山さんの足掻きが、本人により具体的なエピソードとともに語られているのがとても興味深かった。今はもちろん、そんな印象は微塵も持っていない。</p>
-<hr />
-<h2>懇親会</h2>
-<p>具体的に名前を挙げると、漏れてしまった人に申し訳ないので名前は挙げないが、はじめましての人、お久しぶりの人、以前からお会いしたかった人、いろいろな方とお話できて楽しかった。</p>
-<p>自分のトークについて「あれはベストトークでもおかしくなかった」と言ってくださる方もいてうれしかった。</p>
-<p>Findyの方にお声がけいただいて、「ドリンクアップ参加されるんですよね？」と聞かれたのだけど、以下の理由でキャンセルしてたので、ちょっと気まずかった。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">今日行われたFindy Drinkup at YAPC::Fukuoka 2025、最初申し込んでたんだけど、その後キャンセルしてしまった。酒が飲めない人間なので、クラフトビールのお店とかは遠慮してしまう。たとえソフトドリンクが置いてあったとしても、そのお店の一番のウリを注文しない、というのに躊躇いを覚えてしまう</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1989721290610213138?ref_src=twsrc%5Etfw">November 9, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h2>二次会</h2>
-<p>moznionに声をかけられたので二次会へ。お店に予約を入れるために数えた時は22人だったはずだが、お店には35人ぐらいいた。懇親会会場からの移動で電車に乗った駅、以前妻が住んでいたところの最寄り駅だった。</p>
-<p><a href="https://x.com/mackee_w">macopy</a>さんとサシでコーディングエージェントの話をがっつり話せてよかった。また、<a href="https://x.com/kfly8">kobaken</a>さんが途中から参加してくださり、macopyさんの趣味の車や3Dプリンターの話、kobakenさんが建てた家の話など、いろいろな話が聞けて楽しい時間だった。</p>
-<hr />
-<p>ここからはYAPCとは直接関係ないけど、YAPC参加のために来た福岡での自分の行動をXポストで振り返る。興味ない方は回れ右。</p>
-<hr />
-<h2>YAPC前夜</h2>
-<h3>Day -6</h3>
-<p><a href="https://phpcon.fukuoka.jp/2025/">PHPカンファレンス福岡2025</a>にも参加するために、11/7には既に福岡入りしていた。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">乗っていた飛行機が、着陸後の油圧系トラブルで動けなくなり、トーイングカーで駐機場まで牽引され、1時間遅れで到着した</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1986769517306126435?ref_src=twsrc%5Etfw">November 3, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day -5</h3>
-<p>ホテルで朝食食べてたら仮歯が外れた。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">福岡でうまいものたくさん食べるぞ、と思ってたのに、治療中の歯の仮歯が外れてしまった。幸い、日曜もやっている歯科が近くにあって予約できた。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1986921666950377784?ref_src=twsrc%5Etfw">November 4, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>PHPカンファレンス中にラーメン食べに行った。仮歯は外れてるけど痛みはなく、食べ物が詰まりやすいだけで特に支障はなかった。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">この記事で紹介されてたお店に行きました #yapcramen</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987011136370450914?ref_src=twsrc%5Etfw">November 4, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>夜もラーメン食べた。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">#yapcramen</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987098622228676670?ref_src=twsrc%5Etfw">November 4, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day -4</h3>
-<p>福岡、仕事でよく来るんだけど観光したことないんだよな、と思い、敢えて小倉のホテルに泊まったので、門司港行って焼きカレー食べたり、小倉城に行って今屋のハンバーガー食べたり、鉄鍋餃子食べたりした。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">門司港に来た</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987334254561554763?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">くじら焼きカレー</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987339766782943412?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">門司港にGAFAがあった</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987342942286324083?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">小倉城見に来た</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987360824806297851?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">以前から食べたいと思ってた今屋のハンバーガーがあった</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987362629040627722?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">仮歯つけてもらった</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987437178256077224?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">https://t.co/P4YJTr8tYl</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987452392733057221?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">夜の小倉城を見に来た</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987461607140778055?ref_src=twsrc%5Etfw">November 5, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day -3</h3>
-<p><a href="https://x.com/udzura">udzuraさん</a>おすすめのサンドイッチ屋さんでランチ。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">https://t.co/qgkfp2qR42</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987699280635965561?ref_src=twsrc%5Etfw">November 6, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>その後、定宿であるヒルトン福岡シーホークへ移動。このホテル、「まともなワークチェア」「広いデスク」「安定したインターネット回線」とパソコン仕事をするには最高の環境なので、福岡に来てホテルでも仕事をする必要がある時はここに泊まることが多い。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">小倉から福岡市内の定宿に移動した。ボトムの部屋からパノラミックスイートにアップグレードされた。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1987789939095052297?ref_src=twsrc%5Etfw">November 6, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day -2</h3>
-<p>昼飯。みんな「ひらお」に行ったみたいだが、自分は近くに「ひらお」がなかったので「たかお」に行った。「たかお」は関東にも店舗がある。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">#yapctempura</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1988079391025586465?ref_src=twsrc%5Etfw">November 7, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>夜はフルマネージド焼肉を堪能した。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">YAPC::Fukuoka 2025 Day -2 でフルマネージド焼肉にきてる</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1988174471950463344?ref_src=twsrc%5Etfw">November 7, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">@gosukenator
- さんに本当の肉を教えて頂きました。</p>&mdash; pyama (@pyama86) <a href="https://twitter.com/pyama86/status/1988197993238106317?ref_src=twsrc%5Etfw">November 7, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day -1</h3>
-<p>太宰府天満宮に行った。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">なんかゴツい箱が出てきてびっくりした</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1988434800563417265?ref_src=twsrc%5Etfw">November 8, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">焼きたて梅ヶ枝餅を食べた</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1988444958656024761?ref_src=twsrc%5Etfw">November 8, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day 0</h3>
-<p>レターパック投函するだけのつもりで外に出たのだけど、ホテル一階にあるポストはレターパックが入らなかった→郵便局まで行った→ついでにタワー登るか→タワーのレストラン貸切だった→ポーたま食べに行くか、となった。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">この辺りはよく来てるけど、タワーは初めて来た。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1988791760915738874?ref_src=twsrc%5Etfw">November 9, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">https://t.co/vTF2d1ZGT3</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1988792862612549949?ref_src=twsrc%5Etfw">November 9, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>夜はP山さんがアレンジしてくれた食事会に参加した。YAPC前夜祭的な感じ。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">YAPC::Fukuoka 2025 Day 0 非公式前夜祭(P山会)</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1988927596604825805?ref_src=twsrc%5Etfw">November 9, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day 1</h3>
-<p>公式の懇親会はなかったので、帰りに遭遇したhibomaを掴まえて一緒に飯を食いに行くことにした。途中P山さんにも遭遇し、特に予定はないとのことなので、一緒に行くことに。P山さんがいるとお店選びに困らないので大変助かる。さすが二次会のプロ。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">イカ🦑</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1989295710806880259?ref_src=twsrc%5Etfw">November 10, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">こうなった</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1989301159190725118?ref_src=twsrc%5Etfw">November 10, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day 2</h3>
-<p>この日はYAPC本編最終日で公式の懇親会もあったので、YAPCに直接関係のある行動しかしてない。</p>
-<h3>Day 3</h3>
-<p>YAPC翌日。 思いがけずきれいな朝食写真が撮れた。ダイヤモンド会員なので、朝食は無料な上に、あまり混雑しないエグゼクティブラウンジでの朝食も選べるので、基本的に朝食はラウンジで食べている。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">朝飯</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1989838857232372010?ref_src=twsrc%5Etfw">November 11, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>日中はほとんど仕事していた。夜は呪術廻戦の映画を見に行った。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">福岡最後の夜は呪術廻戦で締める ー I'm at ユナイテッド・シネマ福岡ももち in 福岡市, Fukuoka https://t.co/ZBRAQxBiCk</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1990026228343210042?ref_src=twsrc%5Etfw">November 11, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<h3>Day 4</h3>
-<p>YAPC翌々日の福岡最終日。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">福岡最終日の朝飯</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1990201194732814802?ref_src=twsrc%5Etfw">November 11, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">荷造りだいたい終わった。リモート朝会に参加してからチェックアウト。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1990213007289483737?ref_src=twsrc%5Etfw">November 11, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">YAPC締めのラーメン #yapcramen #yapcjapan</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1990244417228472487?ref_src=twsrc%5Etfw">November 11, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>この後、東京には戻るが、翌日からのCloud Native Days Winter 2025にも参加するため、家には帰らず有明のホテルに直行した。</p>
 
 ]]></content>
     </entry>
