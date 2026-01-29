@@ -326,6 +326,14 @@ pre {
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-x: auto;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+pre * {
+    font-size: inherit !important;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 /* Mobile styles */
