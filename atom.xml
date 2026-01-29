@@ -159,22 +159,20 @@
 <pre class="chroma"><code><span class="line"><span class="cl">Error: provider aws: Validation failed: Invalid region <span class="s1">&#39;ap-northeast-1a&#39;</span>, expected one of: ap-northeast-1, ap-northeast-2, ap-northeast-3, ap-southeast-1, ap-southeast-2, ap-south-1, us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, eu-north-1, ca-central-1, sa-east-1 or DSL format like aws.Region.ap_northeast_1
 </span></span></code></pre><p>このようにCarinaでは、型システムを強化することで、より早い段階で設定ミスを検出できるようにしたい、と考えている。</p>
 <p>また、CarinaではAWSリージョンはEnum型として定義されているため、以下のようにリージョンを指定することもできる。</p>
-<pre><code>provider aws {
-  region = aws.Region.ap_northeast_1
-}
-</code></pre>
-<p>更にLSPもサポートしているため、IDE上で補完候補としてリージョンの一覧が表示される。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">aws</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>更にLSPもサポートしているため、IDE上で補完候補としてリージョンの一覧が表示される。</p>
 <p><img src="/images/2026/01/carina-region-completion.png" alt="リージョンの補完候補" /></p>
 <p>誤った文字列を指定している場合も、IDE上でエラーが表示される。</p>
 <p><img src="/images/2026/01/carina-region-error.png" alt="IDEでのエラー表示" /></p>
 <p>もう一つの例として、cidr型を紹介する。cidr型はCIDR表記のIPアドレスブロックを表す型で、不正なCIDR表記が指定された場合にはエラーを返す。</p>
 <p>例えば、以下のように不正なプレフィックス長を指定したとする。</p>
-<pre><code>let main_vpc = aws.vpc {
-    name       = &quot;main-vpc&quot;
-    cidr_block = &quot;10.0.0.0/33&quot;
-}
-</code></pre>
-<p><code>carina validate</code>を実行すると、以下のようなエラーが返る。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">main_vpc</span> <span class="o">=</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;main-vpc&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/33&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p><code>carina validate</code>を実行すると、以下のようなエラーが返る。</p>
 <pre><code>Error: vpc.main-vpc: Validation failed: Invalid prefix length '33': must be 0-32
 </code></pre>
 <p>Terraformでもvalidateで同様のエラーが返るが、IntelliJ IDEAのTerraformプラグインではCIDR表記のフォーマットエラーが検出されない。CarinaのLSPでは、IDE上で以下のようにエラーが表示される。</p>
