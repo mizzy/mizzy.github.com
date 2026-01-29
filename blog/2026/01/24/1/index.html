@@ -9,15 +9,24 @@
     <!-- TODO: change name and description -->
     <meta name="author" content="Gosuke Miyashita"/>
     <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="CarinaというTerraformライクなツールをつくりはじめた"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2026/01/24/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2026/01/24/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="CarinaというTerraformライクなツールをつくりはじめた"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2026/01/24/1/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
     <section class="sidebar">
@@ -114,13 +123,9 @@
           <ul>
             <li>
               例えばTerraform aws providerではregionは文字列で
-              <code>
-                ap-northeast-1
-              </code>
+              <code>ap-northeast-1</code>
               と書くが、Carina aws providerではenumで定義されていて、
-              <code>
-                aws.Region.ap_northeast_1
-              </code>
+              <code>aws.Region.ap_northeast_1</code>
               のように書く
             </li>
           </ul>
@@ -164,9 +169,7 @@
         DSL
       </h2>
       <p>
-        <code>
-          .crn
-        </code>
+        <code>.crn</code>
         という拡張子のファイルにインフラを定義する。
       </p>
       <pre><code>provider aws {
@@ -185,40 +188,31 @@ aws.s3.bucket {
 let backup = aws.s3.bucket {
     name = &quot;my-app-backup&quot;
     region = aws.Region.ap_northeast_1
-}
-</code></pre>
+}</code></pre>
       <p>
         Terraformと似たような感じだけど、以下の点が異なる。
       </p>
       <ul>
         <li>
           リソースタイプの指定が
-          <code>
-            aws.s3.bucket
-          </code>
+          <code>aws.s3.bucket</code>
           のようにドット区切り
           <ul>
             <li>
               Terraformの場合は
-              <code>
-                aws_s3_bucket
-              </code>
+              <code>aws_s3_bucket</code>
               のようにアンダースコア区切り
             </li>
           </ul>
         </li>
         <li>
           名前付きリソースは
-          <code>
-            let
-          </code>
+          <code>let</code>
           で宣言
           <ul>
             <li>
               Terraformの場合は
-              <code>
-                resource &quot;aws_s3_bucket&quot; &quot;backup&quot;
-              </code>
+              <code>resource &quot;aws_s3_bucket&quot; &quot;backup&quot;</code>
               のように書くし、リソース名が必須になるが、Carinaでは、他リソースから参照する必要がなければ、匿名にできるようにしている
             </li>
           </ul>
@@ -229,9 +223,7 @@ let backup = aws.s3.bucket {
       </ul>
       <p>
         Terraformだと、
-        <code>
-          resource &quot;aws_s3_bucket&quot; &quot;my_app_logs&quot;
-        </code>
+        <code>resource &quot;aws_s3_bucket&quot; &quot;my_app_logs&quot;</code>
         のように書くが、リソースタイプがアンダースコア区切りなので、それに合わせてリソース名もアンダースコア区切りにすべきか、それともハイフン区切りにすべきか、といつも悩む。別にどちらでもいいんだけど、どちらでもいいということは、その時々で判断がぶれてしまうので、ぶれないようにしたい、と思ったのがこのような設計にした理由の一つ。
       </p>
       <hr />
@@ -240,52 +232,45 @@ let backup = aws.s3.bucket {
       </h2>
       <p>
         Terraformと同様に
-        <code>
-          validate
-        </code>
+        <code>validate</code>
         、
-        <code>
-          plan
-        </code>
+        <code>plan</code>
         、
-        <code>
-          apply
-        </code>
+        <code>apply</code>
         というコマンドがある。
       </p>
-      <pre><code class="language-bash">$ carina validate example.crn
-Validating...
-✓ 2 resources validated successfully.
-  • s3_bucket.my-app-logs
-  • s3_bucket.my-app-backup
-
-$ carina plan example.crn
-Using AWS provider (region: ap-northeast-1)
-Execution Plan:
-
-  + s3_bucket.my-app-logs
-      name: &quot;my-app-logs&quot;
-      versioning: true
-      expiration_days: 90
-  + s3_bucket.my-app-backup
-      name: &quot;my-app-backup&quot;
-
-Plan: 2 to add, 0 to change, 0 to destroy.
-
-$ carina apply example.crn
-Applying changes...
-
-  ✓ Create s3_bucket.my-app-logs
-  ✓ Create s3_bucket.my-app-backup
-
-Apply complete! 2 changes applied.
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">$ carina validate example.crn
+</span></span><span class="line"><span class="cl">Validating...
+</span></span><span class="line"><span class="cl">✓ <span class="m">2</span> resources validated successfully.
+</span></span><span class="line"><span class="cl">  • s3_bucket.my-app-logs
+</span></span><span class="line"><span class="cl">  • s3_bucket.my-app-backup
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ carina plan example.crn
+</span></span><span class="line"><span class="cl">Using AWS provider <span class="o">(</span>region: ap-northeast-1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Execution Plan:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  + s3_bucket.my-app-logs
+</span></span><span class="line"><span class="cl">      name: <span class="s2">&#34;my-app-logs&#34;</span>
+</span></span><span class="line"><span class="cl">      versioning: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      expiration_days: <span class="m">90</span>
+</span></span><span class="line"><span class="cl">  + s3_bucket.my-app-backup
+</span></span><span class="line"><span class="cl">      name: <span class="s2">&#34;my-app-backup&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Plan: <span class="m">2</span> to add, <span class="m">0</span> to change, <span class="m">0</span> to destroy.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ carina apply example.crn
+</span></span><span class="line"><span class="cl">Applying changes...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  ✓ Create s3_bucket.my-app-logs
+</span></span><span class="line"><span class="cl">  ✓ Create s3_bucket.my-app-backup
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Apply complete! <span class="m">2</span> changes applied.
+</span></span></code></pre>
       <hr />
       <h2>
         アーキテクチャ
       </h2>
-      <pre><code>DSL (.crn) → Parser → Resources → Differ → Plan (Effects) → Interpreter → Provider → Infrastructure
-</code></pre>
+      <pre><code>DSL (.crn) → Parser → Resources → Differ → Plan (Effects) → Interpreter → Provider → Infrastructure</code></pre>
       <ul>
         <li>
           <strong>
@@ -320,21 +305,13 @@ Apply complete! 2 changes applied.
       </ul>
       <p>
         Effectは
-        <code>
-          Create
-        </code>
+        <code>Create</code>
         、
-        <code>
-          Update
-        </code>
+        <code>Update</code>
         、
-        <code>
-          Delete
-        </code>
+        <code>Delete</code>
         、
-        <code>
-          Read
-        </code>
+        <code>Read</code>
         の4種類があり、それぞれが値として扱われる。
       </p>
       <hr />

@@ -21,13 +21,12 @@
     <meta name="twitter:image" content="https://mizzy.org/blog/2026/01/27/1/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
     <section class="sidebar">
@@ -96,10 +95,10 @@
       <p>
         例えば、誤ってリージョンを指定すべきところにアベイラビリティゾーンを指定したとする。
       </p>
-      <pre><code class="language-hcl">provider aws {
-  region = &quot;ap-northeast-1a&quot;
-}
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="k">aws</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  region</span> <span class="o">=</span> <span class="s2">&#34;ap-northeast-1a&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre>
       <p>
         Terraformではさすがに
         <code>plan</code>
@@ -107,16 +106,16 @@
         <code>validate</code>
         は通る。
       </p>
-      <pre><code class="language-shell">$ terraform validate
-Success! The configuration is valid.
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">$ terraform validate
+</span></span><span class="line"><span class="cl">Success! The configuration is valid.
+</span></span></code></pre>
       <p>
         Carinaもproviderの定義はTerraformと同じように記述するが、
         <code>validate</code>
         で以下のようなエラーが返る。
       </p>
-      <pre><code class="language-shell">Error: provider aws: Validation failed: Invalid region 'ap-northeast-1a', expected one of: ap-northeast-1, ap-northeast-2, ap-northeast-3, ap-southeast-1, ap-southeast-2, ap-south-1, us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, eu-north-1, ca-central-1, sa-east-1 or DSL format like aws.Region.ap_northeast_1
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">Error: provider aws: Validation failed: Invalid region <span class="s1">&#39;ap-northeast-1a&#39;</span>, expected one of: ap-northeast-1, ap-northeast-2, ap-northeast-3, ap-southeast-1, ap-southeast-2, ap-south-1, us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, eu-north-1, ca-central-1, sa-east-1 or DSL format like aws.Region.ap_northeast_1
+</span></span></code></pre>
       <p>
         このようにCarinaでは、型システムを強化することで、より早い段階で設定ミスを検出できるようにしたい、と考えている。
       </p>
@@ -186,13 +185,13 @@ Success! The configuration is valid.
         <code>Disabled</code>
         もあるがこれはちょっと特殊な値）。誤った文字列を指定すると、validateやplanでは不正な値が検出されるが、IDE上ではエラーや補完候補が表示されないため、あれ、Enableだっけ？Enabledだっけ？と迷ったら公式ドキュメントを確認する必要がある。
       </p>
-      <pre><code class="language-hcl">resource &quot;aws_s3_bucket_versioning&quot; &quot;versioning_example&quot; {
-  bucket = aws_s3_bucket.example.id
-  versioning_configuration {
-    status = &quot;Enabled&quot;
-  }
-}
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_s3_bucket_versioning&#34; &#34;versioning_example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  bucket</span> <span class="o">=</span> <span class="k">aws_s3_bucket</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">id</span>
+</span></span><span class="line"><span class="cl">  <span class="k">versioning_configuration</span> {
+</span></span><span class="line"><span class="cl"><span class="n">    status</span> <span class="o">=</span> <span class="s2">&#34;Enabled&#34;</span>
+</span></span><span class="line"><span class="cl">  }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre>
       <p>
         Carinaでは、このstatusフィールドをEnum型として定義しているため、以下のように補完候補として&quot;Enabled&quot;と&quot;Suspended&quot;が表示される。
       </p>
@@ -205,12 +204,12 @@ Success! The configuration is valid.
       <p>
         型システムを強化するためには、各リソースの属性やその型情報を正確に把握する必要がある。AWSの場合、CloudFormationのリソースタイプスキーマを利用することで、各リソースの属性情報を取得できる。例えば、以下のコマンドを実行すると、S3バケットリソースのスキーマ情報が取得できる。
       </p>
-      <pre><code class="language-shell">aws cloudformation describe-type \
-      --type RESOURCE \
-      --type-name AWS::S3::Bucket \
-      --query &quot;Schema&quot; \
-      --output text
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">aws cloudformation describe-type <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --type RESOURCE <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --type-name AWS::S3::Bucket <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --query <span class="s2">&#34;Schema&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">      --output text
+</span></span></code></pre>
       <p>
         これを元にCarinaで型定義を自動生成するなり、AIに生成させるなりすれば、型システムの強化がより容易になると考えている。
       </p>

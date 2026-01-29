@@ -9,15 +9,24 @@
     <!-- TODO: change name and description -->
     <meta name="author" content="Gosuke Miyashita"/>
     <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Carina Modules"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2026/01/25/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2026/01/25/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Carina Modules"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2026/01/25/1/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
     <section class="sidebar">
@@ -93,9 +102,7 @@
       </p>
       <p>
         この問題を解決するために、Carinaには
-        <code>
-          module info
-        </code>
+        <code>module info</code>
         というコマンドを実装した。
       </p>
       <hr />
@@ -103,9 +110,7 @@
         module info コマンド
       </h2>
       <p>
-        <code>
-          module info
-        </code>
+        <code>module info</code>
         コマンドを実行すると、モジュールの情報が以下のように表示される。
       </p>
       <p>
@@ -122,8 +127,7 @@
       </p>
       <pre><code>vpc: ref(aws.vpc)  (required)
 cidr_blocks: list(cidr)  (required)
-enable_https: bool = true
-</code></pre>
+enable_https: bool = true</code></pre>
       <p>
         型情報と、必須かどうか、デフォルト値があるかどうかがわかる。
       </p>
@@ -136,13 +140,10 @@ enable_https: bool = true
       <pre><code>input { vpc: ref(aws.vpc) }
 └── web_sg: aws.security_group
     ├── http: aws.security_group.ingress_rule
-    └── https: aws.security_group.ingress_rule
-</code></pre>
+    └── https: aws.security_group.ingress_rule</code></pre>
       <p>
         入力として受け取った
-        <code>
-          vpc
-        </code>
+        <code>vpc</code>
         を起点に、どのリソースがどのリソースに依存しているかが視覚的にわかる。
       </p>
       <h3>
@@ -152,8 +153,7 @@ enable_https: bool = true
         モジュールが外部に公開する出力を表示する。
       </p>
       <pre><code>security_group: ref(aws.security_group)
-  ← from: web_sg
-</code></pre>
+  ← from: web_sg</code></pre>
       <p>
         出力の型と、その出力がモジュール内のどのリソースから来ているかがわかる。
       </p>

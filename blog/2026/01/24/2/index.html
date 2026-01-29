@@ -9,15 +9,24 @@
     <!-- TODO: change name and description -->
     <meta name="author" content="Gosuke Miyashita"/>
     <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="AWS Cloud Control APIは遅い？"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2026/01/24/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2026/01/24/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="AWS Cloud Control APIは遅い？"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2026/01/24/2/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
     <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
     <section class="sidebar">
@@ -90,9 +99,9 @@
       <p>
         Cloud Control APIを使う大きなメリットとして、CloudFormationのJSON Schemaが公開されていることがある。例えばS3バケットのスキーマは以下のコマンドで取得できる。
       </p>
-      <pre><code class="language-shell">aws cloudformation describe-type --type RESOURCE \
-  --type-name AWS::S3::Bucket --query 'Schema' --output text
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">aws cloudformation describe-type --type RESOURCE <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --type-name AWS::S3::Bucket --query <span class="s1">&#39;Schema&#39;</span> --output text
+</span></span></code></pre>
       <p>
         このスキーマを使えば、
         <a href="https://github.com/oxidecomputer/typify">
@@ -113,13 +122,9 @@
       </h2>
       <p>
         S3バケットの
-        <code>
-          versioning_configuration
-        </code>
+        <code>versioning_configuration</code>
         を変更する
-        <code>
-          apply
-        </code>
+        <code>apply</code>
         を実行したところ、完了までに20秒以上かかった。単純なプロパティ変更なのに遅すぎるのでは、と思って調べてみた。
       </p>
       <hr />
@@ -132,10 +137,10 @@
       <h3>
         直接S3 API
       </h3>
-      <pre><code class="language-shell">$ time aws s3api put-bucket-versioning \
-  --bucket carina-test-logs-mizzy-2026 \
-  --versioning-configuration Status=Suspended
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">$ <span class="nb">time</span> aws s3api put-bucket-versioning <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bucket carina-test-logs-mizzy-2026 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --versioning-configuration <span class="nv">Status</span><span class="o">=</span>Suspended
+</span></span></code></pre>
       <p>
         所要時間:
         <strong>
@@ -145,22 +150,22 @@
       <h3>
         Cloud Control API
       </h3>
-      <pre><code class="language-shell">RESULT=$(aws cloudcontrol update-resource \
-  --type-name &quot;AWS::S3::Bucket&quot; \
-  --identifier &quot;carina-test-logs-mizzy-2026&quot; \
-  --patch-document '[{&quot;op&quot;:&quot;replace&quot;,&quot;path&quot;:&quot;/VersioningConfiguration&quot;,&quot;value&quot;:{&quot;Status&quot;:&quot;Enabled&quot;}}]')
-
-REQUEST_TOKEN=$(echo &quot;$RESULT&quot; | jq -r '.ProgressEvent.RequestToken')
-START=$(date +%s)
-
-while true; do
-  STATUS=$(aws cloudcontrol get-resource-request-status \
-    --request-token &quot;$REQUEST_TOKEN&quot; | jq -r '.ProgressEvent.OperationStatus')
-  echo &quot;[$(( $(date +%s) - START ))s] $STATUS&quot;
-  [ &quot;$STATUS&quot; = &quot;SUCCESS&quot; ] || [ &quot;$STATUS&quot; = &quot;FAILED&quot; ] &amp;&amp; break
-  sleep 1
-done
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nv">RESULT</span><span class="o">=</span><span class="k">$(</span>aws cloudcontrol update-resource <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --type-name <span class="s2">&#34;AWS::S3::Bucket&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --identifier <span class="s2">&#34;carina-test-logs-mizzy-2026&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --patch-document <span class="s1">&#39;[{&#34;op&#34;:&#34;replace&#34;,&#34;path&#34;:&#34;/VersioningConfiguration&#34;,&#34;value&#34;:{&#34;Status&#34;:&#34;Enabled&#34;}}]&#39;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">REQUEST_TOKEN</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$RESULT</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.ProgressEvent.RequestToken&#39;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">START</span><span class="o">=</span><span class="k">$(</span>date +%s<span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> true<span class="p">;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">STATUS</span><span class="o">=</span><span class="k">$(</span>aws cloudcontrol get-resource-request-status <span class="se">\
+</span></span></span><span class="line"><span class="cl">    --request-token <span class="s2">&#34;</span><span class="nv">$REQUEST_TOKEN</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.ProgressEvent.OperationStatus&#39;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="k">$((</span> <span class="k">$(</span>date +%s<span class="k">)</span> <span class="o">-</span> START <span class="k">))</span><span class="s2">s] </span><span class="nv">$STATUS</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$STATUS</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;SUCCESS&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$STATUS</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;FAILED&#34;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">break</span>
+</span></span><span class="line"><span class="cl">  sleep <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">done</span>
+</span></span></code></pre>
       <p>
         完了までの所要時間:
         <strong>
