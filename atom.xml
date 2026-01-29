@@ -3,12 +3,69 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-28T21:40:00+09:00</updated>
+    <updated>2026-01-29T19:00:03+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Nebelにシンタックスハイライト機能を追加した]]></title>
+        <link href="https://mizzy.org/blog/2026/01/29/1/"/>
+        <updated>2026-01-29T19:00:03+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/29/1/</id>
+        <content type="html"><![CDATA[
+<p>最近このブログは、<a href="https://github.com/mizzy/carina">Carina</a>の開発進捗報告の場と化して更新頻度が上がっているので、ブログ自体にも手を入れていっている。</p>
+<p>2日前には<a href="https://mizzy.org/blog/2026/01/27/2/">OGP画像自動生成機能を追加した</a>が、今回はコードのシンタックスハイライト機能を追加した。</p>
+<hr />
+<h2>実装内容</h2>
+<p>Markdownパーサとして使っている<a href="https://github.com/yuin/goldmark">goldmark</a>に、<a href="https://github.com/yuin/goldmark-highlighting">goldmark-highlighting</a>拡張を追加した。バックエンドには<a href="https://github.com/alecthomas/chroma">Chroma</a>というGo製のシンタックスハイライターを使っている。</p>
+<p>テーマは<a href="https://catppuccin.com/">Catppuccin Mocha</a>を採用した。パステル調のダークテーマで、紫・青・緑・オレンジ・ピンクの柔らかい配色が特徴。ブログの背景が白なので、ダークテーマの方がコードブロックが目立つかな、と思って選んだ。</p>
+<hr />
+<h2>使い方</h2>
+<p>Markdownで言語を指定してコードブロックを書くと、自動的にハイライトされる。</p>
+<p>たとえばJSONを書くとこうなる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;example&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>Bashだとこう。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">$ <span class="nb">echo</span> <span class="s2">&#34;Hello, World!&#34;</span>
+</span></span></code></pre><hr />
+<h2>Carina言語のサポート</h2>
+<p>せっかくなので、開発中の<a href="https://github.com/mizzy/carina">Carina</a>用のカスタムレクサーも追加した。Chromaはカスタムレクサーを定義できるので、独自言語のハイライトも可能。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">backend</span> <span class="nv">s3</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">bucket</span>      <span class="o">=</span> <span class="s2">&#34;my-carina-state&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">key</span>         <span class="o">=</span> <span class="s2">&#34;prod/carina.crnstate&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">encrypt</span>     <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">auto_create</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">main_vpc</span> <span class="o">=</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;main-vpc&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>キーワード、文字列、真偽値、リソースタイプなどが適切にハイライトされる。</p>
+<hr />
+<h2>CSSの統一</h2>
+<p>言語指定ありのコードブロックはChromaでハイライトされるが、言語指定なしのコードブロックは素の<code>&lt;pre&gt;</code>タグで出力される。見た目を統一するため、<code>base.css</code>の<code>pre</code>スタイルもCatppuccin Mochaテーマに合わせた。</p>
+<p>また、コードブロックのフォントサイズを本文と同じ16pxにして、読みやすさを向上させた。</p>
+<pre><code>言語指定なしのコードブロックも
+同じダークブルー背景で表示される
+</code></pre>
+<hr />
+<h2>まとめ</h2>
+<ul>
+<li>goldmark-highlighting（Chroma）でシンタックスハイライトを実装</li>
+<li>Catppuccin Mochaテーマでパステル調のダークなコードブロックに</li>
+<li>Carina言語用のカスタムレクサーを追加</li>
+<li>フォントサイズを本文と統一して読みやすく</li>
+<li>言語指定なしのコードブロックもスタイルを統一</li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carina State Management]]></title>
@@ -680,41 +737,6 @@ let backup = aws.s3.bucket {
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">YAPC締めのラーメン #yapcramen #yapcjapan</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1990244417228472487?ref_src=twsrc%5Etfw">November 11, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <!-- markdownlint-enable MD013 -->
 <p>この後、東京には戻るが、翌日からのCloud Native Days Winter 2025にも参加するため、家には帰らず有明のホテルに直行した。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[RigelというAI Coding Agentを開発している]]></title>
-        <link href="https://mizzy.org/blog/2025/08/30/2/"/>
-        <updated>2025-08-30T21:31:14+09:00</updated>
-        <id>https://mizzy.org/blog/2025/08/30/2/</id>
-        <content type="html"><![CDATA[
-<h2>きっかけ</h2>
-<p>tokuhiromさんの<a href="https://blog.64p.org/entry/2025/08/29/170302">ashronというAI Coding Agentを開発している</a>というブログ記事や以下のポストを読んだ。</p>
-<!-- markdownlint-disable MD013 -->
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ashron っていう、Coding Agent を書いている - Blog::Amrta <a href="https://t.co/fKU4l0QTQq">https://t.co/fKU4l0QTQq</a></p>&mdash; tokuhirom (@tokuhirom) <a href="https://twitter.com/tokuhirom/status/1960847865967780266?ref_src=twsrc%5Etfw">August 29, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<!-- markdownlint-enable MD013 -->
-<p>Clineがいい、Cursorだ、いやClaude Codeだ、Codexだ、みたいな流行に振り回されたくないし、ローカルLLMをうまく扱えるコーディングエージェントもなかなか見つからない。CodexがローカルLLM対応してるけど、期待したとおりに動いてくれない。</p>
-<p>なので、自分でAI Coding Agentを作るのがよいかもしれない、と考えていた。</p>
-<p>そんな状況で、tokuhiromさんの記事を読んで背中を押された感じ。</p>
-<p>というわけで、自分もRigelというAI Coding Agentを作り始めた。</p>
-<hr />
-<h2>Rigelについて</h2>
-<p><a href="https://github.com/mizzy/rigel">Rigel</a>は、Goで実装しているAI Coding Agent。</p>
-<p>主な特徴は以下の通り。</p>
-<ul>
-<li>ターミナルベースのチャットインターフェース</li>
-<li>複数のLLMプロバイダーに対応（Anthropic Claude、Ollama）</li>
-<li>サンドボックスでの安全なコード実行</li>
-</ul>
-<p>特にローカルLLMを扱えるようにOllamaに対応しているのがポイント。何も設定しない場合、デフォルトでローカルのOllama + gpt-oss:20bを利用するようになっている。エージェント実行中に、AnthropicかOllamaかを切り替えたり、モデルを切り替えたりもできる。</p>
-<p>実際に動かすとこんな感じ。</p>
-<p><img src="/images/2025/08/rigel.jpg" alt="Rigelのスクリーンショット" /></p>
-<p>ちなみにRigelという名前はオリオン座の1等星から拝借しているけど、特に意味はない。リゲルは青白い星なので、色使いもそんな感じにしている。</p>
-<hr />
-<h2>今後の開発</h2>
-<p>とりあえずベースができて会話できる程度にはなったけど、まだコーディングエージェントとして使える状態にはなっていない。今後はツール周りと、コンテキストをどう扱うか、といったあたりが開発の中心になりそう。</p>
 
 ]]></content>
     </entry>

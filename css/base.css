@@ -310,12 +310,14 @@ a {
 
 .content a {
     margin: 2px 3px;
+    text-decoration-skip-ink: auto;
+    text-underline-offset: 2px;
 }
 
 pre {
-    font-size: 13px;
-    color: #d8dee9;
-    background-color: #2e3440;
+    font-size: 16px;
+    color: #cdd6f4;
+    background-color: #1e1e2e;
     border: none;
     border-radius: 6px;
     padding: 1em;
@@ -323,4 +325,36 @@ pre {
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-x: auto;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+    .content {
+        margin-left: 0;
+        width: auto;
+        padding: 0 15px;
+    }
+
+    .content p {
+        font-size: 18px;
+    }
+
+    .content li {
+        font-size: 18px;
+    }
+
+    .content blockquote {
+        font-size: 16px;
+    }
+
+    pre {
+        font-size: 14px;
+    }
 }
