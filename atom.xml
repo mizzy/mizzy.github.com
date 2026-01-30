@@ -3,12 +3,48 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-29T22:07:30+09:00</updated>
+    <updated>2026-01-30T16:30:00+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carinaで列挙型値の省略記法をサポート]]></title>
+        <link href="https://mizzy.org/blog/2026/01/30/1/"/>
+        <updated>2026-01-30T16:30:00+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/30/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/mizzy/carina">Carina</a>で、列挙型の値を省略して書けるようにした。</p>
+<h2>以前の書き方</h2>
+<p>これまでは、VPCのインスタンステナンシーを指定する場合、完全な名前空間付きの形式で書く必要があった。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="nv">vpc</span> <span class="nv">my_vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">cidr_block</span>       <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">instance_tenancy</span> <span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p><code>awscc.vpc.InstanceTenancy.dedicated</code>という記述は正確だが、冗長に感じられる。書くときは補完機能を使うので問題ないが、読みにくい。</p>
+<h2>新しい書き方</h2>
+<p>今回の変更で、3つの形式をサポートした。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="err">//</span> <span class="err">完全形式（従来通り）</span>
+</span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">//</span> <span class="err">型名</span> <span class="err">+</span> <span class="err">値</span>
+</span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">//</span> <span class="err">値のみ</span>
+</span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="nv">dedicated</span>
+</span></span></code></pre><p>属性のスキーマには、どの名前空間に属するかの情報がある。<code>instance_tenancy</code>属性は<code>awscc.vpc</code>名前空間に属し、型名は<code>InstanceTenancy</code>だとわかっている。この情報を使って、省略形式を完全形式に展開する。</p>
+<h2>実装</h2>
+<p>パーサーは、未知の識別子を見つけると<code>UnresolvedIdent</code>として保持する。スキーマの検証時に、属性の名前空間情報を使って完全な形式に展開する。</p>
+<p>LSPの補完も更新し、省略形式で候補を表示するようにした。<code>dedicated</code>や<code>default</code>といった短い形式で補完される。</p>
+<h2>関連リンク</h2>
+<ul>
+<li><a href="https://github.com/mizzy/carina/pull/34">Add shorthand enum value support with schema-based namespace resolution by mizzy · Pull Request #34 · mizzy/carina</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carina aws providerとawscc provider]]></title>
@@ -449,133 +485,6 @@ enable_https: bool = true
 </table>
 <p>Cloud Control APIは統一的なインターフェースで様々なリソースを扱えるメリットがあるが、個別のAPIを直接叩くより大幅に遅い。速度が重要な場合は、リソースタイプごとに直接SDKを使う方がよさそう。</p>
 <p>Carinaでの採用はやめた。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[CarinaというTerraformライクなツールをつくりはじめた]]></title>
-        <link href="https://mizzy.org/blog/2026/01/24/1/"/>
-        <updated>2026-01-24T13:47:59+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/24/1/</id>
-        <content type="html"><![CDATA[
-<h2>きっかけ</h2>
-<p>gfxさんの<a href="https://gfx.hatenablog.com/entry/2026/01/23/212644">個人が静的型付き言語のコンパイラをゼロから作れる時代が来た！</a>という記事を読んで、自分も何か、以前だったらつくろうと思っても面倒で手が出なかったようなものをつくってみよう、と思ってつくりはじめた。</p>
-<p>自分のことを知ってる方ならご存じかと思うが、自分はInfrastructure as Codeが大好きで、普段からIaCのことばかり考えている。最近だとこんなことを考えて発表した。</p>
-<script defer class="speakerdeck-embed" data-id="facd81a255fb4c32ab2d80c559f1ede1" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>Terraformは好きで、公私ともにとてもお世話になっているのだが、こうなっているといいな、と思う点が色々ある。だが、Terraformはそれなりに歴史も実績もあるツールで、とてもよくできているので、自分でいちからつくって、Terraformと同レベルで使えるようになるまで育てるのは大変すぎるな、と思っていた。が、gfxさんの記事を読んで、今ならいけそうだな、と思ってつくりはじめた。</p>
-<hr />
-<h2>Carinaについて</h2>
-<p><a href="https://github.com/mizzy/carina">Carina</a>は、Rustで実装したTerraformライクなインフラ管理ツール。</p>
-<p>基本的にはTerraformと同じなんだけど、今のところ違う点を挙げると以下のような感じ。</p>
-<ul>
-<li>独自DSLによるインフラ定義
-<ul>
-<li>今のところHCLをかなり参考にしているけど、微妙に違う部分もある</li>
-<li>Terraformを使っていて、もっとこうなってるといいのにな、と思う部分を改善していく予定</li>
-</ul>
-</li>
-<li>型がより厳密に定義されている
-<ul>
-<li>例えばTerraform aws providerではregionは文字列で<code>ap-northeast-1</code>と書くが、Carina aws providerではenumで定義されていて、<code>aws.Region.ap_northeast_1</code>のように書く</li>
-</ul>
-</li>
-</ul>
-<p>ちなみに、自分はツールに名前をつけるときは天体に関連する言葉を使うことが多い。Carinaはりゅうこつ座のことで、竜骨は船の重要な骨格部分。インフラを支えるツールにふさわしいかな、と思ってこの名前にした。</p>
-<hr />
-<h2>なぜRustか</h2>
-<p>言語選定はClaude Codeと相談して決めた。候補としてはRust、Go、TypeScriptあたりが挙がった。</p>
-<p>Rustを選んだ理由としては、</p>
-<ul>
-<li>強力な型システムで信頼性の高いインフラツールを作れる</li>
-<li>パーサーライブラリのpestが使いやすい</li>
-<li>非同期処理のエコシステム（tokio）が成熟している</li>
-<li>AWS SDK for Rustが利用可能</li>
-<li>シングルバイナリで配布しやすい</li>
-</ul>
-<p>といったあたりをClaude Codeが挙げてくれたけど、まあなんとなくRust使ってみるか、ぐらいで決めた。自分はRustにあまり馴染みがないけど、Claude Codeに書いてもらうなら問題ないだろうし、Rustを学ぶ良い機会になるかな、と。</p>
-<hr />
-<h2>DSL</h2>
-<p><code>.crn</code>という拡張子のファイルにインフラを定義する。</p>
-<pre><code>provider aws {
-    region = aws.Region.ap_northeast_1
-}
-
-# 匿名リソース
-aws.s3.bucket {
-    name = &quot;my-app-logs&quot;
-    region = aws.Region.ap_northeast_1
-    versioning = true
-    expiration_days = 90
-}
-
-# 名前付きリソース
-let backup = aws.s3.bucket {
-    name = &quot;my-app-backup&quot;
-    region = aws.Region.ap_northeast_1
-}
-</code></pre>
-<p>Terraformと似たような感じだけど、以下の点が異なる。</p>
-<ul>
-<li>リソースタイプの指定が<code>aws.s3.bucket</code>のようにドット区切り
-<ul>
-<li>Terraformの場合は<code>aws_s3_bucket</code>のようにアンダースコア区切り</li>
-</ul>
-</li>
-<li>名前付きリソースは<code>let</code>で宣言
-<ul>
-<li>Terraformの場合は<code>resource &quot;aws_s3_bucket&quot; &quot;backup&quot;</code>のように書くし、リソース名が必須になるが、Carinaでは、他リソースから参照する必要がなければ、匿名にできるようにしている</li>
-</ul>
-</li>
-<li>Data Sourceのことはまだ考えてなかったので、区別するためのキーワードが必要になりそうだけど、まだ決めていない</li>
-</ul>
-<p>Terraformだと、<code>resource &quot;aws_s3_bucket&quot; &quot;my_app_logs&quot;</code>のように書くが、リソースタイプがアンダースコア区切りなので、それに合わせてリソース名もアンダースコア区切りにすべきか、それともハイフン区切りにすべきか、といつも悩む。別にどちらでもいいんだけど、どちらでもいいということは、その時々で判断がぶれてしまうので、ぶれないようにしたい、と思ったのがこのような設計にした理由の一つ。</p>
-<hr />
-<h2>使い方</h2>
-<p>Terraformと同様に<code>validate</code>、<code>plan</code>、<code>apply</code>というコマンドがある。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">$ carina validate example.crn
-</span></span><span class="line"><span class="cl">Validating...
-</span></span><span class="line"><span class="cl">✓ <span class="m">2</span> resources validated successfully.
-</span></span><span class="line"><span class="cl">  • s3_bucket.my-app-logs
-</span></span><span class="line"><span class="cl">  • s3_bucket.my-app-backup
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">$ carina plan example.crn
-</span></span><span class="line"><span class="cl">Using AWS provider <span class="o">(</span>region: ap-northeast-1<span class="o">)</span>
-</span></span><span class="line"><span class="cl">Execution Plan:
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  + s3_bucket.my-app-logs
-</span></span><span class="line"><span class="cl">      name: <span class="s2">&#34;my-app-logs&#34;</span>
-</span></span><span class="line"><span class="cl">      versioning: <span class="nb">true</span>
-</span></span><span class="line"><span class="cl">      expiration_days: <span class="m">90</span>
-</span></span><span class="line"><span class="cl">  + s3_bucket.my-app-backup
-</span></span><span class="line"><span class="cl">      name: <span class="s2">&#34;my-app-backup&#34;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">Plan: <span class="m">2</span> to add, <span class="m">0</span> to change, <span class="m">0</span> to destroy.
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">$ carina apply example.crn
-</span></span><span class="line"><span class="cl">Applying changes...
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  ✓ Create s3_bucket.my-app-logs
-</span></span><span class="line"><span class="cl">  ✓ Create s3_bucket.my-app-backup
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">Apply complete! <span class="m">2</span> changes applied.
-</span></span></code></pre><hr />
-<h2>アーキテクチャ</h2>
-<pre><code>DSL (.crn) → Parser → Resources → Differ → Plan (Effects) → Interpreter → Provider → Infrastructure
-</code></pre>
-<ul>
-<li><strong>Parser</strong>: pestを使ってDSLをパース</li>
-<li><strong>Differ</strong>: 現在の状態と望む状態を比較してEffectを生成</li>
-<li><strong>Plan</strong>: Effectのコレクション</li>
-<li><strong>Interpreter</strong>: PlanをProviderに渡して実行</li>
-<li><strong>Provider</strong>: 実際のインフラ操作を行うトレイト</li>
-</ul>
-<p>Effectは<code>Create</code>、<code>Update</code>、<code>Delete</code>、<code>Read</code>の4種類があり、それぞれが値として扱われる。</p>
-<hr />
-<h2>今後</h2>
-<p>現状、AWSのS3バケットのみ対応している。今後、Terraformこうなっているといいのにな、と思っていることが実際に実現できるのか、を実験する場にしていこうと考えている。</p>
-<p>リポジトリはこちら。</p>
-<p><a href="https://github.com/mizzy/carina">mizzy/carina: A functional infrastructure management tool</a></p>
 
 ]]></content>
     </entry>
