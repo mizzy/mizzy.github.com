@@ -3,7 +3,7 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-30T16:30:00+09:00</updated>
+    <updated>2026-01-30T17:39:23+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
@@ -11,23 +11,75 @@
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
 
     <entry>
+        <title type="html"><![CDATA[Carinaにデータソース機能を追加]]></title>
+        <link href="https://mizzy.org/blog/2026/01/30/2/"/>
+        <updated>2026-01-30T17:39:23+09:00</updated>
+        <id>https://mizzy.org/blog/2026/01/30/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/mizzy/carina">Carina</a>に<code>read</code>キーワードを追加し、既存のインフラリソースを参照できるようにした。Terraformのdata sourceに相当する機能。</p>
+<h2>新しい構文</h2>
+<p><code>read</code>キーワードを使って、既存のリソースを参照できる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">aws</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 既存のVPCを読み取る（データソース）</span>
+</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">existing_vpc</span> <span class="o">=</span> <span class="k">read</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span> <span class="o">=</span> <span class="s2">&#34;production-vpc&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 既存のVPC内に新しいサブネットを作成</span>
+</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">app_subnet</span> <span class="o">=</span> <span class="nc">aws.subnet</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>              <span class="o">=</span> <span class="s2">&#34;app-subnet&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">vpc_id</span>            <span class="o">=</span> <span class="nv">existing_vpc</span><span class="p">.</span><span class="nv">id</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>        <span class="o">=</span> <span class="s2">&#34;10.0.100.0/24&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">availability_zone</span> <span class="o">=</span> <span class="nv">aws</span><span class="p">.</span><span class="err">A</span><span class="nv">vailability</span><span class="err">Z</span><span class="nv">one</span><span class="p">.</span><span class="nv">ap_northeast_1a</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p><code>read</code>で定義したリソースは、ライフサイクルを管理しない。作成・更新・削除は行わず、現在の状態を読み取るだけ。</p>
+<h2>プラン表示</h2>
+<p><code>+</code>（作成）、<code>~</code>（更新）、<code>-</code>（削除）に加えて、<code>&lt;=</code>（読み取り）が表示される。(Ghostty上だと違う文字になってるけど)</p>
+<p><img src="/images/2026-01-30-carina-data-source-plan.png" alt="プラン表示" /></p>
+<h2>実装</h2>
+<p>内部的には、<code>Resource</code>構造体に<code>read_only</code>フィールドを追加した。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Resource</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">id</span>: <span class="nc">ResourceId</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">attributes</span>: <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="n">Value</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">read_only</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">  </span><span class="c1">// データソースの場合true
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p><code>Effect</code>列挙型の<code>Read</code>バリアントも変更し、リソース全体を保持するようにした。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">Effect</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Read</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">resource</span>: <span class="nc">Resource</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="c1">// 変更前: Read(ResourceId)
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Create</span><span class="p">(</span><span class="n">Resource</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">id</span>: <span class="nc">ResourceId</span><span class="p">,</span><span class="w"> </span><span class="n">from</span>: <span class="nc">State</span><span class="p">,</span><span class="w"> </span><span class="n">to</span>: <span class="nc">Resource</span><span class="w"> </span><span class="p">},</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Delete</span><span class="p">(</span><span class="n">ResourceId</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p>パーサーは、<code>read</code>キーワードに続くリソース定義を解析し、<code>read_only = true</code>のリソースを生成する。プラン生成時、<code>read_only</code>なリソースは通常のdiff処理をスキップし、常に<code>Effect::Read</code>を生成する。</p>
+<h2>関連リンク</h2>
+<ul>
+<li><a href="https://github.com/mizzy/carina/pull/35">Add read keyword for data sources by mizzy · Pull Request #35 · mizzy/carina</a></li>
+</ul>
+
+]]></content>
+    </entry>
+
+    <entry>
         <title type="html"><![CDATA[Carinaで列挙型値の省略記法をサポート]]></title>
         <link href="https://mizzy.org/blog/2026/01/30/1/"/>
-        <updated>2026-01-30T16:30:00+09:00</updated>
+        <updated>2026-01-30T16:45:00+09:00</updated>
         <id>https://mizzy.org/blog/2026/01/30/1/</id>
         <content type="html"><![CDATA[
 <p><a href="https://github.com/mizzy/carina">Carina</a>で、列挙型の値を省略して書けるようにした。</p>
 <h2>以前の書き方</h2>
 <p>これまでは、VPCのインスタンステナンシーを指定する場合、完全な名前空間付きの形式で書く必要があった。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="nv">vpc</span> <span class="nv">my_vpc</span> <span class="p">{</span>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.vpc.vpc</span> <span class="nv">my_vpc</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="nv">cidr_block</span>       <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">instance_tenancy</span> <span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">instance_tenancy</span> <span class="o">=</span> <span class="nc">awscc.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p><code>awscc.vpc.InstanceTenancy.dedicated</code>という記述は正確だが、冗長に感じられる。書くときは補完機能を使うので問題ないが、読みにくい。</p>
 <h2>新しい書き方</h2>
 <p>今回の変更で、3つの形式をサポートした。</p>
 <pre class="chroma"><code><span class="line"><span class="cl"><span class="err">//</span> <span class="err">完全形式（従来通り）</span>
-</span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="nc">awscc.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="err">//</span> <span class="err">型名</span> <span class="err">+</span> <span class="err">値</span>
 </span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
@@ -84,12 +136,12 @@
 </span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="nc">awscc.vpc</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">  <span class="nv">name</span>                 <span class="o">=</span> <span class="s2">&#34;cloudcontrol-vpc&#34;</span>
 </span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
 </span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
 </span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nc">awscc.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre><p>基本的な構文は同じだが、以下の点が異なる。</p>
 <ul>
@@ -411,80 +463,6 @@ enable_https: bool = true
 <hr />
 <h2>今後</h2>
 <p>まだ少ないリソース数と単純な依存関係でしか試していないが、モジュールで定義されているリソース構造を把握するのに役立ちそう。リソース数が増えたり、依存関係が複雑になったりするとどうなるか、引き続き試しながら改善していきたい。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[AWS Cloud Control APIは遅い？]]></title>
-        <link href="https://mizzy.org/blog/2026/01/24/2/"/>
-        <updated>2026-01-24T18:40:23+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/24/2/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/mizzy/carina">Carina</a>の開発中に、AWS Cloud Control APIが遅いことに気づいた。</p>
-<hr />
-<h2>Cloud Control APIを試した背景</h2>
-<p>CarinaでAWSリソースを扱うにあたり、最初はaws-sdk-s3を使ってS3バケットの操作を実装していた。ただ、この方法だとリソースタイプごとに個別実装が必要になる。S3、EC2、IAM...とAWSのサービスは膨大にあるので、全部個別に実装するのは大変だ。生成AIがあるとはいえ、もっと楽にできないかと考えた。</p>
-<p>そこで<a href="https://docs.aws.amazon.com/cloudcontrolapi/latest/userguide/what-is-cloudcontrolapi.html">Cloud Control API</a>を使うことを考えた。Cloud Control APIは、CloudFormationと同じリソースハンドラーを使った統一的なAPIで、様々なAWSリソースをCRUD操作できる。</p>
-<p>Cloud Control APIを使う大きなメリットとして、CloudFormationのJSON Schemaが公開されていることがある。例えばS3バケットのスキーマは以下のコマンドで取得できる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">aws cloudformation describe-type --type RESOURCE <span class="se">\
-</span></span></span><span class="line"><span class="cl">  --type-name AWS::S3::Bucket --query <span class="s1">&#39;Schema&#39;</span> --output text
-</span></span></code></pre><p>このスキーマを使えば、<a href="https://github.com/oxidecomputer/typify">typify</a>でRustの型を自動生成できる。生成した型を使ってバリデーションすれば、リソースごとに手動でバリデーションロジックを書く必要がなくなる。</p>
-<p>というわけで、Cloud Control APIを使うよう<a href="https://github.com/mizzy/carina/pull/2">実装してみた</a>。</p>
-<hr />
-<h2>問題発覚</h2>
-<p>S3バケットの<code>versioning_configuration</code>を変更する<code>apply</code>を実行したところ、完了までに20秒以上かかった。単純なプロパティ変更なのに遅すぎるのでは、と思って調べてみた。</p>
-<hr />
-<h2>計測結果</h2>
-<p>直接S3 APIを叩いた場合と、Cloud Control APIを叩いた場合で比較してみた。</p>
-<h3>直接S3 API</h3>
-<pre class="chroma"><code><span class="line"><span class="cl">$ <span class="nb">time</span> aws s3api put-bucket-versioning <span class="se">\
-</span></span></span><span class="line"><span class="cl">  --bucket carina-test-logs-mizzy-2026 <span class="se">\
-</span></span></span><span class="line"><span class="cl">  --versioning-configuration <span class="nv">Status</span><span class="o">=</span>Suspended
-</span></span></code></pre><p>所要時間: <strong>約0.4〜0.5秒</strong></p>
-<h3>Cloud Control API</h3>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="nv">RESULT</span><span class="o">=</span><span class="k">$(</span>aws cloudcontrol update-resource <span class="se">\
-</span></span></span><span class="line"><span class="cl">  --type-name <span class="s2">&#34;AWS::S3::Bucket&#34;</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl">  --identifier <span class="s2">&#34;carina-test-logs-mizzy-2026&#34;</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl">  --patch-document <span class="s1">&#39;[{&#34;op&#34;:&#34;replace&#34;,&#34;path&#34;:&#34;/VersioningConfiguration&#34;,&#34;value&#34;:{&#34;Status&#34;:&#34;Enabled&#34;}}]&#39;</span><span class="k">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nv">REQUEST_TOKEN</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$RESULT</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.ProgressEvent.RequestToken&#39;</span><span class="k">)</span>
-</span></span><span class="line"><span class="cl"><span class="nv">START</span><span class="o">=</span><span class="k">$(</span>date +%s<span class="k">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">while</span> true<span class="p">;</span> <span class="k">do</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">STATUS</span><span class="o">=</span><span class="k">$(</span>aws cloudcontrol get-resource-request-status <span class="se">\
-</span></span></span><span class="line"><span class="cl">    --request-token <span class="s2">&#34;</span><span class="nv">$REQUEST_TOKEN</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.ProgressEvent.OperationStatus&#39;</span><span class="k">)</span>
-</span></span><span class="line"><span class="cl">  <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="k">$((</span> <span class="k">$(</span>date +%s<span class="k">)</span> <span class="o">-</span> START <span class="k">))</span><span class="s2">s] </span><span class="nv">$STATUS</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$STATUS</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;SUCCESS&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$STATUS</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;FAILED&#34;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">break</span>
-</span></span><span class="line"><span class="cl">  sleep <span class="m">1</span>
-</span></span><span class="line"><span class="cl"><span class="k">done</span>
-</span></span></code></pre><p>完了までの所要時間: <strong>約23秒</strong></p>
-<hr />
-<h2>なぜ遅いのか</h2>
-<p>Cloud Control APIはCloudFormationと同じリソースハンドラーを使っており、内部的にリソースの整合性チェックや安定化待ち（resource stabilization）を行っているようだ。</p>
-<p>AWSの公式ブログ<a href="https://aws.amazon.com/blogs/devops/how-we-sped-up-aws-cloudformation-deployments-with-optimistic-stabilization/">How we sped up AWS CloudFormation deployments with optimistic stabilization</a>でも、CloudFormationのデプロイが遅い理由として「resource stabilization」に時間がかかることが説明されている。</p>
-<hr />
-<h2>まとめ</h2>
-<table>
-<thead>
-<tr>
-<th>方式</th>
-<th>所要時間</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>直接S3 API</td>
-<td>約0.5秒</td>
-</tr>
-<tr>
-<td>Cloud Control API</td>
-<td>約23秒</td>
-</tr>
-</tbody>
-</table>
-<p>Cloud Control APIは統一的なインターフェースで様々なリソースを扱えるメリットがあるが、個別のAPIを直接叩くより大幅に遅い。速度が重要な場合は、リソースタイプごとに直接SDKを使う方がよさそう。</p>
-<p>Carinaでの採用はやめた。</p>
 
 ]]></content>
     </entry>

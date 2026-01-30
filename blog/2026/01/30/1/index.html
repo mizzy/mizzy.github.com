@@ -74,7 +74,7 @@
         </a>
       </h1>
       <section class="byline">
-        2026-01-30 16:30:00 +0900
+        2026-01-30 16:45:00 +0900
       </section>
       <p>
         <a href="https://github.com/mizzy/carina">
@@ -88,9 +88,9 @@
       <p>
         これまでは、VPCのインスタンステナンシーを指定する場合、完全な名前空間付きの形式で書く必要があった。
       </p>
-      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="nv">vpc</span> <span class="nv">my_vpc</span> <span class="p">{</span>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.vpc.vpc</span> <span class="nv">my_vpc</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="nv">cidr_block</span>       <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">instance_tenancy</span> <span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">instance_tenancy</span> <span class="o">=</span> <span class="nc">awscc.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre>
       <p>
@@ -104,7 +104,7 @@
         今回の変更で、3つの形式をサポートした。
       </p>
       <pre class="chroma"><code><span class="line"><span class="cl"><span class="err">//</span> <span class="err">完全形式（従来通り）</span>
-</span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="nv">awscc</span><span class="p">.</span><span class="nv">vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
+</span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="nc">awscc.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="err">//</span> <span class="err">型名</span> <span class="err">+</span> <span class="err">値</span>
 </span></span><span class="line"><span class="cl"><span class="na">instance_tenancy </span><span class="o">=</span> <span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
@@ -147,6 +147,9 @@
         </li>
       </ul>
       <div class="pagination">
+        <a href="/blog/2026/01/30/2">
+          ↑ newer post
+        </a>
         <a href="/blog/2026/01/29/2" rel="next">
           older post ↓
         </a>
