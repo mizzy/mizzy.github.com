@@ -3,12 +3,70 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-01-30T17:39:23+09:00</updated>
+    <updated>2026-02-01T09:20:53+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[least - TerraformコードからIAMポリシーを自動生成するツール]]></title>
+        <link href="https://mizzy.org/blog/2026/02/01/1/"/>
+        <updated>2026-02-01T09:20:53+09:00</updated>
+        <id>https://mizzy.org/blog/2026/02/01/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/mizzy/least">least</a>というツールをつくった。Terraformのコードをみて、plan/applyに必要な権限を持つIAMポリシーを自動生成するツール。</p>
+<hr />
+<h2>きっかけ</h2>
+<p>TerraformでGitHub Actions等から自動plan/applyを実行する際、plan/apply用ロールのIAMポリシーをどうするのが良いのか、いつも悩む。最小権限の原則は理想ではあるが、必要な権限を手動で調べてポリシーを作成するのは非常に面倒で、果たしてその苦労に見合うのか、と常々思っている。</p>
+<p>最初に大きめの権限を与えておいて、IAM Access Analyzerを利用して後から権限を絞る、というアプローチもあるが、できれば最初から最小権限に近い状態で始めたい。</p>
+<p>そんなことを考えていたところ、<a href="https://github.com/mizzy/carina">Carina</a>のawscc provider開発中に、<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/resource-type-schemas.html">CloudFormation resource provider schema</a>には各リソースタイプの作成・更新・削除に必要なIAMアクションが<code>handlers</code>という属性で定義されている、ということに気づいた。</p>
+<p>例えば、S3バケット（<code>AWS::S3::Bucket</code>）のスキーマでは<code>handlers</code>は以下のように定義されている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;create&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:CreateBucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:PutBucketTagging&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;...&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;read&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:GetAccelerateConfiguration&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:GetLifecycleConfiguration&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;...&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;update&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:PutBucketAcl&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:PutBucketTagging&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;...&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;delete&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:DeleteBucket&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:ListBucket&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;list&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:ListAllMyBuckets&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>この情報を活用すればTerraformコードから必要なIAMポリシーを自動生成でき、労せず最小権限の原則を満たせるのでは、と思いついた。</p>
+<p>思いついた時は<a href="https://2026.srekaigi.net/">SRE Kaigi 2026</a>に参加中でPCを持参していなかったので、<a href="https://code.claude.com/docs/ja/claude-code-on-the-web">Claude Code on the web</a>にスマホからアクセスし、こんなのつくって、とお願いしてつくってもらった。</p>
+<p>ちなみにまだコードは見てないし、動作確認もしてない。</p>
+<h2>機能</h2>
+<p>機能的には、TerraformコードでIAMポリシーを生成する<code>generate</code>コマンドと、既存のIAMポリシーが持つ権限がTerraformコードに対して過不足がないかチェックする<code>check</code>コマンドを提供している。<code>check</code>コマンドは主にCIでの利用を想定している。</p>
+<h2>今後</h2>
+<p>まだ動作確認すらしてないので、とりあえず動作確認するところから。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carinaにデータソース機能を追加]]></title>
@@ -417,52 +475,6 @@
 <p>Terraformの<code>plan</code>コマンドは、作成・変更・削除されるリソースがフラットなリストで表示される。どのリソースが作成されるかはわかるが、リソース間の依存関係は出力からは読み取れない。</p>
 <p>Carinaの<code>plan</code>では、依存関係に基づいてリソースがツリー構造で表示される。上の例だと、VPCの下にSecurity Groupがあり、その下にIngress Ruleがある、という階層構造が一目でわかる。</p>
 <p>これにより、planの出力を見るだけで、リソース間の依存関係を把握できる。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Carina Modules]]></title>
-        <link href="https://mizzy.org/blog/2026/01/25/1/"/>
-        <updated>2026-01-25T12:59:31+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/25/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/01/24/1/">昨日の記事</a>で紹介した<a href="https://github.com/mizzy/carina">Carina</a>に、モジュール機能を実装した。</p>
-<hr />
-<h2>背景</h2>
-<p><a href="/blog/2025/11/17/1/">YAPC::Fukuoka 2025での発表</a>で、インフラコードのモジュール化の難しさについて話した。</p>
-<script defer class="speakerdeck-embed" data-id="facd81a255fb4c32ab2d80c559f1ede1" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
-<p>ここで挙げた問題のひとつが「内部構造の把握と依存関係の追跡が困難」という点。Terraformのモジュールは中身を見ないと何が作られるかわからないし、依存関係も追いづらい。planを実行してみれば、どんなリソースがつくられるかはわかるが、モジュールを呼び出すためのコードを書かないといけなくて面倒。また、つくられるリソースは表示されるが、リソース間の依存関係はplanの出力からはわからない。</p>
-<p>この問題を解決するために、Carinaには<code>module info</code>というコマンドを実装した。</p>
-<hr />
-<h2>module info コマンド</h2>
-<p><code>module info</code>コマンドを実行すると、モジュールの情報が以下のように表示される。</p>
-<p><img src="/images/2026/01/carina-module-info.png" alt="module info の出力" /></p>
-<p>3つのセクションに分かれている。</p>
-<h3>REQUIRES</h3>
-<p>モジュールが必要とする入力を表示する。</p>
-<pre><code>vpc: ref(aws.vpc)  (required)
-cidr_blocks: list(cidr)  (required)
-enable_https: bool = true
-</code></pre>
-<p>型情報と、必須かどうか、デフォルト値があるかどうかがわかる。</p>
-<h3>CREATES</h3>
-<p>モジュールが作成するリソースをツリー構造で表示する。</p>
-<pre><code>input { vpc: ref(aws.vpc) }
-└── web_sg: aws.security_group
-    ├── http: aws.security_group.ingress_rule
-    └── https: aws.security_group.ingress_rule
-</code></pre>
-<p>入力として受け取った<code>vpc</code>を起点に、どのリソースがどのリソースに依存しているかが視覚的にわかる。</p>
-<h3>EXPOSES</h3>
-<p>モジュールが外部に公開する出力を表示する。</p>
-<pre><code>security_group: ref(aws.security_group)
-  ← from: web_sg
-</code></pre>
-<p>出力の型と、その出力がモジュール内のどのリソースから来ているかがわかる。</p>
-<hr />
-<h2>今後</h2>
-<p>まだ少ないリソース数と単純な依存関係でしか試していないが、モジュールで定義されているリソース構造を把握するのに役立ちそう。リソース数が増えたり、依存関係が複雑になったりするとどうなるか、引き続き試しながら改善していきたい。</p>
 
 ]]></content>
     </entry>
