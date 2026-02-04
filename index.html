@@ -90,7 +90,7 @@
         <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/resource-type-schemas.html">
           CloudFormation resource provider schemas
         </a>
-        から自動生成できるはずだがそうなっておらず、Carinaが手動？でスキーマを定義していた。（これはそのように指示を出していない自分が悪いのだが。）
+        から自動生成できるはずだがそうなっておらず、Claude Codeが手動？でスキーマを定義していた。（これはそのように指示を出していない自分が悪いのだが。）
       </p>
       <p>
         というわけで自動生成するようにしてもらった。こんな感じで、スキーマをRustコードの形で自動生成してくれる。
@@ -160,7 +160,7 @@
       <pre class="chroma"><code><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">AttributeSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;instance_tenancy&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">AttributeType</span>::<span class="nb">String</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;The allowed tenancy of instances launched into the VPC.  + ``default``: An instance launched into the VPC runs on shared hardware by default, unless y...&#34;</span><span class="p">),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">)</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="p">)</span><span class="w">
 </span></span></span></code></pre>
       <p>
         そこで、コードジェネレーターでdescriptionを解析して取り得る値を抽出し、名前空間付き列挙型に変換するようにしてみた。

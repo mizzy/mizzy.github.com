@@ -18,7 +18,7 @@
         <content type="html"><![CDATA[
 <p><a href="https://github.com/mizzy/carina">Carina</a>を1週間ほどコードを見ずにClaude Codeにつくらせて、それっぽく動くようにはなったけど、そろそろコードを読んで指示出さないといけないフェーズに入ったかな、と思い、まずはawscc providerのコードを読んでいる。</p>
 <p>実際にコードを読んでみると、awscc providerはAWS Cloud Control APを利用しているので、aws-sdk-cloudcontrol crateだけを利用すればいいはずなのに、なぜかaws-sdk-ec2 crateも利用している、といったおかしなことになっていた。</p>
-<p>また、プロバイダー用スキーマは、<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/resource-type-schemas.html">CloudFormation resource provider schemas</a>から自動生成できるはずだがそうなっておらず、Carinaが手動？でスキーマを定義していた。（これはそのように指示を出していない自分が悪いのだが。）</p>
+<p>また、プロバイダー用スキーマは、<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/resource-type-schemas.html">CloudFormation resource provider schemas</a>から自動生成できるはずだがそうなっておらず、Claude Codeが手動？でスキーマを定義していた。（これはそのように指示を出していない自分が悪いのだが。）</p>
 <p>というわけで自動生成するようにしてもらった。こんな感じで、スキーマをRustコードの形で自動生成してくれる。</p>
 <pre class="chroma"><code><span class="line"><span class="cl"><span class="sd">//! internet_gateway schema definition for AWS Cloud Control
 </span></span></span><span class="line"><span class="cl"><span class="sd">//!
@@ -61,7 +61,7 @@
 <pre class="chroma"><code><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">AttributeSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;instance_tenancy&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">AttributeType</span>::<span class="nb">String</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;The allowed tenancy of instances launched into the VPC.  + ``default``: An instance launched into the VPC runs on shared hardware by default, unless y...&#34;</span><span class="p">),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">)</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="p">)</span><span class="w">
 </span></span></span></code></pre><p>そこで、コードジェネレーターでdescriptionを解析して取り得る値を抽出し、名前空間付き列挙型に変換するようにしてみた。</p>
 <p>こんな感じで、列挙型のバリデーション関数を生成してくれる。</p>
 <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">const</span><span class="w"> </span><span class="no">VALID_INSTANCE_TENANCY</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="o">&amp;</span><span class="kt">str</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="p">[</span><span class="s">&#34;default&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;dedicated&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;host&#34;</span><span class="p">];</span><span class="w">
