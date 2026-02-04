@@ -3,12 +3,90 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-02-01T09:20:53+09:00</updated>
+    <updated>2026-02-04T09:40:42+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carina awscc providerの自動スキーマ生成]]></title>
+        <link href="https://mizzy.org/blog/2026/02/04/1/"/>
+        <updated>2026-02-04T09:40:42+09:00</updated>
+        <id>https://mizzy.org/blog/2026/02/04/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/mizzy/carina">Carina</a>を1週間ほどコードを見ずにClaude Codeにつくらせて、それっぽく動くようにはなったけど、そろそろコードを読んで指示出さないといけないフェーズに入ったかな、と思い、まずはawscc providerのコードを読んでいる。</p>
+<p>実際にコードを読んでみると、awscc providerはAWS Cloud Control APを利用しているので、aws-sdk-cloudcontrol crateだけを利用すればいいはずなのに、なぜかaws-sdk-ec2 crateも利用している、といったおかしなことになっていた。</p>
+<p>また、プロバイダー用スキーマは、<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/resource-type-schemas.html">CloudFormation resource provider schemas</a>から自動生成できるはずだがそうなっておらず、Carinaが手動？でスキーマを定義していた。（これはそのように指示を出していない自分が悪いのだが。）</p>
+<p>というわけで自動生成するようにしてもらった。こんな感じで、スキーマをRustコードの形で自動生成してくれる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="sd">//! internet_gateway schema definition for AWS Cloud Control
+</span></span></span><span class="line"><span class="cl"><span class="sd">//!
+</span></span></span><span class="line"><span class="cl"><span class="sd">//! Auto-generated from CloudFormation schema: AWS::EC2::InternetGateway
+</span></span></span><span class="line"><span class="cl"><span class="sd">//!
+</span></span></span><span class="line"><span class="cl"><span class="sd">//! DO NOT EDIT MANUALLY - regenerate with carina-codegen
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="k">super</span>::<span class="n">tags_type</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">carina_core</span>::<span class="n">schema</span>::<span class="p">{</span><span class="n">AttributeSchema</span><span class="p">,</span><span class="w"> </span><span class="n">AttributeType</span><span class="p">,</span><span class="w"> </span><span class="n">ResourceSchema</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="sd">/// Returns the schema for ec2_internet_gateway (AWS::EC2::InternetGateway)
+</span></span></span><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">ec2_internet_gateway_schema</span><span class="p">()</span><span class="w"> </span>-&gt; <span class="nc">ResourceSchema</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">ResourceSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;awscc.ec2_internet_gateway&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;Allocates an internet gateway for use with a VPC. After creating the Internet gateway, you then attach it to a VPC.&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">AttributeSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;internet_gateway_id&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">AttributeType</span>::<span class="nb">String</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34; (read-only)&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">AttributeSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;tags&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">tags_type</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;Any tags to assign to the internet gateway.&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p>VPCの<code>cidr_block</code>は、CloudFormation resource provider schemaでは<code>string</code>型になっている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">        <span class="s2">&#34;CidrBlock&#34;</span><span class="err">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;The IPv4 network range for the VPC, in CIDR notation. For example, ``10.0.0.0/16``. We modify the specified CIDR block to its canonical form; for example, if you specify ``100.68.0.18/18``, we modify it to ``100.68.0.0/18``.\n You must specify either``CidrBlock`` or ``Ipv4IpamPoolId``.&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span><span class="err">,</span>
+</span></span></code></pre><p>だが、Carinaは強い型付けを目指しているので、ドメイン固有型である<code>cidr</code>型に変換している。これは指示しなくてもClaude Codeが勝手にそうしてくれた。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">AttributeSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;cidr_block&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">types</span>::<span class="n">cidr</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;The IPv4 network range for the VPC, in CIDR notation. For example, ``10.0.0.0/16``. We modify the specified CIDR block to its canonical form; for exam...&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">)</span><span class="w">
+</span></span></span></code></pre><p>VPCの<code>instance_tenancy</code>属性は、CloudFormation resource provider schemaでは<code>string</code>型になっているが、取り得る値は3つに限定されていることがdescriptionから読み取れる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">        <span class="s2">&#34;InstanceTenancy&#34;</span><span class="err">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;The allowed tenancy of instances launched into the VPC.\n  +  ``default``: An instance launched into the VPC runs on shared hardware by default, unless you explicitly specify a different tenancy during instance launch.\n  +  ``dedicated``: An instance launched into the VPC runs on dedicated hardware by default, unless you explicitly specify a tenancy of ``host`` during instance launch. You cannot specify a tenancy of ``default`` during instance launch.\n  \n Updating ``InstanceTenancy`` requires no replacement only if you are updating its value from ``dedicated`` to ``default``. Updating ``InstanceTenancy`` from ``default`` to ``dedicated`` requires replacement.&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="err">,</span>
+</span></span></code></pre><p>これを何も考えずにRustコードに変換すると、当然のことながら<code>string</code>型になる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">AttributeSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;instance_tenancy&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">AttributeType</span>::<span class="nb">String</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;The allowed tenancy of instances launched into the VPC.  + ``default``: An instance launched into the VPC runs on shared hardware by default, unless y...&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">)</span><span class="w">  
+</span></span></span></code></pre><p>そこで、コードジェネレーターでdescriptionを解析して取り得る値を抽出し、名前空間付き列挙型に変換するようにしてみた。</p>
+<p>こんな感じで、列挙型のバリデーション関数を生成してくれる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">const</span><span class="w"> </span><span class="no">VALID_INSTANCE_TENANCY</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="o">&amp;</span><span class="kt">str</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="p">[</span><span class="s">&#34;default&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;dedicated&#34;</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;host&#34;</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">validate_instance_tenancy</span><span class="p">(</span><span class="n">value</span>: <span class="kp">&amp;</span><span class="nc">Value</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">validate_namespaced_enum</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">value</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="s">&#34;InstanceTenancy&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="s">&#34;awscc.ec2_vpc&#34;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="no">VALID_INSTANCE_TENANCY</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p>そして、スキーマ定義では、カスタム属性型として定義してくれる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">AttributeSchema</span>::<span class="n">new</span><span class="p">(</span><span class="s">&#34;instance_tenancy&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">AttributeType</span>::<span class="n">Custom</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">name</span>: <span class="s">&#34;InstanceTenancy&#34;</span><span class="p">.</span><span class="n">to_string</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">base</span>: <span class="nb">Box</span>::<span class="n">new</span><span class="p">(</span><span class="n">AttributeType</span>::<span class="nb">String</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">validate</span>: <span class="nc">validate_instance_tenancy</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">namespace</span>: <span class="nb">Some</span><span class="p">(</span><span class="s">&#34;awscc.ec2_vpc&#34;</span><span class="p">.</span><span class="n">to_string</span><span class="p">()),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">})</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;The allowed tenancy of instances launched into the VPC.  + ``default``: An instance launched into the VPC runs on shared hardware by default, unless y...&#34;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">)</span><span class="w">
+</span></span></span></code></pre>
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[least - TerraformコードからIAMポリシーを自動生成するツール]]></title>
@@ -460,21 +538,6 @@
 </span></span></span><span class="line"><span class="cl">      --query <span class="s2">&#34;Schema&#34;</span> <span class="se">\
 </span></span></span><span class="line"><span class="cl">      --output text
 </span></span></code></pre><p>これを元にCarinaで型定義を自動生成するなり、AIに生成させるなりすれば、型システムの強化がより容易になると考えている。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[carina planで依存関係を可視化]]></title>
-        <link href="https://mizzy.org/blog/2026/01/25/2/"/>
-        <updated>2026-01-25T15:14:36+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/25/2/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/mizzy/carina">Carina</a>の<code>plan</code>コマンドで、リソース間の依存関係をツリー構造で表示できるようにした。</p>
-<p><img src="/images/2026/01/carina-plan.png" alt="carina plan の出力" /></p>
-<p>Terraformの<code>plan</code>コマンドは、作成・変更・削除されるリソースがフラットなリストで表示される。どのリソースが作成されるかはわかるが、リソース間の依存関係は出力からは読み取れない。</p>
-<p>Carinaの<code>plan</code>では、依存関係に基づいてリソースがツリー構造で表示される。上の例だと、VPCの下にSecurity Groupがあり、その下にIngress Ruleがある、という階層構造が一目でわかる。</p>
-<p>これにより、planの出力を見るだけで、リソース間の依存関係を把握できる。</p>
 
 ]]></content>
     </entry>
