@@ -3,12 +3,48 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-02-04T09:40:42+09:00</updated>
+    <updated>2026-02-08T12:34:04+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carina aws providerとawscc providerに互換性を持たせるのをやめた]]></title>
+        <link href="https://mizzy.org/blog/2026/02/08/1/"/>
+        <updated>2026-02-08T12:34:04+09:00</updated>
+        <id>https://mizzy.org/blog/2026/02/08/1/</id>
+        <content type="html"><![CDATA[
+<p>以前、<a href="https://mizzy.org/blog/2026/01/29/2/">Carina aws providerとawscc provider</a>という記事で、aws providerとawscc providerのスキーマをCloud Control APIベースで統一し、<code>aws</code>と<code>awscc</code>を置換するだけで切り替えられるようにしている、と書いた。この方針をやめた。</p>
+<hr />
+<h2>やめた理由</h2>
+<p>aws providerはSDKを直接叩くので、SDKのAPI構造に合わせた方が自然だし、パフォーマンスや機能面でも有利になる。無理にawscc providerと同じスキーマに合わせると、SDKの良さを活かしきれない。</p>
+<p>一方、awscc providerはCloud Control APIを使っているので、CloudFormationのスキーマにそのまま合わせるのが最も自然。両者の性質が異なるのに、無理に互換性を持たせようとすると後々無理が出てきそうだな、と思った。</p>
+<p>また、仮にプロバイダ間で切り替えたい場合でも、今の時代なら生成AIに変換を任せれば良い。人間が手作業で置換することを前提にスキーマの互換性を維持するより、それぞれのプロバイダに最適な設計にした方が合理的だろう。</p>
+<hr />
+<h2>変更内容</h2>
+<h3>awscc providerの命名規則変更</h3>
+<p>awscc providerのリソース名を、CloudFormationのリソースタイプ名に完全に合わせるようにした。</p>
+<p>変更前:</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;example-vpc&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>変更後:</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.ec2_vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;example-vpc&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>CloudFormationでは<code>AWS::EC2::VPC</code>というリソースタイプ名なので、awscc providerでも<code>awscc.ec2_vpc</code>とする。以前は<code>awscc.vpc</code>のようにサービス名を省略していたが、CloudFormationのスキーマから自動生成する際にも、この方が素直にマッピングできる。</p>
+<h3>aws providerのスキーマ</h3>
+<p>aws providerのスキーマは引き続きCloudFormationのスキーマをベースにするが、awscc providerとの完全な互換性は維持しない。SDKのAPI構造に合わせた方が自然な場合は、そちらに寄せる方針にした。具体的にどう変えるかはまだこれからだが、大きな方針として決めた。</p>
+<hr />
+<h2>まとめ</h2>
+<p>以前は「<code>aws</code>と<code>awscc</code>を置換するだけで切り替えられる」ことを目指していたが、両者の性質が根本的に異なるため、それぞれに適したスキーマ設計をした方がよい、という結論になった。awscc providerはCloudFormationに忠実に、aws providerはSDKに寄せる。ユーザーにとっても、それぞれのプロバイダの特性が明確になる方がわかりやすいはず。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carina awscc providerの自動スキーマ生成]]></title>
@@ -474,70 +510,6 @@
 <hr />
 <h2>今後</h2>
 <p>デザインは現状かなりシンプルなので、余裕があればもう少し凝ったものにしたい。ロゴを入れたり、グラデーション背景にしたり、といったあたりは比較的簡単にできそう。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Carinaの型システムについて]]></title>
-        <link href="https://mizzy.org/blog/2026/01/27/1/"/>
-        <updated>2026-01-27T09:54:37+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/27/1/</id>
-        <content type="html"><![CDATA[
-<p>Terraformライクなツール<a href="https://github.com/mizzy/carina">Carina</a>をつくりはじめた動機のひとつに、「型システムの強化」がある。</p>
-<p>Terraformではプリミティブな型（string, number, bool）に加えて、listやmap、objectなどの複合型がサポートされている。しかし、型システム自体はあまり強力ではない。</p>
-<p>例えば、regionやcidr_blockのような特定のドメインに特化した型は存在しない。そのため、これらの値を扱う際には単なるstring型として扱われ、誤った値が設定される可能性がある。誤った設定をした場合、validateやplanで気づけるのであればまだ良いが、planが通ってしまい、apply時にエラーになってはじめて間違いが発覚することもある。</p>
-<p>これを防ぐために、Carinaではドメイン固有型の導入を試している。現在実装しているものとして、region型やcidr型がある。これらの型は、それぞれのドメインに特化したバリデーションロジックを持っており、不正な値が設定された場合には即座にエラーを返す。</p>
-<p>例えば、誤ってリージョンを指定すべきところにアベイラビリティゾーンを指定したとする。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="k">aws</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  region</span> <span class="o">=</span> <span class="s2">&#34;ap-northeast-1a&#34;</span>
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>Terraformではさすがに<code>plan</code>は通らないが、<code>validate</code>は通る。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">$ terraform validate
-</span></span><span class="line"><span class="cl">Success! The configuration is valid.
-</span></span></code></pre><p>Carinaもproviderの定義はTerraformと同じように記述するが、<code>validate</code>で以下のようなエラーが返る。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">Error: provider aws: Validation failed: Invalid region <span class="s1">&#39;ap-northeast-1a&#39;</span>, expected one of: ap-northeast-1, ap-northeast-2, ap-northeast-3, ap-southeast-1, ap-southeast-2, ap-south-1, us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1, eu-west-2, eu-west-3, eu-central-1, eu-north-1, ca-central-1, sa-east-1 or DSL format like aws.Region.ap_northeast_1
-</span></span></code></pre><p>このようにCarinaでは、型システムを強化することで、より早い段階で設定ミスを検出できるようにしたい、と考えている。</p>
-<p>また、CarinaではAWSリージョンはEnum型として定義されているため、以下のようにリージョンを指定することもできる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">aws</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>更にLSPもサポートしているため、IDE上で補完候補としてリージョンの一覧が表示される。</p>
-<p><img src="/images/2026/01/carina-region-completion.png" alt="リージョンの補完候補" /></p>
-<p>誤った文字列を指定している場合も、IDE上でエラーが表示される。</p>
-<p><img src="/images/2026/01/carina-region-error.png" alt="IDEでのエラー表示" /></p>
-<p>もう一つの例として、cidr型を紹介する。cidr型はCIDR表記のIPアドレスブロックを表す型で、不正なCIDR表記が指定された場合にはエラーを返す。</p>
-<p>例えば、以下のように不正なプレフィックス長を指定したとする。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">main_vpc</span> <span class="o">=</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;main-vpc&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/33&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>carina validate</code>を実行すると、以下のようなエラーが返る。</p>
-<pre><code>Error: vpc.main-vpc: Validation failed: Invalid prefix length '33': must be 0-32
-</code></pre>
-<p>Terraformでもvalidateで同様のエラーが返るが、IntelliJ IDEAのTerraformプラグインではCIDR表記のフォーマットエラーが検出されない。CarinaのLSPでは、IDE上で以下のようにエラーが表示される。</p>
-<p><img src="/images/2026/01/carina-cidr-error.png" alt="cidr_blockのエラー表示" /></p>
-<p>まったくCIDR表記として成り立っていない場合も、当然ながらIDE上でエラーが表示される。</p>
-<p><img src="/images/2026/01/carina-cidr-format-error.png" alt="cidr_blockのフォーマットエラー表示" /></p>
-<p>cidr型でもregion型と同様に、補完候補として一般的なCIDR表記が表示される。</p>
-<p><img src="/images/2026/01/carina-cidr-completion.png" alt="cidr_blockの補完候補" /></p>
-<p>さらに別の例として、S3バケットの<code>versioning_configuration</code>属性を紹介する。<code>versioning_configuration</code>はS3バケットのバージョニング設定を表すオブジェクト型で、<code>status</code>フィールドには<code>Enabled</code>または<code>Suspended</code>のいずれかを文字列で指定する必要がある（<code>Disabled</code>もあるがこれはちょっと特殊な値）。誤った文字列を指定すると、validateやplanでは不正な値が検出されるが、IDE上ではエラーや補完候補が表示されないため、あれ、Enableだっけ？Enabledだっけ？と迷ったら公式ドキュメントを確認する必要がある。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_s3_bucket_versioning&#34; &#34;versioning_example&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  bucket</span> <span class="o">=</span> <span class="k">aws_s3_bucket</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">id</span>
-</span></span><span class="line"><span class="cl">  <span class="k">versioning_configuration</span> {
-</span></span><span class="line"><span class="cl"><span class="n">    status</span> <span class="o">=</span> <span class="s2">&#34;Enabled&#34;</span>
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>Carinaでは、このstatusフィールドをEnum型として定義しているため、以下のように補完候補として&quot;Enabled&quot;と&quot;Suspended&quot;が表示される。</p>
-<p><img src="/images/2026/01/carina-s3-versioning-completion.png" alt="S3バケットのversioning補完" /></p>
-<p>エディタ上でのエラー表示や自動補完については、今は生成AIが基本的にコードを書いてくれるのであまり気にする必要はないかもしれない。しかし、型システムが強力であればあるほど、生成AIがより正確なコードを生成できるようになり、早い段階で間違いに気づけるようになるはず。</p>
-<p>型システムを強化するためには、各リソースの属性やその型情報を正確に把握する必要がある。AWSの場合、CloudFormationのリソースタイプスキーマを利用することで、各リソースの属性情報を取得できる。例えば、以下のコマンドを実行すると、S3バケットリソースのスキーマ情報が取得できる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">aws cloudformation describe-type <span class="se">\
-</span></span></span><span class="line"><span class="cl">      --type RESOURCE <span class="se">\
-</span></span></span><span class="line"><span class="cl">      --type-name AWS::S3::Bucket <span class="se">\
-</span></span></span><span class="line"><span class="cl">      --query <span class="s2">&#34;Schema&#34;</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl">      --output text
-</span></span></code></pre><p>これを元にCarinaで型定義を自動生成するなり、AIに生成させるなりすれば、型システムの強化がより容易になると考えている。</p>
 
 ]]></content>
     </entry>
