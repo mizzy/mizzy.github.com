@@ -3,12 +3,43 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-02-08T12:34:04+09:00</updated>
+    <updated>2026-02-08T14:12:38+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carina organization移行とアイコン・ドキュメント整備]]></title>
+        <link href="https://mizzy.org/blog/2026/02/08/2/"/>
+        <updated>2026-02-08T14:12:38+09:00</updated>
+        <id>https://mizzy.org/blog/2026/02/08/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/carina-rs/carina">Carina</a>のリポジトリを個人アカウント（mizzy）から<a href="https://github.com/carina-rs">carina-rs</a> organizationに移した。あわせて、アイコンの作成と<a href="https://carina-rs.github.io/">ドキュメントサイト</a>の公開もやった。</p>
+<hr />
+<h2>organizationへの移行</h2>
+<p>これまで<a href="https://github.com/mizzy/carina">mizzy/carina</a>として個人アカウント配下に置いていたが、<a href="https://github.com/carina-rs/carina">carina-rs/carina</a>に移した。</p>
+<p>移行の主な理由は、ドキュメントサイトをGitHub Pagesでホストしたかったから。GitHub Pagesでorganizationサイト（<code>carina-rs.github.io</code>）を使えば、プロジェクト専用のドメインでドキュメントを公開できる。organization名は<code>carina-rs</code>にした。Rustプロジェクトでよくある命名だし、<code>carina</code>という名前はすでに取られていたので。</p>
+<p>GitHubのリポジトリ移行機能を使えば、旧URLからのリダイレクトも自動で設定されるので、既存のリンクが壊れる心配もない。</p>
+<hr />
+<h2>アイコンの作成</h2>
+<p>ChatGPTにお願いしてアイコンをつくってもらった。りゅうこつ座（Carina）の船の竜骨と、カノープスをイメージしたデザイン。カノープスはりゅうこつ座のα星で、シリウスに次いで全天で2番目に明るい恒星。ただ、日本では南の空の低い位置にしか見えないのでマイナーな印象がある。organizationのアバターと、リポジトリのREADMEのヘッダーにも使っている。</p>
+<hr />
+<h2>ドキュメントサイト</h2>
+<p><a href="https://rust-lang.github.io/mdBook/">mdBook</a>を使ってドキュメントサイトをつくり、GitHub Pagesでホストするようにした。プロバイダのリソースドキュメントはCloudFormationスキーマから自動生成し、それ以外はClaude Codeにつくってもらった。</p>
+<p><a href="https://carina-rs.github.io/">Introduction - Carina Documentation</a></p>
+<p>現時点では、Carinaの概要や主要機能の説明、クイックスタート、プロバイダのドキュメントなどを載せている。開発が進むにつれて、ドキュメントも充実させていく予定。</p>
+<p>mdBookはRust製のドキュメントジェネレーターで、Markdownから静的サイトを生成してくれる。Rust製ツールのドキュメントによく使われているらしい。</p>
+<hr />
+<h2>関連リンク</h2>
+<ul>
+<li><a href="https://github.com/carina-rs/carina">carina-rs/carina: A strongly typed infrastructure management tool</a></li>
+<li><a href="https://carina-rs.github.io/">Introduction - Carina Documentation</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carina aws providerとawscc providerに互換性を持たせるのをやめた]]></title>
@@ -460,56 +491,6 @@
 <hr />
 <h2>今後</h2>
 <p>Terraform Stateに関する不満として一番大きいのは、やはりstate refreshの速度だと思う。<a href="https://mizzy.org/blog/2022/03/24/1/">Terraform State Refreshの高速化手法と実装</a> という記事で、高速化するための手法や実装をいくつか挙げたが、あくまでもTerraformを前提としたものだった。Carinaではその前提が取っ払えるので、もっとよい形での高速化が実現できるかもしれないし、できないかもしれない。今後の課題として取り組んでいきたい。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[NebelにOGP画像自動生成機能を追加した]]></title>
-        <link href="https://mizzy.org/blog/2026/01/27/2/"/>
-        <updated>2026-01-27T19:08:09+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/27/2/</id>
-        <content type="html"><![CDATA[
-<p>tokuhiromさんの<a href="https://blog.64p.org/entry/2026/01/26/110749">ogp を設定した</a>という記事を読んで、そういえば自分もOGP対応しなきゃな、と思い出した。以前から対応しようと思いつつ、画像生成とか面倒だな、と後回しにしていた。でも今なら生成AIでシュッと対応できるな、と思ってやってみた。</p>
-<p>ちなみにこのブログ記事もClaude Codeが書いたものをそのまま出している。</p>
-<p>このブログの静的サイトジェネレータである<a href="https://github.com/mizzy/nebel">Nebel</a>に、OGP画像を自動生成する機能を追加した。</p>
-<hr />
-<h2>OGP画像とは</h2>
-<p>OGP（Open Graph Protocol）画像は、SNSでURLをシェアしたときに表示されるサムネイル画像のこと。TwitterやFacebookなどでリンクを共有すると、タイトルや説明文と一緒に画像が表示される。</p>
-<p>これまでこのブログにはOGP画像を設定していなかったので、SNSでシェアしてもデフォルトの味気ない表示になっていた。</p>
-<hr />
-<h2>実装内容</h2>
-<p><code>nebel generate</code>を実行すると、各記事のタイトルからOGP画像（1200x630px）を自動生成するようにした。</p>
-<ul>
-<li><strong>サイズ</strong>: 1200x630px（OGP推奨サイズ）</li>
-<li><strong>背景</strong>: ダークグレー（#333）</li>
-<li><strong>テキスト</strong>: 記事タイトル（白色、中央配置）</li>
-<li><strong>フォント</strong>: Noto Sans CJK JP Bold（日本語対応）</li>
-</ul>
-<p>生成される画像はこんな感じ。</p>
-<p><img src="/blog/2026/01/27/2/ogp.png" alt="OGP画像のサンプル" /></p>
-<hr />
-<h2>使用ライブラリ</h2>
-<p>Goで画像を生成するために<a href="https://github.com/fogleman/gg">fogleman/gg</a>というライブラリを使った。シンプルなAPIで2D描画ができるので、こういった用途にはちょうど良い。</p>
-<p>日本語フォントには<a href="https://fonts.google.com/noto/specimen/Noto+Sans+JP">Noto Sans CJK JP</a>を使用。CJK（中国語・日本語・韓国語）に対応しているので、日本語タイトルも問題なく描画できる。</p>
-<hr />
-<h2>テンプレートの変更</h2>
-<p>HTMLテンプレートには、OGPとTwitter Cardのメタタグを追加した。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c">&lt;!-- OGP --&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:title&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Title }}&#34;</span><span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:type&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;article&#34;</span><span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:url&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .Path }}/&#34;</span><span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .OGImagePath }}&#34;</span><span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:site_name&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;Gosuke Miyashita&#34;</span><span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c">&lt;!-- Twitter Card --&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:card&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;summary_large_image&#34;</span><span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:title&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Title }}&#34;</span><span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;https://mizzy.org{{ .OGImagePath }}&#34;</span><span class="p">/&gt;</span>
-</span></span></code></pre><p>これで、SNSでシェアしたときにタイトル入りの画像が表示されるようになる。</p>
-<hr />
-<h2>今後</h2>
-<p>デザインは現状かなりシンプルなので、余裕があればもう少し凝ったものにしたい。ロゴを入れたり、グラデーション背景にしたり、といったあたりは比較的簡単にできそう。</p>
 
 ]]></content>
     </entry>
