@@ -19,7 +19,7 @@
 <p>以前、<a href="https://mizzy.org/blog/2026/01/29/2/">Carina aws providerとawscc provider</a>という記事で、aws providerとawscc providerのスキーマをCloud Control APIベースで統一し、<code>aws</code>と<code>awscc</code>を置換するだけで切り替えられるようにしている、と書いた。この方針をやめた。</p>
 <hr />
 <h2>やめた理由</h2>
-<p>aws providerはSDKを直接叩くので、SDKのAPI構造に合わせた方が自然だし、パフォーマンスや機能面でも有利になる。無理にawscc providerと同じスキーマに合わせると、SDKの良さを活かしきれない。</p>
+<p>aws providerはSDKを直接叩くので、SDKのAPI構造に合わせた方が自然だし、パフォーマンスも有利になる。無理にawscc providerと同じスキーマに合わせると、SDKの良さを活かしきれない。</p>
 <p>一方、awscc providerはCloud Control APIを使っているので、CloudFormationのスキーマにそのまま合わせるのが最も自然。両者の性質が異なるのに、無理に互換性を持たせようとすると後々無理が出てきそうだな、と思った。</p>
 <p>また、仮にプロバイダ間で切り替えたい場合でも、今の時代なら生成AIに変換を任せれば良い。人間が手作業で置換することを前提にスキーマの互換性を維持するより、それぞれのプロバイダに最適な設計にした方が合理的だろう。</p>
 <hr />
