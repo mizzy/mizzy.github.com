@@ -3,12 +3,97 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-02-11T20:44:44+09:00</updated>
+    <updated>2026-02-11T21:27:18+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carina awscc providerのacceptance test]]></title>
+        <link href="https://mizzy.org/blog/2026/02/11/2/"/>
+        <updated>2026-02-11T21:27:18+09:00</updated>
+        <id>https://mizzy.org/blog/2026/02/11/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/carina-rs/carina">Carina</a>のawscc providerにacceptance testを追加した。実際にAWSリソースを作成・削除して、プロバイダーが正しく動作するかを確認するテスト。</p>
+<p>Carinaのプロバイダーのコードは全部生成AIにつくってもらっているので、網羅的なテストが重要になる。自分の手でコードを書いていれば、ある程度の品質は把握できるが、生成AIが書いたコードはちゃんとテストしないと信用できない。一方で、こういった地道なacceptance testを手作業で整備・実行・確認するのは正直面倒なので、テストの生成、実行、確認も全部生成AIにやってもらっている。コードを書くのも生成AI、テストを書くのも生成AI、テストを実行して確認して見つかったバグを直すのも生成AI、という構図。</p>
+<hr />
+<h2>テストの構成</h2>
+<p>テストは<code>.crn</code>ファイルとして記述する。リソースタイプごとにディレクトリを分け、パターンごとにファイルを用意している。現時点で20のEC2リソースタイプに対して39のテストファイルがある。</p>
+<pre><code>acceptance-tests/
+├── ec2_vpc/
+│   ├── basic.crn
+│   └── with_ipam.crn
+├── ec2_subnet/
+│   ├── basic.crn
+│   ├── ipv6.crn
+│   ├── with_dns_options.crn
+│   └── with_ipam.crn
+├── ec2_route/
+│   ├── igw.crn
+│   ├── ipv6.crn
+│   ├── nat_gateway.crn
+│   ├── transit_gateway.crn
+│   └── vpc_peering.crn
+├── ...
+└── run-tests.sh
+</code></pre>
+<p>テストファイルの中身は通常の<code>.crn</code>ファイルと同じ。たとえば<code>ec2_vpc/basic.crn</code>はこんな感じ。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># EC2 VPC - Basic test</span>
+</span></span><span class="line"><span class="cl"><span class="c">#</span>
+</span></span><span class="line"><span class="cl"><span class="c"># Tests: cidr_block, enable_dns_support, enable_dns_hostnames, instance_tenancy, tags</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">awscc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nc">awscc.ec2_vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>                 <span class="o">=</span> <span class="s2">&#34;acceptance-test-vpc-basic&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nv">default</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nv">tags</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="err">E</span><span class="nv">nvironment</span> <span class="o">=</span> <span class="s2">&#34;acceptance-test&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>テストといっても特別なフレームワークは使っておらず、Carinaの<code>.crn</code>ファイルをそのまま使っている。このファイルに対して<code>validate</code>→<code>apply</code>→<code>destroy</code>を実行して、すべて成功すればOK。</p>
+<hr />
+<h2>テストランナー</h2>
+<p><code>run-tests.sh</code>というシェルスクリプトでテストを実行する。以下のコマンドをサポートしている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="c1"># AWSクレデンシャル不要</span>
+</span></span><span class="line"><span class="cl">./run-tests.sh validate
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># aws-vaultで単一アカウント実行</span>
+</span></span><span class="line"><span class="cl">aws-vault <span class="nb">exec</span> myprofile -- ./run-tests.sh plan
+</span></span><span class="line"><span class="cl">aws-vault <span class="nb">exec</span> myprofile -- ./run-tests.sh apply
+</span></span><span class="line"><span class="cl">aws-vault <span class="nb">exec</span> myprofile -- ./run-tests.sh destroy
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 10アカウント並列でapply+destroyサイクル</span>
+</span></span><span class="line"><span class="cl">./run-tests.sh full
+</span></span></code></pre><p><code>validate</code>はAWSクレデンシャル不要で、DSLの構文チェックのみ。<code>plan</code>/<code>apply</code>/<code>destroy</code>は単一アカウントに対して実行する。</p>
+<hr />
+<h2>10アカウント並列実行</h2>
+<p><code>full</code>コマンドは、10個のAWSアカウント（<code>carina-test-000</code>〜<code>carina-test-009</code>）を用意して、テストをラウンドロビンで各アカウントに分配し、並列でapply+destroyサイクルを実行する。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">./run-tests.sh full
+</span></span></code></pre><p>を実行すると、39個のテストが10アカウントに分配され、各アカウントで4個前後のテストが並列に走る。テストごとにリソースを作成して、正常に作成できたことを確認したらすぐに削除する。</p>
+<p>10アカウントを用意している理由は、テスト時間の短縮と、テスト間の独立性の確保。同じアカウントで多くのリソースを同時に作成・削除すると、AWSのAPI rate limitやリソースクォータに引っかかったり、リソース間の依存関係で問題が起きたりする。アカウントを分けることでこれらを回避している。</p>
+<hr />
+<h2>テストで見つかったバグ</h2>
+<p>このacceptance testを実行してみて、いくつかバグが見つかった。</p>
+<ul>
+<li><a href="https://github.com/carina-rs/carina/issues/75">#75</a> - <code>apply</code>で一部リソースの作成に失敗しても終了コード0を返していた</li>
+<li><a href="https://github.com/carina-rs/carina/issues/76">#76</a> - IPAM Poolの削除がCloud Control API経由だとタイムアウトする</li>
+<li><a href="https://github.com/carina-rs/carina/issues/77">#77</a> - IPAM PoolのCIDR伝播遅延でサブネット割り当てが失敗する</li>
+<li><a href="https://github.com/carina-rs/carina/issues/80">#80</a> - 削除に時間がかかるリソースがあると、依存リソースの削除順序が崩れる</li>
+<li><a href="https://github.com/carina-rs/carina/issues/81">#81</a> - <code>ipv4_ipam_pool_id</code>が<code>AwsResourceId</code>型になっていた（正しくは<code>IpamPoolId</code>型）</li>
+</ul>
+<p>単体テストだけでは見つけられなかったバグが結構出てきたので、やはり実際のAWSに対するテストは重要。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carinaの型システム強化]]></title>
@@ -513,63 +598,6 @@
 <p>Terraformのaws providerは、SDKのAPI構造をなぞる形でリソースやプロパティが定義されている。例えば、aws provider v4で、<code>aws_s3_bucket</code>リソースから<code>acl</code>, <code>website</code>, <code>cors_rule</code>, <code>versioning</code>などが分離され、それぞれ独立したリソースタイプになった。おそらく開発効率や保守性を高めるための変更だと思うが、ユーザーからするとリソースが増えて複雑になる。</p>
 <p>一方、Cloud Control APIはCloudFormationのスキーマをベースにしているため、リソースタイプやプロパティが一貫している。例えば、S3バケットのACLやウェブサイト設定、CORS設定、バージョニング設定などは、すべて<code>AWS::S3::Bucket</code>リソースのプロパティとして定義されている。これにより、リソースモデルがシンプルで理解しやすくなる。</p>
 <p>Carinaのaws providerとawscc providerは、Cloud Control APIのスキーマをベースにしている。これにより、両方のプロバイダで同じリソースタイプやプロパティを提供できる。ユーザーは、ユースケースに応じてどちらのプロバイダを使うか選択しやすくなるし、切り替えも簡単になる。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Nebelにシンタックスハイライト機能を追加した]]></title>
-        <link href="https://mizzy.org/blog/2026/01/29/1/"/>
-        <updated>2026-01-29T18:55:03+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/29/1/</id>
-        <content type="html"><![CDATA[
-<p>最近このブログは、<a href="https://github.com/mizzy/carina">Carina</a>の開発進捗報告の場と化して更新頻度が上がっているので、ブログ自体にも手を入れていっている。</p>
-<p>2日前には<a href="https://mizzy.org/blog/2026/01/27/2/">OGP画像自動生成機能を追加した</a>が、今回はコードのシンタックスハイライト機能を追加した。</p>
-<hr />
-<h2>実装内容</h2>
-<p>Markdownパーサとして使っている<a href="https://github.com/yuin/goldmark">goldmark</a>に、<a href="https://github.com/yuin/goldmark-highlighting">goldmark-highlighting</a>拡張を追加した。バックエンドには<a href="https://github.com/alecthomas/chroma">Chroma</a>というGo製のシンタックスハイライターを使っている。</p>
-<p>テーマは<a href="https://catppuccin.com/">Catppuccin Mocha</a>を採用した。パステル調のダークテーマで、紫・青・緑・オレンジ・ピンクの柔らかい配色が特徴。ブログの背景が白なので、ダークテーマの方がコードブロックが目立つかな、と思って選んだ。</p>
-<hr />
-<h2>使い方</h2>
-<p>Markdownで言語を指定してコードブロックを書くと、自動的にハイライトされる。</p>
-<p>たとえばJSONを書くとこうなる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;example&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.0&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>Bashだとこう。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">$ <span class="nb">echo</span> <span class="s2">&#34;Hello, World!&#34;</span>
-</span></span></code></pre><hr />
-<h2>Carina言語のサポート</h2>
-<p>せっかくなので、開発中の<a href="https://github.com/mizzy/carina">Carina</a>用のカスタムレクサーも追加した。Chromaはカスタムレクサーを定義できるので、独自言語のハイライトも可能。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">backend</span> <span class="nv">s3</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">bucket</span>      <span class="o">=</span> <span class="s2">&#34;my-carina-state&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">key</span>         <span class="o">=</span> <span class="s2">&#34;prod/carina.crnstate&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">encrypt</span>     <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">auto_create</span> <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">main_vpc</span> <span class="o">=</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;main-vpc&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>キーワード、文字列、真偽値、リソースタイプなどが適切にハイライトされる。</p>
-<hr />
-<h2>CSSの統一</h2>
-<p>言語指定ありのコードブロックはChromaでハイライトされるが、言語指定なしのコードブロックは素の<code>&lt;pre&gt;</code>タグで出力される。見た目を統一するため、<code>base.css</code>の<code>pre</code>スタイルもCatppuccin Mochaテーマに合わせた。</p>
-<p>また、コードブロックのフォントサイズを本文と同じ16pxにして、読みやすさを向上させた。</p>
-<pre><code>言語指定なしのコードブロックも
-同じダークブルー背景で表示される
-</code></pre>
-<hr />
-<h2>まとめ</h2>
-<ul>
-<li>goldmark-highlighting（Chroma）でシンタックスハイライトを実装</li>
-<li>Catppuccin Mochaテーマでパステル調のダークなコードブロックに</li>
-<li>Carina言語用のカスタムレクサーを追加</li>
-<li>フォントサイズを本文と統一して読みやすく</li>
-<li>言語指定なしのコードブロックもスタイルを統一</li>
-</ul>
 
 ]]></content>
     </entry>
