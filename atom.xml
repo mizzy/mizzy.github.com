@@ -3,12 +3,116 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-02-11T21:27:18+09:00</updated>
+    <updated>2026-02-21T17:11:50+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Claude CodeによるCarinaのイシュー駆動開発]]></title>
+        <link href="https://mizzy.org/blog/2026/02/21/1/"/>
+        <updated>2026-02-21T17:11:50+09:00</updated>
+        <id>https://mizzy.org/blog/2026/02/21/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/carina-rs/carina">Carina</a>の開発はこれまでコード自体をほとんど見ずにやらせていたので、コード全体の品質や一貫性がどうなっているかは把握していなかった。</p>
+<p>そこで、Claude Codeに問題点をGitHubイシューとして登録させ、そのイシューをひとつずつ潰させる、というサイクルを回してみた。イシューの対応はすべて自分でPRをレビューしてからマージしていて、これは自分自身のコードや設計の理解を深める意味もある。10日間回した結果、90個のイシューが登録され、67個がクローズされた。</p>
+<hr />
+<h2>作業フロー</h2>
+<p>具体的な作業フローはこんな感じ。</p>
+<ol>
+<li><code>/pick-issue</code>スキルを呼ぶと、一番新しいオープンイシューをpickしてくる</li>
+<li>Claude Codeがイシューを修正してPRを出す</li>
+<li><code>/self-review</code>スキルで5回セルフレビューさせる</li>
+<li>セルフレビューの過程でPRに関連する問題が見つかればその場で修正、無関係な問題であれば新たにイシューを登録</li>
+<li>自分がPRをレビューしてマージ</li>
+<li>1に戻る</li>
+</ol>
+<p>イシューの優先順位付けは特にやっていない。<code>/pick-issue</code>が一番新しいイシューを拾ってくるので、基本的にはFILO（後入れ先出し）で回している。気になるイシューがあれば<code>/pick-issue 123</code>のように番号指定することもあるが、大半はそのまま最新のものを拾わせている。修正の過程で見つかった新しいイシューが次にpickされやすいので、関連する問題が芋づる式に片付いていく、という副次的な効果もある。</p>
+<p>イシューの登録元はセルフレビューだけではなく、コードベース全体のレビューや、acceptance testの実行結果から問題を拾ってイシューに登録させる、ということもやっている。</p>
+<p>このフローだと、完全にボトルネックは人間によるレビュー。レビュー対象はPRのコードだけでなく、Claude Codeが立てたplanも含まれる。plan段階でプロジェクトの方針とまったく逆方向の提案をしてくることもあるので、方針がおかしければそこで差し戻す。</p>
+<hr />
+<h2>Day 1: 23個のイシュー</h2>
+<p>まずClaude Codeにコードベース全体のレビューとacceptance testの実行をさせたところ、1日で23個のイシューが登録された。バグ、設計上の問題、不足している機能など、色々なカテゴリのイシューが一気に出てきた。たとえば:</p>
+<ul>
+<li><code>Effect::Delete</code>にリソース識別子が含まれていない（<a href="https://github.com/carina-rs/carina/issues/135">#135</a>）</li>
+<li>IGWのデタッチエラーが握りつぶされている（<a href="https://github.com/carina-rs/carina/issues/136">#136</a>）</li>
+<li><code>create_plan()</code>が削除すべきリソースを検出しない（<a href="https://github.com/carina-rs/carina/issues/137">#137</a>）</li>
+<li>Structバリデーションがunknown fieldを無視している（<a href="https://github.com/carina-rs/carina/issues/138">#138</a>）</li>
+<li>plan fileの保存とapplyが欲しい（<a href="https://github.com/carina-rs/carina/issues/142">#142</a>）</li>
+<li><code>name</code>属性をリソース識別子として使うのをやめるべき（<a href="https://github.com/carina-rs/carina/issues/148">#148</a>）</li>
+<li>S3バケットの中身が空でないと削除できない（<a href="https://github.com/carina-rs/carina/issues/160">#160</a>）</li>
+</ul>
+<hr />
+<h2>Day 2-3: 修正がさらなる問題を呼ぶ</h2>
+<p>初日のイシューを潰し始めると、修正の過程で新たな問題が次々と見つかった。</p>
+<p>特に大きかったのが、<code>--detailed-exitcode</code>（<a href="https://github.com/carina-rs/carina/issues/130">#130</a>）の実装と、acceptance testへのapply後plan verify追加（<a href="https://github.com/carina-rs/carina/issues/129">#129</a>）。apply後にもう一度planを実行して差分がないことを確認する仕組みを入れたところ、べき等性の問題が大量に見つかった。</p>
+<ul>
+<li>enum値の大文字小文字が正規化されない（<a href="https://github.com/carina-rs/carina/issues/174">#174</a>、<a href="https://github.com/carina-rs/carina/issues/176">#176</a>）</li>
+<li>AWSから返ってきた値にスキーマにない余分なフィールドが含まれている（<a href="https://github.com/carina-rs/carina/issues/172">#172</a>）</li>
+<li><code>List&lt;Struct&gt;</code>の比較が順序依存で、false diffが出る（<a href="https://github.com/carina-rs/carina/issues/171">#171</a>）</li>
+</ul>
+<p>acceptance testを実際に10アカウント並列で回すと、テストランナー自体のバグも出てきた。ワーカーサブシェルがエラーで黙って停止する問題（<a href="https://github.com/carina-rs/carina/issues/170">#170</a>）や、apply失敗時のリソースクリーンアップ（<a href="https://github.com/carina-rs/carina/issues/180">#180</a>）など。こういった問題もすべてイシューとして登録させて、同じフローで潰していった。</p>
+<hr />
+<h2>Day 4-6: enumの大掃除</h2>
+<p>べき等性の問題を追いかけていくと、根本原因がenum処理の一貫性のなさに行き着いた。</p>
+<p>enumの正規化・バリデーション・変換まわりはアドホックなコードが多く、<code>normalize_instance_tenancy</code>、<code>normalize_region</code>のような個別のハードコードされた関数が各crateに散らばっていて、それぞれ微妙に違う挙動をしていた。</p>
+<p>ここからenumの大掃除が始まった。</p>
+<ul>
+<li>複数crateに散らばっていた<code>normalize_*</code>関数を<code>carina-core::utils</code>に集約（<a href="https://github.com/carina-rs/carina/issues/201">#201</a>、<a href="https://github.com/carina-rs/carina/issues/204">#204</a>）</li>
+<li><code>get_enum_valid_values()</code>をスキーマ定義から自動生成（<a href="https://github.com/carina-rs/carina/issues/186">#186</a>）</li>
+<li>大文字小文字を区別しないenum照合（<a href="https://github.com/carina-rs/carina/issues/217">#217</a>）</li>
+<li><code>extract_enum_value</code>パターンの重複排除（<a href="https://github.com/carina-rs/carina/issues/203">#203</a>、<a href="https://github.com/carina-rs/carina/issues/209">#209</a>、<a href="https://github.com/carina-rs/carina/issues/219">#219</a>）</li>
+<li>ハードコードされた特殊処理の削除（<a href="https://github.com/carina-rs/carina/issues/199">#199</a>）</li>
+</ul>
+<p>ひとつ直すと「この関数と同じパターンがあっちにもある」「この関数、もう使われてないのでは」と芋づる式にイシューが出てくる。Claude Codeに「さっき直した関数と同じパターンが他にもないか探して」と指示すると、重複を見つけてイシューを登録し、修正してくれる。</p>
+<hr />
+<h2>Day 7: APIの引き締め</h2>
+<p>enumの大掃除が一段落したところで、今度はAPIの公開範囲の見直しに入った。</p>
+<ul>
+<li><code>validate_iam_policy_document</code>をprivateに（<a href="https://github.com/carina-rs/carina/issues/231">#231</a>）</li>
+<li><code>validate_namespaced_enum</code>を<code>pub(crate)</code>に（<a href="https://github.com/carina-rs/carina/issues/233">#233</a>）</li>
+<li>type factory関数を<code>pub(crate)</code>に（<a href="https://github.com/carina-rs/carina/issues/236">#236</a>）</li>
+<li><code>validate_*</code>関数のエラーメッセージ形式を統一（<a href="https://github.com/carina-rs/carina/issues/228">#228</a>）</li>
+</ul>
+<p>この日は13個のイシューが登録され、13個すべてクローズ。登録してすぐ直す、のリズムが回っていた。</p>
+<p>同じ日に、コード生成まわりのバグもいくつか見つかった。VPC Endpoint IDの演算子優先順位問題（<a href="https://github.com/carina-rs/carina/issues/244">#244</a>）は、初日に登録されていた<a href="https://github.com/carina-rs/carina/issues/132">#132</a>の派生バグで、5日かけて全箇所を潰した形になる。</p>
+<hr />
+<h2>Day 8-9: CLIからプロバイダ固有ロジックを追い出す</h2>
+<p>初日のレビューで「carina-coreやCLIにプロバイダ固有のロジックが入り込んでいる」（<a href="https://github.com/carina-rs/carina/issues/155">#155</a>）というイシューが登録されていた。ここに本格的に着手。</p>
+<p><code>ProviderFactory</code>トレイトを導入して、設定バリデーション、リージョン抽出、プロバイダインスタンス化、スキーマ読み込みを抽象化した（<a href="https://github.com/carina-rs/carina/issues/259">#259</a>）。CLI側にあった<code>&quot;aws&quot;</code>や<code>&quot;awscc&quot;</code>のmatchブロックがなくなり、新しいプロバイダを追加してもCLIのコードを変更する必要がなくなった。</p>
+<p>enum処理のうちプロバイダ固有のものも、CLI側からProvider trait側に移動させた（<a href="https://github.com/carina-rs/carina/issues/185">#185</a>、<a href="https://github.com/carina-rs/carina/issues/190">#190</a>）。</p>
+<hr />
+<h2>全体を振り返って</h2>
+<p>10日間のサイクルで実装された主な機能・改善をまとめておく。</p>
+<p><strong>新機能:</strong></p>
+<ul>
+<li>plan fileの保存とapply（<code>carina plan --out=plan.json</code> / <code>carina apply plan.json</code>）</li>
+<li>孤児リソースの自動検出・削除</li>
+<li><code>--detailed-exitcode</code>フラグ</li>
+<li><code>lifecycle { force_delete }</code>メタ引数</li>
+<li><code>&lt;attr&gt;_prefix</code>サポート（ランダムサフィックス付きリソース名生成）</li>
+<li>unknown fieldのLevenshtein距離によるサジェスト</li>
+<li>enumエイリアス（<code>IpProtocol</code>の<code>all</code> → <code>-1</code>など）</li>
+</ul>
+<p><strong>リファクタリング:</strong></p>
+<ul>
+<li>リソース識別子の再設計（<code>name</code>属性からの分離）</li>
+<li>enumシステムの全面書き直し（17 PR）</li>
+<li>型の厳密化（String → 具体的なARN型、リソースID型、enum型など）</li>
+<li><code>ProviderFactory</code> traitによるCLI/プロバイダの分離</li>
+<li>API公開範囲の引き締め</li>
+</ul>
+<p><strong>テスト:</strong></p>
+<ul>
+<li>テスト数: 250 → 454</li>
+<li>apply後のplan verifyによるべき等性チェック</li>
+<li>テストランナーのシグナルハンドリング、事前認証、クリーンアップ改善</li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carina awscc providerのacceptance test]]></title>
@@ -539,65 +643,6 @@
 <ul>
 <li><a href="https://github.com/mizzy/carina/pull/34">Add shorthand enum value support with schema-based namespace resolution by mizzy · Pull Request #34 · mizzy/carina</a></li>
 </ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Carina aws providerとawscc provider]]></title>
-        <link href="https://mizzy.org/blog/2026/01/29/2/"/>
-        <updated>2026-01-29T22:07:30+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/29/2/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/mizzy/carina">Carina</a>に、aws providerに加えてawscc providerを実装してみた。</p>
-<hr />
-<h2>背景</h2>
-<p>以前、<a href="https://mizzy.org/blog/2026/01/24/2/">AWS Cloud Control APIは遅い？</a>という記事で、Cloud Control APIは遅いので採用をやめた、と書いた。しかし、その後考えが変わった。</p>
-<p>Cloud Control APIには以下のメリットがある。</p>
-<ul>
-<li>CloudFormationと同じリソースモデルを使っているため、リソースのスキーマが公式に定義されている</li>
-<li>新しいリソースタイプやプロパティが追加された場合、CloudFormationのスキーマが更新されれば自動的にサポートできる</li>
-<li>統一されたAPIで様々なリソースを操作できる</li>
-</ul>
-<p>確かに遅いが、遅さが許容できるユースケースもあるはずだし、もっと多くのリソースを扱ってみると、実はCloud Control APIの方が便利、という場面も出てくるかもしれない。</p>
-<p>また、両方のプロバイダを用意しておけば、ユーザーがユースケースに応じて選択できる。</p>
-<p>というわけで、aws provider（直接SDKを使う高速な方式）とawscc provider（Cloud Control APIを使う方式）の両方を実装しはじめた。</p>
-<hr />
-<h2>DSL構文</h2>
-<h3>awsプロバイダ</h3>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">aws</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nc">aws.vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">name</span>                 <span class="o">=</span> <span class="s2">&#34;example-vpc&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nc">aws.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><h3>awsccプロバイダ</h3>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">awscc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nc">awscc.vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">name</span>                 <span class="o">=</span> <span class="s2">&#34;cloudcontrol-vpc&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nc">awscc.vpc</span><span class="p">.</span><span class="err">I</span><span class="nv">nstance</span><span class="err">T</span><span class="nv">enancy</span><span class="p">.</span><span class="nv">dedicated</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>基本的な構文は同じだが、以下の点が異なる。</p>
-<ul>
-<li>プロバイダ名が<code>aws</code>と<code>awscc</code></li>
-<li>リソースタイプが<code>aws.vpc</code>と<code>awscc.vpc</code></li>
-<li>enum値の名前空間が<code>aws.vpc.InstanceTenancy</code>と<code>awscc.vpc.InstanceTenancy</code></li>
-</ul>
-<p><code>aws</code>と<code>awscc</code>を置換するだけで切り替えられるようになっている。今後追加するリソースタイプも、基本的には両方とも同じスキーマで定義できるようにして、簡単に切り替えられるようにする予定。そうすることで、どちらがどういうユースケースに適しているかを試しやすくなるはず。</p>
-<p>Terraformのaws providerは、SDKのAPI構造をなぞる形でリソースやプロパティが定義されている。例えば、aws provider v4で、<code>aws_s3_bucket</code>リソースから<code>acl</code>, <code>website</code>, <code>cors_rule</code>, <code>versioning</code>などが分離され、それぞれ独立したリソースタイプになった。おそらく開発効率や保守性を高めるための変更だと思うが、ユーザーからするとリソースが増えて複雑になる。</p>
-<p>一方、Cloud Control APIはCloudFormationのスキーマをベースにしているため、リソースタイプやプロパティが一貫している。例えば、S3バケットのACLやウェブサイト設定、CORS設定、バージョニング設定などは、すべて<code>AWS::S3::Bucket</code>リソースのプロパティとして定義されている。これにより、リソースモデルがシンプルで理解しやすくなる。</p>
-<p>Carinaのaws providerとawscc providerは、Cloud Control APIのスキーマをベースにしている。これにより、両方のプロバイダで同じリソースタイプやプロパティを提供できる。ユーザーは、ユースケースに応じてどちらのプロバイダを使うか選択しやすくなるし、切り替えも簡単になる。</p>
 
 ]]></content>
     </entry>
