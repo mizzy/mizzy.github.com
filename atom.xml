@@ -21,7 +21,7 @@
 <hr />
 <h2>AWS providerの本格整備</h2>
 <p>aws providerは以前からあったが、スキーマの手書き部分が多く、テストも不十分だった。この1ヶ月で本格的に整備した。</p>
-<p>まず、<a href="https://github.com/aws/aws-models">Smithyモデル</a>からスキーマを自動生成する仕組みを入れた（<a href="https://github.com/carina-rs/carina/issues/461">#461</a>）。awscc providerのCloudFormationスキーマからの自動生成と同じ考え方で、AWS SDKの元になっているSmithyモデルから、リソーススキーマとread関数を自動生成する。手書きのスキーマは信用できないので、できるだけ自動生成に寄せていきたい。</p>
+<p>まず、<a href="https://github.com/aws/api-models-aws">Smithyモデル</a>からスキーマを自動生成する仕組みを入れた（<a href="https://github.com/carina-rs/carina/issues/461">#461</a>）。awscc providerのCloudFormationスキーマからの自動生成と同じ考え方で、AWS SDKの元になっているSmithyモデルから、リソーススキーマとread関数を自動生成する。手書きのスキーマは信用できないので、できるだけ自動生成に寄せていきたい。</p>
 <hr />
 <h2>Acceptance testの拡充</h2>
 <p>AWS providerとAWSCC providerの両方で、acceptance testを大幅に増やした。前回の記事時点ではAWSCC providerの39ファイルだけだったが、AWS providerのテスト追加とシナリオの拡充で172ファイルになった（AWSCC: 120、AWS: 52）。基本的なCRUDに加えて、タグの削除、in-place update、create-before-destroy、属性の削除といったシナリオを整備している。</p>
