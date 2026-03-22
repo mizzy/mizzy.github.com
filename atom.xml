@@ -3,12 +3,77 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-03-20T17:56:56+09:00</updated>
+    <updated>2026-03-22T19:21:17+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carinaのplan表示を改善した]]></title>
+        <link href="https://mizzy.org/blog/2026/03/22/1/"/>
+        <updated>2026-03-22T19:21:17+09:00</updated>
+        <id>https://mizzy.org/blog/2026/03/22/1/</id>
+        <content type="html"><![CDATA[
+<p>Carinaの<code>carina plan</code>コマンドの表示を最近まとめて改善したので、その内容を書いておく。</p>
+<hr />
+<h2>スナップショットテストの導入</h2>
+<p>plan表示の改善を始める前に、まずテストの仕組みを整えた。plan表示は目視で確認するのが面倒だし、変更のたびに既存の表示が壊れていないか確認するのも大変なので、<a href="https://insta.rs/">insta</a>を使ったスナップショットテストを導入した。</p>
+<p>仕組みはシンプルで、テスト用の<code>.crn</code>ファイル（とオプションでstateファイル）をfixtureとして用意し、それに対して<code>format_plan()</code>を実行した結果をスナップショットとして保存する。テスト実行時にスナップショットと一致しなければ失敗する。表示を変更した場合は<code>cargo insta review</code>で差分を確認してスナップショットを更新すれば良い。</p>
+<p>plan表示はANSIカラーコードを含むので、スナップショットの可読性のためにカラーコードをstripしてからスナップショットに保存している。</p>
+<p>これにより、表示の改善を安心してガンガン進められるようになった。実際のスナップショットは<a href="https://github.com/carina-rs/carina/tree/main/carina-cli/src/snapshots">こちら</a>にあるので、どんな表示になるのかはここを見るとわかる。</p>
+<hr />
+<h2>依存関係のツリー表示</h2>
+<p>Terraformの<code>terraform plan</code>はリソースをフラットなリストで表示する。リソース間に依存関係があっても、出力上はすべて同じ階層にフラットに並ぶ。さらにリソース名のアルファベット順でソートされるので、依存関係のあるリソース同士が離れた位置に表示されることもある。結果として、どのリソースがどのリソースに依存しているかは人間が属性値を見て判断する必要がある。</p>
+<p>Carinaではリソース間の依存関係をツリー構造で表示するようにした。</p>
+<p><img src="/images/2026/03/carina-plan-tree.png" alt="carina plan のツリー表示" /></p>
+<p>VPCの下にroute_tableとsubnetがぶら下がっているのが視覚的にわかる。Create、Update、Destroyが混在する場合でも、依存関係の中で何が起きるかがひと目でわかる。</p>
+<p><img src="/images/2026/03/carina-plan-mixed.png" alt="Create、Update、Destroyが混在するplan表示" /></p>
+<hr />
+<h2>read-only属性の表示</h2>
+<p>リソースを作成する際、ARNやIDのようなread-only属性はAWS側が自動的に割り当てる。以前のplan表示ではこれらは完全に省略されていたが、Terraformと同様に<code>(known after apply)</code>として表示するようにした。</p>
+<p><img src="/images/2026/03/carina-plan-read-only.png" alt="read-only属性の表示" /></p>
+<p>これにより、リソース作成後にどんな属性が生えてくるのかがplanの時点でわかるようになった。</p>
+<hr />
+<h2>デフォルト値の表示</h2>
+<p>スキーマにデフォルト値が定義されている属性も、ユーザが明示的に指定していなければplanに表示されていなかった。これを<code># default</code>アノテーション付きで表示するようにした。</p>
+<p><img src="/images/2026/03/carina-plan-default-values.png" alt="デフォルト値の表示" /></p>
+<p>ユーザが指定した属性、デフォルト値が適用される属性、apply後に確定するread-only属性、という3層が一目でわかる。</p>
+<hr />
+<h2>未変更属性のサマリ表示</h2>
+<p>Update/Replaceの際、変更されない属性がいくつあるかを<code># (3 unchanged attributes hidden)</code>のようなサマリ行で表示するようにした。</p>
+<p><img src="/images/2026/03/carina-plan-map-diff.png" alt="未変更属性のサマリ表示" /></p>
+<hr />
+<h2><code>--detail</code>フラグによる表示レベルの制御</h2>
+<p><code>--detail</code>フラグで表示レベルを制御できるようにした。3つのモードがある。</p>
+<ul>
+<li><strong>full</strong>（デフォルト）: すべての属性を表示。未変更・デフォルト・read-onlyも含む</li>
+<li><strong>explicit</strong>: ユーザが<code>.crn</code>ファイルで明示的に指定した属性のみ表示</li>
+<li><strong>none</strong>: リソース名と依存ツリーのみ表示</li>
+</ul>
+<p>デフォルトの<code>--detail full</code>だとこう。</p>
+<p><img src="/images/2026/03/carina-plan-detail-full.png" alt="--detail full の表示" /></p>
+<p><code>--detail explicit</code>だとこうなる。</p>
+<p><img src="/images/2026/03/carina-plan-detail-explicit.png" alt="--detail explicit の表示" /></p>
+<p><code>--detail none</code>だとリソース名と依存ツリーのみになる。リソース数が多いときに全体の構造だけさくっと確認したい場合に便利。</p>
+<p><img src="/images/2026/03/carina-plan-detail-none.png" alt="--detail none の表示" /></p>
+<hr />
+<h2>TUI（Terminal UI）の追加</h2>
+<p>CLIの表示とは別に、<code>--tui</code>フラグでTUI（Terminal UI）も使えるようにした。ratatuiとcrosstermで実装している。</p>
+<p><video src="/images/2026/03/carina-tui.mp4" controls muted playsinline style="max-width:100%"></video></p>
+<p>主な機能は以下の通り。</p>
+<ul>
+<li><strong>ツリービュー + 詳細パネル</strong>: 画面の70%がリソースの依存関係ツリー、30%が選択したリソースの属性詳細。Tabキーでパネル間を切り替える</li>
+<li><strong>検索・フィルタ</strong>: <code>/</code>キーで検索モードに入り、リソース名やタイプでフィルタ。Tabキーで補完、<code>n</code>/<code>N</code>でマッチ間を移動</li>
+<li><strong>リソース参照ナビゲーション</strong>: 詳細パネルで<code>vpc_id: vpc.vpc_id</code>のようなリソース参照をEnterキーで辿れる。Backspaceで戻る</li>
+<li><strong>色分け</strong>: Create（緑）、Update（黄）、Replace（マゼンタ）、Delete（赤）で操作の種類が一目でわかる</li>
+</ul>
+<hr />
+<p>これらの改善は、Terraformのplan表示を参考にしつつ、ツリー表示やTUIのようなCarina独自の機能も加えている。applyする前にリソースの全体像を把握しやすくなった。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carinaの開発状況（2月下旬〜3月中旬）]]></title>
@@ -644,58 +709,6 @@
 <p>機能的には、TerraformコードでIAMポリシーを生成する<code>generate</code>コマンドと、既存のIAMポリシーが持つ権限がTerraformコードに対して過不足がないかチェックする<code>check</code>コマンドを提供している。<code>check</code>コマンドは主にCIでの利用を想定している。</p>
 <h2>今後</h2>
 <p>まだ動作確認すらしてないので、とりあえず動作確認するところから。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Carinaにデータソース機能を追加]]></title>
-        <link href="https://mizzy.org/blog/2026/01/30/2/"/>
-        <updated>2026-01-30T17:39:23+09:00</updated>
-        <id>https://mizzy.org/blog/2026/01/30/2/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/mizzy/carina">Carina</a>に<code>read</code>キーワードを追加し、既存のインフラリソースを参照できるようにした。Terraformのdata sourceに相当する機能。</p>
-<h2>新しい構文</h2>
-<p><code>read</code>キーワードを使って、既存のリソースを参照できる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">aws</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c"># 既存のVPCを読み取る（データソース）</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">existing_vpc</span> <span class="o">=</span> <span class="k">read</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">name</span> <span class="o">=</span> <span class="s2">&#34;production-vpc&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c"># 既存のVPC内に新しいサブネットを作成</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">app_subnet</span> <span class="o">=</span> <span class="nc">aws.subnet</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">name</span>              <span class="o">=</span> <span class="s2">&#34;app-subnet&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">vpc_id</span>            <span class="o">=</span> <span class="nv">existing_vpc</span><span class="p">.</span><span class="nv">id</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>        <span class="o">=</span> <span class="s2">&#34;10.0.100.0/24&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">availability_zone</span> <span class="o">=</span> <span class="nv">aws</span><span class="p">.</span><span class="err">A</span><span class="nv">vailability</span><span class="err">Z</span><span class="nv">one</span><span class="p">.</span><span class="nv">ap_northeast_1a</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>read</code>で定義したリソースは、ライフサイクルを管理しない。作成・更新・削除は行わず、現在の状態を読み取るだけ。</p>
-<h2>プラン表示</h2>
-<p><code>+</code>（作成）、<code>~</code>（更新）、<code>-</code>（削除）に加えて、<code>&lt;=</code>（読み取り）が表示される。(Ghostty上だと違う文字になってるけど)</p>
-<p><img src="/images/2026-01-30-carina-data-source-plan.png" alt="プラン表示" /></p>
-<h2>実装</h2>
-<p>内部的には、<code>Resource</code>構造体に<code>read_only</code>フィールドを追加した。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Resource</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">id</span>: <span class="nc">ResourceId</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">attributes</span>: <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="n">Value</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">read_only</span>: <span class="kt">bool</span><span class="p">,</span><span class="w">  </span><span class="c1">// データソースの場合true
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p><code>Effect</code>列挙型の<code>Read</code>バリアントも変更し、リソース全体を保持するようにした。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">Effect</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Read</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">resource</span>: <span class="nc">Resource</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="c1">// 変更前: Read(ResourceId)
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Create</span><span class="p">(</span><span class="n">Resource</span><span class="p">),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">id</span>: <span class="nc">ResourceId</span><span class="p">,</span><span class="w"> </span><span class="n">from</span>: <span class="nc">State</span><span class="p">,</span><span class="w"> </span><span class="n">to</span>: <span class="nc">Resource</span><span class="w"> </span><span class="p">},</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Delete</span><span class="p">(</span><span class="n">ResourceId</span><span class="p">),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>パーサーは、<code>read</code>キーワードに続くリソース定義を解析し、<code>read_only = true</code>のリソースを生成する。プラン生成時、<code>read_only</code>なリソースは通常のdiff処理をスキップし、常に<code>Effect::Read</code>を生成する。</p>
-<h2>関連リンク</h2>
-<ul>
-<li><a href="https://github.com/mizzy/carina/pull/35">Add read keyword for data sources by mizzy · Pull Request #35 · mizzy/carina</a></li>
-</ul>
 
 ]]></content>
     </entry>
