@@ -3,12 +3,107 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-03-22T19:21:17+09:00</updated>
+    <updated>2026-03-28T14:52:19+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Carinaのシークレット管理]]></title>
+        <link href="https://mizzy.org/blog/2026/03/28/1/"/>
+        <updated>2026-03-28T14:52:19+09:00</updated>
+        <id>https://mizzy.org/blog/2026/03/28/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://github.com/carina-rs/carina">Carina</a>にシークレット管理の仕組みを設計・実装しているので、Terraformとの設計の違いについて書いておく。</p>
+<hr />
+<h2>Terraformのシークレット問題</h2>
+<p>Terraformにおけるシークレット管理は長年の課題だった。<a href="https://github.com/hashicorp/terraform/issues/516">GitHub issue #516</a>は2014年10月に作成され、250以上のコメントがついている。</p>
+<p>問題の根本は、Terraformのstateにシークレットが平文で保存されることにある。<code>sensitive</code>フラグをつけても、plan出力がマスクされるだけで、stateには平文のまま残る。<code>aws_kms_secrets</code>データソースを使っても、復号結果はstateに平文で保存される。</p>
+<p>この問題に対してTerraformは段階的に対処してきた。</p>
+<ul>
+<li><strong>sensitive</strong>（Terraform 0.14、2020年）: plan出力のマスク。stateは平文のまま</li>
+<li><strong>ephemeral</strong>（Terraform 1.10、2024年11月）: stateに一切保存しない値。<code>ephemeral</code>リソースやephemeral変数として使う</li>
+<li><strong>write-only</strong>（Terraform 1.11、2025年3月）: リソース属性の値をstateに保存しない仕組み</li>
+</ul>
+<p>問題提起から約10年かけて、ようやく「stateに保存しない」という本質的な解決策にたどり着いた形になる。</p>
+<hr />
+<h2>Terraformのwrite-only</h2>
+<p>write-onlyはTerraform 1.11で導入された仕組みで、リソースの属性値をstateに一切保存しないようにする。例えばSSM Parameterにシークレットを保存する場合、従来は値がstateに平文で残っていたが、write-onlyを使うとこうなる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">data</span> <span class="s2">&#34;aws_kms_secrets&#34; &#34;example&#34;</span> {
+</span></span><span class="line"><span class="cl">  <span class="k">secret</span> {
+</span></span><span class="line"><span class="cl"><span class="n">    name</span>    <span class="o">=</span> <span class="s2">&#34;db_password&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">    payload</span> <span class="o">=</span> <span class="s2">&#34;AQICAHh...&#34;</span>
+</span></span><span class="line"><span class="cl">  }
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_ssm_parameter&#34; &#34;db_password&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>             <span class="o">=</span> <span class="s2">&#34;/myapp/db_password&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  type</span>             <span class="o">=</span> <span class="s2">&#34;SecureString&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  value_wo</span>         <span class="o">=</span> <span class="k">data</span><span class="p">.</span><span class="k">aws_kms_secrets</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">plaintext</span><span class="p">[</span><span class="s2">&#34;db_password&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">  value_wo_version</span> <span class="o">=</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre><p>stateに値を保存しないので安全だが、代わりに変更検知ができなくなるという問題がある。そこで<code>value_wo_version</code>という数値を手動で管理する。値を変更したらこれを1から2にインクリメントする。Terraformはこのバージョン番号の変更を検知して、プロバイダーに新しい値を送る。</p>
+<p>実際にversionを変更してplanすると、こうなる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="c1">  # aws_ssm_parameter.db_password will be updated in-place
+</span></span></span><span class="line"><span class="cl">  <span class="err">~</span> <span class="k">resource</span> <span class="s2">&#34;aws_ssm_parameter&#34; &#34;db_password&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">      ~ has_value_wo</span>     <span class="o">=</span> <span class="kt">true</span> <span class="err">-&gt;</span> <span class="p">(</span><span class="k">known</span> <span class="k">after</span> <span class="k">apply</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">        id</span>               <span class="o">=</span> <span class="s2">&#34;/tf-write-only-test/db_password&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">        name</span>             <span class="o">=</span> <span class="s2">&#34;/tf-write-only-test/db_password&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">      ~ value_wo_version</span> <span class="o">=</span> <span class="m">1</span> <span class="err">-&gt;</span> <span class="m">2</span><span class="c1">
+</span></span></span><span class="line"><span class="cl"><span class="c1">        # (12 unchanged attributes hidden)
+</span></span></span><span class="line"><span class="cl">    }
+</span></span></code></pre><p><code>value_wo_version</code>の変更は表示されるが、<code>value_wo</code>自体の値や変更内容は一切表示されない。</p>
+<p>この設計にはいくつかの問題がある。</p>
+<ul>
+<li>バージョンのインクリメントを忘れると、実際の値が変わっていてもTerraformは変更を検知しない</li>
+<li>リソースタイプごとに個別にwrite-only対応が必要で、対応はまだ一部のリソースに限られる</li>
+<li><code>_wo</code>サフィックスの命名規則により、既存の属性名とは別の属性が必要になる</li>
+</ul>
+<p>なお、<a href="https://developer.hashicorp.com/terraform/plugin/framework/resources/write-only-arguments">プラグインフレームワークのドキュメント</a>では、private stateにハッシュを保存して変更を検知するアプローチもベストプラクティスとして紹介されている。ただし、少なくともAWS providerでは現時点ではこの方式は採用されていないようだ。</p>
+<hr />
+<h2>Carinaのsecret() + decrypt()</h2>
+<p>Carinaでは同じことを<code>secret()</code>（<a href="https://github.com/carina-rs/carina/issues/1238">#1238</a>）と<code>decrypt()</code>（<a href="https://github.com/carina-rs/carina/issues/1240">#1240</a>）の組み合わせで実現する。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.ssm.parameter</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">name</span>  <span class="o">=</span> <span class="s2">&#34;/myapp/db_password&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">type</span>  <span class="o">=</span> <span class="s2">&#34;SecureString&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">value</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">decrypt</span><span class="p">(</span><span class="s2">&#34;AQICAHh...&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p><code>decrypt()</code>はapply時にプロバイダーの暗号化サービス（AWS KMS等）を使って復号する。<code>secret()</code>で包むことで、復号後の値はstateにハッシュとしてのみ保存される。</p>
+<p><code>secret()</code>の動作は以下の通り。</p>
+<ul>
+<li><strong>apply時</strong>: <code>secret()</code>をアンラップして実際の値をプロバイダーに送る</li>
+<li><strong>state</strong>: 値そのものではなくArgon2idハッシュのみを保存する。ソルトはリソースタイプ・リソース名・属性キーから生成するので、同じ値でもリソースごとに異なるハッシュになる</li>
+<li><strong>plan出力</strong>: 値の代わりに<code>(secret)</code>と表示する。変更時は<code>(secret) → (secret)</code>と表示され、値は見えないが変更があったことはわかる</li>
+<li><strong>diff</strong>: ハッシュの比較で変更を自動検知する</li>
+</ul>
+<p>Terraformのwrite-onlyとの違いをまとめると以下の通り。</p>
+<ul>
+<li>ハッシュをstateに保存することで変更検知を自動化。バージョン番号を手動で管理する必要がない</li>
+<li>ハッシュから元の値を復元することはできないので、stateからシークレットが漏洩するリスクもない</li>
+<li><code>secret()</code>は組み込み関数なので、プロバイダー側の個別対応は不要。どのリソースのどの属性にも使える</li>
+<li>Terraformでは復号用のデータソースを別途定義する必要があるが、Carinaでは属性値に直接書ける</li>
+<li><code>decrypt()</code>はプロバイダー非依存の設計で、AWS KMS、GCP Cloud KMS、Azure Key Vaultなどプロバイダーの暗号化サービスに自動的に委譲する予定</li>
+</ul>
+<hr />
+<h2>env()との組み合わせ</h2>
+<p>暗号文を<code>.crn</code>ファイルに書きたくない場合は、<code>env()</code>関数（<a href="https://github.com/carina-rs/carina/issues/1239">#1239</a>、実装済み）で環境変数から渡すこともできる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.rds.db_instance</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">master_password</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">env</span><span class="p">(</span><span class="s2">&#34;DB_PASSWORD&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><hr />
+<h2>設計の違いまとめ</h2>
+<p>Carinaのシークレット管理は、<code>secret()</code>と<code>decrypt()</code>の2つの関数で実現する。</p>
+<ul>
+<li><code>secret(value)</code> — 値をシークレットとしてマーク。stateにはハッシュのみ保存</li>
+<li><code>decrypt(ciphertext)</code> — プロバイダーの暗号化サービスで復号</li>
+</ul>
+<p>これらに<code>env()</code>のような汎用関数を組み合わせることもできる。それぞれが単一の責務を持ち、自由に組み合わせられる。Terraformでは<code>sensitive</code>、<code>ephemeral</code>、write-only、<code>aws_kms_secrets</code>データソースと、歴史的経緯から複数の仕組みが並立している。Carinaは後発の利点を活かして、最初からシンプルな設計にできた、と思う。</p>
+<p>ただし、これはあくまで現段階の設計であり、より安全で良い方法が見つかれば変更する可能性はある。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Carinaのplan表示を改善した]]></title>
@@ -652,64 +747,6 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">.</span><span class="n">with_description</span><span class="p">(</span><span class="s">&#34;The allowed tenancy of instances launched into the VPC.  + ``default``: An instance launched into the VPC runs on shared hardware by default, unless y...&#34;</span><span class="p">),</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">)</span><span class="w">
 </span></span></span></code></pre>
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[least - TerraformコードからIAMポリシーを自動生成するツール]]></title>
-        <link href="https://mizzy.org/blog/2026/02/01/1/"/>
-        <updated>2026-02-01T09:20:53+09:00</updated>
-        <id>https://mizzy.org/blog/2026/02/01/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/mizzy/least">least</a>というツールをつくっている。Terraformのコードをみて、plan/applyに必要な権限を持つIAMポリシーを自動生成するツール。</p>
-<hr />
-<h2>きっかけ</h2>
-<p>TerraformでGitHub Actions等から自動plan/applyを実行する際、plan/apply用ロールのIAMポリシーをどうするのが良いのか、いつも悩む。最小権限の原則は理想ではあるが、必要な権限を手動で調べてポリシーを作成するのは非常に面倒で、果たしてその苦労に見合うのか、と常々思っている。</p>
-<p>最初に大きめの権限を与えておいて、IAM Access Analyzerを利用して後から権限を絞る、というアプローチもあるが、できれば最初から最小権限に近い状態で始めたい。</p>
-<p>そんなことを考えていたところ、<a href="https://github.com/mizzy/carina">Carina</a>のawscc provider開発中に、<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/resource-type-schemas.html">CloudFormation resource provider schema</a>には各リソースタイプの作成・更新・削除に必要なIAMアクションが<code>handlers</code>という属性で定義されている、ということに気づいた。</p>
-<p>例えば、S3バケット（<code>AWS::S3::Bucket</code>）のスキーマでは<code>handlers</code>は以下のように定義されている。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;create&#34;</span><span class="p">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:CreateBucket&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:PutBucketTagging&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;...&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;read&#34;</span><span class="p">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:GetAccelerateConfiguration&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:GetLifecycleConfiguration&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;...&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;update&#34;</span><span class="p">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:PutBucketAcl&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:PutBucketTagging&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;...&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;delete&#34;</span><span class="p">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:DeleteBucket&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:ListBucket&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;list&#34;</span><span class="p">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;permissions&#34;</span><span class="p">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">      <span class="s2">&#34;s3:ListAllMyBuckets&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>この情報を活用すればTerraformコードから必要なIAMポリシーを自動生成でき、労せず最小権限の原則を満たせるのでは、と思いついた。</p>
-<p>思いついた時は<a href="https://2026.srekaigi.net/">SRE Kaigi 2026</a>に参加中でPCを持参していなかったので、<a href="https://code.claude.com/docs/ja/claude-code-on-the-web">Claude Code on the web</a>にスマホからアクセスし、こんなのつくって、とお願いしてつくってもらった。</p>
-<p>ちなみにまだコードは見てないし、動作確認もしてない。</p>
-<h2>機能</h2>
-<p>機能的には、TerraformコードでIAMポリシーを生成する<code>generate</code>コマンドと、既存のIAMポリシーが持つ権限がTerraformコードに対して過不足がないかチェックする<code>check</code>コマンドを提供している。<code>check</code>コマンドは主にCIでの利用を想定している。</p>
-<h2>今後</h2>
-<p>まだ動作確認すらしてないので、とりあえず動作確認するところから。</p>
-
 ]]></content>
     </entry>
 
