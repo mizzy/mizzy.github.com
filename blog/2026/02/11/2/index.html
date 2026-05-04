@@ -123,18 +123,18 @@
 </span></span><span class="line"><span class="cl"><span class="c"># Tests: cidr_block, enable_dns_support, enable_dns_hostnames, instance_tenancy, tags</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">awscc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
+</span></span><span class="line"><span class="cl">  <span class="na">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="nc">awscc.ec2_vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">name</span>                 <span class="o">=</span> <span class="s2">&#34;acceptance-test-vpc-basic&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">instance_tenancy</span>     <span class="o">=</span> <span class="nv">default</span>
+</span></span><span class="line"><span class="cl">  <span class="na">name</span>                 <span class="o">=</span> <span class="s2">&#34;acceptance-test-vpc-basic&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="na">cidr_block</span>           <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="na">enable_dns_support</span>   <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="na">enable_dns_hostnames</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="na">instance_tenancy</span>     <span class="o">=</span> <span class="nv">default</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="nv">tags</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="err">E</span><span class="nv">nvironment</span> <span class="o">=</span> <span class="s2">&#34;acceptance-test&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="na">tags</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="na">Environment</span> <span class="o">=</span> <span class="s2">&#34;acceptance-test&#34;</span>
 </span></span><span class="line"><span class="cl">  <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre>

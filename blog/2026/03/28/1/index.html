@@ -214,9 +214,9 @@
         ）の組み合わせで実現する。
       </p>
       <pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.ssm.parameter</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">name</span>  <span class="o">=</span> <span class="s2">&#34;/myapp/db_password&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">type</span>  <span class="o">=</span> <span class="s2">&#34;SecureString&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">value</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">decrypt</span><span class="p">(</span><span class="s2">&#34;AQICAHh...&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">  <span class="na">name</span>  <span class="o">=</span> <span class="s2">&#34;/myapp/db_password&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="na">type</span>  <span class="o">=</span> <span class="s2">&#34;SecureString&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="na">value</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">decrypt</span><span class="p">(</span><span class="s2">&#34;AQICAHh...&#34;</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre>
       <p>
@@ -299,7 +299,7 @@
         、実装済み）で環境変数から渡すこともできる。
       </p>
       <pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.rds.db_instance</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">master_password</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">env</span><span class="p">(</span><span class="s2">&#34;DB_PASSWORD&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">  <span class="na">master_password</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">env</span><span class="p">(</span><span class="s2">&#34;DB_PASSWORD&#34;</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre>
       <hr />
