@@ -1,122 +1,112 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Linux の iostat は何を見てるのか - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/05/11/1">Linux の iostat は何を見てるのか</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>Linux の iostat が出している数値が、正確には何なのか、ということを知る必要があり、調べてみたのでメモ。</p>
-
-<p>知りたいのは、とりあえずは以下の様に実行した場合の、rrqm/s, wrqm/s, r/s, w/s の 4 つ。</p>
-
-<pre><code>$ iostat -d -x
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Linux の iostat は何を見てるのか - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Linux の iostat は何を見てるのか"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/05/11/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/05/11/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Linux の iostat は何を見てるのか"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/05/11/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/05/11/1">
+          Linux の iostat は何を見てるのか
+        </a>
+      </h1>
+      <div class="byline">
+        11 May 2007
+      </div>
+      <p>
+        Linux の iostat が出している数値が、正確には何なのか、ということを知る必要があり、調べてみたのでメモ。
+      </p>
+      <p>
+        知りたいのは、とりあえずは以下の様に実行した場合の、rrqm/s, wrqm/s, r/s, w/s の 4 つ。
+      </p>
+      <pre><code>$ iostat -d -x
 Device:    rrqm/s wrqm/s   r/s   w/s  rsec/s  wsec/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await  svctm  %util
-sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40     0.77   22.15   3.26  11.39
-</code></pre>
-
-<p>特に rrqm/s, wrqm/s が man を読んでもよく分からない。</p>
-
-<pre><code>          rrqm/s
+sda          0.02  72.33  3.73 31.23   57.91  830.07    28.96   415.03    25.40     0.77   22.15   3.26  11.39</code></pre>
+      <p>
+        特に rrqm/s, wrqm/s が man を読んでもよく分からない。
+      </p>
+      <pre><code>rrqm/s
                  The  number  of read requests merged per second that
                  were issued to the device.
 
           wrqm/s
                  The number of write requests merged per second  that
-                 were issued to the device.
-</code></pre>
-
-<p>r/s, w/s が実際にデバイスにリクエストされた I/O 数で、rrqm/s, wrqm/s が、プロセスからリクエストされたものの、デバイスに渡される前にマージされたリクエスト数ではないか、推測。それが正しいかどうか確かめる。</p>
-
-<p>また、このリクエスト数というのが正確には何なのか、ということも確かめる。read/write 系のシステムコールの数？</p>
-
-<p>まずはおそらく /proc/diskstat から値を取得しているのだろう、ということで、中身を見てみると、こんな行がある。</p>
-
-<pre><code>8    0 sda 4506815 26232 69968005 66785384 37727406 87380973 1002794888 868225876 125 137597988 935021144
-</code></pre>
-
-<p>でもって、sysstat-5.0.5 の iostat.c を見てみると、544行目あたりにこんな記述があった。</p>
-
-<pre><code>if (dev_type == DT_DEVICE)
+                 were issued to the device.</code></pre>
+      <p>
+        r/s, w/s が実際にデバイスにリクエストされた I/O 数で、rrqm/s, wrqm/s が、プロセスからリクエストされたものの、デバイスに渡される前にマージされたリクエスト数ではないか、推測。それが正しいかどうか確かめる。
+      </p>
+      <p>
+        また、このリクエスト数というのが正確には何なのか、ということも確かめる。read/write 系のシステムコールの数？
+      </p>
+      <p>
+        まずはおそらく /proc/diskstat から値を取得しているのだろう、ということで、中身を見てみると、こんな行がある。
+      </p>
+      <pre><code>8    0 sda 4506815 26232 69968005 66785384 37727406 87380973 1002794888 868225876 125 137597988 935021144</code></pre>
+      <p>
+        でもって、sysstat-5.0.5 の iostat.c を見てみると、544行目あたりにこんな記述があった。
+      </p>
+      <pre><code>if (dev_type == DT_DEVICE)
    i = (fscanf(sysfp, &quot;%lu %lu %llu %lu %lu %lu %llu %lu %lu %lu %lu&quot;,
-       &amp;sdev.rd_ios, &amp;sdev.rd_merges,
-       &amp;sdev.rd_sectors, &amp;sdev.rd_ticks,
-       &amp;sdev.wr_ios, &amp;sdev.wr_merges,
-       &amp;sdev.wr_sectors, &amp;sdev.wr_ticks,
-       &amp;sdev.ios_pgr, &amp;sdev.tot_ticks, &amp;sdev.rq_ticks) == 11);
-</code></pre>
-
-<p>/proc/diskstat 内の sda 右横にあるカラム数とも一致してるので、ここと考えて良さそう。そうなると、r/s, rrqm/s が 1, 2番目のカラム、w/s と wrqm/s が 5,6 番目のカラム、ってことになる。 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/05/13/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/05/06/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+ 	   &amp;sdev.rd_ios, &amp;sdev.rd_merges,
+	   &amp;sdev.rd_sectors, &amp;sdev.rd_ticks,
+	   &amp;sdev.wr_ios, &amp;sdev.wr_merges,
+	   &amp;sdev.wr_sectors, &amp;sdev.wr_ticks,
+	   &amp;sdev.ios_pgr, &amp;sdev.tot_ticks, &amp;sdev.rq_ticks) == 11);</code></pre>
+      <p>
+        /proc/diskstat 内の sda 右横にあるカラム数とも一致してるので、ここと考えて良さそう。そうなると、r/s, rrqm/s が 1, 2番目のカラム、w/s と wrqm/s が 5,6 番目のカラム、ってことになる。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/05/06/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/05/13/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,140 +1,147 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Plagger::Plugin::Filter::FFmpeg #0 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    Plagger::Plugin::Filter::FFmpeg #0 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="Plagger::Plugin::Filter::FFmpeg #0"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/07/27/2/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/07/27/2/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Plagger::Plugin::Filter::FFmpeg #0"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/07/27/2/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/07/27/2">Plagger::Plugin::Filter::FFmpeg #0</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-前のエントリの <a class="ext-link" href="http://mizzy.org/program/ffmpeg00.html"><span class="icon"></span>FFmpeg::Command</a> を利用して、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Plagger::Plugin::Filger::FFmpeg</a> 書いてみた。（っていうか、このために FFmpeg::Command つくったわけですが。）
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/07/27/2">
+    Plagger::Plugin::Filter::FFmpeg #0
+  </a>
+</h1>
+<div class="byline">
+  27 July 2006
+</div>
 <p>
-とりあえず形にして動くことを確認したかったので、変換パラメータが固定だったり、適当すぎるつくりになってますが、おいおい改善していくということで。
+  前のエントリの
+  <a class="ext-link" href="http://mizzy.org/program/ffmpeg00.html">
+    <span class="icon"></span>
+    FFmpeg::Command
+  </a>
+  を利用して、
+  <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm">
+    <span class="icon"></span>
+    Plagger::Plugin::Filger::FFmpeg
+  </a>
+  書いてみた。（っていうか、このために FFmpeg::Command つくったわけですが。）
 </p>
-
 <p>
-以下の様な設定で、YouTube の My Favorite 動画をダウンロード ⇒ mpeg4 へ変換 ⇒ enclosure url を rewrite ⇒ Publish::Feed で podcast、ってところまで確認済み。 
+  とりあえず形にして動くことを確認したかったので、変換パラメータが固定だったり、適当すぎるつくりになってますが、おいおい改善していくということで。
 </p>
-
 <p>
-<strong> 2006/07/27 03:23:30 追記</strong><br />
-miyagawa さんからの指摘で、URL の書き換えは Filter::RewriteEnclosureURL を使うようにしました。このプラグインの存在をすっかり見落としてました…
+  以下の様な設定で、YouTube の My Favorite 動画をダウンロード ⇒ mpeg4 へ変換 ⇒ enclosure url を rewrite ⇒ Publish::Feed で podcast、ってところまで確認済み。
 </p>
-
+<p>
+  <strong>
+    2006/07/27 03:23:30 追記
+  </strong>
+  <br />
+  miyagawa さんからの指摘で、URL の書き換えは Filter::RewriteEnclosureURL を使うようにしました。このプラグインの存在をすっかり見落としてました…
+</p>
 <pre class="wiki">
 global:
   user_agent:
     cookies: /home/miya/plagger/cookies.txt
   log:
     level: info
-
-plugins:
-  - module: Subscription::Config
-    config:
-      feed:
-        - http://www.youtube.com/my_favorites
-
-  - module: Filter::TruePermalink
-  - module: Filter::FindEnclosures
-  - module: Filter::EntryFullText
-  - module: Filter::HEADEnclosureMetadata
-  - module: Filter::FetchEnclosure
-    config:
-      dir: /home/miya/mov
-
-  - module: Filter::FFmpeg
-    config:
-      output_dir: /home/miya/mov
-      ext: mp4
-
-  - module: Filter::RewriteEnclosureURL
-    config:
-      rewrite:
-        - local: /home/miya/mov/
-          url:   http://mizzy.org/mov/
-
-  - module: Publish::Feed
-    config:
-      format: RSS
-      dir: /home/miya/plagger
-      filename: %t.rss
+<p>plugins:</p>
+<ul>
+<li>
+<p>module: Subscription::Config<br />
+config:<br />
+feed:<br />
+- <a href="http://www.youtube.com/my_favorites">http://www.youtube.com/my_favorites</a></p>
+</li>
+<li>
+<p>module: Filter::TruePermalink</p>
+</li>
+<li>
+<p>module: Filter::FindEnclosures</p>
+</li>
+<li>
+<p>module: Filter::EntryFullText</p>
+</li>
+<li>
+<p>module: Filter::HEADEnclosureMetadata</p>
+</li>
+<li>
+<p>module: Filter::FetchEnclosure<br />
+config:<br />
+dir: /home/miya/mov</p>
+</li>
+<li>
+<p>module: Filter::FFmpeg<br />
+config:<br />
+output_dir: /home/miya/mov<br />
+ext: mp4</p>
+</li>
+<li>
+<p>module: Filter::RewriteEnclosureURL<br />
+config:<br />
+rewrite:<br />
+- local: /home/miya/mov/<br />
+url:   <a href="http://mizzy.org/mov/">http://mizzy.org/mov/</a></p>
+</li>
+<li>
+<p>module: Publish::Feed<br />
+config:<br />
+format: RSS<br />
+dir: /home/miya/plagger<br />
+filename: %t.rss<br />
 </pre>
-
 <p>
-これに合わせて、FFmpeg::Command で ffmpeg を exec で呼び出してたのを、system に変更しました。exec だと Publish::Feed が動いてくれなかったので。おそらく exec はプロセスをフォークした後 wait しないのが原因かな、と。
+  これに合わせて、FFmpeg::Command で ffmpeg を exec で呼び出してたのを、system に変更しました。exec だと Publish::Feed が動いてくれなかったので。おそらく exec はプロセスをフォークした後 wait しないのが原因かな、と。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/07/28/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/07/27/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/07/27/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/07/28/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

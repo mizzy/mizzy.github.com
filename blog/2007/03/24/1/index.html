@@ -1,79 +1,70 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>puppet 今試すなら バージョン 0.22.1 を使え、そして gem で入れるな - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/03/24/1">puppet 今試すなら バージョン 0.22.1 を使え、そして gem で入れるな</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<strong>追記</strong><br />
-<a class="ext-link" href="http://mizzy.org/linux/puppet08.html"><span class="icon"></span>これに関連した続きエントリ書きました</a>。
-</p>
-
-<p>
-gem がだめなわけは、puppetrun が入らないから。（0.22.1, 0.22.2 で確認。）puppetrun 使わないなら gem で構わないけど。metadata 覗いたら、executables の中に puppetrun がない。こんな感じ。
-</p>
-
-<pre class="wiki">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      puppet 今試すなら バージョン 0.22.1 を使え、そして gem で入れるな - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="puppet 今試すなら バージョン 0.22.1 を使え、そして gem で入れるな"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/03/24/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/03/24/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="puppet 今試すなら バージョン 0.22.1 を使え、そして gem で入れるな"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/03/24/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/03/24/1">
+          puppet 今試すなら バージョン 0.22.1 を使え、そして gem で入れるな
+        </a>
+      </h1>
+      <div class="byline">
+        24 March 2007
+      </div>
+      <p>
+        <strong>
+          追記
+        </strong>
+        <br />
+        <a class="ext-link" href="http://mizzy.org/linux/puppet08.html">
+          <span class="icon"></span>
+          これに関連した続きエントリ書きました
+        </a>
+        。
+      </p>
+      <p>
+        gem がだめなわけは、puppetrun が入らないから。（0.22.1, 0.22.2 で確認。）puppetrun 使わないなら gem で構わないけど。metadata 覗いたら、executables の中に puppetrun がない。こんな感じ。
+      </p>
+      <pre class="wiki">
 executables:
 - puppet
 - puppetd
@@ -81,31 +72,30 @@ executables:
 - puppetdoc
 - puppetca  
 </pre>
-
-<p>
-とりあえず<a class="ext-link" href="http://reductivelabs.com/trac/puppet/ticket/561"><span class="icon"></span>チケットに入れておいた</a>。
-</p>
-
-<p>
-あと、最新のバージョン 0.22.2 だと、以下のエラーが出る。
-</p>
-
-<pre class="wiki">
+      <p>
+        とりあえず
+        <a class="ext-link" href="http://reductivelabs.com/trac/puppet/ticket/561">
+          <span class="icon"></span>
+          チケットに入れておいた
+        </a>
+        。
+      </p>
+      <p>
+        あと、最新のバージョン 0.22.2 だと、以下のエラーが出る。
+      </p>
+      <pre class="wiki">
 $ sudo puppetd --listen --no-client -v
 /usr/lib/ruby/site_ruby/1.8/puppet/util/config.rb:29:in `[]': Undefined configuration parameter 'authconfig' (ArgumentError)
         from /usr/lib/ruby/site_ruby/1.8/puppet.rb:83:in `[]'
         from /usr/bin/puppetd:360
 </pre>
-
-<p>
---listen オプション使うときには、/etc/puppet/namespaceauth.conf が必要で、authconfig にはこのパスがセットされるはずなんだけど、セットされていないためのエラーっぽい。これは trunk では直ってる。
-</p>
-
-<p>
-もうひとつ、puppetrun 実行時のエラー。
-</p>
-
-<pre class="wiki">
+      <p>
+        --listen オプション使うときには、/etc/puppet/namespaceauth.conf が必要で、authconfig にはこのパスがセットされるはずなんだけど、セットされていないためのエラーっぽい。これは trunk では直ってる。
+      </p>
+      <p>
+        もうひとつ、puppetrun 実行時のエラー。
+      </p>
+      <pre class="wiki">
 $ sudo puppetrun --host kenny.southpark
 Failed to load ruby LDAP library. LDAP functionality will not be available
 /usr/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/core_ext/module/introspection.rb:5:in `parent': private method `split' called for :Client:Symbol (NoMethodError)
@@ -115,30 +105,42 @@ Failed to load ruby LDAP library. LDAP functionality will not be available
         from /usr/local/bin/puppetrun:335
 kenny.southpark finished with exit code 1 
 </pre>
-
-<p>
-これは puppetrun に以下の一行を追加すれば直る。
-</p>
-
-<pre class="wiki">
+      <p>
+        これは puppetrun に以下の一行を追加すれば直る。
+      </p>
+      <pre class="wiki">
 require 'puppet/network/client/runner'
 </pre>
-
-<p>
-<del>trunk でも直ってないようなので、こちらも<a class="ext-link" href="http://reductivelabs.com/trac/puppet/ticket/562"><span class="icon"></span>チケットに入れた</a>。</del> <a class="ext-link" href="http://reductivelabs.com/trac/puppet/changeset/2352"><span class="icon"></span>fix された</a>。自分の修正内容と違うけど。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/03/24/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/03/21/3" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        <del>
+          trunk でも直ってないようなので、こちらも
+          <a class="ext-link" href="http://reductivelabs.com/trac/puppet/ticket/562">
+            <span class="icon"></span>
+            チケットに入れた
+          </a>
+          。
+        </del>
+        <a class="ext-link" href="http://reductivelabs.com/trac/puppet/changeset/2352">
+          <span class="icon"></span>
+          fix された
+        </a>
+        。自分の修正内容と違うけど。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/03/21/3" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/03/24/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,78 +1,78 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Net::Google::Calendar のパッチ - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    Net::Google::Calendar のパッチ - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="Net::Google::Calendar のパッチ"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/10/01/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/10/01/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Net::Google::Calendar のパッチ"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/10/01/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/10/01/1">Net::Google::Calendar のパッチ</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<strong>2006/10/01 18:22 追記</strong><br />
-<a class="ext-link" href="http://rt.cpan.org/Public/Bug/Display.html?id=21797"><span class="icon"></span>早速対応してくれました</a>。「Domou Arigato」と書いてるのに笑った。<a class="ext-link" href="http://pause.perl.org/incoming/"><span class="icon"></span>http://pause.perl.org/incoming/</a> を見るとアップ済みのようなので、もうすぐ CPAN へ反映されると思います。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/10/01/1">
+    Net::Google::Calendar のパッチ
+  </a>
+</h1>
+<div class="byline">
+  1 October 2006
+</div>
 <p>
-<a class="ext-link" href="http://search.cpan.org/~simonw/Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm"><span class="icon"></span>Net::Google::Calendar</a> がまともに動かないので、パッチ書いた。
+  <strong>
+    2006/10/01 18:22 追記
+  </strong>
+  <br />
+  <a class="ext-link" href="http://rt.cpan.org/Public/Bug/Display.html?id=21797">
+    <span class="icon"></span>
+    早速対応してくれました
+  </a>
+  。「Domou Arigato」と書いてるのに笑った。
+  <a class="ext-link" href="http://pause.perl.org/incoming/">
+    <span class="icon"></span>
+    http://pause.perl.org/incoming/
+  </a>
+  を見るとアップ済みのようなので、もうすぐ CPAN へ反映されると思います。
 </p>
-
+<p>
+  <a class="ext-link" href="http://search.cpan.org/~simonw/Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm">
+    <span class="icon"></span>
+    Net::Google::Calendar
+  </a>
+  がまともに動かないので、パッチ書いた。
+</p>
 <pre class="wiki">
 Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm
 ===================================================================
@@ -80,61 +80,82 @@ Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm
 +++ Net-Google-Calendar-0.3/lib/Net/Google/Calendar.pm (revision 286)
 @@ -348,7 +348,9 @@
      }
- 
-+    my $xml = $entry->as_xml;
-+    _utf8_off($xml);
-     my %params = ( Content_Type => 'application/atom+xml; charset=UTF-8',
-                    Authorization => "GoogleLogin auth=".$self->{_auth},
--                   Content => $entry->as_xml );
-+                   Content => $xml );
- 
-     $params{'X-HTTP-Method-Override'} = $method unless "POST" eq $method;
-@@ -381,4 +383,10 @@
- }
- 
-+sub _utf8_off {
-+    if ($] >= 5.008) {
-+        require Encode;
-+        return Encode::_utf8_off($_[0]);
-+    }
-+}
- 
- =head1 WARNING
-Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm
-===================================================================
---- Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 285)
-+++ Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 286)
-@@ -54,5 +54,5 @@
-     my $self = shift;                                                                               
-                                                                                                   
--    $self->category('', { scheme => 'http://schemas.google.com/g/2005#kind', term => 'http://schemas.google.com/g/2005#event' } );
-+    $self->category( { scheme => 'http://schemas.google.com/g/2005#kind', term => 'http://schemas.google.com/g/2005#event' } );
-                                                                                                   
-     $self->{_gd_ns} = XML::Atom::Namespace->new(gd => 'http://schemas.google.com/g/2005');          
-@@ -174,5 +174,5 @@
-    my($ns, $name, $attr) = @_;
-    my $ns_uri = ref($ns) eq 'XML::Atom::Namespace' ? $ns->{uri} : $ns;
--   my $node = first($atom->{doc}, $ns_uri, $name);
-+   my $node = first($atom->elem, $ns_uri, $name);
-    return $node unless defined $node &amp;&amp; defined $attr;
-    my $val;
+<ul>
+<li>my $xml = $entry-&gt;as_xml;</li>
+<li>_utf8_off($xml);<br />
+my %params = ( Content_Type =&gt; 'application/atom+xml; charset=UTF-8',<br />
+Authorization =&gt; &quot;GoogleLogin auth=&quot;.$self-&gt;{_auth},</li>
+</ul>
+<ul>
+<li>
+<pre><code>Content =&gt; $entry-&gt;as_xml );</code></pre>
+</li>
+</ul>
+<ul>
+<li>
+<pre><code>Content =&gt; $xml );</code></pre>
+<p>$params{'X-HTTP-Method-Override'} = $method unless &quot;POST&quot; eq $method;<br />
+@@ -381,4 +383,10 @@<br />
+}</p>
+</li>
+</ul>
+<p>+sub _utf8_off {</p>
+<ul>
+<li>if ($] &gt;= 5.008) {</li>
+<li>
+<pre><code>require Encode;</code></pre>
+</li>
+<li>
+<pre><code>return Encode::_utf8_off($_[0]);</code></pre>
+</li>
+<li>}<br />
++}</li>
+</ul>
+<h1>=head1 WARNING<br />
+Index: Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm</h1>
+<p>--- Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 285)<br />
++++ Net-Google-Calendar-0.3/lib/Net/Google/Calendar/Entry.pm (revision 286)<br />
+@@ -54,5 +54,5 @@<br />
+my $self = shift;</p>
+<ul>
+<li>$self-&gt;category('', { scheme =&gt; 'http://schemas.google.com/g/2005#kind', term =&gt; 'http://schemas.google.com/g/2005#event' } );</li>
+</ul>
+<ul>
+<li>
+<p>$self-&gt;category( { scheme =&gt; 'http://schemas.google.com/g/2005#kind', term =&gt; 'http://schemas.google.com/g/2005#event' } );</p>
+<p>$self-&gt;{<em>gd_ns} = XML::Atom::Namespace-&gt;new(gd =&gt; 'http://schemas.google.com/g/2005');       <br />
+@@ -174,5 +174,5 @@<br />
+my($ns, $name, $attr) = @</em>;<br />
+my $ns_uri = ref($ns) eq 'XML::Atom::Namespace' ? $ns-&gt;{uri} : $ns;</p>
+</li>
+</ul>
+<ul>
+<li>my $node = first($atom-&gt;{doc}, $ns_uri, $name);</li>
+</ul>
+<ul>
+<li>my $node = first($atom-&gt;elem, $ns_uri, $name);<br />
+return $node unless defined $node &amp;&amp; defined $attr;<br />
+my $val;<br />
 </pre>
-
 <p>
-<a class="ext-link" href="http://rt.cpan.org/"><span class="icon"></span>rt.cpan.org</a> でレポートしておいた。
+  <a class="ext-link" href="http://rt.cpan.org/">
+    <span class="icon"></span>
+    rt.cpan.org
+  </a>
+  でレポートしておいた。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/10/17/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/09/29/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/09/29/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/10/17/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

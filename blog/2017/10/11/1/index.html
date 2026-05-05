@@ -1,113 +1,167 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Rust で D-Bus 経由で systemd から情報を得る - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Rust で D-Bus 経由で systemd から情報を得る - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Rust で D-Bus 経由で systemd から情報を得る"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2017/10/11/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2017/10/11/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Rust で D-Bus 経由で systemd から情報を得る"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2017/10/11/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2017/10/11/1">
+          Rust で D-Bus 経由で systemd から情報を得る
+        </a>
+      </h1>
+      <div class="byline">
+        11 October 2017
+      </div>
+      <p>
+        色々試行錯誤したのでメモ。
+      </p>
+      <hr />
+      <h2>
+        結論
+      </h2>
+      <p>
+        <a href="https://crates.io/crates/dbus">
+          dbus crate
+        </a>
+        を使う。
+      </p>
+      <hr />
+      <h2>
+        経緯
+      </h2>
+      <p>
+        開発中の
+        <a href="http://atl.recruit-tech.co.jp/blog/4339/">
+          libspecinfra
+        </a>
+        で、systemd 配下の service の状態を取得できるようにするための provider を書こうと思い、色々調べたりコード書いて試したりした。
+      </p>
+      <hr />
+      <h2>
+        使えそうな crates を探す
+      </h2>
+      <p>
+        まずは目的に合う crates がないか
+        <a href="https://crates.io/">
+          crates.io
+        </a>
+        で検索。ざっと以下のようなものが見つかる。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          <a href="https://crates.io/crates/systemd">
+            systemd
+          </a>
+        </li>
+        <li>
+          <a href="https://crates.io/crates/systemd-dbus">
+            systemd-dbus
+          </a>
+        </li>
+        <li>
+          <a href="https://crates.io/crates/dbus">
+            dbus
+          </a>
+        </li>
+        <li>
+          <a href="https://crates.io/crates/dbus-bytestream">
+            dbus-bytestream
+          </a>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2017/10/11/1">Rust で D-Bus 経由で systemd から情報を得る</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>色々試行錯誤したのでメモ。</p>
-
-<hr>
-
-<h2>結論</h2>
-
-<p><a href="https://crates.io/crates/dbus">dbus crate</a> を使う。</p>
-
-<hr>
-
-<h2>経緯</h2>
-
-<p>開発中の <a href="http://atl.recruit-tech.co.jp/blog/4339/">libspecinfra</a> で、systemd 配下の service の状態を取得できるようにするための provider を書こうと思い、色々調べたりコード書いて試したりした。</p>
-
-<hr>
-
-<h2>使えそうな crates を探す</h2>
-
-<p>まずは目的に合う crates がないか <a href="https://crates.io/">crates.io</a> で検索。ざっと以下のようなものが見つかる。</p>
-
-<ul>
-<li><a href="https://crates.io/crates/systemd">systemd</a></li>
-<li><a href="https://crates.io/crates/systemd-dbus">systemd-dbus</a></li>
-<li><a href="https://crates.io/crates/dbus">dbus</a></li>
-<li><a href="https://crates.io/crates/dbus-bytestream">dbus-bytestream</a></li>
-</ul>
-
-<p>systemd crate は <a href="https://github.com/systemd/systemd/tree/master/src/libsystemd">libsystemd</a> の Rust インターフェースで、<a href="https://www.freedesktop.org/software/systemd/man/sd-daemon.html">sd-daemon</a>、<a href="https://www.freedesktop.org/software/systemd/man/sd-id128.html">sd-id128</a>、<a href="https://www.freedesktop.org/software/systemd/man/sd-journal.html">sd-journal</a>、<a href="https://www.freedesktop.org/software/systemd/man/sd-login.html">sd-login </a> に対応している。が <a href="https://www.freedesktop.org/software/systemd/man/sd-bus.html">sd-bus</a> は <a href="https://github.com/jmesmon/rust-systemd/blob/aead34dcf64e90014da0fadfe54ea439a19ce8c4/src/lib.rs#L68">まだ実装が不完全</a> なようなので、目的には合わなさそう、と判断。</p>
-
-<p>systemd-dbus crate は2年半以上更新がなく、rust 1.19.0 でコンパイルが通らなかったので断念。</p>
-
-<p>他に systemd を直接扱える、目的に適いそうな crate が見当たらなかったので、D-Bus が扱える crate ってことで、dbus crate と dbus-bytestream create を試してみることにした。</p>
-
-<hr>
-
-<h2>dbus-send で D-Bus を理解する</h2>
-
-<p>dbus crate にしても dbus-bytestream crate にしても、ざっとドキュメントやコードを読んだ感じ、D-Bus でどういった形でメッセージのやりとりがなされているのかを理解しないと、使うのは無理だなこれは、と思ったので、まずは <a href="https://dbus.freedesktop.org/doc/dbus-send.1.html">dbus-send</a> コマンドで必要な情報が得られるかどうかトライしてみた。</p>
-
-<p>libspecinfra でやりたいことのひとつは、サービスが動いているかどうかを調べること。dbus-send では以下のような形で実行すれば、この情報が得られることがわかった。</p>
-
-<p>まずはユニット名(ssh.service)からオブジェクトパス(/org/freedesktop/systemd1/unit/ssh_2eservice)を取得。</p>
-
-<pre><code>$ dbus-send --system \
+      <p>
+        systemd crate は
+        <a href="https://github.com/systemd/systemd/tree/master/src/libsystemd">
+          libsystemd
+        </a>
+        の Rust インターフェースで、
+        <a href="https://www.freedesktop.org/software/systemd/man/sd-daemon.html">
+          sd-daemon
+        </a>
+        、
+        <a href="https://www.freedesktop.org/software/systemd/man/sd-id128.html">
+          sd-id128
+        </a>
+        、
+        <a href="https://www.freedesktop.org/software/systemd/man/sd-journal.html">
+          sd-journal
+        </a>
+        、
+        <a href="https://www.freedesktop.org/software/systemd/man/sd-login.html">
+          sd-login
+        </a>
+        に対応している。が
+        <a href="https://www.freedesktop.org/software/systemd/man/sd-bus.html">
+          sd-bus
+        </a>
+        は
+        <a href="https://github.com/jmesmon/rust-systemd/blob/aead34dcf64e90014da0fadfe54ea439a19ce8c4/src/lib.rs#L68">
+          まだ実装が不完全
+        </a>
+        なようなので、目的には合わなさそう、と判断。
+      </p>
+      <p>
+        systemd-dbus crate は2年半以上更新がなく、rust 1.19.0 でコンパイルが通らなかったので断念。
+      </p>
+      <p>
+        他に systemd を直接扱える、目的に適いそうな crate が見当たらなかったので、D-Bus が扱える crate ってことで、dbus crate と dbus-bytestream create を試してみることにした。
+      </p>
+      <hr />
+      <h2>
+        dbus-send で D-Bus を理解する
+      </h2>
+      <p>
+        dbus crate にしても dbus-bytestream crate にしても、ざっとドキュメントやコードを読んだ感じ、D-Bus でどういった形でメッセージのやりとりがなされているのかを理解しないと、使うのは無理だなこれは、と思ったので、まずは
+        <a href="https://dbus.freedesktop.org/doc/dbus-send.1.html">
+          dbus-send
+        </a>
+        コマンドで必要な情報が得られるかどうかトライしてみた。
+      </p>
+      <p>
+        libspecinfra でやりたいことのひとつは、サービスが動いているかどうかを調べること。dbus-send では以下のような形で実行すれば、この情報が得られることがわかった。
+      </p>
+      <p>
+        まずはユニット名(ssh.service)からオブジェクトパス(/org/freedesktop/systemd1/unit/ssh_2eservice)を取得。
+      </p>
+      <pre><code>$ dbus-send --system \
    --dest=org.freedesktop.systemd1 \
    --type=method_call \
    --print-reply \
@@ -116,14 +170,23 @@
    string:ssh.service
 
 method return time=1507693363.257785 sender=:1.10 -&gt; destination=:1.220 serial=3078 reply_serial=2
-   object path &quot;/org/freedesktop/systemd1/unit/ssh_2eservice&quot;
-</code></pre>
-
-<p><code>--dest=org.freedesktop.systemd1</code> で接続先のバス名を指定。<code>/org/freedesktop/systemd1</code> が操作対象のオブジェクトパス、<code>org.freedesktop.systemd1.Manager</code> がインターフェースで、それに続く <code>GetUnit</code> が呼び出すメソッド、<code>string:ssh.service</code> がメソッドに渡す引数、という形式になっている。</p>
-
-<p>このオブジェクトパスの ActiveState プロパティを取得。</p>
-
-<pre><code>$ dbus-send --system \
+   object path &quot;/org/freedesktop/systemd1/unit/ssh_2eservice&quot;</code></pre>
+      <p>
+        <code>--dest=org.freedesktop.systemd1</code>
+        で接続先のバス名を指定。
+        <code>/org/freedesktop/systemd1</code>
+        が操作対象のオブジェクトパス、
+        <code>org.freedesktop.systemd1.Manager</code>
+        がインターフェースで、それに続く
+        <code>GetUnit</code>
+        が呼び出すメソッド、
+        <code>string:ssh.service</code>
+        がメソッドに渡す引数、という形式になっている。
+      </p>
+      <p>
+        このオブジェクトパスの ActiveState プロパティを取得。
+      </p>
+      <pre><code>$ dbus-send --system \
    --dest=org.freedesktop.systemd1 \
    --type=method_call \
    --print-reply \
@@ -133,39 +196,63 @@ method return time=1507693363.257785 sender=:1.10 -&gt; destination=:1.220 seria
    string:ActiveState
 
 method return time=1507693392.955268 sender=:1.10 -&gt; destination=:1.221 serial=3079 reply_serial=2
-   variant       string &quot;active&quot;
-</code></pre>
-
-<p>これでサービスの状態を得ることができた。</p>
-
-<p>どのようなメソッドやプロパティがあるかは <a href="https://www.freedesktop.org/wiki/Software/systemd/dbus/">The D-Bus API of systemd/PID 1</a> に載っている。</p>
-
-<hr>
-
-<h2>Rust で dbus-send で得たのと同じ情報を得る</h2>
-
-<p>dbus crate を使って以下のようなコードを書けば良い。</p>
-
-<div><script src='https://gist.github.com/0210a1b8c56c1bf1411b1b8e310e90d8.js?file='></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-<p>試したコードは Cargo.toml 等も含めて <a href="https://github.com/mizzy/rust-systemd-playground">GitHub</a> に置いてある。</p>
-
-<p>dbus crate は <a href="https://github.com/diwic/dbus-rs/tree/master/dbus/examples">サンプルコード</a> もあるし、<a href="https://github.com/diwic/dbus-rs/blob/master/dbus/examples/argument_guide.md">ドキュメント</a> もあるので、ドキュメントがほとんどない dbus-bytestream crate と比べると、比較的扱いやすいように思える（といっても、ドキュメント読めばすべてわかる、というわけではなく、コードも読んで色々試行錯誤したけど）。</p>
-
-<p>dbus-bytestream も同時に試したけど、取得した ActiveState の情報をデコードする方法がよくわからないまま、dbus crate の方が動いたので、途中で断念した。なので、GitHub 上にある dbus-bytestream を使ったコードはエラーで動かない。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2017/12/12/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2017/09/06/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+   variant       string &quot;active&quot;</code></pre>
+      <p>
+        これでサービスの状態を得ることができた。
+      </p>
+      <p>
+        どのようなメソッドやプロパティがあるかは
+        <a href="https://www.freedesktop.org/wiki/Software/systemd/dbus/">
+          The D-Bus API of systemd/PID 1
+        </a>
+        に載っている。
+      </p>
+      <hr />
+      <h2>
+        Rust で dbus-send で得たのと同じ情報を得る
+      </h2>
+      <p>
+        dbus crate を使って以下のようなコードを書けば良い。
+      </p>
+      <p>
+        {% gist 0210a1b8c56c1bf1411b1b8e310e90d8 %}
+      </p>
+      <p>
+        試したコードは Cargo.toml 等も含めて
+        <a href="https://github.com/mizzy/rust-systemd-playground">
+          GitHub
+        </a>
+        に置いてある。
+      </p>
+      <p>
+        dbus crate は
+        <a href="https://github.com/diwic/dbus-rs/tree/master/dbus/examples">
+          サンプルコード
+        </a>
+        もあるし、
+        <a href="https://github.com/diwic/dbus-rs/blob/master/dbus/examples/argument_guide.md">
+          ドキュメント
+        </a>
+        もあるので、ドキュメントがほとんどない dbus-bytestream crate と比べると、比較的扱いやすいように思える（といっても、ドキュメント読めばすべてわかる、というわけではなく、コードも読んで色々試行錯誤したけど）。
+      </p>
+      <p>
+        dbus-bytestream も同時に試したけど、取得した ActiveState の情報をデコードする方法がよくわからないまま、dbus crate の方が動いたので、途中で断念した。なので、GitHub 上にある dbus-bytestream を使ったコードはエラーで動かない。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2017/09/06/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2017/12/12/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

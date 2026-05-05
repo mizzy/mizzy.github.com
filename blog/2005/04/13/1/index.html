@@ -1,101 +1,80 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ajaxなウェブメールを作る #1 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      俺について - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="俺について"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/04/13/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/04/13/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="俺について"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/04/13/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/04/13/1">
+          俺について
+        </a>
+      </h1>
+      <div class="byline">
+        13 April 2005
+      </div>
+      <p class="entryBody">
+        30歳男、サラリーマンです。身長167cm, 体重は65kg〜70kgの間を行ったり来たり。70超えもありますが。
+      </p>
+      <p class="entryBody">
+        2歳上の妻、もうすぐ5歳の長男、3歳の次男、生後7ヶ月の長女、という家族構成。神奈川県在住。
+      </p>
+      <p class="entryBody">
+        趣味はなんだろ？最近はプログラム書いてることが多い気がする。perl使ってますが、rubyにも心惹かれてます。
+      </p>
+      <p class="entryBody">
+        あと、歴史小説が好き。主に中国モノ。歴史小説読んでると、「俺もオヤジになったなぁ」と思う。歴史なんて全然興味なかったのに。
+      </p>
+    </article>
+    <footer class="foot">
+      <span></span>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/04/13/2">
+        newer →
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/04/13/1">ajaxなウェブメールを作る #1</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-ilohamil, IMP, SquirrelMail, ActiveMailと気分次第で使うものを変えているのですが、決定的にこれがいい、というものがないわけですよ。（だからこそ気分次第、なのですが。）
-</p>
-
-<p class="entryBody">
-まあ、ウェブメールなんだからしゃあないか、と妥協していたのですが、gmailが教えてくれました。ウェブメールでもJavaScriptをうまく使えば使い勝手がいいものが作れる、と。
-</p>
-
-<p class="entryBody">
-そこで、自分で作ってみようということになり、現在ちまちま作っております。目標としては、普段使っているのがWanderlustなので、それに使い勝手が近いものを作ろう、と考えています。以下の様なコンセプトで。
-</p>
-
-<ul class="entryBody">
-<li>画面遷移しない。</li>
-<li>3ペイン表示。</li>
-<li>キーボードのみで操作可能。ショートカットはWanderlust風。</li>
-<li>メッセージを先読みして待ち時間を少なく。</li>
-</ul>
-
-<p class="entryBody">
-まだ全然このコンセプト通りにはなってませんが、とりあえずメールが読める、という状態にはなってます。近いうちに動作デモを公開予定。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/04/13/2">↑ newer post</a>
-    
-
-    
-  </div>
-
-</body>
-
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

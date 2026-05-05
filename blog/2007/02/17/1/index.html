@@ -1,85 +1,72 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>デブサミ出張 Shibuya イベントの補足 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    デブサミ出張 Shibuya イベントの補足 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="デブサミ出張 Shibuya イベントの補足"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2007/02/17/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2007/02/17/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="デブサミ出張 Shibuya イベントの補足"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2007/02/17/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/02/17/1">デブサミ出張 Shibuya イベントの補足</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://mizzy.org/archives/assurer_devsumi.pdf"><span class="icon"></span>デブサミ発表資料</a>中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2007/02/17/1">
+    デブサミ出張 Shibuya イベントの補足
+  </a>
+</h1>
+<div class="byline">
+  17 February 2007
+</div>
 <p>
-テストプラグインのコードはこの様になっています。
+  <a class="ext-link" href="http://mizzy.org/archives/assurer_devsumi.pdf">
+    <span class="icon"></span>
+    デブサミ発表資料
+  </a>
+  中に、テストプラグインがどういうコードなのかを書いていたのですが、時間がなくてまったく説明できなかったので、ここで補足しておきます。
 </p>
-
+<p>
+  テストプラグインのコードはこの様になっています。
+</p>
 <pre class="wiki">
 package Assurer::Plugin::Test::SMTP;
-
-use strict;
-use warnings;
-<span style="color: blue;">use base qw( Assurer::Plugin::Test ); #(A)</span>
-<span style="color: blue;">use Assurer::Test; #(B)</span>
-use Net::SMTP;
+<p>use strict;<br />
+use warnings;<br />
+<span style="color: blue;">use base qw( Assurer::Plugin::Test ); #(A)</span><br />
+<span style="color: blue;">use Assurer::Test; #(B)</span><br />
+use Net::SMTP;</p>
 <div style="color: blue;">
 sub register {
     my $self = shift;
@@ -88,78 +75,67 @@ sub register {
 </div>
 sub connect {
     my ( $self, $context, $args ) = @_;
+<pre><code>my $conf = $self-&gt;conf;
 
-    my $conf = $self->conf;
+my $host     = $conf-&gt;{host}     || $context-&gt;conf-&gt;{host};
+my $timeout  = $conf-&gt;{timeout}  || 10;
 
-    my $host     = $conf->{host}     || $context->conf->{host};
-    my $timeout  = $conf->{timeout}  || 10;
-
-    my $smtp = Net::SMTP->new(Host => $host, Timeout => $timeout);
-    <span style="color: blue;">ok($smtp, "smtp ok $host"); #(D)</span>
-}
-
-1;
+my $smtp = Net::SMTP-&gt;new(Host =&gt; $host, Timeout =&gt; $timeout);
+&lt;span style=&quot;color: blue;&quot;&gt;ok($smtp, &quot;smtp ok $host&quot;); #(D)&lt;/span&gt;</code></pre>
+<p>}</p>
+<p>1;<br />
 </pre>
-
 <p>
-青字の部分が、プラグインを書く際のお約束というかポイントとなる部分なので、順に説明していきます。
+  青字の部分が、プラグインを書く際のお約束というかポイントとなる部分なので、順に説明していきます。
 </p>
-
 <p>
-(A) では Assurer::Plugin::Test を継承しているわけですが、テストプラグイン共通の処理はすべて Assurer::Plugin::Test に記述することにより、各プラグインでのコード量を減らそうという目論見になってます。
+  (A) では Assurer::Plugin::Test を継承しているわけですが、テストプラグイン共通の処理はすべて Assurer::Plugin::Test に記述することにより、各プラグインでのコード量を減らそうという目論見になってます。
 </p>
-
 <p>
-(B) で Assurer::Test を use することより、ok(), is(), like() といったテスト用メソッドをインポートしています。
+  (B) で Assurer::Test を use することより、ok(), is(), like() といったテスト用メソッドをインポートしています。
 </p>
-
 <p>
-(C) ではテストを行うメソッドを登録しています。複数登録する場合には、
-</p>
-
-<pre class="wiki">
+  (C) ではテストを行うメソッドを登録しています。複数登録する場合には、
+</p><pre class="wiki">
 $self->register_tests( qw/ test1 test2 test3 / ); 
 </pre>
-
 <p>
-といった記述をします。この場合、test1(), test2(), test3() の順で実行されます。
+  といった記述をします。この場合、test1(), test2(), test3() の順で実行されます。
 </p>
-
 <p>
-(D) が実際にテストを行っているところで、Test::More の ok() と同じ動作をします。この ok() は上で書いたように、Assurer::Test からインポートしたメソッドです。このような組み込みのテストメソッドを使うことで、if 文で結果を判断して適切なステータスを返す、といった処理を書く必要がなくなります。
+  (D) が実際にテストを行っているところで、Test::More の ok() と同じ動作をします。この ok() は上で書いたように、Assurer::Test からインポートしたメソッドです。このような組み込みのテストメソッドを使うことで、if 文で結果を判断して適切なステータスを返す、といった処理を書く必要がなくなります。
 </p>
-
 <p>
-<a class="ext-link" href="http://blog.nomadscafe.jp/archives/000713.html"><span class="icon"></span>kazeburo さんの発表</a>にある、Nagios プラグインと対比してみると、Nagios は exit 時のステータスコードだけ気にすればいい、というのに対して、Assurer では、上のコード (A), (B), (C) の様に、Assurer 特有のお約束を守る必要があるものの、exit コードは気にしなくていい、といった特徴があります。また、お約束を守ることによってコード量も減らせます。（特に結果判定で if を書かなくていい。）
+  <a class="ext-link" href="http://blog.nomadscafe.jp/archives/000713.html">
+    <span class="icon"></span>
+    kazeburo さんの発表
+  </a>
+  にある、Nagios プラグインと対比してみると、Nagios は exit 時のステータスコードだけ気にすればいい、というのに対して、Assurer では、上のコード (A), (B), (C) の様に、Assurer 特有のお約束を守る必要があるものの、exit コードは気にしなくていい、といった特徴があります。また、お約束を守ることによってコード量も減らせます。（特に結果判定で if を書かなくていい。）
 </p>
-
 <p>
-Nagios の場合、ステータスコードだけ気にすればいい、とは言っても、ステータスが OK, Warning, Crtitical, Unknown とあるわけで、OK はまだしも、どういった場合が Warning でどういった場合が Critical なのか、ということを気にするのは、ちょっと面倒な気もします。
+  Nagios の場合、ステータスコードだけ気にすればいい、とは言っても、ステータスが OK, Warning, Crtitical, Unknown とあるわけで、OK はまだしも、どういった場合が Warning でどういった場合が Critical なのか、ということを気にするのは、ちょっと面倒な気もします。
 </p>
-
 <p>
-また、結果を受け取る側も、Warning とか Unknown とか受け取ると、それって問題あるの？ないの？って迷ったりしないのかな、とか、Warning と Critical の解釈って、人によって違うんじゃないかな、って思ったりします。（Nagios使ったことないんで、変なこと言ってるかもしれませんが。）
+  また、結果を受け取る側も、Warning とか Unknown とか受け取ると、それって問題あるの？ないの？って迷ったりしないのかな、とか、Warning と Critical の解釈って、人によって違うんじゃないかな、って思ったりします。（Nagios使ったことないんで、変なこと言ってるかもしれませんが。）
 </p>
-
 <p>
-そういった曖昧さをなくしたくて、Assurer では OK か NOT OK かの2種類の結果しか返さない、というポリシーにしました。
+  そういった曖昧さをなくしたくて、Assurer では OK か NOT OK かの2種類の結果しか返さない、というポリシーにしました。
 </p>
-
 <p>
-とは言っても、Nagios の様にステータスが何種類かある方が便利だという場面はあるんでしょうね。その辺りは Assurer では、エラーメッセージでフィルタリングできるようにして、「こういったエラーメッセージの場合は、問題ないから OK にする」といった設定ができるような形にして、結果の解釈を利用者に委ねられるようにしようと考えています。
+  とは言っても、Nagios の様にステータスが何種類かある方が便利だという場面はあるんでしょうね。その辺りは Assurer では、エラーメッセージでフィルタリングできるようにして、「こういったエラーメッセージの場合は、問題ないから OK にする」といった設定ができるような形にして、結果の解釈を利用者に委ねられるようにしようと考えています。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/02/24/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/02/14/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2007/02/14/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2007/02/24/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

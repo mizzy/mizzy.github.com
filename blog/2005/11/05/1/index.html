@@ -1,123 +1,122 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>perlでOpenID Consumerを実装してみる - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/11/05/1">perlでOpenID Consumerを実装してみる</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-<a href="http://openid.net/" target="_blank">OpenID</a> を理解するために、OpenID Consumerをperlで実装してみることにした。といっても、 <a href="http://search.cpan.org/perldoc?Net::OpenID::Consumer" target="_blank">Net::OpenID::Consumer</a> モジュールを利用しているわけで、いちから自分で実装しているわけではないです。「モジュールがあるから楽勝」と思っていたら、意外とてこずってしまいました。<a href="/openid/" target="_blank">動作サンプル</a>。<a href="/archives/openid.tar.gz">ソース</a>。
-</p>
-
-<p class="entryBody">
-認証時の流れについては、「<a href="http://www.banana-fish.com/~piro/20051021.html" target="_blank">ぴろ日記 - OpenID: Specs , OpenID認証サーバ , OpenIDにおける認証って奴</a>」が詳しいです。今回実装しているのは、ぴろ日記さんで「とりあえずわかりやすい」と言われている、「dumb + setup モード」です。
-
-</p>
-
-<!-- more -->
-
-<p class="entryBody">
-以下、簡単に説明を。
-</p>
-
-<p class="entryBody">
-<a href="/openid/" target="_blank">動作サンプル</a>にアクセスすると、以下の部分が実行されます。
-</p>
-
-<pre class="code">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      perlでOpenID Consumerを実装してみる - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="perlでOpenID Consumerを実装してみる"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/11/05/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/11/05/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="perlでOpenID Consumerを実装してみる"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/11/05/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/11/05/1">
+          perlでOpenID Consumerを実装してみる
+        </a>
+      </h1>
+      <div class="byline">
+        5 November 2005
+      </div>
+      <p class="entryBody">
+        <a href="http://openid.net/" target="_blank">
+          OpenID
+        </a>
+        を理解するために、OpenID Consumerをperlで実装してみることにした。といっても、
+        <a href="http://search.cpan.org/perldoc?Net::OpenID::Consumer" target="_blank">
+          Net::OpenID::Consumer
+        </a>
+        モジュールを利用しているわけで、いちから自分で実装しているわけではないです。「モジュールがあるから楽勝」と思っていたら、意外とてこずってしまいました。
+        <a href="/openid/" target="_blank">
+          動作サンプル
+        </a>
+        。
+        <a href="/archives/openid.tar.gz">
+          ソース
+        </a>
+        。
+      </p>
+      <p class="entryBody">
+        認証時の流れについては、「
+        <a href="http://www.banana-fish.com/~piro/20051021.html" target="_blank">
+          ぴろ日記 - OpenID: Specs , OpenID認証サーバ , OpenIDにおける認証って奴
+        </a>
+        」が詳しいです。今回実装しているのは、ぴろ日記さんで「とりあえずわかりやすい」と言われている、「dumb + setup モード」です。
+      </p>
+      <!-- more -->
+      <p class="entryBody">
+        以下、簡単に説明を。
+      </p>
+      <p class="entryBody">
+        <a href="/openid/" target="_blank">
+          動作サンプル
+        </a>
+        にアクセスすると、以下の部分が実行されます。
+      </p>
+      <pre class="code">
 sub login {
     my $self = shift;
 
     if($self->query->param('openid.sig')){
-    my $csr = $self->_create_csr;
-    my $vident = $csr->verified_identity or die $!;
-    return 'You are &lt;strong&gt;' . $vident->url . '&lt;/strong&gt; !';
+	my $csr = $self->_create_csr;
+	my $vident = $csr->verified_identity or die $!;
+	return 'You are &lt;strong&gt;' . $vident->url . '&lt;/strong&gt; !';
     }
     else {
-    my $template = $self->load_tmpl('login.html');
-    return $template->output;
+	my $template = $self->load_tmpl('login.html');
+	return $template->output;
     }
 }
 </pre>
-
-<p class="entryBody">
-openid.sig パラメータが渡されていると、Open ID Serverに対して認証情報の正当性を確認しに行きますが、まだ最初のアクセスで認証していませんので、else 以下が実行されて、ログインフォームを表示します。
-</p>
-
-<p class="entryBody">
-ログインフォームに、自分のIDとなるURLを入力、サブミットすると以下のコードが実行されます。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        openid.sig パラメータが渡されていると、Open ID Serverに対して認証情報の正当性を確認しに行きますが、まだ最初のアクセスで認証していませんので、else 以下が実行されて、ログインフォームを表示します。
+      </p>
+      <p class="entryBody">
+        ログインフォームに、自分のIDとなるURLを入力、サブミットすると以下のコードが実行されます。
+      </p>
+      <pre class="code">
 sub do_login {
     my $self = shift;
     
     my $csr = $self->_create_csr;
     my $claimed_identity = $csr->claimed_identity($self->query->param('openid_url'));
     my $check_url = $claimed_identity->check_url(
-                       return_to      => 'http://mizzy.org/openid/',
-                       trust_root     => 'http://mizzy.org/',
-                       delayed_return => 1,
-                         );
+				       return_to      => 'http://mizzy.org/openid/',
+				       trust_root     => 'http://mizzy.org/',
+				       delayed_return => 1,
+						 );
 
     $self->header_type('redirect');
     $self->header_props(-url => $check_url);
@@ -127,61 +126,74 @@ sub do_login {
 sub _create_csr {
     my $self = shift;
     my $csr = Net::OpenID::Consumer->new(
-                     args            => $self->query,
-                     consumer_secret => '012345',
-                     );
+					 args            => $self->query,
+					 consumer_secret => '012345',
+					 );
 
     return $csr;
 }
 </pre>
-
-<p class="entryBody">
-ここでは、ぴろ日記さんの説明にある、1), 2)の処理が実行され、OpenID Serverへリダイレクトされます。この処理は、<a href="http://openid.net/specs.bml" target="_blank">OpenID: Specs</a> の <a href="http://openid.net/specs.bml#mode-checkid_setup" target="_blank">checkid_setup</a> にあたります。
-</p>
-
-<p class="entryBody">
-OpenID Server上での認証が完了すると、QUERY_STRINGに様々なパラメータをセットした状態で、http://mizzy.org/openid/ へ戻ってき、最初と同様以下のサブルーチンが実行されます。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        ここでは、ぴろ日記さんの説明にある、1), 2)の処理が実行され、OpenID Serverへリダイレクトされます。この処理は、
+        <a href="http://openid.net/specs.bml" target="_blank">
+          OpenID: Specs
+        </a>
+        の
+        <a href="http://openid.net/specs.bml#mode-checkid_setup" target="_blank">
+          checkid_setup
+        </a>
+        にあたります。
+      </p>
+      <p class="entryBody">
+        OpenID Server上での認証が完了すると、QUERY_STRINGに様々なパラメータをセットした状態で、http://mizzy.org/openid/ へ戻ってき、最初と同様以下のサブルーチンが実行されます。
+      </p>
+      <pre class="code">
 sub login {
     my $self = shift;
 
     if($self->query->param('openid.sig')){
-    my $csr = $self->_create_csr;
-    my $vident = $csr->verified_identity or die $!;
-    return 'You are &lt;strong&gt;' . $vident->url . '&lt;/strong&gt; !';
+	my $csr = $self->_create_csr;
+	my $vident = $csr->verified_identity or die $!;
+	return 'You are &lt;strong&gt;' . $vident->url . '&lt;/strong&gt; !';
     }
     else {
-    my $template = $self->load_tmpl('login.html');
-    return $template->output;
+	my $template = $self->load_tmpl('login.html');
+	return $template->output;
     }
 }
 </pre>
-
-<p class="entryBody">
-今度はopenid.sigパラメータ（と他のOpenID関連パラメータ）が QUERY_STRINGにより渡されていますので、 $csr->verified_identity を実行して、ぴろ日記さんの説明4)にあたる、認証情報の正当性確認を OpenID Server に対して行います。この処理は、<a href="http://openid.net/specs.bml" target="_blank">OpenID: Specs</a> の <a href="http://openid.net/specs.bml#mode-check_authentication" target="_blank">check_authentication</a> にあたります。
-</p>
-
-<p class="entryBody">
-正当性が確認できると、「You are あなたのURL !」 と表示されます。
-</p>
-
-<p class="entryBody">
-username.videntity.org と livejournal.com/users/username/ はIDとして正常に動作することが確認できましたが、profile.typekey.com/username/ はなぜか openid.mode=cancel となってしまい、認証できません。videntity.org のログインに profile.typekey.com/username/ を利用しても認証できないので、typekey 側の問題なのかなぁ…
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/11/08/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/11/01/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        今度はopenid.sigパラメータ（と他のOpenID関連パラメータ）が QUERY_STRINGにより渡されていますので、 $csr->verified_identity を実行して、ぴろ日記さんの説明4)にあたる、認証情報の正当性確認を OpenID Server に対して行います。この処理は、
+        <a href="http://openid.net/specs.bml" target="_blank">
+          OpenID: Specs
+        </a>
+        の
+        <a href="http://openid.net/specs.bml#mode-check_authentication" target="_blank">
+          check_authentication
+        </a>
+        にあたります。
+      </p>
+      <p class="entryBody">
+        正当性が確認できると、「You are あなたのURL !」 と表示されます。
+      </p>
+      <p class="entryBody">
+        username.videntity.org と livejournal.com/users/username/ はIDとして正常に動作することが確認できましたが、profile.typekey.com/username/ はなぜか openid.mode=cancel となってしまい、認証できません。videntity.org のログインに profile.typekey.com/username/ を利用しても認証できないので、typekey 側の問題なのかなぁ…
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/11/01/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/11/08/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

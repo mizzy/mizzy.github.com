@@ -1,104 +1,135 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Stellar - A static site generator - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Stellar - A static site generator - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Stellar - A static site generator"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2012/04/07/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2012/04/07/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Stellar - A static site generator"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2012/04/07/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2012/04/07/1">
+          Stellar - A static site generator
+        </a>
+      </h1>
+      <div class="byline">
+        7 April 2012
+      </div>
+      <p>
+        <strong>
+          <a href="/blog/2012/04/24/1/">
+            注! 事情により stellar から nebel へ名称変更しております
+          </a>
+        </strong>
+      </p>
+      <p>
+        自宅サーバが死んでから、緊急避難的に
+        <a href="http://octopress.org/">
+          Octopress
+        </a>
+        + GitHub Pages でブログを運用してたけど、Octopress 飽きたし、generate 時間が長いので、一から自分でつくった。
+      </p>
+      <p>
+        <strike>
+          <a href="https://github.com/mizzy/stellar">
+            mizzy/stellar
+          </a>
+        </strike>
+        <a href="https://github.com/mizzy/nebel">
+          mizzy/nebel
+        </a>
+      </p>
+      <p>
+        まあでもそんな大したものじゃなくて、130行弱の Ruby スクリプトが本体。
+      </p>
+      <p>
+        <strike>
+          <a href="https://github.com/mizzy/stellar-site">
+            mizzy/stellar-site
+          </a>
+        </strike>
+        <a href="https://github.com/mizzy/nebel-site">
+          mizzy/nebel-site
+        </a>
+        のような形で、テンプレやら CSS ファイルやら JavaScript ファイルやら ポスト用 Markdown データやらを用意して、
+        <strike>
+          stellar
+        </strike>
+        nebel を実行すると、今あなたが見ているこのブログのような形でデータを生成してくれる。
+      </p>
+      <p>
+        特徴らしきものをあげれば、
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          Jekyll/Octopress で利用していたポスト用 Markdown データがそのまま使える
+        </li>
+        <li>
+          Jekyll/Octopress で利用していたプラグインがそのまま使える
+        </li>
+        <li>
+          個別エントリページしか生成しない
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2012/04/07/1">Stellar - A static site generator</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><strong><a href="/blog/2012/04/24/1/">注! 事情により stellar から nebel へ名称変更しております</a></strong></p>
-
-<p>自宅サーバが死んでから、緊急避難的に <a href="http://octopress.org/">Octopress</a> + GitHub Pages でブログを運用してたけど、Octopress 飽きたし、generate 時間が長いので、一から自分でつくった。</p>
-
-<p><strike><a href="https://github.com/mizzy/stellar">mizzy/stellar</a></strike> <a href="https://github.com/mizzy/nebel">mizzy/nebel</a></p>
-
-<p>まあでもそんな大したものじゃなくて、130行弱の Ruby スクリプトが本体。</p>
-
-<p><strike><a href="https://github.com/mizzy/stellar-site">mizzy/stellar-site</a></strike>   <a href="https://github.com/mizzy/nebel-site">mizzy/nebel-site</a> のような形で、テンプレやら CSS ファイルやら JavaScript ファイルやら ポスト用 Markdown データやらを用意して、<strike>stellar</strike> nebel を実行すると、今あなたが見ているこのブログのような形でデータを生成してくれる。</p>
-
-<p>特徴らしきものをあげれば、</p>
-
-<ul>
-<li>Jekyll/Octopress で利用していたポスト用 Markdown データがそのまま使える</li>
-<li>Jekyll/Octopress で利用していたプラグインがそのまま使える</li>
-<li>個別エントリページしか生成しない</li>
-</ul>
-
-<p>といったあたり。特に、静的タイプのブログシステムの場合、ひとつファイルを追加するだけで、すべてのページ（複数のエントリを含むページ）を更新しないといけない、というのが、再生成に時間がかかる原因なので、そういったページはなくした。別にそういったものがなくても、Autopagerize で自動的に個別エントリを読みこんでいければ十分。</p>
-
-<p>これで、自分の環境では Octopress で50秒かかっていた再生成時間が、3秒まで短縮できた。</p>
-
-<p>とりあえず自分しか使わない前提でつくったので、色々ハードコートされてたり、使い方とかまとめてないけど、興味のある方がいれば、Pull Request なり Issue 登録なりお気軽にどうぞ。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2012/04/14/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2012/03/31/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        といったあたり。特に、静的タイプのブログシステムの場合、ひとつファイルを追加するだけで、すべてのページ（複数のエントリを含むページ）を更新しないといけない、というのが、再生成に時間がかかる原因なので、そういったページはなくした。別にそういったものがなくても、Autopagerize で自動的に個別エントリを読みこんでいければ十分。
+      </p>
+      <p>
+        これで、自分の環境では Octopress で50秒かかっていた再生成時間が、3秒まで短縮できた。
+      </p>
+      <p>
+        とりあえず自分しか使わない前提でつくったので、色々ハードコートされてたり、使い方とかまとめてないけど、興味のある方がいれば、Pull Request なり Issue 登録なりお気軽にどうぞ。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2012/03/31/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2012/04/14/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

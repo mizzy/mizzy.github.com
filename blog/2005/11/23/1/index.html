@@ -1,82 +1,72 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ajaxで「戻る」「進む」（feedbringerをremixin' #7） - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/11/23/1">ajaxで「戻る」「進む」（feedbringerをremixin' #7）</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-feedbringer 使うのやめた、とか言っておきながら、feedbringer remix ネタ。別に feedbringer じゃなくても良かったのですが、 <a href="http://www.onjava.com/pub/a/onjava/2005/10/26/ajax-handling-bookmarks-and-back-button.html" target="_blank">ONJava.com: AJAX: How to Handle Bookmarks and Back Buttons</a> を見てたら実験したくなったのと、そういや feedbringer 使うのやめた理由のひとつは、「戻る」「進む」ボタンが使えないからだったなぁ、ということを思い出したので、上記 URL にあるテクニックを feedbringer に適用してみることにした。
-</p>
-
-<p class="entryBody">
-いつものごとく、greasemonkey で remix です。 <a href="http://mizzy.org/js/feedbringer_enable_back_and_forth.user.js" target="_blank">feedbringer_enable_back_and_forth.user.js</a>
-</p>
-
-<p class="entryBody">
-実験ということもあり、自分のスキル不足もあってかなりいいかげんなスクリプトですが、簡単に解説を。
-</p>
-
-<pre class="code">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ajaxで「戻る」「進む」（feedbringerをremixin' #7） - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ajaxで「戻る」「進む」（feedbringerをremixin' #7）"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/11/23/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/11/23/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ajaxで「戻る」「進む」（feedbringerをremixin' #7）"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/11/23/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/11/23/1">
+          ajaxで「戻る」「進む」（feedbringerをremixin' #7）
+        </a>
+      </h1>
+      <div class="byline">
+        23 November 2005
+      </div>
+      <p class="entryBody">
+        feedbringer 使うのやめた、とか言っておきながら、feedbringer remix ネタ。別に feedbringer じゃなくても良かったのですが、
+        <a href="http://www.onjava.com/pub/a/onjava/2005/10/26/ajax-handling-bookmarks-and-back-button.html" target="_blank">
+          ONJava.com: AJAX: How to Handle Bookmarks and Back Buttons
+        </a>
+        を見てたら実験したくなったのと、そういや feedbringer 使うのやめた理由のひとつは、「戻る」「進む」ボタンが使えないからだったなぁ、ということを思い出したので、上記 URL にあるテクニックを feedbringer に適用してみることにした。
+      </p>
+      <p class="entryBody">
+        いつものごとく、greasemonkey で remix です。
+        <a href="http://mizzy.org/js/feedbringer_enable_back_and_forth.user.js" target="_blank">
+          feedbringer_enable_back_and_forth.user.js
+        </a>
+      </p>
+      <p class="entryBody">
+        実験ということもあり、自分のスキル不足もあってかなりいいかげんなスクリプトですが、簡単に解説を。
+      </p>
+      <pre class="code">
 <strong>// feedbringer_enable_back_and_forth.user.js から抜粋</strong>
 
 var js = document.createElement("script");
@@ -84,12 +74,14 @@ js.language = "javascript";
 js.src = "http://mizzy.org/js/dhtmlHistory.js";
 document.body.appendChild(js);
 </pre>
-
-<p class="entryBody">
-まずこの部分では、上記 ONJava.com サイトで紹介されている、 <a href="http://codinginparadise.org/projects/dhtml_history/latest.zip" target="_blank">Really Simply History framework</a> のdhtmlHistory.js を読み込んでいます。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        まずこの部分では、上記 ONJava.com サイトで紹介されている、
+        <a href="http://codinginparadise.org/projects/dhtml_history/latest.zip" target="_blank">
+          Really Simply History framework
+        </a>
+        のdhtmlHistory.js を読み込んでいます。
+      </p>
+      <pre class="code">
 <strong>// dhtmlHistory.js から抜粋</strong>
 
 dhtmlHistory.initialize();
@@ -99,16 +91,13 @@ function historyChange(newLocation, historyData) {
     $('main').innerHTML = historyData;
 }
 </pre>
-
-<p class="entryBody">
-dhtmlHistory.js の最後に、上の6行を追加しています。本来であればユーザスクリプト側に書くべきなんでしょうが、dhtmlHistory.js を読み込み終わってから実行しないエラーとなるため、面倒なのでこっちに書いちゃいました。読み込み完了してから実行する方法がよくわからんし。
-</p>
-
-<p class="entryBody">
-ここは dhtmlHistorty オブジェクトの初期化処理ですね。 dhtmlHisotry.addListener が重要なとこで、「戻る」「進む」ボタンを押した時に、どういった処理を実行するのか定義します。ここでやっていることは、後ほど出てくる dhtmlHistory.add によって記録された historyData を、 id が main であるコンテナに書き戻す、ということをやっています。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        dhtmlHistory.js の最後に、上の6行を追加しています。本来であればユーザスクリプト側に書くべきなんでしょうが、dhtmlHistory.js を読み込み終わってから実行しないエラーとなるため、面倒なのでこっちに書いちゃいました。読み込み完了してから実行する方法がよくわからんし。
+      </p>
+      <p class="entryBody">
+        ここは dhtmlHistorty オブジェクトの初期化処理ですね。 dhtmlHisotry.addListener が重要なとこで、「戻る」「進む」ボタンを押した時に、どういった処理を実行するのか定義します。ここでやっていることは、後ほど出てくる dhtmlHistory.add によって記録された historyData を、 id が main であるコンテナに書き戻す、ということをやっています。
+      </p>
+      <pre class="code">
 <strong>// feedbringer_enable_back_and_forth.user.js から抜粋</strong>
 
 Ajax.Updater.prototype.extend(Ajax.Request.prototype).extend({
@@ -128,34 +117,41 @@ Ajax.Updater.prototype.extend(Ajax.Request.prototype).extend({
      }
   ...
 </pre>
-
-<p class="entryBody">
-ユーザスクリプトで prototype.js の Ajax.Updater を上書きしています。太字の部分を追加しただけですね。xhtmlHttpRequest のロードが完了した時点で、dhtmlHistory.add を実行して、 location.hash の値と、それにひもづくデータを historyStorage オブジェクトに格納、でもって location.hash をここで指定された値に書き換える、ということをやってます。
-</p>
-
-<p class="entryBody">
-スクリプトの解説は以上です。これで「戻る」「進む」ボタンを押すと、最初の方に出てきた dhtmlHistory.addListener で指定された historyChange が実行されて、変更された location.hash にひもづく historyData を historyStorage オブジェクトから引っ張り出して、id が main であるコンテナに書き戻す、という具合になります。
-</p>
-
-<p class="entryBody">
-今回の例では id=main コンテナ決めうちで書き換えしてますが、 dhtmlHistory.add で格納できる historyData は、 文字列だけじゃなくオブジェクトも指定できるので、 やろうと思えばもっと複雑なこともできますね。
-</p>
-
-<p class="entryBody">
-上記 ONJava.com サイトによると、<a href="http://www.backbase.com/" target="_blank">Backbase</a> や <a href="http://www.dojotoolkit.org/" target="_blank">Dojo</a> なんかは、こういったヒストリフレームワークが実装されているようです。prototype.js にも実装してほしいっすね。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/11/23/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/11/08/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        ユーザスクリプトで prototype.js の Ajax.Updater を上書きしています。太字の部分を追加しただけですね。xhtmlHttpRequest のロードが完了した時点で、dhtmlHistory.add を実行して、 location.hash の値と、それにひもづくデータを historyStorage オブジェクトに格納、でもって location.hash をここで指定された値に書き換える、ということをやってます。
+      </p>
+      <p class="entryBody">
+        スクリプトの解説は以上です。これで「戻る」「進む」ボタンを押すと、最初の方に出てきた dhtmlHistory.addListener で指定された historyChange が実行されて、変更された location.hash にひもづく historyData を historyStorage オブジェクトから引っ張り出して、id が main であるコンテナに書き戻す、という具合になります。
+      </p>
+      <p class="entryBody">
+        今回の例では id=main コンテナ決めうちで書き換えしてますが、 dhtmlHistory.add で格納できる historyData は、 文字列だけじゃなくオブジェクトも指定できるので、 やろうと思えばもっと複雑なこともできますね。
+      </p>
+      <p class="entryBody">
+        上記 ONJava.com サイトによると、
+        <a href="http://www.backbase.com/" target="_blank">
+          Backbase
+        </a>
+        や
+        <a href="http://www.dojotoolkit.org/" target="_blank">
+          Dojo
+        </a>
+        なんかは、こういったヒストリフレームワークが実装されているようです。prototype.js にも実装してほしいっすね。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/11/08/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/11/23/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

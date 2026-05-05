@@ -1,137 +1,165 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>puppet-lxc-test-box - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      puppet-lxc-test-box - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="puppet-lxc-test-box"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/03/22/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/03/22/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="puppet-lxc-test-box"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/03/22/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/03/22/1">
+          puppet-lxc-test-box
+        </a>
+      </h1>
+      <div class="byline">
+        22 March 2013
+      </div>
+      <p>
+        新たな Puppet のベストプラクティスを求めて、マニフェストの大規模なリファクタリングを行っています。
+      </p>
+      <p>
+        で、リファクタリングするからにはテストが必要だよね、ってことで、
+        <a href="http://rspec-puppet.com/">
+          rspec-puppet
+        </a>
+        でテストを書いてるんだけど、rspec-puppet はマニフェストがコンパイルされた「カタログ」というものに対してテストするもので、実際にマニフェストを流し込んだ状態が正しいかテストするわけではないので、これだとテストとしては不完全。
+      </p>
+      <p>
+        というわけで、
+        <a href="https://github.com/opscode/test-kitchen">
+          Test Kitchen
+        </a>
+        みたいに、同時にいくつも VM を立ててテストを走らせる、ってなことをやりたいんだけど、会社では KVM ベースの VM を利用してるので、VirtualBox ベースの Vagrant は使えないし、そもそもテストを動かす大元のホストも VM なので、VirtualBox どころか KVM も利用できない。
+      </p>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        なので、まずは LXC のシステムコンテナをさくさくと作るための Puppet モジュールを書いてみた。
+      </p>
+      <p>
+        <a href="https://github.com/mizzy/puppet-lxc-test-box">
+          puppet-lxc-test-box
+        </a>
+      </p>
+      <p>
+        (
+        <a href="https://github.com/fgrehm/vagrant-lxc">
+          vagrant-lxc
+        </a>
+        というのもあるけど、&quot;Vagrant &gt;= 1.1.0, the lxc package and a Kernel higher than 3.5.0-17.28, which on Ubuntu 12.10 means something like&quot; ってなことが書かれていて、メインで使ってる RedHat 系 OS では動く気がしないのでスルー。)
+      </p>
+      <p>
+        使い方は次のような感じ。まず lxc-test-box モジュールと sysctl モジュールを持ってくる。
+      </p>
+      <pre><code>$ git clone git://github.com/mizzy/puppet-lxc-test-box.git lxc-test-box
+$ git clone git://github.com/duritong/puppet-sysctl.git sysctl</code></pre>
+      <p>
+        以下のように、Exec リソースのデフォルト値と、システムコンテナのホスト名と IP アドレスを書いたマニフェスト lxc-test-box.pp を作成。
+      </p>
+      <pre><code>include lxc-test-box
 
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
+Exec { path =&gt; '/sbin:/usr/sbin:/bin:/usr/bin' }
 
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+lxc-test-box::lxc::setup { 'base':   ipaddress =&gt; '172.16.0.2' }
+lxc-test-box::lxc::setup { 'manage': ipaddress =&gt; '172.16.0.3' }
+lxc-test-box::lxc::setup { 'smtp':   ipaddress =&gt; '172.16.0.4' }</code></pre>
+      <p>
+        マニフェストを流し込む。
+      </p>
+      <pre><code>$ sudo puppet apply --modulepath=. lxc-test-box.pp</code></pre>
+      <p>
+        これで、ホスト OS への lxc パッケージのインストール、ブリッジインターフェース br0 の作成、IP マスカレードの設定を行い、指定されたホスト名と IP アドレスでシステムコンテナを作成し、コンテナの起動までしてくれる。所要時間は、コンテナひとつあたり5分ぐらい。
+      </p>
+      <p>
+        起動したら、
+      </p>
+      <pre><code>$ ssh root@base.lxc-test-box</code></pre>
+      <p>
+        で、ログインできる。ログイン用の鍵は Puppet で設定済み。（ただし、鍵は /root/.ssh 以下に置いてあるので、必要ならそこからコピーを。）テスト目的なのでホストOSとは通信できるけど、外部からは通信できない。ただし、ホスト OS で IP マスカレードの設定はしてあるので、コンテナから外部への通信は可能。
+      </p>
+      <p>
+        同梱している lxc パッケージは Scientifix Linux 6.2 + Kernel 2.6.32-358.2.1.el6.x86_64 上でビルドしたものなので、RedHat 6 系以外ではたぶん動かないし、カーネルバージョンが違うと動かないかもしれない。
+      </p>
+      <p>
+        これでテスト用のシステムコンテナを量産できるようになったので、次は実際にテストする仕組みを作り込む。
+      </p>
+      <hr />
+      <p>
+        KVM な VM の上で KVM な VM は動かせない、と思っていたら、
+        <a href="https://twitter.com/ursm">
+          @usrm
+        </a>
+        さんから、最近のカーネルであればネストできるはず、という情報をいただきました。
+      </p>
+      <blockquote class="twitter-tweet">
+        <p>
+          @
+          <a href="https://twitter.com/gosukenator">
+            gosukenator
+          </a>
+          最近のカーネルであれば KVM のネストはできるはずです
+          <a href="http://t.co/HZf5HhhUYs" title="http://networkstatic.net/nested-kvm-hypervisor-support/">
+            networkstatic.net/nested-kvm-hyp…
+          </a>
+        </p>
+        &mdash; Keita Urashima (@ursm)
+        <a href="https://twitter.com/ursm/status/314802865313042432">
+          March 21, 2013
+        </a>
+      </blockquote>
+      <p>
+        とても有益な情報ありがとうございます！今度試してみよう。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/03/11/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/03/22/1">puppet-lxc-test-box</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>新たな Puppet のベストプラクティスを求めて、マニフェストの大規模なリファクタリングを行っています。</p>
-
-<p>で、リファクタリングするからにはテストが必要だよね、ってことで、<a href="http://rspec-puppet.com/">rspec-puppet</a> でテストを書いてるんだけど、rspec-puppet はマニフェストがコンパイルされた「カタログ」というものに対してテストするもので、実際にマニフェストを流し込んだ状態が正しいかテストするわけではないので、これだとテストとしては不完全。</p>
-
-<p>というわけで、<a href="https://github.com/opscode/test-kitchen">Test Kitchen</a> みたいに、同時にいくつも VM を立ててテストを走らせる、ってなことをやりたいんだけど、会社では KVM ベースの VM を利用してるので、VirtualBox ベースの Vagrant は使えないし、そもそもテストを動かす大元のホストも VM なので、VirtualBox どころか KVM も利用できない。</p>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>なので、まずは LXC のシステムコンテナをさくさくと作るための Puppet モジュールを書いてみた。</p>
-
-<p><a href="https://github.com/mizzy/puppet-lxc-test-box">puppet-lxc-test-box</a></p>
-
-<p>( <a href="https://github.com/fgrehm/vagrant-lxc">vagrant-lxc</a> というのもあるけど、&quot;Vagrant &gt;= 1.1.0, the lxc package and a Kernel higher than 3.5.0-17.28, which on Ubuntu 12.10 means something like&quot; ってなことが書かれていて、メインで使ってる RedHat 系 OS では動く気がしないのでスルー。)</p>
-
-<p>使い方は次のような感じ。まず lxc-test-box モジュールと sysctl モジュールを持ってくる。</p>
-
-<pre><code>$ git clone git://github.com/mizzy/puppet-lxc-test-box.git lxc-test-box
-$ git clone git://github.com/duritong/puppet-sysctl.git sysctl
-</code></pre>
-
-<p>以下のように、Exec リソースのデフォルト値と、システムコンテナのホスト名と IP アドレスを書いたマニフェスト lxc-test-box.pp を作成。</p>
-
-<pre><code>include lxc-test-box
-
-Exec { path =&gt; &#39;/sbin:/usr/sbin:/bin:/usr/bin&#39; }
-
-lxc-test-box::lxc::setup { &#39;base&#39;:   ipaddress =&gt; &#39;172.16.0.2&#39; }
-lxc-test-box::lxc::setup { &#39;manage&#39;: ipaddress =&gt; &#39;172.16.0.3&#39; }
-lxc-test-box::lxc::setup { &#39;smtp&#39;:   ipaddress =&gt; &#39;172.16.0.4&#39; }
-</code></pre>
-
-<p>マニフェストを流し込む。</p>
-
-<pre><code>$ sudo puppet apply --modulepath=. lxc-test-box.pp
-</code></pre>
-
-<p>これで、ホスト OS への lxc パッケージのインストール、ブリッジインターフェース br0 の作成、IP マスカレードの設定を行い、指定されたホスト名と IP アドレスでシステムコンテナを作成し、コンテナの起動までしてくれる。所要時間は、コンテナひとつあたり5分ぐらい。</p>
-
-<p>起動したら、</p>
-
-<pre><code>$ ssh root@base.lxc-test-box
-</code></pre>
-
-<p>で、ログインできる。ログイン用の鍵は Puppet で設定済み。（ただし、鍵は /root/.ssh 以下に置いてあるので、必要ならそこからコピーを。）テスト目的なのでホストOSとは通信できるけど、外部からは通信できない。ただし、ホスト OS で IP マスカレードの設定はしてあるので、コンテナから外部への通信は可能。</p>
-
-<p>同梱している lxc パッケージは Scientifix Linux 6.2 + Kernel 2.6.32-358.2.1.el6.x86_64 上でビルドしたものなので、RedHat 6 系以外ではたぶん動かないし、カーネルバージョンが違うと動かないかもしれない。</p>
-
-<p>これでテスト用のシステムコンテナを量産できるようになったので、次は実際にテストする仕組みを作り込む。</p>
-
-<hr>
-
-<p>KVM な VM の上で KVM な VM は動かせない、と思っていたら、<a href="https://twitter.com/ursm">@usrm</a> さんから、最近のカーネルであればネストできるはず、という情報をいただきました。</p>
-
-<blockquote class="twitter-tweet"><p>@<a href="https://twitter.com/gosukenator">gosukenator</a> 最近のカーネルであれば KVM のネストはできるはずです <a href="http://t.co/HZf5HhhUYs" title="http://networkstatic.net/nested-kvm-hypervisor-support/">networkstatic.net/nested-kvm-hyp…</a></p>&mdash; Keita Urashima (@ursm) <a href="https://twitter.com/ursm/status/314802865313042432">March 21, 2013</a></blockquote>
-
-<p>とても有益な情報ありがとうございます！今度試してみよう。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/03/23/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/03/11/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/03/23/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

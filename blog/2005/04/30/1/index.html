@@ -1,99 +1,95 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Catalystでajax - 実践編 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/04/30/1">Catalystでajax - 実践編</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <h3>概要</h3>
-
-<p class="entryBody">
-<a href="/program/htmlPrototype.html" target="_blank">前回のエントリ</a>に関して、<a href="http://1470.net/mm/" target="_blank">MM/Memo</a>で、「うーん、便利なのかなー。perl（とかのサーバサイド）コード中にjavascriptが混ざるのって嫌な気がするけど。」と書いている方がいらっしゃったのですが、ちょっと勘違いをされているような気がします。自分でJavascriptのコードを一切書かずに済ませるための、HTML::PrototypeならびにCatalyst::Plugin::Prototypeですから。
-</p>
-
-<p class="entryBody">
-なので、今回は実践編っつーことで、Javascriptを一切書かずにajaxなウェブアプリ（ってほどのものではないけど）をCatalystで作ってみたいと思います。といっても、けんたろさんの<a href="http://antipop.zapto.org/mt/archives/001280.php">Catalyst で作る簡単 Web アプリケーション: Feed2JS 解説</a>で、既にCatalystでajaxで自分ではJavascriptを書いていないという、素晴らしいサンプルがあるのですが、ここではよりシンプルな（しょぼい）サンプルで、「こんなに簡単にajaxできるぜ」ってことを示したいと思います。
-</p>
-
-<h3>プロジェクト生成</h3>
-
-<pre class="code">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Catalystでajax - 実践編 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Catalystでajax - 実践編"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/04/30/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/04/30/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Catalystでajax - 実践編"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/04/30/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/04/30/1">
+          Catalystでajax - 実践編
+        </a>
+      </h1>
+      <div class="byline">
+        30 April 2005
+      </div>
+      <h3>
+        概要
+      </h3>
+      <p class="entryBody">
+        <a href="/program/htmlPrototype.html" target="_blank">
+          前回のエントリ
+        </a>
+        に関して、
+        <a href="http://1470.net/mm/" target="_blank">
+          MM/Memo
+        </a>
+        で、「うーん、便利なのかなー。perl（とかのサーバサイド）コード中にjavascriptが混ざるのって嫌な気がするけど。」と書いている方がいらっしゃったのですが、ちょっと勘違いをされているような気がします。自分でJavascriptのコードを一切書かずに済ませるための、HTML::PrototypeならびにCatalyst::Plugin::Prototypeですから。
+      </p>
+      <p class="entryBody">
+        なので、今回は実践編っつーことで、Javascriptを一切書かずにajaxなウェブアプリ（ってほどのものではないけど）をCatalystで作ってみたいと思います。といっても、けんたろさんの
+        <a href="http://antipop.zapto.org/mt/archives/001280.php">
+          Catalyst で作る簡単 Web アプリケーション: Feed2JS 解説
+        </a>
+        で、既にCatalystでajaxで自分ではJavascriptを書いていないという、素晴らしいサンプルがあるのですが、ここではよりシンプルな（しょぼい）サンプルで、「こんなに簡単にajaxできるぜ」ってことを示したいと思います。
+      </p>
+      <h3>
+        プロジェクト生成
+      </h3>
+      <pre class="code">
 $ catalyst.pl Ajax
 </pre>
-
-<h3>ビューの生成</h3>
-
-<pre class="code">
+      <h3>
+        ビューの生成
+      </h3>
+      <pre class="code">
 $ cd Ajax
 $ ./script/ajax_create.pl view TT TT
 </pre>
-
-<h3>perlコード作成</h3>
-
-<p class="entryBody">
-lib/Ajax.pmを修正します。修正した部分だけ以下に示します。
-</p>
-
-<pre class="code">
+      <h3>
+        perlコード作成
+      </h3>
+      <p class="entryBody">
+        lib/Ajax.pmを修正します。修正した部分だけ以下に示します。
+      </p>
+      <pre class="code">
 use Catalyst qw/Prototype/;
 
 sub default : Private {
@@ -107,14 +103,13 @@ sub get : Global {
     $c->res->output('success.');
 }
 </pre>
-
-<h3>テンプレート作成</h3>
-
-<p class="entryBody">
-以下の内容のroot/default というファイルを作成します。
-</p>
-
-<pre class="code">
+      <h3>
+        テンプレート作成
+      </h3>
+      <p class="entryBody">
+        以下の内容のroot/default というファイルを作成します。
+      </p>
+      <pre class="code">
 &#x5b;% c.prototype.define_javascript_functions %&#x5d;
 &lt;p&gt;
 This is a sample of ajax web app using Catalyst.
@@ -122,23 +117,22 @@ This is a sample of ajax web app using Catalyst.
 
 &lt;p&gt;
 &#x5b;% c.prototype.link_to_remote('click here and you will see the string "success."',
-                  {
-                update => 'container',
-                url => '/get',
-                }) %&#x5d;
+			      {
+				update => 'container',
+				url => '/get',
+				}) %&#x5d;
 &lt;/p&gt;
 
 &lt;div id="container"&gt;
 &lt;/div&gt;
 </pre>
-
-<h3>アクセスしてみる</h3>
-
-<p class="entryBody">
-cgiで起動する場合には、以下の様なスクリプトを作成します。
-</p>
-
-<pre class="code">
+      <h3>
+        アクセスしてみる
+      </h3>
+      <p class="entryBody">
+        cgiで起動する場合には、以下の様なスクリプトを作成します。
+      </p>
+      <pre class="code">
 #!/usr/local/bin/perl -w
 
 use strict;
@@ -147,30 +141,34 @@ use Ajax;
 
 Ajax->run;
 </pre>
-
-<p class="entryBody">
-実際にアクセスしてみると<a href="/archives/Ajax/" target="_blank">こうなります</a>。リンクをクリックすると、画面遷移せずに「success.」という文字を表示します。
-</p>
-
-<p class="entryBody">
-以上で完了です。Javascriptを一切書かずにajaxなウェブアプリが作れる、ということがお分かり頂けたと思います。    
-</p>
-
-<p class="entryBody">
-xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ込むだけなので、サーバ側で生成したデータを、Javascript側で何らかの処理をしてからHTMLにはめ込むという用途には使えませんが、単純なajaxアプリであれば十分使えるかと。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/05/02/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/04/29/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        実際にアクセスしてみると
+        <a href="/archives/Ajax/" target="_blank">
+          こうなります
+        </a>
+        。リンクをクリックすると、画面遷移せずに「success.」という文字を表示します。
+      </p>
+      <p class="entryBody">
+        以上で完了です。Javascriptを一切書かずにajaxなウェブアプリが作れる、ということがお分かり頂けたと思います。
+      </p>
+      <p class="entryBody">
+        xmlHttpRequestで取得したデータを、単純にそのままHTMLにはめ込むだけなので、サーバ側で生成したデータを、Javascript側で何らかの処理をしてからHTMLにはめ込むという用途には使えませんが、単純なajaxアプリであれば十分使えるかと。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/04/29/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/05/02/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

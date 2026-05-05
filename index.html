@@ -6,7 +6,6 @@
     <title>
       Gosuke Miyashita
     </title>
-    <!-- TODO: change name and description -->
     <meta name="author" content="Gosuke Miyashita"/>
     <meta name="description" content="A fantastic blog that is fantastic."/>
     <!-- OGP -->
@@ -22,60 +21,35 @@
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
     <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
-    <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
     <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
-    <section class="sidebar">
-      <a href="/">
-        <!-- TODO: change this gravatar URL -->
-        <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75"
-             class="avatar"/>
-      </a>
-      <!-- TODO: change name -->
-      <section class="name">
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
         <a href="/">
-          <span id="zach">
-            Gosuke
-          </span>
-          <span id="holman">
-            Miyashita
-          </span>
+          posts
         </a>
-      </section>
-      <!-- TODO: change links -->
-      <section class="meta">
-        <a href="https://github.com/mizzy">
-          <img src="/images/github.png"/>
-        </a>
-        <a href="https://twitter.com/gosukenator">
-          <img src="/images/twitter.png">
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
         </a>
         <a href="/atom.xml">
-          <img src="/images/rss.png"/>
+          feed
         </a>
-      </section>
-      <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-    </section>
-    <section class="content autopagerize_page_element">
+      </span>
+    </header>
+    <article>
       <h1>
         <a href="/blog/2026/05/04/1">
           Carinaのupstream state機能
         </a>
       </h1>
-      <section class="byline">
-        2026-05-04 08:47:03 +0900
-      </section>
+      <div class="byline">
+        4 May 2026
+      </div>
       <p>
         <a href="https://github.com/carina-rs/carina">
           Carina
@@ -589,12 +563,16 @@ Plan: 1 to add, 0 to change, 0 to destroy.</code></pre>
           </tr>
         </tbody>
       </table>
-      <div class="pagination">
-        <a href="/blog/2026/04/09/1" rel="next">
-          older post ↓
-        </a>
-      </div>
-    </section>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2026/04/09/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <span></span>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
       mermaid.initialize({startOnLoad: true, theme: 'dark'});

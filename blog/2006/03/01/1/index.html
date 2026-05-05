@@ -1,117 +1,138 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Six Apart ユーザーギャザリングに行ってきました - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Six Apart ユーザーギャザリングに行ってきました - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Six Apart ユーザーギャザリングに行ってきました"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/03/01/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/03/01/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Six Apart ユーザーギャザリングに行ってきました"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/03/01/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/03/01/1">
+          Six Apart ユーザーギャザリングに行ってきました
+        </a>
+      </h1>
+      <div class="byline">
+        1 March 2006
+      </div>
+      <p class="entryBody">
+        Ben と会話することができました！ちょうど今日は Catalyst::Plugin::AtomServer を使ったプログラムを書いていたので、会話のネタもばっちりでした。以下、会話の概要。（
+        <span style="color: crimson;">
+          B:
+        </span>
+        Ben,
+        <span style="color: blue;">
+          M:
+        </span>
+        自分）
+      </p>
+      <p class="code">
+        <span style="color: blue;">
+          M:
+        </span>
+        「今、Catalyst::Plugin::AtomServer 使ったプログラム書いてるよ。WSSE と Basic Auth の両方に対応してるのがいいね。」
+        <br />
+        <span style="color: crimson;">
+          B:
+        </span>
+        「ありがとう。ちゃんと動いてる？」
+        <br />
+        <span style="color: blue;">
+          M:
+        </span>
+        「動いてるけど、Catalyst::Plugin::Authentication::Credential::Atom では MD5 で DB に格納されたパスワードが使えないよね？」
+        <br />
+        <span style="color: crimson;">
+          B:
+        </span>
+        「そうなんだよね。」
+        <br />
+        <span style="color: blue;">
+          M:
+        </span>
+        「だから今ハックしてるよ。」
+        <br />
+        <span style="color: crimson;">
+          B:
+        </span>
+        「できたらパッチ送ってよ。」
+      </p>
+      <p class="entryBody">
+        てな感じでした。話しかける時には全然緊張しなかったのに、会話が終ったあとに鼓動が早くなって、手が小刻みに震えるという軽い興奮状態になり、その余韻が今もまだあったりします。
+      </p>
+      <p class="entryBody">
+        それから、
+        <a href="http://www.lares.dti.ne.jp/~cheebow/" target="_blank">
+          CHEEBOW さん
+        </a>
+        、
+        <a href="http://hinagata.biz/" target="_blank">
+          上ノ郷谷さん
+        </a>
+        ともお話しできました！CHEEBOW さんは、はてブでブクマしてくれてたので、こちらのことは知ってくれているだろうとは思っていたのですが、上ノ郷谷さんまでもが「知ってますよ！」と言ってくれたのはメチャメチャうれしかったです。
+      </p>
+      <p class="entryBody">
+        また、小飼弾さんにも軽くご挨拶。そして帰り際にもまた Ben と話す機会があったので、「Bloglines::WebService の Changes に一緒に名前載ってるよ。」「パッチはできたら明日送るよ。」みたいなことを言いました。
+      </p>
+      <p class="entryBody">
+        今日は perl 界の天上人二人と接することができて、プログラミングに対するモチベーションあがりまくりです。帰りの電車でも Catalyst::Plugin::Authentication::Credential::Atom のコードを眺めながら、どうやってハックしようか考えてました。
+      </p>
+      <p class="entryBody">
+        宮川さんや関村さんにもお会いできるとうれしいな、と思っていたのですが、残念ながらお会いできませんでした。YAPC までの楽しみにしたいと思います。
+      </p>
+      <p class="entryBody">
+        そして終了後は、会社の方々 + ヤスヒサさん + ふうりさん とでお食事。楽しかったっす。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/02/26/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/03/01/1">Six Apart ユーザーギャザリングに行ってきました</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-Ben と会話することができました！ちょうど今日は Catalyst::Plugin::AtomServer を使ったプログラムを書いていたので、会話のネタもばっちりでした。以下、会話の概要。（<span style="color: crimson;">B:</span> Ben, <span style="color: blue;">M:</span> 自分）
-</p>
-
-<p class="code">
-<span style="color: blue;">M:</span>「今、Catalyst::Plugin::AtomServer 使ったプログラム書いてるよ。WSSE と Basic Auth の両方に対応してるのがいいね。」<br />
-<span style="color: crimson;">B:</span>「ありがとう。ちゃんと動いてる？」<br />
-<span style="color: blue;">M:</span>「動いてるけど、Catalyst::Plugin::Authentication::Credential::Atom では MD5 で DB に格納されたパスワードが使えないよね？」<br />
-<span style="color: crimson;">B:</span>「そうなんだよね。」<br />
-<span style="color: blue;">M:</span>「だから今ハックしてるよ。」<br />
-<span style="color: crimson;">B:</span>「できたらパッチ送ってよ。」
-</p>
-
-<p class="entryBody">
-てな感じでした。話しかける時には全然緊張しなかったのに、会話が終ったあとに鼓動が早くなって、手が小刻みに震えるという軽い興奮状態になり、その余韻が今もまだあったりします。
-</p>
-
-<p class="entryBody">
-それから、<a href="http://www.lares.dti.ne.jp/~cheebow/" target="_blank">CHEEBOW さん</a>、<a href="http://hinagata.biz/" target="_blank">上ノ郷谷さん</a>ともお話しできました！CHEEBOW さんは、はてブでブクマしてくれてたので、こちらのことは知ってくれているだろうとは思っていたのですが、上ノ郷谷さんまでもが「知ってますよ！」と言ってくれたのはメチャメチャうれしかったです。
-</p>
-
-<p class="entryBody">
-また、小飼弾さんにも軽くご挨拶。そして帰り際にもまた Ben と話す機会があったので、「Bloglines::WebService の Changes に一緒に名前載ってるよ。」「パッチはできたら明日送るよ。」みたいなことを言いました。
-</p>
-
-<p class="entryBody">
-今日は perl 界の天上人二人と接することができて、プログラミングに対するモチベーションあがりまくりです。帰りの電車でも Catalyst::Plugin::Authentication::Credential::Atom のコードを眺めながら、どうやってハックしようか考えてました。
-</p>
-
-<p class="entryBody">
-宮川さんや関村さんにもお会いできるとうれしいな、と思っていたのですが、残念ながらお会いできませんでした。YAPC までの楽しみにしたいと思います。
-</p>
-
-<p class="entryBody">
-そして終了後は、会社の方々 + ヤスヒサさん + ふうりさん とでお食事。楽しかったっす。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/03/02/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/02/26/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/03/02/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

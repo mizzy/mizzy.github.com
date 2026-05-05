@@ -1,167 +1,258 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ScalableStorageWithOSS00 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ScalableStorageWithOSS00 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ScalableStorageWithOSS00"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2008/12/28/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2008/12/28/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ScalableStorageWithOSS00"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2008/12/28/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2008/12/28/2">
+          ScalableStorageWithOSS00
+        </a>
+      </h1>
+      <div class="byline">
+        28 December 2008
+      </div>
+      <p>
+        <a href="http://trac.mizzy.org/public/wiki/HowToBuildAScalableStorageSystemWithOSS">
+          TLUG Meeting 2008/09 で発表した How to build a scalable storage system with OSS
+        </a>
+        なんですが、発表では概要しか触れてなくて、じゃあいったいどうやって構築するのよ、という部分が全然ないので、ぼちぼちこのブログで書いていくことにします。
+      </p>
+      <p>
+        で、スケーラブルというだけだと曖昧なので、以下のような要件を満たすものを、スケーラブルなストレージと想定することにします。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          特殊なソフトウェアを必要とせずに、OS からファイルシステムとしてマウントできるもの。なので MogileFS、Hadoop Distributed File System、Google File System 等は対象外。（FUSE 使えばやれないこともないけど…）
+        </li>
+        <li>
+          容量をオンラインでダイナミックに追加できる。
+        </li>
+        <li>
+          SPOF がない。
+        </li>
+        <li>
+          複数のサーバから同時にマウントすることができる。
+        </li>
+        <li>
+          物理的に I/O を柔軟に分散することができる。
+        </li>
+        <li>
+          無駄な空きスペースができにくい。
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2008/12/28/2">ScalableStorageWithOSS00</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://trac.mizzy.org/public/wiki/HowToBuildAScalableStorageSystemWithOSS">TLUG Meeting 2008/09 で発表した How to build a scalable storage system with OSS</a> なんですが、発表では概要しか触れてなくて、じゃあいったいどうやって構築するのよ、という部分が全然ないので、ぼちぼちこのブログで書いていくことにします。</p>
-
-<p>で、スケーラブルというだけだと曖昧なので、以下のような要件を満たすものを、スケーラブルなストレージと想定することにします。</p>
-
-<ul>
-<li>特殊なソフトウェアを必要とせずに、OS からファイルシステムとしてマウントできるもの。なので MogileFS、Hadoop Distributed File System、Google File System 等は対象外。（FUSE 使えばやれないこともないけど…）</li>
-<li>容量をオンラインでダイナミックに追加できる。</li>
-<li>SPOF がない。</li>
-<li>複数のサーバから同時にマウントすることができる。</li>
-<li>物理的に I/O を柔軟に分散することができる。</li>
-<li>無駄な空きスペースができにくい。</li>
-</ul>
-
-<p>で、こういったストレージを、高価なハードウェアを買わずに、オープンソースソフトウェアだけで構築することができないか、と考えて、こんな感じで実現できそうだなあー、というのを発表したのが TLUG でのプレゼンの内容。このプレゼンで出てきたキーワードとその概要をおさらいすると、以下のような感じ。</p>
-
-<ul>
-<li><a href="http://sources.redhat.com/cluster/cman/">cman</a>
-
-<ul>
-<li>Cluster Manager</li>
-<li>Red Hat Cluster Suite の一コンポーネント</li>
-<li>クラスタのメンバーシップ管理とノード間のメッセージング</li>
-<li>以下に出てくる、CLVM や GFS2 を使うために必要</li>
-</ul></li>
-<li><a href="http://sources.redhat.com/cluster/clvm/">CLVM</a>
-
-<ul>
-<li>Cluster Logical Volume Manager</li>
-<li>LVM2 のクラスタ版</li>
-<li>LVM2 のメタデータをクラスタノード間で自動的にシェアする</li>
-<li>CLVM で作成された論理ボリュームは、すべてのクラスタノードから参照できる</li>
-</ul></li>
-<li><a href="http://sourceware.org/cluster/gnbd/">GNBD</a>
-
-<ul>
-<li>Global Network Block Device</li>
-<li>TCP/IP ネットワーク経由でのブロックデバイスアクセス</li>
-<li>iSCSI と同じようなもの</li>
-<li>iSCSI との違いは、フェンシング機能を持っていること（フェンシングについては機会があれば説明します）</li>
-</ul></li>
-<li><a href="http://sources.redhat.com/cluster/gfs/">GFS2</a>
-
-<ul>
-<li>Global File System 2</li>
-<li>クラスタファイルシステム</li>
-<li>複数ノードから同時にマウントしてアクセスすることが可能</li>
-<li>cman の DLM(Distributed Lock Manager) を利用して排他制御し、ファイルの整合性を保つ</li>
-<li>OCFS(Oracle Cluster File System) なんかも同類</li>
-</ul></li>
-<li><a href="http://www.drbd.org/">DRBD</a>
-
-<ul>
-<li>Ditributed Replicated Block Device</li>
-<li>要するにネットワーク越しの RAID1</li>
-</ul></li>
-<li><a href="http://www.redhat.com/docs/manuals/csgfs/browse/4.6/DM_Multipath/index.html">DM-MP</a>
-
-<ul>
-<li>Device-Mapper Multipath</li>
-<li>複数の I/O 経路を仮想的にひとつに見せかけることができる</li>
-<li>Active/Passive、Active/Active どちらでも対応可</li>
-</ul></li>
-</ul>
-
-<p><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">TLUG での発表資料</a> では、それぞれを図で説明していたり、これらをどう組み合わせて利用するのかを説明しているので、ご参照ください。</p>
-
-<p>で、これらを組み合わせて構築したストレージがとりあえず動くことは確認できたのだけど、実用に耐えうるかどうかは謎。特に以下の点が気になるところ。</p>
-
-<ul>
-<li>協調動作するコンポーネントが多くて、トラブルが起こりやすそう。</li>
-<li>安定性。</li>
-<li>パフォーマンス。</li>
-<li>ストレージとなるサーバを追加して容量を増やした場合のオーバーヘッドの増加具合。</li>
-</ul>
-
-<p>なので、今後実際に使うかどうかはまだ決めかねてるのですが、一通り動かせるところまでは試してみたので、次回から実際の構築手順を書いていこうと思います。</p>
-
-<h1>関連エントリ</h1>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
-<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
-<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
-<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
-<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
-</ul>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2008/12/28/3">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2008/12/28/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        で、こういったストレージを、高価なハードウェアを買わずに、オープンソースソフトウェアだけで構築することができないか、と考えて、こんな感じで実現できそうだなあー、というのを発表したのが TLUG でのプレゼンの内容。このプレゼンで出てきたキーワードとその概要をおさらいすると、以下のような感じ。
+      </p>
+      <ul>
+        <li>
+          <a href="http://sources.redhat.com/cluster/cman/">
+            cman
+          </a>
+          <ul>
+            <li>
+              Cluster Manager
+            </li>
+            <li>
+              Red Hat Cluster Suite の一コンポーネント
+            </li>
+            <li>
+              クラスタのメンバーシップ管理とノード間のメッセージング
+            </li>
+            <li>
+              以下に出てくる、CLVM や GFS2 を使うために必要
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="http://sources.redhat.com/cluster/clvm/">
+            CLVM
+          </a>
+          <ul>
+            <li>
+              Cluster Logical Volume Manager
+            </li>
+            <li>
+              LVM2 のクラスタ版
+            </li>
+            <li>
+              LVM2 のメタデータをクラスタノード間で自動的にシェアする
+            </li>
+            <li>
+              CLVM で作成された論理ボリュームは、すべてのクラスタノードから参照できる
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="http://sourceware.org/cluster/gnbd/">
+            GNBD
+          </a>
+          <ul>
+            <li>
+              Global Network Block Device
+            </li>
+            <li>
+              TCP/IP ネットワーク経由でのブロックデバイスアクセス
+            </li>
+            <li>
+              iSCSI と同じようなもの
+            </li>
+            <li>
+              iSCSI との違いは、フェンシング機能を持っていること（フェンシングについては機会があれば説明します）
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="http://sources.redhat.com/cluster/gfs/">
+            GFS2
+          </a>
+          <ul>
+            <li>
+              Global File System 2
+            </li>
+            <li>
+              クラスタファイルシステム
+            </li>
+            <li>
+              複数ノードから同時にマウントしてアクセスすることが可能
+            </li>
+            <li>
+              cman の DLM(Distributed Lock Manager) を利用して排他制御し、ファイルの整合性を保つ
+            </li>
+            <li>
+              OCFS(Oracle Cluster File System) なんかも同類
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="http://www.drbd.org/">
+            DRBD
+          </a>
+          <ul>
+            <li>
+              Ditributed Replicated Block Device
+            </li>
+            <li>
+              要するにネットワーク越しの RAID1
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="http://www.redhat.com/docs/manuals/csgfs/browse/4.6/DM_Multipath/index.html">
+            DM-MP
+          </a>
+          <ul>
+            <li>
+              Device-Mapper Multipath
+            </li>
+            <li>
+              複数の I/O 経路を仮想的にひとつに見せかけることができる
+            </li>
+            <li>
+              Active/Passive、Active/Active どちらでも対応可
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p>
+        <a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">
+          TLUG での発表資料
+        </a>
+        では、それぞれを図で説明していたり、これらをどう組み合わせて利用するのかを説明しているので、ご参照ください。
+      </p>
+      <p>
+        で、これらを組み合わせて構築したストレージがとりあえず動くことは確認できたのだけど、実用に耐えうるかどうかは謎。特に以下の点が気になるところ。
+      </p>
+      <ul>
+        <li>
+          協調動作するコンポーネントが多くて、トラブルが起こりやすそう。
+        </li>
+        <li>
+          安定性。
+        </li>
+        <li>
+          パフォーマンス。
+        </li>
+        <li>
+          ストレージとなるサーバを追加して容量を増やした場合のオーバーヘッドの増加具合。
+        </li>
+      </ul>
+      <p>
+        なので、今後実際に使うかどうかはまだ決めかねてるのですが、一通り動かせるところまでは試してみたので、次回から実際の構築手順を書いていこうと思います。
+      </p>
+      <h1>
+        関連エントリ
+      </h1>
+      <ul>
+        <li>
+          [wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2008/12/28/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2008/12/28/3">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

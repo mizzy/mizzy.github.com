@@ -1,105 +1,89 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ModRuidTestAgain - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/06/25/2">ModRuidTestAgain</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>3,4年ぐらい前に、[wiki:ModSuid2AndModRuidAndLinuxCapability  mod<em>suid2 とか mod</em>ruid とか Linux ケーパビリティとか] で、mod_ruid の setuid/setgid は、プロセス単位なのか、それともスレッド単位なのか、という実験をして、スレッド単位で setuid/setgid する、という結果が得られたんですが、Linux kernel 2.4 というだいぶ古い環境での実験だったので、比較的最近の環境で実験してみた。</p>
-
-<p>OS はこんな感じ。</p>
-
-<pre><code>$ uname -a
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ModRuidTestAgain - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ModRuidTestAgain"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/06/25/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/06/25/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ModRuidTestAgain"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/06/25/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/06/25/2">
+          ModRuidTestAgain
+        </a>
+      </h1>
+      <div class="byline">
+        25 June 2011
+      </div>
+      <p>
+        3,4年ぐらい前に、[wiki:ModSuid2AndModRuidAndLinuxCapability  mod_suid2 とか mod_ruid とか Linux ケーパビリティとか] で、mod_ruid の setuid/setgid は、プロセス単位なのか、それともスレッド単位なのか、という実験をして、スレッド単位で setuid/setgid する、という結果が得られたんですが、Linux kernel 2.4 というだいぶ古い環境での実験だったので、比較的最近の環境で実験してみた。
+      </p>
+      <p>
+        OS はこんな感じ。
+      </p>
+      <pre><code>$ uname -a
 Linux h026.southpark 2.6.18-164.el5 #1 SMP Thu Sep 3 03:28:30 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux
 $ cat /etc/redhat-release
-CentOS release 5.4 (Final)
-</code></pre>
-
-<p>httpd のバージョン。</p>
-
-<pre><code>$ rpm -q httpd
-httpd-2.2.3-45.el5.centos.1
-</code></pre>
-
-<p>ps でプロセス/スレッドが見やすいように /etc/httpd/conf/httpd.conf をいじる。</p>
-
-<pre><code>&lt;IfModule worker.c&gt;
+CentOS release 5.4 (Final)</code></pre>
+      <p>
+        httpd のバージョン。
+      </p>
+      <pre><code>$ rpm -q httpd
+httpd-2.2.3-45.el5.centos.1</code></pre>
+      <p>
+        ps でプロセス/スレッドが見やすいように /etc/httpd/conf/httpd.conf をいじる。
+      </p>
+      <pre><code>&lt;IfModule worker.c&gt;
 StartServers        1
 MaxClients          1
 MinSpareThreads     1
 MaxSpareThreads     1
 ThreadsPerChild     1
 MaxRequestsPerChild  0
-&lt;/IfModule&gt;
-</code></pre>
-
-<p>/etc/sysconfig/httpd の以下の行を有効にして worker mpm で動かす。</p>
-
-<pre><code>HTTPD=/usr/sbin/httpd.worker
-</code></pre>
-
-<p>mod_ruid は処理が終わるとすぐに元のユーザに戻してしまうので、戻らないようにコメントアウト。</p>
-
-<pre><code>#!diff
+&lt;/IfModule&gt;</code></pre>
+      <p>
+        /etc/sysconfig/httpd の以下の行を有効にして worker mpm で動かす。
+      </p>
+      <pre><code>HTTPD=/usr/sbin/httpd.worker</code></pre>
+      <p>
+        mod_ruid は処理が終わるとすぐに元のユーザに戻してしまうので、戻らないようにコメントアウト。
+      </p>
+      <pre><code>#!diff
 diff --git a/mod_ruid.c b/mod_ruid.c
 index 5294d32..deed59b 100644
 --- a/mod_ruid.c
@@ -107,62 +91,61 @@ index 5294d32..deed59b 100644
 @@ -269,9 +269,9 @@ static int ruid_suidback (request_rec * r)
         }
         cap_free(cap);
-
+ 
 -       setgroups(0,NULL);
 -       setgid(unixd_config.group_id);
 -       setuid(unixd_config.user_id);
 +       //setgroups(0,NULL);
 +       //setgid(unixd_config.group_id);
 +       //setuid(unixd_config.user_id);
-
+ 
         cap=cap_get_proc();
-        capval[0]=CAP_SETUID;
-</code></pre>
-
-<p>apxs でビルド＆インストール。</p>
-
-<pre><code>$ sudo /usr/sbin/apxs -a -i -l cap -c mod_ruid.c
-</code></pre>
-
-<p>/etc/init.d/httpd restart して、プロセスとスレッドの UID を確認。下3つは PID が同じなので、スレッドだと判断できる。UID はすべて apache。</p>
-
-<pre><code>$ ps -eLf
+        capval[0]=CAP_SETUID;</code></pre>
+      <p>
+        apxs でビルド＆インストール。
+      </p>
+      <pre><code>$ sudo /usr/sbin/apxs -a -i -l cap -c mod_ruid.c</code></pre>
+      <p>
+        /etc/init.d/httpd restart して、プロセスとスレッドの UID を確認。下3つは PID が同じなので、スレッドだと判断できる。UID はすべて apache。
+      </p>
+      <pre><code>$ ps -eLf
 UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
 root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
 apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
 apache   13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-</code></pre>
-
-<p>ここで httpd へアクセスし、再度 ps で確認。</p>
-
-<pre><code>UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
+apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker</code></pre>
+      <p>
+        ここで httpd へアクセスし、再度 ps で確認。
+      </p>
+      <pre><code>UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD
 root     13005     1 13005  0    1 23:29 ?        00:00:00 /usr/sbin/httpd.worker
 apache   13011 13005 13011  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
 100      13011 13005 13013  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker
-</code></pre>
-
-<p>スレッドのひとつだけ UID が 100 になってる。これは mod_ruid.c に以下のようにデフォルトが定義されているから。</p>
-
-<pre><code>#!c
+apache   13011 13005 13014  0    3 23:29 ?        00:00:00 /usr/sbin/httpd.worker</code></pre>
+      <p>
+        スレッドのひとつだけ UID が 100 になってる。これは mod_ruid.c に以下のようにデフォルトが定義されているから。
+      </p>
+      <pre><code>#!c
 #define SUID_DEFAULT_UID        100
-#define SUID_DEFAULT_GID        100
-</code></pre>
-
-<p>というわけで、スレッド単位で setuid/setgid される、ということには変わりありませんでした、という結果に。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/06/29/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/06/25/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+#define SUID_DEFAULT_GID        100</code></pre>
+      <p>
+        というわけで、スレッド単位で setuid/setgid される、ということには変わりありませんでした、という結果に。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/06/25/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/06/29/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

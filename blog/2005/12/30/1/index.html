@@ -1,126 +1,104 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ActiveRecord のコールバックとオブザーバ（Rails勉強中 #6） - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/12/30/1">ActiveRecord のコールバックとオブザーバ（Rails勉強中 #6）</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-Rails の興味深い実装メモの続き。
-</p>
-
-<p class="entryBody">
-ActiveRecord の主な仕事は、DB の読み書きとデータの Validation なわけですが、コールバックを利用すると、Validation の前後や DB 読み書きの前後の、任意のタイミングで好きな処理を割り込ませることができます。
-</p>
-
-<p class="entryBody">
-例えば、 <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Rails本</a>のサンプルでは、
-</p>
-
-<pre class="code">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ActiveRecord のコールバックとオブザーバ（Rails勉強中 #6） - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ActiveRecord のコールバックとオブザーバ（Rails勉強中 #6）"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/12/30/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/12/30/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ActiveRecord のコールバックとオブザーバ（Rails勉強中 #6）"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/12/30/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/12/30/1">
+          ActiveRecord のコールバックとオブザーバ（Rails勉強中 #6）
+        </a>
+      </h1>
+      <div class="byline">
+        30 December 2005
+      </div>
+      <p class="entryBody">
+        Rails の興味深い実装メモの続き。
+      </p>
+      <p class="entryBody">
+        ActiveRecord の主な仕事は、DB の読み書きとデータの Validation なわけですが、コールバックを利用すると、Validation の前後や DB 読み書きの前後の、任意のタイミングで好きな処理を割り込ませることができます。
+      </p>
+      <p class="entryBody">
+        例えば、
+        <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">
+          Rails本
+        </a>
+        のサンプルでは、
+      </p>
+      <pre class="code">
 def before_create
   self.hashed_password = User.hash_password(self.password)
 end
 </pre>
-
-<p class="entryBody">
-といった感じで、DBにユーザ情報をインサートする前にパスワードを SHA1 でハッシュしたり、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        といった感じで、DBにユーザ情報をインサートする前にパスワードを SHA1 でハッシュしたり、
+      </p>
+      <pre class="code">
 after_create do |order|
   logger.info "Order #{order.id} created"
 end
 </pre>
-
-<p class="entryBody">
-といった感じで、オーダー情報をDBに格納した後ログに記録する、といったことをモデルの中で実行できるようになっています。
-</p>
-
-<p class="entryBody">
-モデルで Validation するのと同様、これもコントローラの処理の簡略化につながり、より見通しの良いコードが書けていい感じですね。
-</p>
-
-<p class="entryBody">
-また、上記のようなロギング処理を、モデルにやらせるのは気持ち悪い、という場合には、オブザーバを使ってモデルから処理を追い出すことができます。こんな感じで。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        といった感じで、オーダー情報をDBに格納した後ログに記録する、といったことをモデルの中で実行できるようになっています。
+      </p>
+      <p class="entryBody">
+        モデルで Validation するのと同様、これもコントローラの処理の簡略化につながり、より見通しの良いコードが書けていい感じですね。
+      </p>
+      <p class="entryBody">
+        また、上記のようなロギング処理を、モデルにやらせるのは気持ち悪い、という場合には、オブザーバを使ってモデルから処理を追い出すことができます。こんな感じで。
+      </p>
+      <pre class="code">
 class OrderObserver &lt; ActiceRecord::Observer
   def after_save(an_order)
     an_order.logger.info("Order #{an_order.od} created")
   end
 end
 </pre>
-
-<p class="entryBody">
-クラス名を OrderObserver としておくと、勝手に Order というモデルクラスのオブザーバとなってくれます。
-</p>
-
-<p class="entryBody">
-さらに、observe メソッドで監視対象のクラスを複数指定することもできます。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        クラス名を OrderObserver としておくと、勝手に Order というモデルクラスのオブザーバとなってくれます。
+      </p>
+      <p class="entryBody">
+        さらに、observe メソッドで監視対象のクラスを複数指定することもできます。
+      </p>
+      <pre class="code">
 class AuditObserver &lt; ActiveRecord::Observer
   <strong>observe Order, Payment, Refund</strong>
   def after_save(model)
@@ -128,34 +106,37 @@ class AuditObserver &lt; ActiveRecord::Observer
   end
 end
 </pre>
-
-<p class="entryBody">
-こんな感じで、複数のモデルクラスに共通する処理を、元のクラスをまったくいじることなく、ひとつのクラスに記述しておくことができます。アスペクト指向っぽいですね。
-</p>
-
-<p class="entryBody">
-Catalyst でこれと同じようなことができるのかな、と調べてみたところ、<a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Observe" target="_blank">Catalyst::Plugin::Observe</a> なるものが。といっても、ActiveRecord::Observer はモデルに特化しているのに対し、Catalyst::Plugin::Observe はフレームワーク全体で働くオブザーバなので、用途が異なるようです。
-</p>
-
-<p class="entryBody">
-特に端的に異なるのは、コールバックイベントの種類ですね。ActiveRecord::Observer は before_validation, after_create などの、Validation や DB読み書きの処理段階に応じたイベントですが、Catalyst::Plugin::Observe は dispatch, prepare_action など、フレームワークの処理段階に応じたイベントとなってます。
-</p>
-
-<p class="entryBody">
-Sledge 次期バージョンでは、ActiveRecord の様な Validation、コールバック、オブザーバはぜひ欲しいですね。お前が実装しろ、というのであれば、喜んでコード書きます。（あ、言っちゃった…）
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/01/02/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/12/29/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        こんな感じで、複数のモデルクラスに共通する処理を、元のクラスをまったくいじることなく、ひとつのクラスに記述しておくことができます。アスペクト指向っぽいですね。
+      </p>
+      <p class="entryBody">
+        Catalyst でこれと同じようなことができるのかな、と調べてみたところ、
+        <a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Observe" target="_blank">
+          Catalyst::Plugin::Observe
+        </a>
+        なるものが。といっても、ActiveRecord::Observer はモデルに特化しているのに対し、Catalyst::Plugin::Observe はフレームワーク全体で働くオブザーバなので、用途が異なるようです。
+      </p>
+      <p class="entryBody">
+        特に端的に異なるのは、コールバックイベントの種類ですね。ActiveRecord::Observer は before_validation, after_create などの、Validation や DB読み書きの処理段階に応じたイベントですが、Catalyst::Plugin::Observe は dispatch, prepare_action など、フレームワークの処理段階に応じたイベントとなってます。
+      </p>
+      <p class="entryBody">
+        Sledge 次期バージョンでは、ActiveRecord の様な Validation、コールバック、オブザーバはぜひ欲しいですね。お前が実装しろ、というのであれば、喜んでコード書きます。（あ、言っちゃった…）
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/12/29/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/01/02/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

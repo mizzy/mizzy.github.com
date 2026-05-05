@@ -1,169 +1,224 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>DevOps - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      DevOps - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="DevOps"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2010/03/25/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2010/03/25/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="DevOps"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2010/03/25/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2010/03/25/1">
+          DevOps
+        </a>
+      </h1>
+      <div class="byline">
+        25 March 2010
+      </div>
+      <p>
+        <a href="http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/">
+          DevOps: Why Silos Suck And How To Break Them
+        </a>
+        というエントリをたまたま目にして、「DevOps」という見なれない言葉が出てきたので、気になって調べてみたところ、自分が何となくやっていたことや、今までもやもやと考えていたことに一定の方向性が与えらえた気がしたので、整理してみることにします。
+      </p>
+      <hr />
+      <h1>
+        DevOps とは？
+      </h1>
+      <p>
+        簡単に言ってしまうと*「開発者と運用者の間の壁を取り払うためのベストプラクティス」*と言えそうです。
+      </p>
+      <hr />
+      <h1>
+        開発者と運用者の間の壁？
+      </h1>
+      <p>
+        Flickr の中の人による
+        <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr">
+          10+ Deploys Per Day: Dev and Ops Cooperation at Flickr
+        </a>
+        という Velocity 2009 でのプレゼンスライドには「Devs versus Ops」という章があり、以下のような言葉が載っていました。
+      </p>
+      <p>
+        &quot;It's not my machines, it's your code!&quot;
+      </p>
+      <p>
+        「それは俺のマシンじゃないし、お前のコードだろ」って感じでしょうか。実際、開発者と運用者が明確に分かれている組織では、多かれ少なかれ、また、ニュアンスや詳細は違うでしょうが、こういった言葉が交わされることがあるのではないでしょうか。これは開発者と運用者だけではなく、ウェブ開発者とサーバエンジニア、フロントエンジニアとバックエンドエンジニア、といった形で、明確に役割分担されている組織では起こりうる問題であり、これにより開発がスケジュールから大幅に遅れたり、トラブルがなかなか解決しない、といったような事態を招くこともあるんじゃないかと思います。
+      </p>
+      <p>
+        また、上記スライドでは以下のような考えを「伝統的な考え」と述べています。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          開発者の仕事は新しい機能を追加すること
+        </li>
+        <li>
+          運用者の仕事はサイトを速くて安定した状態に保つこと
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2010/03/25/1">DevOps</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/">DevOps: Why Silos Suck And How To Break Them</a> というエントリをたまたま目にして、「DevOps」という見なれない言葉が出てきたので、気になって調べてみたところ、自分が何となくやっていたことや、今までもやもやと考えていたことに一定の方向性が与えらえた気がしたので、整理してみることにします。</p>
-
-<hr>
-
-<h1>DevOps とは？</h1>
-
-<p>簡単に言ってしまうと<em>「開発者と運用者の間の壁を取り払うためのベストプラクティス」</em>と言えそうです。</p>
-
-<hr>
-
-<h1>開発者と運用者の間の壁？</h1>
-
-<p>Flickr の中の人による <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr">10+ Deploys Per Day: Dev and Ops Cooperation at Flickr</a> という Velocity 2009 でのプレゼンスライドには「Devs versus Ops」という章があり、以下のような言葉が載っていました。</p>
-
-<p>&quot;It&#39;s not my machines, it&#39;s your code!&quot;</p>
-
-<p>「それは俺のマシンじゃないし、お前のコードだろ」って感じでしょうか。実際、開発者と運用者が明確に分かれている組織では、多かれ少なかれ、また、ニュアンスや詳細は違うでしょうが、こういった言葉が交わされることがあるのではないでしょうか。これは開発者と運用者だけではなく、ウェブ開発者とサーバエンジニア、フロントエンジニアとバックエンドエンジニア、といった形で、明確に役割分担されている組織では起こりうる問題であり、これにより開発がスケジュールから大幅に遅れたり、トラブルがなかなか解決しない、といったような事態を招くこともあるんじゃないかと思います。</p>
-
-<p>また、上記スライドでは以下のような考えを「伝統的な考え」と述べています。</p>
-
-<ul>
-<li>開発者の仕事は新しい機能を追加すること</li>
-<li>運用者の仕事はサイトを速くて安定した状態に保つこと</li>
-</ul>
-
-<p>そして、「運用者の仕事はサイトを速くて安定した状態に保つこと<em>ではない<em>&#39;」とし、「ビジネスには変化が必要」であり、&#39;&#39;&#39;「安定性をとって変化を捨てる」&#39;&#39;&#39;か&#39;</em>「必要に応じて変化が起こることを許容する」</em>か、といった選択肢を提示しています。</p>
-
-<hr>
-
-<h1>どうやってその壁を取り除くのか</h1>
-
-<p>では、このような開発者と運用者（あるいはウェブ開発者とサーバエンジニアなど、自身の置かれた状況に置き変えてみてください）の壁を取り払うためには、どうすればいいのでしょうか。上で見たように、壁の原因は<em>「運用者の仕事はサイトを速くて安定した状態に保つこと」<em>&#39;という伝統的な考えにありそうです。（これは別に運用者が悪い、と言っているわけではありません。）そして、提示された選択肢のうちの後者&#39;</em>「必要に応じて変化が起こることを許容する」</em>ことが容易に実現できるようにすることが大事なのではないかと考えられます。これを実現するために重要なことは、</p>
-
-<ul>
-<li>ツール</li>
-<li>文化</li>
-</ul>
-
-<p>の2つに分けることができそうです。</p>
-
-<hr>
-
-<h1>ツール</h1>
-
-<p>「10+ Deploys Per Day: Dev and Ops Cooperation at Flick」では、ツールとして以下のようなものをあげています。</p>
-
-<ul>
-<li>インフラの自動化</li>
-<li>共有されたバージョンコントロール</li>
-<li>ワンステップビルド＆デプロイ</li>
-<li>機能フラグ</li>
-<li>メトリックの共有</li>
-<li>IRC and IM robots</li>
-</ul>
-
-<p>ひとつひとつの解説は省略しますが、いずれも状態やその変化を記録、可視化し、変更しやすい、あるいは変更をコントロールしやすい環境をつくるためのツール、と言えそうです。</p>
-
-<hr>
-
-<h1>文化</h1>
-
-<p>また、文化としては以下のような項目を挙げています。</p>
-
-<ul>
-<li>尊敬</li>
-<li>信頼</li>
-<li>失敗を許容する</li>
-<li>責めない</li>
-</ul>
-
-<p>まあこれは、人と協調して仕事をスムーズに進めるためにはどれも重要なことですよね。</p>
-
-<hr>
-
-<p>以上が DevOps について、自分なりに得たことのまとめです。ツールについては、自分がペパボに入社してから導入や利用促進してきたもの、これから導入したいと思っているものなんかが、軒並み上のリストに含まれていて、DevOps の概念が頭にあったわけではないんですが、思いがけずそういう方向に行こうとしていたんだな、ということがこの言葉に出会うことによって確認できました。（それでエントリのタイトルがあんな感じになってます。）</p>
-
-<p>DevOps 自体まだ定義として固まっているものではないようですし、かなり端折った形でまとめましたので、興味がある方は自分が参考にした以下のURLや、更にそこからのリンクを辿ってみてください。</p>
-
-<ul>
-<li>参考URL
-
-<ul>
-<li><a href="http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/">http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/</a></li>
-<li><a href="http://dev2ops.org/blog/2010/2/22/what-is-devops.html">http://dev2ops.org/blog/2010/2/22/what-is-devops.html</a></li>
-<li><a href="http://code.google.com/p/devops-toolchain/">http://code.google.com/p/devops-toolchain/</a></li>
-<li><a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr">http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr</a></li>
-</ul></li>
-</ul>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2010/03/26/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2010/03/20/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        そして、「運用者の仕事はサイトを速くて安定した状態に保つこと*ではない_'」とし、「ビジネスには変化が必要」であり、'''「安定性をとって変化を捨てる」'''か'_「必要に応じて変化が起こることを許容する」*か、といった選択肢を提示しています。
+      </p>
+      <hr />
+      <h1>
+        どうやってその壁を取り除くのか
+      </h1>
+      <p>
+        では、このような開発者と運用者（あるいはウェブ開発者とサーバエンジニアなど、自身の置かれた状況に置き変えてみてください）の壁を取り払うためには、どうすればいいのでしょうか。上で見たように、壁の原因は*「運用者の仕事はサイトを速くて安定した状態に保つこと」
+        <em>
+          'という伝統的な考えにありそうです。（これは別に運用者が悪い、と言っているわけではありません。）そして、提示された選択肢のうちの後者'
+        </em>
+        「必要に応じて変化が起こることを許容する」*ことが容易に実現できるようにすることが大事なのではないかと考えられます。これを実現するために重要なことは、
+      </p>
+      <ul>
+        <li>
+          ツール
+        </li>
+        <li>
+          文化
+        </li>
+      </ul>
+      <p>
+        の2つに分けることができそうです。
+      </p>
+      <hr />
+      <h1>
+        ツール
+      </h1>
+      <p>
+        「10+ Deploys Per Day: Dev and Ops Cooperation at Flick」では、ツールとして以下のようなものをあげています。
+      </p>
+      <ul>
+        <li>
+          インフラの自動化
+        </li>
+        <li>
+          共有されたバージョンコントロール
+        </li>
+        <li>
+          ワンステップビルド＆デプロイ
+        </li>
+        <li>
+          機能フラグ
+        </li>
+        <li>
+          メトリックの共有
+        </li>
+        <li>
+          IRC and IM robots
+        </li>
+      </ul>
+      <p>
+        ひとつひとつの解説は省略しますが、いずれも状態やその変化を記録、可視化し、変更しやすい、あるいは変更をコントロールしやすい環境をつくるためのツール、と言えそうです。
+      </p>
+      <hr />
+      <h1>
+        文化
+      </h1>
+      <p>
+        また、文化としては以下のような項目を挙げています。
+      </p>
+      <ul>
+        <li>
+          尊敬
+        </li>
+        <li>
+          信頼
+        </li>
+        <li>
+          失敗を許容する
+        </li>
+        <li>
+          責めない
+        </li>
+      </ul>
+      <p>
+        まあこれは、人と協調して仕事をスムーズに進めるためにはどれも重要なことですよね。
+      </p>
+      <hr />
+      <p>
+        以上が DevOps について、自分なりに得たことのまとめです。ツールについては、自分がペパボに入社してから導入や利用促進してきたもの、これから導入したいと思っているものなんかが、軒並み上のリストに含まれていて、DevOps の概念が頭にあったわけではないんですが、思いがけずそういう方向に行こうとしていたんだな、ということがこの言葉に出会うことによって確認できました。（それでエントリのタイトルがあんな感じになってます。）
+      </p>
+      <p>
+        DevOps 自体まだ定義として固まっているものではないようですし、かなり端折った形でまとめましたので、興味がある方は自分が参考にした以下のURLや、更にそこからのリンクを辿ってみてください。
+      </p>
+      <ul>
+        <li>
+          参考URL
+          <ul>
+            <li>
+              <a href="http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/">
+                http://www.agileweboperations.com/devops-why-silos-suck-and-how-to-break-them/
+              </a>
+            </li>
+            <li>
+              <a href="http://dev2ops.org/blog/2010/2/22/what-is-devops.html">
+                http://dev2ops.org/blog/2010/2/22/what-is-devops.html
+              </a>
+            </li>
+            <li>
+              <a href="http://code.google.com/p/devops-toolchain/">
+                http://code.google.com/p/devops-toolchain/
+              </a>
+            </li>
+            <li>
+              <a href="http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr">
+                http://www.slideshare.net/jallspaw/10-deploys-per-day-dev-and-ops-cooperation-at-flickr
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2010/03/20/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2010/03/26/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

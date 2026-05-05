@@ -6,67 +6,50 @@
     <title>
       ObsidianとQuartz 4でつくる雑なメモサイト - Gosuke Miyashita
     </title>
-    <!-- TODO: change name and description -->
     <meta name="author" content="Gosuke Miyashita"/>
     <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ObsidianとQuartz 4でつくる雑なメモサイト"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2025/08/30/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2025/08/30/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ObsidianとQuartz 4でつくる雑なメモサイト"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2025/08/30/1/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
-    <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
-    <section class="sidebar">
-      <a href="/">
-        <!-- TODO: change this gravatar URL -->
-        <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75"
-             class="avatar"/>
-      </a>
-      <!-- TODO: change name -->
-      <section class="name">
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
         <a href="/">
-          <span id="zach">
-            Gosuke
-          </span>
-          <span id="holman">
-            Miyashita
-          </span>
+          posts
         </a>
-      </section>
-      <!-- TODO: change links -->
-      <section class="meta">
-        <a href="https://github.com/mizzy">
-          <img src="/images/github.png"/>
-        </a>
-        <a href="https://twitter.com/gosukenator">
-          <img src="/images/twitter.png">
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
         </a>
         <a href="/atom.xml">
-          <img src="/images/rss.png"/>
+          feed
         </a>
-      </section>
-      <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-    </section>
-    <section class="content autopagerize_page_element">
+      </span>
+    </header>
+    <article>
       <h1>
         <a href="/blog/2025/08/30/1">
           ObsidianとQuartz 4でつくる雑なメモサイト
         </a>
       </h1>
-      <section class="byline">
-        2025-08-30 12:30:00 +0900
-      </section>
+      <div class="byline">
+        30 August 2025
+      </div>
       <p>
         今までGistやはてなブログに書いていたホテルのワークチェアについてのメモだけど、もっと雑に更新したいし、行ったことあるホテルでは実際に椅子がどうだったのか、といったあたりもまとめておきたいな、と思った。
       </p>
@@ -137,28 +120,22 @@
       <p>
         Quartz 4のセットアップは、ghコマンドとghqコマンドを使うと簡単。
       </p>
-      <pre><code class="language-shell">gh repo fork jackyzha0/quartz --clone=false
-ghq get git@github.com:YOUR_USERNAME/quartz.git
-cd $(ghq root)/github.com/YOUR_USERNAME/quartz
-npm i
-npx quartz create
-</code></pre>
+      <pre class="chroma"><code><span class="line"><span class="cl">gh repo fork jackyzha0/quartz --clone<span class="o">=</span><span class="nb">false</span>
+</span></span><span class="line"><span class="cl">ghq get git@github.com:YOUR_USERNAME/quartz.git
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> <span class="k">$(</span>ghq root<span class="k">)</span>/github.com/YOUR_USERNAME/quartz
+</span></span><span class="line"><span class="cl">npm i
+</span></span><span class="line"><span class="cl">npx quartz create
+</span></span></code></pre>
       <p>
         あとは、
-        <code>
-          content
-        </code>
+        <code>content</code>
         ディレクトリにObsidianのVaultを配置するか、シンボリックリンクを張るかすれば良い。
       </p>
       <p>
         自分の場合は、Obsidianで管理してるVaultの
-        <code>
-          publish
-        </code>
+        <code>publish</code>
         ディレクトリだけを公開したかったので、Makefileを使って
-        <code>
-          content
-        </code>
+        <code>content</code>
         ディレクトリにコピーするようにした。
       </p>
       <p>
@@ -181,13 +158,9 @@ npx quartz create
       </p>
       <p>
         Obsidianで書いて、
-        <code>
-          make serve
-        </code>
+        <code>make serve</code>
         でローカルでプレビュー確認、
-        <code>
-          make publish
-        </code>
+        <code>make publish</code>
         で公開、という感じで手軽に運用できる。ブログほど構えずに、本当に雑なメモとして書ける。
       </p>
       <hr />
@@ -211,14 +184,21 @@ npx quartz create
           </a>
         </li>
       </ul>
-      <div class="pagination">
-        <a href="/blog/2025/08/30/2">
-          ↑ newer post
-        </a>
-        <a href="/blog/2025/07/31/1" rel="next">
-          older post ↓
-        </a>
-      </div>
-    </section>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2025/07/31/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2025/08/30/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
   </body>
 </html>

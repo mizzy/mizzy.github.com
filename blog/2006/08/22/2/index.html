@@ -1,121 +1,123 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Plagger::Plugin::CustomFeed::AmazonWebService - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Plagger::Plugin::CustomFeed::AmazonWebService - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Plagger::Plugin::CustomFeed::AmazonWebService"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/08/22/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/08/22/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Plagger::Plugin::CustomFeed::AmazonWebService"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/08/22/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/08/22/2">
+          Plagger::Plugin::CustomFeed::AmazonWebService
+        </a>
+      </h1>
+      <div class="byline">
+        22 August 2006
+      </div>
+      <p>
+        <a class="ext-link" href="http://d.hatena.ne.jp/wata_d/20060821/1156113214">
+          <span class="icon"></span>
+          ベイダー日記 - Amazon2iCal
+        </a>
+        の CustomFeed::AmazonSearch を、他の用途でも使えるように、もう少し汎用的に書き換えてみました。
+      </p>
+      <p>
+        <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm">
+          <span class="icon"></span>
+          CustomFeed::AmazonWebService
+        </a>
+      </p>
+      <p>
+        オリジナルからの変更ポイントは、
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          link や icon もセットするようにした。
+        </li>
+        <li>
+          link には アソシエイト ID を含めることができるようにした。
+        </li>
+        <li>
+          ソート条件を yaml で指定できるようにした。
+        </li>
+        <li>
+          「発売日が今日の日付から一ヶ月以上前のものは省く」という条件廃止。これは Rule でやるべきなので。
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/08/22/2">Plagger::Plugin::CustomFeed::AmazonWebService</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://d.hatena.ne.jp/wata_d/20060821/1156113214"><span class="icon"></span>ベイダー日記 - Amazon2iCal</a> の CustomFeed::AmazonSearch を、他の用途でも使えるように、もう少し汎用的に書き換えてみました。
-</p>
-
-<p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/CustomFeed/AmazonWebService.pm"><span class="icon"></span>CustomFeed::AmazonWebService</a>
-</p>
-
-<p>
-オリジナルからの変更ポイントは、
-</p>
-
-<ul><li>link や icon もセットするようにした。</li>
-<li>link には アソシエイト ID を含めることができるようにした。</li>
-<li>ソート条件を yaml で指定できるようにした。</li>
-<li>「発売日が今日の日付から一ヶ月以上前のものは省く」という条件廃止。これは Rule でやるべきなので。</li></ul>
-
-<p>
-といったあたりですかね。
-</p>
-
-<p>
-名前は以前に <a class="ext-link" href="http://mizzy.org/program/plagger_and_aws.html"><span class="icon"></span>Filter::AmazonWebService</a> というものを作っていたので、それに合わせてます。（Plagger が media API 対応してから色々手を加えようと思い、しばらく放置中ですが…）
-</p>
-
-<p>
-例によって Publish::Gmail と組み合わせるとこんな感じ。
-</p>
-
-<p>
-<img src="http://mizzy.org/img/aws.jpg" alt="CustomFeed::AmazonWebService + Publish::Gmail" />
-</p>
-
-<p>
-でもって、Publish::iCal + Google Calendar ではこんな感じ。
-</p>
-
-<p>
-<img src="http://mizzy.org/img/gcal.jpg" alt="CustomFeed::AmazonWebService + Publish::iCal + Google Calendar" />
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/08/22/3">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/08/22/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        といったあたりですかね。
+      </p>
+      <p>
+        名前は以前に
+        <a class="ext-link" href="http://mizzy.org/program/plagger_and_aws.html">
+          <span class="icon"></span>
+          Filter::AmazonWebService
+        </a>
+        というものを作っていたので、それに合わせてます。（Plagger が media API 対応してから色々手を加えようと思い、しばらく放置中ですが…）
+      </p>
+      <p>
+        例によって Publish::Gmail と組み合わせるとこんな感じ。
+      </p>
+      <p>
+        <img src="http://mizzy.org/img/aws.jpg" alt="CustomFeed::AmazonWebService + Publish::Gmail" />
+      </p>
+      <p>
+        でもって、Publish::iCal + Google Calendar ではこんな感じ。
+      </p>
+      <p>
+        <img src="http://mizzy.org/img/gcal.jpg" alt="CustomFeed::AmazonWebService + Publish::iCal + Google Calendar" />
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/08/22/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/08/22/3">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

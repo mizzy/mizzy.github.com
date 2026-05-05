@@ -1,97 +1,118 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ManagingInfrastructureWithPuppet - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/07/08/1">ManagingInfrastructureWithPuppet</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>#!html
-    <img src="http://covers.oreilly.com/images/0636920020875/lrg.jpg" /></p>
-
-<hr>
-
-<p><a href="http://twitter.com/#!/kdmsnr">@kdmsnr さん</a> の tweet で、<a href="http://oreilly.com/catalog/0636920020875">Managing Infrastructure with Puppet</a> と <a href="http://www.apress.com/9781430230571">Pro Puppet</a> が発売されている事を知ったので読んでみた。まずは Managing Infrastructure with Puppet について。</p>
-
-<p>この本はとても薄い。全体で40ページ強くらい。なので、Puppet をまったく知らない人には全体像を知るためには良い本だけど、既に知っている人には物足りないと思う。</p>
-
-<p>とは言っても、自分は最近の Puppet の動向を追えてないので、その辺の知識不足を補ってくれるような内容もあって、そこは良かった。</p>
-
-<p>また、<a href="http://www.puppetlabs.com/mcollective/introduction/">MCollective</a> についても書かれていて、元々は Puppet Labs とは別なところで開発されていたツールなんで、Puppet とは完全に独立したツールだと思ってたんだけど、Puppet Labs 配下になってから統合が進められたようで、その辺の情報が得られたのがよかった。</p>
-
-<p>以下、内容で気になったところなんかのメモ。</p>
-
-<hr>
-
-<h1>puppet コマンド</h1>
-
-<p>0.25 の次は 2.6 という風にバージョン体系が変わり、それまで puppetmasterd や puppetd といった形で独立していたコマンドが puppet コマンドに統一された、ってことは <a href="http://twitter.com/#!/tnmt">ペパボのイケメンインフラエンジニアの tnmt くん</a> が<a href="http://blog.tnmt.info/2010/11/23/puppet-2-6/">既にブログに書いてある</a> んだけど、それに伴い、コマンドオプションも増えて、やれることが増えてる模様。その中で特に気になったオプションを紹介。</p>
-
-<h2>puppet describe</h2>
-
-<p>リソースタイプのリストを表示してくれたり、指定したリソースタイプに関する説明を表示してくれる。</p>
-
-<p><em>リソースタイプのリスト</em></p>
-
-<pre><code>$ puppet describe --list
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ManagingInfrastructureWithPuppet - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ManagingInfrastructureWithPuppet"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/07/08/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/07/08/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ManagingInfrastructureWithPuppet"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/07/08/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/07/08/1">
+          ManagingInfrastructureWithPuppet
+        </a>
+      </h1>
+      <div class="byline">
+        8 July 2011
+      </div>
+      <p>
+        #!html
+        <br />
+        <img src="http://covers.oreilly.com/images/0636920020875/lrg.jpg" />
+      </p>
+      <hr />
+      <p>
+        <a href="http://twitter.com/#!/kdmsnr">
+          @kdmsnr さん
+        </a>
+        の tweet で、
+        <a href="http://oreilly.com/catalog/0636920020875">
+          Managing Infrastructure with Puppet
+        </a>
+        と
+        <a href="http://www.apress.com/9781430230571">
+          Pro Puppet
+        </a>
+        が発売されている事を知ったので読んでみた。まずは Managing Infrastructure with Puppet について。
+      </p>
+      <p>
+        この本はとても薄い。全体で40ページ強くらい。なので、Puppet をまったく知らない人には全体像を知るためには良い本だけど、既に知っている人には物足りないと思う。
+      </p>
+      <p>
+        とは言っても、自分は最近の Puppet の動向を追えてないので、その辺の知識不足を補ってくれるような内容もあって、そこは良かった。
+      </p>
+      <p>
+        また、
+        <a href="http://www.puppetlabs.com/mcollective/introduction/">
+          MCollective
+        </a>
+        についても書かれていて、元々は Puppet Labs とは別なところで開発されていたツールなんで、Puppet とは完全に独立したツールだと思ってたんだけど、Puppet Labs 配下になってから統合が進められたようで、その辺の情報が得られたのがよかった。
+      </p>
+      <p>
+        以下、内容で気になったところなんかのメモ。
+      </p>
+      <hr />
+      <h1>
+        puppet コマンド
+      </h1>
+      <p>
+        0.25 の次は 2.6 という風にバージョン体系が変わり、それまで puppetmasterd や puppetd といった形で独立していたコマンドが puppet コマンドに統一された、ってことは
+        <a href="http://twitter.com/#!/tnmt">
+          ペパボのイケメンインフラエンジニアの tnmt くん
+        </a>
+        が
+        <a href="http://blog.tnmt.info/2010/11/23/puppet-2-6/">
+          既にブログに書いてある
+        </a>
+        んだけど、それに伴い、コマンドオプションも増えて、やれることが増えてる模様。その中で特に気になったオプションを紹介。
+      </p>
+      <h2>
+        puppet describe
+      </h2>
+      <p>
+        リソースタイプのリストを表示してくれたり、指定したリソースタイプに関する説明を表示してくれる。
+      </p>
+      <p>
+        <em>
+          リソースタイプのリスト
+        </em>
+      </p>
+      <pre><code>$ puppet describe --list
 These are the types known to puppet:
 augeas          - Apply the changes (single or array of changes ...
 computer        - Computer object management using DirectorySer ...
@@ -102,12 +123,13 @@ filebucket      - A repository for backing up files
 group           - Manage groups
 host            - Installs and manages host entries
 k5login         - Manage the `
-...
-</code></pre>
-
-<p><em>package リソースタイプの説明</em></p>
-
-<pre><code>$ puppet describe package
+...</code></pre>
+      <p>
+        <em>
+          package リソースタイプの説明
+        </em>
+      </p>
+      <pre><code>$ puppet describe package
 
 package
 =======
@@ -122,15 +144,25 @@ Puppet will automatically guess the packaging format that you are
 using based on the platform you are on, but you can override it
 using the `provider` parameter; each provider defines what it
 requires in order to function, and you must meet those requirements
-to use a given provider.
-</code></pre>
-
-<p><strong>Autorequires:</strong> If Puppet is managing the files specified as a package&#39;s
-    <code>adminfile</code>, <code>responsefile</code>, or <code>source</code>, the package resource will
-    autorequire
-    those files.</p>
-
-<pre><code>Parameters
+to use a given provider.</code></pre>
+      <p>
+        <strong>
+          Autorequires:
+        </strong>
+        If Puppet is managing the files specified as a package's
+        <br />
+        <code>adminfile</code>
+        ,
+        <code>responsefile</code>
+        , or
+        <code>source</code>
+        , the package resource will
+        <br />
+        autorequire
+        <br />
+        those files.
+      </p>
+      <pre><code>Parameters
 ----------
 
 - **adminfile**
@@ -140,153 +172,211 @@ to use a given provider.
     Solaris means that it should either be a fully qualified path
     or it should be in `/var/sadm/install/admin`.
 
-...
-</code></pre>
-
-<p>詳しくは puppet describe --help を参照。</p>
-
-<h2>puppet resource</h2>
-
-<p>コマンドを実行してるマシンの指定されたリソースの状態を、Puppet マニフェストで表示してくれる。</p>
-
-<p><em>host リソースの表示</em></p>
-
-<p>/etc/hosts の内容を Puppet マニフェストで表示。</p>
-
-<pre><code>$ puppet resource host
-host { &#39;localhost.localdomain&#39;:
-  ensure       =&gt; &#39;present&#39;,
-  host_aliases =&gt; [&#39;localhost&#39;],
-  ip           =&gt; &#39;127.0.0.1&#39;,
-  target       =&gt; &#39;/etc/hosts&#39;,
+...</code></pre>
+      <p>
+        詳しくは puppet describe --help を参照。
+      </p>
+      <h2>
+        puppet resource
+      </h2>
+      <p>
+        コマンドを実行してるマシンの指定されたリソースの状態を、Puppet マニフェストで表示してくれる。
+      </p>
+      <p>
+        <em>
+          host リソースの表示
+        </em>
+      </p>
+      <p>
+        /etc/hosts の内容を Puppet マニフェストで表示。
+      </p>
+      <pre><code>$ puppet resource host
+host { 'localhost.localdomain':
+  ensure       =&gt; 'present',
+  host_aliases =&gt; ['localhost'],
+  ip           =&gt; '127.0.0.1',
+  target       =&gt; '/etc/hosts',
 }
-host { &#39;localhost6.localdomain6&#39;:
-  ensure       =&gt; &#39;present&#39;,
-  host_aliases =&gt; [&#39;localhost6&#39;],
-  ip           =&gt; &#39;::1&#39;,
-  target       =&gt; &#39;/etc/hosts&#39;,
+host { 'localhost6.localdomain6':
+  ensure       =&gt; 'present',
+  host_aliases =&gt; ['localhost6'],
+  ip           =&gt; '::1',
+  target       =&gt; '/etc/hosts',
+}</code></pre>
+      <p>
+        <em>
+          service リソースの表示
+        </em>
+      </p>
+      <p>
+        サービスの状態を Puppet マニフェストで表示。
+      </p>
+      <pre><code>$ puppet resource service
+service { 'NetworkManager':
+  ensure =&gt; 'stopped',
+  enable =&gt; 'false',
 }
-</code></pre>
-
-<p><em>service リソースの表示</em></p>
-
-<p>サービスの状態を Puppet マニフェストで表示。</p>
-
-<pre><code>$ puppet resource service
-service { &#39;NetworkManager&#39;:
-  ensure =&gt; &#39;stopped&#39;,
-  enable =&gt; &#39;false&#39;,
+service { 'acpid':
+  ensure =&gt; 'stopped',
+  enable =&gt; 'true',
 }
-service { &#39;acpid&#39;:
-  ensure =&gt; &#39;stopped&#39;,
-  enable =&gt; &#39;true&#39;,
+service { 'anacron':
+  ensure =&gt; 'stopped',
+  enable =&gt; 'true',
 }
-service { &#39;anacron&#39;:
-  ensure =&gt; &#39;stopped&#39;,
-  enable =&gt; &#39;true&#39;,
+service { 'atd':
+  ensure =&gt; 'running',
+  enable =&gt; 'true',
 }
-service { &#39;atd&#39;:
-  ensure =&gt; &#39;running&#39;,
-  enable =&gt; &#39;true&#39;,
-}
-service { &#39;autofs&#39;:
-  ensure =&gt; &#39;stopped&#39;,
-  enable =&gt; &#39;true&#39;,
+service { 'autofs':
+  ensure =&gt; 'stopped',
+  enable =&gt; 'true',
 }
 
-...
-</code></pre>
-
-<p>既に環境構築されたマシンから Puppet マニフェストの雛形を生成する、とかいった目的に使えそう。</p>
-
-<h2>puppet apply</h2>
-
-<p>Puppet マニフェストを即座に適用できる。</p>
-
-<p><em>test.pp 内のマニフェストを適用する</em></p>
-
-<pre><code>$ puppet apply test.pp
-</code></pre>
-
-<p><em>直接マニフェストを文字列で指定するが --noop つけてるので実際には何もしない</em></p>
-
-<pre><code>$ puppet apply --noop -e &#39;file { &quot;/etc/passwd&quot;: mode =&gt; 600 }&#39;
+...</code></pre>
+      <p>
+        既に環境構築されたマシンから Puppet マニフェストの雛形を生成する、とかいった目的に使えそう。
+      </p>
+      <h2>
+        puppet apply
+      </h2>
+      <p>
+        Puppet マニフェストを即座に適用できる。
+      </p>
+      <p>
+        <em>
+          test.pp 内のマニフェストを適用する
+        </em>
+      </p>
+      <pre><code>$ puppet apply test.pp</code></pre>
+      <p>
+        <em>
+          直接マニフェストを文字列で指定するが --noop つけてるので実際には何もしない
+        </em>
+      </p>
+      <pre><code>$ puppet apply --noop -e 'file { &quot;/etc/passwd&quot;: mode =&gt; 600 }'
 notice: /Stage[main]//File[/etc/passwd]/mode: current_value 644, should be 600 (noop)
-notice: Finished catalog run in 0.05 seconds
-</code></pre>
-
-<p>ちょっとした動作確認なんかするのに便利そう。</p>
-
-<hr>
-
-<h1>Parameterized Classes</h1>
-
-<p>define でリソース定義して、呼び出すときにパラメータを渡す、なんてことは以前からできてたけど、2.6 からは Class にパラメータを渡すことができるようになったらしい。</p>
-
-<p>クラス定義はこんな感じ。</p>
-
-<pre><code>class ruby ( $version = &#39;1.8.7&#39;) {
-    package { &#39;ruby&#39;: ensure =&gt; $version }
-}
-</code></pre>
-
-<p>Parameterized Classes ではない、従来のクラスの呼び出し方。これだと、Ruby 1.8.7 がインストールされる。</p>
-
-<pre><code>node &#39;test.example.jp&#39; {
+notice: Finished catalog run in 0.05 seconds</code></pre>
+      <p>
+        ちょっとした動作確認なんかするのに便利そう。
+      </p>
+      <hr />
+      <h1>
+        Parameterized Classes
+      </h1>
+      <p>
+        define でリソース定義して、呼び出すときにパラメータを渡す、なんてことは以前からできてたけど、2.6 からは Class にパラメータを渡すことができるようになったらしい。
+      </p>
+      <p>
+        クラス定義はこんな感じ。
+      </p>
+      <pre><code>class ruby ( $version = '1.8.7') {
+    package { 'ruby': ensure =&gt; $version }
+}</code></pre>
+      <p>
+        Parameterized Classes ではない、従来のクラスの呼び出し方。これだと、Ruby 1.8.7 がインストールされる。
+      </p>
+      <pre><code>node 'test.example.jp' {
     include ruby
-}
-</code></pre>
-
-<p>パラメータを渡してやると、Ruby 1.9.2 がインストールされる。</p>
-
-<pre><code>node &#39;test.example.jp&#39; {
-    class { &#39;ruby&#39;: version =&gt; &#39;1.9.2&#39; }
-}
-</code></pre>
-
-<p>便利そうだけど、従来の include とだいぶ書式が変わるので、混乱しそう。</p>
-
-<hr>
-
-<h1>Puppet Forge</h1>
-
-<p>Puppet モジュールを集めた <a href="http://forge.puppetlabs.com/">Puppet Forge</a> なんてサイトができてたんだね。Puppet 版 CPAN といった感じ。<a href="http://github.com/puppetlabs/puppet-module-tool">puppet-module-tool</a> というコマンドラインツールを使って、モジュールのインストールとかパッケージングとか色々できるようなんだけど、この本には詳しい説明がなかった。Pro Puppet には詳しい説明があったので、Pro Puppet についての感想を書くときに、この辺について少し詳しく書くつもり。</p>
-
-<hr>
-
-<h1>MCollective</h1>
-
-<p>MCollective は、複数のホストに対して同じ処理を並列実行するためのもの。<a href="https://fedorahosted.org/func/">Func</a> とか <a href="http://fabfile.org/">Fabric</a> とか <a href="http://www.capify.org/">Capistrano</a> みたいな位置づけ。</p>
-
-<p>こんな感じで実行できる。（apache2 を再起動する例。）</p>
-
-<pre><code>$ mc-service --with-class apache2 apache2 restart
-$ mc-service --with-class apache2 --with-fact architecture=x86_64 apache2 restart
-</code></pre>
-
-<p>Puppet の特定のクラスを include してるホストでのみ実行とか、特定の fact (facter によって得られる値) にマッチするホストでのみ実行、という感じで Puppet と連動できる。</p>
-
-<p><a href="http://projects.puppetlabs.com/projects/mcollective-plugins/wiki/AgentPuppetd">Puppetd Agent</a> というプラグインもあって、これを使うと、各ホストの puppet agent の操作を MCollective 経由でできる。つまり、puppet kick(古いバージョンだと puppetrun)の代わりに使える。これの何がうれしいのかというと、puppetrun では特定のクラスを include したホストだけを対象にする、ということをやろうと思うと、LDAP Nodes が必須だった（2.6 でもそうなのかは知らん）けど、このプラグインだとそれが不要になりそう、ってあたりかな。</p>
-
-<p>あと、<a href="http://projects.puppetlabs.com/projects/mcollective-plugins/wiki/ToolPuppetcommander">Puppet Commander</a> というプラグインを使うと、puppet agent の同時起動数を制御できて、puppet master へ同時アクセスが集中しないようにコントロールできるらしい。大量にホストがある環境では良さそうですね。</p>
-
-<p>それから、<a href="http://docs.puppetlabs.com/mcollective/simplerpc/agents.html">MCollective プラグインを書くためのドキュメントへのリンク</a> も載ってた。が本では詳しい説明はなし。</p>
-
-<hr>
-
-<p>というわけで、<a href="http://oreilly.com/catalog/0636920020875">Managing Infrastructure with Puppet</a> について気になった点は以上。次は <a href="http://www.apress.com/9781430230571">Pro Puppet</a> について、気が向いたら書きます。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/07/10/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/06/29/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+}</code></pre>
+      <p>
+        パラメータを渡してやると、Ruby 1.9.2 がインストールされる。
+      </p>
+      <pre><code>node 'test.example.jp' {
+    class { 'ruby': version =&gt; '1.9.2' }
+}</code></pre>
+      <p>
+        便利そうだけど、従来の include とだいぶ書式が変わるので、混乱しそう。
+      </p>
+      <hr />
+      <h1>
+        Puppet Forge
+      </h1>
+      <p>
+        Puppet モジュールを集めた
+        <a href="http://forge.puppetlabs.com/">
+          Puppet Forge
+        </a>
+        なんてサイトができてたんだね。Puppet 版 CPAN といった感じ。
+        <a href="http://github.com/puppetlabs/puppet-module-tool">
+          puppet-module-tool
+        </a>
+        というコマンドラインツールを使って、モジュールのインストールとかパッケージングとか色々できるようなんだけど、この本には詳しい説明がなかった。Pro Puppet には詳しい説明があったので、Pro Puppet についての感想を書くときに、この辺について少し詳しく書くつもり。
+      </p>
+      <hr />
+      <h1>
+        MCollective
+      </h1>
+      <p>
+        MCollective は、複数のホストに対して同じ処理を並列実行するためのもの。
+        <a href="https://fedorahosted.org/func/">
+          Func
+        </a>
+        とか
+        <a href="http://fabfile.org/">
+          Fabric
+        </a>
+        とか
+        <a href="http://www.capify.org/">
+          Capistrano
+        </a>
+        みたいな位置づけ。
+      </p>
+      <p>
+        こんな感じで実行できる。（apache2 を再起動する例。）
+      </p>
+      <pre><code>$ mc-service --with-class apache2 apache2 restart
+$ mc-service --with-class apache2 --with-fact architecture=x86_64 apache2 restart</code></pre>
+      <p>
+        Puppet の特定のクラスを include してるホストでのみ実行とか、特定の fact (facter によって得られる値) にマッチするホストでのみ実行、という感じで Puppet と連動できる。
+      </p>
+      <p>
+        <a href="http://projects.puppetlabs.com/projects/mcollective-plugins/wiki/AgentPuppetd">
+          Puppetd Agent
+        </a>
+        というプラグインもあって、これを使うと、各ホストの puppet agent の操作を MCollective 経由でできる。つまり、puppet kick(古いバージョンだと puppetrun)の代わりに使える。これの何がうれしいのかというと、puppetrun では特定のクラスを include したホストだけを対象にする、ということをやろうと思うと、LDAP Nodes が必須だった（2.6 でもそうなのかは知らん）けど、このプラグインだとそれが不要になりそう、ってあたりかな。
+      </p>
+      <p>
+        あと、
+        <a href="http://projects.puppetlabs.com/projects/mcollective-plugins/wiki/ToolPuppetcommander">
+          Puppet Commander
+        </a>
+        というプラグインを使うと、puppet agent の同時起動数を制御できて、puppet master へ同時アクセスが集中しないようにコントロールできるらしい。大量にホストがある環境では良さそうですね。
+      </p>
+      <p>
+        それから、
+        <a href="http://docs.puppetlabs.com/mcollective/simplerpc/agents.html">
+          MCollective プラグインを書くためのドキュメントへのリンク
+        </a>
+        も載ってた。が本では詳しい説明はなし。
+      </p>
+      <hr />
+      <p>
+        というわけで、
+        <a href="http://oreilly.com/catalog/0636920020875">
+          Managing Infrastructure with Puppet
+        </a>
+        について気になった点は以上。次は
+        <a href="http://www.apress.com/9781430230571">
+          Pro Puppet
+        </a>
+        について、気が向いたら書きます。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/06/29/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/07/10/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

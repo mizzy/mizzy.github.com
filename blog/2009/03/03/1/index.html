@@ -1,84 +1,76 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2009/03/03/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2009/03/03/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2009/03/03/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2009/03/03/1">
+          library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
+        </a>
+      </h1>
+      <div class="byline">
+        3 March 2009
+      </div>
+      <p>
+        source:library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm
+      </p>
+      <h1>
+        NAME
+      </h1>
+      <p>
+        FFmpeg::Command - A wrapper class for ffmpeg command line utility.
+      </p>
+      <h1>
+        DESCRIPTION
+      </h1>
+      <p>
+        A simple interface for using ffmpeg command line utility.
+      </p>
+      <h1>
+        SYNOPSIS
+      </h1>
+      <pre><code>use FFmpeg::Command;
 
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2009/03/03/1">library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>source:library/perl/trunk/FFmpeg-Command/lib/FFmpeg/Command.pm</p>
-
-<h1>NAME</h1>
-
-<p>FFmpeg::Command - A wrapper class for ffmpeg command line utility.</p>
-
-<h1>DESCRIPTION</h1>
-
-<p>A simple interface for using ffmpeg command line utility.</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    use FFmpeg::Command;
-
-    my $ffmpeg = FFmpeg::Command-&gt;new(&#39;/usr/local/bin/ffmpeg&#39;);
+    my $ffmpeg = FFmpeg::Command-&gt;new('/usr/local/bin/ffmpeg');
 
     $ffmpeg-&gt;input_options({
         file =&gt; $input_file,
@@ -90,7 +82,7 @@
     # Convert a video file into iPod playable format.
     $ffmpeg-&gt;output_options({
         file   =&gt; $output_file,
-        device =&gt; &#39;ipod&#39;,
+        device =&gt; 'ipod',
     });
 
     my $result = $ffmpeg-&gt;exec();
@@ -100,11 +92,11 @@
     # This is same as above.
     $ffmpeg-&gt;output_options({
         file                =&gt; $output_file,
-        format              =&gt; &#39;mp4&#39;,
-        video_codec         =&gt; &#39;mpeg4&#39;,
+        format              =&gt; 'mp4',
+        video_codec         =&gt; 'mpeg4',
         bitrate             =&gt; 600,
-        frame_size          =&gt; &#39;320x240&#39;,
-        audio_codec         =&gt; &#39;libaac&#39;,
+        frame_size          =&gt; '320x240',
+        audio_codec         =&gt; 'libaac',
         audio_sampling_rate =&gt; 48000,
         audio_bit_rate      =&gt; 64,
     });
@@ -115,7 +107,7 @@
     # Convert a video file into PSP playable format.
     $ffmpeg-&gt;output_options({
         file  =&gt; $output_file,
-        device =&gt; &#39;psp&#39;,
+        device =&gt; 'psp',
     });
 
     $ffmpeg-&gt;exec();
@@ -123,11 +115,11 @@
     # This is same as above.
     $ffmpeg-&gt;output_options({
         file                =&gt; $output_file,
-        format              =&gt; &#39;psp&#39;,
-        video_codec         =&gt; &#39;mpeg4&#39;,
+        format              =&gt; 'psp',
+        video_codec         =&gt; 'mpeg4',
         bitrate             =&gt; 600,
-        frame_size          =&gt; &#39;320x240&#39;,
-        audio_codec         =&gt; &#39;libaac&#39;,
+        frame_size          =&gt; '320x240',
+        audio_codec         =&gt; 'libaac',
         audio_sampling_rate =&gt; 48000,
         audio_bit_rate      =&gt; 64,
     });
@@ -140,131 +132,210 @@
     $ffmpeg-&gt;output_file($output_file);
 
     $ffmpeg-&gt;options(
-        &#39;-y&#39;,
-        &#39;-f&#39;       =&gt; &#39;image2&#39;,
-        &#39;-pix_fmt&#39; =&gt; &#39;jpg&#39;,
-        &#39;-vframes&#39; =&gt; 1,
-        &#39;-ss&#39;      =&gt; 30,
-        &#39;-s&#39;       =&gt; &#39;320x240&#39;,
-        &#39;-an&#39;,
+        '-y',
+        '-f'       =&gt; 'image2',
+        '-pix_fmt' =&gt; 'jpg',
+        '-vframes' =&gt; 1,
+        '-ss'      =&gt; 30,
+        '-s'       =&gt; '320x240',
+        '-an',
     );
 
-    $ffmpeg-&gt;exec();
-</code></pre>
-
-<h1>METHODS</h1>
-
-<h2>new(&#39;/usr/bin/ffmpeg&#39;)</h2>
-
-<p>Contructs FFmpeg::Command object.It takes a path of ffmpeg command. You can omit this argument and this module searches ffmpeg command within PATH environment variable.</p>
-
-<h2>timeout()</h2>
-
-<p>Set command timeout.Default is 0.</p>
-
-<h2>input_options({ %options })</h2>
-
-<p>Specify input file name and input options.(Now no options are available.)</p>
-
-<p>file:: a file name of input file.</p>
-
-<h2>output_options({ %options })</h2>
-
-<p>Specify output file name and output options.</p>
-
-<p>Avaiable options are:</p>
-
-<p>file:: a file name of output file.
- format:: Output video format.
- video<em>codec:: Output video codec.
- bitrate:: Output video bitrate.
- frame</em>size:: Output video screen size.
- audio<em>codec:: Output audio code.
- audio</em>sampling<em>rate:: Output audio sampling rate.
- audio</em>bit_rate:: Output audio bit rate.
- title:: Set the title.
- author:: Set the author.
- comment:: Set the comment.</p>
-
-<h2>input<em>file(&#39;/path/to/inpuf</em>file&#39;)</h2>
-
-<p>Specify input file name using with options() method.</p>
-
-<h2>output<em>file(&#39;/path/to/output</em>file&#39;)</h2>
-
-<p>Specify output file name using with options() method.</p>
-
-<h2>options( @options )</h2>
-
-<p>Specify ffmpeg command options directly.</p>
-
-<h2>execute()</h2>
-
-<p>Executes ffmpeg comman with specified options.</p>
-
-<h2>exec()</h2>
-
-<p>An alias of execute()</p>
-
-<h2>stdout()</h2>
-
-<p>Get ffmpeg command output to stdout.</p>
-
-<h2>stderr()</h2>
-
-<p>Get ffmpeg command output to stderr.</p>
-
-<h1>AUTHOR</h1>
-
-<p>Gosuke Miyashita, <code>&lt;gosukenator at gmail.com&gt;</code></p>
-
-<h1>BUGS</h1>
-
-<p>Please report any bugs or feature requests to <code>bug-ffmpeg-command at rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FFmpeg-Command">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FFmpeg-Command</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
-
-<h1>SUPPORT</h1>
-
-<p>You can find documentation for this module with the perldoc command.</p>
-
-<pre><code>    perldoc FFmpeg::Command
-</code></pre>
-
-<p>You can also look for information at:</p>
-
-<ul>
-<li><p>AnnoCPAN: Annotated CPAN documentation</p>
-
-<p><a href="http://annocpan.org/dist/FFmpeg-Command">http://annocpan.org/dist/FFmpeg-Command</a></p></li>
-<li><p>CPAN Ratings</p>
-
-<p><a href="http://cpanratings.perl.org/d/FFmpeg-Command">http://cpanratings.perl.org/d/FFmpeg-Command</a></p></li>
-<li><p>RT: CPAN&#39;s request tracker</p>
-
-<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Command">http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Command</a></p></li>
-<li><p>Search CPAN</p>
-
-<p><a href="http://search.cpan.org/dist/FFmpeg-Command">http://search.cpan.org/dist/FFmpeg-Command</a></p></li>
-</ul>
-
-<h1>ACKNOWLEDGEMENTS</h1>
-
-<h1>COPYRIGHT &amp; LICENSE</h1>
-
-<p>Copyright 2006 Gosuke Miyashita, all rights reserved.</p>
-
-<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2009/03/21/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2009/02/06/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+    $ffmpeg-&gt;exec();</code></pre>
+      <h1>
+        METHODS
+      </h1>
+      <h2>
+        new('/usr/bin/ffmpeg')
+      </h2>
+      <p>
+        Contructs FFmpeg::Command object.It takes a path of ffmpeg command. You can omit this argument and this module searches ffmpeg command within PATH environment variable.
+      </p>
+      <h2>
+        timeout()
+      </h2>
+      <p>
+        Set command timeout.Default is 0.
+      </p>
+      <h2>
+        input_options({ %options })
+      </h2>
+      <p>
+        Specify input file name and input options.(Now no options are available.)
+      </p>
+      <p>
+        file:: a file name of input file.
+      </p>
+      <h2>
+        output_options({ %options })
+      </h2>
+      <p>
+        Specify output file name and output options.
+      </p>
+      <p>
+        Avaiable options are:
+      </p>
+      <p>
+        file:: a file name of output file.
+        <br />
+        format:: Output video format.
+        <br />
+        video_codec:: Output video codec.
+        <br />
+        bitrate:: Output video bitrate.
+        <br />
+        frame_size:: Output video screen size.
+        <br />
+        audio_codec:: Output audio code.
+        <br />
+        audio_sampling_rate:: Output audio sampling rate.
+        <br />
+        audio_bit_rate:: Output audio bit rate.
+        <br />
+        title:: Set the title.
+        <br />
+        author:: Set the author.
+        <br />
+        comment:: Set the comment.
+      </p>
+      <h2>
+        input_file('/path/to/inpuf_file')
+      </h2>
+      <p>
+        Specify input file name using with options() method.
+      </p>
+      <h2>
+        output_file('/path/to/output_file')
+      </h2>
+      <p>
+        Specify output file name using with options() method.
+      </p>
+      <h2>
+        options( @options )
+      </h2>
+      <p>
+        Specify ffmpeg command options directly.
+      </p>
+      <h2>
+        execute()
+      </h2>
+      <p>
+        Executes ffmpeg comman with specified options.
+      </p>
+      <h2>
+        exec()
+      </h2>
+      <p>
+        An alias of execute()
+      </p>
+      <h2>
+        stdout()
+      </h2>
+      <p>
+        Get ffmpeg command output to stdout.
+      </p>
+      <h2>
+        stderr()
+      </h2>
+      <p>
+        Get ffmpeg command output to stderr.
+      </p>
+      <h1>
+        AUTHOR
+      </h1>
+      <p>
+        Gosuke Miyashita,
+        <code>&lt;gosukenator at gmail.com&gt;</code>
+      </p>
+      <h1>
+        BUGS
+      </h1>
+      <p>
+        Please report any bugs or feature requests to
+        <code>bug-ffmpeg-command at rt.cpan.org</code>
+        , or through the web interface at
+        <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FFmpeg-Command">
+          http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FFmpeg-Command
+        </a>
+        . I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+      </p>
+      <h1>
+        SUPPORT
+      </h1>
+      <p>
+        You can find documentation for this module with the perldoc command.
+      </p>
+      <pre><code>perldoc FFmpeg::Command</code></pre>
+      <p>
+        You can also look for information at:
+      </p>
+      <ul>
+        <li>
+          AnnoCPAN: Annotated CPAN documentation
+        </li>
+      </ul>
+      <p>
+        <a href="http://annocpan.org/dist/FFmpeg-Command">
+          http://annocpan.org/dist/FFmpeg-Command
+        </a>
+      </p>
+      <ul>
+        <li>
+          CPAN Ratings
+        </li>
+      </ul>
+      <p>
+        <a href="http://cpanratings.perl.org/d/FFmpeg-Command">
+          http://cpanratings.perl.org/d/FFmpeg-Command
+        </a>
+      </p>
+      <ul>
+        <li>
+          RT: CPAN's request tracker
+        </li>
+      </ul>
+      <p>
+        <a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Command">
+          http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Command
+        </a>
+      </p>
+      <ul>
+        <li>
+          Search CPAN
+        </li>
+      </ul>
+      <p>
+        <a href="http://search.cpan.org/dist/FFmpeg-Command">
+          http://search.cpan.org/dist/FFmpeg-Command
+        </a>
+      </p>
+      <h1>
+        ACKNOWLEDGEMENTS
+      </h1>
+      <h1>
+        COPYRIGHT &amp; LICENSE
+      </h1>
+      <p>
+        Copyright 2006 Gosuke Miyashita, all rights reserved.
+      </p>
+      <p>
+        This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2009/02/06/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2009/03/21/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

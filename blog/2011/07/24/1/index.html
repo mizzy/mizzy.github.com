@@ -1,190 +1,192 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>HowToGetGraphiteWorkingOnScientificLinux6 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/07/24/1">HowToGetGraphiteWorkingOnScientificLinux6</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>I found a interest tool, <a href="http://graphite.wikidot.com/">Graphite</a> when I was exploring <a href="https://github.com/etsy">https://github.com/etsy</a> .(<a href="http://graphite.wikidot.com/screen-shots">Screen Shots of Graphite</a>.)</p>
-
-<h1>Install Carbon</h1>
-
-<p><a href="http://graphite.wikidot.com/carbon">Carbon</a> is a backend storage application for Graphite.</p>
-
-<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      HowToGetGraphiteWorkingOnScientificLinux6 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="HowToGetGraphiteWorkingOnScientificLinux6"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/07/24/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/07/24/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="HowToGetGraphiteWorkingOnScientificLinux6"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/07/24/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/07/24/1">
+          HowToGetGraphiteWorkingOnScientificLinux6
+        </a>
+      </h1>
+      <div class="byline">
+        24 July 2011
+      </div>
+      <p>
+        I found a interest tool,
+        <a href="http://graphite.wikidot.com/">
+          Graphite
+        </a>
+        when I was exploring
+        <a href="https://github.com/etsy">
+          https://github.com/etsy
+        </a>
+        .(
+        <a href="http://graphite.wikidot.com/screen-shots">
+          Screen Shots of Graphite
+        </a>
+        .)
+      </p>
+      <h1>
+        Install Carbon
+      </h1>
+      <p>
+        <a href="http://graphite.wikidot.com/carbon">
+          Carbon
+        </a>
+        is a backend storage application for Graphite.
+      </p>
+      <pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/carbon-0.9.8.tar.gz
 # tar zxvf carbon-0.9.8.tar.gz
 # pushd carbon-0.9.8
 # python setup.py install
-# popd
-</code></pre>
-
-<h1>Install Whisper</h1>
-
-<p><a href="http://graphite.wikidot.com/whisper">Whisper</a> is an alternate to RRD.</p>
-
-<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
+# popd</code></pre>
+      <h1>
+        Install Whisper
+      </h1>
+      <p>
+        <a href="http://graphite.wikidot.com/whisper">
+          Whisper
+        </a>
+        is an alternate to RRD.
+      </p>
+      <pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/whisper-0.9.8.tar.gz
 # tar zxvf whisper-0.9.8.tar.gz
 # pushd whisper-0.9.8
 # python setup.py install
-# popd
-</code></pre>
-
-<h1>Install Graphite</h1>
-
-<pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
+# popd</code></pre>
+      <h1>
+        Install Graphite
+      </h1>
+      <pre><code># wget http://launchpad.net/graphite/1.0/0.9.8/+download/graphite-web-0.9.8.tar.gz
 # tar zxvf graphite-web-0.9.8.tar.gz
-# pushd graphite-web-0.9.8      
-</code></pre>
-
-<p>Run check-dependencies.py.</p>
-
-<pre><code># ./check-dependencies.py 
-[FATAL] Unable to import the &#39;cairo&#39; module, do you have pycairo installed for python 2.6.5?
-[FATAL] Unable to import the &#39;django&#39; module, do you have Django installed for python 2.6.5?
-[WARNING] Unable to import the &#39;mod_python&#39; module, do you have mod_python installed for python 2.6.5?
+# pushd graphite-web-0.9.8</code></pre>
+      <p>
+        Run check-dependencies.py.
+      </p>
+      <pre><code># ./check-dependencies.py 
+[FATAL] Unable to import the 'cairo' module, do you have pycairo installed for python 2.6.5?
+[FATAL] Unable to import the 'django' module, do you have Django installed for python 2.6.5?
+[WARNING] Unable to import the 'mod_python' module, do you have mod_python installed for python 2.6.5?
 This means you will only be able to run graphite in the development server mode, which is not
 recommended for production use.
 [WARNING]
-Unable to import the &#39;memcache&#39; module, do you have python-memcached installed for python 2.6.5?
+Unable to import the 'memcache' module, do you have python-memcached installed for python 2.6.5?
 This feature is not required but greatly improves performance.
 
 [WARNING]
-Unable to import the &#39;ldap&#39; module, do you have python-ldap installed for python 2.6.5?
+Unable to import the 'ldap' module, do you have python-ldap installed for python 2.6.5?
 Without python-ldap, you will not be able to use LDAP authentication in the graphite webapp.
 
 [WARNING]
-Unable to import the &#39;twisted&#39; package, do you have Twisted installed for python 2.6.5?
+Unable to import the 'twisted' package, do you have Twisted installed for python 2.6.5?
 Without Twisted, you cannot run carbon on this server.
 [WARNING]
-Unable to import the &#39;txamqp&#39; module, this is required if you want to use AMQP.
+Unable to import the 'txamqp' module, this is required if you want to use AMQP.
 Note that txamqp requires python 2.5 or greater.
 2 necessary dependencies not met. Graphite will not function until these dependencies are fulfilled.
-5 optional dependencies not met. Please consider the warning messages before proceeding.
-</code></pre>
-
-<p>I use a development server included in Graphite, so mod_python is not needed.</p>
-
-<p>Install packages other than mod_python.</p>
-
-<pre><code># yum install pycairo
+5 optional dependencies not met. Please consider the warning messages before proceeding.</code></pre>
+      <p>
+        I use a development server included in Graphite, so mod_python is not needed.
+      </p>
+      <p>
+        Install packages other than mod_python.
+      </p>
+      <pre><code># yum install pycairo
 # rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm
 # yum install Django python-twisted python-memcached python-ldap
 # yum install python-setuptools gcc python-devel
-# easy_install txamqp
-</code></pre>
-
-<p>You need bitmap fonts, so intall it.</p>
-
-<pre><code># yum install bitmap-console-fonts
-</code></pre>
-
-<p>Install Graphite and setup it.</p>
-
-<pre><code># python setup.py install
+# easy_install txamqp</code></pre>
+      <p>
+        You need bitmap fonts, so intall it.
+      </p>
+      <pre><code># yum install bitmap-console-fonts</code></pre>
+      <p>
+        Install Graphite and setup it.
+      </p>
+      <pre><code># python setup.py install
 # python /opt/graphite/webapp/graphite/manage.py syncdb
 # pushd /opt/graphite/conf
 # cp carbon.conf.example carbon.conf
 # cp storage-schemas.conf.example storage-schemas.conf
-# cp dashboard.conf.example dashboard.conf
-</code></pre>
-
-<p>Edit dashborad.conf and uncomment these.</p>
-
-<pre><code>[ui]
+# cp dashboard.conf.example dashboard.conf</code></pre>
+      <p>
+        Edit dashborad.conf and uncomment these.
+      </p>
+      <pre><code>[ui]
 default_graph_width = 400
 default_graph_height = 250
 automatic_variants = true
-refresh_interval = 60
-</code></pre>
-
-<p>Start Carbon.</p>
-
-<pre><code># /opt/graphite/bin/carbon-cache.py start
-</code></pre>
-
-<p>Start example-client included in Graphite source code to send load average data to Carbon.</p>
-
-<pre><code># popd
-# python ./examples/example-client.py
-</code></pre>
-
-<p>Start a develepment server of Graphite.</p>
-
-<pre><code># /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite  
-</code></pre>
-
-<p>Access to port 8080 of this server and you&#39;ll see the screen of Graphite.</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/08/18/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/07/17/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+refresh_interval = 60</code></pre>
+      <p>
+        Start Carbon.
+      </p>
+      <pre><code># /opt/graphite/bin/carbon-cache.py start</code></pre>
+      <p>
+        Start example-client included in Graphite source code to send load average data to Carbon.
+      </p>
+      <pre><code># popd
+# python ./examples/example-client.py</code></pre>
+      <p>
+        Start a develepment server of Graphite.
+      </p>
+      <pre><code># /opt/graphite/bin/run-graphite-devel-server.py /opt/graphite</code></pre>
+      <p>
+        Access to port 8080 of this server and you'll see the screen of Graphite.
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/07/17/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/08/18/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

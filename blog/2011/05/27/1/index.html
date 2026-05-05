@@ -1,78 +1,87 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>UfwOnCentOS5 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/05/27/1">UfwOnCentOS5</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://d.hatena.ne.jp/tokuhirom/">tokuhirom</a> さんが IRC で「<a href="https://launchpad.net/ufw">ufw</a> べんり！」「iptables より簡単」っておっしゃっていて、日頃から iptables のコマンドインターフェースは最悪だと思っていたので、お、それは試してみたい、ってことで、ちょろっと触ってみました。</p>
-
-<p>ufw って Ubuntu に標準で付属してるんですね。Ubuntu 使ってないんで知りませんでした。で、ufw の u は Ubuntu の u なのかな、と思ったら、Uncomplicated Firewall の略だそうで、だったら普段一番使ってる CentOS5 でも動くかも、と思って、パッケージ作ったり軽く動かしたりしてみたんで、その記録です。（CentOS の今後については色々言われてますが、まあそこは気にせずに。）</p>
-
-<p>まず RPM パッケージをつくろう、ってことで、ググったら <a href="http://www.openmamba.org/pub/openmamba/devel-ercolinux/specs/ufw.spec">ufw.spec</a> を見つけたので、これを CentOS5 で動くようにカスタマイズして、<a href="http://svn.mizzy.org/public/yum/SRPMS/ufw-0.30.1-1.src.rpm">ソース RPM</a> と <a href="http://svn.mizzy.org/public/yum/RPMS/centos/5/x86_64/RPMS/ufw-0.30.1-1.x86_64.rpm">バイナリ RPM</a> を作成。ufw は python 2.5 以降が必要なんですが、CentOS5 デフォルトは 2.4 なので、python26 パッケージが必要です。あと、spec のカスタマイズも超適当だけど気にしないでください。</p>
-
-<p>で、パッケージインストール後、iptables が動いてない状態から、ufw enable して iptables -L -n してみたら、以下のようにルールが設定されていた。</p>
-
-<pre><code>$ sudo /usr/sbin/ufw enable
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      UfwOnCentOS5 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="UfwOnCentOS5"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/05/27/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/05/27/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="UfwOnCentOS5"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/05/27/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/05/27/1">
+          UfwOnCentOS5
+        </a>
+      </h1>
+      <div class="byline">
+        27 May 2011
+      </div>
+      <p>
+        <a href="http://d.hatena.ne.jp/tokuhirom/">
+          tokuhirom
+        </a>
+        さんが IRC で「
+        <a href="https://launchpad.net/ufw">
+          ufw
+        </a>
+        べんり！」「iptables より簡単」っておっしゃっていて、日頃から iptables のコマンドインターフェースは最悪だと思っていたので、お、それは試してみたい、ってことで、ちょろっと触ってみました。
+      </p>
+      <p>
+        ufw って Ubuntu に標準で付属してるんですね。Ubuntu 使ってないんで知りませんでした。で、ufw の u は Ubuntu の u なのかな、と思ったら、Uncomplicated Firewall の略だそうで、だったら普段一番使ってる CentOS5 でも動くかも、と思って、パッケージ作ったり軽く動かしたりしてみたんで、その記録です。（CentOS の今後については色々言われてますが、まあそこは気にせずに。）
+      </p>
+      <p>
+        まず RPM パッケージをつくろう、ってことで、ググったら
+        <a href="http://www.openmamba.org/pub/openmamba/devel-ercolinux/specs/ufw.spec">
+          ufw.spec
+        </a>
+        を見つけたので、これを CentOS5 で動くようにカスタマイズして、
+        <a href="http://svn.mizzy.org/public/yum/SRPMS/ufw-0.30.1-1.src.rpm">
+          ソース RPM
+        </a>
+        と
+        <a href="http://svn.mizzy.org/public/yum/RPMS/centos/5/x86_64/RPMS/ufw-0.30.1-1.x86_64.rpm">
+          バイナリ RPM
+        </a>
+        を作成。ufw は python 2.5 以降が必要なんですが、CentOS5 デフォルトは 2.4 なので、python26 パッケージが必要です。あと、spec のカスタマイズも超適当だけど気にしないでください。
+      </p>
+      <p>
+        で、パッケージインストール後、iptables が動いてない状態から、ufw enable して iptables -L -n してみたら、以下のようにルールが設定されていた。
+      </p>
+      <pre><code>$ sudo /usr/sbin/ufw enable
 Password: 
 Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
 Firewall is active and enabled on system startup
@@ -119,11 +128,11 @@ ufw-skip-to-policy-input  all  --  0.0.0.0/0            0.0.0.0/0           ADDR
 
 Chain ufw-after-logging-forward (1 references)
 target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] &#39; 
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
 
 Chain ufw-after-logging-input (1 references)
 target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] &#39; 
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
 
 Chain ufw-after-logging-output (1 references)
 target     prot opt source               destination         
@@ -168,12 +177,12 @@ ufw-user-output  all  --  0.0.0.0/0            0.0.0.0/0
 
 Chain ufw-logging-allow (0 references)
 target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW ALLOW] &#39; 
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW ALLOW] ' 
 
 Chain ufw-logging-deny (2 references)
 target     prot opt source               destination         
 RETURN     all  --  0.0.0.0/0            0.0.0.0/0           state INVALID limit: avg 3/min burst 10 
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] &#39; 
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 10 LOG flags 0 level 4 prefix `[UFW BLOCK] ' 
 
 Chain ufw-not-local (1 references)
 target     prot opt source               destination         
@@ -220,7 +229,7 @@ target     prot opt source               destination
 
 Chain ufw-user-limit (0 references)
 target     prot opt source               destination         
-LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 5 LOG flags 0 level 4 prefix `[UFW LIMIT BLOCK] &#39; 
+LOG        all  --  0.0.0.0/0            0.0.0.0/0           limit: avg 3/min burst 5 LOG flags 0 level 4 prefix `[UFW LIMIT BLOCK] ' 
 REJECT     all  --  0.0.0.0/0            0.0.0.0/0           reject-with icmp-port-unreachable 
 
 Chain ufw-user-limit-accept (0 references)
@@ -237,12 +246,11 @@ Chain ufw-user-logging-output (0 references)
 target     prot opt source               destination         
 
 Chain ufw-user-output (1 references)
-target     prot opt source               destination         
-</code></pre>
-
-<p>で、今度は ufw disable してみたら、以下のようになった。chain は残る模様。</p>
-
-<pre><code>$ sudo /usr/sbin/ufw disable
+target     prot opt source               destination</code></pre>
+      <p>
+        で、今度は ufw disable してみたら、以下のようになった。chain は残る模様。
+      </p>
+      <pre><code>$ sudo /usr/sbin/ufw disable
 Firewall stopped and disabled on system startup
 
 $ sudo /sbin/iptables -L -n
@@ -321,22 +329,25 @@ Chain ufw-track-input (1 references)
 target     prot opt source               destination         
 
 Chain ufw-track-output (1 references)
-target     prot opt source               destination         
-</code></pre>
-
-<p>とりあえず CentOS5 でも動くようなんで、色々遊んでみようと思う。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/06/25/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/05/12/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+target     prot opt source               destination</code></pre>
+      <p>
+        とりあえず CentOS5 でも動くようなんで、色々遊んでみようと思う。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/05/12/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/06/25/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,72 +1,59 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>PerlbalPluginProxyPass - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/11/12/1">PerlbalPluginProxyPass</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>Perlbal で Vpaths プラグインをつかって、</p>
-
-<pre><code>LOAD vpaths
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      PerlbalPluginProxyPass - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="PerlbalPluginProxyPass"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/11/12/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/11/12/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="PerlbalPluginProxyPass"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/11/12/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/11/12/1">
+          PerlbalPluginProxyPass
+        </a>
+      </h1>
+      <div class="byline">
+        12 November 2007
+      </div>
+      <p>
+        Perlbal で Vpaths プラグインをつかって、
+      </p>
+      <pre><code>LOAD vpaths
 
 CREATE POOL apache
   POOL apache ADD 127.0.0.1
@@ -81,22 +68,19 @@ CREATE SERVICE selector
   SET   role    = selector
   SET   plugins = vpaths
   VPATH /apache = apache_proxy
-ENABLE selector
-</code></pre>
-
-<p>みたいな設定をすると、</p>
-
-<pre><code>http://localhost:8080/apache -&gt; http://localhost:80/apache
-</code></pre>
-
-<p>といった形でプロキシしてくれるんだけど、これを</p>
-
-<pre><code>http://localhost:8080/apache -&gt; http://localhost:80/
-</code></pre>
-
-<p>としたくてプラグイン書いてみた。もしかしてプラグイン書かなくてもできるかもしれないけど、やり方がわからなかったのと、プラグインを書く練習ってことで。プラグイン名は Apache mod_proxy の ProxyPass ディレクティブにちなんでます。</p>
-
-<pre><code>#!perl
+ENABLE selector</code></pre>
+      <p>
+        みたいな設定をすると、
+      </p>
+      <pre><code>http://localhost:8080/apache -&gt; http://localhost:80/apache</code></pre>
+      <p>
+        といった形でプロキシしてくれるんだけど、これを
+      </p>
+      <pre><code>http://localhost:8080/apache -&gt; http://localhost:80/</code></pre>
+      <p>
+        としたくてプラグイン書いてみた。もしかしてプラグイン書かなくてもできるかもしれないけど、やり方がわからなかったのと、プラグインを書く練習ってことで。プラグイン名は Apache mod_proxy の ProxyPass ディレクティブにちなんでます。
+      </p>
+      <pre><code>#!perl
 package Perlbal::Plugin::ProxyPass;
 
 use strict;
@@ -105,7 +89,7 @@ use warnings;
 sub load {
     my $class = shift;
 
-    Perlbal::register_global_hook(&#39;manage_command.proxypass&#39;, sub {
+    Perlbal::register_global_hook('manage_command.proxypass', sub {
         my $mc = shift-&gt;parse(qr/proxypass\s+(?:(\w+)\s+)?(\S+)\s*=\s*(\S+)$/,
                               &quot;usage: ProxyPass [&lt;service&gt;] &lt;source path&gt; = &lt;dest path&gt;&quot;);
         my ($selname, $source, $target) = $mc-&gt;args;
@@ -114,7 +98,7 @@ sub load {
         }
 
         my $ss = Perlbal-&gt;service($selname);
-        return $mc-&gt;err(&quot;Service &#39;$selname&#39; is not a reverse_proxy service&quot;)
+        return $mc-&gt;err(&quot;Service '$selname' is not a reverse_proxy service&quot;)
             unless $ss &amp;&amp; $ss-&gt;{role} eq &quot;reverse_proxy&quot;;
 
         $ss-&gt;{extra_config}-&gt;{_proxypass} ||= [];
@@ -129,11 +113,11 @@ sub load {
 sub register {
     my ($class, $svc) = @_;
     unless ($svc &amp;&amp; $svc-&gt;{role} eq &quot;reverse_proxy&quot;) {
-        die &quot;You can&#39;t load the proxypass plugin on a service not of role reverse_proxy.\n&quot;;
+        die &quot;You can't load the proxypass plugin on a service not of role reverse_proxy.\n&quot;;
     }
 
     $svc-&gt;register_hook(
-        &#39;ProxyPass&#39; =&gt; &#39;start_proxy_request&#39;, sub {
+        'ProxyPass' =&gt; 'start_proxy_request', sub {
             my Perlbal::ClientProxy $client = shift;
             for my $proxypass ( @{ $svc-&gt;{extra_config}-&gt;{_proxypass} } ) {
                 my $source = $proxypass-&gt;[0];
@@ -148,12 +132,11 @@ sub register {
     return 1;
 }
 
-1;
-</code></pre>
-
-<p>設定はこんな感じ。</p>
-
-<pre><code>LOAD vpaths
+1;</code></pre>
+      <p>
+        設定はこんな感じ。
+      </p>
+      <pre><code>LOAD vpaths
 LOAD ProxyPass
 
 CREATE POOL apache
@@ -171,20 +154,22 @@ CREATE SERVICE selector
   SET   role    = selector
   SET   plugins = vpaths
   VPATH /apache = apache_proxy
-ENABLE selector
-</code></pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/11/16/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/11/08/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+ENABLE selector</code></pre>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/11/08/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/11/16/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

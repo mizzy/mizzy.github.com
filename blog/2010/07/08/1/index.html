@@ -1,197 +1,224 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>SystemTap00 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      SystemTap00 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="SystemTap00"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2010/07/08/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2010/07/08/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="SystemTap00"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2010/07/08/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2010/07/08/1">
+          SystemTap00
+        </a>
+      </h1>
+      <div class="byline">
+        8 July 2010
+      </div>
+      <p>
+        <a href="http://sourceware.org/systemtap/">
+          SystemTap
+        </a>
+        が以前から気になってたので、ちゃんと調べてみることに。
+      </p>
+      <p>
+        ざっとググってみた感じだと、
+        <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">
+          SystemTap Beginners Guide
+        </a>
+        がしっかりまとまっていてわかりやすそうなので、これをベースに調べたことをメモしていく。
+        <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide.pdf">
+          PDF 版
+        </a>
+        もあるので Kindle に入れて持ち運べるし。
+      </p>
+      <h1>
+        SystemTap とは？
+      </h1>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          カーネルの動きをモニタリングするためのフレームワーク
+        </li>
+        <li>
+          netstat, ps, top, iostat なんかで得られるのと同じような情報が取得できる
+        </li>
+        <li>
+          こういった情報が得られるだけではなく、フィルタリングしたり解析したりもできる
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2010/07/08/1">SystemTap00</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://sourceware.org/systemtap/">SystemTap</a> が以前から気になってたので、ちゃんと調べてみることに。</p>
-
-<p>ざっとググってみた感じだと、<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">SystemTap Beginners Guide</a> がしっかりまとまっていてわかりやすそうなので、これをベースに調べたことをメモしていく。<a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide.pdf">PDF 版</a>もあるので Kindle に入れて持ち運べるし。</p>
-
-<h1>SystemTap とは？</h1>
-
-<ul>
-<li>カーネルの動きをモニタリングするためのフレームワーク</li>
-<li>netstat, ps, top, iostat なんかで得られるのと同じような情報が取得できる</li>
-<li>こういった情報が得られるだけではなく、フィルタリングしたり解析したりもできる</li>
-</ul>
-
-<p>といったもののようです。DTrace を知ってる方なら、それに似たようなもの、と言えばわかりやすいのかもしれません。（自分は DTrace よく知りませんが。）</p>
-
-<ul>
-<li>参考 URL
-
-<ul>
-<li><a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/introduction.html">http://sourceware.org/systemtap/SystemTap_Beginners_Guide/introduction.html</a></li>
-<li><a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/intro-systemtap-vs-others.html">http://sourceware.org/systemtap/SystemTap_Beginners_Guide/intro-systemtap-vs-others.html</a></li>
-</ul></li>
-</ul>
-
-<h1>SystemTap の利用</h1>
-
-<p>CentOS 5 でインストールした際のメモ。</p>
-
-<p>利用している kernel と同じバージョンの kernel-devel パッケージをインストール。（systemtap パッケージを入れると依存で勝手に入るけど、利用中の kernel バージョンと異なる場合もあるので、先に入れておくといいです。）</p>
-
-<pre><code>$ sudo yum install kernel-devel-2.6.18-164.el5
-</code></pre>
-
-<p>systemtap パッケージをインストール。</p>
-
-<pre><code>$ sudo yum install sytemtap
-</code></pre>
-
-<p>kernel-debuginfo と kernel-debuginfo-common のインストールのために、debuginfo-install コマンドが含まれる yum-utils パッケージをインストール。</p>
-
-<pre><code>$ sudo yum install yum-utils
-</code></pre>
-
-<p>kernel-debuginfo と kernel-debuginfo-common を yum で取得できるように、以下のような /etc/yum.repos.d/CentOS-debuginfo.repo を作成。</p>
-
-<pre><code>[debuginfo]
+      <p>
+        といったもののようです。DTrace を知ってる方なら、それに似たようなもの、と言えばわかりやすいのかもしれません。（自分は DTrace よく知りませんが。）
+      </p>
+      <ul>
+        <li>
+          参考 URL
+          <ul>
+            <li>
+              <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/introduction.html">
+                http://sourceware.org/systemtap/SystemTap_Beginners_Guide/introduction.html
+              </a>
+            </li>
+            <li>
+              <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/intro-systemtap-vs-others.html">
+                http://sourceware.org/systemtap/SystemTap_Beginners_Guide/intro-systemtap-vs-others.html
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <h1>
+        SystemTap の利用
+      </h1>
+      <p>
+        CentOS 5 でインストールした際のメモ。
+      </p>
+      <p>
+        利用している kernel と同じバージョンの kernel-devel パッケージをインストール。（systemtap パッケージを入れると依存で勝手に入るけど、利用中の kernel バージョンと異なる場合もあるので、先に入れておくといいです。）
+      </p>
+      <pre><code>$ sudo yum install kernel-devel-2.6.18-164.el5</code></pre>
+      <p>
+        systemtap パッケージをインストール。
+      </p>
+      <pre><code>$ sudo yum install sytemtap</code></pre>
+      <p>
+        kernel-debuginfo と kernel-debuginfo-common のインストールのために、debuginfo-install コマンドが含まれる yum-utils パッケージをインストール。
+      </p>
+      <pre><code>$ sudo yum install yum-utils</code></pre>
+      <p>
+        kernel-debuginfo と kernel-debuginfo-common を yum で取得できるように、以下のような /etc/yum.repos.d/CentOS-debuginfo.repo を作成。
+      </p>
+      <pre><code>[debuginfo]
 name=CentOS debuginfo
 baseurl=http://debuginfo.centos.org/$releasever/$basearch/
 gpgcheck=0
-enabled=1
-</code></pre>
-
-<p>kernel-debuginfo と kernel-debuginfo-common を インストール。</p>
-
-<pre><code>$ sudo debuginfo-install kernel
-</code></pre>
-
-<p>kernel-headers も必要かも？</p>
-
-<p>あとは stap コマンドを実行すれば OK。(root 権限が必要だけど、stapdev グループに属しているユーザであれば、権限は不要。)</p>
-
-<pre><code>$ stap -v -e &#39;probe vfs.read {printf(&quot;read performed\n&quot;); exit()}&#39;
+enabled=1</code></pre>
+      <p>
+        kernel-debuginfo と kernel-debuginfo-common を インストール。
+      </p>
+      <pre><code>$ sudo debuginfo-install kernel</code></pre>
+      <p>
+        kernel-headers も必要かも？
+      </p>
+      <p>
+        あとは stap コマンドを実行すれば OK。(root 権限が必要だけど、stapdev グループに属しているユーザであれば、権限は不要。)
+      </p>
+      <pre><code>$ stap -v -e 'probe vfs.read {printf(&quot;read performed\n&quot;); exit()}'
 Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 170usr/50sys/210real ms.
 Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116696virt/75204res/41808shr kb, in 310usr/50sys/369real ms.
 Pass 3: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.c
 Pass 4: using cached /home/miya/.systemtap/cache/eb/stap_ebec3e35e1d3f3f5cd90569c6319bd2f_4795.ko
 Pass 5: starting run.
 read performed
-Pass 5: run completed in 20usr/50sys/96real ms.
-</code></pre>
-
-<p>-v オプションで詳細表示。v を増やすと更に詳細に。</p>
-
-<p>表示されるメッセージを見るとなんとなくわかるけど、SystemTap スクリプトをコンパイルしてカーネルモジュールを生成して実行してる。なので gcc や make なんかも必要。（なはず。）</p>
-
-<ul>
-<li>参考 URL
-
-<ul>
-<li><a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/using-systemtap.html">http://sourceware.org/systemtap/SystemTap_Beginners_Guide/using-systemtap.html</a></li>
-</ul></li>
-</ul>
-
-<h1>他のマシンで実行できる SystemTap モジュールを生成</h1>
-
-<p>上で見たように、SystemTap の利用には、コンパイラや debuginfo パッケージのインストールが必要なんだけど、ポリシー的にそれが許されない環境ではどうするか？実は SystemTap にはコンパイル済みのモジュールを実行する仕組みもある。（このコンパイル済みモジュールのことを、ドキュメントでは Instrumentation と呼んでいる。）</p>
-
-<p>コンパイル済みモジュールは以下のように stap コマンドで生成できる。(-r と -m オプションを指定する。）</p>
-
-<pre><code>$ stap -r 2.6.18-164.el5 -e &#39;probe vfs.read {exit()}&#39; -m simple -v  [miya@h026]
+Pass 5: run completed in 20usr/50sys/96real ms.</code></pre>
+      <p>
+        -v オプションで詳細表示。v を増やすと更に詳細に。
+      </p>
+      <p>
+        表示されるメッセージを見るとなんとなくわかるけど、SystemTap スクリプトをコンパイルしてカーネルモジュールを生成して実行してる。なので gcc や make なんかも必要。（なはず。）
+      </p>
+      <ul>
+        <li>
+          参考 URL
+          <ul>
+            <li>
+              <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/using-systemtap.html">
+                http://sourceware.org/systemtap/SystemTap_Beginners_Guide/using-systemtap.html
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <h1>
+        他のマシンで実行できる SystemTap モジュールを生成
+      </h1>
+      <p>
+        上で見たように、SystemTap の利用には、コンパイラや debuginfo パッケージのインストールが必要なんだけど、ポリシー的にそれが許されない環境ではどうするか？実は SystemTap にはコンパイル済みのモジュールを実行する仕組みもある。（このコンパイル済みモジュールのことを、ドキュメントでは Instrumentation と呼んでいる。）
+      </p>
+      <p>
+        コンパイル済みモジュールは以下のように stap コマンドで生成できる。(-r と -m オプションを指定する。）
+      </p>
+      <pre><code>$ stap -r 2.6.18-164.el5 -e 'probe vfs.read {exit()}' -m simple -v  [miya@h026]
 Pass 1: parsed user script and 65 library script(s) using 43932virt/19448res/1752shr kb, in 180usr/20sys/205real ms.
 Pass 2: analyzed script: 1 probe(s), 10 function(s), 2 embed(s), 1 global(s) using 116816virt/75200res/41808shr kb, in 320usr/40sys/364real ms.
 Pass 3: translated to C into &quot;/tmp/stapPGBW7a/simple.c&quot; using 116816virt/75940res/42548shr kb, in 230usr/10sys/269real ms.
 Pass 4: compiled C into &quot;simple.ko&quot; in 3820usr/790sys/4619real ms.
 Pass 5: starting run.
-Pass 5: run completed in 20usr/50sys/97real ms.
-</code></pre>
-
-<p>simple.ko が生成されるので、これを実行したいマシンにコピーする。そのマシン上では、systemtap-runtime パッケージがインストールされていれば良い。で、以下のように staprun コマンドを叩いてモジュールを実行する。</p>
-
-<pre><code>$ staprun simple.ko -v
+Pass 5: run completed in 20usr/50sys/97real ms.</code></pre>
+      <p>
+        simple.ko が生成されるので、これを実行したいマシンにコピーする。そのマシン上では、systemtap-runtime パッケージがインストールされていれば良い。で、以下のように staprun コマンドを叩いてモジュールを実行する。
+      </p>
+      <pre><code>$ staprun simple.ko -v
 stapio:cleanup_and_exit:400 detach=0
 stapio:cleanup_and_exit:417 closing control channel
-staprun:remove_module:205 Module simple removed.
-</code></pre>
-
-<p>これも root 権限が必要だけど、stapusr グループに属していれば権限は必要ない。（stapdev グループでももちろん実行できる。）</p>
-
-<ul>
-<li>参考 URL
-
-<ul>
-<li><a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/cross-compiling.html">http://sourceware.org/systemtap/SystemTap_Beginners_Guide/cross-compiling.html</a></li>
-</ul></li>
-</ul>
-
-<p>今日はここまで。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2010/07/13/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2010/07/03/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+staprun:remove_module:205 Module simple removed.</code></pre>
+      <p>
+        これも root 権限が必要だけど、stapusr グループに属していれば権限は必要ない。（stapdev グループでももちろん実行できる。）
+      </p>
+      <ul>
+        <li>
+          参考 URL
+          <ul>
+            <li>
+              <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/cross-compiling.html">
+                http://sourceware.org/systemtap/SystemTap_Beginners_Guide/cross-compiling.html
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p>
+        今日はここまで。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2010/07/03/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2010/07/13/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

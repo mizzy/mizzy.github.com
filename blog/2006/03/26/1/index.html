@@ -1,122 +1,134 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>開発合宿と Plagger と Google Video - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      開発合宿と Plagger と Google Video - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="開発合宿と Plagger と Google Video"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/03/26/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/03/26/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="開発合宿と Plagger と Google Video"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/03/26/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/03/26/1">
+          開発合宿と Plagger と Google Video
+        </a>
+      </h1>
+      <div class="byline">
+        26 March 2006
+      </div>
+      <p class="entryBody">
+        現在、
+        <a href="http://solvalou.net/" target="_blank">
+          オオヒダさん
+        </a>
+        、
+        <a href="http://yasuhisa.com/could/" target="_blank">
+          ヤスヒサさん
+        </a>
+        、
+        <a href="http://purpr.in/" target="_blank">
+          purprin さん
+        </a>
+        、
+        <a href="http://vgzh.dtdns.net/mt/index.html" target="_blank">
+          モイモラさん
+        </a>
+        、ボンヌさん、タロさんと伊東の温泉旅館で開発合宿中です。
+      </p>
+      <p class="entryBody">
+        何をやるかまったく考えないまま来てしまったのですが、プログラマだけでなくデザインや Flash などに詳しいクリエータも一緒なので、お互い最近プライベートで作っているものを見せ合ったり、こんなのおもしろいよね、などと話しているだけでもとても刺激になります。で、色々話しているうちに自分の合宿のテーマは、「Plagger で Google Video の検索結果を取得して、それを iPod で取り込むようなものをつくる」と決めました。決めた時には既に夜遅い時間だったのですが。
+      </p>
+      <p class="entryBody">
+        とりあえず今回は形にすることを最優先にしたため、まだまだブラッシュアップが必要ですが、一応 iPod に取り込むという目標は達成できたので、合宿の成果としてプログラムを公開します。
+      </p>
+      <ul class="entryBody">
+        <li>
+          <a href="http://mizzy.org/archives/GoogleVideo.pm" target="_blank">
+            Plagger::Plugin::CustomFeed::GoogleVideo
+          </a>
+        </li>
+        <li>
+          <a href="http://mizzy.org/archives/PodCast.pm" target="_blank">
+            Plagger::Plugin::Publish::PodCast
+          </a>
+        </li>
+        <li>
+          <a href="http://mizzy.org/archives/TinyURL.pm" target="_blank">
+            Plagger::Plugin::Filter::TinyURL
+          </a>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/03/26/1">開発合宿と Plagger と Google Video</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-現在、<a href="http://solvalou.net/" target="_blank">オオヒダさん</a>、<a href="http://yasuhisa.com/could/" target="_blank">ヤスヒサさん</a>、<a href="http://purpr.in/" target="_blank">purprin さん</a>、<a href="http://vgzh.dtdns.net/mt/index.html" target="_blank">モイモラさん</a>、ボンヌさん、タロさんと伊東の温泉旅館で開発合宿中です。
-</p>
-
-<p class="entryBody">
-何をやるかまったく考えないまま来てしまったのですが、プログラマだけでなくデザインや Flash などに詳しいクリエータも一緒なので、お互い最近プライベートで作っているものを見せ合ったり、こんなのおもしろいよね、などと話しているだけでもとても刺激になります。で、色々話しているうちに自分の合宿のテーマは、「Plagger で Google Video の検索結果を取得して、それを iPod で取り込むようなものをつくる」と決めました。決めた時には既に夜遅い時間だったのですが。
-</p>
-
-<p class="entryBody">
-とりあえず今回は形にすることを最優先にしたため、まだまだブラッシュアップが必要ですが、一応 iPod に取り込むという目標は達成できたので、合宿の成果としてプログラムを公開します。
-</p>
-
-<ul class="entryBody">
-<li><a href="http://mizzy.org/archives/GoogleVideo.pm" target="_blank">Plagger::Plugin::CustomFeed::GoogleVideo</a></li>
-<li><a href="http://mizzy.org/archives/PodCast.pm" target="_blank">Plagger::Plugin::Publish::PodCast</a></li>
-<li><a href="http://mizzy.org/archives/TinyURL.pm" target="_blank">Plagger::Plugin::Filter::TinyURL</a></li>
-</ul>
-
-<p class="entryBody">
-P::P::CustomFeed::GoogleVideo では、config.yaml 中で指定した検索条件にしたがって、Google Video から MediaRSS を取得してパースしています。
-</p>
-
-<p class="entryBody">
-P::P::Publish::PodCast では、PodCast フィードを生成します。このフィードを iTunes に登録してビデオをダウンロード、iPod に取り込むということをやってます。現在 Plagger::Entry には enclosure 用のアクセサがないため、$entry->meta->{enclosure} に enclosure 関連の情報を突っ込んで処理する、ということをやっているのですが、今後宮川さんが Plagger コアで eclosure 対応してくれる、とのことでした。
-</p>
-
-<p class="entryBody">
-また、P::P::Publish::PodCast は P::P::Publish::Feed で吸収できるかな、と思ったのですが、P::P::Publish::Feed で利用している XML::Feed::Entry は enclosure に対応していないので、XML::RSS を使うことにしました。それ以外の部分は宮川さんのコードをほとんどそのまま利用させて頂いてます。
-</p>
-
-<p class="entryBody">
-あと、P::P::Filter::TinyURL は、enclosure の URL を TinyURL に変換するために作りました。なんでこんなことをするかというと、Google Video の URL は長すぎて、iTunes に登録するとエラーとなってしまうためです。また、拡張子がないとやはり怒られるので、TinyURL にダミーで拡張子をつける処理もしています。これは以前モイモラさんがはまった際に、みんなで解決策を考えた、という経緯があったので、今回ははまらずに済みました。
-</p>
-
-<p class="entryBody">
-ちなみに、CustomFeed::GoogleVideo と　Publish::Gmail を組み合わせると<a href="http://mizzy.org/img/video_gmail.png" target="_blank">こんな感じになります</a>。もちろんメール中のリンクをクリックすれば Google Video のページに飛んで、すぐに動画を見ることができます。
-</p>
-
-<p class="entryBody">
-とりあえず形にしただけで、まだまだブラッシュアップが必要なので、commit はしてません。宮川さんや他の開発者の方々と相談しながら、いいものにしていきたいな、と思ってます。あと、YouTube にも対応させたいですね。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/03/27/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/03/10/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        P::P::CustomFeed::GoogleVideo では、config.yaml 中で指定した検索条件にしたがって、Google Video から MediaRSS を取得してパースしています。
+      </p>
+      <p class="entryBody">
+        P::P::Publish::PodCast では、PodCast フィードを生成します。このフィードを iTunes に登録してビデオをダウンロード、iPod に取り込むということをやってます。現在 Plagger::Entry には enclosure 用のアクセサがないため、$entry->meta->{enclosure} に enclosure 関連の情報を突っ込んで処理する、ということをやっているのですが、今後宮川さんが Plagger コアで eclosure 対応してくれる、とのことでした。
+      </p>
+      <p class="entryBody">
+        また、P::P::Publish::PodCast は P::P::Publish::Feed で吸収できるかな、と思ったのですが、P::P::Publish::Feed で利用している XML::Feed::Entry は enclosure に対応していないので、XML::RSS を使うことにしました。それ以外の部分は宮川さんのコードをほとんどそのまま利用させて頂いてます。
+      </p>
+      <p class="entryBody">
+        あと、P::P::Filter::TinyURL は、enclosure の URL を TinyURL に変換するために作りました。なんでこんなことをするかというと、Google Video の URL は長すぎて、iTunes に登録するとエラーとなってしまうためです。また、拡張子がないとやはり怒られるので、TinyURL にダミーで拡張子をつける処理もしています。これは以前モイモラさんがはまった際に、みんなで解決策を考えた、という経緯があったので、今回ははまらずに済みました。
+      </p>
+      <p class="entryBody">
+        ちなみに、CustomFeed::GoogleVideo と　Publish::Gmail を組み合わせると
+        <a href="http://mizzy.org/img/video_gmail.png" target="_blank">
+          こんな感じになります
+        </a>
+        。もちろんメール中のリンクをクリックすれば Google Video のページに飛んで、すぐに動画を見ることができます。
+      </p>
+      <p class="entryBody">
+        とりあえず形にしただけで、まだまだブラッシュアップが必要なので、commit はしてません。宮川さんや他の開発者の方々と相談しながら、いいものにしていきたいな、と思ってます。あと、YouTube にも対応させたいですね。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/03/10/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/03/27/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

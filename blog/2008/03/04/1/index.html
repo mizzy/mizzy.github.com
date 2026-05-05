@@ -1,93 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>oVirt00 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2008/03/04/1">oVirt00</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>Puppet Dojo で知り合った方から、<a href="http://virt-factory.et.redhat.com/">Virt-Factory</a> はもうアクティブじゃなくなって、今は<a href="http://ovirt.org/">oVirt</a> という新しいプロジェクトに移ってる、ということをお聞きして、Virt-Factory のサイトに行ってみたら本当にそう書いてある！Xen が動かせるマシンが調達できたら、本格的に Virt-Factory 検証しよう、と思ってしばらくアクセスしてなかったら、いつの間にやらこんなことに…</p>
-
-<p>つーわけで、Virt-Factory は捨てて oVirt の検証していくです。</p>
-
-<p><a href="http://ovirt.org/install-instructions.html">Installing Instructions</a> を見てみると、パッケージを配布してるわけじゃなく、QEMU/KVM の仮想マシンイメージとして配布されてる模様。まずはこのイメージを動かすところまでやってみる。</p>
-
-<p>検証環境は CentOS 5 x86_64 です。手順は上記サイトの「Installing the management appliance」の通りではあるのですが、説明があまり親切ではないし、その通りではうまくいかないところもあったので、試してみたい方は、以下の手順も合わせて参考にしてみてください。。</p>
-
-<p>まずは VM イメージを取得。場所はどこでもいいんですが、自分は ~/vm というディレクトリを作成して、その下に置いた。</p>
-
-<pre><code>$ mkdir ~/vm
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      oVirt00 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="oVirt00"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2008/03/04/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2008/03/04/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="oVirt00"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2008/03/04/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2008/03/04/1">
+          oVirt00
+        </a>
+      </h1>
+      <div class="byline">
+        4 March 2008
+      </div>
+      <p>
+        Puppet Dojo で知り合った方から、
+        <a href="http://virt-factory.et.redhat.com/">
+          Virt-Factory
+        </a>
+        はもうアクティブじゃなくなって、今は
+        <a href="http://ovirt.org/">
+          oVirt
+        </a>
+        という新しいプロジェクトに移ってる、ということをお聞きして、Virt-Factory のサイトに行ってみたら本当にそう書いてある！Xen が動かせるマシンが調達できたら、本格的に Virt-Factory 検証しよう、と思ってしばらくアクセスしてなかったら、いつの間にやらこんなことに…
+      </p>
+      <p>
+        つーわけで、Virt-Factory は捨てて oVirt の検証していくです。
+      </p>
+      <p>
+        <a href="http://ovirt.org/install-instructions.html">
+          Installing Instructions
+        </a>
+        を見てみると、パッケージを配布してるわけじゃなく、QEMU/KVM の仮想マシンイメージとして配布されてる模様。まずはこのイメージを動かすところまでやってみる。
+      </p>
+      <p>
+        検証環境は CentOS 5 x86_64 です。手順は上記サイトの「Installing the management appliance」の通りではあるのですが、説明があまり親切ではないし、その通りではうまくいかないところもあったので、試してみたい方は、以下の手順も合わせて参考にしてみてください。。
+      </p>
+      <p>
+        まずは VM イメージを取得。場所はどこでもいいんですが、自分は ~/vm というディレクトリを作成して、その下に置いた。
+      </p>
+      <pre><code>$ mkdir ~/vm
 $ cd ~/vm
 $ wget http://ovirt.org/download/wui-appliance.dsk.bz2
-$ bzip2 -d wui-appliance.dsk.bz2
-</code></pre>
-
-<p>次に必要なパッケージのインストール。</p>
-
-<pre><code>$ sudo yum install libvirt qemu kvm
-</code></pre>
-
-<p>以下のような ~/vm/wui-appliance.xml を作成。</p>
-
-<pre><code>&lt;domain type=&quot;kvm&quot;&gt;
+$ bzip2 -d wui-appliance.dsk.bz2</code></pre>
+      <p>
+        次に必要なパッケージのインストール。
+      </p>
+      <pre><code>$ sudo yum install libvirt qemu kvm</code></pre>
+      <p>
+        以下のような ~/vm/wui-appliance.xml を作成。
+      </p>
+      <pre><code>&lt;domain type=&quot;kvm&quot;&gt;
   &lt;name&gt;wui-appliance&lt;/name&gt;
   &lt;memory&gt;768000&lt;/memory&gt;
   &lt;currentMemory&gt;768000&lt;/currentMemory&gt;
@@ -113,12 +113,11 @@ $ bzip2 -d wui-appliance.dsk.bz2
     &lt;input type=&quot;mouse&quot; bus=&quot;ps2&quot;/&gt;
     &lt;graphics type=&quot;vnc&quot; port=&quot;-1&quot; listen=&quot;0.0.0.0&quot;/&gt;
   &lt;/devices&gt;
-&lt;/domain&gt;
-</code></pre>
-
-<p>libvirtd を起動して、virsh で qemu に接続、create でさきほどの XML ファイルを指定して VM 作成。</p>
-
-<pre><code>$ sudo /sbin/chkconfig libvirtd on
+&lt;/domain&gt;</code></pre>
+      <p>
+        libvirtd を起動して、virsh で qemu に接続、create でさきほどの XML ファイルを指定して VM 作成。
+      </p>
+      <pre><code>$ sudo /sbin/chkconfig libvirtd on
 $ sudo /etc/init.d/libvirtd start
 $ sudo virsh --connect qemu:///system  
 virsh #  create wui-appliance.xml
@@ -126,55 +125,63 @@ Domain wui-appliance created from wui-appliance.xml
 virsh # list
  Id Name                 State
 ----------------------------------
-  1 wui-appliance        running
-</code></pre>
-
-<p>以上で VM 起動まで完了。で、VM に SSH とかでアクセスしたいんだけど、IP アドレスがわからない！（VM の IP アドレスを外から知る方法をご存知な方は教えてください。）というわけで、virt-manager からつないでみることにする。</p>
-
-<pre><code>$ sudo yum install virt-manager
-</code></pre>
-
-<p>virt-manager 入れたのはいいけど、CentOS は X 使えるようにしていないことに気づく。とりあえず手元の PC の cygwin に X が入ってたので、cygwin のシェルで</p>
-
-<pre><code>$ startxwin.sh
-$ xhost +
-</code></pre>
-
-<p>でもって CentOS 上で</p>
-
-<pre><code>$ export DISPLAY=192.168.10.19:0.0
-$ virt-manager
-</code></pre>
-
-<p>で virt-manager 起動。</p>
-
-<p>[[Image(01.jpg)]]</p>
-
-<p>無事に画面が出たので、QEMU を選択して接続。</p>
-
-<p>[[Image(02.jpg)]]</p>
-
-<p>VM が見えるので選択して、右下の「Open」をクリック。</p>
-
-<p>[[Image(03.jpg)]]</p>
-
-<p>無事アクセスできた。root のパスワードは ovirtwui 。</p>
-
-<p>ここまでやってから、XML で MAC アドレス指定してるんだから、DHCP サーバのログから IP アドレス調べればいいだけだった、ということに気づく。</p>
-
-<p>今日はここまで。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2008/03/09/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2008/02/03/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+  1 wui-appliance        running</code></pre>
+      <p>
+        以上で VM 起動まで完了。で、VM に SSH とかでアクセスしたいんだけど、IP アドレスがわからない！（VM の IP アドレスを外から知る方法をご存知な方は教えてください。）というわけで、virt-manager からつないでみることにする。
+      </p>
+      <pre><code>$ sudo yum install virt-manager</code></pre>
+      <p>
+        virt-manager 入れたのはいいけど、CentOS は X 使えるようにしていないことに気づく。とりあえず手元の PC の cygwin に X が入ってたので、cygwin のシェルで
+      </p>
+      <pre><code>$ startxwin.sh
+$ xhost +</code></pre>
+      <p>
+        でもって CentOS 上で
+      </p>
+      <pre><code>$ export DISPLAY=192.168.10.19:0.0
+$ virt-manager</code></pre>
+      <p>
+        で virt-manager 起動。
+      </p>
+      <p>
+        [[Image(01.jpg)]]
+      </p>
+      <p>
+        無事に画面が出たので、QEMU を選択して接続。
+      </p>
+      <p>
+        [[Image(02.jpg)]]
+      </p>
+      <p>
+        VM が見えるので選択して、右下の「Open」をクリック。
+      </p>
+      <p>
+        [[Image(03.jpg)]]
+      </p>
+      <p>
+        無事アクセスできた。root のパスワードは ovirtwui 。
+      </p>
+      <p>
+        ここまでやってから、XML で MAC アドレス指定してるんだから、DHCP サーバのログから IP アドレス調べればいいだけだった、ということに気づく。
+      </p>
+      <p>
+        今日はここまで。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2008/02/03/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2008/03/09/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

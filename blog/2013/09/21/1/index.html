@@ -1,122 +1,175 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>自分のプロダクトを海外でも認知してもらうには - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      自分のプロダクトを海外でも認知してもらうには - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="自分のプロダクトを海外でも認知してもらうには"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/09/21/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/09/21/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="自分のプロダクトを海外でも認知してもらうには"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/09/21/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/09/21/1">
+          自分のプロダクトを海外でも認知してもらうには
+        </a>
+      </h1>
+      <div class="byline">
+        21 September 2013
+      </div>
+      <p>
+        ブログを書くまでが YAPC、ってことなので書きます。
+      </p>
+      <p>
+        YAPC 懇親会で
+        <a href="https://twitter.com/hirose31">
+          @hirose31
+        </a>
+        さんと「日本人の作ったプロダクトでとても優れていて日本では知名度抜群なのに、海外では全然知られてない、みたいの割とあるけど、どうやったら serverspec みたいに海外でも認知されるようになるんですかね」みたいな話をしました。
+      </p>
+      <p>
+        serverspec の海外での知名度、といっても、日本での知名度と比較すればまだまだ全然、という感じですが、たまに海外の方の tweet を見かけたり、
+        <a href="http://jjasghar.github.io/blog/2013/07/12/serverspec-the-new-best-way-to-learn-and-audit-your-infrastructure/">
+          Serverspec the New Best Way to Learn and Audit Your Infrastructure
+        </a>
+        というブログエントリを書いてくださった方がいたり、
+        <a href="http://foodfightshow.org/2013/05/testing-in-practice.html">
+          Food Fight という Podcast で取り上げられたり
+        </a>
+        、
+        <a href="http://shop.oreilly.com/product/0636920030973.do">
+          O'Reilly の Test-Driven Infrastructure with Chef 2nd Edition
+        </a>
+        で取り上げられたり、
+        <a href="https://github.com/serverspec/serverspec/pull/128">
+          Puppet Labs の中の人が Vagrant 対応パッチを送ってくれたり
+        </a>
+        、
+        <a href="https://github.com/serverspec/serverspec/issues/239">
+          Opscode の中の人が issue open してくれたり
+        </a>
+        、といった感じで、そこそこ海外の方にも知られる存在になっていて、そうなるように意識してやったことがいくつかあるので、それについて簡単に整理してみます。
+      </p>
+      <h2>
+        英語でドキュメントを書く
+      </h2>
+      <p>
+        これは当たり前、というか、大前提なので、特に説明の必要はないですね。
+      </p>
+      <h2>
+        メジャーなキーワードを散りばめる
+      </h2>
+      <p>
+        <a href="https://github.com/serverspec/serverspec">
+          GitHub の description
+        </a>
+        や
+        <a href="http://serverspec.org/">
+          serverspec.org
+        </a>
+        には serverspec の説明として
+        <strong>
+          &quot;RSpec tests for your servers configured by Puppet, Chef or anything else&quot;
+        </strong>
+        といった言葉があるのですが、
+        <strong>
+          &quot;Puppet&quot;
+        </strong>
+        や
+        <strong>
+          &quot;Chef&quot;
+        </strong>
+        といったワードがあるために、辿り着いて興味を持った人が多いのではないかと思います。特に、Puppet Labs や Opscode の中の人は、Puppet や Chef でエゴサーチしてるでしょうし、そういった方々にリーチして、tweet してもらったりすることで、認知度が高まったのではないかと。
+      </p>
+      <h2>
+        ぱっと見てどんなものかわかりやすくする
+      </h2>
+      <p>
+        検索等で辿り着いたとしても、ぱっと見て何をするものなのかがわからないと、すぐに興味を失って二度と訪れてくれなくなるので、
+        <a href="http://serverspec.org/">
+          serverspec.org
+        </a>
+        のトップページは、ざっと見ただけで何をするものなのかがすぐに理解できる、ということ意識しています。
+      </p>
+      <h2>
+        名前が覚えやすい
+      </h2>
+      <p>
+        <strong>
+          serverspec = server + rspec
+        </strong>
+        ととても安直ですが、それが故に覚えやすく、名前から何をするものなのかが連想しやすいし、tweet 等する時に書きやすいので、それも良かったのではないかと。
+      </p>
+      <h2>
+        簡単に試せる
+      </h2>
+      <p>
+        どんなに優れたプロダクトでも、動かすまでの敷居が高いと、途中で挫折して、もういいや、と離脱されて忘れ去られてしまうし、実際に動かしてみることで、はじめてそのプロダクトの価値がわかる、ということもよくあるので、いかに敷居を低くして、実際に動かして体験してもらうか、ということも意識しています。（これは海外向けに意識したこと、というわけではないですが、広く利用してもらうために意識したことなので、追記。）
+      </p>
+      <hr />
+      <p>
+        とまあこんな感じで、そんな大したことやってないですが、他にも要因は色々あるんでしょうね。例えば、Test-Driven Infrastructure という考え方が浸透してきたけど、serverspec ほどシンプルで敷居の低いツールが他になかった、とか、いわゆる開発者と呼ばれる人たちに Puppet や Chef が浸透してきて、そういった人たちに「サーバのテストを RSpec でやる」というコンセプトが響いた、とか、時代の流れ的なものにうまく嵌まったのかなー、と。
+      </p>
+      <hr />
+      <p>
+        あと、この話は、serverspec のような、技術者向けのツールとかライブラリにはある程度あてはまるでしょうけど、そうじゃないものだと、言語や文化の壁が大きくて、こうはいかないでしょうね。
+      </p>
+      <hr />
+      <p>
+        とはいえ、海外で認知してもらう前に、そもそも国内で認知してもらえるような良いプロダクトを作らないといけないわけだけど、その方法については自分は知りません。むしろ教えて欲しいです。
+      </p>
+      <hr />
+      <p>
+        というわけで、ブログ書くまでが YAPC と言っておきながら、YAPC 全然関係ないエントリをお送りしました。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/06/22/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/09/21/1">自分のプロダクトを海外でも認知してもらうには</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>ブログを書くまでが YAPC、ってことなので書きます。</p>
-
-<p>YAPC 懇親会で <a href="https://twitter.com/hirose31">@hirose31</a> さんと「日本人の作ったプロダクトでとても優れていて日本では知名度抜群なのに、海外では全然知られてない、みたいの割とあるけど、どうやったら serverspec みたいに海外でも認知されるようになるんですかね」みたいな話をしました。</p>
-
-<p>serverspec の海外での知名度、といっても、日本での知名度と比較すればまだまだ全然、という感じですが、たまに海外の方の tweet を見かけたり、<a href="http://jjasghar.github.io/blog/2013/07/12/serverspec-the-new-best-way-to-learn-and-audit-your-infrastructure/">Serverspec the New Best Way to Learn and Audit Your Infrastructure</a> というブログエントリを書いてくださった方がいたり、<a href="http://foodfightshow.org/2013/05/testing-in-practice.html">Food Fight という Podcast で取り上げられたり</a>、<a href="http://shop.oreilly.com/product/0636920030973.do">O&#39;Reilly の Test-Driven Infrastructure with Chef 2nd Edition</a> で取り上げられたり、<a href="https://github.com/serverspec/serverspec/pull/128">Puppet Labs の中の人が Vagrant 対応パッチを送ってくれたり</a>、<a href="https://github.com/serverspec/serverspec/issues/239">Opscode の中の人が issue open してくれたり</a>、といった感じで、そこそこ海外の方にも知られる存在になっていて、そうなるように意識してやったことがいくつかあるので、それについて簡単に整理してみます。</p>
-
-<h2>英語でドキュメントを書く</h2>
-
-<p>これは当たり前、というか、大前提なので、特に説明の必要はないですね。</p>
-
-<h2>メジャーなキーワードを散りばめる</h2>
-
-<p><a href="https://github.com/serverspec/serverspec">GitHub の description</a> や <a href="http://serverspec.org/">serverspec.org</a> には serverspec の説明として <strong>&quot;RSpec tests for your servers configured by Puppet, Chef or anything else&quot;</strong> といった言葉があるのですが、<strong>&quot;Puppet&quot;</strong> や <strong>&quot;Chef&quot;</strong> といったワードがあるために、辿り着いて興味を持った人が多いのではないかと思います。特に、Puppet Labs や Opscode の中の人は、Puppet や Chef でエゴサーチしてるでしょうし、そういった方々にリーチして、tweet してもらったりすることで、認知度が高まったのではないかと。</p>
-
-<h2>ぱっと見てどんなものかわかりやすくする</h2>
-
-<p>検索等で辿り着いたとしても、ぱっと見て何をするものなのかがわからないと、すぐに興味を失って二度と訪れてくれなくなるので、<a href="http://serverspec.org/">serverspec.org</a> のトップページは、ざっと見ただけで何をするものなのかがすぐに理解できる、ということ意識しています。</p>
-
-<h2>名前が覚えやすい</h2>
-
-<p><strong>serverspec = server + rspec</strong> ととても安直ですが、それが故に覚えやすく、名前から何をするものなのかが連想しやすいし、tweet 等する時に書きやすいので、それも良かったのではないかと。</p>
-
-<h2>簡単に試せる</h2>
-
-<p>どんなに優れたプロダクトでも、動かすまでの敷居が高いと、途中で挫折して、もういいや、と離脱されて忘れ去られてしまうし、実際に動かしてみることで、はじめてそのプロダクトの価値がわかる、ということもよくあるので、いかに敷居を低くして、実際に動かして体験してもらうか、ということも意識しています。（これは海外向けに意識したこと、というわけではないですが、広く利用してもらうために意識したことなので、追記。）</p>
-
-<hr>
-
-<p>とまあこんな感じで、そんな大したことやってないですが、他にも要因は色々あるんでしょうね。例えば、Test-Driven Infrastructure という考え方が浸透してきたけど、serverspec ほどシンプルで敷居の低いツールが他になかった、とか、いわゆる開発者と呼ばれる人たちに Puppet や Chef が浸透してきて、そういった人たちに「サーバのテストを RSpec でやる」というコンセプトが響いた、とか、時代の流れ的なものにうまく嵌まったのかなー、と。</p>
-
-<hr>
-
-<p>あと、この話は、serverspec のような、技術者向けのツールとかライブラリにはある程度あてはまるでしょうけど、そうじゃないものだと、言語や文化の壁が大きくて、こうはいかないでしょうね。</p>
-
-<hr>
-
-<p>とはいえ、海外で認知してもらう前に、そもそも国内で認知してもらえるような良いプロダクトを作らないといけないわけだけど、その方法については自分は知りません。むしろ教えて欲しいです。</p>
-
-<hr>
-
-<p>というわけで、ブログ書くまでが YAPC と言っておきながら、YAPC 全然関係ないエントリをお送りしました。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/10/29/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/06/22/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/10/29/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

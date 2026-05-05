@@ -1,81 +1,87 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>PPerl と plagger - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    PPerl と plagger - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="PPerl と plagger"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/06/25/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/06/25/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="PPerl と plagger"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/06/25/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/06/25/1">PPerl と plagger</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/0596526741/httshemizorg-22/ref=nosim"><span class="icon"></span>Perl Hacks</a> に載ってた Hack <a class="ticket" href="/ticket/81">#81</a> の <a class="ext-link" href="http://search.cpan.org/dist/PPerl/"><span class="icon"></span>PPerl</a> を plagger で試してみよう、と思ったら <a class="ext-link" href="http://d.hatena.ne.jp/odz/20060524/1148529647"><span class="icon"></span>既に試していらっしゃる方</a> がおりました。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/06/25/1">
+    PPerl と plagger
+  </a>
+</h1>
+<div class="byline">
+  25 June 2006
+</div>
 <p>
-というわけで、PPerl が何なのかは <a class="ext-link" href="http://d.hatena.ne.jp/odz/"><span class="icon"></span>id:odz さん</a> の上記エントリを見てください。
+  <a class="ext-link" href="http://www.amazon.co.jp/exec/obidos/ASIN/0596526741/httshemizorg-22/ref=nosim">
+    <span class="icon"></span>
+    Perl Hacks
+  </a>
+  に載ってた Hack
+  <a class="ticket" href="/ticket/81">
+    #81
+  </a>
+  の
+  <a class="ext-link" href="http://search.cpan.org/dist/PPerl/">
+    <span class="icon"></span>
+    PPerl
+  </a>
+  を plagger で試してみよう、と思ったら
+  <a class="ext-link" href="http://d.hatena.ne.jp/odz/20060524/1148529647">
+    <span class="icon"></span>
+    既に試していらっしゃる方
+  </a>
+  がおりました。
 </p>
-
 <p>
-と、これだけでも何なので、PPerl について気になって調べたことをメモ。まず、global セクションだけ書いた config.yaml で plagger を起動して、ps コマンドで仮想メモリ容量を見てみると、こんな感じになってます。
+  というわけで、PPerl が何なのかは
+  <a class="ext-link" href="http://d.hatena.ne.jp/odz/">
+    <span class="icon"></span>
+    id:odz さん
+  </a>
+  の上記エントリを見てください。
 </p>
-
+<p>
+  と、これだけでも何なので、PPerl について気になって調べたことをメモ。まず、global セクションだけ書いた config.yaml で plagger を起動して、ps コマンドで仮想メモリ容量を見てみると、こんな感じになってます。
+</p>
 <pre class="wiki">
 $ pperl plagger                                           [~/plagger]
 Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
@@ -87,11 +93,9 @@ $ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep           [~/plagger]
  6474  6470 10772 plagger
  6475  6470 10772 plagger
 </pre>
-
 <p>
-さらにもう2回ほど pperl plagger を実行すると、
+  さらにもう2回ほど pperl plagger を実行すると、
 </p>
-
 <pre class="wiki">
 $ pperl plagger                                           [~/plagger]
 Plagger [info] plugin Plagger::Plugin::Aggregator::Simple loaded.
@@ -105,11 +109,9 @@ $ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep           [~/plagger]
  6474  6470 10772 plagger
  6475  6470 10772 plagger
 </pre>
-
 <p>
-さらにもう何回か実行してみる。
+  さらにもう何回か実行してみる。
 </p>
-
 <pre class="wiki">
 $ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep      [~/plagger]
  6470     1 10772 plagger
@@ -119,15 +121,12 @@ $ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep      [~/plagger]
  6474  6470 <strong>18592</strong> plagger
  6475  6470 <strong>18592</strong> plagger
 </pre>
-
 <p>
-こんな感じで、プロセス ID 6470 が大元の親プロセスになって、他の plagger プロセスをフォークしていて、 親プロセスの仮想メモリ容量が 10772KB、他の子プロセスの仮想メモリ容量との差分である 7820KB が plagger 関連モジュールが確保している仮想メモリ容量なんだろうなぁ、ということが分かります。
+  こんな感じで、プロセス ID 6470 が大元の親プロセスになって、他の plagger プロセスをフォークしていて、 親プロセスの仮想メモリ容量が 10772KB、他の子プロセスの仮想メモリ容量との差分である 7820KB が plagger 関連モジュールが確保している仮想メモリ容量なんだろうなぁ、ということが分かります。
 </p>
-
 <p>
-で、今度は普段使っているコンフィグで起動してみます。
+  で、今度は普段使っているコンフィグで起動してみます。
 </p>
-
 <pre class="wiki">
 $ pperl plagger --config=gmail.yaml
 Plagger [info] plugin Plagger::Plugin::Subscription::Bloglines loaded.
@@ -153,51 +152,46 @@ $ ps -eo pid,ppid,vsz,args|grep plagger|grep -v grep      [~/plagger]
  6474  6470 18592 plagger
  6475  6470 <strong>37388</strong> plagger
 </pre>
-
 <p>
-と、こんな感じで、ID 6475 のプロセスが大きくなってます。これがこのコンフィグで増えた Plagger Plugin モジュールのメモリ容量みたいですね。
+  と、こんな感じで、ID 6475 のプロセスが大きくなってます。これがこのコンフィグで増えた Plagger Plugin モジュールのメモリ容量みたいですね。
 </p>
-
 <p>
-といったように、pperl を最初に起動した時のモジュールだけをメモリ上に確保するだけではなく、その後新たに読み込まれたモジュールもちゃんとメモリ上に確保してくれているようです。当たり前っちゃ当たり前の気もしますが、何となく気になったので。 
+  といったように、pperl を最初に起動した時のモジュールだけをメモリ上に確保するだけではなく、その後新たに読み込まれたモジュールもちゃんとメモリ上に確保してくれているようです。当たり前っちゃ当たり前の気もしますが、何となく気になったので。
 </p>
-
 <p>
-他に気になった点として、起動するプロセスの数を増やしたり、制限したりできるのかな、と思ったところ、以下の様なオプションがあるので、この辺りも制御できるようですね。
+  他に気になった点として、起動するプロセスの数を増やしたり、制限したりできるのかな、と思ったところ、以下の様なオプションがあるので、この辺りも制御できるようですね。
 </p>
-
 <pre class="wiki">
 $ pperl --help                                            [~/plagger]
 pperl version 0.25
 Usage: pperl [options] filename
 perl options are passed to your perl executable (see the perlrun man page).
 pperl options control the persistent perl behaviour
-
-PPerl Options:
-  -k  or --kill      Kill the currently running pperl for that script
-  -h  or --help      This page
-  --prefork          The number of child processes to prefork (default=5)
-  --maxclients       The number of client connections each child
-                       will process (default=100)
-  -z  or --anyuser   Allow any user (after the first) to access the socket
-                       WARNING: This has severe security implications. Use
-                       at your own risk
-  --no-cleanup       Skip the cleanup stage at the end of running your script
-                       this may make your code run faster, but if you forget
-                       to close files then they will remain unflushed and unclosed
+<p>PPerl Options:<br />
+-k  or --kill      Kill the currently running pperl for that script<br />
+-h  or --help      This page<br />
+--prefork          The number of child processes to prefork (default=5)<br />
+--maxclients       The number of client connections each child<br />
+will process (default=100)<br />
+-z  or --anyuser   Allow any user (after the first) to access the socket<br />
+WARNING: This has severe security implications. Use<br />
+at your own risk<br />
+--no-cleanup       Skip the cleanup stage at the end of running your script<br />
+this may make your code run faster, but if you forget<br />
+to close files then they will remain unflushed and unclosed<br />
 </pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/07/02/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/06/20/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/06/20/2" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/07/02/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

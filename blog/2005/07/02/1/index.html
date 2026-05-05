@@ -1,110 +1,107 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Javascriptの皮を被ったXML #0 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Javascriptの皮を被ったXML #0 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Javascriptの皮を被ったXML #0"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/07/02/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/07/02/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Javascriptの皮を被ったXML #0"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/07/02/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/07/02/1">
+          Javascriptの皮を被ったXML #0
+        </a>
+      </h1>
+      <div class="byline">
+        2 July 2005
+      </div>
+      <p class="entryBody">
+        <a href="http://johnvey.com/features/deliciousdirector/" target="_blank">
+          del.icio.us direc.tor
+        </a>
+        を見て、「APIが提供するXMLに、JavascriptでUIを被せるのはアリだな。」と思った方は多いのではないでしょうか。この辺りについては、ma.laさんが
+        <a href="http://la.ma.la/blog/diary_200506291043.htm" target="_blank">
+          「XMLはメタデータというより...」
+        </a>
+        というエントリでご指摘されている通りで、俺なんかから言うことは何もなかったりするのですが、この「del.icio.us direc.torメソッド」が普及、発展するためには、以下の2点がクリアになる必要があるのではないかな、と、名古屋出張帰りの新幹線の中で考えていました。
+      </p>
+      <ol class="entryBody">
+        <li>
+          JavascriptとHTMLの分離。言い換えるとテンプレートエンジンの実装。これにより開発がより容易に。
+        </li>
+        <li>
+          様々なXML形式への対応。ma.laさんが上記エントリで、「はてなブックマークがdel.icio.usと同じ形式で出力するAPIを備えていれば」といったお話をされているのですが、逆に異なる形式であっても、外部XSLTファイルを各サービスごとに用意しておいて、Javascript側でXSLT変換して形式をそろえてあげればいんじゃないかと。これにより、ひとつのUIを様々なサービスに適用可能になる。
+        </li>
+      </ol>
+      <p class="entryBody">
+        とはいうものの、これを実装するのは技術的に結構難しそう。まず、1に関しては、現在いくつかのJavascriptテンプレートエンジンが存在しますが、どれもHTMLからscriptタグを呼び出して、テンプレート処理させるものになってます。それに対し、direc.torメソッドはまずはJavascriptありきなので、JavascriptからHTMLを呼び出して、テンプレート処理する必要があります。ところが、クロスドメインの問題により、HTMLテンプレートをxmlHttpRequestで呼び出すことができません。そうすると、document.createElementによるscript呼び出し、という案が考えられるのですが、呼び出す対象がHTMLであってJavascriptではないため、エラーになるでしょう。
+      </p>
+      <p class="entryBody">
+        2も同様に、クロスドメインの問題でxmlHttpRequestでは外部XSLTファイルが取得できないですし、script呼び出ししようにも、やはりJavascriptではないためエラー。
+      </p>
+      <p class="entryBody">
+        そうなると妥協点としては、サーバ側での処理もやはり必要かなぁ、ということになるのですが、できるならpure javascriptで実現したいですよね。
+      </p>
+      <p class="entryBody">
+        <strong>
+          2005/06/30追記
+        </strong>
+        <br />
+        pure javascriptで実現したい理由は、プログラムをJavascriptに一本化した方が楽だから、というのもあるのですが、認証情報が第三者のサーバを経由しない、ってところも重要なポイントですね。
+      </p>
+      <p class="entryBody">
+        と、ここまで考えたところで、これ以上アイデアが出てこなくなってしまいました。中途半端ですみませんが、これを読んだ頭の良い方が、「こうすればいいんじゃね？」とか「そもそもこの考え方はだめ。こっちの方がいい。」とか言ってくれるのを期待して、晒しておきます。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/06/27/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/07/02/1">Javascriptの皮を被ったXML #0</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-<a href="http://johnvey.com/features/deliciousdirector/" target="_blank">del.icio.us direc.tor</a>を見て、「APIが提供するXMLに、JavascriptでUIを被せるのはアリだな。」と思った方は多いのではないでしょうか。この辺りについては、ma.laさんが<a href="http://la.ma.la/blog/diary_200506291043.htm" target="_blank">「XMLはメタデータというより...」</a>というエントリでご指摘されている通りで、俺なんかから言うことは何もなかったりするのですが、この「del.icio.us direc.torメソッド」が普及、発展するためには、以下の2点がクリアになる必要があるのではないかな、と、名古屋出張帰りの新幹線の中で考えていました。
-</p>
-
-<ol class="entryBody">
-<li>JavascriptとHTMLの分離。言い換えるとテンプレートエンジンの実装。これにより開発がより容易に。</li>
-<li>様々なXML形式への対応。ma.laさんが上記エントリで、「はてなブックマークがdel.icio.usと同じ形式で出力するAPIを備えていれば」といったお話をされているのですが、逆に異なる形式であっても、外部XSLTファイルを各サービスごとに用意しておいて、Javascript側でXSLT変換して形式をそろえてあげればいんじゃないかと。これにより、ひとつのUIを様々なサービスに適用可能になる。</li>
-</ol>
-
-<p class="entryBody">
-とはいうものの、これを実装するのは技術的に結構難しそう。まず、1に関しては、現在いくつかのJavascriptテンプレートエンジンが存在しますが、どれもHTMLからscriptタグを呼び出して、テンプレート処理させるものになってます。それに対し、direc.torメソッドはまずはJavascriptありきなので、JavascriptからHTMLを呼び出して、テンプレート処理する必要があります。ところが、クロスドメインの問題により、HTMLテンプレートをxmlHttpRequestで呼び出すことができません。そうすると、document.createElementによるscript呼び出し、という案が考えられるのですが、呼び出す対象がHTMLであってJavascriptではないため、エラーになるでしょう。
-</p>
-
-<p class="entryBody">
-2も同様に、クロスドメインの問題でxmlHttpRequestでは外部XSLTファイルが取得できないですし、script呼び出ししようにも、やはりJavascriptではないためエラー。
-</p>
-
-<p class="entryBody">
-そうなると妥協点としては、サーバ側での処理もやはり必要かなぁ、ということになるのですが、できるならpure javascriptで実現したいですよね。
-</p>
-
-<p class="entryBody">
-<strong>2005/06/30追記</strong><br />
-pure javascriptで実現したい理由は、プログラムをJavascriptに一本化した方が楽だから、というのもあるのですが、認証情報が第三者のサーバを経由しない、ってところも重要なポイントですね。
-</p>
-
-<p class="entryBody">
-と、ここまで考えたところで、これ以上アイデアが出てこなくなってしまいました。中途半端ですみませんが、これを読んだ頭の良い方が、「こうすればいいんじゃね？」とか「そもそもこの考え方はだめ。こっちの方がいい。」とか言ってくれるのを期待して、晒しておきます。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/07/02/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/06/27/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/07/02/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

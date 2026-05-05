@@ -1,98 +1,103 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>How to manage RPM packages with Git - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      How to manage RPM packages with Git - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="How to manage RPM packages with Git"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/01/19/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/01/19/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="How to manage RPM packages with Git"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/01/19/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/01/19/1">
+          How to manage RPM packages with Git
+        </a>
+      </h1>
+      <div class="byline">
+        19 January 2013
+      </div>
+      <p>
+        Now I manage RPM packages like
+        <a href="https://github.com/paperboy-sqale/sqale-yum">
+          this repo
+        </a>
+        . I put source and binary packages in this repo.But this way has these problems.
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          Binary packages' size is too big.It takes long time to git clone, push, pull and so on.
+        </li>
+        <li>
+          I cannot see the history of each file in the packages.
+          <ul>
+            <li>
+              It's not very meaningful to use Git.
+            </li>
+          </ul>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/01/19/1">How to manage RPM packages with Git</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>Now I manage RPM packages like <a href="https://github.com/paperboy-sqale/sqale-yum">this repo</a>. I put source and binary packages in this repo.But this way has these problems.</p>
-
-<ul>
-<li>Binary packages&#39; size is too big.It takes long time to git clone, push, pull and so on.</li>
-<li>I cannot see the history of each file in the packages.
-
-<ul>
-<li>It&#39;s not very meaningful to use Git.</li>
-</ul></li>
-</ul>
-
-<p>I&#39;d like to change like this.</p>
-
-<ul>
-<li>Put the requisite minumum files to see the hisotory of each file.
-
-<ul>
-<li>Not put binary packages.(Source packages are OK if needed.)</li>
-</ul></li>
-<li>Build packages with files managed with Git.</li>
-</ul>
-
-<p>And I made the prototype of this idea like this.</p>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git">mizzy/how-to-manage-rpm-packages-with-git</a></p>
-
-<p>The file/directory strucure in this repo is like this.</p>
-
-<pre><code>|-- build.rb
+      <p>
+        I'd like to change like this.
+      </p>
+      <ul>
+        <li>
+          Put the requisite minumum files to see the hisotory of each file.
+          <ul>
+            <li>
+              Not put binary packages.(Source packages are OK if needed.)
+            </li>
+          </ul>
+        </li>
+        <li>
+          Build packages with files managed with Git.
+        </li>
+      </ul>
+      <p>
+        And I made the prototype of this idea like this.
+      </p>
+      <p>
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git">
+          mizzy/how-to-manage-rpm-packages-with-git
+        </a>
+      </p>
+      <p>
+        The file/directory strucure in this repo is like this.
+      </p>
+      <pre><code>|-- build.rb
 |-- ffmpeg
 |   |-- ffmpeg-github-0.8.2.spec
 |   |-- libavformat-muxer.paperboy.patch
@@ -102,79 +107,103 @@
 |   |-- memcached-1.4.15-1.el6.src.rpm
 |   `-- memcached.spec
 `-- ngx_openresty
-    `-- ngx_openresty.spec
-</code></pre>
-
-<p>Build rb is the package build script, and others are directories for each package.Which files should be managed is vary from package to package, so I arrange several patterns.</p>
-
-<hr>
-
-<h2>Pattern 1: ngx_openresty</h2>
-
-<p>With <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ngx_openresty">this pattern</a>, all I have to manage is spec file.In this spec file,</p>
-
-<pre><code>Source0: http://agentzh.org/misc/nginx/ngx_openresty-%{version}.tar.gz
-</code></pre>
-
-<p>You can see this line.Build.rb gets this file, pust under ~/rpmbuild/SOURCES and build source and binary packages.This is the simplest pattern.</p>
-
-<hr>
-
-<h2>Pattern2: ffpmeg</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ffmpeg">This pattern</a> has a spec file, patch files and other files.If you need original patches and manage patch files with Git, this pattern is suitable.</p>
-
-<pre><code>Source: http://www.ffmpeg.org/releases/ffmpeg-%{version}.tar.bz2
-</code></pre>
-
-<p>Build.rb get this source file in spec, put this source, patches and other files under ~/rpmbuild/SOURCE and build source and binary packages.</p>
-
-<hr>
-
-<h2>Pattern 3: memcached</h2>
-
-<p>With <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/memcached">this pattern</a>, You&#39;d like to change the build options of the existence source package, but the sources in spec file is like this.</p>
-
-<pre><code>Source0:        http://memcached.googlecode.com/files/%{name}-%{version}.tar.gz
-Source1:        memcached.sysv
-</code></pre>
-
-<p>So you can&#39;t get the memcached.sysv through the network.But this file is included in the existence source package and you don&#39;t need to manage it with Git.</p>
-
-<p>In this case, it&#39;s easy to put the existence source package under the Gir repo.</p>
-
-<hr>
-
-<p>With any of these patterns, you can see the history of each file, total file size in the repo is minimum and all files needed to build package are found in the repo.</p>
-
-<hr>
-
-<h2>Package Building and Deploying</h2>
-
-<p>My final goal is, git clone these files, build packages with the script <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/blob/master/build.rb">like this</a> and deploy the packages to yum servers automatically.</p>
-
-<hr>
-
-<h2>Other featuer</h2>
-
-<p>Also I&#39;d like to write git url as source in the spec file like this.</p>
-
-<pre><code>Source: git://github.com/torvalds/linux.git, ref: dfdeb
-</code></pre>
-
-<p>Build script will clone source files from this git url, build tar ball from these and build package.This idea is inspired by <a href="http://gembundler.com/">Bundler</a>.</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/01/30/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/01/17/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+    `-- ngx_openresty.spec</code></pre>
+      <p>
+        Build rb is the package build script, and others are directories for each package.Which files should be managed is vary from package to package, so I arrange several patterns.
+      </p>
+      <hr />
+      <h2>
+        Pattern 1: ngx_openresty
+      </h2>
+      <p>
+        With
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ngx_openresty">
+          this pattern
+        </a>
+        , all I have to manage is spec file.In this spec file,
+      </p>
+      <pre><code>Source0: http://agentzh.org/misc/nginx/ngx_openresty-%{version}.tar.gz</code></pre>
+      <p>
+        You can see this line.Build.rb gets this file, pust under ~/rpmbuild/SOURCES and build source and binary packages.This is the simplest pattern.
+      </p>
+      <hr />
+      <h2>
+        Pattern2: ffpmeg
+      </h2>
+      <p>
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ffmpeg">
+          This pattern
+        </a>
+        has a spec file, patch files and other files.If you need original patches and manage patch files with Git, this pattern is suitable.
+      </p>
+      <pre><code>Source: http://www.ffmpeg.org/releases/ffmpeg-%{version}.tar.bz2</code></pre>
+      <p>
+        Build.rb get this source file in spec, put this source, patches and other files under ~/rpmbuild/SOURCE and build source and binary packages.
+      </p>
+      <hr />
+      <h2>
+        Pattern 3: memcached
+      </h2>
+      <p>
+        With
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/memcached">
+          this pattern
+        </a>
+        , You'd like to change the build options of the existence source package, but the sources in spec file is like this.
+      </p>
+      <pre><code>Source0:        http://memcached.googlecode.com/files/%{name}-%{version}.tar.gz
+Source1:        memcached.sysv</code></pre>
+      <p>
+        So you can't get the memcached.sysv through the network.But this file is included in the existence source package and you don't need to manage it with Git.
+      </p>
+      <p>
+        In this case, it's easy to put the existence source package under the Gir repo.
+      </p>
+      <hr />
+      <p>
+        With any of these patterns, you can see the history of each file, total file size in the repo is minimum and all files needed to build package are found in the repo.
+      </p>
+      <hr />
+      <h2>
+        Package Building and Deploying
+      </h2>
+      <p>
+        My final goal is, git clone these files, build packages with the script
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/blob/master/build.rb">
+          like this
+        </a>
+        and deploy the packages to yum servers automatically.
+      </p>
+      <hr />
+      <h2>
+        Other featuer
+      </h2>
+      <p>
+        Also I'd like to write git url as source in the spec file like this.
+      </p>
+      <pre><code>Source: git://github.com/torvalds/linux.git, ref: dfdeb</code></pre>
+      <p>
+        Build script will clone source files from this git url, build tar ball from these and build package.This idea is inspired by
+        <a href="http://gembundler.com/">
+          Bundler
+        </a>
+        .
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/01/17/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/01/30/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

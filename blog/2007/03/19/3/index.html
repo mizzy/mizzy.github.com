@@ -1,77 +1,71 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>puppet でファイルが変更されたら指定したコマンドを実行するレシピ - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    puppet でファイルが変更されたら指定したコマンドを実行するレシピ - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="puppet でファイルが変更されたら指定したコマンドを実行するレシピ"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2007/03/19/3/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2007/03/19/3/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="puppet でファイルが変更されたら指定したコマンドを実行するレシピ"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2007/03/19/3/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/03/19/3">puppet でファイルが変更されたら指定したコマンドを実行するレシピ</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-puppet で <a class="ext-link" href="http://mizzy.org/linux/puppet03.html"><span class="icon"></span>ファイルの配布</a> ができたので、次はファイルが変更されたら特定のコマンドを実行、にチャレンジ。これは <a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/FrequentlyAskedQuestions#how-do-i-run-a-command-whenever-a-file-changes"><span class="icon"></span>FAQ</a> にやり方書いてました。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2007/03/19/3">
+    puppet でファイルが変更されたら指定したコマンドを実行するレシピ
+  </a>
+</h1>
+<div class="byline">
+  19 March 2007
+</div>
 <p>
-puppet サーバで管理している /etc/httpd/conf.d/ 以下のファイルが変更されたら、puppet クライアント上のファイルを更新して httpd を再起動するレシピはこんな感じ。
+  puppet で
+  <a class="ext-link" href="http://mizzy.org/linux/puppet03.html">
+    <span class="icon"></span>
+    ファイルの配布
+  </a>
+  ができたので、次はファイルが変更されたら特定のコマンドを実行、にチャレンジ。これは
+  <a class="ext-link" href="http://reductivelabs.com/trac/puppet/wiki/FrequentlyAskedQuestions#how-do-i-run-a-command-whenever-a-file-changes">
+    <span class="icon"></span>
+    FAQ
+  </a>
+  にやり方書いてました。
 </p>
-
+<p>
+  puppet サーバで管理している /etc/httpd/conf.d/ 以下のファイルが変更されたら、puppet クライアント上のファイルを更新して httpd を再起動するレシピはこんな感じ。
+</p>
 <pre class="wiki">
 class web {
   define httpd {
@@ -86,20 +80,15 @@ class web {
       refreshonly => true
     }
   }
-
-  httpd { 'httpd settings': }
-}
-
-node 'www.mizzy.org' {
-  include web
-}
+<p>httpd { 'httpd settings': }<br />
+}</p>
+<p>node 'www.mizzy.org' {<br />
+include web<br />
+}<br />
 </pre>
-
 <p>
-/etc/httpd/cond.d/perl.conf を変更して puppet クライアント上で puppetd --test を実行するとこんな感じに。
-</p>
-
-<pre class="wiki">
+  /etc/httpd/cond.d/perl.conf を変更して puppet クライアント上で puppetd --test を実行するとこんな感じに。
+</p><pre class="wiki">
 $ sudo /usr/sbin/puppetd --server mizzy.org --test
 info: Caching configuration at /var/lib/puppet/localconfig.yaml
 notice: Starting configuration run
@@ -109,29 +98,26 @@ info: //www.mizzy.org/web/httpd[httpd settings]/file=/etc/httpd/conf.d/perl.conf
 notice: //www.mizzy.org/web/httpd[httpd settings]/exec=/etc/init.d/httpd restart: Triggering 'refresh' from 1 dependencies
 notice: Finished configuration run in 7.42 seconds    
 </pre>
-
 <p>
-ファイルが更新されてない場合はこうなる。
-</p>
-
-<pre class="wiki">
+  ファイルが更新されてない場合はこうなる。
+</p><pre class="wiki">
 $ sudo /usr/sbin/puppetd --server mizzy.org --test
 info: Caching configuration at /var/lib/puppet/localconfig.yaml
 notice: Starting configuration run
 notice: Finished configuration run in 6.80 second
 </pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/03/21/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/03/19/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2007/03/19/2" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2007/03/21/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

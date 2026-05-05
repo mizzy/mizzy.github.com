@@ -1,106 +1,165 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ChefConf 2014 に来てます - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ChefConf 2014 に来てます - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ChefConf 2014 に来てます"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2014/04/17/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2014/04/17/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ChefConf 2014 に来てます"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2014/04/17/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2014/04/17/1">
+          ChefConf 2014 に来てます
+        </a>
+      </h1>
+      <div class="byline">
+        17 April 2014
+      </div>
+      <p>
+        今日は最終日で、昨日は Serverspec: The Simplest Server Testing Tool Ever というタイトルでプレゼンしてきました。海外でははじめての serverspec プレゼンなので、もっと基本的な、具体的な使い方とかデモといった内容にした方がいいのかなー、と思いつつも、そういうのはオフィシャルサイトとか見れば割と十分だし、自分以外の人でも話せる内容なので、開発者ならではの、開発をはじめたきっかけとか、開発する上での哲学とか、今後どうしていきたいのか、みたいな話をしました。(
+        <a href="http://memo.sanographix.net/post/82160791768">
+          大体いい感じになるKeynoteテンプレート「Azusa」
+        </a>
+        を使わせてもらいました。ありがとうございます。あと、mirakui さんの真似して entypo や fontawesome も使ってみました。)
+      </p>
+      <div style="width: 65%">
+        <script async class="speakerdeck-embed" data-id="32f62ac0a7db0131c1eb06aa2e69a5d0" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+      </div>
+      <p>
+        英語台本棒読みだし、Splunk の方から質問された内容が、なんかテストカバレッジのことを聞かれてるんだけど、全然理解できなくて若干へこんでいたら、
+        <a href="https://twitter.com/yumano">
+          @yumano
+        </a>
+        さんに間に入っていただいて話を聞いてみると、serverspec そのもののテストカバレッジの話かと思ってたら、Chef レシピに対するカバレッジ、という話で、言ってることはまあわかるようなわからないような、という感じで、日本語で聞かれたとしてもすぐに把握できなさそうな内容だなー、みたいなことがあったりしつつも、プレゼン中に serverspec を知ってる人、使ってる人に手を挙げてもらったら、ちらほらいらっしゃったり、プレゼン後も何人かの方が、serverspec 使ってるよ、いいツールだね、と声をかけてくれたり、握手したり、一緒に写真を撮ったり、他の方のプレゼンでも serverspec について言及されたりで、海外でも使われてるなー、というのは以前からわかってはいたけど、それを強く実感しました。
+      </p>
+      <p>
+        特に今回一番お会いしたかった、
+        <a href="http://kitchen.ci/">
+          Test Kitchen
+        </a>
+        Author の
+        <a href="https://twitter.com/fnichol">
+          @fnichol
+        </a>
+        さんとお話しすることができて、serverspec のステッカーを渡したらとても喜んでくれ、代わりに Test Kitchen や Sensu のステッカーをもらうことができました。（Sensu Author の
+        <a href="https://twitter.com/portertech">
+          @portertech
+        </a>
+        さんは、@fnichol さんと同じ
+        <a href="http://hw-ops.com/">
+          Heavy Water Operations, LLC
+        </a>
+        所属）
+      </p>
+      <p>
+        <img src="https://pbs.twimg.com/media/BlYRAFjCcAAO1NL.jpg" alt="stickers" />
+      </p>
+      <p>
+        （この並びだと、mirakui さんが便利 DevOps ツール四天王の一角を占めてるような感じになってる。）
+      </p>
+      <p>
+        今日もカンファレンス会場をふらふらしていて、@fnichol さんが何人かの方と話しているところに通りがかったら、今ちょうど serverspec の話をしてたんだよ、みたいなことがあって、その場にいた方にステッカー渡したりしてました。
+      </p>
+      <p>
+        それから、Chef Original Author で CTO でもある
+        <a href="https://twitter.com/adamhjk">
+          @adamhjk
+        </a>
+        氏と一緒に写真を撮りました。（しかも撮ってくれたのが CEO の
+        <a href="https://twitter.com/barry_crist">
+          @barry_crist
+        </a>
+        氏）
+      </p>
+      <blockquote class="twitter-tweet" lang="en">
+        <p>
+          With .
+          <a href="https://twitter.com/adamhjk">
+            @adamhjk
+          </a>
+          taken by .
+          <a href="https://twitter.com/barry_crist">
+            @barry_crist
+          </a>
+          . Thanks a lot!
+          <a href="http://t.co/emSqlVrvZM">
+            pic.twitter.com/emSqlVrvZM
+          </a>
+        </p>
+        &mdash; Gosuke Miyashita (@gosukenator)
+        <a href="https://twitter.com/gosukenator/statuses/456861368751124480">
+          April 17, 2014
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        また、serverspec を自社プロジェクトに組み込もうとしてるところなんだけど、時間あったらちょっと話できないか、みたいなメールが来て、すぐに会って話したり、といったこともありました。
+      </p>
+      <p>
+        カンファレンス以外にも、初日は Oracle Arena に NBA を観に行ったり、
+        <a href="https://twitter.com/kosaki55tea">
+          @kosaki55tea
+        </a>
+        さんに誘って頂いておいしいお肉を食べに行ったり、前々職時代に大変お世話になった方に蟹をごちそうしてもらったり、今日の夕方は
+        <a href="https://twitter.com/niw">
+          @niw
+        </a>
+        さんからお誘い頂いたので Twitter 社に遊びに行く予定だったりと、明日帰国という短いサンフランシスコ滞在期間だけど、とても満喫しています。（
+        <a href="https://twitter.com/miyagawa">
+          @miyagawa
+        </a>
+        さんとはすれ違いになってしまってお会いできなかったのは残念でしたが。）
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2014/04/13/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2014/04/17/1">ChefConf 2014 に来てます</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>今日は最終日で、昨日は Serverspec: The Simplest Server Testing Tool Ever というタイトルでプレゼンしてきました。海外でははじめての serverspec プレゼンなので、もっと基本的な、具体的な使い方とかデモといった内容にした方がいいのかなー、と思いつつも、そういうのはオフィシャルサイトとか見れば割と十分だし、自分以外の人でも話せる内容なので、開発者ならではの、開発をはじめたきっかけとか、開発する上での哲学とか、今後どうしていきたいのか、みたいな話をしました。(<a href="http://memo.sanographix.net/post/82160791768">大体いい感じになるKeynoteテンプレート「Azusa」</a> を使わせてもらいました。ありがとうございます。あと、mirakui さんの真似して entypo や fontawesome も使ってみました。)</p>
-
-<div style="width: 65%">
-<script async class="speakerdeck-embed" data-id="32f62ac0a7db0131c1eb06aa2e69a5d0" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
-</div>
-
-<p>英語台本棒読みだし、Splunk の方から質問された内容が、なんかテストカバレッジのことを聞かれてるんだけど、全然理解できなくて若干へこんでいたら、<a href="https://twitter.com/yumano">@yumano</a> さんに間に入っていただいて話を聞いてみると、serverspec そのもののテストカバレッジの話かと思ってたら、Chef レシピに対するカバレッジ、という話で、言ってることはまあわかるようなわからないような、という感じで、日本語で聞かれたとしてもすぐに把握できなさそうな内容だなー、みたいなことがあったりしつつも、プレゼン中に serverspec を知ってる人、使ってる人に手を挙げてもらったら、ちらほらいらっしゃったり、プレゼン後も何人かの方が、serverspec 使ってるよ、いいツールだね、と声をかけてくれたり、握手したり、一緒に写真を撮ったり、他の方のプレゼンでも serverspec について言及されたりで、海外でも使われてるなー、というのは以前からわかってはいたけど、それを強く実感しました。</p>
-
-<p>特に今回一番お会いしたかった、<a href="http://kitchen.ci/">Test Kitchen</a> Author の <a href="https://twitter.com/fnichol">@fnichol</a> さんとお話しすることができて、serverspec のステッカーを渡したらとても喜んでくれ、代わりに Test Kitchen や Sensu のステッカーをもらうことができました。（Sensu Author の <a href="https://twitter.com/portertech">@portertech</a> さんは、@fnichol さんと同じ <a href="http://hw-ops.com/">Heavy Water Operations, LLC</a> 所属）</p>
-
-<p><img src="https://pbs.twimg.com/media/BlYRAFjCcAAO1NL.jpg" alt="stickers"></p>
-
-<p>（この並びだと、mirakui さんが便利 DevOps ツール四天王の一角を占めてるような感じになってる。）</p>
-
-<p>今日もカンファレンス会場をふらふらしていて、@fnichol さんが何人かの方と話しているところに通りがかったら、今ちょうど serverspec の話をしてたんだよ、みたいなことがあって、その場にいた方にステッカー渡したりしてました。</p>
-
-<p>それから、Chef Original Author で CTO でもある <a href="https://twitter.com/adamhjk">@adamhjk</a> 氏と一緒に写真を撮りました。（しかも撮ってくれたのが CEO の <a href="https://twitter.com/barry_crist">@barry_crist</a> 氏）</p>
-
-<blockquote class="twitter-tweet" lang="en"><p>With .<a href="https://twitter.com/adamhjk">@adamhjk</a> taken by .<a href="https://twitter.com/barry_crist">@barry_crist</a> . Thanks a lot! <a href="http://t.co/emSqlVrvZM">pic.twitter.com/emSqlVrvZM</a></p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/statuses/456861368751124480">April 17, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>また、serverspec を自社プロジェクトに組み込もうとしてるところなんだけど、時間あったらちょっと話できないか、みたいなメールが来て、すぐに会って話したり、といったこともありました。</p>
-
-<p>カンファレンス以外にも、初日は Oracle Arena に NBA を観に行ったり、<a href="https://twitter.com/kosaki55tea">@kosaki55tea</a> さんに誘って頂いておいしいお肉を食べに行ったり、前々職時代に大変お世話になった方に蟹をごちそうしてもらったり、今日の夕方は <a href="https://twitter.com/niw">@niw</a> さんからお誘い頂いたので Twitter 社に遊びに行く予定だったりと、明日帰国という短いサンフランシスコ滞在期間だけど、とても満喫しています。（<a href="https://twitter.com/miyagawa">@miyagawa</a> さんとはすれ違いになってしまってお会いできなかったのは残念でしたが。）</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2014/04/18/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2014/04/13/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2014/04/18/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

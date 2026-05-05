@@ -1,167 +1,233 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ScalableStorageWithOSS01 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ScalableStorageWithOSS01 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ScalableStorageWithOSS01"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2008/12/28/3/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2008/12/28/3/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ScalableStorageWithOSS01"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2008/12/28/3/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2008/12/28/3">
+          ScalableStorageWithOSS01
+        </a>
+      </h1>
+      <div class="byline">
+        28 December 2008
+      </div>
+      <p>
+        [wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0] のつづき。
+      </p>
+      <h1>
+        サーバ構成概要
+      </h1>
+      <p>
+        <a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">
+          TLUG 発表資料
+        </a>
+        で触れた、全体的な構成のおさらい。構成図は以下のような感じ。
+      </p>
+      <p>
+        [[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]]
+      </p>
+      <p>
+        この構成について説明すると、以下のようになります。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          DRBD により、2台一組でブロックデバイスをミラーリング
+          <ul>
+            <li>
+              /dev/gnbd0 と /dev/gnbd1 がセット
+            </li>
+            <li>
+              /dev/gnbd2 と /dev/gnbd3 がセット
+            </li>
+          </ul>
+        </li>
+        <li>
+          GNBD でブロックデバイスをエクスポート
+          <ul>
+            <li>
+              /dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 がネットワーク越しに見える
+            </li>
+          </ul>
+        </li>
+        <li>
+          クライアント側で GNBD でエクスポートされたブロックデバイスをインポート
+          <ul>
+            <li>
+              /dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 をすべてインポート
+            </li>
+          </ul>
+        </li>
+        <li>
+          DM-MP により、2つのデバイスを1つに見せる
+          <ul>
+            <li>
+              /dev/gnbd0 + /dev/gnbd1 が /dev/mapper/mpath0 として見える
+            </li>
+            <li>
+              /dev/gnbd2 + /dev/gnbd3 が /dev/mapper/mpath1 として見える
+            </li>
+          </ul>
+        </li>
+        <li>
+          CLVM により論理ボリュームを作成
+          <ul>
+            <li>
+              /dev/mapper/mpath0 と /dev/mapper/mpath1 が物理ボリューム
+            </li>
+            <li>
+              この2つの物理ボリュームから、ボリュームグループ VG0 を作成
+            </li>
+            <li>
+              VG0 上に論理ボリューム LV0 を作成
+            </li>
+            <li>
+              この論理ボリュームが、/dev/VG0/LV0 として見える
+            </li>
+          </ul>
+        </li>
+        <li>
+          /dev/VG0/LV0 を GFS2 でフォーマット
+        </li>
+        <li>
+          ストレージ全体が論理ボリューム /dev/VG0/LV0 として見えるので、こいつをマウントする
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2008/12/28/3">ScalableStorageWithOSS01</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0] のつづき。</p>
-
-<h1>サーバ構成概要</h1>
-
-<p><a href="http://www.slideshare.net/mizzy/how-to-build-a-scalable-storage-system-at-tlug-meeting-20080913-presentation">TLUG 発表資料</a> で触れた、全体的な構成のおさらい。構成図は以下のような感じ。</p>
-
-<p>[[Image(<a href="http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)%5D">http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]</a>]</p>
-
-<p>この構成について説明すると、以下のようになります。</p>
-
-<ul>
-<li>DRBD により、2台一組でブロックデバイスをミラーリング
-
-<ul>
-<li>/dev/gnbd0 と /dev/gnbd1 がセット</li>
-<li>/dev/gnbd2 と /dev/gnbd3 がセット<br></li>
-</ul></li>
-<li>GNBD でブロックデバイスをエクスポート
-
-<ul>
-<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 がネットワーク越しに見える</li>
-</ul></li>
-<li>クライアント側で GNBD でエクスポートされたブロックデバイスをインポート
-
-<ul>
-<li>/dev/gnbd0, /dev/gnbd1, /dev/gnbd2, /dev/gnbd3 をすべてインポート</li>
-</ul></li>
-<li>DM-MP により、2つのデバイスを1つに見せる
-
-<ul>
-<li>/dev/gnbd0 + /dev/gnbd1 が /dev/mapper/mpath0 として見える</li>
-<li>/dev/gnbd2 + /dev/gnbd3 が /dev/mapper/mpath1 として見える</li>
-</ul></li>
-<li>CLVM により論理ボリュームを作成<br>
-
-<ul>
-<li>/dev/mapper/mpath0 と /dev/mapper/mpath1 が物理ボリューム</li>
-<li>この2つの物理ボリュームから、ボリュームグループ VG0 を作成</li>
-<li>VG0 上に論理ボリューム LV0 を作成</li>
-<li>この論理ボリュームが、/dev/VG0/LV0 として見える</li>
-</ul></li>
-<li>/dev/VG0/LV0 を GFS2 でフォーマット</li>
-<li>ストレージ全体が論理ボリューム /dev/VG0/LV0 として見えるので、こいつをマウントする</li>
-</ul>
-
-<h1>構築手順概要</h1>
-
-<p>構築手順はざっと以下のようになります。CentOS 5.2 + Xen で検証しています。</p>
-
-<ul>
-<li>Xen インスタンスをつくる
-
-<ul>
-<li>client0, client1</li>
-<li>storage0a, storage0b</li>
-<li>storage1a, storage1b</li>
-</ul></li>
-<li>ストレージサーバで GNBD によりエクスポートするブロックデバイスを作成する</li>
-<li>2台セットで DRBD ミラーリング
-
-<ul>
-<li>storage0a と storage0b を同期</li>
-<li>storage1a と storage1b を同期</li>
-</ul></li>
-<li>storage![01][ab] で GNBD によりブロックデバイスをエクスポート</li>
-<li>client![01]でブロックデバイスをインポート</li>
-<li>client![01]上で、DM-MP により複数のデバイスをまとめる
-
-<ul>
-<li>storage0[ab] からエクスポートしたデバイスをひとつに見せる</li>
-<li>storage1[ab] からエクスポートしたデバイスをひとつに見せる</li>
-</ul></li>
-<li>DM-MP でまとめたデバイスを、CLVM によりひとつの論理ボリュームに見せる</li>
-<li>論理ボリュームを GFS2 でフォーマットする</li>
-<li>論理ボリュームをマウントする</li>
-</ul>
-
-<p>次回以降、それぞれについて解説していきます。</p>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
-<li>[wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]</li>
-<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
-<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
-<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
-</ul>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2008/12/28/4">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2008/12/28/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <h1>
+        構築手順概要
+      </h1>
+      <p>
+        構築手順はざっと以下のようになります。CentOS 5.2 + Xen で検証しています。
+      </p>
+      <ul>
+        <li>
+          Xen インスタンスをつくる
+          <ul>
+            <li>
+              client0, client1
+            </li>
+            <li>
+              storage0a, storage0b
+            </li>
+            <li>
+              storage1a, storage1b
+            </li>
+          </ul>
+        </li>
+        <li>
+          ストレージサーバで GNBD によりエクスポートするブロックデバイスを作成する
+        </li>
+        <li>
+          2台セットで DRBD ミラーリング
+          <ul>
+            <li>
+              storage0a と storage0b を同期
+            </li>
+            <li>
+              storage1a と storage1b を同期
+            </li>
+          </ul>
+        </li>
+        <li>
+          storage![01][ab] で GNBD によりブロックデバイスをエクスポート
+        </li>
+        <li>
+          client![01]でブロックデバイスをインポート
+        </li>
+        <li>
+          client![01]上で、DM-MP により複数のデバイスをまとめる
+          <ul>
+            <li>
+              storage0[ab] からエクスポートしたデバイスをひとつに見せる
+            </li>
+            <li>
+              storage1[ab] からエクスポートしたデバイスをひとつに見せる
+            </li>
+          </ul>
+        </li>
+        <li>
+          DM-MP でまとめたデバイスを、CLVM によりひとつの論理ボリュームに見せる
+        </li>
+        <li>
+          論理ボリュームを GFS2 でフォーマットする
+        </li>
+        <li>
+          論理ボリュームをマウントする
+        </li>
+      </ul>
+      <p>
+        次回以降、それぞれについて解説していきます。
+      </p>
+      <ul>
+        <li>
+          [wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS02 OSS だけでスケーラブルなストレージを安価に構築する方法 #2]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2008/12/28/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2008/12/28/4">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,136 +1,121 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>フィードアグリゲータに求めること - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      フィードアグリゲータに求めること - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="フィードアグリゲータに求めること"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/08/28/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/08/28/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="フィードアグリゲータに求めること"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/08/28/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/08/28/1">
+          フィードアグリゲータに求めること
+        </a>
+      </h1>
+      <div class="byline">
+        28 August 2005
+      </div>
+      <p class="entryBody">
+        feedbringer、使うのをやめることにしました。bloglines に戻ります。理由は、UI の改良により、HTML も修正されたため、自作の greasemonkey 用ユーザスクリプトならびに css ファイルがそのままでは使えなくなったから。修正するのも面倒だし、修正してまで feedbringer を使い続けるほどの魅力を感じなくなった。かといって、素の UI は改良されたとはいえ、正直あまり使いやすくはない。自分がカスタマイズしたものに似てはいるけど、微妙に使いづらいと感じるのは、他の誰かが言っているように、上下の幅が広くて圧迫感を感じるからだろう。それから逆スクロールは Shift + Space というのも嫌。Backspace に慣れてしまっているので。
+      </p>
+      <p class="entryBody">
+        そして、一番大きな理由は上の様な些末なことではなく、今回の改良で「feedbringer は俺が求めているものとは違う」と感じてしまったから。じゃあ、俺が求めるフィードアグリゲータって何だろう、ということになると、実はきちんと整理しているわけではないので、これを機会に整理してみることにした。以下、順番に挙げていきます。
+      </p>
+      <h3>
+        サーバ集約型
+      </h3>
+      <p class="entryBody">
+        家でも複数のPCを利用するし、会社からも携帯からも利用するので、サーバ集約型がいいっすね。集約されていないと、購読しているフィードの同期がめんどうだし、未読/既読が統一できないから。（これは、フィードアグリゲータだけでなく、どんなサービスにも言えるんですけどね。）
+      </p>
+      <p class="entryBody">
+        サーバに集約されていれば、ウェブ型じゃなくてもいいのか、という話もありますが、それについては後ほど触れます。
+      </p>
+      <h3>
+        フィードのクロールと蓄積
+      </h3>
+      <p class="entryBody">
+        これは言うまでもないですね。これをやってくれないとフィードアグリゲータではない。
+      </p>
+      <h3>
+        検索
+      </h3>
+      <p class="entryBody">
+        蓄積したら、当然検索は必要でしょう。自分が購読しているフィードのみ検索対象にできれば、「あれ、誰かが書いてたんだけど、何だったっけ？」という時に探しやすい。
+      </p>
+      <h3>
+        言語フィルタリング
+      </h3>
+      <p class="entryBody">
+        最近、del.icio.us のフィードに、中国語がやたら目立つ様になってきたので、言語フィルタリングで除外できればありがたいな、と。別に中国語に限らず、自分が読めない言語のエントリがあっても、ただのノイズにしかならないし、辞書引いたり自動翻訳使ったリまでして読もうとは思わない。ただでさえエントリ数が多いんだから、こういったノイズはできる限り排除したい。
+      </p>
+      <h3>
+        カテゴリフィルタリング
+      </h3>
+      <p class="entryBody">
+        フィード中にカテゴリが記述されていることが多いと思うので、特定のフィードの中でも、除外したいカテゴリを指定したり、逆に読みたいカテゴリを指定する、ってことができればいいなぁ、と。フィードに含まれるすべてのエントリが読みたい、ってことの方がまれだと思うんですよね。
+      </p>
+      <h3>
+        充実したREST API
+      </h3>
+      <p class="entryBody">
+        極端な話、充実した REST API を持っていて、きれいな XML フォーマットでデータを吐いてくれれば、フィードアグリゲータは UI を持っていなくていいです。XSLT で XHTML へ変換して、css　と　javascript　でリッチなUIにしたり、携帯用の HTML に変換したり、そこは好きなように作り込んでいけるので。自分で作らなくても、もっとセンスのある人がいいモノを作ってくれたりもするでしょうしね。
+      </p>
+      <p class="entryBody">
+        ここで REST API と言ってしまっているので、さきほどの「サーバに集約されていれば、ウェブ型じゃなくてもいいのか」という点については、やはりウェブ型がいい、ということに必然的になりますね。
+      </p>
+      <p class="entryBody">
+        だれかこんなフィードアグリゲータ作ってくれないかなぁ…自分で作れって言われそうだな。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/08/25/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/08/28/1">フィードアグリゲータに求めること</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-feedbringer、使うのをやめることにしました。bloglines に戻ります。理由は、UI の改良により、HTML も修正されたため、自作の greasemonkey 用ユーザスクリプトならびに css ファイルがそのままでは使えなくなったから。修正するのも面倒だし、修正してまで feedbringer を使い続けるほどの魅力を感じなくなった。かといって、素の UI は改良されたとはいえ、正直あまり使いやすくはない。自分がカスタマイズしたものに似てはいるけど、微妙に使いづらいと感じるのは、他の誰かが言っているように、上下の幅が広くて圧迫感を感じるからだろう。それから逆スクロールは Shift + Space というのも嫌。Backspace に慣れてしまっているので。
-</p>
-
-<p class="entryBody">
-そして、一番大きな理由は上の様な些末なことではなく、今回の改良で「feedbringer は俺が求めているものとは違う」と感じてしまったから。じゃあ、俺が求めるフィードアグリゲータって何だろう、ということになると、実はきちんと整理しているわけではないので、これを機会に整理してみることにした。以下、順番に挙げていきます。
-</p>
-
-<h3>サーバ集約型</h3>
-
-<p class="entryBody">
-家でも複数のPCを利用するし、会社からも携帯からも利用するので、サーバ集約型がいいっすね。集約されていないと、購読しているフィードの同期がめんどうだし、未読/既読が統一できないから。（これは、フィードアグリゲータだけでなく、どんなサービスにも言えるんですけどね。）
-</p>
-
-<p class="entryBody">
-サーバに集約されていれば、ウェブ型じゃなくてもいいのか、という話もありますが、それについては後ほど触れます。
-</p>
-
-<h3>フィードのクロールと蓄積</h3>
-
-<p class="entryBody">
-これは言うまでもないですね。これをやってくれないとフィードアグリゲータではない。
-</p>
-
-<h3>検索</h3>
-
-<p class="entryBody">
-蓄積したら、当然検索は必要でしょう。自分が購読しているフィードのみ検索対象にできれば、「あれ、誰かが書いてたんだけど、何だったっけ？」という時に探しやすい。
-</p>
-
-<h3>言語フィルタリング</h3>
-
-<p class="entryBody">
-最近、del.icio.us のフィードに、中国語がやたら目立つ様になってきたので、言語フィルタリングで除外できればありがたいな、と。別に中国語に限らず、自分が読めない言語のエントリがあっても、ただのノイズにしかならないし、辞書引いたり自動翻訳使ったリまでして読もうとは思わない。ただでさえエントリ数が多いんだから、こういったノイズはできる限り排除したい。
-</p>
-
-<h3>カテゴリフィルタリング</h3>
-
-<p class="entryBody">
-フィード中にカテゴリが記述されていることが多いと思うので、特定のフィードの中でも、除外したいカテゴリを指定したり、逆に読みたいカテゴリを指定する、ってことができればいいなぁ、と。フィードに含まれるすべてのエントリが読みたい、ってことの方がまれだと思うんですよね。
-</p>
-
-<h3>充実したREST API</h3>
-
-<p class="entryBody">
-極端な話、充実した REST API を持っていて、きれいな XML フォーマットでデータを吐いてくれれば、フィードアグリゲータは UI を持っていなくていいです。XSLT で XHTML へ変換して、css　と　javascript　でリッチなUIにしたり、携帯用の HTML に変換したり、そこは好きなように作り込んでいけるので。自分で作らなくても、もっとセンスのある人がいいモノを作ってくれたりもするでしょうしね。
-</p>
-
-<p class="entryBody">
-ここで REST API と言ってしまっているので、さきほどの「サーバに集約されていれば、ウェブ型じゃなくてもいいのか」という点については、やはりウェブ型がいい、ということに必然的になりますね。
-</p>
-
-<p class="entryBody">
-だれかこんなフィードアグリゲータ作ってくれないかなぁ…自分で作れって言われそうだな。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/09/01/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/08/25/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/09/01/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

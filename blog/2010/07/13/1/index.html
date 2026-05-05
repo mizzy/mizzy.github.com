@@ -1,183 +1,289 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>SystemTap01 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      SystemTap01 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="SystemTap01"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2010/07/13/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2010/07/13/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="SystemTap01"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2010/07/13/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2010/07/13/1">
+          SystemTap01
+        </a>
+      </h1>
+      <div class="byline">
+        13 July 2010
+      </div>
+      <p>
+        [wiki:SystemTap00 SystemTap メモ #0] の続き。今回は
+        <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">
+          SystemTap Beginners Guide
+        </a>
+        の
+        <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/scripts.html">
+          3.2. SystemTap Scripts
+        </a>
+        から抜粋。
+      </p>
+      <hr />
+      <h1>
+        スクリプトのフォーマット
+      </h1>
+      <p>
+        SystemTap スクリプトのフォーマットはこんな感じ。
+      </p>
+      <pre><code>probe event { statements }</code></pre>
+      <p>
+        なので、[wiki:SystemTap00 前回] 出てきた、
+      </p>
+      <pre><code>$ stap -v -e 'probe vfs.read { printf(&quot;read performed\n&quot;); exit() }'</code></pre>
+      <p>
+        をフォーマットと照らし合わせて読み解くと、*「vfs.read イベントが発生したら read performed と表示して exit する」*といった意味になる。
+      </p>
+      <p>
+        <em>
+          { statements }_' の部分は '''handler''' と呼ばれ、'''event''' と それに対応した '''handler''' をあわせて '_probe
+        </em>
+        と呼ぶらしい。
+      </p>
+      <p>
+        スクリプトの中では関数を定義して呼び出すこともできる。
+      </p>
+      <pre><code>function function_name(arguments) { statements }
 
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2010/07/13/1">SystemTap01</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>[wiki:SystemTap00 SystemTap メモ #0] の続き。今回は <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/">SystemTap Beginners Guide</a> の <a href="http://sourceware.org/systemtap/SystemTap_Beginners_Guide/scripts.html">3.2. SystemTap Scripts</a> から抜粋。</p>
-
-<hr>
-
-<h1>スクリプトのフォーマット</h1>
-
-<p>SystemTap スクリプトのフォーマットはこんな感じ。</p>
-
-<pre><code>probe event { statements }
-</code></pre>
-
-<p>なので、[wiki:SystemTap00 前回] 出てきた、</p>
-
-<pre><code>$ stap -v -e &#39;probe vfs.read { printf(&quot;read performed\n&quot;); exit() }&#39;
-</code></pre>
-
-<p>をフォーマットと照らし合わせて読み解くと、<em>「vfs.read イベントが発生したら read performed と表示して exit する」</em>といった意味になる。</p>
-
-<p><em>{ statements }<em>&#39; の部分は &#39;&#39;&#39;handler&#39;&#39;&#39; と呼ばれ、&#39;&#39;&#39;event&#39;&#39;&#39; と それに対応した &#39;&#39;&#39;handler&#39;&#39;&#39; をあわせて &#39;</em>probe</em> と呼ぶらしい。</p>
-
-<p>スクリプトの中では関数を定義して呼び出すこともできる。</p>
-
-<pre><code>function function_name(arguments) { statements }
-
-probe event { function_name(arguments) }
-</code></pre>
-
-<hr>
-
-<h1>イベント</h1>
-
-<p>イベントは同期イベントと非同期イベントに分かれる。</p>
-
-<h2>同期イベント</h2>
-
-<p>同期イベントはカーネルコード中の特定の場所で命令が実行された場合に発生するイベント。（非同期イベントは後で説明するが、命令実行とは関係なしに発生するイベント。）</p>
-
-<p>同期イベントには以下のようなものがある。</p>
-
-<p><em>syscall.<em>&#39;&#39;&#39;&#39;&#39;&#39;system</em>call_</em></p>
-
-<p><em>system</em>call&#39;&#39; というシステムコールの呼び始めに発生するイベント。呼び終わりに発生するイベントは syscall.&#39;&#39;system<em>call</em>.return 。close システムコールの呼び始めに発生するイベントは syscall.close、呼び終わりに発生するイベントは syscall.close.return 。</p>
-
-<p><em>vfs.<em>&#39;&#39;&#39;&#39;&#39;&#39;file</em>operation_</em></p>
-
-<p>VFS に対して <em>file</em>operation_ の呼び始めに発生するイベント。syscall と同様、 .return を付加すると、呼び終わりイベントとなる。</p>
-
-<p><em>kernel.function(&quot;<em>&#39;&#39;&#39;&#39;&#39;&#39;function&#39;&#39;&#39;&#39;&#39;&#39;</em>&quot;)</em></p>
-
-<p>カーネルファンクション <em>function</em> の呼び始めに発生するイベント。例えば <em>kernel.function(&quot;sys_open&quot;)</em> は sys_open の呼び始めに発生するイベント。.return がつくと呼び終わりイベント。ワイルドカードとして * がつかえる。また、以下のように特定のソースファイル中のファンクションも指定できる。</p>
-
-<pre><code>probe kernel.function(&quot;*@net/socket.c&quot;) { }
-probe kernel.function(&quot;*@net/socket.c&quot;).return { }
-</code></pre>
-
-<p><em>kernel.trace(&quot;<em>&#39;&#39;&#39;&#39;&#39;&#39;tracepoint&#39;&#39;&#39;&#39;&#39;&#39;</em>&quot;)</em></p>
-
-<p>カーネル内の特定のトレースポイントで発生するイベント。例えば、<em>kernel.trace(&quot;kfree_skb&quot;)</em> だと、カーネル内のネットワークバッファが解放された時にイベントが発生する。</p>
-
-<p><em>module(&quot;<em>&#39;&#39;&#39;&#39;&#39;&#39;module&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&quot;).function(&quot;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;function&#39;&#39;&#39;&#39;&#39;&#39;</em>&quot;)</em></p>
-
-<p>モジュール内の特定のファンクションが呼ばれた場合に発生するイベント。</p>
-
-<pre><code>probe module(&quot;ext3&quot;).function(&quot;*&quot;) { }
-probe module(&quot;ext3&quot;).function(&quot;*&quot;).return { }
-</code></pre>
-
-<p>この例だと、前者は ext3 モジュール内のすべてのファンクションの呼び始めに発生するイベント、後者は呼び終わりに発生するイベント、となる。</p>
-
-<h2>非同期イベント</h2>
-
-<p>非同期イベントはカーネルコード内の命令実行とは無関係に発生するイベント。以下のようなイベントがある。</p>
-
-<p><em>begin</em></p>
-
-<p>SystemTap セッションの開始時（SystemTap スクリプトの実行開始時）に発生するイベント。</p>
-
-<p><em>end</em></p>
-
-<p>SystemTap セッションの終了時に発生するイベント。</p>
-
-<p><em>timer events</em></p>
-
-<p>タイマーイベント。以下の例では4秒ごとにイベントを発生させる。</p>
-
-<pre><code>probe timer.s(4)
+probe event { function_name(arguments) }</code></pre>
+      <hr />
+      <h1>
+        イベント
+      </h1>
+      <p>
+        イベントは同期イベントと非同期イベントに分かれる。
+      </p>
+      <h2>
+        同期イベント
+      </h2>
+      <p>
+        同期イベントはカーネルコード中の特定の場所で命令が実行された場合に発生するイベント。（非同期イベントは後で説明するが、命令実行とは関係なしに発生するイベント。）
+      </p>
+      <p>
+        同期イベントには以下のようなものがある。
+      </p>
+      <p>
+        <em>
+          syscall.
+          <em>
+            ''''''system_call
+          </em>
+        </em>
+      </p>
+      <p>
+        <em>
+          system_call'' というシステムコールの呼び始めに発生するイベント。呼び終わりに発生するイベントは syscall.''system_call
+        </em>
+        .return 。close システムコールの呼び始めに発生するイベントは syscall.close、呼び終わりに発生するイベントは syscall.close.return 。
+      </p>
+      <p>
+        <em>
+          vfs.
+          <em>
+            ''''''file_operation
+          </em>
+        </em>
+      </p>
+      <p>
+        VFS に対して
+        <em>
+          file_operation
+        </em>
+        の呼び始めに発生するイベント。syscall と同様、 .return を付加すると、呼び終わりイベントとなる。
+      </p>
+      <p>
+        <em>
+          kernel.function(&quot;
+          <em>
+            ''''''function''''''
+          </em>
+          &quot;)
+        </em>
+      </p>
+      <p>
+        カーネルファンクション
+        <em>
+          function
+        </em>
+        の呼び始めに発生するイベント。例えば
+        <em>
+          kernel.function(&quot;sys_open&quot;)
+        </em>
+        は sys_open の呼び始めに発生するイベント。.return がつくと呼び終わりイベント。ワイルドカードとして * がつかえる。また、以下のように特定のソースファイル中のファンクションも指定できる。
+      </p>
+      <pre><code>probe kernel.function(&quot;*@net/socket.c&quot;) { }
+probe kernel.function(&quot;*@net/socket.c&quot;).return { }</code></pre>
+      <p>
+        <em>
+          kernel.trace(&quot;
+          <em>
+            ''''''tracepoint''''''
+          </em>
+          &quot;)
+        </em>
+      </p>
+      <p>
+        カーネル内の特定のトレースポイントで発生するイベント。例えば、
+        <em>
+          kernel.trace(&quot;kfree_skb&quot;)
+        </em>
+        だと、カーネル内のネットワークバッファが解放された時にイベントが発生する。
+      </p>
+      <p>
+        <em>
+          module(&quot;
+          <em>
+            ''''''module''''''''&quot;).function(&quot;''''''''function''''''
+          </em>
+          &quot;)
+        </em>
+      </p>
+      <p>
+        モジュール内の特定のファンクションが呼ばれた場合に発生するイベント。
+      </p>
+      <pre><code>probe module(&quot;ext3&quot;).function(&quot;*&quot;) { }
+probe module(&quot;ext3&quot;).function(&quot;*&quot;).return { }</code></pre>
+      <p>
+        この例だと、前者は ext3 モジュール内のすべてのファンクションの呼び始めに発生するイベント、後者は呼び終わりに発生するイベント、となる。
+      </p>
+      <h2>
+        非同期イベント
+      </h2>
+      <p>
+        非同期イベントはカーネルコード内の命令実行とは無関係に発生するイベント。以下のようなイベントがある。
+      </p>
+      <p>
+        <em>
+          begin
+        </em>
+      </p>
+      <p>
+        SystemTap セッションの開始時（SystemTap スクリプトの実行開始時）に発生するイベント。
+      </p>
+      <p>
+        <em>
+          end
+        </em>
+      </p>
+      <p>
+        SystemTap セッションの終了時に発生するイベント。
+      </p>
+      <p>
+        <em>
+          timer events
+        </em>
+      </p>
+      <p>
+        タイマーイベント。以下の例では4秒ごとにイベントを発生させる。
+      </p>
+      <pre><code>probe timer.s(4)
 {
   printf(&quot;hello world\n&quot;)
-}
-</code></pre>
-
-<p>時間単位は上の例の秒以外にも、以下のように指定できる。</p>
-
-<ul>
-<li>timer.ms(<em>milliseconds</em>)</li>
-<li>timer.us(<em>microseconds</em>)</li>
-<li>timer.ns(<em>nanoseconds</em>)</li>
-<li>timer.hz(<em>hertz</em>)</li>
-<li>timer.jiffies(<em>jiffies</em>) </li>
-</ul>
-
-<p>イベントは他にもたくさんあるので、詳しく知りたければ <em>man stapprobes</em> すべし。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2010/12/14/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2010/07/08/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+}</code></pre>
+      <p>
+        時間単位は上の例の秒以外にも、以下のように指定できる。
+      </p>
+      <ul>
+        <li>
+          timer.ms(
+          <em>
+            milliseconds
+          </em>
+          )
+        </li>
+        <li>
+          timer.us(
+          <em>
+            microseconds
+          </em>
+          )
+        </li>
+        <li>
+          timer.ns(
+          <em>
+            nanoseconds
+          </em>
+          )
+        </li>
+        <li>
+          timer.hz(
+          <em>
+            hertz
+          </em>
+          )
+        </li>
+        <li>
+          timer.jiffies(
+          <em>
+            jiffies
+          </em>
+          )
+        </li>
+      </ul>
+      <p>
+        イベントは他にもたくさんあるので、詳しく知りたければ
+        <em>
+          man stapprobes
+        </em>
+        すべし。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2010/07/08/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2010/12/14/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

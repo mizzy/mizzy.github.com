@@ -1,112 +1,124 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Text::Trac のバグフィックス・機能追加とテスト駆動開発 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Text::Trac のバグフィックス・機能追加とテスト駆動開発 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Text::Trac のバグフィックス・機能追加とテスト駆動開発"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/10/29/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/10/29/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Text::Trac のバグフィックス・機能追加とテスト駆動開発"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/10/29/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/10/29/1">
+          Text::Trac のバグフィックス・機能追加とテスト駆動開発
+        </a>
+      </h1>
+      <div class="byline">
+        29 October 2006
+      </div>
+      <p>
+        rt.cpan.org でバグレポートと機能追加要望があがっていたので、久々に
+        <a class="ext-link" href="http://search.cpan.org/~mizzy/Text-Trac/lib/Text/Trac.pm">
+          <span class="icon"></span>
+          Text::Trac
+        </a>
+        に手を入れました。
+      </p>
+      <p>
+        バグフィックスしたものは 0.05 としてアップしてあります。また、新機能として
+        <a class="ext-link" href="http://trac.mizzy.org/public/wiki/TracLinks">
+          <span class="icon"></span>
+          Trac Links
+        </a>
+        と
+        <a class="ext-link" href="http://trac.mizzy.org/public/wiki/WikiMacros">
+          <span class="icon"></span>
+          Wiki Macros
+        </a>
+        をサポートしたものは、
+        <a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Text-Trac/">
+          <span class="icon"></span>
+          svn リポジトリ
+        </a>
+        に置いてあります。リクエストしてくれた方の確認後、問題なければ CPAN にアップ予定です。
+      </p>
+      <p>
+        今回のこのバグフィックスと機能追加で、TDD のありがたさを改めて実感しました。
+      </p>
+      <p>
+        バグについては一度修正して、報告者に確認をお願いしたのですが、まだバグが残っている状態でした。すると今度は報告者の方が、テストを書いて送ってくれたのですが、これが大いに役に立ちました。テストがあると、どこにどういったバグがあるのか、make test （あるいは prove コマンド）一発でわかるので、言葉で説明してもらうよりも明確ですし、バグ確認後、fail したテスト（と他のテスト）全てが通るようにプログラムに修正を施していけばいいわけで、やることが明確になって作業がスムーズにできました。
+      </p>
+      <p>
+        自分も今後バグレポートする際には、テストとセットでレポートするようにします。
+      </p>
+      <p>
+        新機能の追加についても、ひとつの機能毎にテストを書く、実装する、テスト動かして確認、修正する、というサイクルで作業していたのですが、コマンド一発でテストができると、全体の流れを途切れさせることなく、集中力を保ったまま作業ができていいですね。
+      </p>
+      <p>
+        これを機に Text::Trac のテストを Test::More から Test::Base へ移行したのですが、Test::Base で DRY にテストが書けると、更に全体の流れがよくなり、非常に気持ちよく作業ができます。Test::Base 最高。
+      </p>
+      <p>
+        Test::Base をご存知ない方は、
+        <a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200610.html">
+          <span class="icon"></span>
+          Shibuya.pm テクニカルトーク #7
+        </a>
+        の
+        <a class="ext-link" href="http://blog.bulknews.net/mt/archives/Test-Base.pdf">
+          <span class="icon"></span>
+          宮川さんの発表資料（PDF）
+        </a>
+        を是非ご覧下さい。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/10/25/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/10/29/1">Text::Trac のバグフィックス・機能追加とテスト駆動開発</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-rt.cpan.org でバグレポートと機能追加要望があがっていたので、久々に <a class="ext-link" href="http://search.cpan.org/~mizzy/Text-Trac/lib/Text/Trac.pm"><span class="icon"></span>Text::Trac</a> に手を入れました。
-</p>
-
-<p>
-バグフィックスしたものは 0.05 としてアップしてあります。また、新機能として <a class="ext-link" href="http://trac.mizzy.org/public/wiki/TracLinks"><span class="icon"></span>Trac Links</a> と <a class="ext-link" href="http://trac.mizzy.org/public/wiki/WikiMacros"><span class="icon"></span>Wiki Macros</a> をサポートしたものは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Text-Trac/"><span class="icon"></span>svn リポジトリ</a>に置いてあります。リクエストしてくれた方の確認後、問題なければ CPAN にアップ予定です。
-</p>
-
-<p>
-今回のこのバグフィックスと機能追加で、TDD のありがたさを改めて実感しました。
-</p>
-
-<p>
-バグについては一度修正して、報告者に確認をお願いしたのですが、まだバグが残っている状態でした。すると今度は報告者の方が、テストを書いて送ってくれたのですが、これが大いに役に立ちました。テストがあると、どこにどういったバグがあるのか、make test （あるいは prove コマンド）一発でわかるので、言葉で説明してもらうよりも明確ですし、バグ確認後、fail したテスト（と他のテスト）全てが通るようにプログラムに修正を施していけばいいわけで、やることが明確になって作業がスムーズにできました。
-</p>
-
-<p>
-自分も今後バグレポートする際には、テストとセットでレポートするようにします。
-</p>
-
-<p>
-新機能の追加についても、ひとつの機能毎にテストを書く、実装する、テスト動かして確認、修正する、というサイクルで作業していたのですが、コマンド一発でテストができると、全体の流れを途切れさせることなく、集中力を保ったまま作業ができていいですね。
-</p>
-
-<p>
-これを機に Text::Trac のテストを Test::More から Test::Base へ移行したのですが、Test::Base で DRY にテストが書けると、更に全体の流れがよくなり、非常に気持ちよく作業ができます。Test::Base 最高。
-</p>
-
-<p>
-Test::Base をご存知ない方は、<a class="ext-link" href="http://shibuya.pm.org/blosxom/techtalks/200610.html"><span class="icon"></span>Shibuya.pm テクニカルトーク #7</a> の <a class="ext-link" href="http://blog.bulknews.net/mt/archives/Test-Base.pdf"><span class="icon"></span>宮川さんの発表資料（PDF）</a> を是非ご覧下さい。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/11/03/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/10/25/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/11/03/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,118 +1,135 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Testing servers provisioned by Puppet or Chef with RSpec - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Testing servers provisioned by Puppet or Chef with RSpec - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Testing servers provisioned by Puppet or Chef with RSpec"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/03/24/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/03/24/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Testing servers provisioned by Puppet or Chef with RSpec"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/03/24/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/03/24/2">
+          Testing servers provisioned by Puppet or Chef with RSpec
+        </a>
+      </h1>
+      <div class="byline">
+        24 March 2013
+      </div>
+      <p>
+        <strong>
+          Note:
+        </strong>
+        I made
+        <a href="https://github.com/mizzy/serverspec">
+          serverspec
+        </a>
+        gem for this purpose. Please see the entry
+        <a href="/blog/2013/03/24/4/">
+          serverspec - a rubygem for testing provisioned servers with RSpec
+        </a>
+        .
+      </p>
+      <p>
+        <a href="/blog/2013/03/24/1/">
+          I've made a Puppet module for creating LXC system containers
+        </a>
+        .Next I've tried to the basis for writing test code easily.
+      </p>
+      <p>
+        With
+        <a href="https://github.com/mizzy/rspec-lxc-test-box">
+          rspec-lxc-test-box
+        </a>
+        , you can write code for testing server status like this.
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;container_spec_helper&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;nrpe&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_installed</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_enabled</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_running</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;nagios-plugins-all&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_installed</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;/etc/nagios/nrpe.cfg&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_file</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">contain</span> <span class="s1">&#39;server_port=5666&#39;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;/etc/nrpe.d/01base.cfg&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_file</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;port 5666&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_listening</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre>
+      <p>
+        This code accesses to a container through SSH and execute commands to check whether files exist, packages are installed, files contain some strings, services run, some ports listen and so on.Very simple.(But code base are specific for Red Hat and its clone OS.)
+      </p>
+      <p>
+        You can see how I make it simply
+        <a href="https://github.com/mizzy/rspec-lxc-test-box/tree/master/spec/support/matchers">
+          with these codes
+        </a>
+        .
+      </p>
+      <p>
+        This test code works with any servers provisioned by any tools(Puppet, Chef, CFEngine, Shell Script, Hands and so on).
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/03/24/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/03/24/2">Testing servers provisioned by Puppet or Chef with RSpec</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><strong>Note:</strong> I made <a href="https://github.com/mizzy/serverspec">serverspec</a> gem for this purpose. Please see the entry <a href="/blog/2013/03/24/4/">serverspec - a rubygem for testing provisioned servers with RSpec</a>.</p>
-
-<p><a href="/blog/2013/03/24/1/">I&#39;ve made a Puppet module for creating LXC system containers</a>.Next I&#39;ve tried to the basis for writing test code easily.</p>
-
-<p>With <a href="https://github.com/mizzy/rspec-lxc-test-box">rspec-lxc-test-box</a>, you can write code for testing server status like this.</p>
-
-<pre><code class="ruby">require &#39;container_spec_helper&#39;
-
-describe &#39;nrpe&#39; do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;nagios-plugins-all&#39; do
-  it { should be_installed }
-end
-
-describe &#39;/etc/nagios/nrpe.cfg&#39; do
-  it { should be_file }
-  it { should contain &#39;server_port=5666&#39; }
-end
-
-describe &#39;/etc/nrpe.d/01base.cfg&#39; do
-  it { should be_file }
-end
-
-describe &#39;port 5666&#39; do
-  it { should be_listening }
-end
-</code></pre>
-
-<p>This code accesses to a container through SSH and execute commands to check whether files exist, packages are installed, files contain some strings, services run, some ports listen and so on.Very simple.(But code base are specific for Red Hat and its clone OS.)</p>
-
-<p>You can see how I make it simply <a href="https://github.com/mizzy/rspec-lxc-test-box/tree/master/spec/support/matchers">with these codes</a>.</p>
-
-<p>This test code works with any servers provisioned by any tools(Puppet, Chef, CFEngine, Shell Script, Hands and so on).</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/03/24/3">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/03/24/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/03/24/3">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

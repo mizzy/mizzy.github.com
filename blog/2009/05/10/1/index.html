@@ -1,76 +1,77 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>AddModRewriteInternalFunction - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2009/05/10/1">AddModRewriteInternalFunction</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html#rewritemap">RewriteMap</a> での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、という形なので、並列処理させることができません。これは rewrite 処理するときにデータベースへ問い合わせるなど、I/O ブロッキングが発生するような処理をさせたいときには致命的なパフォーマンス劣化を引き起こすことになります。</p>
-
-<p>これを解決するためには、Apache モジュールの中で望みの rewrite 処理をさせるようにすればいいのでは、と思い、RewriteMap にある int タイプに好きな internal function を追加できればいけるんじゃないないか、と考えたものの、<a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html">mod_rewrite のリファレンス</a> では、「you cannot create your own」とか書かれていて、追加できないっぽい。かと言って mod_rewrite.c に手を入れるのもやだなー、と思っていたところ、<a href="http://code.google.com/p/modicpquery/wiki/Internals">mod_icpquery のドキュメント</a> を見つけた。これを見ると、好きな internal function を独立したモジュールの形で追加できそう、ってことでやってみたらできた。</p>
-
-<p>以下が internal function を追加するためのモジュールテンプレ。rewrite<em>mapfunc</em>custom の中で、望みの処理を記述してあげるだけで OK。</p>
-
-<pre><code>#!c
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      AddModRewriteInternalFunction - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="AddModRewriteInternalFunction"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2009/05/10/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2009/05/10/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="AddModRewriteInternalFunction"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2009/05/10/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2009/05/10/1">
+          AddModRewriteInternalFunction
+        </a>
+      </h1>
+      <div class="byline">
+        10 May 2009
+      </div>
+      <p>
+        Apache モジュール界のスイスアーミーナイフこと mod_rewrite の中でも、最も何でもありな rewrite ができるのが、
+        <a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html#rewritemap">
+          RewriteMap
+        </a>
+        での prg タイプによる外部プログラム実行ですが、こいつは外部プログラムがひとつだけ常駐し、httpd と標準入出力を介してやりとりする、という形なので、並列処理させることができません。これは rewrite 処理するときにデータベースへ問い合わせるなど、I/O ブロッキングが発生するような処理をさせたいときには致命的なパフォーマンス劣化を引き起こすことになります。
+      </p>
+      <p>
+        これを解決するためには、Apache モジュールの中で望みの rewrite 処理をさせるようにすればいいのでは、と思い、RewriteMap にある int タイプに好きな internal function を追加できればいけるんじゃないないか、と考えたものの、
+        <a href="http://httpd.apache.org/docs/2.2/ja/mod/mod_rewrite.html">
+          mod_rewrite のリファレンス
+        </a>
+        では、「you cannot create your own」とか書かれていて、追加できないっぽい。かと言って mod_rewrite.c に手を入れるのもやだなー、と思っていたところ、
+        <a href="http://code.google.com/p/modicpquery/wiki/Internals">
+          mod_icpquery のドキュメント
+        </a>
+        を見つけた。これを見ると、好きな internal function を独立したモジュールの形で追加できそう、ってことでやってみたらできた。
+      </p>
+      <p>
+        以下が internal function を追加するためのモジュールテンプレ。rewrite_mapfunc_custom の中で、望みの処理を記述してあげるだけで OK。
+      </p>
+      <pre><code>#!c
 #include &quot;httpd.h&quot;
 #include &quot;http_config.h&quot;
 #include &quot;apr_optional.h&quot;
@@ -116,40 +117,51 @@ module AP_MODULE_DECLARE_DATA rewrite_mapfunc_custom_module = {
     NULL,                  /* merge  per-server config structures */
     NULL,                  /* table of config file commands       */
     register_hooks         /* register hooks                      */
-};
-</code></pre>
-
-<p>追加した internal function を呼び出すための httpd.conf は以下のような感じ。</p>
-
-<pre><code>LoadModule rewrite_mapfunc_custom_module modules/mod_rewrite_mapfunc_custom.so
+};</code></pre>
+      <p>
+        追加した internal function を呼び出すための httpd.conf は以下のような感じ。
+      </p>
+      <pre><code>LoadModule rewrite_mapfunc_custom_module modules/mod_rewrite_mapfunc_custom.so
 
 RewriteEngine On
 ProxyPreserveHost On
 RewriteMap custom int:custom
-RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]
-</code></pre>
-
-<p>この例では、Host ヘッダの内容を custom function に渡して、ホスト名を変換して proxy するけど、Host ヘッダはオリジナルのままで変換しない、といった処理を想定してます。</p>
-
-<p>例の件はこんな感じで実現できそうだよ。＞<a href="http://d.hatena.ne.jp/hiboma/">id:hiboma</a></p>
-
-<p>*2009/05/10 13:57:00 追記 *</p>
-
-<p>github に Makefile 等も含めてコードアップしました。</p>
-
-<p><a href="http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master">http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master</a></p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2009/07/21/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2009/05/05/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+RewriteRule ^/(.*)$ http://${custom:%{HTTP_HOST}}/$1 [P,QSA]</code></pre>
+      <p>
+        この例では、Host ヘッダの内容を custom function に渡して、ホスト名を変換して proxy するけど、Host ヘッダはオリジナルのままで変換しない、といった処理を想定してます。
+      </p>
+      <p>
+        例の件はこんな感じで実現できそうだよ。＞
+        <a href="http://d.hatena.ne.jp/hiboma/">
+          id:hiboma
+        </a>
+      </p>
+      <p>
+        *2009/05/10 13:57:00 追記 *
+      </p>
+      <p>
+        github に Makefile 等も含めてコードアップしました。
+      </p>
+      <p>
+        <a href="http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master">
+          http://github.com/mizzy/mod_rewrite_mapfunc_custom/tree/master
+        </a>
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2009/05/05/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2009/07/21/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

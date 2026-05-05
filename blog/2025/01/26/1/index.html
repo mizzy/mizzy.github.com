@@ -1,94 +1,125 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Ruby製の静的サイトジェネレータをGoで再実装した - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Ruby製の静的サイトジェネレータをGoで再実装した - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Ruby製の静的サイトジェネレータをGoで再実装した"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2025/01/26/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2025/01/26/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Ruby製の静的サイトジェネレータをGoで再実装した"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2025/01/26/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2025/01/26/1">
+          Ruby製の静的サイトジェネレータをGoで再実装した
+        </a>
+      </h1>
+      <div class="byline">
+        26 January 2025
+      </div>
+      <blockquote class="twitter-tweet">
+        <p lang="ja" dir="ltr">
+          ブログ3年ぐらい更新してなくて、もう少しマメに書くか、という機運になってきたので、ブログツール書き始めた。
+        </p>
+        &mdash; mizzy (@gosukenator)
+        <a href="https://twitter.com/gosukenator/status/1883311289768063332?ref_src=twsrc%5Etfw">
+          January 26, 2025
+        </a>
+      </blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        このブログは、マークダウン形式で記事を書いて、
+        <a href="https://github.com/mizzy/ruby-nebel">
+          Nebel
+        </a>
+        というRubyで実装したお手製の静的サイトジェネレータでHTMLに変換してGitHub Pagesでホストしている。
+      </p>
+      <p>
+        が、久々に書くか、と思ってNebelを動かしてみたところ、エラーで動かない。具体的には、ローカルでの確認用サーバのために利用しているeventmachine gemがビルドに失敗してインストールできない。
+      </p>
+      <p>
+        エラーの原因を調べて直すのもよいのだけど、13年ぐらい前につくって全然メンテしてないし、今となっては不要な機能もあるので、
+        <a href="https://github.com/mizzy/nebel">
+          Goで再実装した
+        </a>
+        。
+      </p>
+      <p>
+        といっても、Ruby版のすべての機能を実装したわけではない。Ruby版にはプラグイン機構があって、様々なプラグインが動いているが、プラグイン機構や各種プラグインは未実装。
+      </p>
+      <p>
+        例えばgistプラグインは
+      </p>
+      <pre><code>{% gist 37401088bc6e3564addf7a27d698f6fb %}</code></pre>
+      <p>
+        と書いておくと
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;https://gist.github.com/37401088bc6e3564addf7a27d698f6fb.js?file=&#39;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">noscript</span><span class="p">&gt;&lt;</span><span class="nt">pre</span><span class="p">&gt;&lt;</span><span class="nt">code</span><span class="p">&gt;&lt;/</span><span class="nt">code</span><span class="p">&gt;&lt;/</span><span class="nt">pre</span><span class="p">&gt;&lt;/</span><span class="nt">noscript</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span></code></pre>
+      <p>
+        といったHTMLに変換してくれる。自分でつくっておいてなんだけど、プラグインで変換しなくてもgistのページからEmbed用コードを簡単にコピーできるので、別にいらなかったな、と思ってる。
+      </p>
+      <p>
+        もしかしたら必要なプラグインもあるかもだけど、必要になってから実装すればいいやと思っている。
+      </p>
+      <p>
+        プラグイン利用前提で書いた過去記事はGo版では正しく変換してくれないことになるが、過去記事を再生成する必要はいまのところないので特に問題なさそう。
+      </p>
+      <p>
+        またRuby版には、コマンド一発で確認用のローカルサーバを立ち上げてブラウザで開き、記事を保存したら自動でHTMLに変換してブラウザも自動リロード、という、機能があるのだけど、これはあれば便利だけどなくても困らないので未実装。
+      </p>
+      <p>
+        とりあえず最低限必要な機能は実装でき、この記事もGo版で生成している。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2022/03/24/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2025/01/26/1">Ruby製の静的サイトジェネレータをGoで再実装した</a>
-  </h1>
-
-  <section class="byline">
-    2025-01-26 19:32:42 +0900
-  </section>
-
-  <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ブログ3年ぐらい更新してなくて、もう少しマメに書くか、という機運になってきたので、ブログツール書き始めた。</p>&mdash; mizzy (@gosukenator) <a href="https://twitter.com/gosukenator/status/1883311289768063332?ref_src=twsrc%5Etfw">January 26, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>このブログは、マークダウン形式で記事を書いて、<a href="https://github.com/mizzy/ruby-nebel">Nebel</a>というRubyで実装したお手製の静的サイトジェネレータでHTMLに変換してGitHub Pagesでホストしている。</p>
-<p>が、久々に書くか、と思ってNebelを動かしてみたところ、エラーで動かない。具体的には、ローカルでの確認用サーバのために利用しているeventmachine gemがビルドに失敗してインストールできない。</p>
-<p>エラーの原因を調べて直すのもよいのだけど、13年ぐらい前につくって全然メンテしてないし、今となっては不要な機能もあるので、<a href="https://github.com/mizzy/nebel">Goで再実装した</a>。</p>
-<p>といっても、Ruby版のすべての機能を実装したわけではない。Ruby版にはプラグイン機構があって、様々なプラグインが動いているが、プラグイン機構や各種プラグインは未実装。</p>
-<p>例えばgistプラグインは</p>
-<pre><code>{% gist 37401088bc6e3564addf7a27d698f6fb %}
-</code></pre>
-<p>と書いておくと</p>
-<pre><code class="language-html">&lt;div&gt;&lt;script src='https://gist.github.com/37401088bc6e3564addf7a27d698f6fb.js?file='&gt;&lt;/script&gt;
-&lt;noscript&gt;&lt;pre&gt;&lt;code&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/noscript&gt;&lt;/div&gt;
-</code></pre>
-<p>といったHTMLに変換してくれる。自分でつくっておいてなんだけど、プラグインで変換しなくてもgistのページからEmbed用コードを簡単にコピーできるので、別にいらなかったな、と思ってる。</p>
-<p>もしかしたら必要なプラグインもあるかもだけど、必要になってから実装すればいいやと思っている。</p>
-<p>プラグイン利用前提で書いた過去記事はGo版では正しく変換してくれないことになるが、過去記事を再生成する必要はいまのところないので特に問題なさそう。</p>
-<p>またRuby版には、コマンド一発で確認用のローカルサーバを立ち上げてブラウザで開き、記事を保存したら自動でHTMLに変換してブラウザも自動リロード、という、機能があるのだけど、これはあれば便利だけどなくても困らないので未実装。</p>
-<p>とりあえず最低限必要な機能は実装でき、この記事もGo版で生成している。</p>
-
-
-  <div class="pagination">
-    <a href="/blog/2025/01/27/1">↑ newer post</a>
-    <a href="/blog/2022/03/24/1" rel="next">older post ↓</a>
-    </div>
-</section>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2025/01/27/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

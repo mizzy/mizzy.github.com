@@ -1,116 +1,101 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Build on your own API - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Build on your own API - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Build on your own API"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/02/11/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/02/11/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Build on your own API"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/02/11/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/02/11/1">
+          Build on your own API
+        </a>
+      </h1>
+      <div class="byline">
+        11 February 2006
+      </div>
+      <p class="entryBody">
+        本職ウェブプログラマになった弊害として、ブログがちょっと書きにくくなってしまいました。今までのウェブ関連エントリは完全に趣味でやってたことなので、誰に憚ることもなかったわけですが、これからは仕事と絡む内容も多くなってしまうため、どこまで書いていいのかの線引きに悩んでしまいます。
+      </p>
+      <p class="entryBody">
+        ですが、なるべくオープンなスタンスは貫きたいと思っているので、自社ビジネスに影響を与えない範囲で、うまく書いていけたらな、と思ってます。
+      </p>
+      <p class="entryBody">
+        というわけで今日は、
+        <a href="http://radar.oreilly.com/archives/2006/02/web_development_20.html" target="_blank">
+          O'Reilly Radar &gt; Web Development 2.0
+        </a>
+        から。
+      </p>
+      <p class="entryBody">
+        海外ブログ紹介エントリは書くつもりはないため、内容は詳しく説明しませんが、Web 2.0 について開発の観点から整理したもの、という感じです。
+      </p>
+      <p class="entryBody">
+        この中で特に目を引いたのが、「Buidl on your own API」 の項。これはまさに、自分が転職して最初にやりたかったこととまったく同じだったりします。
+      </p>
+      <p class="entryBody">
+        API を公開、ってのが今の流れになってるわけですが、API を第三者へ公開することを主目的とせずに、自社のサービスの基盤となるデータ上に API を被せ、ライブラリを整備することによって、自社内でのサービス開発の効率化と各サービスの連携が容易にできるようにしよう、という狙いですね。第三者への API やライブラリの公開はその副産物、といった感じで。
+      </p>
+      <p class="entryBody">
+        転職してからのここ1週間ちょいの間に、既存のサービスの改良をしつつ、以前から考えていた上の様なアイデアを整理して上司に提出、他の方々とディスカッションして意見を頂き、ある程度方向性が固まったところで、これから具体的な仕様決めと実装に着手といった感じです。
+      </p>
+      <p class="entryBody">
+        この考えについては、社内での反応も悪くはなかったので、イケるという確信はあるものの、やはり今までは日曜プログラマにしかすぎなかったわけで、自社内でやるんなら API でラップせずに直接データベース叩かせた方がパフォーマンスはいいんじゃね、とか、他社はこんなまわりくどいことをやってるんだろうか、とか若干の不安はあったのですが、O'Reilly Radar のエントリによりそういう流れが実際にあるということを知って、大変勇気づけられました。
+      </p>
+      <p class="entryBody">
+        といった形で、しばらくは API やライブラリ整備といったサービス基盤作りに注力、その後おもしろいサービスをがんがん作っていけたらなぁ、と思ってたりします。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/02/06/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/02/11/1">Build on your own API</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-本職ウェブプログラマになった弊害として、ブログがちょっと書きにくくなってしまいました。今までのウェブ関連エントリは完全に趣味でやってたことなので、誰に憚ることもなかったわけですが、これからは仕事と絡む内容も多くなってしまうため、どこまで書いていいのかの線引きに悩んでしまいます。
-</p>
-
-<p class="entryBody">
-ですが、なるべくオープンなスタンスは貫きたいと思っているので、自社ビジネスに影響を与えない範囲で、うまく書いていけたらな、と思ってます。
-</p>
-
-<p class="entryBody">
-というわけで今日は、<a href="http://radar.oreilly.com/archives/2006/02/web_development_20.html" target="_blank">O'Reilly Radar &gt; Web Development 2.0</a> から。
-</p>
-
-<p class="entryBody">
-海外ブログ紹介エントリは書くつもりはないため、内容は詳しく説明しませんが、Web 2.0 について開発の観点から整理したもの、という感じです。
-</p>
-
-<p class="entryBody">
-この中で特に目を引いたのが、「Buidl on your own API」 の項。これはまさに、自分が転職して最初にやりたかったこととまったく同じだったりします。
-</p>
-
-<p class="entryBody">
-API を公開、ってのが今の流れになってるわけですが、API を第三者へ公開することを主目的とせずに、自社のサービスの基盤となるデータ上に API を被せ、ライブラリを整備することによって、自社内でのサービス開発の効率化と各サービスの連携が容易にできるようにしよう、という狙いですね。第三者への API やライブラリの公開はその副産物、といった感じで。
-</p>
-
-<p class="entryBody">
-転職してからのここ1週間ちょいの間に、既存のサービスの改良をしつつ、以前から考えていた上の様なアイデアを整理して上司に提出、他の方々とディスカッションして意見を頂き、ある程度方向性が固まったところで、これから具体的な仕様決めと実装に着手といった感じです。
-</p>
-
-<p class="entryBody">
-この考えについては、社内での反応も悪くはなかったので、イケるという確信はあるものの、やはり今までは日曜プログラマにしかすぎなかったわけで、自社内でやるんなら API でラップせずに直接データベース叩かせた方がパフォーマンスはいいんじゃね、とか、他社はこんなまわりくどいことをやってるんだろうか、とか若干の不安はあったのですが、O'Reilly Radar のエントリによりそういう流れが実際にあるということを知って、大変勇気づけられました。
-</p>
-
-<p class="entryBody">
-といった形で、しばらくは API やライブラリ整備といったサービス基盤作りに注力、その後おもしろいサービスをがんがん作っていけたらなぁ、と思ってたりします。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/02/17/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/02/06/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/02/17/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

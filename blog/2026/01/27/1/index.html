@@ -6,7 +6,6 @@
     <title>
       Carinaの型システムについて - Gosuke Miyashita
     </title>
-    <!-- TODO: change name and description -->
     <meta name="author" content="Gosuke Miyashita"/>
     <meta name="description" content="A fantastic blog that is fantastic."/>
     <!-- OGP -->
@@ -22,60 +21,35 @@
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
     <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
-    <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
     <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
-    <section class="sidebar">
-      <a href="/">
-        <!-- TODO: change this gravatar URL -->
-        <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75"
-             class="avatar"/>
-      </a>
-      <!-- TODO: change name -->
-      <section class="name">
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
         <a href="/">
-          <span id="zach">
-            Gosuke
-          </span>
-          <span id="holman">
-            Miyashita
-          </span>
+          posts
         </a>
-      </section>
-      <!-- TODO: change links -->
-      <section class="meta">
-        <a href="https://github.com/mizzy">
-          <img src="/images/github.png"/>
-        </a>
-        <a href="https://twitter.com/gosukenator">
-          <img src="/images/twitter.png">
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
         </a>
         <a href="/atom.xml">
-          <img src="/images/rss.png"/>
+          feed
         </a>
-      </section>
-      <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-    </section>
-    <section class="content autopagerize_page_element">
+      </span>
+    </header>
+    <article>
       <h1>
         <a href="/blog/2026/01/27/1">
           Carinaの型システムについて
         </a>
       </h1>
-      <section class="byline">
-        2026-01-27 09:54:37 +0900
-      </section>
+      <div class="byline">
+        27 January 2026
+      </div>
       <p>
         Terraformライクなツール
         <a href="https://github.com/mizzy/carina">
@@ -123,7 +97,7 @@
         また、CarinaではAWSリージョンはEnum型として定義されているため、以下のようにリージョンを指定することもできる。
       </p>
       <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">provider</span> <span class="nv">aws</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
+</span></span><span class="line"><span class="cl">  <span class="na">region</span> <span class="o">=</span> <span class="no">aws.Region.ap_northeast_1</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre>
       <p>
@@ -144,9 +118,9 @@
       <p>
         例えば、以下のように不正なプレフィックス長を指定したとする。
       </p>
-      <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="nv">main_vpc</span> <span class="o">=</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">name</span>       <span class="o">=</span> <span class="s2">&#34;main-vpc&#34;</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/33&#34;</span>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="na">main_vpc</span> <span class="o">=</span> <span class="nc">aws.vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="na">name</span>       <span class="o">=</span> <span class="s2">&#34;main-vpc&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/33&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre>
       <p>
@@ -215,14 +189,21 @@
       <p>
         これを元にCarinaで型定義を自動生成するなり、AIに生成させるなりすれば、型システムの強化がより容易になると考えている。
       </p>
-      <div class="pagination">
-        <a href="/blog/2026/01/27/2">
-          ↑ newer post
-        </a>
-        <a href="/blog/2026/01/25/2" rel="next">
-          older post ↓
-        </a>
-      </div>
-    </section>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2026/01/25/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2026/01/27/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
   </body>
 </html>

@@ -1,111 +1,168 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2014/02/14/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2014/02/14/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2014/02/14/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2014/02/14/1">
+          Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました
+        </a>
+      </h1>
+      <div class="byline">
+        14 February 2014
+      </div>
+      <div style="width: 65%">
+        <script async class="speakerdeck-embed" data-id="3fc5c5d07684013148646268bd6e389b" data-ratio="1.3333333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+      </div>
+      <p>
+        内容自体は基本的に、
+        <a href="http://atnd.org/event/E0021065">
+          第5弾 週末ランサーズ
+        </a>
+        にお邪魔した時に
+        <a href="https://speakerdeck.com/mizzy/future-of-server-provisioning">
+          お話した資料
+        </a>
+        と同じなんですが、この時よりも時間が少し長かったので、多少内容を追加しているのと、当時自分の中でうまく整理できてなかったけど、今は多少クリアになった部分もあって、そういった内容を盛り込んだりしてみました。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          <a href="http://togetter.com/li/628616">
+            Togetter まとめ
+          </a>
+        </li>
+        <li>
+          <a href="http://d.hatena.ne.jp/rx7/20140213/p1">
+            NAMIKAWA さんによるまとめ
+          </a>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2014/02/14/1">Developers Summit 2014 で「サーバプロビジョニングのこれまでとこれから」という発表を行いました</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <div style="width: 65%">
-<script async class="speakerdeck-embed" data-id="3fc5c5d07684013148646268bd6e389b" data-ratio="1.3333333333333333" src="//speakerdeck.com/assets/embed.js"></script>
-</div>
-
-<p>内容自体は基本的に、<a href="http://atnd.org/event/E0021065">第5弾 週末ランサーズ</a> にお邪魔した時に <a href="https://speakerdeck.com/mizzy/future-of-server-provisioning">お話した資料</a> と同じなんですが、この時よりも時間が少し長かったので、多少内容を追加しているのと、当時自分の中でうまく整理できてなかったけど、今は多少クリアになった部分もあって、そういった内容を盛り込んだりしてみました。</p>
-
-<ul>
-<li><a href="http://togetter.com/li/628616">Togetter まとめ</a></li>
-<li><a href="http://d.hatena.ne.jp/rx7/20140213/p1">NAMIKAWA さんによるまとめ</a></li>
-</ul>
-
-<p>一点お詫びしたいのは、登壇者に質問ができる Ask the Speaker というコーナーがあって、セッションが終わった後はそちらに移動、という段取りだったのですが、裏でやっていた <a href="http://event.shoeisha.jp/devsumi/20140213/session/394/">OSS コミッタ大集合</a> の方でも登壇するために終了後すぐに E 会場に向かったため、Ask the Speaker コーナーに行けませんでした。もし質問するためにいらしてくださった方がいましたら、本当に申し訳ないです。</p>
-
-<p>今回デブサミに登壇させて頂いた経緯については、会場で <a href="http://twitter.com/t_wada">@t_wada</a> さんからも説明があったのですが、<a href="http://atnd.org/events/40914">Testing Casual Talks #1</a> でご一緒させて頂いたり、<a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ</a> というブログエントリを読んでくださった @t_wada さんから直々に依頼があり、二つ返事で OK させて頂いた、という次第です。</p>
-
-<p>お話したテーマのうちのひとつである「テスト駆動インフラ」は、Puppet を使い始めてから割とすぐに考えはじめて、<a href="http://d.hatena.ne.jp/dayflower/20070405/1175782564#c">2007 年には「テスト駆動サーバ構築」という言葉を使ったり</a> してました。（当時はインフラという言葉が今のような使われ方をしていなかった。）</p>
-
-<p>で、それを実現するための <a href="http://tokyo2007.yapcasia.org/sessions/2007/02/assurer_a_pluggable_server_tes.html">Assurer</a> というツールを 2007 年につくって YAPC で発表したものの、実用には至らず頓挫した、という経緯があったりします。</p>
-
-<p>それから実に6年もかかって serverspec が生まれたわけですが、テスト駆動インフラという言葉は割と認知されてきたのかな、という状況で、言葉尻をとらえて「インフラをテスト駆動？何それpgr」みたいな意見も見かける中、@t_wada さん直々の登壇依頼が来た、という事実は、テスト駆動開発の第一人者からテスト駆動インフラと serverspec が認められた、お墨付きを頂けた、ということであると（勝手に）受け止め、本当にうれしかったですね。</p>
-
-<p>登壇の前後でも以下の様なお言葉を頂けて、こちらこそ登壇依頼を頂いて本当に良かったですし、感無量です。ありがとうございました。</p>
-
-<blockquote class="twitter-tweet" lang="en"><p>朝の舞台挨拶を終えました。そして mizzy さんの登壇を実現できただけで感無量なのだなぁ <a href="https://twitter.com/search?q=%23devsumiB&amp;src=hash">#devsumiB</a></p>&mdash; Takuto Wada (@t_wada) <a href="https://twitter.com/t_wada/statuses/433769588715577344">February 13, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<blockquote class="twitter-tweet" lang="en"><p>mizzy さん (<a href="https://twitter.com/gosukenator">@gosukenator</a> さん) の話、インフラ技術のこれまでとこれからを語るスケールの大きい話だった。特に後半はワクワクしっぱなしだったな。登壇して頂けて本当に良かった。 <a href="https://twitter.com/search?q=%23devsumiB&amp;src=hash">#devsumiB</a></p>&mdash; Takuto Wada (@t_wada) <a href="https://twitter.com/t_wada/statuses/433781951523069952">February 13, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2014/03/11/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2014/01/31/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        一点お詫びしたいのは、登壇者に質問ができる Ask the Speaker というコーナーがあって、セッションが終わった後はそちらに移動、という段取りだったのですが、裏でやっていた
+        <a href="http://event.shoeisha.jp/devsumi/20140213/session/394/">
+          OSS コミッタ大集合
+        </a>
+        の方でも登壇するために終了後すぐに E 会場に向かったため、Ask the Speaker コーナーに行けませんでした。もし質問するためにいらしてくださった方がいましたら、本当に申し訳ないです。
+      </p>
+      <p>
+        今回デブサミに登壇させて頂いた経緯については、会場で
+        <a href="http://twitter.com/t_wada">
+          @t_wada
+        </a>
+        さんからも説明があったのですが、
+        <a href="http://atnd.org/events/40914">
+          Testing Casual Talks #1
+        </a>
+        でご一緒させて頂いたり、
+        <a href="http://mizzy.org/blog/2013/10/29/1/">
+          インフラ系技術の流れ
+        </a>
+        というブログエントリを読んでくださった @t_wada さんから直々に依頼があり、二つ返事で OK させて頂いた、という次第です。
+      </p>
+      <p>
+        お話したテーマのうちのひとつである「テスト駆動インフラ」は、Puppet を使い始めてから割とすぐに考えはじめて、
+        <a href="http://d.hatena.ne.jp/dayflower/20070405/1175782564#c">
+          2007 年には「テスト駆動サーバ構築」という言葉を使ったり
+        </a>
+        してました。（当時はインフラという言葉が今のような使われ方をしていなかった。）
+      </p>
+      <p>
+        で、それを実現するための
+        <a href="http://tokyo2007.yapcasia.org/sessions/2007/02/assurer_a_pluggable_server_tes.html">
+          Assurer
+        </a>
+        というツールを 2007 年につくって YAPC で発表したものの、実用には至らず頓挫した、という経緯があったりします。
+      </p>
+      <p>
+        それから実に6年もかかって serverspec が生まれたわけですが、テスト駆動インフラという言葉は割と認知されてきたのかな、という状況で、言葉尻をとらえて「インフラをテスト駆動？何それpgr」みたいな意見も見かける中、@t_wada さん直々の登壇依頼が来た、という事実は、テスト駆動開発の第一人者からテスト駆動インフラと serverspec が認められた、お墨付きを頂けた、ということであると（勝手に）受け止め、本当にうれしかったですね。
+      </p>
+      <p>
+        登壇の前後でも以下の様なお言葉を頂けて、こちらこそ登壇依頼を頂いて本当に良かったですし、感無量です。ありがとうございました。
+      </p>
+      <blockquote class="twitter-tweet" lang="en">
+        <p>
+          朝の舞台挨拶を終えました。そして mizzy さんの登壇を実現できただけで感無量なのだなぁ
+          <a href="https://twitter.com/search?q=%23devsumiB&amp;src=hash">
+            #devsumiB
+          </a>
+        </p>
+        &mdash; Takuto Wada (@t_wada)
+        <a href="https://twitter.com/t_wada/statuses/433769588715577344">
+          February 13, 2014
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <blockquote class="twitter-tweet" lang="en">
+        <p>
+          mizzy さん (
+          <a href="https://twitter.com/gosukenator">
+            @gosukenator
+          </a>
+          さん) の話、インフラ技術のこれまでとこれからを語るスケールの大きい話だった。特に後半はワクワクしっぱなしだったな。登壇して頂けて本当に良かった。
+          <a href="https://twitter.com/search?q=%23devsumiB&amp;src=hash">
+            #devsumiB
+          </a>
+        </p>
+        &mdash; Takuto Wada (@t_wada)
+        <a href="https://twitter.com/t_wada/statuses/433781951523069952">
+          February 13, 2014
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2014/01/31/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2014/03/11/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

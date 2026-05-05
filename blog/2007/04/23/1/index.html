@@ -1,95 +1,87 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>OpenVPN - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/04/23/1">OpenVPN</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <h1>ダウンロード</h1>
-
-<p><a href="http://openvpn.net/">http://openvpn.net/</a> からダウンロード</p>
-
-<h1>インストール</h1>
-
-<pre><code>$ tar zxvf openvpn-2.0.9.tar.gz
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      OpenVPN - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="OpenVPN"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/04/23/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/04/23/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="OpenVPN"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/04/23/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/04/23/1">
+          OpenVPN
+        </a>
+      </h1>
+      <div class="byline">
+        23 April 2007
+      </div>
+      <h1>
+        ダウンロード
+      </h1>
+      <p>
+        <a href="http://openvpn.net/">
+          http://openvpn.net/
+        </a>
+        からダウンロード
+      </p>
+      <h1>
+        インストール
+      </h1>
+      <pre><code>$ tar zxvf openvpn-2.0.9.tar.gz
 $ cd openvpn-2.0.9
 $ ./configure --with-ssl-headers=/usr/local/ssl/include --with-ssl-lib=/usr/local/ssl/lib
 $ make
-$ sudo make install
-</code></pre>
-
-<h1>サーバの設定/起動</h1>
-
-<h2>キーの生成</h2>
-
-<pre><code>$ sudo mkdir /etc/openvpn
-$ sudo /usr/local/sbin/openvpn --genkey --secret /etc/openvpn/server.key
-</code></pre>
-
-<h2>設定ファイル</h2>
-
-<p>/etc/openvpn/server.conf</p>
-
-<pre><code>proto tcp-server
+$ sudo make install</code></pre>
+      <h1>
+        サーバの設定/起動
+      </h1>
+      <h2>
+        キーの生成
+      </h2>
+      <pre><code>$ sudo mkdir /etc/openvpn
+$ sudo /usr/local/sbin/openvpn --genkey --secret /etc/openvpn/server.key</code></pre>
+      <h2>
+        設定ファイル
+      </h2>
+      <p>
+        /etc/openvpn/server.conf
+      </p>
+      <pre><code>proto tcp-server
 
 dev tap
 
@@ -103,25 +95,27 @@ ping-restart 60
 ping-timer-rem
 persist-key
 persist-tun
-verb 3     
-</code></pre>
-
-<p>デフォルトのポート番号は 1194。</p>
-
-<h2>起動</h2>
-
-<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;
-</code></pre>
-
-<h1>クライアントの設定/起動</h1>
-
-<h2>キー</h2>
-
-<p>サーバで生成したものをコピー</p>
-
-<h2>設定ファイル</h2>
-
-<pre><code>remote mizzy.org
+verb 3</code></pre>
+      <p>
+        デフォルトのポート番号は 1194。
+      </p>
+      <h2>
+        起動
+      </h2>
+      <pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/server.conf &amp;</code></pre>
+      <h1>
+        クライアントの設定/起動
+      </h1>
+      <h2>
+        キー
+      </h2>
+      <p>
+        サーバで生成したものをコピー
+      </p>
+      <h2>
+        設定ファイル
+      </h2>
+      <pre><code>remote mizzy.org
 proto tcp-client
 port 1194
 dev tap
@@ -129,41 +123,43 @@ verb 3
 ping    3600
 secret /etc/openvpn/server.key
 ifconfig 172.16.0.2 255.255.255.0
-route 192.168.10.0 255.255.255.0 172.16.0.1 
-</code></pre>
-
-<h2>起動</h2>
-
-<p>サーバと一緒。</p>
-
-<pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/client.conf &amp;
-</code></pre>
-
-<h1>その他</h1>
-
-<p>Linux のルーティング設定が必要。</p>
-
-<p>/etc/sysconfig/network</p>
-
-<pre><code>FORWARD_IPV4=yes
-</code></pre>
-
-<p>即反映するなら</p>
-
-<pre><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward
-</code></pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/04/23/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/04/22/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+route 192.168.10.0 255.255.255.0 172.16.0.1</code></pre>
+      <h2>
+        起動
+      </h2>
+      <p>
+        サーバと一緒。
+      </p>
+      <pre><code>$ sudo /usr/local/sbin/openvpn --config /etc/openvpn/client.conf &amp;</code></pre>
+      <h1>
+        その他
+      </h1>
+      <p>
+        Linux のルーティング設定が必要。
+      </p>
+      <p>
+        /etc/sysconfig/network
+      </p>
+      <pre><code>FORWARD_IPV4=yes</code></pre>
+      <p>
+        即反映するなら
+      </p>
+      <pre><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code></pre>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/04/22/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/04/23/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

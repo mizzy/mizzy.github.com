@@ -1,113 +1,131 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>write はユーザプロセスを待たせない？の答え - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      write はユーザプロセスを待たせない？の答え - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="write はユーザプロセスを待たせない？の答え"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/05/25/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/05/25/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="write はユーザプロセスを待たせない？の答え"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/05/25/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/05/25/1">
+          write はユーザプロセスを待たせない？の答え
+        </a>
+      </h1>
+      <div class="byline">
+        25 May 2007
+      </div>
+      <p>
+        <a href="http://blog.mizzy.org/articles/2007/05/23/linux-disk-io-00">
+          前回のエントリ
+        </a>
+        について、naoya さんから
+        <a href="http://d.hatena.ne.jp/naoya/20070523/1179938637">
+          僕の期待以上の素晴らしい回答
+        </a>
+        を頂きました。感謝感謝です。
+      </p>
+      <p>
+        詳細は上記エントリをじっくり読んで頂きたいのですが、僕の疑問への直接の答えとなるのが、まとめにある
+      </p>
+      <blockquote>
+        <ul>
+          <li>
+            write はプロセスを待たせない
+          </li>
+          <li>
+            ただし明示的に sync する場合は待たせる
+          </li>
+        </ul>
+      </blockquote>
+      <p>
+        ですね。「write はプロセスを待たせない」が正しい、というのは naoya さんの解説を読んで納得しました。プロセスが write するということと、それが実際にディスクに書き出されることを、区別しないで考えていたのが僕の敗因ですね。
+      </p>
+      <p>
+        また、こちらの環境で kjournald や qmail-queue プロセスが待たされていたのは、sync してるから、ということでした。kjournald は確かめていないのですが、qmail-queue のソースの中では確かに fsync() が実行されていました。考えてみれば当然ですよね。ジャーナルのメタデータやメールキューなど、大事なデータを write して sync しないなんてことはあり得ないでしょうし。
+      </p>
+      <p>
+        なので、
+        <a href="http://d.hatena.ne.jp/hirose31/">
+          id:hirose31
+        </a>
+        さんからのコメント「fsync(2)のせい？」がずばり回答になっていました。ありがとうございます。今度カレーおごらせてください。
+      </p>
+      <p>
+        というわけで、「write はユーザプロセスを待たせない？」は「待たせない」が答え、ということで完結です。
+      </p>
+      <p>
+        あと、
+      </p>
+      <blockquote>
+        <p>
+          ということですが free の結果では、プロセスに割り当てるためのメモリが足りてるかどうかはわかりますが、ページキャッシュ用にメモリが足りてるかどうかはわかりません。
+        </p>
+      </blockquote>
+      <blockquote>
+        <p>
+          実際そのサーバーが主な仕事で使っているデータは、合計でどのぐらいのサイズでしょう。おそらく、キューに溜まったメールその他 OS 上で必要なデータのサイズをあわせると 800MB を超えるんではないかなあと思います。外してたらごめん。
+        </p>
+      </blockquote>
+      <p>
+        もおっしゃるとおりですね。プロセスに必要なメモリ容量と、キャッシュに必要なメモリ容量をちゃんと区別していませんでした。
+      </p>
+      <p>
+        となると、メモリを増やせば書き込み性能が向上する可能性があるのでは、と思ったのですが、今回のケースではおそらく向上することはなさそうです。というのも、iostat の値を見てると、avgqu-sz が 1 日平均でおよそ 5、短時間で見ると 10 とか 20 あるいはそれ以上ということがざらにあります。avgqu-sz はキューに入っていて待ちとなっている I/O リクエストの数なので、常に処理待ちとなっている I/O リクエストが存在する、ということなります。なので、ページキャッシュの容量の問題ではなく、ディスクの性能がボトルネックになっている、と言えそうです。（これも自分の勘違いなら恥ずかしいなー…メモリを簡単に増やせるなら、試してみたいんですけどね。）
+      </p>
+      <p>
+        naoya さん、詳細な解説ありがとうございました。大変勉強になりました。僕のために時間を割いて長文エントリ書いてくれた、と思うとちょっと萌えました。（べっ、別にあんたのために…、とか言われそうですが。）
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/05/23/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/05/25/1">write はユーザプロセスを待たせない？の答え</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://blog.mizzy.org/articles/2007/05/23/linux-disk-io-00">前回のエントリ</a> について、naoya さんから<a href="http://d.hatena.ne.jp/naoya/20070523/1179938637">僕の期待以上の素晴らしい回答</a>を頂きました。感謝感謝です。</p>
-
-<p>詳細は上記エントリをじっくり読んで頂きたいのですが、僕の疑問への直接の答えとなるのが、まとめにある</p>
-
-<blockquote>
-<ul>
-<li>write はプロセスを待たせない</li>
-<li>ただし明示的に sync する場合は待たせる</li>
-</ul>
-</blockquote>
-
-<p>ですね。「write はプロセスを待たせない」が正しい、というのは naoya さんの解説を読んで納得しました。プロセスが write するということと、それが実際にディスクに書き出されることを、区別しないで考えていたのが僕の敗因ですね。</p>
-
-<p>また、こちらの環境で kjournald や qmail-queue プロセスが待たされていたのは、sync してるから、ということでした。kjournald は確かめていないのですが、qmail-queue のソースの中では確かに fsync() が実行されていました。考えてみれば当然ですよね。ジャーナルのメタデータやメールキューなど、大事なデータを write して sync しないなんてことはあり得ないでしょうし。</p>
-
-<p>なので、<a href="http://d.hatena.ne.jp/hirose31/">id:hirose31</a>さんからのコメント「fsync(2)のせい？」がずばり回答になっていました。ありがとうございます。今度カレーおごらせてください。</p>
-
-<p>というわけで、「write はユーザプロセスを待たせない？」は「待たせない」が答え、ということで完結です。</p>
-
-<p>あと、</p>
-
-<blockquote>
-<p>ということですが free の結果では、プロセスに割り当てるためのメモリが足りてるかどうかはわかりますが、ページキャッシュ用にメモリが足りてるかどうかはわかりません。</p>
-
-<p>実際そのサーバーが主な仕事で使っているデータは、合計でどのぐらいのサイズでしょう。おそらく、キューに溜まったメールその他 OS 上で必要なデータのサイズをあわせると 800MB を超えるんではないかなあと思います。外してたらごめん。</p>
-</blockquote>
-
-<p>もおっしゃるとおりですね。プロセスに必要なメモリ容量と、キャッシュに必要なメモリ容量をちゃんと区別していませんでした。</p>
-
-<p>となると、メモリを増やせば書き込み性能が向上する可能性があるのでは、と思ったのですが、今回のケースではおそらく向上することはなさそうです。というのも、iostat の値を見てると、avgqu-sz が 1 日平均でおよそ 5、短時間で見ると 10 とか 20 あるいはそれ以上ということがざらにあります。avgqu-sz はキューに入っていて待ちとなっている I/O リクエストの数なので、常に処理待ちとなっている I/O リクエストが存在する、ということなります。なので、ページキャッシュの容量の問題ではなく、ディスクの性能がボトルネックになっている、と言えそうです。（これも自分の勘違いなら恥ずかしいなー…メモリを簡単に増やせるなら、試してみたいんですけどね。）</p>
-
-<p>naoya さん、詳細な解説ありがとうございました。大変勉強になりました。僕のために時間を割いて長文エントリ書いてくれた、と思うとちょっと萌えました。（べっ、別にあんたのために…、とか言われそうですが。）</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/05/25/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/05/23/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/05/25/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

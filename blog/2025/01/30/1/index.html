@@ -6,67 +6,50 @@
     <title>
       Git scrapingでヒルトンの宿泊料金/ポイントをウォッチ - Gosuke Miyashita
     </title>
-    <!-- TODO: change name and description -->
     <meta name="author" content="Gosuke Miyashita"/>
     <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Git scrapingでヒルトンの宿泊料金/ポイントをウォッチ"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2025/01/30/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2025/01/30/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Git scrapingでヒルトンの宿泊料金/ポイントをウォッチ"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2025/01/30/1/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/css/pygments.css" type="text/css"/>
-    <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet"/>
-    <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/application.js"></script>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
   </head>
   <body>
-    <section class="sidebar">
-      <a href="/">
-        <!-- TODO: change this gravatar URL -->
-        <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75"
-             class="avatar"/>
-      </a>
-      <!-- TODO: change name -->
-      <section class="name">
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
         <a href="/">
-          <span id="zach">
-            Gosuke
-          </span>
-          <span id="holman">
-            Miyashita
-          </span>
+          posts
         </a>
-      </section>
-      <!-- TODO: change links -->
-      <section class="meta">
-        <a href="https://github.com/mizzy">
-          <img src="/images/github.png"/>
-        </a>
-        <a href="https://twitter.com/gosukenator">
-          <img src="/images/twitter.png">
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
         </a>
         <a href="/atom.xml">
-          <img src="/images/rss.png"/>
+          feed
         </a>
-      </section>
-      <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-    </section>
-    <section class="content autopagerize_page_element">
+      </span>
+    </header>
+    <article>
       <h1>
         <a href="/blog/2025/01/30/1">
           Git scrapingでヒルトンの宿泊料金/ポイントをウォッチ
         </a>
       </h1>
-      <section class="byline">
-        2025-01-30 13:25:16 +0900
-      </section>
+      <div class="byline">
+        30 January 2025
+      </div>
       <p>
         自分はHilton Honors会員かつ
         <a href="https://www.hpcj.jp/">
@@ -106,14 +89,10 @@
       <script src="https://gist.github.com/mizzy/88978b078626b9c464648f451f01b20a.js"></script>
       <p>
         各ホテルの料金やポイントは、
-        <code>
-          https://www.hilton.com/en/book/reservation/rooms/?ctyhocn=FUKHIHI&amp;arrivalDate=...
-        </code>
+        <code>https://www.hilton.com/en/book/reservation/rooms/?ctyhocn=FUKHIHI&amp;arrivalDate=...</code>
         <br />
         というURLから取得しているが、
-        <code>
-          ctyhocn=FUKHIHI
-        </code>
+        <code>ctyhocn=FUKHIHI</code>
         にホテルコードらしきものが入っているので、ロケーション名とホテルコードのマッピングを上のコードで行っている。
       </p>
       <p>
@@ -128,14 +107,21 @@
       <p>
         より正確な情報を得ようとするならば、自分の場合、ポイント、Flexible RateにHonors Discountが適用された価格、HPCJ価格（Flexible Rate * 0.75）の3つがあれば良いので、次はこれらの料金を取得できるよう改善する予定。
       </p>
-      <div class="pagination">
-        <a href="/blog/2025/02/01/1">
-          ↑ newer post
-        </a>
-        <a href="/blog/2025/01/28/1" rel="next">
-          older post ↓
-        </a>
-      </div>
-    </section>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2025/01/28/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2025/02/01/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
   </body>
 </html>

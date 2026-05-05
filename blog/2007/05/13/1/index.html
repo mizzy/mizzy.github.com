@@ -1,78 +1,75 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>FizzBuzz アセンブラ版 for x86/Linux - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/05/13/1">FizzBuzz アセンブラ版 for x86/Linux</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://labs.cybozu.co.jp/blog/takesako/2007/05/fizzbuzz_x86.html">竹迫さん</a>、<a href="http://subtech.g.hatena.ne.jp/yappo/20070511/1178907299">Yappo さん</a> に触発されて、FizzBuzz アセンブラ版 for x86/Linux をつくってみた。</p>
-
-<p>20年ほど前に Z80 でアセンブラをちょっとかじった程度の知識しかないので、ベストには程遠いコードだと思います。だれかもっといいコードを教えてください。</p>
-
-<p>最初竹迫さんのコードと同じように書けるかな、と思ったのですが、Windows とちがって、画面に表示するだけで EAX, EBX, ECX, EDX レジスタ使うので、竹迫さんのように BX レジスタを見張り役に、CX レジスタをカウンタに、ってことができませんでした。</p>
-
-<p>また、とりあえず書いただけで疲れたので、コードゴルフにチャレンジする気力はありません。</p>
-
-<pre><code>global  _start
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      FizzBuzz アセンブラ版 for x86/Linux - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="FizzBuzz アセンブラ版 for x86/Linux"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/05/13/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/05/13/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="FizzBuzz アセンブラ版 for x86/Linux"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/05/13/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/05/13/1">
+          FizzBuzz アセンブラ版 for x86/Linux
+        </a>
+      </h1>
+      <div class="byline">
+        13 May 2007
+      </div>
+      <p>
+        <a href="http://labs.cybozu.co.jp/blog/takesako/2007/05/fizzbuzz_x86.html">
+          竹迫さん
+        </a>
+        、
+        <a href="http://subtech.g.hatena.ne.jp/yappo/20070511/1178907299">
+          Yappo さん
+        </a>
+        に触発されて、FizzBuzz アセンブラ版 for x86/Linux をつくってみた。
+      </p>
+      <p>
+        20年ほど前に Z80 でアセンブラをちょっとかじった程度の知識しかないので、ベストには程遠いコードだと思います。だれかもっといいコードを教えてください。
+      </p>
+      <p>
+        最初竹迫さんのコードと同じように書けるかな、と思ったのですが、Windows とちがって、画面に表示するだけで EAX, EBX, ECX, EDX レジスタ使うので、竹迫さんのように BX レジスタを見張り役に、CX レジスタをカウンタに、ってことができませんでした。
+      </p>
+      <p>
+        また、とりあえず書いただけで疲れたので、コードゴルフにチャレンジする気力はありません。
+      </p>
+      <pre><code>global  _start
 
 _start:
         mov     si, 0
@@ -81,7 +78,7 @@ mawasu:
         call    space
         inc     si
         mov     ax, si
-
+        
         mov     di, 3
         xor     edx, edx
         div     di
@@ -108,7 +105,7 @@ pfizz:
         div     di
         cmp     dx, 0
         je      pbuzz
-
+        
         jmp     mawasu
 
 pbuzz:
@@ -123,17 +120,17 @@ num:
         jnge    num2
 
         jmp     end
-
+        
 num2:
         mov     di, 10
         cmp     ax, di
         jnge    num3
-
+        
         xor     edx, edx
         div     di
         add     ax, 48
         call    print
-
+        
 num3:   
         mov     ax, si
         mov     di, 10
@@ -143,7 +140,7 @@ num3:
         add     al, 48
         call    print
         ret
-
+        
 fizz:
         mov     al, 0x46
         call    print
@@ -153,7 +150,7 @@ fizz:
         call    print
         call    print
         ret
-
+        
 buzz:
         mov     al, 0x42
         call    print
@@ -163,12 +160,12 @@ buzz:
         call    print
         call    print
         ret
-
+        
 space:
         mov     al, 0x20
         call    print
         ret
-
+        
 print:
         push    eax
         mov     eax, 4
@@ -178,38 +175,41 @@ print:
         int     0x80
         pop     eax
         ret
-
+        
 end:    
         mov     al, 0x0a
         call    print
-
+        
         mov     al, 1
         mov     bl, 0
-        int     0x80
-</code></pre>
-
-<p>nasm を使ってこんな感じで動かすことができます。</p>
-
-<pre><code>$ nasm -f elf fizzbuzz.asm
+        int     0x80</code></pre>
+      <p>
+        nasm を使ってこんな感じで動かすことができます。
+      </p>
+      <pre><code>$ nasm -f elf fizzbuzz.asm
 $ ld -s -o fizzbuzz fizzbuzz.o
-$ ./fizzbuzz 
-</code></pre>
-
-<p><img src="/files/fizzbuzz.jpg" alt="fizzbuzz.asm"></p>
-
-<p>書いていてアセンブラの TMTOWTDI っぷりは Perl の比じゃないと思った。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/05/23/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/05/11/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+$ ./fizzbuzz</code></pre>
+      <p>
+        <img src="/files/fizzbuzz.jpg" alt="fizzbuzz.asm" />
+      </p>
+      <p>
+        書いていてアセンブラの TMTOWTDI っぷりは Perl の比じゃないと思った。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/05/11/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/05/23/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

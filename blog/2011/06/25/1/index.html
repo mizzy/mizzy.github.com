@@ -1,114 +1,159 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>DevOpsConference - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      DevOpsConference - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="DevOpsConference"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/06/25/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/06/25/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="DevOpsConference"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/06/25/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/06/25/1">
+          DevOpsConference
+        </a>
+      </h1>
+      <div class="byline">
+        25 June 2011
+      </div>
+      <p>
+        <a href="http://partake.in/events/b5472f43-5bc0-42d0-9469-dc70d7d95b24">
+          DevOps カンファレンス
+        </a>
+        に参加してきたので、個人的なまとめ＆補足など。
+      </p>
+      <p>
+        といっても
+        <a href="http://twitter.com/#!/kuwa_tw">
+          @kuwa_tw さん
+        </a>
+        の
+        <a href="http://togetter.com/li/153695">
+          togetter まとめ
+        </a>
+        が既にあるので、まとめというよりは、自分が話した内容の補足なんかをしてみようかと。
+      </p>
+      <p>
+        プレゼンに利用したスライドは
+        <a href="http://www.slideshare.net/mizzy/10devops">
+          slideshare にアップ
+        </a>
+        してますが、話すこと前提でスライドの内容は薄いので、togetter と併せてご覧下さい。
+      </p>
+      <p>
+        カンファレンスの内容が素晴らしかったのは自分が敢えてここで書く必要はないので、個人的に内容以外でよかった点を挙げると、
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          <a href="http://twitter.com/#!/kdmsnr">
+            @kdmsnr
+          </a>
+          さんと初めてお会いして、ウェブオペレーションを献本頂いたお礼を直接言うことができた！
+        </li>
+        <li>
+          <a href="http://twitter.com/#!/riywo">
+            @riywo
+          </a>
+          さんとは以前からお会いしたいなー、と思っていたので、ようやくその願いが叶った！
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/06/25/1">DevOpsConference</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://partake.in/events/b5472f43-5bc0-42d0-9469-dc70d7d95b24">DevOps カンファレンス</a> に参加してきたので、個人的なまとめ＆補足など。</p>
-
-<p>といっても <a href="http://twitter.com/#!/kuwa_tw">@kuwa_tw さん</a> の <a href="http://togetter.com/li/153695">togetter まとめ</a> が既にあるので、まとめというよりは、自分が話した内容の補足なんかをしてみようかと。</p>
-
-<p>プレゼンに利用したスライドは <a href="http://www.slideshare.net/mizzy/10devops">slideshare にアップ</a> してますが、話すこと前提でスライドの内容は薄いので、togetter と併せてご覧下さい。</p>
-
-<p>カンファレンスの内容が素晴らしかったのは自分が敢えてここで書く必要はないので、個人的に内容以外でよかった点を挙げると、</p>
-
-<ul>
-<li><a href="http://twitter.com/#!/kdmsnr">@kdmsnr</a> さんと初めてお会いして、ウェブオペレーションを献本頂いたお礼を直接言うことができた！</li>
-<li><a href="http://twitter.com/#!/riywo">@riywo</a> さんとは以前からお会いしたいなー、と思っていたので、ようやくその願いが叶った！</li>
-</ul>
-
-<p>といったあたりですかね。</p>
-
-<p>自分の発表では最初に、Dev な人、Ops な人、Dev &amp;&amp; Ops な人、!(Dev &amp;&amp; Ops) な人、それぞれで挙手してもらったんですが、Dev な人が意外と多い印象でした。プレゼンでも話しましたが、元々 Ops 発祥のムーブメントなので、Ops の人の方が圧倒的に多いんじゃないかと思ってましたが、意外な結果でした。</p>
-
-<p>ただし、スピーカー陣は全員 Ops 寄りな人で、Ops の話がメインでしたね。（<a href="http://twitter.com/#!/hiroshi19790209">諸富さん</a> は Dev も Ops も兼ねてらっしゃるようですが、Ops の話がメインでしたしね。）</p>
-
-<p>第2回では Dev な人のお話をぜひ聞いてみたいですね。<a href="http://twitter.com/#!/acotie/status/84302902939750400">@acotie が何かしゃべってくれそうです</a> 。</p>
-
-<p>それから、プレゼンに盛り込もうと思っていたけど、時間の関係で断念したんですが、DevOps に対する批判、というものもあります。</p>
-
-<ul>
-<li><a href="http://www.rationalsurvivability.com/blog/?p=1890">Incomplete Thought: The DevOps Disconnect | Rational Survivability</a></li>
-<li><a href="http://teddziuba.com/2011/03/devops-scam.html">Devops Is a Poorly Executed Scam</a></li>
-</ul>
-
-<p>このうちのひとつめのエントリに対する John Allspaw 氏のコメントをプレゼンでは引用させてもらいました。</p>
-
-<p>まあ、批判する人はどこにでもいるし、批判の内容もわからんでもないんですが、それが何か？という感じですね。</p>
-
-<p>帰り際に <a href="http://twitter.com/#!/marqs">@marqs さん</a> と、みんな同じような問題意識を抱えているんだな、ということ、ただそれを適切に表す言葉がいままでなかったために、お互いの共通認識として情報を共有する場を持てなかった、でも、DevOps という言葉が与えられることによって、それがはっきりと共通認識として浮かび上がり、共有する場を持てるようなった、それって、とても素晴らしいことだよね、なんて事を話して、がっちり握手を交わしてきました。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/06/25/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/05/27/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        といったあたりですかね。
+      </p>
+      <p>
+        自分の発表では最初に、Dev な人、Ops な人、Dev &amp;&amp; Ops な人、!(Dev &amp;&amp; Ops) な人、それぞれで挙手してもらったんですが、Dev な人が意外と多い印象でした。プレゼンでも話しましたが、元々 Ops 発祥のムーブメントなので、Ops の人の方が圧倒的に多いんじゃないかと思ってましたが、意外な結果でした。
+      </p>
+      <p>
+        ただし、スピーカー陣は全員 Ops 寄りな人で、Ops の話がメインでしたね。（
+        <a href="http://twitter.com/#!/hiroshi19790209">
+          諸富さん
+        </a>
+        は Dev も Ops も兼ねてらっしゃるようですが、Ops の話がメインでしたしね。）
+      </p>
+      <p>
+        第2回では Dev な人のお話をぜひ聞いてみたいですね。
+        <a href="http://twitter.com/#!/acotie/status/84302902939750400">
+          @acotie が何かしゃべってくれそうです
+        </a>
+        。
+      </p>
+      <p>
+        それから、プレゼンに盛り込もうと思っていたけど、時間の関係で断念したんですが、DevOps に対する批判、というものもあります。
+      </p>
+      <ul>
+        <li>
+          <a href="http://www.rationalsurvivability.com/blog/?p=1890">
+            Incomplete Thought: The DevOps Disconnect | Rational Survivability
+          </a>
+        </li>
+        <li>
+          <a href="http://teddziuba.com/2011/03/devops-scam.html">
+            Devops Is a Poorly Executed Scam
+          </a>
+        </li>
+      </ul>
+      <p>
+        このうちのひとつめのエントリに対する John Allspaw 氏のコメントをプレゼンでは引用させてもらいました。
+      </p>
+      <p>
+        まあ、批判する人はどこにでもいるし、批判の内容もわからんでもないんですが、それが何か？という感じですね。
+      </p>
+      <p>
+        帰り際に
+        <a href="http://twitter.com/#!/marqs">
+          @marqs さん
+        </a>
+        と、みんな同じような問題意識を抱えているんだな、ということ、ただそれを適切に表す言葉がいままでなかったために、お互いの共通認識として情報を共有する場を持てなかった、でも、DevOps という言葉が与えられることによって、それがはっきりと共通認識として浮かび上がり、共有する場を持てるようなった、それって、とても素晴らしいことだよね、なんて事を話して、がっちり握手を交わしてきました。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/05/27/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/06/25/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

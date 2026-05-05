@@ -1,139 +1,179 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Catalystでajax (HTML::Prototypeモジュールの使い方) - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Catalystでajax (HTML::Prototypeモジュールの使い方) - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Catalystでajax (HTML::Prototypeモジュールの使い方)"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/09/10/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/09/10/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Catalystでajax (HTML::Prototypeモジュールの使い方)"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/09/10/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/09/10/1">
+          Catalystでajax (HTML::Prototypeモジュールの使い方)
+        </a>
+      </h1>
+      <div class="byline">
+        10 September 2005
+      </div>
+      <h3>
+        changelog
+      </h3>
+      <p class="entryBody">
+      <ul class="entryBody">
+        <li>
+          typoを修正。positionの説明で「4通り」を「44通り」と書いていたので。そんなにあるわけない。(2005/05/13)
+        </li>
+        <li>
+          <a href="#form_remote_tag">
+            $prototype->form_remote_tag
+          </a>
+          のオプションpostitionの説明を追加。(2005/04/30)
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/09/10/1">Catalystでajax (HTML::Prototypeモジュールの使い方)</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <h3>changelog</h3>
-
-<p class="entryBody">
-<ul class="entryBody">
-<li>typoを修正。positionの説明で「4通り」を「44通り」と書いていたので。そんなにあるわけない。(2005/05/13)</li>
-<li><a href="#form_remote_tag">$prototype->form_remote_tag</a>のオプションpostitionの説明を追加。(2005/04/30)</li>
-</ul>
-
-<h3>概要</h3>
-<p class="entryBody">
-<a href="http://antipop.zapto.org/mt/archives/001280.php" target="_blank">Catalyst で作る簡単 Web アプリケーション: Feed2JS 解説</a>を参考にしながら、<a href="http://catalyst.perl.org/" target="_blank">Catalyst</a>をいじっていたのですが、ajaxな部分を司る<a href="http://search.cpan.org/dist/Catalyst-Plugin-Prototype/lib/Catalyst/Plugin/Prototype.pm" target="_blank">Catalyst::Plugin::Prototype</a>について調べたことを、ここにメモしておきます。
-</p>
-
-<p class="entryBody">
-まず、「prototype」という名が示すのは、「原型」という意味ではなくて、<a href="http://prototype.conio.net/" target="_blank">prototypeという名のオブジェクト指向Javascriptライブラリ</a>です。俺は最初それが分からず、「ん？何かの原型を作るようなモジュールなのか？」と悩んでました。このライブラリの実態はこんな感じです。<a href="http://prototype.conio.net/dist/prototype-1.2.0.js" target="_blank">prototype.js</a>
-</p>
-
-<p class="entryBody">
-で、Catalyst::Plugin::Prototype自体は、<a href="http://search.cpan.org/~sri/HTML-Prototype/Prototype.pm" target="_blank">HTML::Prototype</a>のメソッドをCatalystのビューから呼び出せる様にするものです。なので、Catalyst::Plugin::Prototypeの使い方を知るためには、まずはHTML::Prototypeの使い方を知る必要があります。
-</p>
-
-<p class="entryBody">
-このHTML::Protoytypeは何をするものなのかというと、prototype.js内のajax関連の関数を呼び出すようなHTMLを手軽に生成するためのもの、ということになります。以下、HTML::Prototypeの使い方と、Catalystから呼び出す方法についてHTML::Prototypeのドキュメントを参考にしながら、実行例も交えて順に見ていきます。また、ドキュメントに載っていないものの、ソースコードから読みとれるものもできる限り記述したいと思います。
-</p>
-
-<p class="entryBody">
-基本的なHTML::Prototypeの使い方は以下の様になります。
-</p>
-
-<pre class="code">
+      <h3>
+        概要
+      </h3>
+      <p class="entryBody">
+        <a href="http://antipop.zapto.org/mt/archives/001280.php" target="_blank">
+          Catalyst で作る簡単 Web アプリケーション: Feed2JS 解説
+        </a>
+        を参考にしながら、
+        <a href="http://catalyst.perl.org/" target="_blank">
+          Catalyst
+        </a>
+        をいじっていたのですが、ajaxな部分を司る
+        <a href="http://search.cpan.org/dist/Catalyst-Plugin-Prototype/lib/Catalyst/Plugin/Prototype.pm" target="_blank">
+          Catalyst::Plugin::Prototype
+        </a>
+        について調べたことを、ここにメモしておきます。
+      </p>
+      <p class="entryBody">
+        まず、「prototype」という名が示すのは、「原型」という意味ではなくて、
+        <a href="http://prototype.conio.net/" target="_blank">
+          prototypeという名のオブジェクト指向Javascriptライブラリ
+        </a>
+        です。俺は最初それが分からず、「ん？何かの原型を作るようなモジュールなのか？」と悩んでました。このライブラリの実態はこんな感じです。
+        <a href="http://prototype.conio.net/dist/prototype-1.2.0.js" target="_blank">
+          prototype.js
+        </a>
+      </p>
+      <p class="entryBody">
+        で、Catalyst::Plugin::Prototype自体は、
+        <a href="http://search.cpan.org/~sri/HTML-Prototype/Prototype.pm" target="_blank">
+          HTML::Prototype
+        </a>
+        のメソッドをCatalystのビューから呼び出せる様にするものです。なので、Catalyst::Plugin::Prototypeの使い方を知るためには、まずはHTML::Prototypeの使い方を知る必要があります。
+      </p>
+      <p class="entryBody">
+        このHTML::Protoytypeは何をするものなのかというと、prototype.js内のajax関連の関数を呼び出すようなHTMLを手軽に生成するためのもの、ということになります。以下、HTML::Prototypeの使い方と、Catalystから呼び出す方法についてHTML::Prototypeのドキュメントを参考にしながら、実行例も交えて順に見ていきます。また、ドキュメントに載っていないものの、ソースコードから読みとれるものもできる限り記述したいと思います。
+      </p>
+      <p class="entryBody">
+        基本的なHTML::Prototypeの使い方は以下の様になります。
+      </p>
+      <pre class="code">
 use HTML::Prototype;
 
 my $prototype = HTML::Prototype->new;
 print $prototype->define_javascript_functions;
 </pre>
-
-<p class="entryBody">
-HTML::Prototypeで利用できるメソッドは以下の通りです。
-</p>
-
-<ul class="entryBody">
-<li><a href="#define_javascript_functions">$prototype->define_javascript_functions</a></li>
-<li><a href="#form_remote_tag">$prototype->form_remote_tag(\%option)</a></li>
-<li><a href="#link_to_function">$prototype->link_to_function( $name, $function )</a></li>
-<li><a href="#link_to_remote">$prototype->link_to_remote( $id, \%options )</a></li>
-<li><a href="#observe_field">$prototype->observe_field( $id, \%options)</a></li>
-<li><a href="#observe_form">$prototype->observe_form( $id, \%options )</a></li>
-<li><a href="#periodically_call_remote">$prototype->periodically_call_remote( \%options )</a></li>
-<li><a href="#submit_to_remote">$prototype->submit_to_remote( $name, $value, \%options )</a></li>
-</ul>
-
-<p class="entryBody">
-各メソッドを順に見ていきます。
-</p>
-
-<h3><a id="define_javascript_functions">$prototype->define_javascript_functions</a></h3>
-
-<p class="entryBody">
-このメソッドはprototype.jsの内容そのものを返します。つまり、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        HTML::Prototypeで利用できるメソッドは以下の通りです。
+      </p>
+      <ul class="entryBody">
+        <li>
+          <a href="#define_javascript_functions">
+            $prototype->define_javascript_functions
+          </a>
+        </li>
+        <li>
+          <a href="#form_remote_tag">
+            $prototype->form_remote_tag(\%option)
+          </a>
+        </li>
+        <li>
+          <a href="#link_to_function">
+            $prototype->link_to_function( $name, $function )
+          </a>
+        </li>
+        <li>
+          <a href="#link_to_remote">
+            $prototype->link_to_remote( $id, \%options )
+          </a>
+        </li>
+        <li>
+          <a href="#observe_field">
+            $prototype->observe_field( $id, \%options)
+          </a>
+        </li>
+        <li>
+          <a href="#observe_form">
+            $prototype->observe_form( $id, \%options )
+          </a>
+        </li>
+        <li>
+          <a href="#periodically_call_remote">
+            $prototype->periodically_call_remote( \%options )
+          </a>
+        </li>
+        <li>
+          <a href="#submit_to_remote">
+            $prototype->submit_to_remote( $name, $value, \%options )
+          </a>
+        </li>
+      </ul>
+      <p class="entryBody">
+        各メソッドを順に見ていきます。
+      </p>
+      <h3>
+        <a id="define_javascript_functions">
+          $prototype->define_javascript_functions
+        </a>
+      </h3>
+      <p class="entryBody">
+        このメソッドはprototype.jsの内容そのものを返します。つまり、
+      </p>
+      <pre class="code">
 print $prototype->define_javascript_functions;
 </pre>
-
-<p class="entryBody">
-を実行すると、以下の内容が出力されます。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        を実行すると、以下の内容が出力されます。
+      </p>
+      <pre class="code">
 &lt;script type="text/javascript"&gt;
 &lt;!--
 /*  Prototype: an object-oriented Javascript library, version 1.2.0
@@ -153,34 +193,30 @@ var Prototype = {
 }
 ... (省略)
 </pre>
-
-<p class="entryBody">
-これはあんまり使い道ない気がします。HTML内で、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        これはあんまり使い道ない気がします。HTML内で、
+      </p>
+      <pre class="code">
 &lt;script type="text/javascript" src="prototype.js"&gt;&lt;/script&gt;
 </pre>
-
-<p class="entryBody">
-としてやればいいですし、Catalystでも、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        としてやればいいですし、Catalystでも、
+      </p>
+      <pre class="code">
 $ script/my-app_create.pl Prototype
 </pre>
-
-<p class="entryBody">
-でroot以下にprototype.jsが生成されますから。
-</p>
-
-<h3><a id="form_remote_tag">$prototype->form_remote_tag(\%option)</a></h3>
-
-<p class="entryBody">
-このメソッドでは、xmlHttpRequestでサブミットする様なformタグを生成します。オプションとその説明は以下の通りです。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        でroot以下にprototype.jsが生成されますから。
+      </p>
+      <h3>
+        <a id="form_remote_tag">
+          $prototype->form_remote_tag(\%option)
+        </a>
+      </h3>
+      <p class="entryBody">
+        このメソッドでは、xmlHttpRequestでサブミットする様なformタグを生成します。オプションとその説明は以下の通りです。
+      </p>
+      <pre class="code">
 $prototype->form_remote_tag({
     <strong>method</strong> => 'post',
     <strong>url</strong> => '/url',
@@ -190,45 +226,76 @@ $prototype->form_remote_tag({
     <strong>callback</strong> => 'callback()',
 });
 </pre>
-
-<dl class="entryBody">
-<dt>method</dt>
-<dd>リクエストメソッドを指定します。</dd>
-<dt>url</dt>
-<dd>submit先のURLを指定します。</dd>
-<dt>update</dt>
-<dd>
-xmlHttpRequestで得られたレスポンスを、どのidを持つコンテナに挿入するかを指定します。つまり、ここで指定したidに対して、prototype.jsが document.getElementById(id).innerHTML = req.responseText; みたいなことをやってくれます。
-</dd>
-<dt>position</dt>
-<dd>
-何も指定しない場合、idで指定されたコンテナの内容をすべてresponseTextで置き換えますが、positionを指定していると、特定の位置にreponseTextを挿入します。指定できる位置は以下の4通りです。
-<ul>
-<li>Before ... コンテナの直前。（コンテナの外側）</li>
-<li>Top ... コンテナの一番上。（コンテナの内側）</li>
-<li>Bottom ... コンテナの一番下。（コンテナの内側）</li>
-<li>After ... コンテナの直後。（コンテナの外側）</li>
-</ul>
-</dd>
-<dt>type</dt>
-<dd>synchronousかasynchronousを指定します。デフォルトはasynchronousです。</dd>
-<dt>callback</dt>
-<dd>
-xmlHttpRequestのreadyStateに応じて呼び出す関数を指定します。callbackには以下の種類があります。
-<ul>
-<li>loading ... readyStateが1の時に呼び出す関数を指定します。</li>
-<li>loaded ... readyStateが2の時に呼び出す関数を指定します。</li>
-<li>interactive ... readyStateが3の時に呼び出す関数を指定します。</li>
-<li>complete ... readyStateが4の時に呼び出す関数を指定します。</li>
-</ul>
-</dd>
-</dl>
-
-<p class="entryBody">
-実際にこのメソッドが吐き出すHTMLコードを見るために、
-</p>
-
-<pre class="code">
+      <dl class="entryBody">
+        <dt>
+          method
+        </dt>
+        <dd>
+          リクエストメソッドを指定します。
+        </dd>
+        <dt>
+          url
+        </dt>
+        <dd>
+          submit先のURLを指定します。
+        </dd>
+        <dt>
+          update
+        </dt>
+        <dd>
+          xmlHttpRequestで得られたレスポンスを、どのidを持つコンテナに挿入するかを指定します。つまり、ここで指定したidに対して、prototype.jsが document.getElementById(id).innerHTML = req.responseText; みたいなことをやってくれます。
+        </dd>
+        <dt>
+          position
+        </dt>
+        <dd>
+          何も指定しない場合、idで指定されたコンテナの内容をすべてresponseTextで置き換えますが、positionを指定していると、特定の位置にreponseTextを挿入します。指定できる位置は以下の4通りです。
+          <ul>
+            <li>
+              Before ... コンテナの直前。（コンテナの外側）
+            </li>
+            <li>
+              Top ... コンテナの一番上。（コンテナの内側）
+            </li>
+            <li>
+              Bottom ... コンテナの一番下。（コンテナの内側）
+            </li>
+            <li>
+              After ... コンテナの直後。（コンテナの外側）
+            </li>
+          </ul>
+        </dd>
+        <dt>
+          type
+        </dt>
+        <dd>
+          synchronousかasynchronousを指定します。デフォルトはasynchronousです。
+        </dd>
+        <dt>
+          callback
+        </dt>
+        <dd>
+          xmlHttpRequestのreadyStateに応じて呼び出す関数を指定します。callbackには以下の種類があります。
+          <ul>
+            <li>
+              loading ... readyStateが1の時に呼び出す関数を指定します。
+            </li>
+            <li>
+              loaded ... readyStateが2の時に呼び出す関数を指定します。
+            </li>
+            <li>
+              interactive ... readyStateが3の時に呼び出す関数を指定します。
+            </li>
+            <li>
+              complete ... readyStateが4の時に呼び出す関数を指定します。
+            </li>
+          </ul>
+        </dd>
+      </dl>
+      <p class="entryBody">
+        実際にこのメソッドが吐き出すHTMLコードを見るために、
+      </p>
+      <pre class="code">
 print $prototype->form_remote_tag({
     url => '/url',
     update => 'id',
@@ -236,194 +303,186 @@ print $prototype->form_remote_tag({
     loading => 'loading()',
 });
 </pre>
-
-<p class="entryBody">
-というコードを実行してみると、以下の様に出力されます。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というコードを実行してみると、以下の様に出力されます。
+      </p>
+      <pre class="code">
 &lt;form onsubmit=" new Ajax.Updater( 'id',  '/url', { parameters: Form.serialize(this),asynchronous: 0,onLoading: function(request){loading()} } ) ; return false;"&gt;
 </pre>
-
-<h3><a id="link_to_function">$prototype->link_to_function( $name, $function )</a></h3>
-
-<p class="entryBody">
-このメソッドでは、$functionを呼び出す、$nameで指定したアンカーを持つリンクを生成します。実行すれば一目瞭然、ってことで、
-</p>
-
-<pre class="code">
+      <h3>
+        <a id="link_to_function">
+          $prototype->link_to_function( $name, $function )
+        </a>
+      </h3>
+      <p class="entryBody">
+        このメソッドでは、$functionを呼び出す、$nameで指定したアンカーを持つリンクを生成します。実行すれば一目瞭然、ってことで、
+      </p>
+      <pre class="code">
 print $prototype->link_to_function( "<strong>Greeting</strong>", "<strong>alert('Hello World!')</strong>" );
 </pre>
-
-<p class="entryBody">
-と実行すると、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        と実行すると、
+      </p>
+      <pre class="code">
 &lt;a href="#" onClick="<strong>alert('Hello World!');</strong> return false;"&gt;<strong>Greeting</strong>&lt;/a&gt;
 </pre>
-
-<p class="entryBody">
-というHTMLを吐きますし、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というHTMLを吐きますし、
+      </p>
+      <pre class="code">
 print $prototype->link_to_function( '<strong>&lt;img src="really.png"/&gt;</strong>', '<strong>do_delete()</strong>' );
 </pre>
-
-<p class="entryBody">
-と実行すると、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        と実行すると、
+      </p>
+      <pre class="code">
 &lt;a href="#" onClick="<strong>do_delete();</strong> return false;"&gt;<strong>&lt;img src="really.png"/&gt;</strong>&lt;/a&gt;
 </pre>
-
-<p class="entryBody">
-というHTMLを吐きます。
-</p>
-
-<h3><a id="link_to_remote">$prototype->link_to_remote( $id, \%options )</a></h3>
-
-<p class="entryBody">
-このメソッドでは、指定したURLに対してxmlHttpRequestでリクエストする様なリンクを返します。オプションと説明は以下の通りです。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というHTMLを吐きます。
+      </p>
+      <h3>
+        <a id="link_to_remote">
+          $prototype->link_to_remote( $id, \%options )
+        </a>
+      </h3>
+      <p class="entryBody">
+        このメソッドでは、指定したURLに対してxmlHttpRequestでリクエストする様なリンクを返します。オプションと説明は以下の通りです。
+      </p>
+      <pre class="code">
 $prototype->link_to_remote( 
-    <strong>'anchor'</strong>, {
-            <strong>with</strong> => 'name=value',
-        url    => 'url',
-        update => 'id',
-        type => 'synchronous',
-        callback => 'callback()',
-    })
+	<strong>'anchor'</strong>, {
+	        <strong>with</strong> => 'name=value',
+		url    => 'url',
+		update => 'id',
+		type => 'synchronous',
+		callback => 'callback()',
+	})
 </pre>
-
-<dl>
-<dt>anchor</dt>
-<dd>リンクのanchorを指定します。</dd>
-<dt>with</dt>
-<dd>GETのQUERY_STRINGまたはPOSTのbodyとして送信するデータを、name=valueといった形で指定します。</dd>
-<dt>その他のオプション</dt>
-<dd>$prototype->form_remote_tag(\%options)と同じです。</dd>
-</dl>
-
-<p class="entryBody">
-実際にこのメソッドが吐き出すHTMLコードを見るために、
-</p>
-
-<pre class="code">
+      <dl>
+        <dt>
+          anchor
+        </dt>
+        <dd>
+          リンクのanchorを指定します。
+        </dd>
+        <dt>
+          with
+        </dt>
+        <dd>
+          GETのQUERY_STRINGまたはPOSTのbodyとして送信するデータを、name=valueといった形で指定します。
+        </dd>
+        <dt>
+          その他のオプション
+        </dt>
+        <dd>
+          $prototype->form_remote_tag(\%options)と同じです。
+        </dd>
+      </dl>
+      <p class="entryBody">
+        実際にこのメソッドが吐き出すHTMLコードを見るために、
+      </p>
+      <pre class="code">
 print $prototype->link_to_remote( 
-                  'anchor', 
-                  {
-                      update => 'id',
-                      url    => 'url',
-                      type => 'synchronous',
-                  } );
+				  'anchor', 
+				  {
+				      update => 'id',
+				      url    => 'url',
+				      type => 'synchronous',
+				  } );
 </pre>
-
-<p class="entryBody">
-というコードをを実行すると、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というコードをを実行すると、
+      </p>
+      <pre class="code">
 &lt;a href="#" onClick=" new Ajax.Updater( 'id',  'url', { asynchronous: 0 } ) ; return false;"&gt;anchor&lt;/a&gt;
 </pre>
-
-<p class="entryBody">
-というHTMLを吐きます。
-</p>
-
-<h3><a id="observe_field">$prototype->observe_field( $id, \%options)</a></h3>
-
-<p class="entryBody">
-このメソッドでは、$idで指定されたidを持つフィールドを監視して、変更があればxmlHttpRequestでリクエストを出すようなスクリプトを返します。%optionsは$prototype->form_remote_tag(\%options)と同じです。
-</p>
-
-<p class="entryBody">
-実際にこのメソッドが吐き出すJavascriptコードを見るために、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というHTMLを吐きます。
+      </p>
+      <h3>
+        <a id="observe_field">
+          $prototype->observe_field( $id, \%options)
+        </a>
+      </h3>
+      <p class="entryBody">
+        このメソッドでは、$idで指定されたidを持つフィールドを監視して、変更があればxmlHttpRequestでリクエストを出すようなスクリプトを返します。%optionsは$prototype->form_remote_tag(\%options)と同じです。
+      </p>
+      <p class="entryBody">
+        実際にこのメソッドが吐き出すJavascriptコードを見るために、
+      </p>
+      <pre class="code">
 print $prototype->observe_field( 
-                  'field_id', 
-                  {
-                      update => 'id',
-                      url    => 'url',
-                      type => 'synchronous',
-                  } );
+				  'field_id', 
+				  {
+				      update => 'id',
+				      url    => 'url',
+				      type => 'synchronous',
+				  } );
 </pre>
-
-<p class="entryBody">
-と実行すると、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        と実行すると、
+      </p>
+      <pre class="code">
 &lt;script type="text/javascript"&gt;
 &lt;!--
 new Form.Element.Observer( 'field_id', 2, function( element, value ) {  new Ajax.Updater( 'id',  'url', { parameters: value,asynchronous: 0 } )  } );
 //--&gt;
 &lt;/script&gt;
 </pre>
-
-<p class="entryBody">
-というJavascriptコードを吐きます。
-</p>
-
-<h3><a id="observe_form">$prototype->observe_form( $id, \%options )</a></h3>
-
-<p class="entryBody">
-$prototype->observe_fieldと基本的に同じですが、$idで指定されたフォーム全体を監視して、変更があればxmlHttpRequestでリクエストを出すようなスクリプトを返します。%optionsは$prototype->form_remote_tag(\%options)や他と同じです。
-</p>
-
-<p class="entryBody">
-実際にこのメソッドが吐き出すJavscriptコードを見るために、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というJavascriptコードを吐きます。
+      </p>
+      <h3>
+        <a id="observe_form">
+          $prototype->observe_form( $id, \%options )
+        </a>
+      </h3>
+      <p class="entryBody">
+        $prototype->observe_fieldと基本的に同じですが、$idで指定されたフォーム全体を監視して、変更があればxmlHttpRequestでリクエストを出すようなスクリプトを返します。%optionsは$prototype->form_remote_tag(\%options)や他と同じです。
+      </p>
+      <p class="entryBody">
+        実際にこのメソッドが吐き出すJavscriptコードを見るために、
+      </p>
+      <pre class="code">
 print $prototype->observe_form( 
-            'form_id', 
-            {
-                update => 'id',
-                url    => 'url',
-            });
+			'form_id', 
+			{
+				update => 'id',
+				url    => 'url',
+			});
 </pre>
-
-<p class="entryBody">
-と実行すると、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        と実行すると、
+      </p>
+      <pre class="code">
 &lt;script type="text/javascript"&gt;
 &lt;!--
 new Form.Observer( 'form_id', 2, function( element, value ) {  new Ajax.Updater( 'id',  'url', { parameters: value,asynchronous: 1 } )  } );
 //--&gt;
 &lt;/script&gt;
 </pre>
-
-<p class="entryBody">
-というJavascriptコードを吐きます。
-</p>
-
-<h3><a id="periodically_call_remote">$prototype->periodically_call_remote( \%options )</a></h3>
-
-<p class="entryBody">
-このメソッドでは、xmlHttpRequestによるサーバへのリクエストを、一定間隔で呼び出すようなスクリプトを返します。$options->{frequency}で時間を秒間隔で指定します。（デフォルト2秒。）他のオプションについては、他のメソッドと同様です。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というJavascriptコードを吐きます。
+      </p>
+      <h3>
+        <a id="periodically_call_remote">
+          $prototype->periodically_call_remote( \%options )
+        </a>
+      </h3>
+      <p class="entryBody">
+        このメソッドでは、xmlHttpRequestによるサーバへのリクエストを、一定間隔で呼び出すようなスクリプトを返します。$options->{frequency}で時間を秒間隔で指定します。（デフォルト2秒。）他のオプションについては、他のメソッドと同様です。
+      </p>
+      <pre class="code">
 print $prototype->periodically_call_remote({
-                      update => 'id',
-                      url    => 'url',
-                  });
+				      update => 'id',
+				      url    => 'url',
+				  });
 </pre>
-
-<p class="entryBody">
-と実行すると、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        と実行すると、
+      </p>
+      <pre class="code">
 &lt;script type="text/javascript"&gt;
 &lt;!--
 new PeriodicalExecuter( function () {  new Ajax.Updater( 'id',  'url', { asynchr
@@ -431,71 +490,69 @@ onous: 1 } )  }, 10 );
 //--&gt;
 &lt;/script&gt;
 </pre>
-
-<p class="entryBody">
-というJavascriptコードを吐きます。
-</p>
-
-<h3><a id="submit_to_remote">$prototype->submit_to_remote( $name, $value, \%options )</a></h3>
-
-<p class="entryBody">
-このメソッドでは、$name, $valueで指定されたnameとvalueをxmlHttpRequestでsubmitするボタンを生成します。%optionsは他のメソッドと同様です。
-</p>
-
-<p class="entryBody">
-実際にこのメソッドが吐き出すHTMLコードを見るために、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というJavascriptコードを吐きます。
+      </p>
+      <h3>
+        <a id="submit_to_remote">
+          $prototype->submit_to_remote( $name, $value, \%options )
+        </a>
+      </h3>
+      <p class="entryBody">
+        このメソッドでは、$name, $valueで指定されたnameとvalueをxmlHttpRequestでsubmitするボタンを生成します。%optionsは他のメソッドと同様です。
+      </p>
+      <p class="entryBody">
+        実際にこのメソッドが吐き出すHTMLコードを見るために、
+      </p>
+      <pre class="code">
 print $prototype->submit_to_remote(
-                   'name',
-                   'value',
-                   {
-                       update => 'id',
-                       url    => 'url',
-                   });
+				   'name',
+				   'value',
+				   {
+				       update => 'id',
+				       url    => 'url',
+				   });
 </pre>
-
-<p class="entryBody">
-と実行すると、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        と実行すると、
+      </p>
+      <pre class="code">
 &lt;input type="button" name="name" value="value" onsubmit=" new Ajax.Updater( 'id',  'url', { asynchronous: 1 } ) ; return false;"/&gt;
 </pre>
-
-<p class="entryBody">
-というHTMLコードを吐きます。
-</p>
-
-<h3>Catalystのビューから呼び出す方法</h3>
-
-<p class="entryBody">
-HTML::Prototypeのメソッドを、Catalystのビューから呼び出すためには、テンプレートに以下の様に記述します。</p>
-
-<pre class="code">
+      <p class="entryBody">
+        というHTMLコードを吐きます。
+      </p>
+      <h3>
+        Catalystのビューから呼び出す方法
+      </h3>
+      <p class="entryBody">
+        HTML::Prototypeのメソッドを、Catalystのビューから呼び出すためには、テンプレートに以下の様に記述します。
+      </p>
+      <pre class="code">
 &#x5b;% c.prototype.observe_field( 'editor', {
         url    => 'url',
         with   => "'body='+value",
         update => 'view'
     }) %&#x5d;
 </pre>
-
-<p class="entryBody">
-ご覧頂くと分かるように、オプションの渡し方は、perlでのメソッド呼び出しと何ら変わりありませんので、詳細は省きます。（手抜きですんません。HTML::Prototypeの説明で力尽きました。）
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/09/26/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/09/08/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        ご覧頂くと分かるように、オプションの渡し方は、perlでのメソッド呼び出しと何ら変わりありませんので、詳細は省きます。（手抜きですんません。HTML::Prototypeの説明で力尽きました。）
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/09/08/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/09/26/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

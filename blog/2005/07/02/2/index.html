@@ -1,92 +1,94 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Javascriptの皮を被ったXML #1 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Javascriptの皮を被ったXML #1 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Javascriptの皮を被ったXML #1"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/07/02/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/07/02/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Javascriptの皮を被ったXML #1"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/07/02/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/07/02/2">
+          Javascriptの皮を被ったXML #1
+        </a>
+      </h1>
+      <div class="byline">
+        2 July 2005
+      </div>
+      <p class="entryBody">
+        <a href="http://mizzy.org/program/javaScriptOverXml.html" target="_blank">
+          前回のエントリ
+        </a>
+        について、
+        <a href="http://amazie.jp/" target="_blank">
+          nektixe
+        </a>
+        さんから、「Greasemonkey限定であれば、GM_xmlhttpRequest という関数を使うことで、外部ドメインのデータも受信可能みたいです」というコメントを頂きました。ありがとうございます。確かに、
+        <a href="http://diveintogreasemonkey.org/api/gm_xmlhttprequest.html" target="_blank">
+          「GM_xmlhttpRequest is not restricted to the current domain」
+        </a>
+        って書いてありますね。これは強力。
+      </p>
+      <p class="entryBody">
+        というわけで、「Javascriptの皮を被ったXML構想」は、Greasemonkeyであれば実現できそうな感じです。この構想の要点をおさらいとして整理すると、
+      </p>
+      <ul class="entryBody">
+        <li>
+          Javascriptから直接APIにアクセスしてXMLを取得して、UIを被せる。
+        </li>
+        <li>
+          UIとなるHTMLはJavasciptから分離する。
+        </li>
+        <li>
+          各サービスに合わせて外部XSLTファイルを用意し、JavascriptでXSLT変換する。これにより様々なサービスに統一的なUIを適用する。
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/07/02/2">Javascriptの皮を被ったXML #1</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-<a href="http://mizzy.org/program/javaScriptOverXml.html" target="_blank">前回のエントリ</a>について、<a href="http://amazie.jp/" target="_blank">nektixe</a>さんから、「Greasemonkey限定であれば、GM_xmlhttpRequest という関数を使うことで、外部ドメインのデータも受信可能みたいです」というコメントを頂きました。ありがとうございます。確かに、<a href="http://diveintogreasemonkey.org/api/gm_xmlhttprequest.html" target="_blank">「GM_xmlhttpRequest is not restricted to the current domain」</a>って書いてありますね。これは強力。
-</p>
-
-<p class="entryBody">
-というわけで、「Javascriptの皮を被ったXML構想」は、Greasemonkeyであれば実現できそうな感じです。この構想の要点をおさらいとして整理すると、
-</p>
-
-<ul class="entryBody">
-<li>Javascriptから直接APIにアクセスしてXMLを取得して、UIを被せる。</li>
-<li>UIとなるHTMLはJavasciptから分離する。</li>
-<li>各サービスに合わせて外部XSLTファイルを用意し、JavascriptでXSLT変換する。これにより様々なサービスに統一的なUIを適用する。</li>
-</ul>
-
-<p class="entryBody">
-といった感じです。
-</p>
-
-<p class="entryBody">
-構想の実現に向けて、まずはGM_xmlhttpRequest関数で遊んでみようかと思ったのですが、その前にdel.icio.us direc.torをGreasemonkeyで動かしてみることにしました。といっても、やってみるとものすごく簡単で、del.icio.us direc.torのおおもとのJavascriptである、<a href="http://johnvey.com/features/deliciousdirector/dboot.js" target="_blank">dboot.js</a>の先頭に、以下の様にGreasemonkey用の記述を数行加えてあげるだけです。
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        といった感じです。
+      </p>
+      <p class="entryBody">
+        構想の実現に向けて、まずはGM_xmlhttpRequest関数で遊んでみようかと思ったのですが、その前にdel.icio.us direc.torをGreasemonkeyで動かしてみることにしました。といっても、やってみるとものすごく簡単で、del.icio.us direc.torのおおもとのJavascriptである、
+        <a href="http://johnvey.com/features/deliciousdirector/dboot.js" target="_blank">
+          dboot.js
+        </a>
+        の先頭に、以下の様にGreasemonkey用の記述を数行加えてあげるだけです。
+      </p>
+      <pre class="code">
 // ==UserScript==
 // @name            del.icio.us direc.tor greasemonkey user script
 // @namespace       http://mizzy.org/
@@ -99,12 +101,12 @@ d += '&lt;input id="q" name="q" type="text" size="60" onkeyup="rd.filter(this.va
 d += '&lt;input type="checkbox" id="h" checked="checked" onchange="rd.th()" /&gt;&lt;label for="h"&gt;Highlight Terms&lt;/label&gt;&lt;/form&gt;';
 d += '&lt;h2&gt;Tag Browser&lt;/h2&gt;';
 d += '&lt;div id="browser"&gt;';
-d += '  &lt;div id="br1" class="browserPane"&gt;&lt;/div&gt;';
-d += '  &lt;div id="br2" class="browserPane"&gt;&lt;/div&gt;';
-d += '  &lt;div id="br3" class="browserPane"&gt;&lt;/div&gt;';
-d += '  &lt;div id="br4" class="browserPane"&gt;&lt;/div&gt;';
-d += '  &lt;div id="br5" class="browserPane"&gt;&lt;/div&gt;';
-d += '  &lt;div id="br6" class="browserPane"&gt;&lt;/div&gt;';
+d += '	&lt;div id="br1" class="browserPane"&gt;&lt;/div&gt;';
+d += '	&lt;div id="br2" class="browserPane"&gt;&lt;/div&gt;';
+d += '	&lt;div id="br3" class="browserPane"&gt;&lt;/div&gt;';
+d += '	&lt;div id="br4" class="browserPane"&gt;&lt;/div&gt;';
+d += '	&lt;div id="br5" class="browserPane"&gt;&lt;/div&gt;';
+d += '	&lt;div id="br6" class="browserPane"&gt;&lt;/div&gt;';
 d += '&lt;/div&gt;';
 d += '&lt;h2 id="summary"&gt;Bookmarks&lt;/h2&gt;';
 d += '&lt;div id="ps"&gt;&lt;p&gt;Loading your del.icio.us bookmarks...&lt;/p&gt;&lt;/div&gt;';
@@ -112,57 +114,61 @@ d += '&lt;p id="ft"&gt;&#169; 2005 Johnvey Hwang. &lt;a href="http://johnvey.com
 
 function init() {
 
-    var i, a, main;
+	var i, a, main;
 
-    document.body.innerHTML = "";
-    document.body.innerHTML = d;
-    
-    for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
-      if(a.getAttribute("rel").indexOf("style") != -1) {
-        a.disabled = true;
-      }
-    }
-    
-    var ns = document.createElement("link");
-    ns.rel = "stylesheet";
-    ns.type = "text/css";
-    ns.href = "http://johnvey.com/features/deliciousdirector/d.css";
-    document.body.appendChild(ns);
-    
-    var js = document.createElement("script");
-    js.language = "javascript";
-    js.src = "http://johnvey.com/features/deliciousdirector/d.js";
-    document.body.appendChild(js);
-    
-    document.title += " (Direc.tor)";
+	document.body.innerHTML = "";
+	document.body.innerHTML = d;
+	
+	for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
+	  if(a.getAttribute("rel").indexOf("style") != -1) {
+	    a.disabled = true;
+	  }
+	}
+	
+	var ns = document.createElement("link");
+	ns.rel = "stylesheet";
+	ns.type = "text/css";
+	ns.href = "http://johnvey.com/features/deliciousdirector/d.css";
+	document.body.appendChild(ns);
+	
+	var js = document.createElement("script");
+	js.language = "javascript";
+	js.src = "http://johnvey.com/features/deliciousdirector/d.js";
+	document.body.appendChild(js);
+	
+	document.title += " (Direc.tor)";
 }
 
 init();
 </pre>
-
-<p class="entryBody">
-実際に試してみたい方は、<a href="http://mizzy.org/js/dboot.user.js" target="_blank">こちらからどうぞ</a>。
-</p>
-
-<p class="entryBody">
-@includeで指定されるページは、適宜変更してください。自分は、http://del.icio.us/mizzy/director にアクセスした時にお猿さんが発動するようにしていますが、そこは各自のお好みで。
-</p>
-
-<p class="entryBody">
-次回は実際にGM_xmlhttpRequest関数を利用して、外部HTMLテンプレートを読み込むのに挑戦したいと思います。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/07/02/3">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/07/02/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        実際に試してみたい方は、
+        <a href="http://mizzy.org/js/dboot.user.js" target="_blank">
+          こちらからどうぞ
+        </a>
+        。
+      </p>
+      <p class="entryBody">
+        @includeで指定されるページは、適宜変更してください。自分は、http://del.icio.us/mizzy/director にアクセスした時にお猿さんが発動するようにしていますが、そこは各自のお好みで。
+      </p>
+      <p class="entryBody">
+        次回は実際にGM_xmlhttpRequest関数を利用して、外部HTMLテンプレートを読み込むのに挑戦したいと思います。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/07/02/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/07/02/3">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

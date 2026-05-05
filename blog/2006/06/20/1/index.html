@@ -1,190 +1,181 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Text::Trac - Trac Wiki 記法パーサ #1 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    Text::Trac - Trac Wiki 記法パーサ #1 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="Text::Trac - Trac Wiki 記法パーサ #1"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/06/20/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/06/20/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Text::Trac - Trac Wiki 記法パーサ #1"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/06/20/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/06/20/1">Text::Trac - Trac Wiki 記法パーサ #1</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <h3 id="Text::Tracをblosxomから呼び出してみるテスト">Text::Trac を blosxom から呼び出してみる テスト</h3>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/06/20/1">
+    Text::Trac - Trac Wiki 記法パーサ #1
+  </a>
+</h1>
+<div class="byline">
+  20 June 2006
+</div>
+<h3 id="Text::Tracをblosxomから呼び出してみるテスト">
+  Text::Trac を blosxom から呼び出してみる テスト
+</h3>
 <p>
-Text::Trac が形になってきたので、実際に文章を書いてテストしてみる。
+  Text::Trac が形になってきたので、実際に文章を書いてテストしてみる。
 </p>
-
-<h4 id="もういっちょ見出しのテスト">もういっちょ見出しのテスト</h4>
-
+<h4 id="もういっちょ見出しのテスト">
+  もういっちょ見出しのテスト
+</h4>
 <p>
-paragraph 1<br />
-paragraph 1<br />
-paragraph 1
+  paragraph 1
+  <br />
+  paragraph 1
+  <br />
+  paragraph 1
 </p>
-
 <p>
-paragraph 2<br />
-paragraph 2<br />
-paragraph 2
+  paragraph 2
+  <br />
+  paragraph 2
+  <br />
+  paragraph 2
 </p>
-
-<ul><li>リスト 1</li>
-<li>リスト 2</li>
-<li>リスト 3</li></ul>
-
-<ol start="1"><li>リスト 1</li>
-<li>リスト 2</li>
-<li>リスト 3</li></ol>
-
+<ul>
+  <li>
+    リスト 1
+  </li>
+  <li>
+    リスト 2
+  </li>
+  <li>
+    リスト 3
+  </li>
+</ul>
+<ol start="1">
+  <li>
+    リスト 1
+  </li>
+  <li>
+    リスト 2
+  </li>
+  <li>
+    リスト 3
+  </li>
+</ol>
 <dl>
-<dt>定義リスト1</dt>
-<dd>
-内容その1
-</dd>
-<dt>定義リスト2</dt>
-<dd>
-内容その2
-</dd>
+  <dt>
+    定義リスト1
+  </dt>
+  <dd>
+    内容その1
+  </dd>
+  <dt>
+    定義リスト2
+  </dt>
+  <dd>
+    内容その2
+  </dd>
 </dl>
-
 <p>
-上の内容は実際にはこんな感じで書いてます。
+  上の内容は実際にはこんな感じで書いてます。
 </p>
-
 <pre class="wiki">
 = Text::Trac を blosxom から呼び出してみる テスト =
-
-== もういっちょ見出しのテスト ==
-
-paragraph 1[[BR]]
-paragraph 1[[BR]]
-paragraph 1
-
-paragraph 2[[BR]]
-paragraph 2[[BR]]
-paragraph 2
-
- * リスト 1
- * リスト 2
- * リスト 3
-
- 1. リスト 1
- 1. リスト 2
- 1. リスト 3
-
- 定義リスト1::
-   内容その1
- 定義リスト2::
-   内容その2
+<p>== もういっちょ見出しのテスト ==</p>
+<p>paragraph 1[[BR]]<br />
+paragraph 1[[BR]]<br />
+paragraph 1</p>
+<p>paragraph 2[[BR]]<br />
+paragraph 2[[BR]]<br />
+paragraph 2</p>
+<ul>
+<li>リスト 1</li>
+<li>リスト 2</li>
+<li>リスト 3</li>
+</ul>
+<ol>
+<li>リスト 1</li>
+<li>リスト 2</li>
+<li>リスト 3</li>
+</ol>
+<p>定義リスト1::<br />
+内容その1<br />
+定義リスト2::<br />
+内容その2<br />
 </pre>
-
 <p>
-blosxom からは以下の様なプラグインで Text::Trac を呼び出してます。
-</p>
-
-<pre class="wiki">
+  blosxom からは以下の様なプラグインで Text::Trac を呼び出してます。
+</p><pre class="wiki">
 # Blosxom Plugin: text_trac
 # Author: Gosuke Miyashita &lt;miya at mizzy.org&gt;
 # Version: 2006-06-20
 # Blosxom Home/Docs/Licensing: http://www.blosxom.com/
-
-package text_trac;
-
-use strict;
-use Text::Trac;
-
-sub start {
-  1;
-}
-
-sub story {
-  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
-
-  if ( $meta::syntax eq 'trac' ){
-      my $parser = Text::Trac-&gt;new( min_heading_level =&gt; 3 );
-      $parser-&gt;parse($$body_ref);
-      $$body_ref = $parser-&gt;html;
-  }
-
-  return 1;
-}
-
-1;
-
-__END__
+<p>package text_trac;</p>
+<p>use strict;<br />
+use Text::Trac;</p>
+<p>sub start {<br />
+1;<br />
+}</p>
+<p>sub story {<br />
+my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;</p>
+<p>if ( $meta::syntax eq 'trac' ){<br />
+my $parser = Text::Trac-&gt;new( min_heading_level =&gt; 3 );<br />
+$parser-&gt;parse($$body_ref);<br />
+$$body_ref = $parser-&gt;html;<br />
+}</p>
+<p>return 1;<br />
+}</p>
+<p>1;</p>
+<p><strong>END</strong><br />
 </pre>
-
 <p>
-Text::Trac 自体はもうちょいで CPAN にアップできると思います。ただし、Yappo さんご所望の機能はもう少し時間ください。
+  Text::Trac 自体はもうちょいで CPAN にアップできると思います。ただし、Yappo さんご所望の機能はもう少し時間ください。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/06/20/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/06/17/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/06/17/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/06/20/2">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

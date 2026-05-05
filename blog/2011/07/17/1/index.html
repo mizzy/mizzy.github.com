@@ -1,74 +1,62 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>LinuxContainer00 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/07/17/1">LinuxContainer00</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <h1>Make and install lxc rpm packages</h1>
-
-<p>The spec file for lxc is included in lxc source code.So you can make rpm packages of lxc easily.</p>
-
-<pre><code># yum -y update kernel
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      LinuxContainer00 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="LinuxContainer00"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/07/17/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/07/17/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="LinuxContainer00"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/07/17/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/07/17/1">
+          LinuxContainer00
+        </a>
+      </h1>
+      <div class="byline">
+        17 July 2011
+      </div>
+      <h1>
+        Make and install lxc rpm packages
+      </h1>
+      <p>
+        The spec file for lxc is included in lxc source code.So you can make rpm packages of lxc easily.
+      </p>
+      <pre><code># yum -y update kernel
 # reboot
 # yum -y install rpm-build libcap-devel docbook-utils kernel-devel gcc make
 # wget http://lxc.sourceforge.net/download/lxc/lxc-0.7.4.2.tar.gz
@@ -76,17 +64,16 @@
 # mkdir -p ~/rpmbuild/SOURCES
 # cp lxc-0.7.4.2.tar.gz ~/rpmbuild/SOURCES
 # chown root:root lxc-0.7.4.2/lxc.spec
-# rpmbuild -ba lxc-0.7.4.2/lxc.spec --define &#39;ksrc /usr/src/kernels/`uname -r`&#39;
-# rpm -Uvh ~/rpmbuild/RPMS/x86_64/lxc-0.7.4.2-1.x86_64.rpm
-</code></pre>
-
-<hr>
-
-<h1>Check whether this os is lxc ready or not</h1>
-
-<p>All statuses should be &quot;enabled&quot;.</p>
-
-<pre><code># lxc-checkconfig 
+# rpmbuild -ba lxc-0.7.4.2/lxc.spec --define 'ksrc /usr/src/kernels/`uname -r`'
+# rpm -Uvh ~/rpmbuild/RPMS/x86_64/lxc-0.7.4.2-1.x86_64.rpm</code></pre>
+      <hr />
+      <h1>
+        Check whether this os is lxc ready or not
+      </h1>
+      <p>
+        All statuses should be &quot;enabled&quot;.
+      </p>
+      <pre><code># lxc-checkconfig 
 Kernel config /proc/config.gz not found, looking in other places...
 Found kernel config file /boot/config-2.6.32-131.2.1.el6.x86_64
 --- Namespaces ---
@@ -112,49 +99,44 @@ Veth pair device: enabled
 Macvlan: enabled
 Vlan: enabled
 File capabilities: enabled
-enabled
-</code></pre>
-
-<hr>
-
-<h1>Quick Start</h1>
-
-<p>In the man of lxc, you can get how to start lxc quickly.</p>
-
-<pre><code>QUICK START
+enabled</code></pre>
+      <hr />
+      <h1>
+        Quick Start
+      </h1>
+      <p>
+        In the man of lxc, you can get how to start lxc quickly.
+      </p>
+      <pre><code>QUICK START
        You are in a hurry, and you don’t want to read this man page. Ok, with-
        out warranty, here are the commands to launch a  shell  inside  a  con-
        tainer   with   a  predefined  configuration  template,  it  may  work.
        /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/
-       lxc-macvlan.conf /bin/bash
-</code></pre>
-
-<p>But before running lxc-execute, you should mount croup.</p>
-
-<pre><code># mount -t cgroup cgroup /cgroup
-# /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/lxc-macvlan.conf /bin/bash
-</code></pre>
-
-<p>In the container, processes are like this.</p>
-
-<pre><code># ps -ef
+       lxc-macvlan.conf /bin/bash</code></pre>
+      <p>
+        But before running lxc-execute, you should mount croup.
+      </p>
+      <pre><code># mount -t cgroup cgroup /cgroup
+# /usr/bin/lxc-execute -n foo -f /usr/share/doc/lxc/examples/lxc-macvlan.conf /bin/bash</code></pre>
+      <p>
+        In the container, processes are like this.
+      </p>
+      <pre><code># ps -ef
 UID        PID  PPID  C STIME TTY          TIME CMD
 root         1     0  0 10:54 ttyS0    00:00:00 /usr/lib64/lxc/lxc-init -- /bin/
 root         2     1  0 10:54 ttyS0    00:00:00 /bin/bash
-root        11     2  0 10:55 ttyS0    00:00:00 ps -ef
-</code></pre>
-
-<p>You can also see the processes in the container from the outside of the container.</p>
-
-<pre><code># lxc-ps --name=foo
+root        11     2  0 10:55 ttyS0    00:00:00 ps -ef</code></pre>
+      <p>
+        You can also see the processes in the container from the outside of the container.
+      </p>
+      <pre><code># lxc-ps --name=foo
 CONTAINER    PID TTY          TIME CMD
 foo         1654 ttyS0    00:00:00 lxc-init
-foo         1656 ttyS0    00:00:00 bash
-</code></pre>
-
-<p>The sample lxc conf is like this.</p>
-
-<pre><code># cat /usr/share/doc/lxc/examples/lxc-macvlan.conf 
+foo         1656 ttyS0    00:00:00 bash</code></pre>
+      <p>
+        The sample lxc conf is like this.
+      </p>
+      <pre><code># cat /usr/share/doc/lxc/examples/lxc-macvlan.conf 
 # Container with network virtualized using the macvlan device driver
 lxc.utsname = alpha
 lxc.network.type = macvlan
@@ -162,20 +144,22 @@ lxc.network.flags = up
 lxc.network.link = eth0
 lxc.network.hwaddr = 4a:49:43:49:79:bd
 lxc.network.ipv4 = 1.2.3.4/24
-lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596
-</code></pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/07/17/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/07/12/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+lxc.network.ipv6 = 2003:db8:1:0:214:1234:fe0b:3596</code></pre>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/07/12/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/07/17/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

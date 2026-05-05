@@ -1,87 +1,82 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Publish::iCal patch - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    Publish::iCal patch - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="Publish::iCal patch"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/08/23/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/08/23/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Publish::iCal patch"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/08/23/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/08/23/1">Publish::iCal patch</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://mizzy.org/program/amazon2ical01.html"><span class="icon"></span>『Plagger で Amazon2iCal 改良』</a> にて、Data::ICal で ORGANIZER をちゃんとしたフォーマットにする方法がわからん、と言っていたのですが、やりかたわかりました。
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/08/23/1">
+    Publish::iCal patch
+  </a>
+</h1>
+<div class="byline">
+  23 August 2006
+</div>
+<p>
+  <a class="ext-link" href="http://mizzy.org/program/amazon2ical01.html">
+    <span class="icon"></span>
+    『Plagger で Amazon2iCal 改良』
+  </a>
+  にて、Data::ICal で ORGANIZER をちゃんとしたフォーマットにする方法がわからん、と言っていたのですが、やりかたわかりました。
 </p>
-
 <pre class="wiki">
 $event->add_properties(
     organizer   => [ 'MAILTO:gosukenator@gmail.com', { CN => 'Gosuke Miyashita' } ],
 );
 </pre>
-
 <p>
-<a class="ext-link" href="http://search.cpan.org/~jesse/Data-ICal-0.07/lib/Data/ICal/Entry.pm#add_property_%24propname_%3D%3E_%24propval"><span class="icon"></span>Data::ICal::Entry の pod</a> にちゃんと書いてありましたね。
+  <a class="ext-link" href="http://search.cpan.org/~jesse/Data-ICal-0.07/lib/Data/ICal/Entry.pm#add_property_%24propname_%3D%3E_%24propval">
+    <span class="icon"></span>
+    Data::ICal::Entry の pod
+  </a>
+  にちゃんと書いてありましたね。
 </p>
-
 <p>
-というわけで、organizer をちゃんとセットするように、Publish::iCal を書き換えてみました。Email::Address は <a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060815"><span class="icon"></span>Filter::ExtractAuthorName</a> から拝借してます。
+  というわけで、organizer をちゃんとセットするように、Publish::iCal を書き換えてみました。Email::Address は
+  <a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060815">
+    <span class="icon"></span>
+    Filter::ExtractAuthorName
+  </a>
+  から拝借してます。
 </p>
-
 <pre class="wiki">
 Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
 ===================================================================
@@ -91,41 +86,59 @@ Index: plagger/trunk/lib/Plagger/Plugin/Publish/iCal.pm
  use Data::ICal;
  use Data::ICal::Entry::Event;
 +use Email::Address;
- 
- sub register {
-@@ -34,4 +35,8 @@
- 
-     for my $entry ($feed->entries) {
-+        my $address = ( Email::Address->parse($entry->author) )[0];
-+        my $mail = eval { $address->address } || 'nobody@example.com';
-+        my $name = eval { $address->name } || $entry->author;
-+
-         my $date = $entry->date;
-         my $event = Data::ICal::Entry::Event->new;
-@@ -39,5 +44,5 @@
-             summary     => $entry->title . ' - ' . $entry->author,
-             description => $entry->summary || $entry->body,
--            organizer   => $entry->author,
-+            organizer   => [ "MAILTO:$mail", { cn => $name } ],
-             url         => $entry->link,
-             dtstart     => join('', split('-', $date->ymd)),
-</pre>
-
+<p>sub register {<br />
+@@ -34,4 +35,8 @@</p>
+<pre><code>for my $entry ($feed-&gt;entries) {</code></pre>
+<ul>
+<li>
+<pre><code>my $address = ( Email::Address-&gt;parse($entry-&gt;author) )[0];</code></pre>
+</li>
+<li>
+<pre><code>my $mail = eval { $address-&gt;address } || 'nobody@example.com';</code></pre>
+</li>
+<li>
+<pre><code>my $name = eval { $address-&gt;name } || $entry-&gt;author;</code></pre>
+</li>
+<li>
+<pre><code>my $date = $entry-&gt;date;
+   my $event = Data::ICal::Entry::Event-&gt;new;</code></pre>
+</li>
+</ul>
+<p>@@ -39,5 +44,5 @@<br />
+summary     =&gt; $entry-&gt;title . ' - ' . $entry-&gt;author,<br />
+description =&gt; $entry-&gt;summary || $entry-&gt;body,</p>
+<ul>
+<li>
+<pre><code>organizer   =&gt; $entry-&gt;author,</code></pre>
+</li>
+</ul>
+<ul>
+<li>
+<pre><code>organizer   =&gt; [ &quot;MAILTO:$mail&quot;, { cn =&gt; $name } ],
+       url         =&gt; $entry-&gt;link,
+       dtstart     =&gt; join('', split('-', $date-&gt;ymd)),</code></pre>
+</li>
+</ul>
+<p></pre>
 <p>
-<a class="ext-link" href="http://trac.mizzy.org/public/changeset/233"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+  <a class="ext-link" href="http://trac.mizzy.org/public/changeset/233">
+    <span class="icon"></span>
+    trac のチェンジセットはこちら
+  </a>
+  。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/08/24/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/08/22/3" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/08/22/3" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/08/24/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

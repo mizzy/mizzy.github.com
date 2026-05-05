@@ -1,156 +1,132 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>HTML::Widget::Kwalify #0 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    HTML::Widget::Kwalify #0 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="HTML::Widget::Kwalify #0"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/10/18/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/10/18/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="HTML::Widget::Kwalify #0"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/10/18/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/10/18/1">HTML::Widget::Kwalify #0</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify"><span class="icon"></span>HTML::Widget::Kwalify</a> というものをつくってます。まだプロトタイプにもなってない感じだけど。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/10/18/1">
+    HTML::Widget::Kwalify #0
+  </a>
+</h1>
+<div class="byline">
+  18 October 2006
+</div>
 <p>
-これで <a class="ext-link" href="http://www.kuwata-lab.com/kwalify/"><span class="icon"></span>Kwalify</a> スキーマから <a class="ext-link" href="http://search.cpan.org/~cfranks/HTML-Widget/lib/HTML/Widget.pm"><span class="icon"></span>HTML::Widget</a> オブジェクトを自動生成して、Plagger のウェブインターフェースを簡単につくっちゃおう、という目論見です。
+  <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/HTML-Widget-Kwalify">
+    <span class="icon"></span>
+    HTML::Widget::Kwalify
+  </a>
+  というものをつくってます。まだプロトタイプにもなってない感じだけど。
 </p>
-
+<p>
+  これで
+  <a class="ext-link" href="http://www.kuwata-lab.com/kwalify/">
+    <span class="icon"></span>
+    Kwalify
+  </a>
+  スキーマから
+  <a class="ext-link" href="http://search.cpan.org/~cfranks/HTML-Widget/lib/HTML/Widget.pm">
+    <span class="icon"></span>
+    HTML::Widget
+  </a>
+  オブジェクトを自動生成して、Plagger のウェブインターフェースを簡単につくっちゃおう、という目論見です。
+</p>
 <pre class="wiki">
 use HTML::Widget::Kwalify;
-
-my $w = HTML::Widget::Kwalify->create_from( file => 'schema.yaml' );
-print $w->process;
+<p>my $w = HTML::Widget::Kwalify-&gt;create_from( file =&gt; 'schema.yaml' );<br />
+print $w-&gt;process;<br />
 </pre>
-
 <p>
-みたいな感じで、schema.yaml から HTML フォームを一発で生成できます。
+  みたいな感じで、schema.yaml から HTML フォームを一発で生成できます。
 </p>
-
 <p>
-CGI::Application ベースでサンプルをつくると、こんな感じになります。
+  CGI::Application ベースでサンプルをつくると、こんな感じになります。
 </p>
-
 <p>
-まずはディスパッチする index.cgi 。
-</p>
-
-<pre class="wiki">
+  まずはディスパッチする index.cgi 。
+</p><pre class="wiki">
 #!/usr/local/bin/perl
-
-use strict;
-use warnings;
-use lib './lib';
-
-use WidgetKwalify;
-
-my $w = WidgetKwalify->new;
-$w->run;
+<p>use strict;<br />
+use warnings;<br />
+use lib './lib';</p>
+<p>use WidgetKwalify;</p>
+<p>my $w = WidgetKwalify-&gt;new;<br />
+$w-&gt;run;<br />
 </pre>
-
 <p>
-本体の lib/WidgetKwalify.pm 。
-</p>
-
-<pre class="wiki">
+  本体の lib/WidgetKwalify.pm 。
+</p><pre class="wiki">
 package WidgetKwalify;
+<p>use strict;<br />
+use warnings;<br />
+use base qw( CGI::Application );<br />
+use HTML::Widget::Kwalify;<br />
+use CGI::Application::Plugin::TT;</p>
+<p>our $TEMPLATE_OPTIONS = {<br />
+INCLUDE_PATH =&gt; '/path/to/template',<br />
+};</p>
+<p>sub setup {<br />
+my $self = shift;</p>
+<pre><code>$self-&gt;start_mode('top');
+$self-&gt;run_modes(
+    top =&gt; 'top',
+);
 
-use strict;
-use warnings;
-use base qw( CGI::Application );
-use HTML::Widget::Kwalify;
-use CGI::Application::Plugin::TT;
-
-our $TEMPLATE_OPTIONS = {
-    INCLUDE_PATH => '/path/to/template',
-};
-
-sub setup {
-    my $self = shift;
-
-    $self->start_mode('top');
-    $self->run_modes(
-        top => 'top',
-    );
-
-    $self->tt_config( TEMPLATE_OPTIONS => $TEMPLATE_OPTIONS );
-}
-
-sub top {
-    my $self = shift;
-
-    my $q = $self->query;
-    my $w = HTML::Widget::Kwalify->create_from( file => 'schema.yaml' );
-    return $self->tt_process(
-        'index.html',
-        { widget => $q ? $w->process($q) : $w->process }
-    );
-}
-
-1;
+$self-&gt;tt_config( TEMPLATE_OPTIONS =&gt; $TEMPLATE_OPTIONS );</code></pre>
+<p>}</p>
+<p>sub top {<br />
+my $self = shift;</p>
+<pre><code>my $q = $self-&gt;query;
+my $w = HTML::Widget::Kwalify-&gt;create_from( file =&gt; 'schema.yaml' );
+return $self-&gt;tt_process(
+    'index.html',
+    { widget =&gt; $q ? $w-&gt;process($q) : $w-&gt;process }
+);</code></pre>
+<p>}</p>
+<p>1;<br />
 </pre>
-
 <p>
-HTML テンプレート template/index.html 。
-</p>
-
-<pre class="wiki">
+  HTML テンプレート template/index.html 。
+</p><pre class="wiki">
 &lt;table&gt;
 &#91;% FOREACH element = widget.elements %&#93;
   &lt;tr&gt;
@@ -160,38 +136,42 @@ HTML テンプレート template/index.html 。
 &#91;% END %&#93;
 &lt;/table&gt;
 </pre>
-
 <p>
-Plagger の example にある <a class="ext-link" href="http://plagger.org/trac/browser/trunk/plagger/examples/schema.yaml"><span class="icon"></span>schema.yaml</a> の global セクションを使ってこのサンプルを動かすと、<a class="ext-link" href="http://mizzy.org/widget/index.cgi"><span class="icon"></span>こんな感じ</a>になります。まだ type:seq の処理をちゃんとしてないので、plugin_path が変ですが、他は良い感じ。log-level もちゃんと select になってるし。
+  Plagger の example にある
+  <a class="ext-link" href="http://plagger.org/trac/browser/trunk/plagger/examples/schema.yaml">
+    <span class="icon"></span>
+    schema.yaml
+  </a>
+  の global セクションを使ってこのサンプルを動かすと、
+  <a class="ext-link" href="http://mizzy.org/widget/index.cgi">
+    <span class="icon"></span>
+    こんな感じ
+  </a>
+  になります。まだ type:seq の処理をちゃんとしてないので、plugin_path が変ですが、他は良い感じ。log-level もちゃんと select になってるし。
 </p>
-
 <p>
-これで、Plagger ホスティングウェブアプリつくれば、bloglines2gmail とか youtube2podcast とか、目的別にスキーマファイルつくるだけで、設定用フォームが自動で生成できるし、プラグイン毎にスキーマファイル用意しておいて、利用したいプラグインを選択すると、そのプラグイン用の設定フォームが自動で生成できる、といったことが可能になりますね。
+  これで、Plagger ホスティングウェブアプリつくれば、bloglines2gmail とか youtube2podcast とか、目的別にスキーマファイルつくるだけで、設定用フォームが自動で生成できるし、プラグイン毎にスキーマファイル用意しておいて、利用したいプラグインを選択すると、そのプラグイン用の設定フォームが自動で生成できる、といったことが可能になりますね。
 </p>
-
 <p>
-あと、
-</p>
-
-<pre class="wiki">
+  あと、
+</p><pre class="wiki">
 $widget->process($query)->save_to( file => 'config.yaml' );
 </pre>
-
 <p>
-な感じで POST したフォームの内容を YAML にしてファイルに保存、とかできるようにする予定です。（他にも type: seq の処理とか、フォームバリデーション対応とか、やること山積みですが。）
+  な感じで POST したフォームの内容を YAML にしてファイルに保存、とかできるようにする予定です。（他にも type: seq の処理とか、フォームバリデーション対応とか、やること山積みですが。）
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/10/21/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/10/17/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/10/17/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/10/21/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

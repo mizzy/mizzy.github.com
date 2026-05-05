@@ -1,82 +1,76 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>mod_dosdetector を Apache 2.0 系で動かすパッチ - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      mod_dosdetector を Apache 2.0 系で動かすパッチ - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="mod_dosdetector を Apache 2.0 系で動かすパッチ"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/07/26/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/07/26/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="mod_dosdetector を Apache 2.0 系で動かすパッチ"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/07/26/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/07/26/1">
+          mod_dosdetector を Apache 2.0 系で動かすパッチ
+        </a>
+      </h1>
+      <div class="byline">
+        26 July 2007
+      </div>
+      <p>
+        &quot;mod_dosdetecter 0.2&quot;:http://sourceforge.net/projects/moddosdetector/ を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          /usr/local/apache/include/pcreposix.h:41: error: redeclaration of enumerator `REG_BADBR' といったエラーが大量に出てくるが、これは /usr/include/regex.h と宣言が重複しているため。なので、#include &lt;regex.h&gt; は削除。
+        </li>
+        <li>
+          ap_regmatch_t 構造体と ap_regex_t 構造体は 2.2 系にのみ存在し、2.0 系には存在しない。なのでそれぞれ、regmatch_t, regex_t に置き換える。
+        </li>
+        <li>
+          apr_shm_remove は 2.2系 でしか使えないので、そのための修正を &quot;mod_fcgid のソース&quot;:http://mod-fcgid.cvs.sourceforge.net/mod-fcgid/mod_fcgid/arch/unix/fcgid_proctbl_unix.c?r1=1.7&amp;r2=1.8 からパクる。
+        </li>
+        <li>
+          set_ignore_contenttype_config() がセグフォるので修正
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/07/26/1">mod_dosdetector を Apache 2.0 系で動かすパッチ</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>&quot;mod_dosdetecter 0.2&quot;:<a href="http://sourceforge.net/projects/moddosdetector/">http://sourceforge.net/projects/moddosdetector/</a> を Apache 2.0 系で動かすパッチを書いてみた。修正ポイントは、</p>
-
-<ul>
-<li>/usr/local/apache/include/pcreposix.h:41: error: redeclaration of enumerator `REG_BADBR&#39; といったエラーが大量に出てくるが、これは /usr/include/regex.h と宣言が重複しているため。なので、#include &lt;regex.h&gt; は削除。</li>
-<li>ap<em>regmatch</em>t 構造体と ap<em>regex</em>t 構造体は 2.2 系にのみ存在し、2.0 系には存在しない。なのでそれぞれ、regmatch<em>t, regex</em>t に置き換える。</li>
-<li>apr<em>shm</em>remove は 2.2系 でしか使えないので、そのための修正を &quot;mod<em>fcgid のソース&quot;:<a href="http://mod-fcgid.cvs.sourceforge.net/mod-fcgid/mod">http://mod-fcgid.cvs.sourceforge.net/mod-fcgid/mod</a></em>fcgid/arch/unix/fcgid<em>proctbl</em>unix.c?r1=1.7&amp;r2=1.8 からパクる。</li>
-<li>set<em>ignore</em>contenttype_config() がセグフォるので修正</li>
-</ul>
-
-<pre><code>=== mod_dosdetector.c
+      <pre><code>=== mod_dosdetector.c
 ==================================================================
---- mod_dosdetector.c   (revision 804)
-+++ mod_dosdetector.c   (local)
+--- mod_dosdetector.c	(revision 804)
++++ mod_dosdetector.c	(local)
 @@ -28,7 +28,6 @@
  #include <arpa/inet.h>
  //#include <netinet/in.h>
@@ -124,61 +118,61 @@
 +static apr_status_t apr_shm_remove(const char *filename, apr_pool_t * pool)
 +{
 +#if APR_USE_SHMEM_SHMGET
-+   apr_status_t status;
-+   apr_file_t *file;
-+   key_t shmkey;
-+   int shmid;
++	apr_status_t status;
++	apr_file_t *file;
++	key_t shmkey;
++	int shmid;
 +#endif
 +
 +#if APR_USE_SHMEM_MMAP_TMP
-+   return apr_file_remove(filename, pool);
++	return apr_file_remove(filename, pool);
 +#endif
 +#if APR_USE_SHMEM_MMAP_SHM
-+   if (shm_unlink(filename) == -1) {
-+       return errno;
-+   }
-+   return APR_SUCCESS;
++	if (shm_unlink(filename) == -1) {
++		return errno;
++	}
++	return APR_SUCCESS;
 +#endif
 +#if APR_USE_SHMEM_SHMGET
-+   /* Presume that the file already exists; just open for writing */
-+   status = apr_file_open(&file, filename, APR_WRITE,
-+                          APR_OS_DEFAULT, pool);
-+   if (status) {
-+       return status;
-+   }
++	/* Presume that the file already exists; just open for writing */
++	status = apr_file_open(&file, filename, APR_WRITE,
++						   APR_OS_DEFAULT, pool);
++	if (status) {
++		return status;
++	}
 +
-+   /* ftok() (on solaris at least) requires that the file actually
-+    * exist before calling ftok(). */
-+   shmkey = ftok(filename, 1);
-+   if (shmkey == (key_t) - 1) {
-+       goto shm_remove_failed;
-+   }
++	/* ftok() (on solaris at least) requires that the file actually
++	 * exist before calling ftok(). */
++	shmkey = ftok(filename, 1);
++	if (shmkey == (key_t) - 1) {
++		goto shm_remove_failed;
++	}
 +
-+   apr_file_close(file);
++	apr_file_close(file);
 +
-+   if ((shmid = shmget(shmkey, 0, SHM_R | SHM_W)) < 0) {
-+       goto shm_remove_failed;
-+   }
++	if ((shmid = shmget(shmkey, 0, SHM_R | SHM_W)) < 0) {
++		goto shm_remove_failed;
++	}
 +
-+   /* Indicate that the segment is to be destroyed as soon
-+    * as all processes have detached. This also disallows any
-+    * new attachments to the segment. */
-+   if (shmctl(shmid, IPC_RMID, NULL) == -1) {
-+       goto shm_remove_failed;
-+   }
-+   return apr_file_remove(filename, pool);
++	/* Indicate that the segment is to be destroyed as soon
++	 * as all processes have detached. This also disallows any
++	 * new attachments to the segment. */
++	if (shmctl(shmid, IPC_RMID, NULL) == -1) {
++		goto shm_remove_failed;
++	}
++	return apr_file_remove(filename, pool);
 +
 +  shm_remove_failed:
-+   status = errno;
-+   /* ensure the file has been removed anyway. */
-+   apr_file_remove(filename, pool);
-+   return status;
++	status = errno;
++	/* ensure the file has been removed anyway. */
++	apr_file_remove(filename, pool);
++	return status;
 +#endif
 +
-+   /* No support for anonymous shm */
-+   return APR_ENOTIMPL;
++	/* No support for anonymous shm */
++	return APR_ENOTIMPL;
 +}
-+#endif                         /* APR_MAJOR_VERSION<1 */
++#endif							/* APR_MAJOR_VERSION<1 */
 +
 +
  static apr_status_t cleanup_shm(void *not_used)
@@ -186,17 +180,17 @@
      ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, "Notice: cleaning up shared memory");
 @@ -261,8 +344,8 @@
  
-    address = r->connection->remote_ip;
+ 	address = r->connection->remote_ip;
  
 -    ap_regmatch_t regmatch[AP_MAX_REG_MATCH];
 -    ap_regex_t **contenttype_regexp = (ap_regex_t **) cfg->contenttype_regexp->elts;
 +    regmatch_t regmatch[AP_MAX_REG_MATCH];
 +    regex_t **contenttype_regexp = (regex_t **) cfg->contenttype_regexp->elts;
-    for (i = 0; i < cfg->contenttype_regexp->nelts; i++) {
-        if(!ap_regexec(contenttype_regexp[i], content_type, AP_MAX_REG_MATCH, regmatch, 0)){
-            //ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, 0, "ignoring content-type: %s", content_type);
+ 	for (i = 0; i < cfg->contenttype_regexp->nelts; i++) {
+ 		if(!ap_regexec(contenttype_regexp[i], content_type, AP_MAX_REG_MATCH, regmatch, 0)){
+ 			//ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, 0, "ignoring content-type: %s", content_type);
 @@ -390,15 +473,13 @@
-                     const char *arg)
+ 					 const char *arg)
  {
      dosdetector_dir_config *cfg = (dosdetector_dir_config *) mconfig;
 -    char **ignore_contenttype = (char **) cfg->ignore_contenttype->elts;
@@ -205,33 +199,36 @@
  
 -    *(char **) apr_array_push(cfg->ignore_contenttype) = apr_pstrdup(parms->pool, arg);
 -
--   int i;
--   regex_t *regexp;
--   for (i = 0; i < cfg->ignore_contenttype->nelts; i++) {
+-	int i;
+-	regex_t *regexp;
+-	for (i = 0; i < cfg->ignore_contenttype->nelts; i++) {
 -        regexp = (regex_t *)ap_pregcomp(parms->pool, (char *)ignore_contenttype[i], REG_EXTENDED|REG_ICASE);
--       *(regex_t **)apr_array_push(cfg->contenttype_regexp) = regexp;
+-		*(regex_t **)apr_array_push(cfg->contenttype_regexp) = regexp;
 +    while (*arg) {
 +      type = ap_getword_conf(parms->pool, &arg);
 +      regexp = ap_pregcomp(parms->pool, type, REG_EXTENDED|REG_ICASE);
 +      *(regex_t **)apr_array_push(cfg->contenttype_regexp) = regexp;
      }
  
-     return NULL;
-</code></pre>
-
-<p>2.0 系でも 2.2 系でもどっちでも動くように修正した方がいいんだろうけど、それはまた今度。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/08/03/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/07/09/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+     return NULL;</code></pre>
+      <p>
+        2.0 系でも 2.2 系でもどっちでも動くように修正した方がいいんだろうけど、それはまた今度。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/07/09/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/08/03/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

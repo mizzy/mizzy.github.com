@@ -1,90 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Assurer - サーバテスティングフレームワーク #1 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Assurer - サーバテスティングフレームワーク #1 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Assurer - サーバテスティングフレームワーク #1"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/01/06/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/01/06/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Assurer - サーバテスティングフレームワーク #1"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/01/06/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/01/06/2">
+          Assurer - サーバテスティングフレームワーク #1
+        </a>
+      </h1>
+      <div class="byline">
+        6 January 2007
+      </div>
+      <p>
+        <a class="ext-link" href="http://unknownplace.org/memo/">
+          <span class="icon"></span>
+          typester さん
+        </a>
+        が del.icio.us で「開発参加したい！」とおっしゃってくださったので、#assurer@freenode チャネルつくりました。まだおおまかな仕様すら固まっていない段階なので、いろいろご助言頂けると大変うれしいです。ご興味のある方はぜひ！
+      </p>
+      <p>
+        で、本題。
+        <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer">
+          <span class="icon"></span>
+          Assurer
+        </a>
+        (
+        <a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/">
+          <span class="icon"></span>
+          SVN
+        </a>
+        ) をちょっと修正しました。修正点は以下の通りです。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          assurer.pl に Plagger の文字が残っていたので、修正しました。（はてブでコメント頂きました。ありがとうございます。）
+        </li>
+        <li>
+          Assurer::Test というクラスをつくりました。Assurer::Plugin::HTTP では最初、Test::More を使っていたのですが、代わりにこちらを使うようにしてます。
+        </li>
+        <li>
+          他微修正。
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/01/06/2">Assurer - サーバテスティングフレームワーク #1</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://unknownplace.org/memo/"><span class="icon"></span>typester さん</a> が del.icio.us で「開発参加したい！」とおっしゃってくださったので、#assurer@freenode チャネルつくりました。まだおおまかな仕様すら固まっていない段階なので、いろいろご助言頂けると大変うれしいです。ご興味のある方はぜひ！
-</p>
-
-<p>
-で、本題。<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) をちょっと修正しました。修正点は以下の通りです。
-</p>
-
-<ul><li>assurer.pl に Plagger の文字が残っていたので、修正しました。（はてブでコメント頂きました。ありがとうございます。）</li>
-<li>Assurer::Test というクラスをつくりました。Assurer::Plugin::HTTP では最初、Test::More を使っていたのですが、代わりにこちらを使うようにしてます。</li>
-<li>他微修正。</li></ul>
-
-<p>
-今回追加した Assurer::Test というクラスは Test::Builder を利用していて、 Test::More の代わりとしてテスト用プラグインから利用することを想定しています。
-</p>
-
-<p>
-なぜわざわざこのクラスを作ったかというと、テスト結果出力を色分けしたかったからです。実行するとこんな感じの出力になります。（RSS リーダだと色が見えないと思いますが…）
-</p>
-
-<pre class="wiki">
+      <p>
+        今回追加した Assurer::Test というクラスは Test::Builder を利用していて、 Test::More の代わりとしてテスト用プラグインから利用することを想定しています。
+      </p>
+      <p>
+        なぜわざわざこのクラスを作ったかというと、テスト結果出力を色分けしたかったからです。実行するとこんな感じの出力になります。（RSS リーダだと色が見えないと思いますが…）
+      </p>
+      <pre class="wiki">
 $ ./assurer.pl -c examples/config.yaml
 [info] Testing http://svn.mizzy.org/ #0
 <span style="color: blue;">ok 1 - Content of http://svn.mizzy.org/ matches 'It works!'</span>
@@ -93,44 +96,42 @@ $ ./assurer.pl -c examples/config.yaml
 #                   '&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;'
 #     doesn't match '(?-xism:It not works!)'
 </pre>
-
-<p>
-また、
-</p>
-
-<pre class="wiki">
+      <p>
+        また、
+      </p>
+      <pre class="wiki">
 global:
   config:
     no_diag: 1
 </pre>
-
-<p>
-といった設定をすると、以下のように diag message を表示しなくなります。
-</p>
-
-<pre class="wiki">
+      <p>
+        といった設定をすると、以下のように diag message を表示しなくなります。
+      </p>
+      <pre class="wiki">
 $ ./assurer.pl -c examples/config.yaml
 [info] Testing http://svn.mizzy.org/ #0
 <span style="color: blue;">ok 1 - Content of http://svn.mizzy.org/ matches 'It works!'</span>
 [info] Testing http://svn.mizzy.org/ #1
 <span style="color: red;">not ok 2 - Content of http://svn.mizzy.org/ matches 'It not works!'</span>
 </pre>
-
-<p>
-Assurer::Test は今後、 Assurer::Test::More とか Assurer::Test::Class といった感じでベースとなる Test::* に応じて細分化するかもしれません。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/01/08/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/01/06/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        Assurer::Test は今後、 Assurer::Test::More とか Assurer::Test::Class といった感じでベースとなる Test::* に応じて細分化するかもしれません。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/01/06/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/01/08/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

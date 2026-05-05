@@ -90,3 +90,42 @@ pre.chroma code {
     padding: 0;
     margin: 0;
 }
+
+/* A1 — muted 3-color syntax highlighting */
+pre.chroma {
+  background: #fafafa;
+  padding: 18px 20px;
+  border-left: 3px solid #000;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 1.4em 0;
+  overflow-x: auto;
+  color: #111;
+}
+
+/* keywords / types / declarations — black bold */
+.chroma .k, .chroma .kc, .chroma .kd, .chroma .kn, .chroma .kp, .chroma .kr, .chroma .kt,
+.chroma .nt, .chroma .nb, .chroma .bp, .chroma .nc, .chroma .nd, .chroma .ne {
+  color: #000 !important; font-weight: 700 !important;
+}
+
+/* strings — dark blue */
+.chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .dl,
+.chroma .s2, .chroma .se, .chroma .sh, .chroma .si, .chroma .sx,
+.chroma .sr, .chroma .s1, .chroma .ss {
+  color: #1d3a6e !important; font-weight: normal !important;
+}
+
+/* comments — grey italic */
+.chroma .c, .chroma .ch, .chroma .cm, .chroma .c1, .chroma .cs,
+.chroma .cp, .chroma .cpf {
+  color: #888 !important; font-style: italic !important;
+}
+
+/* everything else (numbers, identifiers, functions, operators) — flat black */
+.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .il, .chroma .mo,
+.chroma .na, .chroma .no, .chroma .ni, .chroma .nl, .chroma .nn, .chroma .py,
+.chroma .nv, .chroma .vc, .chroma .vg, .chroma .vi, .chroma .vm,
+.chroma .nf, .chroma .fm, .chroma .o, .chroma .ow, .chroma .p {
+  color: #111 !important; font-weight: normal !important;
+}

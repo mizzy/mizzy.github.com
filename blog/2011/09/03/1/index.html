@@ -1,107 +1,124 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>SSLCertOfLolipop - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      SSLCertOfLolipop - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="SSLCertOfLolipop"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/09/03/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/09/03/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="SSLCertOfLolipop"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/09/03/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/09/03/1">
+          SSLCertOfLolipop
+        </a>
+      </h1>
+      <div class="byline">
+        3 September 2011
+      </div>
+      <p>
+        <a href="http://blog2.or6.jp/ftpisdead">
+          FFFTP開発終了で大騒ぎしている人たちへ
+        </a>
+        にて、
+      </p>
+      <pre><code>SSL証明書がまともなものでないと接続時にエラーが出るのですが、ロリポップなんかだと
+このエラーを無視するように公式ドキュメントに書いてあるので、かなり悪質です。</code></pre>
+      <p>
+        と書かれていますので、これについて説明させて頂きます。
+      </p>
+      <p>
+        この方が指摘されているのは、~~
+        <a href="http://lolipop.jp/manual/hp/w-fz/">
+          Win FileZillaの設定 / ホームページ / マニュアル - ロリポップ！
+        </a>
+        ~~(FileZilla非推奨のため現在は削除されています)の中の、
+      </p>
+      <pre><code>証明書の確認を行います。『今後もこの証明書を常に信用する(A)』にチェックを入れて、『OK』をクリックします。</code></pre>
+      <p>
+        という部分だと思われるのですが、確かに、無条件で信用するにチェックを入れるようお客様に指示するのは大変良くないですね。
+      </p>
+      <p>
+        ロリポップでは
+        <a href="http://www.digicert.ne.jp/">
+          DigiCert Inc社
+        </a>
+        によって発行されている証明書を利用しているのですが、Filezillaでは警告が出てしまうようです。
+      </p>
+      <p>
+        調べてみたところ、FilezillaはルートCAの証明書を保持しておらず、どのような証明書であっても、ユーザが「信用する」にチェックを入れなければ警告が出る仕様となっているようです。
+      </p>
+      <p>
+        <a href="http://forum.filezilla-project.org/viewtopic.php?f=2&amp;t=20767">
+          how to install root CA certificate on Filezilla
+        </a>
+      </p>
+      <p>
+        OR6 blog 様のご指摘により、このような証明書の検証をきちんと行っていないソフトウェアをお客様に推奨すべきではないと判断いたしましたので、Windows/Mac版ともに存在し、証明書の検証をきちんと行っている
+        <a href="http://cyberduck.ch/">
+          Cyberduck
+        </a>
+        を推奨するよう、マニュアルを変更させて頂くことになりました。
+      </p>
+      <p>
+        また、蛇足ですが、ロリポップの
+        <a href="http://lolipop.jp/service/plan-chicappa/">
+          チカッパプラン
+        </a>
+        では SSH サービスを提供していますので、FTPS の代わりに SCP/SFTP もご利用頂けます。
+      </p>
+      <p>
+        OR6 blog 様、この度はご指摘誠にありがとうございました。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/08/18/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/09/03/1">SSLCertOfLolipop</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://blog2.or6.jp/ftpisdead">FFFTP開発終了で大騒ぎしている人たちへ</a> にて、</p>
-
-<pre><code>SSL証明書がまともなものでないと接続時にエラーが出るのですが、ロリポップなんかだと
-このエラーを無視するように公式ドキュメントに書いてあるので、かなり悪質です。
-</code></pre>
-
-<p>と書かれていますので、これについて説明させて頂きます。</p>
-
-<p>この方が指摘されているのは、~~<a href="http://lolipop.jp/manual/hp/w-fz/">Win FileZillaの設定 / ホームページ / マニュアル - ロリポップ！</a> ~~(FileZilla非推奨のため現在は削除されています)の中の、</p>
-
-<pre><code> 証明書の確認を行います。『今後もこの証明書を常に信用する(A)』にチェックを入れて、『OK』をクリックします。
-</code></pre>
-
-<p>という部分だと思われるのですが、確かに、無条件で信用するにチェックを入れるようお客様に指示するのは大変良くないですね。</p>
-
-<p>ロリポップでは <a href="http://www.digicert.ne.jp/">DigiCert Inc社</a> によって発行されている証明書を利用しているのですが、Filezillaでは警告が出てしまうようです。</p>
-
-<p>調べてみたところ、FilezillaはルートCAの証明書を保持しておらず、どのような証明書であっても、ユーザが「信用する」にチェックを入れなければ警告が出る仕様となっているようです。</p>
-
-<p><a href="http://forum.filezilla-project.org/viewtopic.php?f=2&amp;t=20767">how to install root CA certificate on Filezilla</a></p>
-
-<p>OR6 blog 様のご指摘により、このような証明書の検証をきちんと行っていないソフトウェアをお客様に推奨すべきではないと判断いたしましたので、Windows/Mac版ともに存在し、証明書の検証をきちんと行っている <a href="http://cyberduck.ch/">Cyberduck</a> を推奨するよう、マニュアルを変更させて頂くことになりました。</p>
-
-<p>また、蛇足ですが、ロリポップの <a href="http://lolipop.jp/service/plan-chicappa/">チカッパプラン</a> では SSH サービスを提供していますので、FTPS の代わりに SCP/SFTP もご利用頂けます。</p>
-
-<p>OR6 blog 様、この度はご指摘誠にありがとうございました。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/10/05/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/08/18/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/10/05/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

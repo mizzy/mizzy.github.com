@@ -1,136 +1,134 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ScalableStorageWithOSS02 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ScalableStorageWithOSS02 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ScalableStorageWithOSS02"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2008/12/28/4/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2008/12/28/4/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ScalableStorageWithOSS02"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2008/12/28/4/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2008/12/28/4">
+          ScalableStorageWithOSS02
+        </a>
+      </h1>
+      <div class="byline">
+        28 December 2008
+      </div>
+      <p>
+        [wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1] のつづき。
+      </p>
+      <h1>
+        Xen インスタンスの作成
+      </h1>
+      <p>
+        ここは詳しく解説しません。好きなように作成してください。自分は [wiki:Cobbler Cobbler]/[wiki:Koan Koan] を使ってます。インスタンスは6つ作成。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          client0, client1（ストレージをマウントするインスタンス）
+        </li>
+        <li>
+          storage0a, storage0b（ストレージを構成するインスタンスセットその1）
+        </li>
+        <li>
+          storage1a, storage1b（ストレージを構成するインスタンスセットその2）
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2008/12/28/4">ScalableStorageWithOSS02</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1] のつづき。</p>
-
-<h1>Xen インスタンスの作成</h1>
-
-<p>ここは詳しく解説しません。好きなように作成してください。自分は [wiki:Cobbler Cobbler]/[wiki:Koan Koan] を使ってます。インスタンスは6つ作成。</p>
-
-<ul>
-<li>client0, client1（ストレージをマウントするインスタンス）</li>
-<li>storage0a, storage0b（ストレージを構成するインスタンスセットその1）</li>
-<li>storage1a, storage1b（ストレージを構成するインスタンスセットその2）</li>
-</ul>
-
-<p>全体的な構成概要については、[wiki:ScalableStorageWithOSS01 前回のエントリ] を参照してください。</p>
-
-<h1>エクスポート用ブロックデバイスの作成</h1>
-
-<p>storage![01][ab] 上で、GNBD によりエクスポートするブロックデバイス（ディスク）を作成。</p>
-
-<p>ディスクイメージを作成。テスト用なので容量とかは適当に。</p>
-
-<pre><code>$ sudo dd if=/dev/null of=/var/lib/xen/images/storage0a-disk1 bs=1M count=1 seek=1024
-</code></pre>
-
-<p>/etc/xen/storage0a の disk の項目を修正して、作成したディスクイメージを追加。</p>
-
-<pre><code>disk = [ &quot;file:/var/lib/xen/images/storage0a-disk0,xvda,w&quot;, &quot;file:/var/lib/xen/images/storage0a-disk1,xvdb,w&quot; ] 
+      <p>
+        全体的な構成概要については、[wiki:ScalableStorageWithOSS01 前回のエントリ] を参照してください。
+      </p>
+      <h1>
+        エクスポート用ブロックデバイスの作成
+      </h1>
+      <p>
+        storage![01][ab] 上で、GNBD によりエクスポートするブロックデバイス（ディスク）を作成。
+      </p>
+      <p>
+        ディスクイメージを作成。テスト用なので容量とかは適当に。
+      </p>
+      <pre><code>$ sudo dd if=/dev/null of=/var/lib/xen/images/storage0a-disk1 bs=1M count=1 seek=1024</code></pre>
+      <p>
+        /etc/xen/storage0a の disk の項目を修正して、作成したディスクイメージを追加。
+      </p>
+      <pre><code>disk = [ &quot;file:/var/lib/xen/images/storage0a-disk0,xvda,w&quot;, &quot;file:/var/lib/xen/images/storage0a-disk1,xvdb,w&quot; ] 
 
 
 
-$ sudo /usr/sbin/xm create storage0a
-</code></pre>
-
-<p>デバイスができていることを確認。</p>
-
-<pre><code>$ dmesg|grep -B2 xvdb
+$ sudo /usr/sbin/xm create storage0a</code></pre>
+      <p>
+        デバイスができていることを確認。
+      </p>
+      <pre><code>$ dmesg|grep -B2 xvdb
 Registering block device major 202
  xvda: xvda1 xvda2
- xvdb: unknown partition table 
-</code></pre>
-
-<p>パーティション作成。</p>
-
-<pre><code>$ sudo /sbin/parted /dev/xvdb
+ xvdb: unknown partition table</code></pre>
+      <p>
+        パーティション作成。
+      </p>
+      <pre><code>$ sudo /sbin/parted /dev/xvdb
 (parted) mklabel gpt
 (parted) mkpart primary 0 1074
 (parted) set 1 lvm on
-(parted) quit
-</code></pre>
-
-<p>これで /dev/xvdb1 が作成される。</p>
-
-<p>storage0a 上で完了したら、storage0b, storage1a, storage1b でも同様の作業をする。</p>
-
-<h1>DRBD の設定</h1>
-
-<p>storage0a と storage0b の /dev/xvdb1 を同期するための設定を行う。</p>
-
-<p>まずは必要なパッケージのインストール。(storage0a, storage0b 双方で。)</p>
-
-<pre><code>$ sudo yum -y install kmod-drbd82-xen
-</code></pre>
-
-<p>kmod-drbd82-xen が kernel-xen-2.6.18-92.1.10.el5xen に依存していて、うちの環境ではこのバージョンのカーネルがインストールされた。で、/etc/grub.conf をいじって、2.6.18-92.1.10.el5xen で起動するようにして、再起動。</p>
-
-<p>次に/etc/drbd.conf を設定。テストなので適当に。(storage0a, storage0b 双方で。)</p>
-
-<pre><code>global {
+(parted) quit</code></pre>
+      <p>
+        これで /dev/xvdb1 が作成される。
+      </p>
+      <p>
+        storage0a 上で完了したら、storage0b, storage1a, storage1b でも同様の作業をする。
+      </p>
+      <h1>
+        DRBD の設定
+      </h1>
+      <p>
+        storage0a と storage0b の /dev/xvdb1 を同期するための設定を行う。
+      </p>
+      <p>
+        まずは必要なパッケージのインストール。(storage0a, storage0b 双方で。)
+      </p>
+      <pre><code>$ sudo yum -y install kmod-drbd82-xen</code></pre>
+      <p>
+        kmod-drbd82-xen が kernel-xen-2.6.18-92.1.10.el5xen に依存していて、うちの環境ではこのバージョンのカーネルがインストールされた。で、/etc/grub.conf をいじって、2.6.18-92.1.10.el5xen で起動するようにして、再起動。
+      </p>
+      <p>
+        次に/etc/drbd.conf を設定。テストなので適当に。(storage0a, storage0b 双方で。)
+      </p>
+      <pre><code>global {
     usage-count no;
 }
 
@@ -169,99 +167,111 @@ resource r0 {
     meta-disk internal;
   }
 
-} 
-</code></pre>
-
-<p>設定を終えたら、起動する。(storage0a, storage0b 双方で。)</p>
-
-<pre><code>$ sudo /sbin/modprobe drbd minor_count=1
+}</code></pre>
+      <p>
+        設定を終えたら、起動する。(storage0a, storage0b 双方で。)
+      </p>
+      <pre><code>$ sudo /sbin/modprobe drbd minor_count=1
 $ sudo /sbin/drbdadm create-md r0
-$ sudo /sbin/drbdadm up all
-</code></pre>
-
-<p>この時点で、どっちもセカンダリになってるはず。</p>
-
-<pre><code>$ cat /proc/drbd
+$ sudo /sbin/drbdadm up all</code></pre>
+      <p>
+        この時点で、どっちもセカンダリになってるはず。
+      </p>
+      <pre><code>$ cat /proc/drbd
 version: 8.2.6 (api:88/proto:86-88)
 GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-build, 2008-08-07 17:50:46
  0: cs:Connected st:Secondary/Secondary ds:Inconsistent/Inconsistent C r---
-    ns:0 nr:0 dw:0 dr:0 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 oos:1048472
-</code></pre>
-
-<p>片方を primary にして、同期を開始する。(storage0a だけで実行。）</p>
-
-<pre><code>$ sudo /sbin/drbdadm -- --overwrite-data-of-peer primary all
-</code></pre>
-
-<p>同期中は /proc/drbd がこんな感じになる。</p>
-
-<pre><code>$ cat /proc/drbd
+    ns:0 nr:0 dw:0 dr:0 al:0 bm:0 lo:0 pe:0 ua:0 ap:0 oos:1048472</code></pre>
+      <p>
+        片方を primary にして、同期を開始する。(storage0a だけで実行。）
+      </p>
+      <pre><code>$ sudo /sbin/drbdadm -- --overwrite-data-of-peer primary all</code></pre>
+      <p>
+        同期中は /proc/drbd がこんな感じになる。
+      </p>
+      <pre><code>$ cat /proc/drbd
 version: 8.2.6 (api:88/proto:86-88)
 GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-build, 2008-08-07 17:50:46
  0: cs:SyncSource st:Primary/Secondary ds:UpToDate/Inconsistent C r---
     ns:40436 nr:0 dw:0 dr:40436 al:0 bm:2 lo:0 pe:0 ua:0 ap:0 oos:1008036
-        [&gt;....................] sync&#39;ed:  4.0% (1008036/1048472)K
-        finish: 0:01:38 speed: 10,108 (10,108) K/sec
-</code></pre>
-
-<p>同期が完了するとこんな感じ。</p>
-
-<pre><code>$ cat /proc/drbd
+        [&gt;....................] sync'ed:  4.0% (1008036/1048472)K
+        finish: 0:01:38 speed: 10,108 (10,108) K/sec</code></pre>
+      <p>
+        同期が完了するとこんな感じ。
+      </p>
+      <pre><code>$ cat /proc/drbd
 version: 8.2.6 (api:88/proto:86-88)
 GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-build, 2008-08-07 17:50:46
  0: cs:Connected st:Primary/Secondary ds:UpToDate/UpToDate C r---
-    ns:1048472 nr:0 dw:0 dr:1048472 al:0 bm:64 lo:0 pe:0 ua:0 ap:0 oos:0
-</code></pre>
-
-<p>両方プライマリにするので、現在のセカンダリ(storage0b)で以下を実行。</p>
-
-<pre><code>$ sudo /sbin/drbdadm primary r0
-</code></pre>
-
-<p>両方プライマリになる。</p>
-
-<pre><code>$ cat /proc/drbd
+    ns:1048472 nr:0 dw:0 dr:1048472 al:0 bm:64 lo:0 pe:0 ua:0 ap:0 oos:0</code></pre>
+      <p>
+        両方プライマリにするので、現在のセカンダリ(storage0b)で以下を実行。
+      </p>
+      <pre><code>$ sudo /sbin/drbdadm primary r0</code></pre>
+      <p>
+        両方プライマリになる。
+      </p>
+      <pre><code>$ cat /proc/drbd
 version: 8.2.6 (api:88/proto:86-88)
 GIT-hash: 3e69822d3bb4920a8c1bfdf7d647169eba7d2eb4 build by buildsvn@c5-x8664-build, 2008-08-07 17:50:46
  0: cs:Connected st:Primary/Primary ds:UpToDate/UpToDate C r---
-    ns:0 nr:1048472 dw:1048472 dr:0 al:0 bm:64 lo:0 pe:0 ua:0 ap:0 oos:0
-</code></pre>
-
-<p>これで DRBD による同期は完了。sorage1a, storage1b についても同様の操作を行う。</p>
-
-<h1>現在の状態</h1>
-
-<p>ここまでセットアップした状態を図にすると、以下のようになります。</p>
-
-<p>[[Image(<a href="http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS02/storages_with_drbd.jpg?format=raw)%5D">http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS02/storages_with_drbd.jpg?format=raw)]</a>]</p>
-
-<p>以下の [wiki:ScalableStorageWithOSS01 前回エントリの構成図] と比較してみて下さい。 </p>
-
-<p>[[Image(<a href="http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)%5D">http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]</a>]</p>
-
-<p>次回は GNBD によるブロックデバイスのエクスポート/インポートについて説明する予定です。</p>
-
-<h1>関連エントリ</h1>
-
-<ul>
-<li>[wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]</li>
-<li>[wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]</li>
-<li>[wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]</li>
-<li>[wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]</li>
-<li>[wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]</li>
-</ul>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2008/12/28/5">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2008/12/28/3" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+    ns:0 nr:1048472 dw:1048472 dr:0 al:0 bm:64 lo:0 pe:0 ua:0 ap:0 oos:0</code></pre>
+      <p>
+        これで DRBD による同期は完了。sorage1a, storage1b についても同様の操作を行う。
+      </p>
+      <h1>
+        現在の状態
+      </h1>
+      <p>
+        ここまでセットアップした状態を図にすると、以下のようになります。
+      </p>
+      <p>
+        [[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS02/storages_with_drbd.jpg?format=raw)]]
+      </p>
+      <p>
+        以下の [wiki:ScalableStorageWithOSS01 前回エントリの構成図] と比較してみて下さい。
+      </p>
+      <p>
+        [[Image(http://trac.mizzy.org/public/attachment/wiki/ScalableStorageWithOSS01/scalable_storage.jpg?format=raw)]]
+      </p>
+      <p>
+        次回は GNBD によるブロックデバイスのエクスポート/インポートについて説明する予定です。
+      </p>
+      <h1>
+        関連エントリ
+      </h1>
+      <ul>
+        <li>
+          [wiki:ScalableStorageWithOSS00 OSS だけでスケーラブルなストレージを安価に構築する方法 #0]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS01 OSS だけでスケーラブルなストレージを安価に構築する方法 #1]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS03 OSS だけでスケーラブルなストレージを安価に構築する方法 #3]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS04 OSS だけでスケーラブルなストレージを安価に構築する方法 #4]
+        </li>
+        <li>
+          [wiki:ScalableStorageWithOSS05 OSS だけでスケーラブルなストレージを安価に構築する方法 #5]
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2008/12/28/3" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2008/12/28/5">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,120 +1,157 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>フリーランスになって1年が経った - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      フリーランスになって1年が経った - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="フリーランスになって1年が経った"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2015/04/01/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2015/04/01/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="フリーランスになって1年が経った"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2015/04/01/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2015/04/01/1">
+          フリーランスになって1年が経った
+        </a>
+      </h1>
+      <div class="byline">
+        1 April 2015
+      </div>
+      <p>
+        <a href="http://mizzy.org/blog/2014/04/01/1/">
+          4月からクックパッドで仕事してます
+        </a>
+        というエントリを書いてからちょうど1年経ったので振り返ってみる。
+      </p>
+      <h2>
+        フリーランスになった経緯
+      </h2>
+      <p>
+        そもそも最初からフリーランスになるぞ、と思ってなったわけではなく、なんとなく流れにしたがってたらフリーランスになってた。
+      </p>
+      <p>
+        もう少し詳しい経緯。色々あって2014年3月に無職（有給消化中のファッション無職じゃなくガチ無職）になって、普通に正社員として次の会社を探していて、知り合いに声をかけて話を聞いて回っていた。その中でクックパッドに決めたのは、
+        <a href="https://twitter.com/hotchpotch">
+          セコンさん
+        </a>
+        や
+        <a href="https://twitter.com/mirakui">
+          mirakui さん
+        </a>
+        の、これからクックパッドの技術やインフラをこうして行きたい、という思いや考えに共感し、そこに自分が価値を提供できるイメージが具体的に沸いたから。
+      </p>
+      <p>
+        ただ、事情があって最初から正社員ではなく、お互い様子見ということで、正社員になる前提で半年間業務委託契約という形で仕事してみましょう、ということになり、半年どころか一ヶ月経たないうちに、正社員よりも業務委託の方が自分にあってるな、と思ったので、そのままフリーランスで行くことにした。
+      </p>
+      <p>
+        （この辺りは
+        <a href="http://rebuild.fm/75/">
+          Rebuild: 75: Book Driven Development
+        </a>
+        でも少し話した気がする）
+      </p>
+      <p>
+        Serverspec という代表的プロダクトを持ったから独立したんじゃないか、みたいに言われたり思われたりするけれど、実際は上に書いたとおり、フリーランスになろうなんてことはまったく考えていなかったけれど、流れにしたがって気づいたらフリーランスになってた、というのが正解。Serverspec の存在はまったくの偶然。とはいえ、Serverspec の存在はフリーランスという立場にとって非常に強力な武器になっていることは確か。
+      </p>
+      <h2>
+        仕事のスタイル
+      </h2>
+      <p>
+        メインはクックパッドで週4日、10:00-18:00 の間オフィスで仕事をしている。前職の頃は定時が 10:00-19:00 だったので1時間短い。火曜日は基本的に家で、クックパッド以外に請け負っている仕事をしている。火曜日に家にいる理由は、娘の習い事の送り迎えが夕方にあるため。あと、夜や土日にも仕事絡みでコード書いたりもしてるけど、それはフリーランスになる以前からやってる。元々、仕事と趣味の境目が曖昧だし。仕事内容も、前職でやっていたようなマネージメント的な仕事は一切なく、技術的な仕事のみ。
+      </p>
+      <p>
+        「クックパッド以外に請け負っている仕事」というのは、具体的には今はリクルートテクノロジーズの案件を受けていて、
+        <a href="https://github.com/walter-cd/walter">
+          Walter
+        </a>
+        や
+        <a href="https://prevs.io/">
+          prevs.io
+        </a>
+        の開発に関わっている（prevs.io の方は一旦3月で契約終了となったけど）。
+      </p>
+      <p>
+        基本的にオフィス勤務なので、家族や自分が病気だったり、別の仕事の打合せとか海外のカンファレンスに行く時なんかは休まざるを得ないんだけど、休んだ分業務委託料から引かれるということもなく、非常にありがたいけれど、申し訳ないな、と思いつつ、そのご厚意に甘えさせてもらっている。特に、子供が5人と多いので、どうしても家庭の事情での休みが多くなるんだけど、その辺の事情も理解してもらっていて、とても助かっているし、今後はリモートでも仕事ができるよう取りはからってくれていて、非常にありがたいです。なので感覚としては、クックパッドの業務を請け負っているというよりも、自分のフリーランスとしての働き方を、クックパッド（というかセコンさんや mirakui さん）にスポンサードしてもらっている、というのが近いかな、と思っていたりする。
+      </p>
+      <p>
+        リクルートテクノロジーズの案件は完全にリモートで、最初の打合せの時以外は、すべて Slack や GitHub でやりとりしている。
+      </p>
+      <p>
+        こんな感じのスタイルで仕事してますが、今後はフリーランスらしく、更にリモートワークの割合を増やしたり、年に一度は沖縄でリゾートワークしたり、子供達の夏休みにあわせて8月はまるっと休んだり、
+        <a href="http://www.konami.jp/mgs5/tpp/jp/">
+          MGSV:TPP
+        </a>
+        が発売される9月も休もうか、などと計画してる。
+      </p>
+      <p>
+        仕事の契約面についても、クックパッドもそれ以外のところも、厳密な納品物が定められていない契約になっていて、毎月請求書を出して、決裁権者が承認してくれさえすればそれで支払われるので、納期に追われるということもなく、自分のペースで仕事をさせてもらっている。
+      </p>
+      <h2>
+        収入について
+      </h2>
+      <p>
+        フリーランスになった経緯とか仕事のスタイルとかどうでもいいから、ぶっちゃけ収入どうなんだ、ってのがみんな知りたいところだと思う。
+      </p>
+      <p>
+        昨年は1,2月は前職に在籍していたし、3月は無職だったし、4月からの半年は、正社員になること前提で、前職の収入をベースとした金額で業務委託料をもらっていたりで、トータルで前職の年収の1.4倍ぐらいの収入だったけど、今年は1月〜6月の半年の収入で、前職の年収の1.2倍ぐらいになる見通し。通年だと前職の年収の2.5倍ぐらいになりそう。その分税金もがっつり持っていかれるけど。
+      </p>
+      <p>
+        具体的な金額はパブリックなところに書くと色々めんどくさそうなので書かないけど、知りたい人は会った時にでも直接聞いてもらったら答えます。
+      </p>
+      <h2>
+        まとめ
+      </h2>
+      <p>
+        フリーランス、技術的な仕事だけしていても、マネージメントしてた頃より収入いいし、実稼働時間減ったりリモートで働ける時間増えたりで家族といる時間増えたし、そもそもクリティカルな部分は任されないので、セキュリティインシデントが発生して徹夜対応、みたいなこともなくて気楽だけど、いつまでこの状態が続くのか、みたいな不安もないことはないし、自分の立ち位置はフリーランスの中でも割と特殊な方だと思うので、他人にはお勧めしない。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2014/12/31/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2015/04/01/1">フリーランスになって1年が経った</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://mizzy.org/blog/2014/04/01/1/">4月からクックパッドで仕事してます</a> というエントリを書いてからちょうど1年経ったので振り返ってみる。</p>
-
-<h2>フリーランスになった経緯</h2>
-
-<p>そもそも最初からフリーランスになるぞ、と思ってなったわけではなく、なんとなく流れにしたがってたらフリーランスになってた。</p>
-
-<p>もう少し詳しい経緯。色々あって2014年3月に無職（有給消化中のファッション無職じゃなくガチ無職）になって、普通に正社員として次の会社を探していて、知り合いに声をかけて話を聞いて回っていた。その中でクックパッドに決めたのは、<a href="https://twitter.com/hotchpotch">セコンさん</a> や <a href="https://twitter.com/mirakui">mirakui さん</a> の、これからクックパッドの技術やインフラをこうして行きたい、という思いや考えに共感し、そこに自分が価値を提供できるイメージが具体的に沸いたから。</p>
-
-<p>ただ、事情があって最初から正社員ではなく、お互い様子見ということで、正社員になる前提で半年間業務委託契約という形で仕事してみましょう、ということになり、半年どころか一ヶ月経たないうちに、正社員よりも業務委託の方が自分にあってるな、と思ったので、そのままフリーランスで行くことにした。</p>
-
-<p>（この辺りは <a href="http://rebuild.fm/75/">Rebuild: 75: Book Driven Development</a> でも少し話した気がする）</p>
-
-<p>Serverspec という代表的プロダクトを持ったから独立したんじゃないか、みたいに言われたり思われたりするけれど、実際は上に書いたとおり、フリーランスになろうなんてことはまったく考えていなかったけれど、流れにしたがって気づいたらフリーランスになってた、というのが正解。Serverspec の存在はまったくの偶然。とはいえ、Serverspec の存在はフリーランスという立場にとって非常に強力な武器になっていることは確か。</p>
-
-<h2>仕事のスタイル</h2>
-
-<p>メインはクックパッドで週4日、10:00-18:00 の間オフィスで仕事をしている。前職の頃は定時が 10:00-19:00 だったので1時間短い。火曜日は基本的に家で、クックパッド以外に請け負っている仕事をしている。火曜日に家にいる理由は、娘の習い事の送り迎えが夕方にあるため。あと、夜や土日にも仕事絡みでコード書いたりもしてるけど、それはフリーランスになる以前からやってる。元々、仕事と趣味の境目が曖昧だし。仕事内容も、前職でやっていたようなマネージメント的な仕事は一切なく、技術的な仕事のみ。</p>
-
-<p>「クックパッド以外に請け負っている仕事」というのは、具体的には今はリクルートテクノロジーズの案件を受けていて、<a href="https://github.com/walter-cd/walter">Walter</a> や <a href="https://prevs.io/">prevs.io</a> の開発に関わっている（prevs.io の方は一旦3月で契約終了となったけど）。</p>
-
-<p>基本的にオフィス勤務なので、家族や自分が病気だったり、別の仕事の打合せとか海外のカンファレンスに行く時なんかは休まざるを得ないんだけど、休んだ分業務委託料から引かれるということもなく、非常にありがたいけれど、申し訳ないな、と思いつつ、そのご厚意に甘えさせてもらっている。特に、子供が5人と多いので、どうしても家庭の事情での休みが多くなるんだけど、その辺の事情も理解してもらっていて、とても助かっているし、今後はリモートでも仕事ができるよう取りはからってくれていて、非常にありがたいです。なので感覚としては、クックパッドの業務を請け負っているというよりも、自分のフリーランスとしての働き方を、クックパッド（というかセコンさんや mirakui さん）にスポンサードしてもらっている、というのが近いかな、と思っていたりする。</p>
-
-<p>リクルートテクノロジーズの案件は完全にリモートで、最初の打合せの時以外は、すべて Slack や GitHub でやりとりしている。</p>
-
-<p>こんな感じのスタイルで仕事してますが、今後はフリーランスらしく、更にリモートワークの割合を増やしたり、年に一度は沖縄でリゾートワークしたり、子供達の夏休みにあわせて8月はまるっと休んだり、<a href="http://www.konami.jp/mgs5/tpp/jp/">MGSV:TPP</a> が発売される9月も休もうか、などと計画してる。</p>
-
-<p>仕事の契約面についても、クックパッドもそれ以外のところも、厳密な納品物が定められていない契約になっていて、毎月請求書を出して、決裁権者が承認してくれさえすればそれで支払われるので、納期に追われるということもなく、自分のペースで仕事をさせてもらっている。</p>
-
-<h2>収入について</h2>
-
-<p>フリーランスになった経緯とか仕事のスタイルとかどうでもいいから、ぶっちゃけ収入どうなんだ、ってのがみんな知りたいところだと思う。</p>
-
-<p>昨年は1,2月は前職に在籍していたし、3月は無職だったし、4月からの半年は、正社員になること前提で、前職の収入をベースとした金額で業務委託料をもらっていたりで、トータルで前職の年収の1.4倍ぐらいの収入だったけど、今年は1月〜6月の半年の収入で、前職の年収の1.2倍ぐらいになる見通し。通年だと前職の年収の2.5倍ぐらいになりそう。その分税金もがっつり持っていかれるけど。</p>
-
-<p>具体的な金額はパブリックなところに書くと色々めんどくさそうなので書かないけど、知りたい人は会った時にでも直接聞いてもらったら答えます。</p>
-
-<h2>まとめ</h2>
-
-<p>フリーランス、技術的な仕事だけしていても、マネージメントしてた頃より収入いいし、実稼働時間減ったりリモートで働ける時間増えたりで家族といる時間増えたし、そもそもクリティカルな部分は任されないので、セキュリティインシデントが発生して徹夜対応、みたいなこともなくて気楽だけど、いつまでこの状態が続くのか、みたいな不安もないことはないし、自分の立ち位置はフリーランスの中でも割と特殊な方だと思うので、他人にはお勧めしない。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2015/06/16/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2014/12/31/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2015/06/16/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

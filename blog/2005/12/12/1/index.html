@@ -1,104 +1,92 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>NBA 2.0 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      NBA 2.0 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="NBA 2.0"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/12/12/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/12/12/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="NBA 2.0"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/12/12/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/12/12/1">
+          NBA 2.0
+        </a>
+      </h1>
+      <div class="byline">
+        12 December 2005
+      </div>
+      <p class="entryBody">
+        CNET Japan で
+        <a href="http://japan.cnet.com/news/media/story/0,2000047715,20092624,00.htm" target="_blank">
+          NBAの「Web 2.0」な英断--全映像をアーカイブ化、ファンに「解放」へ
+        </a>
+        という記事が！
+      </p>
+      <p class="entryBody">
+        要は現存するすべての試合のアナログデータをデジタル化して開放する、ということで、Web 2.0 とは関係ないじゃん、って感じですが、より使いやすいシステムとするためには、Web 2.0 的な要素が不可欠なんでしょうね。
+      </p>
+      <p class="entryBody">
+        例えば、「何年何月何日のどこ対どこの試合が見たい」、ということであれば、割と簡単に見たい試合が見つけられるでしょうが、「いつの試合か忘れたけど、残り時間わずかで Warriors の Tim Hardaway が Rockets の Hakeem Olajuwon の頭越しに決めた逆転のフェードアウェイショットがもう1度見たい！」ということになれば、それ相応のメタデータが蓄積されている必要があるわけで、こういった詳細なメタデータを、60年間に渡る試合全てに対して、NBA のスタッフだけでつけるのは大変でしょう。そこで CGM/Folksonomy の出番となるわけですね。
+      </p>
+      <p class="entryBody">
+        ちなみに、上の試合は、Rockets の Vernon Maxwell によるまぐれだろそりゃ、と言いたくなるアクロバティックなショットで再逆転されて試合終了、がっくりきたのをよく覚えてます。
+      </p>
+      <p class="entryBody">
+        更に映像とメタデータを API で開放して、Tim Hardaway のハイライトシーン、しかも killer cross over でディフェンスを切り裂くシーンのみをプログラムで自動抽出、とかできると最高！
+      </p>
+      <p class="entryBody">
+        それよりも何よりも、今溜まっている膨大な数のVHSテープを廃棄できるのが一番うれしいかもしれない。ずっと以前から、劣化する前にデジタル化しようと考えてはいたものの、ストレージの容量、デジタル化の手間、メタデータの付与、バックアップなど、悩ましい問題がいろいろあってためらっていたので。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/12/03/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/12/12/1">NBA 2.0</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-CNET Japan で <a href="http://japan.cnet.com/news/media/story/0,2000047715,20092624,00.htm" target="_blank">NBAの「Web 2.0」な英断--全映像をアーカイブ化、ファンに「解放」へ</a> という記事が！
-</p>
-
-<p class="entryBody">
-要は現存するすべての試合のアナログデータをデジタル化して開放する、ということで、Web 2.0 とは関係ないじゃん、って感じですが、より使いやすいシステムとするためには、Web 2.0 的な要素が不可欠なんでしょうね。
-</p>
-
-<p class="entryBody">
-例えば、「何年何月何日のどこ対どこの試合が見たい」、ということであれば、割と簡単に見たい試合が見つけられるでしょうが、「いつの試合か忘れたけど、残り時間わずかで Warriors の Tim Hardaway が Rockets の Hakeem Olajuwon の頭越しに決めた逆転のフェードアウェイショットがもう1度見たい！」ということになれば、それ相応のメタデータが蓄積されている必要があるわけで、こういった詳細なメタデータを、60年間に渡る試合全てに対して、NBA のスタッフだけでつけるのは大変でしょう。そこで CGM/Folksonomy の出番となるわけですね。
-</p>
-
-<p class="entryBody">
-ちなみに、上の試合は、Rockets の Vernon Maxwell によるまぐれだろそりゃ、と言いたくなるアクロバティックなショットで再逆転されて試合終了、がっくりきたのをよく覚えてます。
-</p>
-
-<p class="entryBody">
-更に映像とメタデータを API で開放して、Tim Hardaway のハイライトシーン、しかも killer cross over でディフェンスを切り裂くシーンのみをプログラムで自動抽出、とかできると最高！
-</p>
-
-<p class="entryBody">
-それよりも何よりも、今溜まっている膨大な数のVHSテープを廃棄できるのが一番うれしいかもしれない。ずっと以前から、劣化する前にデジタル化しようと考えてはいたものの、ストレージの容量、デジタル化の手間、メタデータの付与、バックアップなど、悩ましい問題がいろいろあってためらっていたので。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/12/14/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/12/03/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/12/14/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

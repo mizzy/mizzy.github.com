@@ -1,246 +1,242 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>SetupRemedie - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2009/01/13/1">SetupRemedie</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>overlast さんの<a href="http://overlasting.dyndns.org/2009-01-07-1.html">これから15分で Remedie を始めるための資料</a> に触発されて書いてみました。こっちは CPAN モジュールをインストールする時間も入れて15分。ただし限定された環境のみ。</p>
-
-<p>Remedie 用に CPAN モジュールの RPM パッケージ作ったので、これプラス Puppet を利用します。ただし、RPM パッケージを CentOS 5 x86_64 でビルドしてるので、この環境限定。<a href="http://svn.mizzy.org/public/yum/SRPMS/">SRPM</a> はあるので、他の環境の方はこいつをビルドして使ってください。</p>
-
-<p>まずは Puppet をインストールするための yum リポジトリ設定。以下の内容で /etc/yum.repos.d/dlutter.repo を作成。</p>
-
-<pre><code>[dlutter]
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      SetupRemedie - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="SetupRemedie"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2009/01/13/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2009/01/13/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="SetupRemedie"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2009/01/13/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2009/01/13/1">
+          SetupRemedie
+        </a>
+      </h1>
+      <div class="byline">
+        13 January 2009
+      </div>
+      <p>
+        overlast さんの
+        <a href="http://overlasting.dyndns.org/2009-01-07-1.html">
+          これから15分で Remedie を始めるための資料
+        </a>
+        に触発されて書いてみました。こっちは CPAN モジュールをインストールする時間も入れて15分。ただし限定された環境のみ。
+      </p>
+      <p>
+        Remedie 用に CPAN モジュールの RPM パッケージ作ったので、これプラス Puppet を利用します。ただし、RPM パッケージを CentOS 5 x86_64 でビルドしてるので、この環境限定。
+        <a href="http://svn.mizzy.org/public/yum/SRPMS/">
+          SRPM
+        </a>
+        はあるので、他の環境の方はこいつをビルドして使ってください。
+      </p>
+      <p>
+        まずは Puppet をインストールするための yum リポジトリ設定。以下の内容で /etc/yum.repos.d/dlutter.repo を作成。
+      </p>
+      <pre><code>[dlutter]
 name=lutter
 baseurl=http://people.redhat.com/dlutter/yum/rhel/$releasever/$basearch/
 enabled=1
-gpgcheck=0
-</code></pre>
-
-<p>Puppet のインストール。</p>
-
-<pre><code># yum -y install puppet-server
-</code></pre>
-
-<p>Puppet で署名するのはだるいので、以下の内容で /etc/puppet/autosign.conf を作成。</p>
-
-<p>*</p>
-
-<p>/etc/puppet/manifests ディレクトリを作成。</p>
-
-<pre><code># mkdir /etc/puppet/manifests
-</code></pre>
-
-<p>以下の内容の /etc/puppet/manifests/site.pp を作成。</p>
-
-<pre><code>node default {
+gpgcheck=0</code></pre>
+      <p>
+        Puppet のインストール。
+      </p>
+      <pre><code># yum -y install puppet-server</code></pre>
+      <p>
+        Puppet で署名するのはだるいので、以下の内容で /etc/puppet/autosign.conf を作成。
+      </p>
+      <ul>
+        <li></li>
+      </ul>
+      <p>
+        /etc/puppet/manifests ディレクトリを作成。
+      </p>
+      <pre><code># mkdir /etc/puppet/manifests</code></pre>
+      <p>
+        以下の内容の /etc/puppet/manifests/site.pp を作成。
+      </p>
+      <pre><code>node default {
 
   yumrepo {
-    &#39;mizzy&#39;:
-      baseurl  =&gt; &#39;http://svn.mizzy.org/public/yum/RPMS/centos/$releasever/$basearch/&#39;,
+    'mizzy':
+      baseurl  =&gt; 'http://svn.mizzy.org/public/yum/RPMS/centos/$releasever/$basearch/',
       enabled  =&gt; 1,
       gpgcheck =&gt; 0;
-    &#39;dag&#39;:
-      baseurl  =&gt; &#39;http://ftp.riken.jp/Linux/dag/redhat/el$releasever/en/$basearch/dag/&#39;,
+    'dag':
+      baseurl  =&gt; 'http://ftp.riken.jp/Linux/dag/redhat/el$releasever/en/$basearch/dag/',
       enabled  =&gt; 1,
       gpgcheck =&gt; 0;
-    &#39;updates&#39;:
-      exclude =&gt; &#39;perl&#39;;
-    &#39;extras&#39;:
-      exclude =&gt; &#39;perl&#39;;
+    'updates':
+      exclude =&gt; 'perl';
+    'extras':
+      exclude =&gt; 'perl';
   }
 
   Package {
-    require =&gt; [ Yumrepo[&#39;mizzy&#39;], Yumrepo[&#39;dag&#39;], Yumrepo[&#39;updates&#39;], Yumrepo[extras] ],
+    require =&gt; [ Yumrepo['mizzy'], Yumrepo['dag'], Yumrepo['updates'], Yumrepo[extras] ],
   }  
 
   package {
-    &#39;git&#39;:
+    'git':
       ensure =&gt; present;
-    &#39;perl&#39;:
-      ensure =&gt; &#39;5.8.8-15.1&#39;;
-    &#39;perl-Moose&#39;:
+    'perl':
+      ensure =&gt; '5.8.8-15.1';
+    'perl-Moose':
       ensure =&gt; present;
-    &#39;perl-Class-C3&#39;:
+    'perl-Class-C3':
       ensure =&gt; present;
-    &#39;perl-Sub-Name&#39;:
+    'perl-Sub-Name':
       ensure =&gt; present;
-    &#39;perl-Devel-GlobalDestruction&#39;:
+    'perl-Devel-GlobalDestruction':
       ensure =&gt; present;
-    &#39;perl-Rose-DB&#39;:
+    'perl-Rose-DB':
       ensure =&gt; present;
-    &#39;perl-Rose-DB-Object&#39;:
+    'perl-Rose-DB-Object':
       ensure =&gt; present;
-    &#39;perl-DateTime-TimeZone&#39;:
-      ensure =&gt; &#39;0.8301-8&#39;;
-    &#39;perl-MooseX-Types-Path-Class&#39;:
+    'perl-DateTime-TimeZone':
+      ensure =&gt; '0.8301-8';
+    'perl-MooseX-Types-Path-Class':
       ensure =&gt; present;
-    &#39;perl-DBD-SQLite&#39;:
+    'perl-DBD-SQLite':
       ensure =&gt; present;
-    &#39;perl-FindBin-libs&#39;:
+    'perl-FindBin-libs':
       ensure =&gt; present;
-    &#39;perl-HTTP-Engine&#39;:
+    'perl-HTTP-Engine':
       ensure =&gt; present;
-    &#39;perl-MIME-Types&#39;:
+    'perl-MIME-Types':
       ensure =&gt; present;
-    &#39;perl-Path-Class-URI&#39;:
+    'perl-Path-Class-URI':
       ensure =&gt; present;
-    &#39;perl-String-CamelCase&#39;:
+    'perl-String-CamelCase':
       ensure =&gt; present;
-    &#39;perl-Log-Dispatch&#39;:
+    'perl-Log-Dispatch':
       ensure =&gt; present;
-    &#39;perl-JSON-XS&#39;:
+    'perl-JSON-XS':
       ensure =&gt; present;
-    &#39;perl-MooseX-Getopt&#39;:
+    'perl-MooseX-Getopt':
       ensure =&gt; present;
-    &#39;perl-MooseX-ConfigFromFile&#39;:
+    'perl-MooseX-ConfigFromFile':
       ensure =&gt; present;
-    &#39;perl-File-Find-Rule&#39;:
+    'perl-File-Find-Rule':
       ensure =&gt; present;
-    &#39;perl-UNIVERSAL-require&#39;:
+    'perl-UNIVERSAL-require':
       ensure =&gt; present;
-    &#39;perl-Class-Accessor&#39;:
+    'perl-Class-Accessor':
       ensure =&gt; present;
-    &#39;perl-DateTime-Format-Strptime&#39;:
+    'perl-DateTime-Format-Strptime':
       ensure =&gt; present;
-    &#39;perl-Feed-Find&#39;:
+    'perl-Feed-Find':
       ensure =&gt; present;
-    &#39;perl-Class-ErrorHandler&#39;:
+    'perl-Class-ErrorHandler':
       ensure =&gt; present;
-    &#39;perl-XML-Atom&#39;:
+    'perl-XML-Atom':
       ensure =&gt; present;
-    &#39;perl-XML-XPath&#39;:
+    'perl-XML-XPath':
       ensure =&gt; present;
-    &#39;perl-XML-Feed&#39;:
+    'perl-XML-Feed':
       ensure =&gt; present;
-    &#39;perl-Template-Toolkit&#39;:
+    'perl-Template-Toolkit':
       ensure =&gt; present;
-    &#39;perl-DateTime-Format-ISO8601&#39;:
+    'perl-DateTime-Format-ISO8601':
       ensure =&gt; present;
-    &#39;perl-MooseX-ClassAttribute&#39;:
+    'perl-MooseX-ClassAttribute':
       ensure =&gt; present;
-    &#39;perl-XML-OPML-LibXML&#39;:
+    'perl-XML-OPML-LibXML':
       ensure =&gt; present;
-    &#39;perl-File-Find-Rule-Filesys-Virtual&#39;:
+    'perl-File-Find-Rule-Filesys-Virtual':
       ensure =&gt; present;
-    &#39;perl-HTTP-Response-Encoding&#39;:
+    'perl-HTTP-Response-Encoding':
       ensure =&gt; present;
-    &#39;perl-HTML-ResolveLink&#39;:
+    'perl-HTML-ResolveLink':
       ensure =&gt; present;
-    &#39;perl-HTML-Selector-XPath&#39;:
+    'perl-HTML-Selector-XPath':
       ensure =&gt; present;
-    &#39;perl-HTML-TreeBuilder-XPath&#39;:
+    'perl-HTML-TreeBuilder-XPath':
       ensure =&gt; present;
-    &#39;perl-YAML&#39;:
+    'perl-YAML':
       ensure =&gt; present;
-    &#39;perl-YAML-Syck&#39;:
+    'perl-YAML-Syck':
       ensure =&gt; present;
-    &#39;perl-HTML-Scrubber&#39;:
+    'perl-HTML-Scrubber':
       ensure =&gt; present;
-    &#39;perl-Image-Info&#39;:
+    'perl-Image-Info':
       ensure =&gt; present;
-    &#39;perl-Text-Tags&#39;:
+    'perl-Text-Tags':
       ensure =&gt; present;
-    &#39;perl-XML-RSS-LibXML&#39;:
+    'perl-XML-RSS-LibXML':
       ensure =&gt; present;
-    &#39;perl-Web-Scraper&#39;:
+    'perl-Web-Scraper':
       ensure =&gt; present;
   }
 
-}
-</code></pre>
-
-<p>puppetmasterd を起動。</p>
-
-<pre><code># puppetmasterd --verbose --no-daemonize
-</code></pre>
-
-<p>puppetd を起動して、マニフェストを適用。注意点としては、localhost とかではなく、きちんと FQDN で指定すること。（puppetmasterd 初回起動時に自動作成される証明書中の CN と --server で指定するサーバ名が一致してないと怒られる。）</p>
-
-<pre><code># puppetd --server host.example.org --verbose --no-daemonize
-</code></pre>
-
-<p>このままログを見ながらしばらく待つ。完了したら Remedie を github.com から取得して起動。</p>
-
-<pre><code># git clone git://github.com/miyagawa/remedie.git
+}</code></pre>
+      <p>
+        puppetmasterd を起動。
+      </p>
+      <pre><code># puppetmasterd --verbose --no-daemonize</code></pre>
+      <p>
+        puppetd を起動して、マニフェストを適用。注意点としては、localhost とかではなく、きちんと FQDN で指定すること。（puppetmasterd 初回起動時に自動作成される証明書中の CN と --server で指定するサーバ名が一致してないと怒られる。）
+      </p>
+      <pre><code># puppetd --server host.example.org --verbose --no-daemonize</code></pre>
+      <p>
+        このままログを見ながらしばらく待つ。完了したら Remedie を github.com から取得して起動。
+      </p>
+      <pre><code># git clone git://github.com/miyagawa/remedie.git
 # cd remedie
-# perl -Ilib -MRemedie::DB::Schema -e &#39;Remedie::DB::Schema-&gt;install&#39;
-# ./bin/remedie-server.pl
-</code></pre>
-
-<p>自分でやったら10分ぐらいで終わった。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2009/02/06/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2008/12/28/6" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+# perl -Ilib -MRemedie::DB::Schema -e 'Remedie::DB::Schema-&gt;install'
+# ./bin/remedie-server.pl</code></pre>
+      <p>
+        自分でやったら10分ぐらいで終わった。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2008/12/28/6" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2009/02/06/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

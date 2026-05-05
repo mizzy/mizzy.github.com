@@ -1,169 +1,172 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>configspec/serverspec でシェルスクリプトを生成できるようにした - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      configspec/serverspec でシェルスクリプトを生成できるようにした - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="configspec/serverspec でシェルスクリプトを生成できるようにした"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/12/01/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/12/01/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="configspec/serverspec でシェルスクリプトを生成できるようにした"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/12/01/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/12/01/2">
+          configspec/serverspec でシェルスクリプトを生成できるようにした
+        </a>
+      </h1>
+      <div class="byline">
+        1 December 2013
+      </div>
+      <p>
+        specinfra で
+        <a href="https://github.com/mizzy/specinfra/pull/1">
+          ShellScript backend に対応
+        </a>
+        したので、configspec や serverspec で実行されるコマンドをシェルスクリプト形式でダンプできるようになった。
+      </p>
+      <p>
+        例えば configspec の場合
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;configspec&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kp">include</span> <span class="no">SpecInfra</span><span class="o">::</span><span class="no">Helper</span><span class="o">::</span><span class="no">ShellScript</span>
+</span></span><span class="line"><span class="cl"><span class="kp">include</span> <span class="no">SpecInfra</span><span class="o">::</span><span class="no">Helper</span><span class="o">::</span><span class="no">RedHat</span>
+</span></span></code></pre>
+      <p>
+        といった spec_helper.rb を用意して
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="n">package</span><span class="p">(</span><span class="s1">&#39;httpd&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_installed</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre>
+      <p>
+        といった内容の spec を書いて実行すると
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">yum -y install httpd
+</span></span></code></pre>
+      <p>
+        こんな内容の spec.sh というファイルを生成してくれる。
+      </p>
+      <p>
+        また、serverspec の場合
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;serverspec&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kp">include</span> <span class="no">SpecInfra</span><span class="o">::</span><span class="no">Helper</span><span class="o">::</span><span class="no">ShellScript</span>
+</span></span><span class="line"><span class="cl"><span class="kp">include</span> <span class="no">SpecInfra</span><span class="o">::</span><span class="no">Helper</span><span class="o">::</span><span class="no">RedHat</span>
+</span></span></code></pre>
+      <p>
+        といった spec_helper.rb を用意して
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="n">package</span><span class="p">(</span><span class="s1">&#39;httpd&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_installed</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="n">service</span><span class="p">(</span><span class="s1">&#39;httpd&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_enabled</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_running</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="n">port</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_listening</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="n">file</span><span class="p">(</span><span class="s1">&#39;/etc/httpd/conf/httpd.conf&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_file</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">contain</span> <span class="s2">&#34;ServerName users501&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre>
+      <p>
+        という serverspec-init で生成されるサンプルの spec を実行すると
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">rpm -q httpd
+</span></span><span class="line"><span class="cl">chkconfig --list httpd <span class="p">|</span> grep 3:on
+</span></span><span class="line"><span class="cl">service httpd status
+</span></span><span class="line"><span class="cl">netstat -tunl <span class="p">|</span> grep -- :80<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="nb">test</span> -f /etc/httpd/conf/httpd.conf
+</span></span><span class="line"><span class="cl">grep -q -- ServerName<span class="se">\ </span>users501 /etc/httpd/conf/httpd.conf <span class="o">||</span> grep -qF -- ServerName<span class="se">\ </span>users501 /etc/httpd/conf/httpd.conf
+</span></span></code></pre>
+      <p>
+        こんな内容の spec.sh を吐き出してくれる。
+      </p>
+      <p>
+        さらに
+        <code>include SpecInfra::Helper::RedHat</code>
+        を
+        <code>include SpecInfra::Helper::Solaris11</code>
+        に変えると
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">pkg list -H httpd 2&gt; /dev/null
+</span></span><span class="line"><span class="cl">svcs -l httpd 2&gt; /dev/null <span class="p">|</span> egrep <span class="s1">&#39;^enabled *true$&#39;</span>
+</span></span><span class="line"><span class="cl">svcs -l httpd status 2&gt; /dev/null <span class="p">|</span> egrep <span class="s1">&#39;^state *online$&#39;</span>
+</span></span><span class="line"><span class="cl">netstat -an 2&gt; /dev/null <span class="p">|</span> grep -- LISTEN <span class="p">|</span> grep -- <span class="se">\\</span>.80<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="nb">test</span> -f /etc/httpd/conf/httpd.conf
+</span></span><span class="line"><span class="cl">grep -q -- ServerName<span class="se">\ </span>users501 /etc/httpd/conf/httpd.conf <span class="o">||</span> grep -qF -- ServerName<span class="se">\ </span>users501 /etc/httpd/conf/httpd.conf
+</span></span></code></pre>
+      <p>
+        といった感じで、Solaris 11 用のシェルスクリプトを吐き出してくれる。（実際にはパッケージ名が違ってそのままでは使えないだろうけど。）
+      </p>
+      <p>
+        serverspec の場合は、シェルコマンドだけじゃなく Ruby で処理してる部分もあるので、ダンプされるシェルスクリプトで serverspec がやってることをそのまま再現できるわけではないし、そもそもシェルスクリプトでダンプすることに意味があるのか、という感じだけど、specinfra 側で対応するだけで、configspec と serverspec 両方で使えるようになる、という実例として挙げてみた。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/12/01/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/12/01/2">configspec/serverspec でシェルスクリプトを生成できるようにした</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>specinfra で <a href="https://github.com/mizzy/specinfra/pull/1">ShellScript backend に対応</a> したので、configspec や serverspec で実行されるコマンドをシェルスクリプト形式でダンプできるようになった。</p>
-
-<p>例えば configspec の場合</p>
-
-<pre><code class="ruby">require &#39;configspec&#39;
-
-include SpecInfra::Helper::ShellScript
-include SpecInfra::Helper::RedHat
-</code></pre>
-
-<p>といった spec_helper.rb を用意して</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe package(&#39;httpd&#39;) do
-  it { should be_installed }
-end
-</code></pre>
-
-<p>といった内容の spec を書いて実行すると</p>
-
-<pre><code class="sh">#!/bin/sh
-
-yum -y install httpd
-</code></pre>
-
-<p>こんな内容の spec.sh というファイルを生成してくれる。</p>
-
-<p>また、serverspec の場合</p>
-
-<pre><code class="ruby">require &#39;serverspec&#39;
-
-include SpecInfra::Helper::ShellScript
-include SpecInfra::Helper::RedHat
-</code></pre>
-
-<p>といった spec_helper.rb を用意して</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe package(&#39;httpd&#39;) do
-  it { should be_installed }
-end
-
-describe service(&#39;httpd&#39;) do
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe port(80) do
-  it { should be_listening }
-end
-
-describe file(&#39;/etc/httpd/conf/httpd.conf&#39;) do
-  it { should be_file }
-  it { should contain &quot;ServerName users501&quot; }
-end
-</code></pre>
-
-<p>という serverspec-init で生成されるサンプルの spec を実行すると</p>
-
-<pre><code class="sh">#!/bin/sh
-
-rpm -q httpd
-chkconfig --list httpd | grep 3:on
-service httpd status
-netstat -tunl | grep -- :80\
-test -f /etc/httpd/conf/httpd.conf
-grep -q -- ServerName\ users501 /etc/httpd/conf/httpd.conf || grep -qF -- ServerName\ users501 /etc/httpd/conf/httpd.conf
-</code></pre>
-
-<p>こんな内容の spec.sh を吐き出してくれる。</p>
-
-<p>さらに <code>include SpecInfra::Helper::RedHat</code> を <code>include SpecInfra::Helper::Solaris11</code> に変えると</p>
-
-<pre><code class="sh">#!/bin/sh
-
-pkg list -H httpd 2&gt; /dev/null
-svcs -l httpd 2&gt; /dev/null | egrep &#39;^enabled *true$&#39;
-svcs -l httpd status 2&gt; /dev/null | egrep &#39;^state *online$&#39;
-netstat -an 2&gt; /dev/null | grep -- LISTEN | grep -- \\.80\
-test -f /etc/httpd/conf/httpd.conf
-grep -q -- ServerName\ users501 /etc/httpd/conf/httpd.conf || grep -qF -- ServerName\ users501 /etc/httpd/conf/httpd.conf
-</code></pre>
-
-<p>といった感じで、Solaris 11 用のシェルスクリプトを吐き出してくれる。（実際にはパッケージ名が違ってそのままでは使えないだろうけど。）</p>
-
-<p>serverspec の場合は、シェルコマンドだけじゃなく Ruby で処理してる部分もあるので、ダンプされるシェルスクリプトで serverspec がやってることをそのまま再現できるわけではないし、そもそもシェルスクリプトでダンプすることに意味があるのか、という感じだけど、specinfra 側で対応するだけで、configspec と serverspec 両方で使えるようになる、という実例として挙げてみた。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/12/04/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/12/01/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/12/04/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

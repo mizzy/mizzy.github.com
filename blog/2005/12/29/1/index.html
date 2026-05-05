@@ -1,137 +1,132 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ActiveRecord で Validation （Rails勉強中 #5） - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/12/29/1">ActiveRecord で Validation （Rails勉強中 #5）</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-Rails の実装で、ああこれ面白いなー、よさげだなー、と思ったものをメモ。
-</p>
-
-<p class="entryBody">
-<a href="/program/learningRails.html" target="_blank">Rails 勉強中 #0</a> でも触れたけど、ActiveRecord はモデルクラスでデータの Validation ができます。これはコントローラで Validation する必要がなくなるので、コードが簡略化できて見通しがよくなっていいです。その分モデルのコードが増えますが、元々モデルにはそんなにコードを書かないので、多少増えたところで見通しが悪くなったり、煩雑になったりということはないですし。
-</p>
-
-<p class="entryBody">
-また、Validation の処理のしかたもなかなかスマート。例えば、フォームで入力必須項目を設定したい場合には、モデルに
-</p>
-
-<pre class="code">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ActiveRecord で Validation （Rails勉強中 #5） - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ActiveRecord で Validation （Rails勉強中 #5）"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/12/29/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/12/29/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ActiveRecord で Validation （Rails勉強中 #5）"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/12/29/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/12/29/1">
+          ActiveRecord で Validation （Rails勉強中 #5）
+        </a>
+      </h1>
+      <div class="byline">
+        29 December 2005
+      </div>
+      <p class="entryBody">
+        Rails の実装で、ああこれ面白いなー、よさげだなー、と思ったものをメモ。
+      </p>
+      <p class="entryBody">
+        <a href="/program/learningRails.html" target="_blank">
+          Rails 勉強中 #0
+        </a>
+        でも触れたけど、ActiveRecord はモデルクラスでデータの Validation ができます。これはコントローラで Validation する必要がなくなるので、コードが簡略化できて見通しがよくなっていいです。その分モデルのコードが増えますが、元々モデルにはそんなにコードを書かないので、多少増えたところで見通しが悪くなったり、煩雑になったりということはないですし。
+      </p>
+      <p class="entryBody">
+        また、Validation の処理のしかたもなかなかスマート。例えば、フォームで入力必須項目を設定したい場合には、モデルに
+      </p>
+      <pre class="code">
 validates_presence_of :email
 </pre>
-
-<p class="entryBody">
-とか書いておいて、View には
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        とか書いておいて、View には
+      </p>
+      <pre class="code">
 &lt;!-- エラーメッセージ表示部分 --&gt;
 &lt;%= error_messages_for(:order) %&gt;
 
 &lt;!-- Email入力フィールド --&gt;
 EMail: &lt;%= text_field("order", "email", "size" => 40 ) %&gt;
 </pre>
-
-<p class="entryBody">
-とか書いておくと、以下の様なエラー画面を勝手に出してくれちゃいます。
-</p>
-
-<p class="entryBody" style="border: solid 1px #333333;">
-<img src="/img/rails_validation.jpg" />
-</p>
-
-<p class="entryBody">
-エラーメッセージも、
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        とか書いておくと、以下の様なエラー画面を勝手に出してくれちゃいます。
+      </p>
+      <p class="entryBody" style="border: solid 1px #333333;">
+        <img src="/img/rails_validation.jpg" />
+      </p>
+      <p class="entryBody">
+        エラーメッセージも、
+      </p>
+      <pre class="code">
 validates_presence_of :email, :message => "can't be blank"
 </pre>
-
-<p class="entryBody">
-といった感じで任意に設定できますし。validates_presence_of 以外にも様々なヘルパーがありますし（詳しくは <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">Rails本</a>で）、もちろん、自分で任意の Validation コードを書くことも可能です。
-</p>
-
-<p class="entryBody">
-また、日本人であれば当然、日本語にするにはどうするんだろう、という疑問を持つと思いますが、
-<a href="http://d.hatena.ne.jp/secondlife/" target="_blank">gorou</a> さん作の <a href="http://jp.rubyist.net/magazine/?0012-RubyOnRails" target="_blank">ActiveHeart</a> や、<a href="http://wota.jp/ac/?date=20051220" target="_blank">ヽ( ・∀・)ノきゅまきゅまーさんとこの jscaffold</a> とかがあるので心配無用です。お二方、素敵すぎです。
-</p>
-
-<p class="entryBody">
-次回はコールバックとオブザーバについて書こうと思います。ほんとは一気に書こうかと思ったので、このエントリのタイトルは最初「ActiveRecord とコールバックとオブザーバ」だったのですが、力尽きました。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/12/29/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/12/26/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        といった感じで任意に設定できますし。validates_presence_of 以外にも様々なヘルパーがありますし（詳しくは
+        <a href="http://www.amazon.co.jp/exec/obidos/ASIN/097669400X/httshemizorg-22/ref=nosim" target="_blank">
+          Rails本
+        </a>
+        で）、もちろん、自分で任意の Validation コードを書くことも可能です。
+      </p>
+      <p class="entryBody">
+        また、日本人であれば当然、日本語にするにはどうするんだろう、という疑問を持つと思いますが、
+        <a href="http://d.hatena.ne.jp/secondlife/" target="_blank">
+          gorou
+        </a>
+        さん作の
+        <a href="http://jp.rubyist.net/magazine/?0012-RubyOnRails" target="_blank">
+          ActiveHeart
+        </a>
+        や、
+        <a href="http://wota.jp/ac/?date=20051220" target="_blank">
+          ヽ( ・∀・)ノきゅまきゅまーさんとこの jscaffold
+        </a>
+        とかがあるので心配無用です。お二方、素敵すぎです。
+      </p>
+      <p class="entryBody">
+        次回はコールバックとオブザーバについて書こうと思います。ほんとは一気に書こうかと思ったので、このエントリのタイトルは最初「ActiveRecord とコールバックとオブザーバ」だったのですが、力尽きました。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/12/26/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/12/29/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

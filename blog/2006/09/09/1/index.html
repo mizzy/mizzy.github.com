@@ -1,143 +1,119 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>SSL クライアント証明書の発行 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    SSL クライアント証明書の発行 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="SSL クライアント証明書の発行"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/09/09/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/09/09/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="SSL クライアント証明書の発行"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/09/09/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/09/09/1">SSL クライアント証明書の発行</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-OpenSSL で クライアント証明書を発行する手順メモ。
-</p>
-
-<h3 id="openssl.cnfの修正">openssl.cnf の修正</h3>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/09/09/1">
+    SSL クライアント証明書の発行
+  </a>
+</h1>
+<div class="byline">
+  9 September 2006
+</div>
 <p>
-パスは環境によって違うでしょうが、うちの場合は /usr/local/ssl/openssl.cnf 。
+  OpenSSL で クライアント証明書を発行する手順メモ。
 </p>
-
+<h3 id="openssl.cnfの修正">
+  openssl.cnf の修正
+</h3>
+<p>
+  パスは環境によって違うでしょうが、うちの場合は /usr/local/ssl/openssl.cnf 。
+</p>
 <pre class="wiki">
 # For normal client use this is typical
 # nsCertType = client, email
 </pre>
-
 <p>
-を以下の様に変えとく。
+  を以下の様に変えとく。
 </p>
-
 <pre class="wiki">
 # For normal client use this is typical
 nsCertType = client, email
 </pre>
-
-<h3 id="CA用ファイルの作成">CA 用ファイルの作成</h3>
-
+<h3 id="CA用ファイルの作成">
+  CA 用ファイルの作成
+</h3>
 <p>
-直接 openssl コマンド叩くよりも、OpenSSL 付属の CA.sh や CA.pl を使うほうが楽。どちらもやれることは一緒っぽいので、ここでは CA.pl の方を使ってみる。
+  直接 openssl コマンド叩くよりも、OpenSSL 付属の CA.sh や CA.pl を使うほうが楽。どちらもやれることは一緒っぽいので、ここでは CA.pl の方を使ってみる。
 </p>
-
 <pre class="wiki">
 $ mkdir cert
 $ cd cert
 $ /usr/local/ssl/misc/CA.pl -newca
 CA certificate filename (or enter to create)
-
-Making CA certificate ...
-Generating a 1024 bit RSA private key
-...++++++
-.............++++++
-unable to write 'random state'
-writing new private key to './demoCA/private/cakey.pem'
-Enter PEM pass phrase:
-Verifying - Enter PEM pass phrase:
------
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-Country Name (2 letter code) [AU]:jp
-State or Province Name (full name) [Some-State]:kanagawa
-Locality Name (eg, city) []:sagamihara
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:mizzy.org
-Organizational Unit Name (eg, section) []:
-Common Name (eg, YOUR name) []:CA of mizzy.org
-Email Address []:
-$ ls
-demoCA/
+<h2>Making CA certificate ...<br />
+Generating a 1024 bit RSA private key<br />
+...++++++<br />
+.............++++++<br />
+unable to write 'random state'<br />
+writing new private key to './demoCA/private/cakey.pem'<br />
+Enter PEM pass phrase:<br />
+Verifying - Enter PEM pass phrase:</h2>
+<h2>You are about to be asked to enter information that will be incorporated<br />
+into your certificate request.<br />
+What you are about to enter is what is called a Distinguished Name or a DN.<br />
+There are quite a few fields but you can leave some blank<br />
+For some fields there will be a default value,<br />
+If you enter '.', the field will be left blank.</h2>
+<p>Country Name (2 letter code) [AU]:jp<br />
+State or Province Name (full name) [Some-State]:kanagawa<br />
+Locality Name (eg, city) []:sagamihara<br />
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:mizzy.org<br />
+Organizational Unit Name (eg, section) []:<br />
+Common Name (eg, YOUR name) []:CA of mizzy.org<br />
+Email Address []:<br />
+$ ls<br />
+demoCA/<br />
 </pre>
-
 <p>
-CA のキーや証明書やらシリアル番号管理用ファイルやら、諸々作ってくれます。
+  CA のキーや証明書やらシリアル番号管理用ファイルやら、諸々作ってくれます。
 </p>
-
-<h3 id="リクエスト生成">リクエスト生成</h3>
-
+<h3 id="リクエスト生成">
+  リクエスト生成
+</h3>
 <p>
-クライアント証明書用リクエスト作成。
-</p>
-
-<pre class="wiki">
+  クライアント証明書用リクエスト作成。
+</p><pre class="wiki">
 $ /usr/local/ssl/misc/CA.pl -newreq
 Generating a 1024 bit RSA private key
 ...............................++++++
@@ -161,53 +137,47 @@ Organization Name (eg, company) [Internet Widgits Pty Ltd]:mizzy.org
 Organizational Unit Name (eg, section) []:
 Common Name (eg, YOUR name) []:Gosuke Miyashita
 Email Address []:
-
-Please enter the following 'extra' attributes
-to be sent with your certificate request
-A challenge password []:
-An optional company name []:
-Request (and private key) is in newreq.pem
+<p>Please enter the following 'extra' attributes<br />
+to be sent with your certificate request<br />
+A challenge password []:<br />
+An optional company name []:<br />
+Request (and private key) is in newreq.pem<br />
 </pre>
-
 <p>
-以下の様な キーと CSR を含んだ newreq.pem ができあがる。
-</p>
-
-<pre class="wiki">
+  以下の様な キーと CSR を含んだ newreq.pem ができあがる。
+</p><pre class="wiki">
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,C27EDC6FD0152E96
-
-ki738nKH/tR2n2QWm9LmRrRJNGMOPpBwT+a3+HMeU/jGuXutW4qGdVA+OGTKES89
-FB11qih4Utb1fEasofdubvuQssSM3yHaPYD20rLkSlepHuoT0PiBYf7yrIJxntd4
-IwnFm4OepZ2wW9yzT6sicWLmPq/W+h7db0OCU/sls/5Je5awdY74/68VdurgKFpH
-Ev8qdo1Qr/azyIsCOCjEIHj1ZgDdJs2wNbg7iIyPkDscZYe0uL+E8B81SCx8UUWV
-iXRjJrrQZLgN0hFKQuYKb+RSQjv9gYQk47vgigAEQmBBpsrPB9nOb0+vuXCpY6o6
-AqvTCgk7/UYjDuSPEDT3VS+JD8EG9B+wZNIMXrT4WerX4ajiF/ylOd280YhZf+dC
-Dcw1nM2lulgJ+HKGdCLHXAIT4uEdRYJSsqZ23hmSmWmwjODN0kuqEQxAfRZC6tmJ
-UPdTRZBdXX8q+dT6pndHFdOG+kTkkoD/VwVtYShnGiAch+dbSRNyNQxslQX3QJJk
-oj+Q90pB8+EQ09tJJjUGwV2R/9O5Cdxc6JJ1nkrkUaRqDU2G9SjL2XUiQzYShbvV
-TAJkECe/6yYYpAOR2S2s0bxJKEq7cIyBEAbKf7HaNB7n+Qh/d4QK4kgbA+qgTY6D
-/l328ja/gbweljfX1gdOsS3OG8HvtDrbK3VKabf5hJrmmEOEpMejiCso8exTVluW
-uC4O8lijiZXCMlluR9JLjw5TUZ2bje3YEDxhNKrxmu8s2mMHKiWtl48d7fvWfLQP
-UsdqFM/mbTCFGXPMsAZ5NpFd1aTASW+JzlI5ivi7SmMNblgCasuuMA==
------END RSA PRIVATE KEY-----
------BEGIN CERTIFICATE REQUEST-----
-MIIBpDCCAQ0CAQAwZDELMAkGA1UEBhMCanAxETAPBgNVBAgTCGthbmFnYXdhMRMw
-EQYDVQQHEwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcxGTAXBgNVBAMT
-EEdvc3VrZSBNaXlhc2hpdGEwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANp9
-lhjHNQmMSH08ccj0C4+bKle4Prd0GglGMueKIUBCXGk5o6xS7o5U9JH9YfzVN4vC
-zdOLwzw9NNfeLALrymt8vyBTE9/RenxRcCRk4CMRvD6YMsrJ6+9b/z425FY/FU5q
-TAg0Gs30VgyjqBo81K7A9Zi63U2z5JkFtFOY2dyZAgMBAAGgADANBgkqhkiG9w0B
-AQQFAAOBgQBNo4ubHdThZOAQvB+jqRBG4pXQu4Go8sgzEY+hdOEvp+L7T3jxqh1W
-XXrA3FFBQtbzEnjXlias3g4jQcFtakdD1SIM7HoJbBQ9y4gsT/9q+ZyvyIkuCPnD
-SasVBdVklOC19BT6kw5V0sOv+Zt/4n4asrktjqSArFz6dF7ERXcjVg==
------END CERTIFICATE REQUEST-----
+<p>ki738nKH/tR2n2QWm9LmRrRJNGMOPpBwT+a3+HMeU/jGuXutW4qGdVA+OGTKES89<br />
+FB11qih4Utb1fEasofdubvuQssSM3yHaPYD20rLkSlepHuoT0PiBYf7yrIJxntd4<br />
+IwnFm4OepZ2wW9yzT6sicWLmPq/W+h7db0OCU/sls/5Je5awdY74/68VdurgKFpH<br />
+Ev8qdo1Qr/azyIsCOCjEIHj1ZgDdJs2wNbg7iIyPkDscZYe0uL+E8B81SCx8UUWV<br />
+iXRjJrrQZLgN0hFKQuYKb+RSQjv9gYQk47vgigAEQmBBpsrPB9nOb0+vuXCpY6o6<br />
+AqvTCgk7/UYjDuSPEDT3VS+JD8EG9B+wZNIMXrT4WerX4ajiF/ylOd280YhZf+dC<br />
+Dcw1nM2lulgJ+HKGdCLHXAIT4uEdRYJSsqZ23hmSmWmwjODN0kuqEQxAfRZC6tmJ<br />
+UPdTRZBdXX8q+dT6pndHFdOG+kTkkoD/VwVtYShnGiAch+dbSRNyNQxslQX3QJJk<br />
+oj+Q90pB8+EQ09tJJjUGwV2R/9O5Cdxc6JJ1nkrkUaRqDU2G9SjL2XUiQzYShbvV<br />
+TAJkECe/6yYYpAOR2S2s0bxJKEq7cIyBEAbKf7HaNB7n+Qh/d4QK4kgbA+qgTY6D<br />
+/l328ja/gbweljfX1gdOsS3OG8HvtDrbK3VKabf5hJrmmEOEpMejiCso8exTVluW<br />
+uC4O8lijiZXCMlluR9JLjw5TUZ2bje3YEDxhNKrxmu8s2mMHKiWtl48d7fvWfLQP<br />
+UsdqFM/mbTCFGXPMsAZ5NpFd1aTASW+JzlI5ivi7SmMNblgCasuuMA==<br />
+-----END RSA PRIVATE KEY-----<br />
+-----BEGIN CERTIFICATE REQUEST-----<br />
+MIIBpDCCAQ0CAQAwZDELMAkGA1UEBhMCanAxETAPBgNVBAgTCGthbmFnYXdhMRMw<br />
+EQYDVQQHEwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcxGTAXBgNVBAMT<br />
+EEdvc3VrZSBNaXlhc2hpdGEwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANp9<br />
+lhjHNQmMSH08ccj0C4+bKle4Prd0GglGMueKIUBCXGk5o6xS7o5U9JH9YfzVN4vC<br />
+zdOLwzw9NNfeLALrymt8vyBTE9/RenxRcCRk4CMRvD6YMsrJ6+9b/z425FY/FU5q<br />
+TAg0Gs30VgyjqBo81K7A9Zi63U2z5JkFtFOY2dyZAgMBAAGgADANBgkqhkiG9w0B<br />
+AQQFAAOBgQBNo4ubHdThZOAQvB+jqRBG4pXQu4Go8sgzEY+hdOEvp+L7T3jxqh1W<br />
+XXrA3FFBQtbzEnjXlias3g4jQcFtakdD1SIM7HoJbBQ9y4gsT/9q+ZyvyIkuCPnD<br />
+SasVBdVklOC19BT6kw5V0sOv+Zt/4n4asrktjqSArFz6dF7ERXcjVg==<br />
+-----END CERTIFICATE REQUEST-----<br />
 </pre>
-
-<h3 id="CAによる署名">CA による署名</h3>
-
-<pre class="wiki">
+<h3 id="CAによる署名">
+  CA による署名
+</h3><pre class="wiki">
 $ /usr/local/ssl/misc/CA.pl -sign
 Using configuration from /usr/local/ssl/openssl.cnf
 Enter pass phrase for ./demoCA/private/cakey.pem:
@@ -237,22 +207,16 @@ Certificate Details:
             keyid:27:4C:C9:4E:45:63:A8:62:1B:41:4D:14:2A:98:C9:EE:87:AE:1D:09
             DirName:/C=jp/ST=kanagawa/L=sagamihara/O=mizzy.org/CN=CA of mizzy.org
             serial:00
-
-Certificate is to be certified until Sep  8 17:57:48 2007 GMT (365 days)
-Sign the certificate? [y/n]:y
-
-
-1 out of 1 certificate requests certified, commit? [y/n]y
-Write out database with 1 new entries
-Data Base Updated
-Signed certificate is in newcert.pem
+<p>Certificate is to be certified until Sep  8 17:57:48 2007 GMT (365 days)<br />
+Sign the certificate? [y/n]:y</p>
+<p>1 out of 1 certificate requests certified, commit? [y/n]y<br />
+Write out database with 1 new entries<br />
+Data Base Updated<br />
+Signed certificate is in newcert.pem<br />
 </pre>
-
 <p>
-以下の様な newcert.pem ができる。
-</p>
-
-<pre class="wiki">
+  以下の様な newcert.pem ができる。
+</p><pre class="wiki">
 Certificate:
     Data:
         Version: 3 (0x2)
@@ -290,72 +254,68 @@ Certificate:
             keyid:27:4C:C9:4E:45:63:A8:62:1B:41:4D:14:2A:98:C9:EE:87:AE:1D:09
             DirName:/C=jp/ST=kanagawa/L=sagamihara/O=mizzy.org/CN=CA of mizzy.org
             serial:00
-
-    Signature Algorithm: md5WithRSAEncryption
-        96:0f:74:99:c1:b7:ce:62:08:df:d0:f8:f2:6b:ee:1e:90:43:
-        c7:8e:9c:4d:f2:de:2d:05:06:b9:25:49:d1:6e:d5:65:04:65:
-        71:52:44:1e:8f:87:9b:7b:e7:ed:d1:60:0a:6a:d1:fa:41:cc:
-        2a:82:b6:10:84:2a:7c:e3:8f:bf:32:a8:e0:01:d9:99:e6:ab:
-        dd:5e:a8:26:4d:85:cf:64:b7:62:de:74:5f:df:36:fe:ce:fd:
-        cd:b2:37:e1:a4:ce:6a:da:1e:3e:f7:89:24:cd:de:f3:9f:39:
-        5f:01:78:3c:30:ae:57:e1:94:07:fd:60:51:66:f8:9b:66:60:
-        1c:bb
------BEGIN CERTIFICATE-----
-MIIDPDCCAqWgAwIBAgIBATANBgkqhkiG9w0BAQQFADBjMQswCQYDVQQGEwJqcDER
-MA8GA1UECBMIa2FuYWdhd2ExEzARBgNVBAcTCnNhZ2FtaWhhcmExEjAQBgNVBAoT
-CW1penp5Lm9yZzEYMBYGA1UEAxMPQ0Egb2YgbWl6enkub3JnMB4XDTA2MDkwODE3
-NTc0OFoXDTA3MDkwODE3NTc0OFowZDELMAkGA1UEBhMCanAxETAPBgNVBAgTCGth
-bmFnYXdhMRMwEQYDVQQHEwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcx
-GTAXBgNVBAMTEEdvc3VrZSBNaXlhc2hpdGEwgZ8wDQYJKoZIhvcNAQEBBQADgY0A
-MIGJAoGBANp9lhjHNQmMSH08ccj0C4+bKle4Prd0GglGMueKIUBCXGk5o6xS7o5U
-9JH9YfzVN4vCzdOLwzw9NNfeLALrymt8vyBTE9/RenxRcCRk4CMRvD6YMsrJ6+9b
-/z425FY/FU5qTAg0Gs30VgyjqBo81K7A9Zi63U2z5JkFtFOY2dyZAgMBAAGjgf4w
-gfswCQYDVR0TBAIwADARBglghkgBhvhCAQEEBAMCBaAwLAYJYIZIAYb4QgENBB8W
-HU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBTvf6rYmsKD
-vGnAVci2ET/B3dKnyTCBjQYDVR0jBIGFMIGCgBQnTMlORWOoYhtBTRQqmMnuh64d
-CaFnpGUwYzELMAkGA1UEBhMCanAxETAPBgNVBAgTCGthbmFnYXdhMRMwEQYDVQQH
-EwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcxGDAWBgNVBAMTD0NBIG9m
-IG1penp5Lm9yZ4IBADANBgkqhkiG9w0BAQQFAAOBgQCWD3SZwbfOYgjf0Pjya+4e
-kEPHjpxN8t4tBQa5JUnRbtVlBGVxUkQej4ebe+ft0WAKatH6QcwqgrYQhCp844+/
-MqjgAdmZ5qvdXqgmTYXPZLdi3nRf3zb+zv3NsjfhpM5q2h4+94kkzd7znzlfAXg8
-MK5X4ZQH/WBRZvibZmAcuw==
------END CERTIFICATE-----
+<pre><code>Signature Algorithm: md5WithRSAEncryption
+    96:0f:74:99:c1:b7:ce:62:08:df:d0:f8:f2:6b:ee:1e:90:43:
+    c7:8e:9c:4d:f2:de:2d:05:06:b9:25:49:d1:6e:d5:65:04:65:
+    71:52:44:1e:8f:87:9b:7b:e7:ed:d1:60:0a:6a:d1:fa:41:cc:
+    2a:82:b6:10:84:2a:7c:e3:8f:bf:32:a8:e0:01:d9:99:e6:ab:
+    dd:5e:a8:26:4d:85:cf:64:b7:62:de:74:5f:df:36:fe:ce:fd:
+    cd:b2:37:e1:a4:ce:6a:da:1e:3e:f7:89:24:cd:de:f3:9f:39:
+    5f:01:78:3c:30:ae:57:e1:94:07:fd:60:51:66:f8:9b:66:60:
+    1c:bb</code></pre>
+<p>-----BEGIN CERTIFICATE-----<br />
+MIIDPDCCAqWgAwIBAgIBATANBgkqhkiG9w0BAQQFADBjMQswCQYDVQQGEwJqcDER<br />
+MA8GA1UECBMIa2FuYWdhd2ExEzARBgNVBAcTCnNhZ2FtaWhhcmExEjAQBgNVBAoT<br />
+CW1penp5Lm9yZzEYMBYGA1UEAxMPQ0Egb2YgbWl6enkub3JnMB4XDTA2MDkwODE3<br />
+NTc0OFoXDTA3MDkwODE3NTc0OFowZDELMAkGA1UEBhMCanAxETAPBgNVBAgTCGth<br />
+bmFnYXdhMRMwEQYDVQQHEwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcx<br />
+GTAXBgNVBAMTEEdvc3VrZSBNaXlhc2hpdGEwgZ8wDQYJKoZIhvcNAQEBBQADgY0A<br />
+MIGJAoGBANp9lhjHNQmMSH08ccj0C4+bKle4Prd0GglGMueKIUBCXGk5o6xS7o5U<br />
+9JH9YfzVN4vCzdOLwzw9NNfeLALrymt8vyBTE9/RenxRcCRk4CMRvD6YMsrJ6+9b<br />
+/z425FY/FU5qTAg0Gs30VgyjqBo81K7A9Zi63U2z5JkFtFOY2dyZAgMBAAGjgf4w<br />
+gfswCQYDVR0TBAIwADARBglghkgBhvhCAQEEBAMCBaAwLAYJYIZIAYb4QgENBB8W<br />
+HU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBTvf6rYmsKD<br />
+vGnAVci2ET/B3dKnyTCBjQYDVR0jBIGFMIGCgBQnTMlORWOoYhtBTRQqmMnuh64d<br />
+CaFnpGUwYzELMAkGA1UEBhMCanAxETAPBgNVBAgTCGthbmFnYXdhMRMwEQYDVQQH<br />
+EwpzYWdhbWloYXJhMRIwEAYDVQQKEwltaXp6eS5vcmcxGDAWBgNVBAMTD0NBIG9m<br />
+IG1penp5Lm9yZ4IBADANBgkqhkiG9w0BAQQFAAOBgQCWD3SZwbfOYgjf0Pjya+4e<br />
+kEPHjpxN8t4tBQa5JUnRbtVlBGVxUkQej4ebe+ft0WAKatH6QcwqgrYQhCp844+/<br />
+MqjgAdmZ5qvdXqgmTYXPZLdi3nRf3zb+zv3NsjfhpM5q2h4+94kkzd7znzlfAXg8<br />
+MK5X4ZQH/WBRZvibZmAcuw==<br />
+-----END CERTIFICATE-----<br />
 </pre>
-
-<h3 id="PEMからPKCS12へ">PEM から PKCS12 へ</h3>
-
+<h3 id="PEMからPKCS12へ">
+  PEM から PKCS12 へ
+</h3>
 <p>
-PEM のままではブラウザにインポートできないので、PKCS12 へ変換。
-</p>
-
-<pre class="wiki">
+  PEM のままではブラウザにインポートできないので、PKCS12 へ変換。
+</p><pre class="wiki">
 $ openssl pkcs12 -export -in newcert.pem -inkey newreq.pem -certfile demoCA/cacert.pem -out newcert.p12
 Enter pass phrase for newreq.pem:
 Enter Export Password:
 Verifying - Enter Export Password:
 </pre>
-
-<h3 id="newcert.p12をブラウザにインポート">newcert.p12 をブラウザにインポート</h3>
-
+<h3 id="newcert.p12をブラウザにインポート">
+  newcert.p12 をブラウザにインポート
+</h3>
 <p>
-手順は省略。Firefox だとこんな感じで入る。
+  手順は省略。Firefox だとこんな感じで入る。
 </p>
-
 <p>
-<img src="http://mizzy.org/img/client_certificate.jpg" alt="http://mizzy.org/img/client_certificate.jpg" />
+  <img src="http://mizzy.org/img/client_certificate.jpg" alt="http://mizzy.org/img/client_certificate.jpg" />
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/09/09/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/09/06/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/09/06/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/09/09/2">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

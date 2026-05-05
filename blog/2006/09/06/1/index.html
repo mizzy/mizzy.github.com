@@ -1,73 +1,62 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Plagger::Plugin::SmartFeed の使い方 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    Plagger::Plugin::SmartFeed の使い方 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="Plagger::Plugin::SmartFeed の使い方"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/09/06/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/09/06/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Plagger::Plugin::SmartFeed の使い方"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/09/06/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/09/06/1">Plagger::Plugin::SmartFeed の使い方</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://mizzy.org/program/filter_rule_and_filter_clone_feed.html"><span class="icon"></span>前回のエントリ</a> について、それ SmartFeed でできるよ、と宮川さんに教えて頂きました。こんな感じで。
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/09/06/1">
+    Plagger::Plugin::SmartFeed の使い方
+  </a>
+</h1>
+<div class="byline">
+  6 September 2006
+</div>
+<p>
+  <a class="ext-link" href="http://mizzy.org/program/filter_rule_and_filter_clone_feed.html">
+    <span class="icon"></span>
+    前回のエントリ
+  </a>
+  について、それ SmartFeed でできるよ、と宮川さんに教えて頂きました。こんな感じで。
 </p>
-
 <pre class="wiki">
   - module: CustomFeed::AmazonWebService
     config:
@@ -76,67 +65,76 @@
       associate_id: xxxxxx-22
       keywords:
         - 川原正敏
-
-  - module: SmartFeed
-    rule:
-      module: Ahead
-    config:
-      title: Amazon - New Books
-
-  - module: Publish::iCal
-    config:
-      dir: /home/miya/ical
-      filename: %t.ics
-    rule:
-      expression: $args->{feed}->id ne 'smartfeed:ahead'
-
-  - module: Publish::Gmail
-    config:
-      mailto:   xxx@gmail.com
-      mailfrom: xxx@mizzy.org
-      mailroute:
-        via: smtp
-        host: localhost
-    rule:
-      expression: $args->{feed}->id eq 'smartfeed:ahead'
+<ul>
+<li>
+<p>module: SmartFeed<br />
+rule:<br />
+module: Ahead<br />
+config:<br />
+title: Amazon - New Books</p>
+</li>
+<li>
+<p>module: Publish::iCal<br />
+config:<br />
+dir: /home/miya/ical<br />
+filename: %t.ics<br />
+rule:<br />
+expression: $args-&gt;{feed}-&gt;id ne 'smartfeed:ahead'</p>
+</li>
+<li>
+<p>module: Publish::Gmail<br />
+config:<br />
+mailto:   <a href="mailto:xxx@gmail.com">xxx@gmail.com</a><br />
+mailfrom: <a href="mailto:xxx@mizzy.org">xxx@mizzy.org</a><br />
+mailroute:<br />
+via: smtp<br />
+host: localhost<br />
+rule:<br />
+expression: $args-&gt;{feed}-&gt;id eq 'smartfeed:ahead'<br />
 </pre>
-
 <p>
-というわけで、Filter::Rule の改造も、Filter::CloneFeed の存在もまったく必要なし、でした。<a class="ext-link" href="http://trac.mizzy.org/public/changeset/260"><span class="icon"></span>Rule::Ahead には若干手を加えました</a> 。
+  というわけで、Filter::Rule の改造も、Filter::CloneFeed の存在もまったく必要なし、でした。
+  <a class="ext-link" href="http://trac.mizzy.org/public/changeset/260">
+    <span class="icon"></span>
+    Rule::Ahead には若干手を加えました
+  </a>
+  。
 </p>
-
 <p>
-今まで SmartFeed が全然理解できていなかったのですが、Filter::Rule の DESCRIPTION に以下の様な記述がある、ということも教えて頂きました。
-</p>
-
-<pre class="wiki">
+  今まで SmartFeed が全然理解できていなかったのですが、Filter::Rule の DESCRIPTION に以下の様な記述がある、ということも教えて頂きました。
+</p><pre class="wiki">
 DESCRIPTION
        This module strips entries and feeds using Rules. It's
        sort of like SmartFeed, but while SmartFeed creates new
        feed using Rule, Filter::Rule strips entries and feeds
        that don't match with Rules.
 </pre>
-
 <p>
-「Filter::Rule は Rule に基づいてフィード/エントリをフィルタリングする（元フィード自体に手を加える）、SmartFeed は 指定された Rule に基づいて新しくフィードを生成する（元フィードには手を加えない）」ってことですね。
+  「Filter::Rule は Rule に基づいてフィード/エントリをフィルタリングする（元フィード自体に手を加える）、SmartFeed は 指定された Rule に基づいて新しくフィードを生成する（元フィードには手を加えない）」ってことですね。
 </p>
-
 <p>
-<strong>追記</strong><br />
-<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060906"><span class="icon"></span>宮川さんがこちらに書いてくださってましたね</a>。ありがとうございます！
+  <strong>
+    追記
+  </strong>
+  <br />
+  <a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060906">
+    <span class="icon"></span>
+    宮川さんがこちらに書いてくださってましたね
+  </a>
+  。ありがとうございます！
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/09/09/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/09/05/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/09/05/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/09/09/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

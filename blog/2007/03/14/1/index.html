@@ -1,108 +1,152 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Plagger について本に書きました - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Plagger について本に書きました - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Plagger について本に書きました"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/03/14/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/03/14/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Plagger について本に書きました"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/03/14/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/03/14/1">
+          Plagger について本に書きました
+        </a>
+      </h1>
+      <div class="byline">
+        14 March 2007
+      </div>
+      <p>
+        タイトルは
+        <a class="ext-link" href="http://www.9-ten.co.jp/bookdata/1654.php">
+          <span class="icon"></span>
+          MASHUP++
+        </a>
+        です。その名の通り、マッシュアップを主題とした本なのですが、主に自分でマッシュアップな開発をしてみたい、という方向けの本で、自分は「マッシュアップとプラガブルなフレームワーク」をテーマに、Plagger プラグインの開発方法について書きました。
+      </p>
+      <p>
+        内容としては、プラグイン開発の基礎知識として、
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          内部データ形式である Plagger::Feed と Plagger::Entry
+        </li>
+        <li>
+          フィードデータがどの様に入力、加工、出力されるのか
+        </li>
+        <li>
+          プラグインの用途と種類にはどんなものがあるのか
+        </li>
+        <li>
+          各プラグインの関係や実行フェーズ、実行順序
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/03/14/1">Plagger について本に書きました</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-タイトルは <a class="ext-link" href="http://www.9-ten.co.jp/bookdata/1654.php"><span class="icon"></span>MASHUP++</a> です。その名の通り、マッシュアップを主題とした本なのですが、主に自分でマッシュアップな開発をしてみたい、という方向けの本で、自分は「マッシュアップとプラガブルなフレームワーク」をテーマに、Plagger プラグインの開発方法について書きました。
-</p>
-
-<p>
-内容としては、プラグイン開発の基礎知識として、
-</p>
-
-<ul><li>内部データ形式である Plagger::Feed と Plagger::Entry</li>
-<li>フィードデータがどの様に入力、加工、出力されるのか</li>
-<li>プラグインの用途と種類にはどんなものがあるのか</li>
-<li>各プラグインの関係や実行フェーズ、実行順序</li></ul>
-
-<p>
-といったことを解説しています。また、後半は
-</p>
-
-<ul><li>各フェーズの実際のプラグインソースコードを引用しながらの解説</li>
-<li>プラグインの雛形生成、ドキュメント、テストの書き方といったプラグイン開発の流れ</li></ul>
-
-<p>
-といった感じになっています。プラグインを開発してみたいけど、どこから手をつけていいのかわからない、という方に是非ご覧頂きたいです。
-</p>
-
-<p>
-他にも <a class="ext-link" href="http://vgzh.dtdns.net/"><span class="icon"></span>さうなまん</a> さん、<a class="ext-link" href="http://www.koui.net/"><span class="icon"></span>鹿倉公維</a> さん、<a class="ext-link" href="http://graffiti-web.org/"><span class="icon"></span>セトウナオ</a> さん、<a class="ext-link" href="http://pickles.tv/"><span class="icon"></span>タナカミノル</a> さんといった <a class="ext-link" href="http://www.amazon.co.jp/dp/4872835905"><span class="icon"></span>.fla</a> の執筆陣による Flash を主体としたマッシュアップ（タナカさんは今回は Flash ではないですが）や、<a class="ext-link" href="http://www.catwalk.co.jp/"><span class="icon"></span>CATWALK</a> の三宅涼さん、澤久裕昭さんによる、これぞ正当なマッシュアップ、といった感じの PHP と JavaScript によるマッシュアップ、そして、タナカミノルさんと<a class="ext-link" href="http://www.tsumuji.net"><span class="icon"></span>原央樹</a> さんによる、<a class="ext-link" href="http://gainer.cc/"><span class="icon"></span>Gainer</a>というハードウェアを使ったマッシュアップなど、バリエーション豊かなマッシュアップがソースコードつきで解説されています。必読。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/03/18/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/03/10/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        といったことを解説しています。また、後半は
+      </p>
+      <ul>
+        <li>
+          各フェーズの実際のプラグインソースコードを引用しながらの解説
+        </li>
+        <li>
+          プラグインの雛形生成、ドキュメント、テストの書き方といったプラグイン開発の流れ
+        </li>
+      </ul>
+      <p>
+        といった感じになっています。プラグインを開発してみたいけど、どこから手をつけていいのかわからない、という方に是非ご覧頂きたいです。
+      </p>
+      <p>
+        他にも
+        <a class="ext-link" href="http://vgzh.dtdns.net/">
+          <span class="icon"></span>
+          さうなまん
+        </a>
+        さん、
+        <a class="ext-link" href="http://www.koui.net/">
+          <span class="icon"></span>
+          鹿倉公維
+        </a>
+        さん、
+        <a class="ext-link" href="http://graffiti-web.org/">
+          <span class="icon"></span>
+          セトウナオ
+        </a>
+        さん、
+        <a class="ext-link" href="http://pickles.tv/">
+          <span class="icon"></span>
+          タナカミノル
+        </a>
+        さんといった
+        <a class="ext-link" href="http://www.amazon.co.jp/dp/4872835905">
+          <span class="icon"></span>
+          .fla
+        </a>
+        の執筆陣による Flash を主体としたマッシュアップ（タナカさんは今回は Flash ではないですが）や、
+        <a class="ext-link" href="http://www.catwalk.co.jp/">
+          <span class="icon"></span>
+          CATWALK
+        </a>
+        の三宅涼さん、澤久裕昭さんによる、これぞ正当なマッシュアップ、といった感じの PHP と JavaScript によるマッシュアップ、そして、タナカミノルさんと
+        <a class="ext-link" href="http://www.tsumuji.net">
+          <span class="icon"></span>
+          原央樹
+        </a>
+        さんによる、
+        <a class="ext-link" href="http://gainer.cc/">
+          <span class="icon"></span>
+          Gainer
+        </a>
+        というハードウェアを使ったマッシュアップなど、バリエーション豊かなマッシュアップがソースコードつきで解説されています。必読。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/03/10/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/03/18/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

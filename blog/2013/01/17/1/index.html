@@ -1,106 +1,126 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>RPM パッケージを Git で管理する方法（案） - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      RPM パッケージを Git で管理する方法（案） - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="RPM パッケージを Git で管理する方法（案）"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/01/17/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/01/17/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="RPM パッケージを Git で管理する方法（案）"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/01/17/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/01/17/1">
+          RPM パッケージを Git で管理する方法（案）
+        </a>
+      </h1>
+      <div class="byline">
+        17 January 2013
+      </div>
+      <p>
+        <a href="https://twitter.com/trombik">
+          @trombik
+        </a>
+        さんの
+      </p>
+      <blockquote class="twitter-tweet">
+        <p>
+          弊社ではtinderbox+gitですべて統一させてる
+        </p>
+        &mdash; trombik (@trombik)
+        <a href="https://twitter.com/trombik/status/284200636021608449" data-datetime="2012-12-27T07:34:46+00:00">
+          December 27, 2012
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        という tweet を見て気になったので調べてみたところ、
+        <a href="http://tinderbox.marcuscom.com/">
+          Tinderbox
+        </a>
+        はどうやら FreeBSD の ports を自動ビルドするためのシステムのようで、RPM でもこんなのないのかなー、と探してみたものの見つけられなかったし、Tinderbox が自分が求めてるものなのかどうかもいまいちピンと来なかったので、プロトタイプ的なものをつくってみることに。
+      </p>
+      <p>
+        現在 RPM パッケージの管理は、
+        <a href="https://github.com/paperboy-sqale/sqale-yum">
+          こんな感じで
+        </a>
+        ソース/バイナリパッケージを直接リポジトリに突っ込んじゃってるんだけど、これだと以下のような問題がある。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          バイナリパッケージのファイルサイズが大きすぎて、git clone や push や pull に時間がかかる
+        </li>
+        <li>
+          パッケージ丸ごと突っ込んでるので、ファイル個別の差分が確認できない
+          <ul>
+            <li>
+              そもそも差分確認できないものを突っ込むのは git を使う意義がだいぶ削がれる
+            </li>
+          </ul>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/01/17/1">RPM パッケージを Git で管理する方法（案）</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="https://twitter.com/trombik">@trombik</a> さんの</p>
-
-<blockquote class="twitter-tweet"><p>弊社ではtinderbox+gitですべて統一させてる</p>&mdash; trombik (@trombik) <a href="https://twitter.com/trombik/status/284200636021608449" data-datetime="2012-12-27T07:34:46+00:00">December 27, 2012</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>という tweet を見て気になったので調べてみたところ、 <a href="http://tinderbox.marcuscom.com/">Tinderbox</a> はどうやら FreeBSD の ports を自動ビルドするためのシステムのようで、RPM でもこんなのないのかなー、と探してみたものの見つけられなかったし、Tinderbox が自分が求めてるものなのかどうかもいまいちピンと来なかったので、プロトタイプ的なものをつくってみることに。</p>
-
-<p>現在 RPM パッケージの管理は、<a href="https://github.com/paperboy-sqale/sqale-yum">こんな感じで</a> ソース/バイナリパッケージを直接リポジトリに突っ込んじゃってるんだけど、これだと以下のような問題がある。</p>
-
-<ul>
-<li>バイナリパッケージのファイルサイズが大きすぎて、git clone や push や pull に時間がかかる</li>
-<li>パッケージ丸ごと突っ込んでるので、ファイル個別の差分が確認できない
-
-<ul>
-<li>そもそも差分確認できないものを突っ込むのは git を使う意義がだいぶ削がれる</li>
-</ul></li>
-</ul>
-
-<p>それをこんな風にしたい。</p>
-
-<ul>
-<li>必要最小限のファイルだけを git リポジトリに突っ込んでファイル個別に差分確認できるように</li>
-<li>パッケージは突っ込まず、git で管理してるファイルからパッケージビルドする
-
-<ul>
-<li>ただしソースパッケージは必要なら突っ込んでもOK</li>
-</ul></li>
-</ul>
-
-<p>で、プロトタイプ的なものをつくってみたのがこれ。</p>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git">mizzy/how-to-manage-rpm-packages-with-git</a></p>
-
-<p>このリポジトリの構成はこんな感じ。</p>
-
-<pre><code>|-- build.rb
+      <p>
+        それをこんな風にしたい。
+      </p>
+      <ul>
+        <li>
+          必要最小限のファイルだけを git リポジトリに突っ込んでファイル個別に差分確認できるように
+        </li>
+        <li>
+          パッケージは突っ込まず、git で管理してるファイルからパッケージビルドする
+          <ul>
+            <li>
+              ただしソースパッケージは必要なら突っ込んでもOK
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p>
+        で、プロトタイプ的なものをつくってみたのがこれ。
+      </p>
+      <p>
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git">
+          mizzy/how-to-manage-rpm-packages-with-git
+        </a>
+      </p>
+      <p>
+        このリポジトリの構成はこんな感じ。
+      </p>
+      <pre><code>|-- build.rb
 |-- ffmpeg
 |   |-- ffmpeg-github-0.8.2.spec
 |   |-- libavformat-muxer.paperboy.patch
@@ -110,85 +130,110 @@
 |   |-- memcached-1.4.15-1.el6.src.rpm
 |   `-- memcached.spec
 `-- ngx_openresty
-    `-- ngx_openresty.spec
-</code></pre>
-
-<p>build.rb がビルド用のスクリプトで、それ以外に各パッケージ用のディレクトリがある。で、どのファイルをバージョン管理するかは、パッケージによって異なるだろうな、ってことで、あり得そうなパターンをいくつか用意してみた。</p>
-
-<hr>
-
-<h2>パターン1: ngx_openresty</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ngx_openresty">これ</a> は spec ファイルだけを管理するパターン。spec の中に</p>
-
-<pre><code>Source0: http://agentzh.org/misc/nginx/ngx_openresty-%{version}.tar.gz
-</code></pre>
-
-<p>という記述があるので、こいつをダウンロードして ~/rpmbuild/SOURCES に置き、ソースパッケージとバイナリパッケージをビルド、という一番シンプルなパターン。</p>
-
-<p>configure オプションぐらいをカスタマイズできればOK、という場合はこのパターンになるはず。</p>
-
-<hr>
-
-<h2>パターン2: ffpmeg</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ffmpeg">これ</a> は spec ファイル＋パッチ（＋α）な構成。独自にパッチをあてて、パッチもバージョン管理したい、といったパターン。これも spec ファイルに</p>
-
-<pre><code>Source: http://www.ffmpeg.org/releases/ffmpeg-%{version}.tar.bz2
-</code></pre>
-
-<p>という記述があるので、こいつをダウンロードし、他のパッチファイル等とともに ~/rpmbuild/SOURCES に置いて、ソースパッケージとバイナリパッケージをビルドする。</p>
-
-<hr>
-
-<h2>パターン3: memcached</h2>
-
-<p><a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/memcached">こいつ</a> は既存のソースパッケージのビルドオプションだけを変えたいんだけど、spec ファイル中のソースが</p>
-
-<pre><code>Source0:        http://memcached.googlecode.com/files/%{name}-%{version}.tar.gz
-Source1:        memcached.sysv
-</code></pre>
-
-<p>となっていて、memcached.sysv をネットワーク越しに取得できない、かといって、このファイルは既存ソースパッケージに入ってるものをそのまま使うので、特にバージョン管理の必要はない、といったケース。</p>
-
-<p>このケースであれば、既存ソースパッケージ内のファイルは、spec 以外は修正することはないからバージョン管理の必要はないし、バイナリパッケージと比べればサイズは小さいから、そのまま突っ込んじゃう方が楽だろう、ということで、src.rpm ファイルをリポジトリにそのまま突っ込んでる。（別に memcached.sysv だけ取り出して置いといてもいいんだけど、memcached.sysv 以外にも付随するソースやパッチがもっとたくさんある場合は、この方が楽だろう、という判断。）</p>
-
-<hr>
-
-<p>今のところこれぐらいのパターンを網羅できれば大丈夫かなー、と。いずれのパターンでも、ファイル個別に差分の確認ができるし、管理すべきファイルのサイズも最小限に抑えられているし、ビルドに必要なファイルは一通り揃っている。</p>
-
-<hr>
-
-<h2>パッケージのビルド</h2>
-
-<p>で、これらのファイルを git clone してきて、<a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/blob/master/build.rb">build.rb</a> みたいなスクリプトでビルド＆yum サーバへのデプロイ、ってなことができればいいなー、というのが最終的な目論見。</p>
-
-<hr>
-
-<h2>その他</h2>
-
-<p>とりあえず自分のアイデアを形にしてみて、意見をもらったりとか、それ○○でできるよ、みたいな反応がもらえるといいな、というのがこのブログエントリを書いた目的。</p>
-
-<p>あと、こんなのできればいいなー、と思っているのは、Ruby の Bundler みたいに、</p>
-
-<pre><code>Source: git://github.com/torvalds/linux.git, ref: dfdeb
-</code></pre>
-
-<p>とか spec に書いておくと、git clone して tar ball 作成して、そいつを使ってパッケージビルドできたりするといいなー、とか。</p>
-
-<p>また、@trombik さんと twitter でやりとりしてる中で、<a href="https://fedorahosted.org/koji/wiki">koji</a> という RPM ビルドシステムを見つけたんだけど、これも使えないか調べてみる。（が、自分がやりたいこととはちょっと違う感じ。）</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/01/19/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/01/10/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+    `-- ngx_openresty.spec</code></pre>
+      <p>
+        build.rb がビルド用のスクリプトで、それ以外に各パッケージ用のディレクトリがある。で、どのファイルをバージョン管理するかは、パッケージによって異なるだろうな、ってことで、あり得そうなパターンをいくつか用意してみた。
+      </p>
+      <hr />
+      <h2>
+        パターン1: ngx_openresty
+      </h2>
+      <p>
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ngx_openresty">
+          これ
+        </a>
+        は spec ファイルだけを管理するパターン。spec の中に
+      </p>
+      <pre><code>Source0: http://agentzh.org/misc/nginx/ngx_openresty-%{version}.tar.gz</code></pre>
+      <p>
+        という記述があるので、こいつをダウンロードして ~/rpmbuild/SOURCES に置き、ソースパッケージとバイナリパッケージをビルド、という一番シンプルなパターン。
+      </p>
+      <p>
+        configure オプションぐらいをカスタマイズできればOK、という場合はこのパターンになるはず。
+      </p>
+      <hr />
+      <h2>
+        パターン2: ffpmeg
+      </h2>
+      <p>
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/ffmpeg">
+          これ
+        </a>
+        は spec ファイル＋パッチ（＋α）な構成。独自にパッチをあてて、パッチもバージョン管理したい、といったパターン。これも spec ファイルに
+      </p>
+      <pre><code>Source: http://www.ffmpeg.org/releases/ffmpeg-%{version}.tar.bz2</code></pre>
+      <p>
+        という記述があるので、こいつをダウンロードし、他のパッチファイル等とともに ~/rpmbuild/SOURCES に置いて、ソースパッケージとバイナリパッケージをビルドする。
+      </p>
+      <hr />
+      <h2>
+        パターン3: memcached
+      </h2>
+      <p>
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/tree/master/memcached">
+          こいつ
+        </a>
+        は既存のソースパッケージのビルドオプションだけを変えたいんだけど、spec ファイル中のソースが
+      </p>
+      <pre><code>Source0:        http://memcached.googlecode.com/files/%{name}-%{version}.tar.gz
+Source1:        memcached.sysv</code></pre>
+      <p>
+        となっていて、memcached.sysv をネットワーク越しに取得できない、かといって、このファイルは既存ソースパッケージに入ってるものをそのまま使うので、特にバージョン管理の必要はない、といったケース。
+      </p>
+      <p>
+        このケースであれば、既存ソースパッケージ内のファイルは、spec 以外は修正することはないからバージョン管理の必要はないし、バイナリパッケージと比べればサイズは小さいから、そのまま突っ込んじゃう方が楽だろう、ということで、src.rpm ファイルをリポジトリにそのまま突っ込んでる。（別に memcached.sysv だけ取り出して置いといてもいいんだけど、memcached.sysv 以外にも付随するソースやパッチがもっとたくさんある場合は、この方が楽だろう、という判断。）
+      </p>
+      <hr />
+      <p>
+        今のところこれぐらいのパターンを網羅できれば大丈夫かなー、と。いずれのパターンでも、ファイル個別に差分の確認ができるし、管理すべきファイルのサイズも最小限に抑えられているし、ビルドに必要なファイルは一通り揃っている。
+      </p>
+      <hr />
+      <h2>
+        パッケージのビルド
+      </h2>
+      <p>
+        で、これらのファイルを git clone してきて、
+        <a href="https://github.com/mizzy/how-to-manage-rpm-packages-with-git/blob/master/build.rb">
+          build.rb
+        </a>
+        みたいなスクリプトでビルド＆yum サーバへのデプロイ、ってなことができればいいなー、というのが最終的な目論見。
+      </p>
+      <hr />
+      <h2>
+        その他
+      </h2>
+      <p>
+        とりあえず自分のアイデアを形にしてみて、意見をもらったりとか、それ○○でできるよ、みたいな反応がもらえるといいな、というのがこのブログエントリを書いた目的。
+      </p>
+      <p>
+        あと、こんなのできればいいなー、と思っているのは、Ruby の Bundler みたいに、
+      </p>
+      <pre><code>Source: git://github.com/torvalds/linux.git, ref: dfdeb</code></pre>
+      <p>
+        とか spec に書いておくと、git clone して tar ball 作成して、そいつを使ってパッケージビルドできたりするといいなー、とか。
+      </p>
+      <p>
+        また、@trombik さんと twitter でやりとりしてる中で、
+        <a href="https://fedorahosted.org/koji/wiki">
+          koji
+        </a>
+        という RPM ビルドシステムを見つけたんだけど、これも使えないか調べてみる。（が、自分がやりたいこととはちょっと違う感じ。）
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/01/10/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/01/19/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

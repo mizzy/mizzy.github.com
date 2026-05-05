@@ -1,109 +1,103 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/05/06/2">Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://en.yummy.stripper.jp/?eid=550053">ブログが続かないわけ | DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い</a> にて、</p>
-
-<blockquote>
-<p>とはいえ、僕の稼働中のアプリはすでに手動型のSchema で動いている。スキーマを作り直したら、リレーションの設定を全てしなおさなければならないので、それは現実的じゃない。inflate, deflate の指定は、やっぱりすべてのSchema にかかなきゃだめそうだ。</p>
-</blockquote>
-
-<p>とあったので、これに関して少し楽ができる方法をコメントしようと思ったけれど、コメント欄ではうまく伝えられる自信がないので、こちらで書いてみることにしました。</p>
-
-<h3>load_components で 読み込む方法</h3>
-
-<p>DBIx::Class::Schema::Loader ではなく DBIx::Class::Schema を継承したスキーマの場合には、各スキーマファイルに以下の様に書いてあげれば OK です。（既にご存知かもしれませんが。）</p>
-
-<pre><code>package My::Schema::Table;
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/05/06/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/05/06/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/05/06/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/05/06/2">
+          Re: DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い
+        </a>
+      </h1>
+      <div class="byline">
+        6 May 2007
+      </div>
+      <p>
+        <a href="http://en.yummy.stripper.jp/?eid=550053">
+          ブログが続かないわけ | DBICとDBIx::Class::Schema::Loader 僕のいろいろな勘違い
+        </a>
+        にて、
+      </p>
+      <blockquote>
+        <p>
+          とはいえ、僕の稼働中のアプリはすでに手動型のSchema で動いている。スキーマを作り直したら、リレーションの設定を全てしなおさなければならないので、それは現実的じゃない。inflate, deflate の指定は、やっぱりすべてのSchema にかかなきゃだめそうだ。
+        </p>
+      </blockquote>
+      <p>
+        とあったので、これに関して少し楽ができる方法をコメントしようと思ったけれど、コメント欄ではうまく伝えられる自信がないので、こちらで書いてみることにしました。
+      </p>
+      <h3>
+        load_components で 読み込む方法
+      </h3>
+      <p>
+        DBIx::Class::Schema::Loader ではなく DBIx::Class::Schema を継承したスキーマの場合には、各スキーマファイルに以下の様に書いてあげれば OK です。（既にご存知かもしれませんが。）
+      </p>
+      <pre><code>package My::Schema::Table;
 
 __PACKAGE__-&gt;load_components(
   &quot;InflateColumn::DateTime&quot;,
   &quot;PK::Auto&quot;,
   &quot;Core&quot;,
-);
-</code></pre>
-
-<p>すべてのスキーマファイルに書かなきゃいけないことには変わりありませんが、各カラムに inflate/deflate を設定するよりははるかに楽だと思います。</p>
-
-<h3>make_schema_at を使う方法</h3>
-
-<p>make_schema_at でスキーマファイルを生成しているのであれば、こんな感じでリレーションだけ定義した ./tmp/lib/My/Schema/Table.pm をまず用意します。</p>
-
-<pre><code>package My::Schema::Table;
+);</code></pre>
+      <p>
+        すべてのスキーマファイルに書かなきゃいけないことには変わりありませんが、各カラムに inflate/deflate を設定するよりははるかに楽だと思います。
+      </p>
+      <h3>
+        make_schema_at を使う方法
+      </h3>
+      <p>
+        make_schema_at でスキーマファイルを生成しているのであれば、こんな感じでリレーションだけ定義した ./tmp/lib/My/Schema/Table.pm をまず用意します。
+      </p>
+      <pre><code>package My::Schema::Table;
 
 __PACKAGE__-&gt;belongs_to(
-    realation =&gt; &#39;My::Schema::OtherTable
-    { &#39;foreign.id&#39; =&gt; &#39;self.other_table_id&#39; },
+    realation =&gt; 'My::Schema::OtherTable
+    { 'foreign.id' =&gt; 'self.other_table_id' },
 );
 
-1;
-</code></pre>
-
-<p>でもって、こんなスクリプトを実行します。</p>
-
-<pre><code>#!/usr/bin/perl
+1;</code></pre>
+      <p>
+        でもって、こんなスクリプトを実行します。
+      </p>
+      <pre><code>#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -113,25 +107,24 @@ use Carp;
 use DBIx::Class::Schema::Loader qw( make_schema_at dump_to_dir:lib dump_overwrite );
 
 make_schema_at(
-    &#39;My::Schema::Table&#39;,
+    'My::Schema::Table',
     {
         components     =&gt; [qw/ ResultSetManager UTF8Columns InflateColumn::DateTime /],
         dump_overwrite =&gt; 1,
     },
-    [&#39;dbi:mysql:dbname&#39; ,&#39;user&#39;, &#39;password&#39;],
-);
-</code></pre>
-
-<p>そうすると、lib/My/Schema/Table.pm に以下の内容を吐き出してくれます。</p>
-
-<pre><code>package My::Schema::Table;
+    ['dbi:mysql:dbname' ,'user', 'password'],
+);</code></pre>
+      <p>
+        そうすると、lib/My/Schema/Table.pm に以下の内容を吐き出してくれます。
+      </p>
+      <pre><code>package My::Schema::Table;
 
 # Created by DBIx::Class::Schema::Loader v0.03009 @ 2007-04-26 18:21:23
 
 use strict;
 use warnings;
 
-use base &#39;DBIx::Class&#39;;
+use base 'DBIx::Class';
 
 __PACKAGE__-&gt;load_components(
   &quot;ResultSetManager&quot;,
@@ -154,29 +147,33 @@ __PACKAGE__-&gt;set_primary_key(&quot;id&quot;);
 package My::Schema::Table;
 
 __PACKAGE__-&gt;belongs_to(
-    employees =&gt; &#39;My::Schema::Table&#39;,
-    { &#39;foreign.id&#39; =&gt; &#39;self.other_table_id&#39; },
+    employees =&gt; 'My::Schema::Table',
+    { 'foreign.id' =&gt; 'self.other_table_id' },
 );
 
 1;
-# End of lines loaded from user-supplied external file
-</code></pre>
-
-<p>この方法を使うと、スキーマを作り直しても、リレーションの再設定をしなくて済みます。</p>
-
-<p>手動でやるのが楽なのか、上の方法のいずれかを使うのが楽なのかは、状況にもよると思いますが、こんな方法もありますよ、ということで、ご参考になれば幸いです。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/05/11/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/05/06/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+# End of lines loaded from user-supplied external file</code></pre>
+      <p>
+        この方法を使うと、スキーマを作り直しても、リレーションの再設定をしなくて済みます。
+      </p>
+      <p>
+        手動でやるのが楽なのか、上の方法のいずれかを使うのが楽なのかは、状況にもよると思いますが、こんな方法もありますよ、ということで、ご参考になれば幸いです。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/05/06/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/05/11/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

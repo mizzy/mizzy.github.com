@@ -1,165 +1,256 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>2012年のふりかえり - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      2012年のふりかえり - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="2012年のふりかえり"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2012/12/31/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2012/12/31/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="2012年のふりかえり"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2012/12/31/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2012/12/31/1">
+          2012年のふりかえり
+        </a>
+      </h1>
+      <div class="byline">
+        31 December 2012
+      </div>
+      <p>
+        1年間のまとめ的なエントリは今まで書いたことがなかったけど、今年は色々あったし、後から振り返ってターニングポイントだったな、と思えそうな年になったので、特に印象に残ってることをまとめてみることにします。
+      </p>
+      <hr />
+      <h2>
+        ペパボでの新しい技術者評価制度のスタートと技術基盤整備エンジニアというポジションの創設
+      </h2>
+      <p>
+        まずは 2012/01/06 のこの予感めいた tweet。
+      </p>
+      <blockquote class="twitter-tweet">
+        <p>
+          今年は転機になりそうな気がする、なんとなく。
+        </p>
+        &mdash; Gosuke Miyashita (@gosukenator)
+        <a href="https://twitter.com/gosukenator/status/155287369682124800" data-datetime="2012-01-06T13:59:28+00:00">
+          January 6, 2012
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        これは無根拠にこんなことを言ってたわけではなく、ペパボで新しく技術者のための評価制度ができたこと、そしてこの評価制度をベースとして、「技術基盤整備エンジニア」というポジションをつくることが承認されたこと、が背景にあっての tweet です。技術者評価制度と技術基盤整備エンジニアについては、以下のエントリにまとめています。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          <a href="/blog/2012/01/17/1/">
+            Paperboy is hiring
+          </a>
+        </li>
+        <li>
+          <a href="/blog/2012/02/29/1/">
+            Paperboy's engineer evaluation system
+          </a>
+        </li>
+        <li>
+          <a href="/blog/2012/08/20/1/">
+            Paperboy's engineer evaluation system その後
+          </a>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2012/12/31/1">2012年のふりかえり</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>1年間のまとめ的なエントリは今まで書いたことがなかったけど、今年は色々あったし、後から振り返ってターニングポイントだったな、と思えそうな年になったので、特に印象に残ってることをまとめてみることにします。</p>
-
-<hr>
-
-<h2>ペパボでの新しい技術者評価制度のスタートと技術基盤整備エンジニアというポジションの創設</h2>
-
-<p>まずは 2012/01/06 のこの予感めいた tweet。</p>
-
-<blockquote class="twitter-tweet"><p>今年は転機になりそうな気がする、なんとなく。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/status/155287369682124800" data-datetime="2012-01-06T13:59:28+00:00">January 6, 2012</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>これは無根拠にこんなことを言ってたわけではなく、ペパボで新しく技術者のための評価制度ができたこと、そしてこの評価制度をベースとして、「技術基盤整備エンジニア」というポジションをつくることが承認されたこと、が背景にあっての tweet です。技術者評価制度と技術基盤整備エンジニアについては、以下のエントリにまとめています。</p>
-
-<ul>
-<li><a href="/blog/2012/01/17/1/">Paperboy is hiring</a></li>
-<li><a href="/blog/2012/02/29/1/">Paperboy&#39;s engineer evaluation system</a></li>
-<li><a href="/blog/2012/08/20/1/">Paperboy&#39;s engineer evaluation system その後</a></li>
-</ul>
-
-<hr>
-
-<h2>あんちぽさんとhsbtさんがペパボに入社</h2>
-
-<p>上で書いた技術基盤整備エンジニアとして、<a href="https://twitter.com/kentaro">あんちぽ</a> さんと <a href="https://twitter.com/hsbt">hsbt</a> さんがペパボに入社してくれました。</p>
-
-<ul>
-<li><a href="http://www.hsbt.org/diary/20120501.html">株式会社paperboy&amp;co.に入社しましたのお知らせ - HsbtDiary(2012-05-01)</a></li>
-<li><a href="http://blog.kentarok.org/entry/2012/05/01/145925">株式会社paperboy&amp;co.に入社しました - delirious thoughts</a></li>
-</ul>
-
-<p>今までペパボの技術責任者として、ペパボ全体の技術を見る立場だったのですが、自分はどちらかというと OS やミドルウェアレイヤーの技術がテリトリーで、開発についてはそれほど得意ではなく、十分にケアすることができてなかったのですが、あんちぽさん、hsbt さんにペパボの開発全般を見てもらえるようになり、とても助かっています。</p>
-
-<p>特に、自分の能力不足やリソース不足で、これはやるべきだろうと思いながらもできなかった数々のことを、二人がガンガンやってくれるので、とても頼もしく、ペパボの技術にとってなくてはならない存在になっています。</p>
-
-<hr>
-
-<h2>大学生になった</h2>
-
-<p>色々思うところがあって、<a href="/blog/2012/04/14/1/">4月から大学生になりました</a>。いまのところ、学業の方も順調に進んでいて、1年目で目標としてる単位数はなんとか取得できそうだな、という感触なのですが、大学に再入学してぶっちゃけどうか、といったエントリを、大学生活が1年経過した4月ぐらいに書く予定です。</p>
-
-<p>また、<a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol72">WEB+DB PRESS Vol.72</a> のインタビュー記事でも、このことについてとりあげて頂きました。</p>
-
-<hr>
-
-<h2>Sqale のリリース</h2>
-
-<p>ペパボ初/発の PaaS である <a href="http://sqale.jp/">Sqale</a> をリリースしました。これまでのペパボにはなかったタイプのサービスで、技術的な面でも新しいチャレンジができて、とても楽しく仕事ができました。</p>
-
-<p>過去にペパボでがっつりと関わったサービスには、<a href="http://30d.jp/">30days Album</a> や <a href="http://lolipop.jp/">ロリポップの大幅リニューアル</a>があるのですが、このどちらもアーキテクトとして技術全般を見つつも、実装もがっつりやる、という感じで、なかなか大変だったのですが、今回は頼もしいメンバーに恵まれ、アーキテクトにほぼ徹することができました。（OpenSSH や Linux カーネルのパッチ書いたり、AMIつくったり、といったこともやってましたが。）</p>
-
-<hr>
-
-<h2>札幌Ruby会議2012でスピーカーに</h2>
-
-<p>ペパボが徐々に Ruby にスイッチしてることもあり、<a href="http://sqale.jp/">Sqale</a> でもふんだんに Ruby を使っている、ということもあって、<a href="http://sapporo.rubykaigi.org/2012/ja/">札幌Ruby会議2012</a> で発表してきました。Ruby 関係の集まりで発表したのはこれが初めてです。（自分の発表ではほとんど Ruby の話はしてないですが。）</p>
-
-<iframe src="http://player.vimeo.com/video/51481486" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/51481486">[sprk2012] Inside Sqale's Backend</a> from <a href="http://vimeo.com/suzuki">suzuki</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
-
- <iframe src="http://www.slideshare.net/slideshow/embed_code/14290440" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
-
-<p>自分以外にも、<a href="https://twitter.com/kentaro">あんちぽ</a> さん、<a href="https://twitter.com/hsbt">hsbt</a> さん、<a href="https://twitter.com/kyanny">刺身</a> と、トータル4人がペパボから登壇していて、Rubyコミュニティの方々に、ペパボを印象づけることができたのではないかと思います。</p>
-
-<hr>
-
-<h2>YAPC::Asia Tokyo 2012 でゲストスピーカーに</h2>
-
-<p><a href="http://yapcasia.org/2012/">YAPC::Asia Tokyo 2012</a> でゲストスピーカーとして招いて頂き、クロージングキーノートをつとめることに。牧さんからお話を頂いたときは、びっくりするとともに、とても名誉なことで、二つ返事でOKしました。自分が今までスピーカーをやった中でも、最高の出来事です。</p>
-
-<iframe width="500" height="281" src="http://www.youtube.com/embed/wxUxFdFxd0Y" frameborder="0" allowfullscreen></iframe>
-
-<p><iframe src="http://www.slideshare.net/slideshow/embed_code/14532075" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe></p>
-
-<hr>
-
-<h2>RubyConf Taiwan 2012 で海外スピーカーデビュー</h2>
-
-<p><a href="http://rubyconf.tw/2012/">RubyConf Taiwan 2012</a> で、初めて海外でスピーカーデビューしてきました。</p>
-
-<iframe src="http://www.slideshare.net/slideshow/embed_code/15544447" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
-
-<hr>
-
-<p>今年は、仕事面でもプライベート面でも大きな変化があったけど、技術者評価制度にしても、学生になったことにしても、まだ種を蒔いただけ、という段階。技術者評価制度は、ペパボのビジネスに貢献して業績向上につながるようじゃないと意味がないし、大学も卒業しないと意味がないので、現状に甘んじることなく前に進んでいく所存。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/01/10/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2012/11/05/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <hr />
+      <h2>
+        あんちぽさんとhsbtさんがペパボに入社
+      </h2>
+      <p>
+        上で書いた技術基盤整備エンジニアとして、
+        <a href="https://twitter.com/kentaro">
+          あんちぽ
+        </a>
+        さんと
+        <a href="https://twitter.com/hsbt">
+          hsbt
+        </a>
+        さんがペパボに入社してくれました。
+      </p>
+      <ul>
+        <li>
+          <a href="http://www.hsbt.org/diary/20120501.html">
+            株式会社paperboy&amp;co.に入社しましたのお知らせ - HsbtDiary(2012-05-01)
+          </a>
+        </li>
+        <li>
+          <a href="http://blog.kentarok.org/entry/2012/05/01/145925">
+            株式会社paperboy&amp;co.に入社しました - delirious thoughts
+          </a>
+        </li>
+      </ul>
+      <p>
+        今までペパボの技術責任者として、ペパボ全体の技術を見る立場だったのですが、自分はどちらかというと OS やミドルウェアレイヤーの技術がテリトリーで、開発についてはそれほど得意ではなく、十分にケアすることができてなかったのですが、あんちぽさん、hsbt さんにペパボの開発全般を見てもらえるようになり、とても助かっています。
+      </p>
+      <p>
+        特に、自分の能力不足やリソース不足で、これはやるべきだろうと思いながらもできなかった数々のことを、二人がガンガンやってくれるので、とても頼もしく、ペパボの技術にとってなくてはならない存在になっています。
+      </p>
+      <hr />
+      <h2>
+        大学生になった
+      </h2>
+      <p>
+        色々思うところがあって、
+        <a href="/blog/2012/04/14/1/">
+          4月から大学生になりました
+        </a>
+        。いまのところ、学業の方も順調に進んでいて、1年目で目標としてる単位数はなんとか取得できそうだな、という感触なのですが、大学に再入学してぶっちゃけどうか、といったエントリを、大学生活が1年経過した4月ぐらいに書く予定です。
+      </p>
+      <p>
+        また、
+        <a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol72">
+          WEB+DB PRESS Vol.72
+        </a>
+        のインタビュー記事でも、このことについてとりあげて頂きました。
+      </p>
+      <hr />
+      <h2>
+        Sqale のリリース
+      </h2>
+      <p>
+        ペパボ初/発の PaaS である
+        <a href="http://sqale.jp/">
+          Sqale
+        </a>
+        をリリースしました。これまでのペパボにはなかったタイプのサービスで、技術的な面でも新しいチャレンジができて、とても楽しく仕事ができました。
+      </p>
+      <p>
+        過去にペパボでがっつりと関わったサービスには、
+        <a href="http://30d.jp/">
+          30days Album
+        </a>
+        や
+        <a href="http://lolipop.jp/">
+          ロリポップの大幅リニューアル
+        </a>
+        があるのですが、このどちらもアーキテクトとして技術全般を見つつも、実装もがっつりやる、という感じで、なかなか大変だったのですが、今回は頼もしいメンバーに恵まれ、アーキテクトにほぼ徹することができました。（OpenSSH や Linux カーネルのパッチ書いたり、AMIつくったり、といったこともやってましたが。）
+      </p>
+      <hr />
+      <h2>
+        札幌Ruby会議2012でスピーカーに
+      </h2>
+      <p>
+        ペパボが徐々に Ruby にスイッチしてることもあり、
+        <a href="http://sqale.jp/">
+          Sqale
+        </a>
+        でもふんだんに Ruby を使っている、ということもあって、
+        <a href="http://sapporo.rubykaigi.org/2012/ja/">
+          札幌Ruby会議2012
+        </a>
+        で発表してきました。Ruby 関係の集まりで発表したのはこれが初めてです。（自分の発表ではほとんど Ruby の話はしてないですが。）
+      </p>
+      <iframe src="http://player.vimeo.com/video/51481486" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+      <p>
+        <a href="http://vimeo.com/51481486">
+          [sprk2012] Inside Sqale's Backend
+        </a>
+        from
+        <a href="http://vimeo.com/suzuki">
+          suzuki
+        </a>
+        on
+        <a href="http://vimeo.com">
+          Vimeo
+        </a>
+        .
+      </p>
+      <iframe src="http://www.slideshare.net/slideshow/embed_code/14290440" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe>
+      <p>
+        自分以外にも、
+        <a href="https://twitter.com/kentaro">
+          あんちぽ
+        </a>
+        さん、
+        <a href="https://twitter.com/hsbt">
+          hsbt
+        </a>
+        さん、
+        <a href="https://twitter.com/kyanny">
+          刺身
+        </a>
+        と、トータル4人がペパボから登壇していて、Rubyコミュニティの方々に、ペパボを印象づけることができたのではないかと思います。
+      </p>
+      <hr />
+      <h2>
+        YAPC::Asia Tokyo 2012 でゲストスピーカーに
+      </h2>
+      <p>
+        <a href="http://yapcasia.org/2012/">
+          YAPC::Asia Tokyo 2012
+        </a>
+        でゲストスピーカーとして招いて頂き、クロージングキーノートをつとめることに。牧さんからお話を頂いたときは、びっくりするとともに、とても名誉なことで、二つ返事でOKしました。自分が今までスピーカーをやった中でも、最高の出来事です。
+      </p>
+      <iframe width="500" height="281" src="http://www.youtube.com/embed/wxUxFdFxd0Y" frameborder="0" allowfullscreen></iframe>
+      <iframe src="http://www.slideshare.net/slideshow/embed_code/14532075" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe>
+      <hr />
+      <h2>
+        RubyConf Taiwan 2012 で海外スピーカーデビュー
+      </h2>
+      <p>
+        <a href="http://rubyconf.tw/2012/">
+          RubyConf Taiwan 2012
+        </a>
+        で、初めて海外でスピーカーデビューしてきました。
+      </p>
+      <iframe src="http://www.slideshare.net/slideshow/embed_code/15544447" width="500" height="441" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe>
+      <hr />
+      <p>
+        今年は、仕事面でもプライベート面でも大きな変化があったけど、技術者評価制度にしても、学生になったことにしても、まだ種を蒔いただけ、という段階。技術者評価制度は、ペパボのビジネスに貢献して業績向上につながるようじゃないと意味がないし、大学も卒業しないと意味がないので、現状に甘んじることなく前に進んでいく所存。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2012/11/05/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/01/10/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

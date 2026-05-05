@@ -1,163 +1,199 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>言語を問わないサーバインフラ管理用汎用コマンド実行フレームワークの提案と実装 (WSA研#6予稿) - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      言語を問わないサーバインフラ管理用汎用コマンド実行フレームワークの提案と実装 (WSA研#6予稿) - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="言語を問わないサーバインフラ管理用汎用コマンド実行フレームワークの提案と実装 (WSA研#6予稿)"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2020/04/19/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2020/04/19/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="言語を問わないサーバインフラ管理用汎用コマンド実行フレームワークの提案と実装 (WSA研#6予稿)"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2020/04/19/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2020/04/19/1">
+          言語を問わないサーバインフラ管理用汎用コマンド実行フレームワークの提案と実装 (WSA研#6予稿)
+        </a>
+      </h1>
+      <div class="byline">
+        19 April 2020
+      </div>
+      <p>
+        このエントリは
+        <a href="https://websystemarchitecture.hatenablog.jp/entry/2019/12/11/165624">
+          第6回Web System Architecture研究会
+        </a>
+        の予稿です。
+      </p>
+      <hr />
+      <h2>
+        はじめに
+      </h2>
+      <p>
+        <a href="http://id.nii.ac.jp/1001/00204179/">
+          Serverspec：宣言的記述でサーバの設定状態をテスト可能な汎用性の高いテストフレームワーク
+        </a>
+        では、従来手法を補うための要件を考察し、要件を満たすために以下の様にテストフレームワークを2つに分割する手法を提案した。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          汎用コマンド実行フレームワーク
+          <ul>
+            <li>
+              運用業務で発生するコマンド群、特に確認業務に必要なコマンド群の体系化・抽象化を行う
+            </li>
+          </ul>
+        </li>
+        <li>
+          制御テストフレームワーク
+          <ul>
+            <li>
+              汎用コマンド実行フレームワークを宣言的な記法で操作する
+            </li>
+          </ul>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2020/04/19/1">言語を問わないサーバインフラ管理用汎用コマンド実行フレームワークの提案と実装 (WSA研#6予稿)</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>このエントリは<a href="https://websystemarchitecture.hatenablog.jp/entry/2019/12/11/165624">第6回Web System Architecture研究会</a>の予稿です。</p>
-
-<hr>
-
-<h2>はじめに</h2>
-
-<p><a href="http://id.nii.ac.jp/1001/00204179/">Serverspec：宣言的記述でサーバの設定状態をテスト可能な汎用性の高いテストフレームワーク</a>では、従来手法を補うための要件を考察し、要件を満たすために以下の様にテストフレームワークを2つに分割する手法を提案した。</p>
-
-<ul>
-<li>汎用コマンド実行フレームワーク
-
-<ul>
-<li>運用業務で発生するコマンド群、特に確認業務に必要なコマンド群の体系化・抽象化を行う</li>
-</ul></li>
-<li>制御テストフレームワーク
-
-<ul>
-<li>汎用コマンド実行フレームワークを宣言的な記法で操作する</li>
-</ul></li>
-</ul>
-
-<p>そして、提案手法に基づき実装した汎用コマンド実行フレームワークをSpecinfra、制御テストフレームワークをServerspecと名付けた。</p>
-
-<p>Specinfraを利用したより優れたテストフレームワーク実装の登場や、確認業務以外の運用業務に必要なコマンド群を体系化することによるテストフレームワーク以外への応用、例えば構成管理ツールへの応用も期待し、いくつかの実装も登場したが、Specinfraは期待したほど広く利用されていない。</p>
-
-<p>本予稿では、Specinfraが期待ほど利用されていない要因について考察し、解決するための手法と実装について述べる。</p>
-
-<hr>
-
-<h2>現状の課題</h2>
-
-<p>サーバ管理系ツールを実装する場合、多くの環境をサポートしようとすると、以下の2つ違いについて考慮し、ツール内で違いを吸収するための抽象化を行うのが一般的である。</p>
-
-<ul>
-<li>サーバの操作や情報を取得するための方法の違い
-
-<ul>
-<li>例えばパッケージ管理系の操作の場合、RedHat系であればyumやrpmコマンド、Debian系であればapt-getやdpkgコマンド、といった違いがOSやディストリビューション毎にある。</li>
-</ul></li>
-<li>サーバ操作や情報取得の実行形式の違い
-
-<ul>
-<li>コマンドを実行する際に、サーバ上で直接コマンドを実行するのか、SSH経由で実行するのか、Docker API経由で実行するのか、などの違い。</li>
-</ul></li>
-</ul>
-
-<p>Chef, Puppet, Ansible, Itamae(Specinfra)といった似たような目的を持つサーバ構成管理ツールは、OS/ディストリビューションや実行形式の抽象化をそれぞれ独自に実装している。</p>
-
-<p>Specinfra開発の狙いは、各サーバ管理ツールで独自に実装している抽象化部分をライブラリに切り出すことによって、ツール本体の実装の手間を省き、手軽に実装できるようにすることにある。</p>
-
-<p>しかし、再利用性を考慮して開発したSpecinfraはそれほど広く使われていない。</p>
-
-<hr>
-
-<h2>課題を解決するための手法と実装</h2>
-
-<p>再利用性を考慮して開発したSpecinfraがそれほど広く利用されていない理由のひとつは、SpecinfraがRuby製であるため、Ruby以外のプロジェクトでは採用できない、ということである。</p>
-
-<p>この課題を解決するための手法として、OS/ディストリビューションの抽象化や実行形式の抽象化を行うためのライブラリを、SpecinfraのようなRubyGemではなく、様々な言語からも利用できる共有ライブラリという形で提供する。</p>
-
-<p>そのための実装を<a href="https://github.com/libspecinfra">libspecinfra</a>と名付けた。libspecinfraはさらに以下の実装に分類される。</p>
-
-<ol>
-<li>共有ライブラリを提供するSpecinfra本体</li>
-<li>Specinfra本体が提供する共有ライブラリを呼び出すための各言語用バインディング</li>
-</ol>
-
-<p>1は実装途中だが、現在開発を停止している。SpecinfraをRustで再実装する形で実装しているが、名前は敢えて変えずにSpecinfraとしている。</p>
-
-<p>2はRuby, mruby, Python用バインディングが存在するが、こちらも現在開発は停止している。</p>
-
-<p>GitHub上のlibspecinfra Organizationにある<a href="https://github.com/libspecinfra/examples">examples</a>リポジトリにはRuby, mruby, Rustのサンプルコードがある。</p>
-
-<hr>
-
-<h2>本研究を進めるにあたっての検討事項</h2>
-
-<p>PuppetやChefやServerspecについて、話題にのぼることが少なくなっている。これはコンテナが広く使われるようになり、サーバの構成管理とテストのあり方が変わってきているためである。コンテナイメージの作成は、従来のサーバプロビジョニングと比較して簡素なため、サーバ構成管理ツールの重要性が低下し、それに伴いテストの重要性も低下している。</p>
-
-<p>とはいえ、従来のようなサーバプロビジョニングがなくなったわけではなく、コンテナのプロビジョニングとコンテナ実行基盤のプロビジョニング、2つのレイヤーに分離された、と考えることができる。</p>
-
-<p>libspecinfraの適用領域はコンテナ実行基盤のプロビジョニングであると考えている。しかしその領域において、libspecinfraのような抽象度の高さは本当に必要なのか、コンテナ実行基盤のプロビジョニング以外にも応用できる領域がないか、等について検討する必要がある。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2020/11/06/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2020/04/01/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        そして、提案手法に基づき実装した汎用コマンド実行フレームワークをSpecinfra、制御テストフレームワークをServerspecと名付けた。
+      </p>
+      <p>
+        Specinfraを利用したより優れたテストフレームワーク実装の登場や、確認業務以外の運用業務に必要なコマンド群を体系化することによるテストフレームワーク以外への応用、例えば構成管理ツールへの応用も期待し、いくつかの実装も登場したが、Specinfraは期待したほど広く利用されていない。
+      </p>
+      <p>
+        本予稿では、Specinfraが期待ほど利用されていない要因について考察し、解決するための手法と実装について述べる。
+      </p>
+      <hr />
+      <h2>
+        現状の課題
+      </h2>
+      <p>
+        サーバ管理系ツールを実装する場合、多くの環境をサポートしようとすると、以下の2つ違いについて考慮し、ツール内で違いを吸収するための抽象化を行うのが一般的である。
+      </p>
+      <ul>
+        <li>
+          サーバの操作や情報を取得するための方法の違い
+          <ul>
+            <li>
+              例えばパッケージ管理系の操作の場合、RedHat系であればyumやrpmコマンド、Debian系であればapt-getやdpkgコマンド、といった違いがOSやディストリビューション毎にある。
+            </li>
+          </ul>
+        </li>
+        <li>
+          サーバ操作や情報取得の実行形式の違い
+          <ul>
+            <li>
+              コマンドを実行する際に、サーバ上で直接コマンドを実行するのか、SSH経由で実行するのか、Docker API経由で実行するのか、などの違い。
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p>
+        Chef, Puppet, Ansible, Itamae(Specinfra)といった似たような目的を持つサーバ構成管理ツールは、OS/ディストリビューションや実行形式の抽象化をそれぞれ独自に実装している。
+      </p>
+      <p>
+        Specinfra開発の狙いは、各サーバ管理ツールで独自に実装している抽象化部分をライブラリに切り出すことによって、ツール本体の実装の手間を省き、手軽に実装できるようにすることにある。
+      </p>
+      <p>
+        しかし、再利用性を考慮して開発したSpecinfraはそれほど広く使われていない。
+      </p>
+      <hr />
+      <h2>
+        課題を解決するための手法と実装
+      </h2>
+      <p>
+        再利用性を考慮して開発したSpecinfraがそれほど広く利用されていない理由のひとつは、SpecinfraがRuby製であるため、Ruby以外のプロジェクトでは採用できない、ということである。
+      </p>
+      <p>
+        この課題を解決するための手法として、OS/ディストリビューションの抽象化や実行形式の抽象化を行うためのライブラリを、SpecinfraのようなRubyGemではなく、様々な言語からも利用できる共有ライブラリという形で提供する。
+      </p>
+      <p>
+        そのための実装を
+        <a href="https://github.com/libspecinfra">
+          libspecinfra
+        </a>
+        と名付けた。libspecinfraはさらに以下の実装に分類される。
+      </p>
+      <ol>
+        <li>
+          共有ライブラリを提供するSpecinfra本体
+        </li>
+        <li>
+          Specinfra本体が提供する共有ライブラリを呼び出すための各言語用バインディング
+        </li>
+      </ol>
+      <p>
+        1は実装途中だが、現在開発を停止している。SpecinfraをRustで再実装する形で実装しているが、名前は敢えて変えずにSpecinfraとしている。
+      </p>
+      <p>
+        2はRuby, mruby, Python用バインディングが存在するが、こちらも現在開発は停止している。
+      </p>
+      <p>
+        GitHub上のlibspecinfra Organizationにある
+        <a href="https://github.com/libspecinfra/examples">
+          examples
+        </a>
+        リポジトリにはRuby, mruby, Rustのサンプルコードがある。
+      </p>
+      <hr />
+      <h2>
+        本研究を進めるにあたっての検討事項
+      </h2>
+      <p>
+        PuppetやChefやServerspecについて、話題にのぼることが少なくなっている。これはコンテナが広く使われるようになり、サーバの構成管理とテストのあり方が変わってきているためである。コンテナイメージの作成は、従来のサーバプロビジョニングと比較して簡素なため、サーバ構成管理ツールの重要性が低下し、それに伴いテストの重要性も低下している。
+      </p>
+      <p>
+        とはいえ、従来のようなサーバプロビジョニングがなくなったわけではなく、コンテナのプロビジョニングとコンテナ実行基盤のプロビジョニング、2つのレイヤーに分離された、と考えることができる。
+      </p>
+      <p>
+        libspecinfraの適用領域はコンテナ実行基盤のプロビジョニングであると考えている。しかしその領域において、libspecinfraのような抽象度の高さは本当に必要なのか、コンテナ実行基盤のプロビジョニング以外にも応用できる領域がないか、等について検討する必要がある。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2020/04/01/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2020/11/06/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

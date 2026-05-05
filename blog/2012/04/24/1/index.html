@@ -1,189 +1,229 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>nebel で静的サイト作成 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2012/04/24/1">nebel で静的サイト作成</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="/blog/2012/04/07/1/">stellar</a> という静的サイトジェネレータをつくっていたのですが、<a href="https://rubygems.org/gems/stellar">名前がモロ被りな gem</a> があったので、<a href="https://github.com/mizzy/nebel">nebel</a> と名前を変更しました。</p>
-
-<p>nebel の方は、静的サイト生成に利用するコマンドと、確認用のテストサーバコマンドのみを含んでいて、実際のサイト生成用のテンプレートやユーティリティツールは、<a href="https://github.com/mizzy/nebel-site">nebel-site</a> の方にあります。(Jekyll と Octopress のような関係です。)</p>
-
-<p>使い方は <a href="https://github.com/mizzy/nebel-site/blob/master/README.md">nebel-site の README</a> にまとめてあるのですが、こちらのブログに日本語でまとめておきます。</p>
-
-<h2>セットアップ</h2>
-
-<p>git clone して、必要な gems を bundle install します。nebel も一緒に入ります。</p>
-
-<pre><code>$ git clone git://github.com/mizzy/nebel-site.git
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      nebel で静的サイト作成 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="nebel で静的サイト作成"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2012/04/24/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2012/04/24/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="nebel で静的サイト作成"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2012/04/24/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2012/04/24/1">
+          nebel で静的サイト作成
+        </a>
+      </h1>
+      <div class="byline">
+        24 April 2012
+      </div>
+      <p>
+        <a href="/blog/2012/04/07/1/">
+          stellar
+        </a>
+        という静的サイトジェネレータをつくっていたのですが、
+        <a href="https://rubygems.org/gems/stellar">
+          名前がモロ被りな gem
+        </a>
+        があったので、
+        <a href="https://github.com/mizzy/nebel">
+          nebel
+        </a>
+        と名前を変更しました。
+      </p>
+      <p>
+        nebel の方は、静的サイト生成に利用するコマンドと、確認用のテストサーバコマンドのみを含んでいて、実際のサイト生成用のテンプレートやユーティリティツールは、
+        <a href="https://github.com/mizzy/nebel-site">
+          nebel-site
+        </a>
+        の方にあります。(Jekyll と Octopress のような関係です。)
+      </p>
+      <p>
+        使い方は
+        <a href="https://github.com/mizzy/nebel-site/blob/master/README.md">
+          nebel-site の README
+        </a>
+        にまとめてあるのですが、こちらのブログに日本語でまとめておきます。
+      </p>
+      <h2>
+        セットアップ
+      </h2>
+      <p>
+        git clone して、必要な gems を bundle install します。nebel も一緒に入ります。
+      </p>
+      <pre><code>$ git clone git://github.com/mizzy/nebel-site.git
 $ cd nebel-site
-$ bundle install
-</code></pre>
-
-<h2>ファイルの修正や作成</h2>
-
-<ul>
-<li>layouts/post.html
-
-<ul>
-<li>エントリのテンプレートなので、適宜修正してください。</li>
-</ul></li>
-<li>layouts/atom.xml
-
-<ul>
-<li>Atom フィードのテンプレートなので、適宜修正してください。</li>
-</ul></li>
-<li>static/
-
-<ul>
-<li>静的ファイル置き場。画像、CSS、JavaScript など、好きなファイルを置いてください。サブディレクトリも作成できます。</li>
-</ul></li>
-</ul>
-
-<h2>エントリファイルの作成</h2>
-
-<p>以下のような内容でエントリファイルを作成します。ファイル名は、.md か .markdown で終わっていれば、何でもいいです。</p>
-
-<pre><code>---
+$ bundle install</code></pre>
+      <h2>
+        ファイルの修正や作成
+      </h2>
+      <ul>
+        <li>
+          layouts/post.html
+          <ul>
+            <li>
+              エントリのテンプレートなので、適宜修正してください。
+            </li>
+          </ul>
+        </li>
+        <li>
+          layouts/atom.xml
+          <ul>
+            <li>
+              Atom フィードのテンプレートなので、適宜修正してください。
+            </li>
+          </ul>
+        </li>
+        <li>
+          static/
+          <ul>
+            <li>
+              静的ファイル置き場。画像、CSS、JavaScript など、好きなファイルを置いてください。サブディレクトリも作成できます。
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <h2>
+        エントリファイルの作成
+      </h2>
+      <p>
+        以下のような内容でエントリファイルを作成します。ファイル名は、.md か .markdown で終わっていれば、何でもいいです。
+      </p>
+      <pre><code>---
 title: エントリのタイトル
 date: 2012-04-24 18:15:59 +0900
 ---
 
-エントリの本文。Markdown 記法が使えます。
-</code></pre>
-
-<h2>nebel コマンドの実行</h2>
-
-<pre><code>$ bundle exec nebel
-</code></pre>
-
-<p>nebel コマンドを実行すると、posts 以下のエントリファイルを処理して、生成されたファイルを public 以下に配置します。また、static ディレクトリ以下のファイルもすべて、public 以下にコピーされます。</p>
-
-<h2>テストサーバで確認</h2>
-
-<p>以下のコマンドでテストサーバが立ち上がるので、http://localhost:5000/ にアクセスすると、生成されたコンテンツの確認ができます。</p>
-
-<pre><code>$ bundle exec nebel-server
-</code></pre>
-
-<h2>コンテンツの公開</h2>
-
-<p>public ディレクトリ以下のファイルを、お好きなサーバにアップロードしてください。</p>
-
-<h2>ユーティリティツール</h2>
-
-<p>更に便利に利用するためのユーティリティツールも同梱してます。</p>
-
-<h3>エントリファイルの作成</h3>
-
-<p>thor post:create で、エントリファイルを作成します。</p>
-
-<pre><code>$ thor post:create entry-title
-</code></pre>
-
-<p>と実行すると、posts/2012-04-24-entry-title.markdown といったファイル名で、以下の様な内容のファイルを作成し、さらにエディタで開いてくれます。(ただし Mac のみ。)</p>
-
-<pre><code>---
+エントリの本文。Markdown 記法が使えます。</code></pre>
+      <h2>
+        nebel コマンドの実行
+      </h2>
+      <pre><code>$ bundle exec nebel</code></pre>
+      <p>
+        nebel コマンドを実行すると、posts 以下のエントリファイルを処理して、生成されたファイルを public 以下に配置します。また、static ディレクトリ以下のファイルもすべて、public 以下にコピーされます。
+      </p>
+      <h2>
+        テストサーバで確認
+      </h2>
+      <p>
+        以下のコマンドでテストサーバが立ち上がるので、http://localhost:5000/ にアクセスすると、生成されたコンテンツの確認ができます。
+      </p>
+      <pre><code>$ bundle exec nebel-server</code></pre>
+      <h2>
+        コンテンツの公開
+      </h2>
+      <p>
+        public ディレクトリ以下のファイルを、お好きなサーバにアップロードしてください。
+      </p>
+      <h2>
+        ユーティリティツール
+      </h2>
+      <p>
+        更に便利に利用するためのユーティリティツールも同梱してます。
+      </p>
+      <h3>
+        エントリファイルの作成
+      </h3>
+      <p>
+        thor post:create で、エントリファイルを作成します。
+      </p>
+      <pre><code>$ thor post:create entry-title</code></pre>
+      <p>
+        と実行すると、posts/2012-04-24-entry-title.markdown といったファイル名で、以下の様な内容のファイルを作成し、さらにエディタで開いてくれます。(ただし Mac のみ。)
+      </p>
+      <pre><code>---
 title: entry-title
 date: 2012-04-24 19:25:34 +0900
----
-</code></pre>
-
-<h3>nebel コマンドの自動実行</h3>
-
-<p>同僚の <a href="https://github.com/banyan">@banyan</a> が Guardfile をつくってくれたので、ファイルが変更されると自動的に nebel コマンドを実行して、コンテンツを再生成します。</p>
-
-<pre><code>$ bundle exec nebel-server
-</code></pre>
-
-<p><a href="https://github.com/guard/guard-livereload">guard-livereload</a> も利用しているので、ブラウザでの自動リロードにも対応してます。</p>
-
-<h3>テストサーバ起動＆諸々自動化</h3>
-
-<pre><code>$ thor server:start
-</code></pre>
-
-<p>を実行すると、以下の一連の処理が自動的に実行されます。</p>
-
-<ul>
-<li>テストサーバの起動</li>
-<li>ブラウザで http://localhost:5000/ を開く</li>
-<li>ファイル変更を検知して自動生成</li>
-<li>ブラウザの自動リロード</li>
-</ul>
-
-<p>こんな感じで、かなり便利になった。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2012/04/24/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2012/04/23/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+---</code></pre>
+      <h3>
+        nebel コマンドの自動実行
+      </h3>
+      <p>
+        同僚の
+        <a href="https://github.com/banyan">
+          @banyan
+        </a>
+        が Guardfile をつくってくれたので、ファイルが変更されると自動的に nebel コマンドを実行して、コンテンツを再生成します。
+      </p>
+      <pre><code>$ bundle exec nebel-server</code></pre>
+      <p>
+        <a href="https://github.com/guard/guard-livereload">
+          guard-livereload
+        </a>
+        も利用しているので、ブラウザでの自動リロードにも対応してます。
+      </p>
+      <h3>
+        テストサーバ起動＆諸々自動化
+      </h3>
+      <pre><code>$ thor server:start</code></pre>
+      <p>
+        を実行すると、以下の一連の処理が自動的に実行されます。
+      </p>
+      <ul>
+        <li>
+          テストサーバの起動
+        </li>
+        <li>
+          ブラウザで http://localhost:5000/ を開く
+        </li>
+        <li>
+          ファイル変更を検知して自動生成
+        </li>
+        <li>
+          ブラウザの自動リロード
+        </li>
+      </ul>
+      <p>
+        こんな感じで、かなり便利になった。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2012/04/23/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2012/04/24/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

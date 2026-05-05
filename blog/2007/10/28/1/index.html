@@ -1,143 +1,157 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ModSuid2AndModRuidAndLinuxCapability - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ModSuid2AndModRuidAndLinuxCapability - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ModSuid2AndModRuidAndLinuxCapability"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/10/28/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/10/28/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ModSuid2AndModRuidAndLinuxCapability"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/10/28/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/10/28/1">
+          ModSuid2AndModRuidAndLinuxCapability
+        </a>
+      </h1>
+      <div class="byline">
+        28 October 2007
+      </div>
+      <p>
+        Apache の suEXEC では setuid/setgid を使って、httpd 実行ユーザとは異なるユーザ権限で CGI プログラムや SSI プログラムを実行できるわけですが、mod_php で処理される PHP プログラムのように、httpd 内で処理されるプログラムは、httpd 実行ユーザの権限で実行されてしまいます。こういったものまで httpd とは異なるユーザ権限で実行するためのモジュールとして、
+        <a href="http://bluecoara.net/download/mod_suid2/">
+          mod_suid2
+        </a>
+        や
+        <a href="http://websupport.sk/~stanojr/projects/mod_ruid/">
+          mod_ruid
+        </a>
+        といったものがあります。
+      </p>
+      <p>
+        mod_suid2 は、httpd を root で起動しておいて、リクエストに応じて（VirtualHost 単位等で）setuid/setgid して実行ユーザを切り替える、という動作をします。そのため、以下のような問題があります。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          -DBIG_SECURITY_HOLE つきで Apache をコンパイルする必要がある。
+        </li>
+        <li>
+          root でプロセスを起動する危険性。
+        </li>
+        <li>
+          MaxRequestsPerChild が 1 に設定されることによるパフォーマンスの劣化。（一度 setuid/setgid してしまうと、root ではなくなり setuid/setgid できなくなるので、リクエストを処理するたびにプロセス/スレッドを殺す必要があるため）
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/10/28/1">ModSuid2AndModRuidAndLinuxCapability</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>Apache の suEXEC では setuid/setgid を使って、httpd 実行ユーザとは異なるユーザ権限で CGI プログラムや SSI プログラムを実行できるわけですが、mod_php で処理される PHP プログラムのように、httpd 内で処理されるプログラムは、httpd 実行ユーザの権限で実行されてしまいます。こういったものまで httpd とは異なるユーザ権限で実行するためのモジュールとして、<a href="http://bluecoara.net/download/mod_suid2/">mod_suid2</a> や <a href="http://websupport.sk/%7Estanojr/projects/mod_ruid/">mod_ruid</a> といったものがあります。</p>
-
-<p>mod_suid2 は、httpd を root で起動しておいて、リクエストに応じて（VirtualHost 単位等で）setuid/setgid して実行ユーザを切り替える、という動作をします。そのため、以下のような問題があります。</p>
-
-<ul>
-<li>-DBIG<em>SECURITY</em>HOLE つきで Apache をコンパイルする必要がある。</li>
-<li>root でプロセスを起動する危険性。</li>
-<li>MaxRequestsPerChild が 1 に設定されることによるパフォーマンスの劣化。（一度 setuid/setgid してしまうと、root ではなくなり setuid/setgid できなくなるので、リクエストを処理するたびにプロセス/スレッドを殺す必要があるため）</li>
-</ul>
-
-<p>これに対し、mod<em>ruid は Linux に実装されている POSIX 1003.1e で定義された<a href="http://opentechpress.jp/security/03/08/06/0941214.shtml">ケーパビリティ</a> を利用して、root で httpd を起動することなく、setuid/segid できる権限のみ与えて、プロセス/スレッドの実行ユーザを切り替えています。そのため、mod</em>suid2 が抱える問題点の多くを解消しています。（また、mod_suid2 と違い、参照するファイルやディレクトリのユーザ/グループに実行権限を切り替える機能もあります。）</p>
-
-<p>ここで気になったのは、「setuid/setgid って、プロセス単位じゃなくてスレッド単位でもできるの？」ということ。もしできないのであれば、worker ではなく prefork で動かす必要もある、ということになる。で、結論からいうと「できる」でした。<a href="http://d.hatena.ne.jp/naoya/20071010/1192040413">マルチスレッドのコンテキスト切り替えに伴うコスト - naoyaのはてなダイアリー</a> をご覧になると分かるように、スレッドを生成する毎に dup<em>task</em>struct(current) して、各スレッドが個別にプロセスディスクリプタを持つので、当然と言えば当然なのですが、mod<em>ruid を有効にした Apache のプロセス状態を表示することによって、スレッドごとに実行ユーザがちゃんと異なっていることを確認しました。（mod</em>ruid はリクエスト処理後に元のユーザに戻してしまうため、確認のため戻さないようにソースを少しいじってます。）</p>
-
-<pre><code>$ ps -efL
+      <p>
+        これに対し、mod_ruid は Linux に実装されている POSIX 1003.1e で定義された
+        <a href="http://opentechpress.jp/security/03/08/06/0941214.shtml">
+          ケーパビリティ
+        </a>
+        を利用して、root で httpd を起動することなく、setuid/segid できる権限のみ与えて、プロセス/スレッドの実行ユーザを切り替えています。そのため、mod_suid2 が抱える問題点の多くを解消しています。（また、mod_suid2 と違い、参照するファイルやディレクトリのユーザ/グループに実行権限を切り替える機能もあります。）
+      </p>
+      <p>
+        ここで気になったのは、「setuid/setgid って、プロセス単位じゃなくてスレッド単位でもできるの？」ということ。もしできないのであれば、worker ではなく prefork で動かす必要もある、ということになる。で、結論からいうと「できる」でした。
+        <a href="http://d.hatena.ne.jp/naoya/20071010/1192040413">
+          マルチスレッドのコンテキスト切り替えに伴うコスト - naoyaのはてなダイアリー
+        </a>
+        をご覧になると分かるように、スレッドを生成する毎に dup_task_struct(current) して、各スレッドが個別にプロセスディスクリプタを持つので、当然と言えば当然なのですが、mod_ruid を有効にした Apache のプロセス状態を表示することによって、スレッドごとに実行ユーザがちゃんと異なっていることを確認しました。（mod_ruid はリクエスト処理後に元のユーザに戻してしまうため、確認のため戻さないようにソースを少しいじってます。）
+      </p>
+      <pre><code>$ ps -efL
 UID        PID  PPID   LWP  C NLWP STIME TTY          TIME CMD 
 daemon    4156  4153  4188  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start 
 miya      4156  4153  4189  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
-puppet    4156  4153  4225  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start
-</code></pre>
-
-<p>ちなみに、Linux での setuid の処理は、kernel/sys.c で以下のようになっています。</p>
-
-<pre><code>#!c
+puppet    4156  4153  4225  0   27 20:48 ?        00:00:00 /usr/local/apache2/bin/httpd -k start</code></pre>
+      <p>
+        ちなみに、Linux での setuid の処理は、kernel/sys.c で以下のようになっています。
+      </p>
+      <pre><code>#!c
 asmlinkage long sys_setuid(uid_t uid)
 {
-    int old_euid = current-&gt;euid;
-    int old_ruid, old_suid, new_suid;
-    int retval;
+	int old_euid = current-&gt;euid;
+	int old_ruid, old_suid, new_suid;
+	int retval;
 
-    retval = security_task_setuid(uid, (uid_t)-1, (uid_t)-1, LSM_SETID_ID);
-    if (retval)
-        return retval;
+	retval = security_task_setuid(uid, (uid_t)-1, (uid_t)-1, LSM_SETID_ID);
+	if (retval)
+		return retval;
 
-    old_ruid = current-&gt;uid;
-    old_suid = current-&gt;suid;
-    new_suid = old_suid;
+	old_ruid = current-&gt;uid;
+	old_suid = current-&gt;suid;
+	new_suid = old_suid;
+	
+	if (capable(CAP_SETUID)) {
+		if (uid != old_ruid &amp;&amp; set_user(uid, old_euid != uid) &lt; 0)
+			return -EAGAIN;
+		new_suid = uid;
+	} else if ((uid != current-&gt;uid) &amp;&amp; (uid != new_suid))
+		return -EPERM;
 
-    if (capable(CAP_SETUID)) {
-        if (uid != old_ruid &amp;&amp; set_user(uid, old_euid != uid) &lt; 0)
-            return -EAGAIN;
-        new_suid = uid;
-    } else if ((uid != current-&gt;uid) &amp;&amp; (uid != new_suid))
-        return -EPERM;
+	if (old_euid != uid) {
+		set_dumpable(current-&gt;mm, suid_dumpable);
+		smp_wmb();
+	}
+	current-&gt;fsuid uid;
+	current-&gt;suid = new_suid;
 
-    if (old_euid != uid) {
-        set_dumpable(current-&gt;mm, suid_dumpable);
-        smp_wmb();
-    }
-    current-&gt;fsuid uid;
-    current-&gt;suid = new_suid;
+	key_fsuid_changed(current);
+	proc_id_connector(current, PROC_EVENT_UID);
 
-    key_fsuid_changed(current);
-    proc_id_connector(current, PROC_EVENT_UID);
-
-    return security_task_post_setuid(old_ruid, old_euid, old_suid, LSM_SETID_ID);
-}
-</code></pre>
-
-<p>task_struct 構造体の、fsuid, euid, suid あたりを書き換えているようですね。</p>
-
-<p>まとまりのないエントリになってしまいましたが、ケーパビリティとか、スレッド単位で setuid/setgid できるとか、はじめて知ることが多かったのでとりあえずメモ。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/11/08/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/10/27/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+	return security_task_post_setuid(old_ruid, old_euid, old_suid, LSM_SETID_ID);
+}</code></pre>
+      <p>
+        task_struct 構造体の、fsuid, euid, suid あたりを書き換えているようですね。
+      </p>
+      <p>
+        まとまりのないエントリになってしまいましたが、ケーパビリティとか、スレッド単位で setuid/setgid できるとか、はじめて知ることが多かったのでとりあえずメモ。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/10/27/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/11/08/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

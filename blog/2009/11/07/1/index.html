@@ -1,90 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>TheArtofApplicationPerformanceTesting - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      TheArtofApplicationPerformanceTesting - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="TheArtofApplicationPerformanceTesting"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2009/11/07/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2009/11/07/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="TheArtofApplicationPerformanceTesting"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2009/11/07/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2009/11/07/1">
+          TheArtofApplicationPerformanceTesting
+        </a>
+      </h1>
+      <div class="byline">
+        7 November 2009
+      </div>
+      <p>
+        ご献本いただきました、
+        <a href="http://www.oreilly.co.jp/books/9784873114248/">
+          アート・オブ・アプリケーション パフォーマンステスト
+        </a>
+        をようやく読了しました。オライリー・ジャパン様、
+        <a href="http://d.hatena.ne.jp/stanaka/">
+          id:stanaka
+        </a>
+        さん、ありがとうございます。
+      </p>
+      <p>
+        アプリケーションのパフォーマンステストって、せいぜいウェブアプリに対して ab で負荷かけてみるとか、JMeter つかってみるとか、そんな程度のことしかやったことなくて、ツールそのものの使い方なんかは調べれば出てくるけど、こういったツールを使って、正しくパフォーマンスを測定するためには、どのように環境を整えればいいのか、とか、どういったテストプランを立てればいいのかとか、立てたプランをどのように実行すればいいのか、とか、結果をどのように分析すればいいのか、といったことは、ググってもまったく出てこないわけですが、本書はまさに、こういったことに対する系統だった知識を与えてくれます。
+      </p>
+      <p>
+        逆に言うと、具体的なツールについてはほとんど触れられておらず、付録にツールの一覧が載っているのみ、となっています。
+      </p>
+      <p>
+        というわけで、主に「考え方」にフォーカスしていて、すぐに実践で使える、という内容にはなっていません。また、出てくる事例なんかを見ても、著者はエンタープライズな Windows 環境での経験が豊富な方のようで、個人ユーザ向けに Linux サーバでサービス提供しているようなペパボのような会社には、本書の内容をそのまますぐに適用するのは難しそうな印象を受けました。
+      </p>
+      <p>
+        とはいうものの、本書の「はじめに」で書かれている、「ほとんどのアプリケーションの多くは、スケーラビリティとパフォーマンスについてのテストが適切になされずに稼働している。」というのは、ペパボもまさにそうであり、パフォーマンステストが十分になされず、リリースしてみたらパフォーマンスが思ったように出ない、といったことも正直あったりして、反省させられました。本書をきっかけに、開発プランの中に適切なパフォーマンステストをどのように組み込み、どのように実践していけばいいのか、検討していきたいと思いました。そのための指針として、単なるツールの使い方を示すような上辺だけの方法論ではなく、ベースとなる考え方をしっかりと提示してくれている本書は、今後とても役立つのではないかと感じています。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2009/10/31/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2009/11/07/1">TheArtofApplicationPerformanceTesting</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>ご献本いただきました、<a href="http://www.oreilly.co.jp/books/9784873114248/">アート・オブ・アプリケーション パフォーマンステスト</a> をようやく読了しました。オライリー・ジャパン様、<a href="http://d.hatena.ne.jp/stanaka/">id:stanaka</a> さん、ありがとうございます。</p>
-
-<p>アプリケーションのパフォーマンステストって、せいぜいウェブアプリに対して ab で負荷かけてみるとか、JMeter つかってみるとか、そんな程度のことしかやったことなくて、ツールそのものの使い方なんかは調べれば出てくるけど、こういったツールを使って、正しくパフォーマンスを測定するためには、どのように環境を整えればいいのか、とか、どういったテストプランを立てればいいのかとか、立てたプランをどのように実行すればいいのか、とか、結果をどのように分析すればいいのか、といったことは、ググってもまったく出てこないわけですが、本書はまさに、こういったことに対する系統だった知識を与えてくれます。</p>
-
-<p>逆に言うと、具体的なツールについてはほとんど触れられておらず、付録にツールの一覧が載っているのみ、となっています。</p>
-
-<p>というわけで、主に「考え方」にフォーカスしていて、すぐに実践で使える、という内容にはなっていません。また、出てくる事例なんかを見ても、著者はエンタープライズな Windows 環境での経験が豊富な方のようで、個人ユーザ向けに Linux サーバでサービス提供しているようなペパボのような会社には、本書の内容をそのまますぐに適用するのは難しそうな印象を受けました。</p>
-
-<p>とはいうものの、本書の「はじめに」で書かれている、「ほとんどのアプリケーションの多くは、スケーラビリティとパフォーマンスについてのテストが適切になされずに稼働している。」というのは、ペパボもまさにそうであり、パフォーマンステストが十分になされず、リリースしてみたらパフォーマンスが思ったように出ない、といったことも正直あったりして、反省させられました。本書をきっかけに、開発プランの中に適切なパフォーマンステストをどのように組み込み、どのように実践していけばいいのか、検討していきたいと思いました。そのための指針として、単なるツールの使い方を示すような上辺だけの方法論ではなく、ベースとなる考え方をしっかりと提示してくれている本書は、今後とても役立つのではないかと感じています。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2009/11/15/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2009/10/31/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2009/11/15/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

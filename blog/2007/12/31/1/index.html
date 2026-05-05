@@ -1,100 +1,92 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Koan - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/12/31/1">Koan</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://cobbler.et.redhat.com/docs/koan.html">Koan (Kickstart over a network)</a> を使うと、Cobbler と連携して、PXE ブートを使わずに OS を再インストールしたり、Xen または QEMU のゲスト OS をコマンド一発でインストールすることができます。</p>
-
-<p>以下、Fedora 7 で Koan を試してみたメモ。</p>
-
-<h1>Koan のインストール</h1>
-
-<pre><code>$ sudo yum install koan
-</code></pre>
-
-<h1>プロファイルやシステムの一覧を表示</h1>
-
-<p>プロファイル一覧を表示する。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --list-profile
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Koan - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Koan"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/12/31/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/12/31/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Koan"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/12/31/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/12/31/1">
+          Koan
+        </a>
+      </h1>
+      <div class="byline">
+        31 December 2007
+      </div>
+      <p>
+        <a href="http://cobbler.et.redhat.com/docs/koan.html">
+          Koan (Kickstart over a network)
+        </a>
+        を使うと、Cobbler と連携して、PXE ブートを使わずに OS を再インストールしたり、Xen または QEMU のゲスト OS をコマンド一発でインストールすることができます。
+      </p>
+      <p>
+        以下、Fedora 7 で Koan を試してみたメモ。
+      </p>
+      <h1>
+        Koan のインストール
+      </h1>
+      <pre><code>$ sudo yum install koan</code></pre>
+      <h1>
+        プロファイルやシステムの一覧を表示
+      </h1>
+      <p>
+        プロファイル一覧を表示する。
+      </p>
+      <pre><code>$ sudo koan --server=cobbler.example.org --list-profile
 fc7-i386
-fc7-xen-i386 
-</code></pre>
-
-<p>システム一覧を表示する。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --list-system
-test-server.example.org
-</code></pre>
-
-<p>cobbler.example.org は cobbler が動いてるサーバ。koan による OS インストールを行うときには、プロファイルかシステムのどちらかを指定する。</p>
-
-<h1>OS の再インストール</h1>
-
-<p>OS を再インストールする時には、--replace-self オプション と --profile または --system を指定して koan を実行。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --replace-self --profile=f7-i386
+fc7-xen-i386</code></pre>
+      <p>
+        システム一覧を表示する。
+      </p>
+      <pre><code>$ sudo koan --server=cobbler.example.org --list-system
+test-server.example.org</code></pre>
+      <p>
+        cobbler.example.org は cobbler が動いてるサーバ。koan による OS インストールを行うときには、プロファイルかシステムのどちらかを指定する。
+      </p>
+      <h1>
+        OS の再インストール
+      </h1>
+      <p>
+        OS を再インストールする時には、--replace-self オプション と --profile または --system を指定して koan を実行。
+      </p>
+      <pre><code>$ sudo koan --server=cobbler.example.org --replace-self --profile=f7-i386
 - using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
 downloading initrd initrd.img to /boot/initrd.img
 url=http://cobbler.example.org/cobbler/images/f7-i386/initrd.img
@@ -105,52 +97,60 @@ url=http://cobbler.example.org/cobbler/images/f7-i386/vmlinuz
 - kickstart: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
 - downloading http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
 - using kickstart from cobbler: http://cobbler.example.org/cblr/kickstarts/f7-i386/ks.cfg
-- [&#39;/bin/bash&#39;, &#39;/var/spool/koan/insert.sh&#39;]
+- ['/bin/bash', '/var/spool/koan/insert.sh']
 cpio
 14535 blocks
 14538 blocks
 done
-- [&#39;/sbin/grubby&#39;, &#39;--grub&#39;, &#39;--add-kernel&#39;, &#39;/boot/vmlinuz&#39;, &#39;--initrd&#39;, &#39;/boot/initrd.img&#39;, &#39;--make-default&#39;, &#39;--title&#39;, &#39;kick1199098439&#39;, &#39;--args&#39;, &#39;ksdevice=eth0 lang=  kssendmac syslog=cobbler.example.org:25150 text  ks=file:ks.cfg&#39;, &#39;--copy-default&#39;]
-- reboot to apply changes 
-</code></pre>
-
-<p>ネットワークインストール用の /boot/initrd.img とか /boot/vmlinuz とかを cobbler サーバからダウンロードして、/boot/grub/menu.lst を書き換えてくれる。</p>
-
-<p>あとは再起動すれば、OS の再インストールが勝手にはじまる。</p>
-
-<h1>Xen ゲスト OS のインストール</h1>
-
-<h2>Xen のインストールと Xen カーネルの起動</h2>
-
-<p>当然 Xen 環境が必要になるので、Xen をインストール。</p>
-
-<pre><code>$ sudo yum install kernel-xen xen
-</code></pre>
-
-<p>インストール後、/boot/grub/menu.lst を書き換えて、デフォルトで Xen カーネルが起動するようにして再起動する。</p>
-
-<h2>koan コマンドでの Xen ゲスト OS インストール</h2>
-
-<p>--replace-self ではなく --virt を指定する。</p>
-
-<pre><code>$ sudo koan --server=cobbler.example.org --virt --profile=f7-xen-i386
-</code></pre>
-
-<p>これで Xen ゲスト OS のインストールがはじまる、はずなんだけど、うちの環境では Segmentation Fault になってしまった。VMWare 上で Xen を動かすというのは無理があるのかもしれない。</p>
-
-<p>実機で試したいところだけど、試せるサーバがないので保留。Yappo さんあたりが試してレポートしてくれるに違いない、きっと。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2008/01/05/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/12/29/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+- ['/sbin/grubby', '--grub', '--add-kernel', '/boot/vmlinuz', '--initrd', '/boot/initrd.img', '--make-default', '--title', 'kick1199098439', '--args', 'ksdevice=eth0 lang=  kssendmac syslog=cobbler.example.org:25150 text  ks=file:ks.cfg', '--copy-default']
+- reboot to apply changes</code></pre>
+      <p>
+        ネットワークインストール用の /boot/initrd.img とか /boot/vmlinuz とかを cobbler サーバからダウンロードして、/boot/grub/menu.lst を書き換えてくれる。
+      </p>
+      <p>
+        あとは再起動すれば、OS の再インストールが勝手にはじまる。
+      </p>
+      <h1>
+        Xen ゲスト OS のインストール
+      </h1>
+      <h2>
+        Xen のインストールと Xen カーネルの起動
+      </h2>
+      <p>
+        当然 Xen 環境が必要になるので、Xen をインストール。
+      </p>
+      <pre><code>$ sudo yum install kernel-xen xen</code></pre>
+      <p>
+        インストール後、/boot/grub/menu.lst を書き換えて、デフォルトで Xen カーネルが起動するようにして再起動する。
+      </p>
+      <h2>
+        koan コマンドでの Xen ゲスト OS インストール
+      </h2>
+      <p>
+        --replace-self ではなく --virt を指定する。
+      </p>
+      <pre><code>$ sudo koan --server=cobbler.example.org --virt --profile=f7-xen-i386</code></pre>
+      <p>
+        これで Xen ゲスト OS のインストールがはじまる、はずなんだけど、うちの環境では Segmentation Fault になってしまった。VMWare 上で Xen を動かすというのは無理があるのかもしれない。
+      </p>
+      <p>
+        実機で試したいところだけど、試せるサーバがないので保留。Yappo さんあたりが試してレポートしてくれるに違いない、きっと。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/12/29/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2008/01/05/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

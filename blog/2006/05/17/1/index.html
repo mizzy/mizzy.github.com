@@ -1,124 +1,125 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>mod_rpaf よりも mod_extract_forwarded - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/05/17/1">mod_rpaf よりも mod_extract_forwarded</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-リバースプロキシな環境では <a href="http://stderr.net/apache/rpaf/" target="_blank">mod_rpaf</a> 使ったりすることが多いと思いますが、バックエンドの apache でアクセス制限かける場合には、<a href="http://www.openinfo.co.uk/apache/index.html">mod_extract_forwarded</a> を使ったほうが良いよ、というお話。
-</p>
-
-<p class="entryBody">
-バックエンドの apache 2.0 + mod_rpaf な環境で .htaccess によるアクセス制限をかけようとしても、接続元の IP アドレスではなく、pound の IP アドレスで制限がかかってしまう、という現象に悩まされました。で、ソースを眺めてみると mod_rpaf は ap_hook_post_read_request で実行されているのに対し、mod_access は ap_hook_access_checker で実行されています。おそらく、ap_hook_post_read_request よりも ap_hook_access_checker が先に実行されてしまい、mod_rpaf によるアドレス書き換え前にアクセス制限が実行されてしまう、ということなのでしょう、たぶん。（<a href="http://httpd.apache.org/docs/2.2/ja/developer/modules.html" target="_blank">「モジュールの Apache 1.3 から Apache 2.0 への移植」</a> にモジュールのフックステージ一覧があるのですが、実行される順番は不明。apache のソース軽く眺めても、いくつかのファイルに分散しててよくわからんかった。）
-</p>
-
-<p class="entryBody">
-で、mod_rpaf のソース書き換えて、フックする場所変えればいいんじゃね、と思いつつ試してみるも、思った通りの動作をせずに悩んでいたところ、弊社のサーバエンジニアの方が、mod_extract_forwarded を見つけてきてくれました。
-</p>
-
-<p class="entryBody">
-これを試してみたところ、ちゃんと pound ではなく接続元の IP アドレスで制限がかかってくれました。
-</p>
-
-<p class="entryBody">
-mod_extract_forwarded のソースを眺めてみると、ap_hook_post_read_request, ap_hook_translate_name, ap_hook_access_checker の3つのフックステージで何やらごにょごにょやっている様子。特に、mod_access の場合は、
-</p>
-
-<pre class="code">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      mod_rpaf よりも mod_extract_forwarded - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="mod_rpaf よりも mod_extract_forwarded"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/05/17/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/05/17/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="mod_rpaf よりも mod_extract_forwarded"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/05/17/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/05/17/1">
+          mod_rpaf よりも mod_extract_forwarded
+        </a>
+      </h1>
+      <div class="byline">
+        17 May 2006
+      </div>
+      <p class="entryBody">
+        リバースプロキシな環境では
+        <a href="http://stderr.net/apache/rpaf/" target="_blank">
+          mod_rpaf
+        </a>
+        使ったりすることが多いと思いますが、バックエンドの apache でアクセス制限かける場合には、
+        <a href="http://www.openinfo.co.uk/apache/index.html">
+          mod_extract_forwarded
+        </a>
+        を使ったほうが良いよ、というお話。
+      </p>
+      <p class="entryBody">
+        バックエンドの apache 2.0 + mod_rpaf な環境で .htaccess によるアクセス制限をかけようとしても、接続元の IP アドレスではなく、pound の IP アドレスで制限がかかってしまう、という現象に悩まされました。で、ソースを眺めてみると mod_rpaf は ap_hook_post_read_request で実行されているのに対し、mod_access は ap_hook_access_checker で実行されています。おそらく、ap_hook_post_read_request よりも ap_hook_access_checker が先に実行されてしまい、mod_rpaf によるアドレス書き換え前にアクセス制限が実行されてしまう、ということなのでしょう、たぶん。（
+        <a href="http://httpd.apache.org/docs/2.2/ja/developer/modules.html" target="_blank">
+          「モジュールの Apache 1.3 から Apache 2.0 への移植」
+        </a>
+        にモジュールのフックステージ一覧があるのですが、実行される順番は不明。apache のソース軽く眺めても、いくつかのファイルに分散しててよくわからんかった。）
+      </p>
+      <p class="entryBody">
+        で、mod_rpaf のソース書き換えて、フックする場所変えればいいんじゃね、と思いつつ試してみるも、思った通りの動作をせずに悩んでいたところ、弊社のサーバエンジニアの方が、mod_extract_forwarded を見つけてきてくれました。
+      </p>
+      <p class="entryBody">
+        これを試してみたところ、ちゃんと pound ではなく接続元の IP アドレスで制限がかかってくれました。
+      </p>
+      <p class="entryBody">
+        mod_extract_forwarded のソースを眺めてみると、ap_hook_post_read_request, ap_hook_translate_name, ap_hook_access_checker の3つのフックステージで何やらごにょごにょやっている様子。特に、mod_access の場合は、
+      </p>
+      <pre class="code">
 ap_hook_access_checker(check_dir_access,NULL,NULL,<strong>APR_HOOK_MIDDLE</strong>);
 </pre>
-
-<p class="entryBody">
-と同じ ap_hook_access_checker の APR_HOOK_MIDDLE で実行されてるのに対し、mod_extract_forwarded では
-</p>
-
-<pre class="code">
+      <p class="entryBody">
+        と同じ ap_hook_access_checker の APR_HOOK_MIDDLE で実行されてるのに対し、mod_extract_forwarded では
+      </p>
+      <pre class="code">
 ap_hook_access_checker(mef_access_check, NULL, NULL, <strong>APR_HOOK_FIRST</strong>);
 </pre>
-
-<p class="entryBody">
-といった感じで APR_HOOK_FIRST で実行されてたりするので、この辺がポイントなのかな、とあまりソース読めないなりに理解しました。
-</p>
-
-<p class="entryBody">
-ためしたのは .htaccess だけですが、おそらく httpd.conf でアクセス制限かける場合でも同じなのではないかと。
-</p>
-
-<p class="entryBody">
-<s>また、 apache 2.2 では mod_access ではなく mod_authz_host ですが、フックしているところは mod_access と全く同じなので、たぶん 2.2 でも同じことでしょう。</s> <a href="http://d.hatena.ne.jp/dayflower/20060603/1149314379" target="_blank">2.2 ではそのままでは動かないそうです。</a> その他にも色々注意点があり大変参考になります。<a href="http://d.hatena.ne.jp/dayflower/" target="_blank">id:dayflower さん</a>、ありがとうございます。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/05/17/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/05/13/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p class="entryBody">
+        といった感じで APR_HOOK_FIRST で実行されてたりするので、この辺がポイントなのかな、とあまりソース読めないなりに理解しました。
+      </p>
+      <p class="entryBody">
+        ためしたのは .htaccess だけですが、おそらく httpd.conf でアクセス制限かける場合でも同じなのではないかと。
+      </p>
+      <p class="entryBody">
+        <s>
+          また、 apache 2.2 では mod_access ではなく mod_authz_host ですが、フックしているところは mod_access と全く同じなので、たぶん 2.2 でも同じことでしょう。
+        </s>
+        <a href="http://d.hatena.ne.jp/dayflower/20060603/1149314379" target="_blank">
+          2.2 ではそのままでは動かないそうです。
+        </a>
+        その他にも色々注意点があり大変参考になります。
+        <a href="http://d.hatena.ne.jp/dayflower/" target="_blank">
+          id:dayflower さん
+        </a>
+        、ありがとうございます。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/05/13/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/05/17/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

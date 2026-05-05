@@ -1,78 +1,76 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Filter::Audio #0 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/08/27/1">Filter::Audio #0</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060827/1156610704"><span class="icon"></span>Convert Apache index to Podcasts</a> とか <a class="ext-link" href="http://www.hsbt.org/diary/20060827.html#p03"><span class="icon"></span>RubyKaigi2006の音声ファイルをPlaggerで色々</a> を見て、音声ファイル変換用のプラグインがあれば便利かな、と思い、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm"><span class="icon"></span>Filter::Audio</a> をつくってみました。
-</p>
-
-<p>
-宮川さんの設定に以下の様な内容を追加すれば、ローカルにダウンロード、mp3 へ変換して PodCasting できます。
-</p>
-
-<pre class="wiki">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Filter::Audio #0 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Filter::Audio #0"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/08/27/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/08/27/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Filter::Audio #0"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/08/27/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/08/27/1">
+          Filter::Audio #0
+        </a>
+      </h1>
+      <div class="byline">
+        27 August 2006
+      </div>
+      <p>
+        <a class="ext-link" href="http://subtech.g.hatena.ne.jp/miyagawa/20060827/1156610704">
+          <span class="icon"></span>
+          Convert Apache index to Podcasts
+        </a>
+        とか
+        <a class="ext-link" href="http://www.hsbt.org/diary/20060827.html#p03">
+          <span class="icon"></span>
+          RubyKaigi2006の音声ファイルをPlaggerで色々
+        </a>
+        を見て、音声ファイル変換用のプラグインがあれば便利かな、と思い、
+        <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/Audio.pm">
+          <span class="icon"></span>
+          Filter::Audio
+        </a>
+        をつくってみました。
+      </p>
+      <p>
+        宮川さんの設定に以下の様な内容を追加すれば、ローカルにダウンロード、mp3 へ変換して PodCasting できます。
+      </p>
+      <pre class="wiki">
   - module: Filter::FetchEnclosure
     config:
       dir: /home/miya/audio
@@ -87,34 +85,64 @@
         - local: /home/miya/audio/
           url:   http://mizzy.org/audio/
 </pre>
-
-<p>
-Filter::Audio は <a class="ext-link" href="http://search.cpan.org/~mhooreman/Audio-ConvTools-0.06/lib/Audio/ConvTools.pm"><span class="icon"></span>Audio::ConvTools</a> に依存しているのですが、ogg -> mp3 への変換は oggenc と lame が必要です。oggenc はともかく、lame はライセンス的に微妙なんですよね。（詳しくはよく知らないのですが。）
-</p>
-
-<p>
-<strong>追記</strong><br />
-ffmpeg が --enable-libogg と --ebale-mp3lame つきでコンパイルされていれば、<a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm"><span class="icon"></span>Filter::FFmpeg</a> でも ogg -> mp3 変換できそう。なのでわざわざ Filter::Audio つくらなくてもよかった。うちの環境では。
-</p>
-
-<p>
-<strong>TODO</strong><br />
-</p>
-
-<ul><li><a class="ext-link" href="http://search.cpan.org/~dbp/Ogg-Vorbis-Header-0.03/Header.pm"><span class="icon"></span>Ogg::Vorbis::Header</a> とか <a class="ext-link" href="http://search.cpan.org/~daniel/MP3-Info-1.20/Info.pm"><span class="icon"></span>MP3::Info</a> とか使って、メタ情報の取得やセットができるようになると更に良さそう。</li>
-<li>config: from は設定しなくても、拡張子とかから自動判断させるようにするといいかな。</li></ul>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/08/28/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/08/26/3" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        Filter::Audio は
+        <a class="ext-link" href="http://search.cpan.org/~mhooreman/Audio-ConvTools-0.06/lib/Audio/ConvTools.pm">
+          <span class="icon"></span>
+          Audio::ConvTools
+        </a>
+        に依存しているのですが、ogg -> mp3 への変換は oggenc と lame が必要です。oggenc はともかく、lame はライセンス的に微妙なんですよね。（詳しくはよく知らないのですが。）
+      </p>
+      <p>
+        <strong>
+          追記
+        </strong>
+        <br />
+        ffmpeg が --enable-libogg と --ebale-mp3lame つきでコンパイルされていれば、
+        <a class="ext-link" href="http://trac.mizzy.org/public/browser/plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm">
+          <span class="icon"></span>
+          Filter::FFmpeg
+        </a>
+        でも ogg -> mp3 変換できそう。なのでわざわざ Filter::Audio つくらなくてもよかった。うちの環境では。
+      </p>
+      <p>
+        <strong>
+          TODO
+        </strong>
+        <br />
+      </p>
+      <ul>
+        <li>
+          <a class="ext-link" href="http://search.cpan.org/~dbp/Ogg-Vorbis-Header-0.03/Header.pm">
+            <span class="icon"></span>
+            Ogg::Vorbis::Header
+          </a>
+          とか
+          <a class="ext-link" href="http://search.cpan.org/~daniel/MP3-Info-1.20/Info.pm">
+            <span class="icon"></span>
+            MP3::Info
+          </a>
+          とか使って、メタ情報の取得やセットができるようになると更に良さそう。
+        </li>
+        <li>
+          config: from は設定しなくても、拡張子とかから自動判断させるようにするといいかな。
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/08/26/3" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/08/28/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,168 +1,219 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>MHA for MySQL の概要 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      MHA for MySQL の概要 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="MHA for MySQL の概要"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/02/06/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/02/06/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="MHA for MySQL の概要"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/02/06/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/02/06/1">
+          MHA for MySQL の概要
+        </a>
+      </h1>
+      <div class="byline">
+        6 February 2013
+      </div>
+      <p>
+        MHA for MySQL の導入を検討していて、まずは社内の技術者向けに、MHA for MySQL の概要を伝えようと、主に
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/TableOfContents?tm=6">
+          オフィシャルなドキュメント
+        </a>
+        からポイントを抜粋して社内向けの Wiki に書いてみた。本当なら、オフィシャルドキュメント全体に目を通してもらうのがいいんだけど、英語なので、はじめの一歩としては敷居が高く感じる人もいるだろう、ということで。
+      </p>
+      <p>
+        特に外に出してまずい情報があるわけでもないので、このブログでも曝しておきます。
+      </p>
+      <hr />
+      <h2>
+        MHA の概要
+      </h2>
+      <p>
+        MySQL エキスパートとして世界的にも著名な松信嘉範氏による、MySQL マスターの HA 化を行うためのツール。Perl 製。
+      </p>
+      <p>
+        最小限のダウンタイムで、データの不整合を防ぎつつ、マスターのフェイルオーバーを行う、というのが主な機能。
+      </p>
+      <p>
+        また、既に動作している MySQL に影響を与えることなく導入できる。
+      </p>
+      <p>
+        機能は大きくわけると以下の4つ。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          自動的なマスターの監視とフェイルオーバー
+          <ul>
+            <li>
+              トータルダウンタイム10〜30秒ぐらいで切り替え可能
+            </li>
+          </ul>
+        </li>
+        <li>
+          手動によるマスターフェイルオーバー
+        </li>
+        <li>
+          自動的なマスターのフェイルオーバー（監視はしない）
+          <ul>
+            <li>
+              監視を既存ソフトウェア（Pacemaker など）で行う場合に有用
+            </li>
+          </ul>
+        </li>
+        <li>
+          オンラインでマスターを別ホストに切り替え
+          <ul>
+            <li>
+              マスターは動作してるが、ハードウェア的に怪しい兆候が見られるので、別ホストに事前に切り替えたい、などといった場合に有用
+            </li>
+            <li>
+              0.5〜2秒ほど書き込みブロックされるだけで切り替え可能
+            </li>
+          </ul>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/02/06/1">MHA for MySQL の概要</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>MHA for MySQL の導入を検討していて、まずは社内の技術者向けに、MHA for MySQL の概要を伝えようと、主に <a href="http://code.google.com/p/mysql-master-ha/wiki/TableOfContents?tm=6">オフィシャルなドキュメント</a> からポイントを抜粋して社内向けの Wiki に書いてみた。本当なら、オフィシャルドキュメント全体に目を通してもらうのがいいんだけど、英語なので、はじめの一歩としては敷居が高く感じる人もいるだろう、ということで。</p>
-
-<p>特に外に出してまずい情報があるわけでもないので、このブログでも曝しておきます。</p>
-
-<hr>
-
-<h2>MHA の概要</h2>
-
-<p>MySQL エキスパートとして世界的にも著名な松信嘉範氏による、MySQL マスターの HA 化を行うためのツール。Perl 製。</p>
-
-<p>最小限のダウンタイムで、データの不整合を防ぎつつ、マスターのフェイルオーバーを行う、というのが主な機能。</p>
-
-<p>また、既に動作している MySQL に影響を与えることなく導入できる。</p>
-
-<p>機能は大きくわけると以下の4つ。</p>
-
-<ul>
-<li>自動的なマスターの監視とフェイルオーバー
-
-<ul>
-<li>トータルダウンタイム10〜30秒ぐらいで切り替え可能</li>
-</ul></li>
-<li>手動によるマスターフェイルオーバー</li>
-<li>自動的なマスターのフェイルオーバー（監視はしない）
-
-<ul>
-<li>監視を既存ソフトウェア（Pacemaker など）で行う場合に有用</li>
-</ul></li>
-<li>オンラインでマスターを別ホストに切り替え
-
-<ul>
-<li>マスターは動作してるが、ハードウェア的に怪しい兆候が見られるので、別ホストに事前に切り替えたい、などといった場合に有用</li>
-<li>0.5〜2秒ほど書き込みブロックされるだけで切り替え可能</li>
-</ul></li>
-</ul>
-
-<hr>
-
-<h2>MHA のコンポーネントと動作概要</h2>
-
-<p>マスターの監視とフェイルオーバーを MHA で自動的に行う場合の構成は以下のようになる。</p>
-
-<p><img src="/images/2013/02/components_of_mha.png" title="Components of MHA" ></p>
-
-<p>動作の流れは以下の通り。</p>
-
-<ul>
-<li>Manager が MySQL Master を監視</li>
-<li>ダウンを検知すると、以下を実行
-
-<ul>
-<li>Master の最新のバイナリログを各 Slave に保存（可能であれば）</li>
-<li>新マスターのリカバリ
-
-<ul>
-<li>スレーブのうちのひとつを新マスターにする</li>
-<li>デフォルトでは一番新しいポジションまで進んでいるスレーブが選ばれる。設定で、このスレーブを次のマスターにする、といったこともできる。</li>
-<li>新マスターにバイナリログの最新のポジションまでのデータを反映させる</li>
-</ul></li>
-<li>その他のスレーブのリカバリ 
-
-<ul>
-<li>バイナリログの最新のポジションまでのデータを反映させる</li>
-<li>新マスターからレプリケーションを開始</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<p>動作の詳細についてはオフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Sequences_of_MHA">Sequences of MHA</a> を参照。</p>
-
-<hr>
-
-<h2>Manager の拡張</h2>
-
-<p>Manager の本体である masterha_manager には拡張ポイントがいくつかあり、設定ファイル中で以下のパラメータに対してスクリプトを指定することで、動作を拡張することができる。拡張ポイントは以下の通り。</p>
-
-<ul>
-<li>secondary_check_script</li>
-<li>master_ip_failover_script</li>
-<li>shutdown_script</li>
-<li>report_script</li>
-<li>init_conf_load_script</li>
-<li>master_ip_online_change_script</li>
-</ul>
-
-<p>例えば、MHA 自体には、マスターがフェイルオーバーした時に VIP を付け替える機能はないが、以下のように VIP 付け替え用のスクリプトを設定ファイルで指定すると、フェイルオーバー時に VIP の付け替えをしてくれる。（スクリプトは自分で用意する。）</p>
-
-<pre><code>master_ip_failover_script=/usr/local/sample/bin/master_ip_failover
-</code></pre>
-
-<p>詳細は <a href="http://code.google.com/p/mysql-master-ha/wiki/Architecture#Custom_Extensions">Custom Extensions</a> を参照。</p>
-
-<hr>
-
-<h2>Manager の設定例</h2>
-
-<p>拡張スクリプトの設定など、必須ではないものも含む。</p>
-
-<pre><code>[server default]
+      <hr />
+      <h2>
+        MHA のコンポーネントと動作概要
+      </h2>
+      <p>
+        マスターの監視とフェイルオーバーを MHA で自動的に行う場合の構成は以下のようになる。
+      </p>
+      <p>
+        {% img /images/2013/02/components_of_mha.png Components of MHA %}
+      </p>
+      <p>
+        動作の流れは以下の通り。
+      </p>
+      <ul>
+        <li>
+          Manager が MySQL Master を監視
+        </li>
+        <li>
+          ダウンを検知すると、以下を実行
+          <ul>
+            <li>
+              Master の最新のバイナリログを各 Slave に保存（可能であれば）
+            </li>
+            <li>
+              新マスターのリカバリ
+              <ul>
+                <li>
+                  スレーブのうちのひとつを新マスターにする
+                  <ul>
+                    <li>
+                      デフォルトでは一番新しいポジションまで進んでいるスレーブが選ばれる。設定で、このスレーブを次のマスターにする、といったこともできる。
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  新マスターにバイナリログの最新のポジションまでのデータを反映させる
+                </li>
+              </ul>
+            </li>
+            <li>
+              その他のスレーブのリカバリ
+              <ul>
+                <li>
+                  バイナリログの最新のポジションまでのデータを反映させる
+                </li>
+                <li>
+                  新マスターからレプリケーションを開始
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p>
+        動作の詳細についてはオフィシャルドキュメントの
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/Sequences_of_MHA">
+          Sequences of MHA
+        </a>
+        を参照。
+      </p>
+      <hr />
+      <h2>
+        Manager の拡張
+      </h2>
+      <p>
+        Manager の本体である masterha_manager には拡張ポイントがいくつかあり、設定ファイル中で以下のパラメータに対してスクリプトを指定することで、動作を拡張することができる。拡張ポイントは以下の通り。
+      </p>
+      <ul>
+        <li>
+          secondary_check_script
+        </li>
+        <li>
+          master_ip_failover_script
+        </li>
+        <li>
+          shutdown_script
+        </li>
+        <li>
+          report_script
+        </li>
+        <li>
+          init_conf_load_script
+        </li>
+        <li>
+          master_ip_online_change_script
+        </li>
+      </ul>
+      <p>
+        例えば、MHA 自体には、マスターがフェイルオーバーした時に VIP を付け替える機能はないが、以下のように VIP 付け替え用のスクリプトを設定ファイルで指定すると、フェイルオーバー時に VIP の付け替えをしてくれる。（スクリプトは自分で用意する。）
+      </p>
+      <pre><code>master_ip_failover_script=/usr/local/sample/bin/master_ip_failover</code></pre>
+      <p>
+        詳細は
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/Architecture#Custom_Extensions">
+          Custom Extensions
+        </a>
+        を参照。
+      </p>
+      <hr />
+      <h2>
+        Manager の設定例
+      </h2>
+      <p>
+        拡張スクリプトの設定など、必須ではないものも含む。
+      </p>
+      <pre><code>[server default]
 # mysql user and password
 user=root
 password=mysqlpass
@@ -177,7 +228,7 @@ ping_interval=3
 master_ip_failover_script=/script/masterha/master_ip_failover
 shutdown_script=/script/masterha/power_manager
 report_script=/script/masterha/send_master_failover_mail
-
+  
 [server1]
 hostname=host1
 candidate_master=1 # 次のマスター候補
@@ -187,112 +238,205 @@ hostname=host2
 
 [server3]
 hostname=host3
-no_master=1 # このホストはマスターにしない
-</code></pre>
-
-<p>以下のように設定ファイルを指定して起動する。</p>
-
-<pre><code class="text"># masterha_manager --conf=/etc/mha.cnf
-</code></pre>
-
-<p>設定パラメータ一覧はオフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters">Parameters</a> を参照。</p>
-
-<hr>
-
-<h2>チュートリアル</h2>
-
-<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Tutorial">Tutorial</a> を参照。</p>
-
-<hr>
-
-<h2>FAQ</h2>
-
-<p><a href="http://code.google.com/p/mysql-master-ha/wiki/FAQ">FAQ</a> からいくつかピックアップ。超意訳。</p>
-
-<ul>
-<li>サポートされている MySQL のバージョンは？
-
-<ul>
-<li>5.0 以降がサポートされている。4.1 以下はサポート対象外。</li>
-</ul></li>
-<li>特定のスレーブホストをマスターに昇格したり、逆に特定のホストはマスターに昇格しない、といったことは可能か？
-
-<ul>
-<li><a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#candidate_master">cadidate_master</a> や <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#no_master">no_master</a> といったパラメータで設定可能。</li>
-</ul></li>
-<li>インタラクティブ/手動でのフェイルオーバーは可能？
-
-<ul>
-<li><a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_master_switch">masterha<em>master</em>switch</a> 使えばOK。</li>
-</ul></li>
-<li>MHA Manager 自体の冗長化は？
-
-<ul>
-<li>Pacemaker とか使っとけ。</li>
-</ul></li>
-</ul>
-
-<hr>
-
-<h2>よくあるエラーと対処方法</h2>
-
-<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/TypicalErrors">TypicalErrors</a> を参照。</p>
-
-<hr>
-
-<h2>必要条件</h2>
-
-<p>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/Requirements">Requirements</a> からいくつかピックアップして超意訳。</p>
-
-<p>MHA を動作させるためには、以下の設定が必要。<a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_manager">masterha_manager</a> や <a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_check_repl">masterha_check_repl</a> 実行時に自動的にチェックしてくれる。</p>
-
-<ul>
-<li>root で各ノード間での SSH 公開鍵認証ができること
-
-<ul>
-<li>masterha_check_ssh コマンドでチェックできる</li>
-</ul></li>
-<li>MySQL 5.0 以降のみサポート</li>
-<li>マスター昇格候補のサーバで log-bin が enable になってること </li>
-<li>マスター昇格候補サーバにレプリケーション用ユーザが存在すること</li>
-<li>ステートメントベースのレプリケーションでは LOAD DATA INFILE を使用してはいけない</li>
-</ul>
-
-<hr>
-
-<h2>その他</h2>
-
-<ul>
-<li>Semi-Synchronous Replication と組み合わせることで、マスターのハードウェア故障等によるデータロスのリスクを抑えることができる
-
-<ul>
-<li>オフィシャルドキュメントの <a href="http://code.google.com/p/mysql-master-ha/wiki/UseCases#Using_together_with_Semi-Synchronous_Replication">Using together with Semi-Synchronous Replication</a> を参照</li>
-<li>Semi-Synchronous Replication については <a href="http://nippondanji.blogspot.jp/2009/03/mysql-ha-semi-synchronous-replication.html">漢(オトコ)のコンピュータ道: 最強のMySQL HA化手法 - Semi-Synchronous Replication</a> が詳しい</li>
-</ul></li>
-</ul>
-
-<hr>
-
-<h2>参考 URL</h2>
-
-<ul>
-<li><a href="http://www.slideshare.net/matsunobu/mha-for-mysqldena">MHA for MySQL と DeNA のオープンソースの話</a></li>
-<li><a href="http://code.google.com/p/mysql-master-ha/"> mysql-master-ha - MHA for MySQL: Master High Availability Manager and tools for MySQL - Google Project Hosting</a></li>
-<li><a href="https://github.com/yoshinorim/mha4mysql-node">yoshinorim/mha4mysql-node on GitHub</a></li>
-<li><a href="https://github.com/yoshinorim/mha4mysql-manager">yoshinorim/mha4mysql-manager on GitHub</a></li>
-</ul>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/02/11/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/01/30/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+no_master=1 # このホストはマスターにしない</code></pre>
+      <p>
+        以下のように設定ファイルを指定して起動する。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"># masterha_manager --conf=/etc/mha.cnf
+</span></span></code></pre>
+      <p>
+        設定パラメータ一覧はオフィシャルドキュメントの
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters">
+          Parameters
+        </a>
+        を参照。
+      </p>
+      <hr />
+      <h2>
+        チュートリアル
+      </h2>
+      <p>
+        オフィシャルドキュメントの
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/Tutorial">
+          Tutorial
+        </a>
+        を参照。
+      </p>
+      <hr />
+      <h2>
+        FAQ
+      </h2>
+      <p>
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/FAQ">
+          FAQ
+        </a>
+        からいくつかピックアップ。超意訳。
+      </p>
+      <ul>
+        <li>
+          サポートされている MySQL のバージョンは？
+          <ul>
+            <li>
+              5.0 以降がサポートされている。4.1 以下はサポート対象外。
+            </li>
+          </ul>
+        </li>
+        <li>
+          特定のスレーブホストをマスターに昇格したり、逆に特定のホストはマスターに昇格しない、といったことは可能か？
+          <ul>
+            <li>
+              <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#candidate_master">
+                cadidate_master
+              </a>
+              や
+              <a href="http://code.google.com/p/mysql-master-ha/wiki/Parameters#no_master">
+                no_master
+              </a>
+              といったパラメータで設定可能。
+            </li>
+          </ul>
+        </li>
+        <li>
+          インタラクティブ/手動でのフェイルオーバーは可能？
+          <ul>
+            <li>
+              <a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_master_switch">
+                masterha_master_switch
+              </a>
+              使えばOK。
+            </li>
+          </ul>
+        </li>
+        <li>
+          MHA Manager 自体の冗長化は？
+          <ul>
+            <li>
+              Pacemaker とか使っとけ。
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <hr />
+      <h2>
+        よくあるエラーと対処方法
+      </h2>
+      <p>
+        オフィシャルドキュメントの
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/TypicalErrors">
+          TypicalErrors
+        </a>
+        を参照。
+      </p>
+      <hr />
+      <h2>
+        必要条件
+      </h2>
+      <p>
+        オフィシャルドキュメントの
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/Requirements">
+          Requirements
+        </a>
+        からいくつかピックアップして超意訳。
+      </p>
+      <p>
+        MHA を動作させるためには、以下の設定が必要。
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_manager">
+          masterha_manager
+        </a>
+        や
+        <a href="http://code.google.com/p/mysql-master-ha/wiki/masterha_check_repl">
+          masterha_check_repl
+        </a>
+        実行時に自動的にチェックしてくれる。
+      </p>
+      <ul>
+        <li>
+          root で各ノード間での SSH 公開鍵認証ができること
+          <ul>
+            <li>
+              masterha_check_ssh コマンドでチェックできる
+            </li>
+          </ul>
+        </li>
+        <li>
+          MySQL 5.0 以降のみサポート
+        </li>
+        <li>
+          マスター昇格候補のサーバで log-bin が enable になってること
+        </li>
+        <li>
+          マスター昇格候補サーバにレプリケーション用ユーザが存在すること
+        </li>
+        <li>
+          ステートメントベースのレプリケーションでは LOAD DATA INFILE を使用してはいけない
+        </li>
+      </ul>
+      <hr />
+      <h2>
+        その他
+      </h2>
+      <ul>
+        <li>
+          Semi-Synchronous Replication と組み合わせることで、マスターのハードウェア故障等によるデータロスのリスクを抑えることができる
+          <ul>
+            <li>
+              オフィシャルドキュメントの
+              <a href="http://code.google.com/p/mysql-master-ha/wiki/UseCases#Using_together_with_Semi-Synchronous_Replication">
+                Using together with Semi-Synchronous Replication
+              </a>
+              を参照
+            </li>
+            <li>
+              Semi-Synchronous Replication については
+              <a href="http://nippondanji.blogspot.jp/2009/03/mysql-ha-semi-synchronous-replication.html">
+                漢(オトコ)のコンピュータ道: 最強のMySQL HA化手法 - Semi-Synchronous Replication
+              </a>
+              が詳しい
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <hr />
+      <h2>
+        参考 URL
+      </h2>
+      <ul>
+        <li>
+          <a href="http://www.slideshare.net/matsunobu/mha-for-mysqldena">
+            MHA for MySQL と DeNA のオープンソースの話
+          </a>
+        </li>
+        <li>
+          <a href="http://code.google.com/p/mysql-master-ha/">
+            mysql-master-ha - MHA for MySQL: Master High Availability Manager and tools for MySQL - Google Project Hosting
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/yoshinorim/mha4mysql-node">
+            yoshinorim/mha4mysql-node on GitHub
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/yoshinorim/mha4mysql-manager">
+            yoshinorim/mha4mysql-manager on GitHub
+          </a>
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/01/30/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/02/11/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

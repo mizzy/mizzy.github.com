@@ -1,168 +1,205 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2007/04/09/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2007/04/09/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2007/04/09/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/04/09/1">html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://clouder.jp/yoshiki/mt/archives/000377.html"><span class="icon"></span>Clouder::Blogger: html-tt - emacsのTemplate Toolkit用のmode</a> を html-helper-mode ではなく、sgml-mode のマイナーモードで動くようにしたパッチ。（置換しただけ。）
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2007/04/09/1">
+    html-tt-mode を sgml-mode のマイナーモードで動くようにしてみた
+  </a>
+</h1>
+<div class="byline">
+  9 April 2007
+</div>
 <p>
-別に sgml-mode に思い入れはなく、Meadow でデフォルトで動いてるからそのまま使ってるだけなので、html-helper-mode にしてもいいんだけど、どうも Meadow でうまく色づけされないので、その原因追求するよりも、sgml-mode で動くようにした方がはやかったので。
+  <a class="ext-link" href="http://clouder.jp/yoshiki/mt/archives/000377.html">
+    <span class="icon"></span>
+    Clouder::Blogger: html-tt - emacsのTemplate Toolkit用のmode
+  </a>
+  を html-helper-mode ではなく、sgml-mode のマイナーモードで動くようにしたパッチ。（置換しただけ。）
 </p>
-
 <p>
-本当はどっちでも動くようにするのがいいんだろうけど、それはまた今度。
+  別に sgml-mode に思い入れはなく、Meadow でデフォルトで動いてるからそのまま使ってるだけなので、html-helper-mode にしてもいいんだけど、どうも Meadow でうまく色づけされないので、その原因追求するよりも、sgml-mode で動くようにした方がはやかったので。
 </p>
-
+<p>
+  本当はどっちでも動くようにするのがいいんだろうけど、それはまた今度。
+</p>
 <pre class="wiki">
 === html-tt.el
 ==================================================================
---- html-tt.el  (revision 193)
-+++ html-tt.el  (local)
+--- html-tt.el	(revision 193)
++++ html-tt.el	(local)
 @@ -66,7 +66,7 @@
  ;; Code:
- 
- (provide 'html-tt)
--(require 'html-helper-mode)
-+(require 'sgml-mode)
- (require 'tempo)
- (require 'font-lock)
- 
-@@ -217,38 +217,38 @@
- (defun html-tt-load-hook ()
-   (interactive)
-   ;; define key bind
--  ;(define-key html-helper-mode-map "\C-cs"
-+  ;(define-key sgml-mode-map "\C-cs"
-   ;  'html-tt-insert-sequence)
--  (define-key html-helper-mode-map "\C-cs"
-+  (define-key sgml-mode-map "\C-cs"
-     'tempo-template-html-tt-insert-sequence)
--  (define-key html-helper-mode-map "\C-cd"
-+  (define-key sgml-mode-map "\C-cd"
-     'html-tt-insert-directive)
--  (define-key html-helper-mode-map "\C-cn"
-+  (define-key sgml-mode-map "\C-cn"
-     'tempo-template-html-tt-insert-directive)
--  (define-key html-helper-mode-map "\C-ci"
-+  (define-key sgml-mode-map "\C-ci"
-     'tempo-template-html-tt-insert-if)
--  (define-key html-helper-mode-map "\C-cl"
-+  (define-key sgml-mode-map "\C-cl"
-     'tempo-template-html-tt-insert-elsif)
--  (define-key html-helper-mode-map "\C-ce"
-+  (define-key sgml-mode-map "\C-ce"
-     'tempo-template-html-tt-insert-else)
--  (define-key html-helper-mode-map "\C-cf"
-+  (define-key sgml-mode-map "\C-cf"
-     'tempo-template-html-tt-insert-foreach)
--  (define-key html-helper-mode-map "\C-cw"
-+  (define-key sgml-mode-map "\C-cw"
-     'tempo-template-html-tt-insert-while)
--  (define-key html-helper-mode-map "\C-cm"
-+  (define-key sgml-mode-map "\C-cm"
-     'tempo-template-html-tt-insert-switch)
--  (define-key html-helper-mode-map "\C-cn"
-+  (define-key sgml-mode-map "\C-cn"
-     'tempo-template-html-tt-insert-include)
-
-   ;; add hilit-set-mode-pattern, if use hilit19.
-   (if (featurep 'hilit19)
--      (hilit-add-pattern "\\&#x5b;%" "%\\&#x5d;" 'midnightblue 'html-helper-mode)
-+      (hilit-add-pattern "\\&#x5b;%" "%\\&#x5d;" 'midnightblue 'sgml-mode)
-     )
- 
-   ;; set font-lock
-   (make-local-variable 'font-lock-defaults)
-   (setq html-tt-font-lock-keywords
--   (append html-helper-font-lock-keywords html-tt-font-lock-keywords))
-+   (append sgml-font-lock-keywords html-tt-font-lock-keywords))
-   (setq font-lock-defaults '(html-tt-font-lock-keywords t t))
-   ) 
+<p>(provide 'html-tt)<br />
+-(require 'html-helper-mode)<br />
++(require 'sgml-mode)<br />
+(require 'tempo)<br />
+(require 'font-lock)</p>
+<p>@@ -217,38 +217,38 @@<br />
+(defun html-tt-load-hook ()<br />
+(interactive)<br />
+;; define key bind</p>
+<ul>
+<li>;(define-key html-helper-mode-map &quot;\C-cs&quot;</li>
+</ul>
+<ul>
+<li>;(define-key sgml-mode-map &quot;\C-cs&quot;<br />
+;  'html-tt-insert-sequence)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cs&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-cs&quot;<br />
+'tempo-template-html-tt-insert-sequence)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cd&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-cd&quot;<br />
+'html-tt-insert-directive)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cn&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-cn&quot;<br />
+'tempo-template-html-tt-insert-directive)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-ci&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-ci&quot;<br />
+'tempo-template-html-tt-insert-if)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cl&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-cl&quot;<br />
+'tempo-template-html-tt-insert-elsif)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-ce&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-ce&quot;<br />
+'tempo-template-html-tt-insert-else)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cf&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-cf&quot;<br />
+'tempo-template-html-tt-insert-foreach)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cw&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-cw&quot;<br />
+'tempo-template-html-tt-insert-while)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cm&quot;</li>
+</ul>
+<ul>
+<li>(define-key sgml-mode-map &quot;\C-cm&quot;<br />
+'tempo-template-html-tt-insert-switch)</li>
+</ul>
+<ul>
+<li>(define-key html-helper-mode-map &quot;\C-cn&quot;</li>
+</ul>
+<ul>
+<li>
+<p>(define-key sgml-mode-map &quot;\C-cn&quot;<br />
+'tempo-template-html-tt-insert-include)</p>
+<p>;; add hilit-set-mode-pattern, if use hilit19.<br />
+(if (featurep 'hilit19)</p>
+</li>
+</ul>
+<ul>
+<li>
+<pre><code>(hilit-add-pattern &quot;\\&amp;#x5b;%&quot; &quot;%\\&amp;#x5d;&quot; 'midnightblue 'html-helper-mode)</code></pre>
+</li>
+</ul>
+<ul>
+<li>
+<pre><code>(hilit-add-pattern &quot;\\&amp;#x5b;%&quot; &quot;%\\&amp;#x5d;&quot; 'midnightblue 'sgml-mode)</code></pre>
+<p>)</p>
+<p>;; set font-lock<br />
+(make-local-variable 'font-lock-defaults)<br />
+(setq html-tt-font-lock-keywords</p>
+</li>
+</ul>
+<ul>
+<li>(append html-helper-font-lock-keywords html-tt-font-lock-keywords))</li>
+</ul>
+<ul>
+<li>(append sgml-font-lock-keywords html-tt-font-lock-keywords))<br />
+(setq font-lock-defaults '(html-tt-font-lock-keywords t t))<br />
+)<br />
 </pre>
-
 <p>
-.emacs での設定はこんな感じで。
-</p>
-
-<pre class="wiki">
+  .emacs での設定はこんな感じで。
+</p><pre class="wiki">
 (require 'html-tt)
 (add-hook 'sgml-mode-hook 'html-tt-load-hook)
 </pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/04/22/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/03/25/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2007/03/25/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2007/04/22/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

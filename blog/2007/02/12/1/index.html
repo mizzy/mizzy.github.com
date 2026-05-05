@@ -1,181 +1,220 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>デプロイツール Archer #0 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    デプロイツール Archer #0 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="デプロイツール Archer #0"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2007/02/12/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2007/02/12/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="デプロイツール Archer #0"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2007/02/12/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/02/12/1">デプロイツール Archer #0</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/"><span class="icon"></span>id:tokuhirom</a> さん作のデプロイツール <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> を最近使い始めたのですが、これがすげーいいっす。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2007/02/12/1">
+    デプロイツール Archer #0
+  </a>
+</h1>
+<div class="byline">
+  12 February 2007
+</div>
 <p>
-で、この週末は更に便利に使えるように、Archer 用のプラグイン書いたりしてました。
+  <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/">
+    <span class="icon"></span>
+    id:tokuhirom
+  </a>
+  さん作のデプロイツール
+  <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175">
+    <span class="icon"></span>
+    Archer
+  </a>
+  を最近使い始めたのですが、これがすげーいいっす。
 </p>
-
-<ul><li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Log.pm"><span class="icon"></span>Archer::Plugin::SVN::Log</a></li>
-<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Diff.pm"><span class="icon"></span>Archer::Plugin::SVN::Diff</a></li>
-<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Update.pm"><span class="icon"></span>Archer::Plugin::SVN::Update</a></li>
-<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Rsync.pm"><span class="icon"></span>Archer::Plugin::Rsync</a></li>
-<li><a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Shell.pm"><span class="icon"></span>Archer::Plugin::Shell</a></li></ul>
+<p>
+  で、この週末は更に便利に使えるように、Archer 用のプラグイン書いたりしてました。
+</p>
+<ul>
+  <li>
+    <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Log.pm">
+      <span class="icon"></span>
+      Archer::Plugin::SVN::Log
+    </a>
+  </li>
+  <li>
+    <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Diff.pm">
+      <span class="icon"></span>
+      Archer::Plugin::SVN::Diff
+    </a>
+  </li>
+  <li>
+    <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/SVN/Update.pm">
+      <span class="icon"></span>
+      Archer::Plugin::SVN::Update
+    </a>
+  </li>
+  <li>
+    <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Rsync.pm">
+      <span class="icon"></span>
+      Archer::Plugin::Rsync
+    </a>
+  </li>
+  <li>
+    <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Archer/lib/Archer/Plugin/Shell.pm">
+      <span class="icon"></span>
+      Archer::Plugin::Shell
+    </a>
+  </li>
+</ul>
 <pre class="wiki">
 global:
   work_dir: /home/miya/work
   dest_dir: /home/miya/assurer
+<p>tasks:<br />
+init:<br />
+- module: SVN::Diff</p>
+<pre><code>- module: Confirm
+  config:
+    msg: really update? [y/n]
 
-tasks:
-  init:
-    - module: SVN::Diff
+- module: SVN::Update
 
-    - module: Confirm
-      config:
-        msg: really update? [y/n]
-
-    - module: SVN::Update
-
-    - module: Confirm
-      config:
-        msg: really deploy? [y/n]
-
-  process:
-    - module: Rsync
-
-projects:
-  Assurer:
-    app:
-      - mizzy.org
+- module: Confirm
+  config:
+    msg: really deploy? [y/n]</code></pre>
+<p>process:<br />
+- module: Rsync</p>
+<p>projects:<br />
+Assurer:<br />
+app:<br />
+- mizzy.org<br />
 </pre>
 <p>
-こんな感じの設定をして、
-</p>
-<pre class="wiki">
+  こんな感じの設定をして、
+</p><pre class="wiki">
 $ archer.pl Assurer -c assurer.yaml
 </pre>
 <p>
-とか実行すると、
+  とか実行すると、
 </p>
 <p>
-<ul>
-<li>/home/miya/work/Assurer にある svn co したファイルと、SVN HEAD の diff を表示。</li>
-<li>svn up するかどうか、プロンプト表示。</li>
-<li>svn up 実行。</li>
-<li>実際にデプロイするか、プロンプトを表示。</li>
-<li>ローカルの /home/miya/work/Assurer から リモートサーバ上の /home/miya/assurer へ rsync でファイルコピー。</li>
-</ul>
-
-<p></p>
-<p>
-といった動作になります。
+  <ul>
+    <li>
+      /home/miya/work/Assurer にある svn co したファイルと、SVN HEAD の diff を表示。
+    </li>
+    <li>
+      svn up するかどうか、プロンプト表示。
+    </li>
+    <li>
+      svn up 実行。
+    </li>
+    <li>
+      実際にデプロイするか、プロンプトを表示。
+    </li>
+    <li>
+      ローカルの /home/miya/work/Assurer から リモートサーバ上の /home/miya/assurer へ rsync でファイルコピー。
+    </li>
+  </ul>
 </p>
 <p>
-<a class="ext-link" href="http://code.mfac.jp/trac/file/Archer/examples/config.yaml"><span class="icon"></span>Archer 同梱の config.yaml</a> では、svn log, svn up, rsync は Exec::Local プラグインで実行しているのですが、この辺りの記述をできるだけ簡略化したいな、ということで、こういったプラグインをつくってみました。
+  といった動作になります。
 </p>
 <p>
-また、ライブドアテクノロジーセミナーの <a class="ext-link" href="http://d.hatena.ne.jp/naoya/20061214/1166063145"><span class="icon"></span>naoya さんのプレゼン</a> で、Capistrano にはシェルプロンプトを表示して、指定したコマンドを複数のリモートサーバ上で一発で実行できる、という機能があって、これがうらやましかったので、Archer プラグインとして実装してみました。
+  <a class="ext-link" href="http://code.mfac.jp/trac/file/Archer/examples/config.yaml">
+    <span class="icon"></span>
+    Archer 同梱の config.yaml
+  </a>
+  では、svn log, svn up, rsync は Exec::Local プラグインで実行しているのですが、この辺りの記述をできるだけ簡略化したいな、ということで、こういったプラグインをつくってみました。
 </p>
-<pre class="wiki">
+<p>
+  また、ライブドアテクノロジーセミナーの
+  <a class="ext-link" href="http://d.hatena.ne.jp/naoya/20061214/1166063145">
+    <span class="icon"></span>
+    naoya さんのプレゼン
+  </a>
+  で、Capistrano にはシェルプロンプトを表示して、指定したコマンドを複数のリモートサーバ上で一発で実行できる、という機能があって、これがうらやましかったので、Archer プラグインとして実装してみました。
+</p><pre class="wiki">
 tasks:
   init:
     - module: Shell
       config:
         role: app
-        para: 1</p>
-
-<p>projects:
-  mizzy.org:
-    app:
-      - <a href="http://www.mizzy.org">www.mizzy.org</a>
-      - svn.mizzy.org
-      - ftp.mizzy.org
+        para: 1
+<p>projects:<br />
+mizzy.org:<br />
+app:<br />
+- <a href="http://www.mizzy.org">www.mizzy.org</a><br />
+- svn.mizzy.org<br />
+- ftp.mizzy.org<br />
 </pre>
 <p>
-といった設定をしやると、以下の様な感じで実行できます。（3つのサーバは実体が同じなので、結果が同じですが。）
-</p>
-<pre class="wiki">
+  といった設定をしやると、以下の様な感じで実行できます。（3つのサーバは実体が同じなので、結果が同じですが。）
+</p><pre class="wiki">
 $ ./archer.pl -c shell.yaml mizzy.org
 [info] run hook init
 [debug] load Archer::Plugin::Shell
 [info] run Archer::Plugin::Shell
-shell&gt; uptime
-[<a href="http://www.mizzy.org">www.mizzy.org</a>]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
+shell> uptime
+[www.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
 [svn.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
 [ftp.mizzy.org]  02:59:34 up 4 days,  3:39,  1 user,  load average: 0.21, 0.23, 0.22
-shell&gt; 
+shell> 
 </pre>
 <p>
-<a class="ext-link" href="http://code.mfac.jp/svn/Archer/"><span class="icon"></span>Archer はこちらから</a>入手できます。また、俺が書いたプラグインなんかは、<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Archer/"><span class="icon"></span>ここに置いてあります</a>。
-</p></p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/02/12/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/01/18/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+  <a class="ext-link" href="http://code.mfac.jp/svn/Archer/">
+    <span class="icon"></span>
+    Archer はこちらから
+  </a>
+  入手できます。また、俺が書いたプラグインなんかは、
+  <a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Archer/">
+    <span class="icon"></span>
+    ここに置いてあります
+  </a>
+  。
+</p>
+<footer class="foot">
+  <a href="/blog/2007/01/18/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2007/02/12/2">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

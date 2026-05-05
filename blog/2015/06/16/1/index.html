@@ -1,90 +1,102 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Walter + Wercker + DigitalOcean による Serverspec CI - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Walter + Wercker + DigitalOcean による Serverspec CI - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Walter + Wercker + DigitalOcean による Serverspec CI"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2015/06/16/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2015/06/16/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Walter + Wercker + DigitalOcean による Serverspec CI"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2015/06/16/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2015/06/16/1">
+          Walter + Wercker + DigitalOcean による Serverspec CI
+        </a>
+      </h1>
+      <div class="byline">
+        16 June 2015
+      </div>
+      <p>
+        <a href="/blog/2015/04/01/1/">
+          フリーランスになって1年が経った
+        </a>
+        というエントリで少しだけ触れた、仕事でも絡んでいる
+        <a href="https://github.com/walter-cd/walter">
+          Walter
+        </a>
+        を自分はどう使っているのか、という話を書きます。
+      </p>
+      <h2>
+        TL;DR
+      </h2>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          Serverspec/Specinfra 本体のインテグレーションテストに Walter を
+          <a href="http://wercker.com/">
+            Wercker
+          </a>
+          と組み合わせて利用している
+        </li>
+        <li>
+          Wercker は並列実行サポートしてないけど、Walter と組み合わせることで並列実行できて便利
+          <ul>
+            <li>
+              Docker on CoreOS, CentOS 6.5, CentOS 7.0, Ubuntu 14.04, FreeBSD 10.1 の各 VM を使ったテストを並列で実行してる
+            </li>
+          </ul>
+        </li>
+        <li>
+          ローカルでも実行できて便利 （Wercker v2 でもできるようになってるけど、Walter の場合は Docker 環境なくてもできる）
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2015/06/16/1">Walter + Wercker + DigitalOcean による Serverspec CI</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="/blog/2015/04/01/1/">フリーランスになって1年が経った</a> というエントリで少しだけ触れた、仕事でも絡んでいる <a href="https://github.com/walter-cd/walter">Walter</a> を自分はどう使っているのか、という話を書きます。</p>
-
-<h2>TL;DR</h2>
-
-<ul>
-<li>Serverspec/Specinfra 本体のインテグレーションテストに Walter を <a href="http://wercker.com/">Wercker</a> と組み合わせて利用している</li>
-<li>Wercker は並列実行サポートしてないけど、Walter と組み合わせることで並列実行できて便利
-
-<ul>
-<li>Docker on CoreOS, CentOS 6.5, CentOS 7.0, Ubuntu 14.04, FreeBSD 10.1 の各 VM を使ったテストを並列で実行してる</li>
-</ul></li>
-<li>ローカルでも実行できて便利 （Wercker v2 でもできるようになってるけど、Walter の場合は Docker 環境なくてもできる）</li>
-</ul>
-
-<h2>Walter + Wercker</h2>
-
-<p>Dogfooding のため、Walter を Wercker と組み合わせて <a href="https://github.com/serverspec/serverspec-integration-test">Serverspec/Specinfra 本体のインテグレーションテスト</a> に使用している。</p>
-
-<p>どのように利用しているかというと、wercker.yml で以下のように walter を実行している。</p>
-
-<pre><code>box: mizzy/serverspec-base@0.0.6
+      <h2>
+        Walter + Wercker
+      </h2>
+      <p>
+        Dogfooding のため、Walter を Wercker と組み合わせて
+        <a href="https://github.com/serverspec/serverspec-integration-test">
+          Serverspec/Specinfra 本体のインテグレーションテスト
+        </a>
+        に使用している。
+      </p>
+      <p>
+        どのように利用しているかというと、wercker.yml で以下のように walter を実行している。
+      </p>
+      <pre><code>box: mizzy/serverspec-base@0.0.6
 build:
   steps:
     - script:
@@ -92,30 +104,37 @@ build:
         code: ./$WORKING_DIR/walter -c ./$WORKING_DIR/pipeline.yml
   after-steps:
     - wantedly/pretty-slack-notify:
-        webhook_url: $SLACK_WEBHOOK_URL
-</code></pre>
-
-<p>Walter の設定が書かれた <a href="https://github.com/serverspec/serverspec-integration-test/blob/master/pipeline.yml">pipeline.yml</a> はこんな感じ（一部抜粋）。</p>
-
-<pre><code>  - name: Make $HOME/.ssh directory
+        webhook_url: $SLACK_WEBHOOK_URL</code></pre>
+      <p>
+        Walter の設定が書かれた
+        <a href="https://github.com/serverspec/serverspec-integration-test/blob/master/pipeline.yml">
+          pipeline.yml
+        </a>
+        はこんな感じ（一部抜粋）。
+      </p>
+      <pre><code>- name: Make $HOME/.ssh directory
     type: command
     command: mkdir -p $HOME/.ssh
     only_if: test &quot;$WERCKER&quot; = &quot;true&quot;
   - name: Put SSH publick key
     type: command
     command: echo &quot;$DIGITALOCEAN_SSH_KEY_PUBLIC&quot; &gt; $HOME/.ssh/id_rsa.pub
-    only_if: test &quot;$WERCKER&quot; = &quot;true&quot;
-</code></pre>
-
-<p>Walter を使うと、手元でも Wercker 上でも同じ処理が実行できるので、リポジトリを push しなくても設定通りに動くか確認できるので便利。とは言え、手元と Wercker 上では微妙に処理内容が異なったりするので、そいう場合は上のように <code>only_if</code> で Wercker 上かそうじゃないかを判断してコマンドを実行したりしている。</p>
-
-<p>Wercker v2 でも手元でテストできるけど Docker 使うし、Serverspec/Specinfra のインテグレーションテストは性質上 Docker 不要なので、間に入るレイヤーが一段少ない、という意味で Walter でやる方が個人的には楽。</p>
-
-<h2>並列実行</h2>
-
-<p>実際にテストを走らせるところは、DigitalOcean 上に各 OS 毎に VM を立ててテストしており、以下のように記述することで並列実行している。</p>
-
-<pre><code>  - name: Parallel builds each OSes
+    only_if: test &quot;$WERCKER&quot; = &quot;true&quot;</code></pre>
+      <p>
+        Walter を使うと、手元でも Wercker 上でも同じ処理が実行できるので、リポジトリを push しなくても設定通りに動くか確認できるので便利。とは言え、手元と Wercker 上では微妙に処理内容が異なったりするので、そいう場合は上のように
+        <code>only_if</code>
+        で Wercker 上かそうじゃないかを判断してコマンドを実行したりしている。
+      </p>
+      <p>
+        Wercker v2 でも手元でテストできるけど Docker 使うし、Serverspec/Specinfra のインテグレーションテストは性質上 Docker 不要なので、間に入るレイヤーが一段少ない、という意味で Walter でやる方が個人的には楽。
+      </p>
+      <h2>
+        並列実行
+      </h2>
+      <p>
+        実際にテストを走らせるところは、DigitalOcean 上に各 OS 毎に VM を立ててテストしており、以下のように記述することで並列実行している。
+      </p>
+      <pre><code>- name: Parallel builds each OSes
     parallel:
       - name: Build CoreOS
         type: command
@@ -140,56 +159,86 @@ build:
       - name: Build FreeBSD 10.1
         type: command
         command: vagrant up freebsd --provider=digital_ocean &amp;&amp; DIGITALOCEAN=true rake spec:freebsd
-        directory: $WORKING_DIR
-</code></pre>
-
-<p>CoreOS, CentOS 6.5, CentOS 7.0, Ubuntu 14.04, FreeBSD 10.1 の VM を DigitalOcean 上で起動し、<a href="http://itamae.kitchen/">Itamae</a> でプロビジョニングし、Serverspec でテストを実行している。</p>
-
-<p>直列に実行すると Wercker の制限時間内（たしか25分だったかな）に終わらないけれど、Walter を利用して並列実行することで、時間内に完了している。</p>
-
-<p>Wercker でテストしたログがどんな感じかは <a href="https://app.wercker.com/#buildstep/55801d169e5d0cdb4600d0dd">こちら</a> で参照できる。これを見てもらうとわかるように、並列実行している部分は、以下のスクショのようになっていて見づらい。</p>
-
-<p><img src="/images/2015/06/wercker.png" alt="Walter + Wercker" style="width: 100%;" /></p>
-
-<p>テストがすべて通った場合はいいけど、失敗した場合はどこで失敗してるのかが探しにくい。これは次に紹介する、Slack 通知と組み合わせることで解決している。</p>
-
-<h2>Slack 通知</h2>
-
-<p>Walter には Slack や HipChat に通知する機能が組み込まれている。</p>
-
-<p>ビルドの各フェーズを Walter では「ステージ」と呼んでいるが、以下のように、ステージ毎の結果を通知するようになっている。</p>
-
-<p><img src="/images/2015/06/walter-success.png" alt="Walter + Wercker with Slack" style="width: 50%;" /></p>
-
-<p>失敗したステージは以下のように赤く表示される。</p>
-
-<p><img src="/images/2015/06/walter-fail.png" alt="Walter with Slack" style="width: 50%;" /></p>
-
-<p>この例だと CoreOS 上の Docker コンテナに対するテストが失敗してることがわかるので、一番下の Wercker による通知のリンクを踏んでビルドページに飛び、CoreOS 部分のみに絞り込んで失敗した原因を調べることができる。</p>
-
-<h2>今後の展望</h2>
-
-<p>今のところ、Wercker との組み合わせは自分にとって十分なので、今後は Jenkins なんかと組み合わせて、必要な機能があれば追加していこうかな、などと考えている。</p>
-
-<p>また、Wercker や Jenkins との組み合わせではなく、単体でも利用できるようにしたい、と目論んでいるが、そのための機能はまだまだ不足している。</p>
-
-<p>直近では、結果を集約するサーバが必要だと感じており、walter-server 的な何かを開発しようと目論んでいるんだけど、イメージ的には <a href="https://github.com/ukigumo/Ukigumo-Server">Ukigumo-Server</a> が近い、というか、パクらせてもらおうと考えている。</p>
-
-<h2>最後に</h2>
-
-<p>Walter は <a href="https://github.com/walter-cd/walter">GitHub で公開されている</a> ので、興味ある方はぜひ。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2015/07/05/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2015/04/01/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+        directory: $WORKING_DIR</code></pre>
+      <p>
+        CoreOS, CentOS 6.5, CentOS 7.0, Ubuntu 14.04, FreeBSD 10.1 の VM を DigitalOcean 上で起動し、
+        <a href="http://itamae.kitchen/">
+          Itamae
+        </a>
+        でプロビジョニングし、Serverspec でテストを実行している。
+      </p>
+      <p>
+        直列に実行すると Wercker の制限時間内（たしか25分だったかな）に終わらないけれど、Walter を利用して並列実行することで、時間内に完了している。
+      </p>
+      <p>
+        Wercker でテストしたログがどんな感じかは
+        <a href="https://app.wercker.com/#buildstep/55801d169e5d0cdb4600d0dd">
+          こちら
+        </a>
+        で参照できる。これを見てもらうとわかるように、並列実行している部分は、以下のスクショのようになっていて見づらい。
+      </p>
+      <img src="/images/2015/06/wercker.png" alt="Walter + Wercker" style="width: 100%;" />
+      <p>
+        テストがすべて通った場合はいいけど、失敗した場合はどこで失敗してるのかが探しにくい。これは次に紹介する、Slack 通知と組み合わせることで解決している。
+      </p>
+      <h2>
+        Slack 通知
+      </h2>
+      <p>
+        Walter には Slack や HipChat に通知する機能が組み込まれている。
+      </p>
+      <p>
+        ビルドの各フェーズを Walter では「ステージ」と呼んでいるが、以下のように、ステージ毎の結果を通知するようになっている。
+      </p>
+      <img src="/images/2015/06/walter-success.png" alt="Walter + Wercker with Slack" style="width: 50%;" />
+      <p>
+        失敗したステージは以下のように赤く表示される。
+      </p>
+      <img src="/images/2015/06/walter-fail.png" alt="Walter with Slack" style="width: 50%;" />
+      <p>
+        この例だと CoreOS 上の Docker コンテナに対するテストが失敗してることがわかるので、一番下の Wercker による通知のリンクを踏んでビルドページに飛び、CoreOS 部分のみに絞り込んで失敗した原因を調べることができる。
+      </p>
+      <h2>
+        今後の展望
+      </h2>
+      <p>
+        今のところ、Wercker との組み合わせは自分にとって十分なので、今後は Jenkins なんかと組み合わせて、必要な機能があれば追加していこうかな、などと考えている。
+      </p>
+      <p>
+        また、Wercker や Jenkins との組み合わせではなく、単体でも利用できるようにしたい、と目論んでいるが、そのための機能はまだまだ不足している。
+      </p>
+      <p>
+        直近では、結果を集約するサーバが必要だと感じており、walter-server 的な何かを開発しようと目論んでいるんだけど、イメージ的には
+        <a href="https://github.com/ukigumo/Ukigumo-Server">
+          Ukigumo-Server
+        </a>
+        が近い、というか、パクらせてもらおうと考えている。
+      </p>
+      <h2>
+        最後に
+      </h2>
+      <p>
+        Walter は
+        <a href="https://github.com/walter-cd/walter">
+          GitHub で公開されている
+        </a>
+        ので、興味ある方はぜひ。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2015/04/01/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2015/07/05/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

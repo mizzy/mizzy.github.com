@@ -1,157 +1,185 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2009/07/21/1">library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>source:library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm</p>
-
-<h1>NAME</h1>
-
-<p>Net::Amazon::ECS - [One line description of module&#39;s purpose here]</p>
-
-<h1>VERSION</h1>
-
-<p>This document describes Net::Amazon::ECS version 0.0.1</p>
-
-<h1>SYNOPSIS</h1>
-
-<pre><code>    use Net::Amazon::ECS;
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2009/07/21/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2009/07/21/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2009/07/21/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2009/07/21/1">
+          library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm
+        </a>
+      </h1>
+      <div class="byline">
+        21 July 2009
+      </div>
+      <p>
+        source:library/perl/trunk/Net-Amazon-ECS/lib/Net/Amazon/ECS.pm
+      </p>
+      <h1>
+        NAME
+      </h1>
+      <p>
+        Net::Amazon::ECS - [One line description of module's purpose here]
+      </p>
+      <h1>
+        VERSION
+      </h1>
+      <p>
+        This document describes Net::Amazon::ECS version 0.0.1
+      </p>
+      <h1>
+        SYNOPSIS
+      </h1>
+      <pre><code>use Net::Amazon::ECS;
 
     my $ua =  Net::Amazon::ECS-&gt;new(
-        access_key_id =&gt; &#39;YOUR_AWS_ACCESS_KEY_ID&#39;,
-        associate_tag =&gt; &#39;YOUR_AFFILIATE_ID&#39;,
-        locale        =&gt; &#39;jp&#39;,
+        access_key_id =&gt; 'YOUR_AWS_ACCESS_KEY_ID',
+        associate_tag =&gt; 'YOUR_AFFILIATE_ID',
+        locale        =&gt; 'jp',
     );
 
     my $req = Net::Amazon::Request::Keyword-&gt;new(
-        keywords     =&gt; &#39;SEARCH KEYWORDS&#39;,
-        search_index =&gt; &#39;books&#39;,
-        sort         =&gt; &#39;daterank&#39;,
+        keywords     =&gt; 'SEARCH KEYWORDS',
+        search_index =&gt; 'books',
+        sort         =&gt; 'daterank',
     );
 
     my $res = $ua-&gt;request($req);
 
     croak $res-&gt;message if $res-&gt;is_error;
 
-    my @items = $res-&gt;items;
-</code></pre>
-
-<h1>DESCRIPTION</h1>
-
-<h1>INTERFACE</h1>
-
-<h1>DIAGNOSTICS</h1>
-
-<p><code>Error message here, perhaps with %s placeholders</code>:: [Description of error here]
- <code>Another error message here</code>:: [Description of error here]
-[Et cetera, et cetera]</p>
-
-<h1>CONFIGURATION AND ENVIRONMENT</h1>
-
-<p>Net::Amazon::ECS requires no configuration files or environment variables.</p>
-
-<h1>DEPENDENCIES</h1>
-
-<p>None.</p>
-
-<h1>INCOMPATIBILITIES</h1>
-
-<p>None reported.</p>
-
-<h1>BUGS AND LIMITATIONS</h1>
-
-<p>No bugs have been reported.</p>
-
-<p>Please report any bugs or feature requests to <code>bug-net-amazon-ecs@rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org">http://rt.cpan.org</a>.</p>
-
-<h1>AUTHOR</h1>
-
-<p>Gosuke Miyashita <code>&lt;gosukenator@gmail.com&gt;</code></p>
-
-<h1>LICENCE AND COPYRIGHT</h1>
-
-<p>Copyright (c) 2006, Gosuke Miyashita <code>&lt;gosukenator@gmail.com&gt;</code>. All rights reserved.</p>
-
-<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See perlartistic.</p>
-
-<h1>DISCLAIMER OF WARRANTY</h1>
-
-<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
-
-<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2009/08/06/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2009/05/10/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+    my @items = $res-&gt;items;</code></pre>
+      <h1>
+        DESCRIPTION
+      </h1>
+      <h1>
+        INTERFACE
+      </h1>
+      <h1>
+        DIAGNOSTICS
+      </h1>
+      <p>
+        <code>Error message here, perhaps with %s placeholders</code>
+        :: [Description of error here]
+        <br />
+        <code>Another error message here</code>
+        :: [Description of error here]
+        <br />
+        [Et cetera, et cetera]
+      </p>
+      <h1>
+        CONFIGURATION AND ENVIRONMENT
+      </h1>
+      <p>
+        Net::Amazon::ECS requires no configuration files or environment variables.
+      </p>
+      <h1>
+        DEPENDENCIES
+      </h1>
+      <p>
+        None.
+      </p>
+      <h1>
+        INCOMPATIBILITIES
+      </h1>
+      <p>
+        None reported.
+      </p>
+      <h1>
+        BUGS AND LIMITATIONS
+      </h1>
+      <p>
+        No bugs have been reported.
+      </p>
+      <p>
+        Please report any bugs or feature requests to
+        <code>bug-net-amazon-ecs@rt.cpan.org</code>
+        , or through the web interface at
+        <a href="http://rt.cpan.org">
+          http://rt.cpan.org
+        </a>
+        .
+      </p>
+      <h1>
+        AUTHOR
+      </h1>
+      <p>
+        Gosuke Miyashita
+        <code>&lt;gosukenator@gmail.com&gt;</code>
+      </p>
+      <h1>
+        LICENCE AND COPYRIGHT
+      </h1>
+      <p>
+        Copyright (c) 2006, Gosuke Miyashita
+        <code>&lt;gosukenator@gmail.com&gt;</code>
+        . All rights reserved.
+      </p>
+      <p>
+        This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See perlartistic.
+      </p>
+      <h1>
+        DISCLAIMER OF WARRANTY
+      </h1>
+      <p>
+        BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+      </p>
+      <p>
+        IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2009/05/10/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2009/08/06/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

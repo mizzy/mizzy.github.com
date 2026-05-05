@@ -1,152 +1,154 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Cobbler - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Cobbler - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Cobbler"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/12/29/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/12/29/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Cobbler"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/12/29/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/12/29/1">
+          Cobbler
+        </a>
+      </h1>
+      <div class="byline">
+        29 December 2007
+      </div>
+      <p>
+        ネットワークインストール環境がさくっと構築できる
+        <a href="http://cobbler.et.redhat.com/">
+          Cobbler
+        </a>
+        がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。
+      </p>
       <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
+        <li>
+          <a href="http://www.cafechantant.com/blog/2007/08/09/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae5/">
+            サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）
+          </a>
+        </li>
+        <li>
+          <a href="http://www.cafechantant.com/blog/2007/09/05/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae6/">
+            サーバの構築を簡単にするためのステップ （その6：Cobber編 Part2 ）
+          </a>
+        </li>
+        <li>
+          <a href="http://www.asahi-net.or.jp/~aa4t-nngk/pxeinstall.html">
+            PXEネットワークインストール(Cobbler)
+          </a>
+        </li>
+        <li>
+          <a href="http://www.cafechantant.com/trac/wiki/cobbler_top">
+            cobbler_top - Cafe Chantant Info Repositry - Trac
+          </a>
+        </li>
       </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/12/29/1">Cobbler</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>ネットワークインストール環境がさくっと構築できる <a href="http://cobbler.et.redhat.com/">Cobbler</a> がおもしろそうなので触ってみたメモ。参考にしたサイトは以下の通り。</p>
-
-<ul>
-<li><a href="http://www.cafechantant.com/blog/2007/08/09/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae5/">サーバの構築を簡単にするためのステップ （その5：Cobber編 Part1 ）</a></li>
-<li><a href="http://www.cafechantant.com/blog/2007/09/05/%e3%82%b5%e3%83%bc%e3%83%90%e3%81%ae%e6%a7%8b%e7%af%89%e3%82%92%e7%b0%a1%e5%8d%98%e3%81%ab%e3%81%99%e3%82%8b%e3%81%9f%e3%82%81%e3%81%ae%e3%82%b9%e3%83%86%e3%83%83%e3%83%97-%ef%bc%88%e3%81%9d%e3%81%ae6/">サーバの構築を簡単にするためのステップ （その6：Cobber編 Part2 ）</a></li>
-<li><a href="http://www.asahi-net.or.jp/%7Eaa4t-nngk/pxeinstall.html">PXEネットワークインストール(Cobbler)</a></li>
-<li><a href="http://www.cafechantant.com/trac/wiki/cobbler_top">cobbler_top - Cafe Chantant Info Repositry - Trac</a></li>
-</ul>
-
-<p>以下、Fedora 7 で Cobbler を動かしてみたメモ。</p>
-
-<h1>インストール</h1>
-
-<p>yum で一発インストール。</p>
-
-<pre><code>$ sudo yum install cobbler
-</code></pre>
-
-<h1>設定</h1>
-
-<p>cobbler check コマンドを実行すると、見直すべき設定ポイントを教えてくれる。親切。</p>
-
-<pre><code>$ sudo cobbler check
+      <p>
+        以下、Fedora 7 で Cobbler を動かしてみたメモ。
+      </p>
+      <h1>
+        インストール
+      </h1>
+      <p>
+        yum で一発インストール。
+      </p>
+      <pre><code>$ sudo yum install cobbler</code></pre>
+      <h1>
+        設定
+      </h1>
+      <p>
+        cobbler check コマンドを実行すると、見直すべき設定ポイントを教えてくれる。親切。
+      </p>
+      <pre><code>$ sudo cobbler check
 The following potential problems were detected:
-#0: The &#39;server&#39; field in /var/lib/cobbler/settings must be set to something other than localhost, or kickstarting features will not work.  This should be a resolvable hostname or IP for the boot server as reachable by all machines that will use it.
-#1: For PXE to be functional, the &#39;next_server&#39; field in /var/lib/cobbler/settings must be set to something other than 127.0.0.1, and should match the IP of the boot server on the PXE network.
+#0: The 'server' field in /var/lib/cobbler/settings must be set to something other than localhost, or kickstarting features will not work.  This should be a resolvable hostname or IP for the boot server as reachable by all machines that will use it.
+#1: For PXE to be functional, the 'next_server' field in /var/lib/cobbler/settings must be set to something other than 127.0.0.1, and should match the IP of the boot server on the PXE network.
 #2: service cobblerd is not running
 #3: syslinux should be installed but is not, expecting to find something at /usr/lib/syslinux/pxelinux.0
 #4: service xinetd is not running
-#5: change &#39;disable&#39; to &#39;no&#39; in /etc/xinetd.d/tftp
+#5: change 'disable' to 'no' in /etc/xinetd.d/tftp
 #6: service httpd is not running
 #7: since iptables may be running, ensure 69, 80, 25150, and 25151 are unblocked#8: reposync is not installed, need for cobbler reposync, install/upgrade yum-utils?
 #9: yumdownloader is not installed, needed for cobbler repo add with --rpm-list
-parameter, install/upgrade yum-utils? 
-</code></pre>
-
-<p>これを元に設定変更を行っていく。まずは /var/lib/cobbler/settings を以下のように修正。</p>
-
-<pre><code>manage_dhcp: 1
-next_server: &#39;192.168.10.12&#39;
-server: 192.168.10.12
-</code></pre>
-
-<p>192.168.10.12 は Cobbler が動いているマシンの IP アドレス。</p>
-
-<p>cobblerd を起動。</p>
-
-<pre><code>$ sudo /sbin/chkconfig cobblerd on 
-$ sudo /etc/init.d/cobblerd start 
-</code></pre>
-
-<p>syslinux をインストール。</p>
-
-<pre><code>$ sudo yum install syslinux
-</code></pre>
-
-<p>tftpd と xinetd を起動。</p>
-
-<pre><code>$ sudo /sbin/chkconfig tftp on
+parameter, install/upgrade yum-utils?</code></pre>
+      <p>
+        これを元に設定変更を行っていく。まずは /var/lib/cobbler/settings を以下のように修正。
+      </p>
+      <pre><code>manage_dhcp: 1
+next_server: '192.168.10.12'
+server: 192.168.10.12</code></pre>
+      <p>
+        192.168.10.12 は Cobbler が動いているマシンの IP アドレス。
+      </p>
+      <p>
+        cobblerd を起動。
+      </p>
+      <pre><code>$ sudo /sbin/chkconfig cobblerd on 
+$ sudo /etc/init.d/cobblerd start</code></pre>
+      <p>
+        syslinux をインストール。
+      </p>
+      <pre><code>$ sudo yum install syslinux</code></pre>
+      <p>
+        tftpd と xinetd を起動。
+      </p>
+      <pre><code>$ sudo /sbin/chkconfig tftp on
 $ sudo /sbin/chkconfig xinetd on 
-$ sudo /etc/init.d/xinetd start 
-</code></pre>
-
-<p>httpd を起動。</p>
-
-<pre><code>$ sudo /sbin/chkconfig httpd on
-$ sudo /etc/init.d/httpd start 
-</code></pre>
-
-<p>iptables はとりあえずオフにしとく。</p>
-
-<pre><code>$ sudo /sbin/chkconfig iptables off
-$ sudo /etc/init.d/iptables stop 
-</code></pre>
-
-<p>yum-utils のインストール。</p>
-
-<pre><code>$ sudo yum install yum-utils
-</code></pre>
-
-<p>/etc/cobbler/dhcp.template を以下のような感じで修正。</p>
-
-<pre><code># ******************************************************************
+$ sudo /etc/init.d/xinetd start</code></pre>
+      <p>
+        httpd を起動。
+      </p>
+      <pre><code>$ sudo /sbin/chkconfig httpd on
+$ sudo /etc/init.d/httpd start</code></pre>
+      <p>
+        iptables はとりあえずオフにしとく。
+      </p>
+      <pre><code>$ sudo /sbin/chkconfig iptables off
+$ sudo /etc/init.d/iptables stop</code></pre>
+      <p>
+        yum-utils のインストール。
+      </p>
+      <pre><code>$ sudo yum install yum-utils</code></pre>
+      <p>
+        /etc/cobbler/dhcp.template を以下のような感じで修正。
+      </p>
+      <pre><code># ******************************************************************
 # Cobbler managed dhcpd.conf file
 #
 # generated from cobbler dhcp.conf template ($date)
@@ -171,33 +173,32 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
      next-server             $next_server;
 }
 
-$insert_cobbler_system_definitions
-</code></pre>
-
-<p>dhcp をインストールしておく。dhcpd はこの段階では起動しなくていい。（起動してもエラーになる。）</p>
-
-<pre><code>$ sudo yum install dhcp
-$ sudo /sbin/chkconfig dhcpd on
-</code></pre>
-
-<h1>ネットワークインストールに必要なファイルの用意</h1>
-
-<p>インストールイメージとか、キックスタートファイルとかを作成。</p>
-
-<pre><code>$ sudo cobbler import --path=rsync://ftp.jaist.ac.jp/pub/Linux/Fedora/releases/7/Fedora/i386/os --name=f7
-</code></pre>
-
-<p>このコマンド一発で必要なものを全部つくってくれる。超簡単。時間はかかるけど。</p>
-
-<p>cobbler report を実行すると、どこにどんなファイルがあるかとかを表示してくれる。</p>
-
-<pre><code>$ sudo cobbler report
+$insert_cobbler_system_definitions</code></pre>
+      <p>
+        dhcp をインストールしておく。dhcpd はこの段階では起動しなくていい。（起動してもエラーになる。）
+      </p>
+      <pre><code>$ sudo yum install dhcp
+$ sudo /sbin/chkconfig dhcpd on</code></pre>
+      <h1>
+        ネットワークインストールに必要なファイルの用意
+      </h1>
+      <p>
+        インストールイメージとか、キックスタートファイルとかを作成。
+      </p>
+      <pre><code>$ sudo cobbler import --path=rsync://ftp.jaist.ac.jp/pub/Linux/Fedora/releases/7/Fedora/i386/os --name=f7</code></pre>
+      <p>
+        このコマンド一発で必要なものを全部つくってくれる。超簡単。時間はかかるけど。
+      </p>
+      <p>
+        cobbler report を実行すると、どこにどんなファイルがあるかとかを表示してくれる。
+      </p>
+      <pre><code>$ sudo cobbler report
 distro          : f7-i386
 kernel          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/vmlinuz
 initrd          : /var/www/cobbler/ks_mirror/f7/images/pxeboot/initrd.img
 kernel options  : {}
 architecture    : x86
-ks metadata     : {&#39;tree&#39;: &#39;http://@@server@@/cblr/links/f7-i386&#39;}
+ks metadata     : {'tree': 'http://@@server@@/cblr/links/f7-i386'}
 breed           : redhat
 
 distro          : f7-xen-i386
@@ -205,7 +206,7 @@ kernel          : /var/www/cobbler/ks_mirror/f7/images/xen/vmlinuz
 initrd          : /var/www/cobbler/ks_mirror/f7/images/xen/initrd.img
 kernel options  : {}
 architecture    : x86
-ks metadata     : {&#39;tree&#39;: &#39;http://@@server@@/cblr/links/f7-xen-i386&#39;}
+ks metadata     : {'tree': 'http://@@server@@/cblr/links/f7-xen-i386'}
 breed           : redhat
 
 profile         : f7-i386
@@ -236,41 +237,43 @@ virt bridge     : xenbr0
 virt cpus       : 1
 repos           : []
 dhcp tag        : default
-server          : &lt;&lt;inherit&gt;&gt;
-</code></pre>
-
-<p>これを見て分かるとおり、Xen 用のイメージなんかも勝手に作ってくれる。</p>
-
-<p>あとは必要に応じてキックスタートファイル（/etc/cobbler/kickstart_fc6.ks）なんかをいじる。何かファイルを修正したりしたら、cobbler sync を忘れずに実行。</p>
-
-<pre><code>$ sudo cobbler sync
-</code></pre>
-
-<h1>ネットワークインストールを実行する</h1>
-
-<p>ここまできたら、別のマシンを PXE ブートで起動して、boot プロンプトで cobbler import で作成したイメージの名前を入力。</p>
-
-<pre><code>boot: f7-i386
-</code></pre>
-
-<p>あとは勝手にインストールが始まる。</p>
-
-<p>以下のように system 登録しておくと、PXE ブート時にイメージ名を入力しなくても、勝手に割り当てられたイメージでブートしてくれる。</p>
-
-<pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386
-</code></pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/12/29/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/12/08/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+server          : &lt;&lt;inherit&gt;&gt;</code></pre>
+      <p>
+        これを見て分かるとおり、Xen 用のイメージなんかも勝手に作ってくれる。
+      </p>
+      <p>
+        あとは必要に応じてキックスタートファイル（/etc/cobbler/kickstart_fc6.ks）なんかをいじる。何かファイルを修正したりしたら、cobbler sync を忘れずに実行。
+      </p>
+      <pre><code>$ sudo cobbler sync</code></pre>
+      <h1>
+        ネットワークインストールを実行する
+      </h1>
+      <p>
+        ここまできたら、別のマシンを PXE ブートで起動して、boot プロンプトで cobbler import で作成したイメージの名前を入力。
+      </p>
+      <pre><code>boot: f7-i386</code></pre>
+      <p>
+        あとは勝手にインストールが始まる。
+      </p>
+      <p>
+        以下のように system 登録しておくと、PXE ブート時にイメージ名を入力しなくても、勝手に割り当てられたイメージでブートしてくれる。
+      </p>
+      <pre><code>$ sudo cobbler system add --name=test-server --mac=00:0C:29:7E:3A:8B --profile=f7-i386</code></pre>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/12/08/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/12/29/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

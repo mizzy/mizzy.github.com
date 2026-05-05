@@ -1,80 +1,78 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>LISA07TechSessionFirstDay - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/11/16/1">LISA07TechSessionFirstDay</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>現在、<a href="http://www.usenix.org/events/lisa07/">LISA</a> という大規模システム管理者向けカンファレンスへの参加のため、ダラスに来ています。自分は 11/14 - 11/16 に開催されるテクニカルセッションのみに参加していて、本日はテクニカルセッションの初日でした。今日聞いた中で気になったテーマについて、さらっとご紹介、というか自分用にまとめてみます。</p>
-
-<h1>CAMP: A Common API for Measuring Performance</h1>
-
-<p>名前の通り、パフォーマンス計測のための API。異なる OS が混在する分散システムでのパフォーマンステストを正確に行うために、共通な API を定義しよう、という試み。</p>
-
-<p><a href="http://www.usenix.org/events/lisa07/tech/gabel.html">概要はこちら</a>。ここから論文すべて（HTML or PDF）を参照できる。（2008年11月までは、USENIX メンバーじゃないとアクセスできない、と書いてあるけど、アクセス制限はかかってないみたい。いいのかな？）</p>
-
-<p>CAMP は Python で実装されていて、以下のようなコードでパフォーマンスデータが取得できる。</p>
-
-<pre><code>#!python
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      LISA07TechSessionFirstDay - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="LISA07TechSessionFirstDay"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/11/16/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/11/16/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="LISA07TechSessionFirstDay"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/11/16/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/11/16/1">
+          LISA07TechSessionFirstDay
+        </a>
+      </h1>
+      <div class="byline">
+        16 November 2007
+      </div>
+      <p>
+        現在、
+        <a href="http://www.usenix.org/events/lisa07/">
+          LISA
+        </a>
+        という大規模システム管理者向けカンファレンスへの参加のため、ダラスに来ています。自分は 11/14 - 11/16 に開催されるテクニカルセッションのみに参加していて、本日はテクニカルセッションの初日でした。今日聞いた中で気になったテーマについて、さらっとご紹介、というか自分用にまとめてみます。
+      </p>
+      <h1>
+        CAMP: A Common API for Measuring Performance
+      </h1>
+      <p>
+        名前の通り、パフォーマンス計測のための API。異なる OS が混在する分散システムでのパフォーマンステストを正確に行うために、共通な API を定義しよう、という試み。
+      </p>
+      <p>
+        <a href="http://www.usenix.org/events/lisa07/tech/gabel.html">
+          概要はこちら
+        </a>
+        。ここから論文すべて（HTML or PDF）を参照できる。（2008年11月までは、USENIX メンバーじゃないとアクセスできない、と書いてあるけど、アクセス制限はかかってないみたい。いいのかな？）
+      </p>
+      <p>
+        CAMP は Python で実装されていて、以下のようなコードでパフォーマンスデータが取得できる。
+      </p>
+      <pre><code>#!python
 # Calculate the current transfer rate (Both
 # in and out) for the given network adapter.
 def BulkByteTransferRate(adapter):
@@ -85,62 +83,105 @@ def BulkByteTransferRate(adapter):
     # Query CAMP for the final state.
     final = GetNetBytesSent(adapter)
     final += GetNetBytesRecvd(adapter)
-    return (final - initial)/SAMPLE_INTERVAL
-</code></pre>
-
-<p>GetNetBytesSent や GetNetBytesRecvd が CAMP によって提供されているメソッド。</p>
-
-<p>現在対応している OS は、</p>
-
-<ul>
-<li>Linux 2.6</li>
-<li>Win32 (Windows NT/2000/XP)</li>
-<li>Solaris (SunOS kernel 5.x)</li>
-</ul>
-
-<p>の3種類。パフォーマンスデータの取得は、Linux では proc、Windows では Microsoft&#39;s performance data handler (PDH) interface、Solaris では proc と kstat を利用しているとのこと。</p>
-
-<p>論文の中では、CAMP によって取得できるパフォーマンスデータの妥当性に関する検証や、CAMP 自体のパフォーマンス、オーバーヘッドに関する検証データも載っている。</p>
-
-<p>proc ファイルシステムへのアクセスオーバヘッドの低さから、特に Linux でのパフォーマンスは高いみたい。</p>
-
-<p>パフォーマンスデータを取得するのであれば、SNMP でもできるのでは、と思ったけど、これについても論文でちゃんと触れられていて、SNMP は UDP によるアプリケーションプロトコルであり、CAMP を利用することで OS に依存しない SNMP エージェントを実装する、といった形での住み分けができる、といったことが書かれていた。</p>
-
-<p><a href="http://wiki.csc.calpoly.edu/camp">CAMP の Trac サイト</a>が存在するけど、内容はまだ何もない。「** Download coming soon! **」ということなので、ソースが公開されたら要チェック。</p>
-
-<h1>Application Buffer-Cache Management for Performance: Running the World’s Largest MRTG</h1>
-
-<p>OS のディスク I/O 先読みとバッファキャッシュは通常、アプリケーションのパフォーマンスを高めるものであるが、大規模ネットワークで MRTG を運用していると、逆にパフォーマンスを低下させてしまう、ということについて、何がボトルネックになっているのか、どうやってそのボトルネックを解消するのか、といったことに関する考察。<a href="http://www.usenix.org/events/lisa07/tech/plonka.html">概要はこちら</a>。</p>
-
-<p>まず、大規模ネットワークサイトでの MRTG の処理時間がグラフで示されている。これによると、5分おきに MRTG を実行しているにも関わらず、半分ほどの処理が5分以内に完了していない、という結果に。そして、MRTG のボトルネックはディスク I/O であり、特に read の比率が高い、ということが示されている。</p>
-
-<p>MRTG は RRDtool を利用しているが、RRD ファイルは特性として、一度の操作で読み書きするブロックがシーケンシャルになっていない。そのため、OS がシーケンシャルにファイルを先読みすることによって、読み込む必要のないブロックまで読み込んでしまい、余分な I/O が発生する、ということがボトルネックの一因。いわゆる余計なお世話。</p>
-
-<p>また、必要のないブロックを読み込んでバッファキャッシュに載せるため、キャッシュに本当に載せてほしいブロックが載らずに、ページフォルトが発生する、というのもボトルネックの一因。</p>
-
-<p>この調査のために、<a href="http://net.doit.wisc.edu/%7Eplonka/fincore/">fincore</a> という、指定したファイルのどのページがバッファキャッシュに載っているのかを表示するツールを作っている。</p>
-
-<p>ボトルネックを解消するアプローチのひとつは、独自のキャッシュライブラリを作成して、MRTG にこのライブラリ経由でファイル操作をさせる、というもの。これにより、ほとんどの処理が1分以内で完了するようになった。（ただし、キャッシュの処理は図を見るとちょっと複雑。）</p>
-
-<p>もうひとつのアプローチは、アプリケーションのファイルアクセス特性を OS に伝えることによって、OS のディスクI/O に関する挙動を変えたり、キャッシュアルゴリズムを変えたり、といったことが可能な、<a href="http://docs.hp.com/ja/B2355-60129/fadvise.2.html">POSIX fadvise システムコール</a>を利用して MRTG を動かす、というもの。</p>
-
-<p><a href="http://net.doit.wisc.edu/%7Eplonka/fadvise/">fadvise を実行する Perl スクリプト</a> も作成している。</p>
-
-<p>論文では FADV<em>RANDOM を指定することによって、OS に対してアプリケーションが、シーケンシャルではなくランダムにファイルアクセスすることを伝えている。これにより OS は先読みをしなくなり余計なI/Oが発生しないし、余分なデータを読み込まないのでバッファキャッシュも無駄なく利用できる。（FADV</em>RANDOM という言葉は出てないけど、たぶんそうだと思う。）</p>
-
-<p>このアプローチでもほとんどの処理が1分以内に完了する、という結果に。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/11/16/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/11/12/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+    return (final - initial)/SAMPLE_INTERVAL</code></pre>
+      <p>
+        GetNetBytesSent や GetNetBytesRecvd が CAMP によって提供されているメソッド。
+      </p>
+      <p>
+        現在対応している OS は、
+      </p>
+      <ul>
+        <li>
+          Linux 2.6
+        </li>
+        <li>
+          Win32 (Windows NT/2000/XP)
+        </li>
+        <li>
+          Solaris (SunOS kernel 5.x)
+        </li>
+      </ul>
+      <p>
+        の3種類。パフォーマンスデータの取得は、Linux では proc、Windows では Microsoft's performance data handler (PDH) interface、Solaris では proc と kstat を利用しているとのこと。
+      </p>
+      <p>
+        論文の中では、CAMP によって取得できるパフォーマンスデータの妥当性に関する検証や、CAMP 自体のパフォーマンス、オーバーヘッドに関する検証データも載っている。
+      </p>
+      <p>
+        proc ファイルシステムへのアクセスオーバヘッドの低さから、特に Linux でのパフォーマンスは高いみたい。
+      </p>
+      <p>
+        パフォーマンスデータを取得するのであれば、SNMP でもできるのでは、と思ったけど、これについても論文でちゃんと触れられていて、SNMP は UDP によるアプリケーションプロトコルであり、CAMP を利用することで OS に依存しない SNMP エージェントを実装する、といった形での住み分けができる、といったことが書かれていた。
+      </p>
+      <p>
+        <a href="http://wiki.csc.calpoly.edu/camp">
+          CAMP の Trac サイト
+        </a>
+        が存在するけど、内容はまだ何もない。「** Download coming soon! **」ということなので、ソースが公開されたら要チェック。
+      </p>
+      <h1>
+        Application Buffer-Cache Management for Performance: Running the World’s Largest MRTG
+      </h1>
+      <p>
+        OS のディスク I/O 先読みとバッファキャッシュは通常、アプリケーションのパフォーマンスを高めるものであるが、大規模ネットワークで MRTG を運用していると、逆にパフォーマンスを低下させてしまう、ということについて、何がボトルネックになっているのか、どうやってそのボトルネックを解消するのか、といったことに関する考察。
+        <a href="http://www.usenix.org/events/lisa07/tech/plonka.html">
+          概要はこちら
+        </a>
+        。
+      </p>
+      <p>
+        まず、大規模ネットワークサイトでの MRTG の処理時間がグラフで示されている。これによると、5分おきに MRTG を実行しているにも関わらず、半分ほどの処理が5分以内に完了していない、という結果に。そして、MRTG のボトルネックはディスク I/O であり、特に read の比率が高い、ということが示されている。
+      </p>
+      <p>
+        MRTG は RRDtool を利用しているが、RRD ファイルは特性として、一度の操作で読み書きするブロックがシーケンシャルになっていない。そのため、OS がシーケンシャルにファイルを先読みすることによって、読み込む必要のないブロックまで読み込んでしまい、余分な I/O が発生する、ということがボトルネックの一因。いわゆる余計なお世話。
+      </p>
+      <p>
+        また、必要のないブロックを読み込んでバッファキャッシュに載せるため、キャッシュに本当に載せてほしいブロックが載らずに、ページフォルトが発生する、というのもボトルネックの一因。
+      </p>
+      <p>
+        この調査のために、
+        <a href="http://net.doit.wisc.edu/~plonka/fincore/">
+          fincore
+        </a>
+        という、指定したファイルのどのページがバッファキャッシュに載っているのかを表示するツールを作っている。
+      </p>
+      <p>
+        ボトルネックを解消するアプローチのひとつは、独自のキャッシュライブラリを作成して、MRTG にこのライブラリ経由でファイル操作をさせる、というもの。これにより、ほとんどの処理が1分以内で完了するようになった。（ただし、キャッシュの処理は図を見るとちょっと複雑。）
+      </p>
+      <p>
+        もうひとつのアプローチは、アプリケーションのファイルアクセス特性を OS に伝えることによって、OS のディスクI/O に関する挙動を変えたり、キャッシュアルゴリズムを変えたり、といったことが可能な、
+        <a href="http://docs.hp.com/ja/B2355-60129/fadvise.2.html">
+          POSIX fadvise システムコール
+        </a>
+        を利用して MRTG を動かす、というもの。
+      </p>
+      <p>
+        <a href="http://net.doit.wisc.edu/~plonka/fadvise/">
+          fadvise を実行する Perl スクリプト
+        </a>
+        も作成している。
+      </p>
+      <p>
+        論文では FADV_RANDOM を指定することによって、OS に対してアプリケーションが、シーケンシャルではなくランダムにファイルアクセスすることを伝えている。これにより OS は先読みをしなくなり余計なI/Oが発生しないし、余分なデータを読み込まないのでバッファキャッシュも無駄なく利用できる。（FADV_RANDOM という言葉は出てないけど、たぶんそうだと思う。）
+      </p>
+      <p>
+        このアプローチでもほとんどの処理が1分以内に完了する、という結果に。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/11/12/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/11/16/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

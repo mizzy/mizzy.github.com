@@ -1,76 +1,88 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>JSONParserWithParseYapp - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/02/17/1">JSONParserWithParseYapp</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>構文解析をちゃんと学ばないとなー、と前々から思いつつしばらく放置だったけど、なんとなくやる気になったのでやってみる。</p>
-
-<p><a href="http://twitter.com/zigorou">ZIGOROu</a> さんの <a href="http://d.hatena.ne.jp/ZIGOROu/20080422/1208849930">Parse::Yapp ヨチヨチ歩き</a> で <a href="http://search.cpan.org/%7Efdesar/Parse-Yapp/lib/Parse/Yapp.pm">Parse::Yapp</a> の使い方を学びつつ、<a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> でパーサの書き方の基礎がなんとなくわかった気になり、でも実際は自分で書いてみなきゃわからん、ってことで、<a href="http://twitter.com/hakobe">hakobe</a> さんの <a href="http://d.hatena.ne.jp/hakobe932/20090130/1233327296">Parse::RecDescentでJSONをパース</a> を参考に、Parse::Yapp で JSON パーサを書いてみることにした。</p>
-
-<p>パーサ＋スキャナは以下のような感じ。</p>
-
-<pre><code>#!perl
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      JSONParserWithParseYapp - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="JSONParserWithParseYapp"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/02/17/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/02/17/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="JSONParserWithParseYapp"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/02/17/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/02/17/1">
+          JSONParserWithParseYapp
+        </a>
+      </h1>
+      <div class="byline">
+        17 February 2011
+      </div>
+      <p>
+        構文解析をちゃんと学ばないとなー、と前々から思いつつしばらく放置だったけど、なんとなくやる気になったのでやってみる。
+      </p>
+      <p>
+        <a href="http://twitter.com/zigorou">
+          ZIGOROu
+        </a>
+        さんの
+        <a href="http://d.hatena.ne.jp/ZIGOROu/20080422/1208849930">
+          Parse::Yapp ヨチヨチ歩き
+        </a>
+        で
+        <a href="http://search.cpan.org/~fdesar/Parse-Yapp/lib/Parse/Yapp.pm">
+          Parse::Yapp
+        </a>
+        の使い方を学びつつ、
+        <a href="http://www.loveruby.net/ja/rhg/book/yacc.html">
+          Rubyソースコード完全解説 第9章 速習yacc
+        </a>
+        でパーサの書き方の基礎がなんとなくわかった気になり、でも実際は自分で書いてみなきゃわからん、ってことで、
+        <a href="http://twitter.com/hakobe">
+          hakobe
+        </a>
+        さんの
+        <a href="http://d.hatena.ne.jp/hakobe932/20090130/1233327296">
+          Parse::RecDescentでJSONをパース
+        </a>
+        を参考に、Parse::Yapp で JSON パーサを書いてみることにした。
+      </p>
+      <p>
+        パーサ＋スキャナは以下のような感じ。
+      </p>
+      <pre><code>#!perl
 %{
 use strict;
 use warnings;
@@ -81,28 +93,28 @@ JSON       : value
 value      : atom
            | number
            | string
-           | &#39;[&#39; array             { return $_[2] }
-           | &#39;{&#39; object            { return $_[2] }
+           | '[' array             { return $_[2] }
+           | '{' object            { return $_[2] }
            ;
-array      : &#39;]&#39;                   { return [] }
-           | &#39;,&#39; &#39;]&#39;               { return [] }
+array      : ']'                   { return [] }
+           | ',' ']'               { return [] }
            | element array_cdr     { unshift @{$_[2]}, $_[1];return $_[2] }
            ;
-array_cdr  : &#39;]&#39;                   { return [] }
-           | &#39;,&#39; &#39;]&#39;               { return [] }
-           | &#39;,&#39; element array_cdr { unshift @{$_[3]}, $_[2];return $_[3] }
+array_cdr  : ']'                   { return [] }
+           | ',' ']'               { return [] }
+           | ',' element array_cdr { unshift @{$_[3]}, $_[2];return $_[3] }
            ;
 element    : value
            ;
-object     : &#39;}&#39;                   { return {} }
-           | &#39;,&#39; &#39;}&#39;               { return {} }
+object     : '}'                   { return {} }
+           | ',' '}'               { return {} }
            | member object_cdr     { return { %{ $_[2] }, %{ $_[1] } } }
            ;
-object_cdr : &#39;}&#39;                   { return {} }
-           | &#39;,&#39; &#39;}&#39;               { return {} }
-           | &#39;,&#39; member object_cdr { return { %{ $_[3] }, %{ $_[2] } } }
+object_cdr : '}'                   { return {} }
+           | ',' '}'               { return {} }
+           | ',' member object_cdr { return { %{ $_[3] }, %{ $_[2] } } }
            ;
-member     : key &#39;:&#39; value         { return { $_[1] =&gt; $_[3] } }
+member     : key ':' value         { return { $_[1] =&gt; $_[3] } }
            ;
 key        : string
            | identifier
@@ -119,38 +131,36 @@ sub yylex {
             [^\x00-\x1f\&quot;\\]*)*)&quot;
         /xms;
     my $single_quoted_string = qr/
-            ^&#39;([^\x00-\x1f\&#39;\\]*
-            (?:\\(?:[\&#39;\\\/bfnrt]|u[0-9a-fA-F]{4})
-            [^\x00-\x1f\&#39;\\]*)*)&#39;
+            ^'([^\x00-\x1f\'\\]*
+            (?:\\(?:[\'\\\/bfnrt]|u[0-9a-fA-F]{4})
+            [^\x00-\x1f\'\\]*)*)'
         /xms;
 
     for ( $self-&gt;YYData-&gt;{INPUT} ) {
         s|\s+||;
-        s|^($number)||                and return (&#39;number&#39;, $1);
-        s/^(true|false|null)//        and return (&#39;atom&#39;, $1);
-        s|^([_a-zA-Z][_a-zA-Z0-9]*)|| and return (&#39;identifier&#39;, $1);
-        s|$double_quoted_string||     and return (&#39;string&#39;, $1);
-        s|$single_quoted_string||     and return (&#39;string&#39;, $1);
+        s|^($number)||                and return ('number', $1);
+        s/^(true|false|null)//        and return ('atom', $1);
+        s|^([_a-zA-Z][_a-zA-Z0-9]*)|| and return ('identifier', $1);
+        s|$double_quoted_string||     and return ('string', $1);
+        s|$single_quoted_string||     and return ('string', $1);
         s|^(.)||                      and return ($1, $1);
     }
-    return (&#39;&#39;, undef);
+    return ('', undef);
 }
 
 sub run {
     my $self = shift;
     return $self-&gt;YYParse( yylex =&gt; \&amp;yylex, yyerror =&gt; \&amp;yyerror );
-}
-</code></pre>
-
-<p>こいつを yapp コマンドにかけるとパーサモジュールができる。</p>
-
-<pre><code>#!sh
-$ yapp -m JSONParser json.yp
-</code></pre>
-
-<p>このモジュールを使ってパースしてみる。</p>
-
-<pre><code>#!perl
+}</code></pre>
+      <p>
+        こいつを yapp コマンドにかけるとパーサモジュールができる。
+      </p>
+      <pre><code>#!sh
+$ yapp -m JSONParser json.yp</code></pre>
+      <p>
+        このモジュールを使ってパースしてみる。
+      </p>
+      <pre><code>#!perl
 #!/usr/bin/perl
 
 use strict;
@@ -160,32 +170,43 @@ use JSONParser;
 
 my $parser = JSONParser-&gt;new;
 $parser-&gt;YYData-&gt;{INPUT} = q{[
-        &#39;Mercury&#39;,
+        'Mercury',
         &quot;Venus&quot;,
-        [&quot;Earth&quot;, [&#39;Moon&#39;]],
-        [&#39;Mars&#39;, [&quot;Phobos&quot;, &#39;Deimos&#39;]],
-        [&#39;Jupiter&#39;,[&quot;Io&quot;, &#39;Europa&#39;, &quot;Ganymede&quot;, &#39;Callisto&#39;]]
+        [&quot;Earth&quot;, ['Moon']],
+        ['Mars', [&quot;Phobos&quot;, 'Deimos']],
+        ['Jupiter',[&quot;Io&quot;, 'Europa', &quot;Ganymede&quot;, 'Callisto']]
 ]};
 my $result = $parser-&gt;run;
 
-is_deeply($result, [&#39;Mercury&#39;, &quot;Venus&quot;, [&quot;Earth&quot;, [&#39;Moon&#39;]], [&#39;Mars&#39;, [&quot;Phobos&quot;, &#39;Deimos&#39;]], [&#39;Jupiter&#39;,[&quot;Io&quot;, &#39;Europa&#39;, &quot;Ganymede&quot;, &#39;Callisto&#39;]]]);
-</code></pre>
-
-<p>うん、なんとなくわかってきた気がする。</p>
-
-<p><a href="http://www.loveruby.net/ja/rhg/book/yacc.html">Rubyソースコード完全解説 第9章 速習yacc</a> の中で「客観的に見てもこの分野に関しては一番わかりやすい本」とオススメされていた<a href="http://www.amazon.co.jp/dp/4756137091">Rubyを256倍使うための本 無道編</a> も買ってみた。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/02/23/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/02/11/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+is_deeply($result, ['Mercury', &quot;Venus&quot;, [&quot;Earth&quot;, ['Moon']], ['Mars', [&quot;Phobos&quot;, 'Deimos']], ['Jupiter',[&quot;Io&quot;, 'Europa', &quot;Ganymede&quot;, 'Callisto']]]);</code></pre>
+      <p>
+        うん、なんとなくわかってきた気がする。
+      </p>
+      <p>
+        <a href="http://www.loveruby.net/ja/rhg/book/yacc.html">
+          Rubyソースコード完全解説 第9章 速習yacc
+        </a>
+        の中で「客観的に見てもこの分野に関しては一番わかりやすい本」とオススメされていた
+        <a href="http://www.amazon.co.jp/dp/4756137091">
+          Rubyを256倍使うための本 無道編
+        </a>
+        も買ってみた。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/02/11/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/02/23/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,97 +1,102 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ProPuppet00 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/07/10/1">ProPuppet00</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>#!html
-    <img src="http://www.apress.com/media/catalog/product/cache/9/image/9df78eab33525d08d6e5fb8d27136e95/A/9/A9781430230571-3d_11.png" /></p>
-
-<p>[wiki:ManagingInfrastructureWithPuppet Managing Infrastructure With Puppet] の中でも少しだけ触れた、<a href="http://www.apress.com/9781430230571">Pro Puppet</a> についてメモ。</p>
-
-<p>こちらは内容盛りだくさんで、Puppet をヘビーに使っている人でも読みごたえがあるんじゃないかと。たとえば、バージョン違いの Puppet を混在させる方法、といったところもフォローされていたり。</p>
-
-<p>ただし、Puppet や、Git といった周辺ツールのインストール方法まで詳細に書かれていて、この辺は自分には必要ないなー、と思ったりもした。</p>
-
-<p>とはいえ、最近の Puppet 動向を追いかけていない自分には、とても有意義な内容が多かったので、その辺についてメモしてみる。</p>
-
-<p>（あんまり書きすぎると出版社の人に怒られそうなんで、さらっと。あと、量が多くなりそうなので、何度かにわけて書く。）</p>
-
-<hr>
-
-<h1>モジュール化について</h1>
-
-<p>Puppet 解説書なんで、当然のことながらマニフェストの書き方が最初の方に出てくるんだけど、本書ではいきなりモジュールを作成するところから始めていて驚いた。</p>
-
-<p>このことで思ったのは、マニフェストはとにかく全部モジュール化しちゃう、というのがベストプラクティスなのかもしれない、ということ。</p>
-
-<p><a href="http://gihyo.jp/admin/serial/01/puppet/0008">第8回　Puppet実践テクニック（その3）</a> の中で書いているデータファイルの構造は、modules ディレクトリはあるものの、すべてをモジュール化することは想定していないため、menifests ディレクトリの下に、クラス毎にマニフェストファイルを置いている。</p>
-
-<p>このやり方だと、dist の下にもクラス毎にスタティックなファイルがあったり、templates の下にもクラス毎にテンプレートがあったりで、同じクラスで利用するマニフェスト、スタティックファイル、テンプレートがばらばらな場所にあって、非常にさがしづらい、といったはめになる。（なので上の記事の内容は今となっては真似しない方がいい。）</p>
-
-<p>これがすべてモジュール化されていると、</p>
-
-<pre><code>modules/
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ProPuppet00 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ProPuppet00"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/07/10/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/07/10/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ProPuppet00"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/07/10/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/07/10/1">
+          ProPuppet00
+        </a>
+      </h1>
+      <div class="byline">
+        10 July 2011
+      </div>
+      <p>
+        #!html
+        <br />
+        <img src="http://www.apress.com/media/catalog/product/cache/9/image/9df78eab33525d08d6e5fb8d27136e95/A/9/A9781430230571-3d_11.png" />
+      </p>
+      <p>
+        [wiki:ManagingInfrastructureWithPuppet Managing Infrastructure With Puppet] の中でも少しだけ触れた、
+        <a href="http://www.apress.com/9781430230571">
+          Pro Puppet
+        </a>
+        についてメモ。
+      </p>
+      <p>
+        こちらは内容盛りだくさんで、Puppet をヘビーに使っている人でも読みごたえがあるんじゃないかと。たとえば、バージョン違いの Puppet を混在させる方法、といったところもフォローされていたり。
+      </p>
+      <p>
+        ただし、Puppet や、Git といった周辺ツールのインストール方法まで詳細に書かれていて、この辺は自分には必要ないなー、と思ったりもした。
+      </p>
+      <p>
+        とはいえ、最近の Puppet 動向を追いかけていない自分には、とても有意義な内容が多かったので、その辺についてメモしてみる。
+      </p>
+      <p>
+        （あんまり書きすぎると出版社の人に怒られそうなんで、さらっと。あと、量が多くなりそうなので、何度かにわけて書く。）
+      </p>
+      <hr />
+      <h1>
+        モジュール化について
+      </h1>
+      <p>
+        Puppet 解説書なんで、当然のことながらマニフェストの書き方が最初の方に出てくるんだけど、本書ではいきなりモジュールを作成するところから始めていて驚いた。
+      </p>
+      <p>
+        このことで思ったのは、マニフェストはとにかく全部モジュール化しちゃう、というのがベストプラクティスなのかもしれない、ということ。
+      </p>
+      <p>
+        <a href="http://gihyo.jp/admin/serial/01/puppet/0008">
+          第8回　Puppet実践テクニック（その3）
+        </a>
+        の中で書いているデータファイルの構造は、modules ディレクトリはあるものの、すべてをモジュール化することは想定していないため、menifests ディレクトリの下に、クラス毎にマニフェストファイルを置いている。
+      </p>
+      <p>
+        このやり方だと、dist の下にもクラス毎にスタティックなファイルがあったり、templates の下にもクラス毎にテンプレートがあったりで、同じクラスで利用するマニフェスト、スタティックファイル、テンプレートがばらばらな場所にあって、非常にさがしづらい、といったはめになる。（なので上の記事の内容は今となっては真似しない方がいい。）
+      </p>
+      <p>
+        これがすべてモジュール化されていると、
+      </p>
+      <pre><code>modules/
   |
   +--- ssh/
   |     |
@@ -107,18 +112,18 @@
         |
         +--- manifests/
         |
-        +--- templates/
-</code></pre>
-
-<p>といった形で、関連するマニフェスト、スタティックファイル、テンプレートが1カ所にまとまっていて、非常に見通しが良い。</p>
-
-<hr>
-
-<h1>モジュールのマニフェストファイルとクラスの分け方</h1>
-
-<p>本書では以下のようにマニフェストファイルをわけている。(ssh モジュールの例。ファイル内容は本とは少し変えてる。)</p>
-
-<pre><code>ssh/
+        +--- templates/</code></pre>
+      <p>
+        といった形で、関連するマニフェスト、スタティックファイル、テンプレートが1カ所にまとまっていて、非常に見通しが良い。
+      </p>
+      <hr />
+      <h1>
+        モジュールのマニフェストファイルとクラスの分け方
+      </h1>
+      <p>
+        本書では以下のようにマニフェストファイルをわけている。(ssh モジュールの例。ファイル内容は本とは少し変えてる。)
+      </p>
+      <pre><code>ssh/
  |
  +--- manifets/
         |
@@ -130,181 +135,191 @@
         |
         +--- config.pp
         |
-        +--- service.pp
-</code></pre>
-
-<p>で、各ファイルの内容は以下のような感じ。</p>
-
-<p><em>init.pp</em></p>
-
-<p>ssh モジュールを利用をするために include ssh すると、このファイルが読み込まれ ssh モジュールが適用される。</p>
-
-<p>このファイルでは、さらにモジュール内で細分化されたクラスを include しているだけ。</p>
-
-<pre><code>class ssh {
+        +--- service.pp</code></pre>
+      <p>
+        で、各ファイルの内容は以下のような感じ。
+      </p>
+      <p>
+        <em>
+          init.pp
+        </em>
+      </p>
+      <p>
+        ssh モジュールを利用をするために include ssh すると、このファイルが読み込まれ ssh モジュールが適用される。
+      </p>
+      <p>
+        このファイルでは、さらにモジュール内で細分化されたクラスを include しているだけ。
+      </p>
+      <pre><code>class ssh {
     include ssh::params, ssh::install, ssh::config, ssh::service
-}
-</code></pre>
-
-<ul>
-<li>params.pp*</li>
-</ul>
-
-<p>環境毎に異なるパラメータをまとめるためのファイル。このファイル内にパラメータをまとめることによって、モジュール全体の見通しを良くする。</p>
-
-<pre><code>class ssh::params {
+}</code></pre>
+      <ul>
+        <li>
+          params.pp*
+        </li>
+      </ul>
+      <p>
+        環境毎に異なるパラメータをまとめるためのファイル。このファイル内にパラメータをまとめることによって、モジュール全体の見通しを良くする。
+      </p>
+      <pre><code>class ssh::params {
     case $operatingsystem {
         Solaris: {
-            $package_name = &#39;openssh&#39;
-            $service_name = &#39;sshd&#39;
+            $package_name = 'openssh'
+            $service_name = 'sshd'
         }
         ...
     }
-}
-</code></pre>
-
-<p><em>install.pp</em></p>
-
-<p>必要なパッケージをインストールするためのマニフェスト。</p>
-
-<pre><code>class ssh::install {
+}</code></pre>
+      <p>
+        <em>
+          install.pp
+        </em>
+      </p>
+      <p>
+        必要なパッケージをインストールするためのマニフェスト。
+      </p>
+      <pre><code>class ssh::install {
     package { $ssh::params::package_name: ensure =&gt; installed }
-}
-</code></pre>
-
-<p><em>config.pp</em></p>
-
-<p>設定ファイル用マニフェスト。</p>
-
-<pre><code>class ssh::config {
-    file { &#39;/etc/ssh/sshd_config&#39;:
+}</code></pre>
+      <p>
+        <em>
+          config.pp
+        </em>
+      </p>
+      <p>
+        設定ファイル用マニフェスト。
+      </p>
+      <pre><code>class ssh::config {
+    file { '/etc/ssh/sshd_config':
         ensure  =&gt; present,
-        source  =&gt; &#39;puppet:///modules/ssh/sshd_config&#39;,
-        require =&gt; Class[&#39;ssh::install&#39;],
-        notify  =&gt; Class[&#39;ssh::service&#39;],
+        source  =&gt; 'puppet:///modules/ssh/sshd_config',
+        require =&gt; Class['ssh::install'],
+        notify  =&gt; Class['ssh::service'],
     }
-}
-</code></pre>
-
-<p><em>service.pp</em></p>
-
-<p>サービス用マニフェスト。</p>
-
-<pre><code>class ssh::service {
+}</code></pre>
+      <p>
+        <em>
+          service.pp
+        </em>
+      </p>
+      <p>
+        サービス用マニフェスト。
+      </p>
+      <pre><code>class ssh::service {
     ensure  =&gt; running,
     enable  =&gt; true,
-    require =&gt; Class[&#39;ssh::config&#39;],
-}
-</code></pre>
-
-<p>こういった形で、ssh モジュールの中でも、ssh::params, ssh::install, ssh::config, ssh::service といった形でクラスを役割毎に細分化して、ファイルもクラス毎に作成、といった形で、一ファイル内の見通しを良くする、というやり方が紹介されている。</p>
-
-<p>もうひとつのポイントは、require や notify で Class 指定していること。（Class を require とかするのって以前のバージョンからできるんだっけ？）</p>
-
-<p>たとえば、sercice.pp では、</p>
-
-<pre><code>require =&gt; Class[&#39;ssh::config&#39;],
-</code></pre>
-
-<p>といった指定があるが、これは以下のように、Class ではなく File でも指定できる。</p>
-
-<pre><code>require =&gt; File[&#39;/etc/ssh/sshd_config&#39;],
-</code></pre>
-
-<p>ひとつの設定ファイルから構成されているようなモジュールであればこれでも良いが、複数の設定ファイルから構成されるようなモジュールだと、変更に対して脆くなってしまう。例えば postfix モジュールで考えてみる。</p>
-
-<p>最初は main.cf のみ Puppet で管理して、他の設定ファイルはデフォルトのまま、という状態を想定すると、マニフェストは以下のようになる。</p>
-
-<pre><code>class postfix::config {
-    file { &#39;/etc/postfix/main.cf&#39;:
-        source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+    require =&gt; Class['ssh::config'],
+}</code></pre>
+      <p>
+        こういった形で、ssh モジュールの中でも、ssh::params, ssh::install, ssh::config, ssh::service といった形でクラスを役割毎に細分化して、ファイルもクラス毎に作成、といった形で、一ファイル内の見通しを良くする、というやり方が紹介されている。
+      </p>
+      <p>
+        もうひとつのポイントは、require や notify で Class 指定していること。（Class を require とかするのって以前のバージョンからできるんだっけ？）
+      </p>
+      <p>
+        たとえば、sercice.pp では、
+      </p>
+      <pre><code>require =&gt; Class['ssh::config'],</code></pre>
+      <p>
+        といった指定があるが、これは以下のように、Class ではなく File でも指定できる。
+      </p>
+      <pre><code>require =&gt; File['/etc/ssh/sshd_config'],</code></pre>
+      <p>
+        ひとつの設定ファイルから構成されているようなモジュールであればこれでも良いが、複数の設定ファイルから構成されるようなモジュールだと、変更に対して脆くなってしまう。例えば postfix モジュールで考えてみる。
+      </p>
+      <p>
+        最初は main.cf のみ Puppet で管理して、他の設定ファイルはデフォルトのまま、という状態を想定すると、マニフェストは以下のようになる。
+      </p>
+      <pre><code>class postfix::config {
+    file { '/etc/postfix/main.cf':
+        source =&gt; 'file:///modules/postfix/main.cf',
     }
 }
 
 class postfix::service {
-    service { &#39;postfix&#39;:
+    service { 'postfix':
         ensure  =&gt; running,
         enable  =&gt; true,
-        require =&gt; File[&#39;/etc/postfix/main.cf&#39;],
+        require =&gt; File['/etc/postfix/main.cf'],
     }
-}
-</code></pre>
-
-<p>後から、master.cf もデフォルトのままではなくなったので、Puppet で管理することにすると、マニフェストは以下のように、postfix::config と postfix::service の両方を書き換えることになる。</p>
-
-<pre><code>#!diff
+}</code></pre>
+      <p>
+        後から、master.cf もデフォルトのままではなくなったので、Puppet で管理することにすると、マニフェストは以下のように、postfix::config と postfix::service の両方を書き換えることになる。
+      </p>
+      <pre><code>#!diff
 diff --git a/postfix.pp b/postfix.pp
 index f55234e..a032d65 100644
 --- a/postfix.pp
 +++ b/postfix.pp
 @@ -2,12 +2,16 @@ class postfix::config {
-     file { &#39;/etc/postfix/main.cf&#39;:
-         source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+     file { '/etc/postfix/main.cf':
+         source =&gt; 'file:///modules/postfix/main.cf',
      }
-+    file { &#39;/etc/postfix/master.cf&#39;:
-+        source =&gt; &#39;file:///modules/postfix/master.cf&#39;,
++    file { '/etc/postfix/master.cf':
++        source =&gt; 'file:///modules/postfix/master.cf',
 +    }
  }
-
+ 
  class postfix::service {
-     service { &#39;postfix&#39;:
+     service { 'postfix':
          ensure  =&gt; running,
          enable  =&gt; true,
--        require =&gt; File[&#39;/etc/postfix/main.cf&#39;],
-+        require =&gt; [ File[&#39;/etc/postfix/main.cf&#39;], File[&#39;/etc/postfix/master.cf
+-        require =&gt; File['/etc/postfix/main.cf'],
++        require =&gt; [ File['/etc/postfix/main.cf'], File['/etc/postfix/master.cf
      }
- }
-</code></pre>
-
-<p>もし、Class を require するようになっていれば、main.cf だけを管理する最初の状態では、マニフェストは</p>
-
-<pre><code>class postfix::config {
-    file { &#39;/etc/postfix/main.cf&#39;:
-        source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+ }</code></pre>
+      <p>
+        もし、Class を require するようになっていれば、main.cf だけを管理する最初の状態では、マニフェストは
+      </p>
+      <pre><code>class postfix::config {
+    file { '/etc/postfix/main.cf':
+        source =&gt; 'file:///modules/postfix/main.cf',
     }
 }
 
 class postfix::service {
-    service { &#39;postfix&#39;:
+    service { 'postfix':
         ensure  =&gt; running,
         enable  =&gt; true,
-        require =&gt; Class[&#39;postfix::config&#39;],
+        require =&gt; Class['postfix::config'],
     }
-}
-</code></pre>
-
-<p>となっており、master.cf を追加した場合、差分は</p>
-
-<pre><code>#!diff
+}</code></pre>
+      <p>
+        となっており、master.cf を追加した場合、差分は
+      </p>
+      <pre><code>#!diff
 diff --git a/postfix.pp b/postfix.pp
 index 9745478..e82621c 100644
 --- a/postfix.pp
 +++ b/postfix.pp
 @@ -2,6 +2,9 @@ class postfix::config {
-     file { &#39;/etc/postfix/main.cf&#39;:
-         source =&gt; &#39;file:///modules/postfix/main.cf&#39;,
+     file { '/etc/postfix/main.cf':
+         source =&gt; 'file:///modules/postfix/main.cf',
      }
-+    file { &#39;/etc/postfix/master.cf&#39;:
-+        source =&gt; &#39;file:///modules/postfix/master.cf&#39;,
++    file { '/etc/postfix/master.cf':
++        source =&gt; 'file:///modules/postfix/master.cf',
 +    }
  }
-
- class postfix::service {
-</code></pre>
-
-<p>だけになり、postfix::service はまったく変更する必要がない。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/07/10/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/07/08/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+ 
+ class postfix::service {</code></pre>
+      <p>
+        だけになり、postfix::service はまったく変更する必要がない。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/07/08/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/07/10/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

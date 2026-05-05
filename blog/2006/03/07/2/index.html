@@ -1,105 +1,96 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>PLAYLOG HACKS with Plagger #1 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      PLAYLOG HACKS with Plagger #1 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="PLAYLOG HACKS with Plagger #1"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/03/07/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/03/07/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="PLAYLOG HACKS with Plagger #1"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/03/07/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/03/07/2">
+          PLAYLOG HACKS with Plagger #1
+        </a>
+      </h1>
+      <div class="byline">
+        7 March 2006
+      </div>
+      <p class="entryBody">
+        Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアップデート。
+        <a href="http://plagger.org/trac" target="_blank">
+          本家サイト
+        </a>
+        にコミットしてますので、こちらをご参照ください。
+      </p>
+      <p class="entryBody">
+        宮川さんの助言にしたがって、CustomFeed::iTunesRecentPlay の中の reload_period を廃止して、Rule::Fresh を利用するようにししました。
+      </p>
+      <p class="entryBody">
+        それにともない、Publish::Playlog も publish.feed の代わりに publish.entry を利用するようにしています。（entry ひとつひとつの日時を見る必要があるため。）
+      </p>
+      <p class="entryBody">
+        最初、宮川さんが CustomFeed::iTunesRecentPlay を修正しているのに気づかないままローカルコピーをいじってました…。svn update する癖をつけないといかんですね。
+      </p>
+      <p class="entryBody">
+        次のタスクは、宮川さんの助言にある「スマートリストまたは iTunes API の利用」と otsune さんの助言にある「iTunes Music Library.xml の URL 指定での取得」ですね。といっても、実は「スマートリストの利用」というのが具体的にどうするのかがわからなかったりします。XML をパースするわけでもなく、API も利用せずに、スマートリストを取得する方法があるのでしょうか？#plagger-ja に宮川さんがいらっしゃれば聞いてみようと思ったのですが、誰もいなかったので忘れないようにここにメモしておきます。またコメントしてくれることを期待して:-)
+      </p>
+      <p class="entryBody">
+        <strong>
+          2006/03/07 14:50 追記
+        </strong>
+        <br />
+        深夜に回線ダウンしている間に、宮川さんからメールで回答頂けました。多謝。 #plagger-ja に誰もいなかったのは、単にサーバ選択を間違えていたからでした。 IRC ビギナーなので、クライアントでサーバ選択できるのを見て、「分散システムになってて、どこのサーバ選んでもいいのかな？」と激しく勘違いしてました…
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/03/07/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/03/07/2">PLAYLOG HACKS with Plagger #1</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-Plagger Plugin の CustomFeed::iTunesRecentPlay と Publish::Playlog をアップデート。<a href="http://plagger.org/trac" target="_blank">本家サイト</a> にコミットしてますので、こちらをご参照ください。
-</p>
-
-<p class="entryBody">
-宮川さんの助言にしたがって、CustomFeed::iTunesRecentPlay の中の reload_period を廃止して、Rule::Fresh を利用するようにししました。
-</p>
-
-<p class="entryBody">
-それにともない、Publish::Playlog も publish.feed の代わりに publish.entry を利用するようにしています。（entry ひとつひとつの日時を見る必要があるため。）
-</p>
-
-<p class="entryBody">
-最初、宮川さんが CustomFeed::iTunesRecentPlay を修正しているのに気づかないままローカルコピーをいじってました…。svn update する癖をつけないといかんですね。
-</p>
-
-<p class="entryBody">
-次のタスクは、宮川さんの助言にある「スマートリストまたは iTunes API の利用」と otsune さんの助言にある「iTunes Music Library.xml の URL 指定での取得」ですね。といっても、実は「スマートリストの利用」というのが具体的にどうするのかがわからなかったりします。XML をパースするわけでもなく、API も利用せずに、スマートリストを取得する方法があるのでしょうか？#plagger-ja に宮川さんがいらっしゃれば聞いてみようと思ったのですが、誰もいなかったので忘れないようにここにメモしておきます。またコメントしてくれることを期待して:-)
-</p>
-
-<p class="entryBody">
-<strong>2006/03/07 14:50 追記</strong><br />
-深夜に回線ダウンしている間に、宮川さんからメールで回答頂けました。多謝。 #plagger-ja に誰もいなかったのは、単にサーバ選択を間違えていたからでした。 IRC ビギナーなので、クライアントでサーバ選択できるのを見て、「分散システムになってて、どこのサーバ選んでもいいのかな？」と激しく勘違いしてました…
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/03/07/3">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/03/07/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/03/07/3">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

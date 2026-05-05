@@ -1,109 +1,108 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Using svk with plagger - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/09/29/1">Using svk with plagger</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-うちでは 普段実行している plagger は<a class="ext-link" href="http://svn.bulknews.net/repos/plagger/trunk/plagger"><span class="icon"></span>本家 trunk</a> から持ってきていて、自分で作ったプラグインは <a class="ext-link" href="http://svn.mizzy.org/public/plagger/trunk"><span class="icon"></span>svn.mizzy.org</a> に置いてあるのですが、以下の様なプロセスで開発してました。
-</p>
-
-<ol start="1"><li>svn.mizzy.org からチェックアウトしたディレクトリに、俺プラグインを書いて置く。</li>
-<li>plagger 本家 trunk からチェックアウトしたディレクトリに、上記ディレクトリからファイルをコピーして、俺プラグインの動作テスト。</li>
-<li>テストが問題なければ、svn.mizzy.org に俺プラグインをコミット。</li>
-<li>本家 trunk にコミットする場合は、svn co で コミットするファイルだけを指定。</li></ol>
-
-<p>
-2.のコピーがめんどくさくて、svk 使えばもっとエレガントになるんじゃないかな、と以前から思っていたのですが、使い方間違えると本家 trunk に余分なファイルまでコミットしてしまいそうで、怖くて使ってなかったのですが、色々試行錯誤してみて、こんな感じでいけそうだという感触がつかめたので、ここに整理しておきます。
-</p>
-
-<h3 id="準備">準備</h3>
-
-<p>
-本家 trunk のローカルミラーとローカルブランチの作成
-</p>
-
-<pre class="wiki">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Using svk with plagger - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Using svk with plagger"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2006/09/29/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2006/09/29/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Using svk with plagger"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2006/09/29/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2006/09/29/1">
+          Using svk with plagger
+        </a>
+      </h1>
+      <div class="byline">
+        29 September 2006
+      </div>
+      <p>
+        うちでは 普段実行している plagger は
+        <a class="ext-link" href="http://svn.bulknews.net/repos/plagger/trunk/plagger">
+          <span class="icon"></span>
+          本家 trunk
+        </a>
+        から持ってきていて、自分で作ったプラグインは
+        <a class="ext-link" href="http://svn.mizzy.org/public/plagger/trunk">
+          <span class="icon"></span>
+          svn.mizzy.org
+        </a>
+        に置いてあるのですが、以下の様なプロセスで開発してました。
+      </p>
+      <ol start="1">
+        <li>
+          svn.mizzy.org からチェックアウトしたディレクトリに、俺プラグインを書いて置く。
+        </li>
+        <li>
+          plagger 本家 trunk からチェックアウトしたディレクトリに、上記ディレクトリからファイルをコピーして、俺プラグインの動作テスト。
+        </li>
+        <li>
+          テストが問題なければ、svn.mizzy.org に俺プラグインをコミット。
+        </li>
+        <li>
+          本家 trunk にコミットする場合は、svn co で コミットするファイルだけを指定。
+        </li>
+      </ol>
+      <p>
+        2.のコピーがめんどくさくて、svk 使えばもっとエレガントになるんじゃないかな、と以前から思っていたのですが、使い方間違えると本家 trunk に余分なファイルまでコミットしてしまいそうで、怖くて使ってなかったのですが、色々試行錯誤してみて、こんな感じでいけそうだという感触がつかめたので、ここに整理しておきます。
+      </p>
+      <h3 id="準備">
+        準備
+      </h3>
+      <p>
+        本家 trunk のローカルミラーとローカルブランチの作成
+      </p>
+      <pre class="wiki">
 $ svk mirror //mirror/plagger-trunk http://svn.bulknews.net/repos/plagger/trunk/plagger
 $ svk sync //mirror/plagger-trunk --skipto HEAD  
 $ svk cp -p //mirror/plagger-trunk //local/plagger-trunk
 </pre>
-
-<p>
-svn.mizzy.org のローカルミラーとローカルブランチの作成
-</p>
-
-<pre class="wiki">
+      <p>
+        svn.mizzy.org のローカルミラーとローカルブランチの作成
+      </p>
+      <pre class="wiki">
 $ svk mirror //mirror/plagger-mizzy http://svn.mizzy.org/public/plagger/trunk
 $ svk sync //mirror/plagger-mizzy
 $ svk cp //mirror/plagger-mizzy //local//plagger-mizzy
 </pre>
-
-<p>
-svk リポジトリの確認
-</p>
-
-<pre class="wiki">
+      <p>
+        svk リポジトリの確認
+      </p>
+      <pre class="wiki">
 $ svk list -R -d 1 //
 local/
  plagger-mizzy/
@@ -112,12 +111,10 @@ mirror/
  plagger-mizzy/
  plagger-trunk/   
 </pre>
-
-<p>
-ローカルディレクトリにチェックアウト
-</p>
-
-<pre class="wiki">
+      <p>
+        ローカルディレクトリにチェックアウト
+      </p>
+      <pre class="wiki">
 $ mkdir svk                                                       [~]
 $ cd svk                                                          [~]
 $ svk co //local/plagger-trunk                                [~/svk]
@@ -125,65 +122,66 @@ $ svk co //local/plagger-mizzy                                [~/svk]
 $ ls                                                          [~/svk]
 plagger-mizzy/  plagger-trunk/
 </pre>
-
-<h3 id="プラグインの作成や修正など">プラグインの作成や修正など</h3>
-
-<p>
-プラグインを作ったり、修正したりして plagger-mizzy ローカルブランチにコミット
-</p>
-
-<pre class="wiki">
+      <h3 id="プラグインの作成や修正など">
+        プラグインの作成や修正など
+      </h3>
+      <p>
+        プラグインを作ったり、修正したりして plagger-mizzy ローカルブランチにコミット
+      </p>
+      <pre class="wiki">
 $ ./tools/plugin-start.pl Filter::Hoge          [~/svk/plagger-mizzy]
 ... &lt;プラグインを書く&gt; ...
 $ svk commit                                    [~/svk/plagger-mizzy]
 </pre>
-
-<p>
-つくったプラグインを plagger-trunk ローカルブランチとマージしてテスト
-</p>
-
-<pre class="wiki">
+      <p>
+        つくったプラグインを plagger-trunk ローカルブランチとマージしてテスト
+      </p>
+      <pre class="wiki">
 $ svk smerge -B //local/plagger-mizzy           [~/svk/plagger-trunk]
 $ ./plagger -c test.yaml                        [~/svk/plagger-trunk]
 </pre>
-
-<p>
-プラグインに問題がなければ、plagger-mizzy ブランチの変更を svn.mizzy.org にコミット。一度 plagger-trunk とマージしてしまうと、なぜか svk push では svn.mizzy.org まで反映されなくなってしまったので、svk smerge 。
-</p>
-
-<pre class="wiki">
+      <p>
+        プラグインに問題がなければ、plagger-mizzy ブランチの変更を svn.mizzy.org にコミット。一度 plagger-trunk とマージしてしまうと、なぜか svk push では svn.mizzy.org まで反映されなくなってしまったので、svk smerge 。
+      </p>
+      <pre class="wiki">
 $ svk smerge //local/plagger-mizzy //mirror/plagger-mizzy
 </pre>
-
-<h3 id="plagger本家trunkへのコミット">plagger 本家 trunk へのコミット</h3>
-
-<p>
-まだ試してないけど、こんな感じでできるはず。
-</p>
-
-<pre class="wiki">
+      <h3 id="plagger本家trunkへのコミット">
+        plagger 本家 trunk へのコミット
+      </h3>
+      <p>
+        まだ試してないけど、こんな感じでできるはず。
+      </p>
+      <pre class="wiki">
 $ svk commit files_to_commit                    [~/svk/plagger-trunk]
 $ svk push -C                                   [~/svk/plagger-trunk]
 $ svk push --verbatim                           [~/svk/plagger-trunk]
 </pre>
-
-<p>
-余計なファイルまでコミットしてしまうと迷惑をかけてしまうので、-C をつけて確認する。
-</p>
-
-<p>UPDATE: <a href="http://mizzy.org/archives/using_svk_with_plagger.pdf">Shibuya.pm テクニカルトーク #7の発表資料</a> も併せてご参照ください。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/10/01/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/09/25/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <p>
+        余計なファイルまでコミットしてしまうと迷惑をかけてしまうので、-C をつけて確認する。
+      </p>
+      <p>
+        UPDATE:
+        <a href="http://mizzy.org/archives/using_svk_with_plagger.pdf">
+          Shibuya.pm テクニカルトーク #7の発表資料
+        </a>
+        も併せてご参照ください。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2006/09/25/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2006/10/01/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

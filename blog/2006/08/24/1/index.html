@@ -1,85 +1,79 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Plagger::Plugin::Filter::FFmpeg #3 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    Plagger::Plugin::Filter::FFmpeg #3 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="Plagger::Plugin::Filter::FFmpeg #3"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/08/24/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/08/24/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Plagger::Plugin::Filter::FFmpeg #3"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/08/24/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/08/24/1">Plagger::Plugin::Filter::FFmpeg #3</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://mizzy.org/program/plagger_and_ffmpeg02.html#comments"><span class="icon"></span>このエントリのコメント</a> にて sumikawa さんより指摘があった点について修正しました。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/08/24/1">
+    Plagger::Plugin::Filter::FFmpeg #3
+  </a>
+</h1>
+<div class="byline">
+  24 August 2006
+</div>
 <p>
-というか、気づいてはいたのですが以下の理由から放置してました。
+  <a class="ext-link" href="http://mizzy.org/program/plagger_and_ffmpeg02.html#comments">
+    <span class="icon"></span>
+    このエントリのコメント
+  </a>
+  にて sumikawa さんより指摘があった点について修正しました。
 </p>
-
-<ol start="1"><li>今のところ特に実害がない。</li>
-<li>Plagger::Util::mime_type_of (というか MIME::Types::mimeTypeOf ) が mp4 という拡張子は video/vnd.objectvideo と返す。m4v だと何も返さない。video/mp4 が一般的っぽいので、これは何か気持ち悪い。</li>
-<li>$Plagger::Util::mimetypes->addType で mp4 と m4v を追加してやればいいんだけど、本来なら Plagger::Util 内でやる方が良さそう。既にいくつか Plagger::Util 内で追加されてるので。でも、Filter::FFmpeg は野良プラグインなので、Plagger::Util をいじるべきではない。かといって、Filter::FFmpeg 内でやるのも、分散してしまって良くない。</li></ol>
-
 <p>
-とは言うものの、指摘があったものを放置しておくのもなんなので、3番目については妥協することにしました。
+  というか、気づいてはいたのですが以下の理由から放置してました。
 </p>
-
+<ol start="1">
+  <li>
+    今のところ特に実害がない。
+  </li>
+  <li>
+    Plagger::Util::mime_type_of (というか MIME::Types::mimeTypeOf ) が mp4 という拡張子は video/vnd.objectvideo と返す。m4v だと何も返さない。video/mp4 が一般的っぽいので、これは何か気持ち悪い。
+  </li>
+  <li>
+    $Plagger::Util::mimetypes->addType で mp4 と m4v を追加してやればいいんだけど、本来なら Plagger::Util 内でやる方が良さそう。既にいくつか Plagger::Util 内で追加されてるので。でも、Filter::FFmpeg は野良プラグインなので、Plagger::Util をいじるべきではない。かといって、Filter::FFmpeg 内でやるのも、分散してしまって良くない。
+  </li>
+</ol>
+<p>
+  とは言うものの、指摘があったものを放置しておくのもなんなので、3番目については妥協することにしました。
+</p>
 <pre class="wiki">
 Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
 ===================================================================
@@ -94,36 +88,52 @@ Index: plagger/trunk/lib/Plagger/Plugin/Filter/FFmpeg.pm
  use FFmpeg::Command;
 +
 +$Plagger::Util::mimetypes->addType( MIME::Type->new(type => 'video/mp4', extensions => [ qw(mp4 m4v) ]) );
- 
- sub register {
-@@ -54,4 +57,5 @@
-     $e->enclosure->local_path($output_file);
-     $e->enclosure->filename("$file.$ext");
-+    $e->enclosure->type( Plagger::Util::mime_type_of($ext) );
- }
+<p>sub register {<br />
+@@ -54,4 +57,5 @@<br />
+$e-&gt;enclosure-&gt;local_path($output_file);<br />
+$e-&gt;enclosure-&gt;filename(&quot;$file.$ext&quot;);</p>
+<ul>
+<li>$e-&gt;enclosure-&gt;type( Plagger::Util::mime_type_of($ext) );<br />
+}<br />
 </pre>
-
 <p>
-<a class="ext-link" href="http://trac.mizzy.org/public/changeset/234"><span class="icon"></span>trac のチェンジセットはこちら</a>。
+  <a class="ext-link" href="http://trac.mizzy.org/public/changeset/234">
+    <span class="icon"></span>
+    trac のチェンジセットはこちら
+  </a>
+  。
 </p>
-
 <p>
-<strong>追記</strong><br />
-宮川さんが <a class="ext-link" href="http://plagger.org/trac/changeset/1593"><span class="icon"></span>Changeset 1593</a> にて早速対応してくれました。はやっ。<br />
-というわけで、<a class="ext-link" href="http://trac.mizzy.org/public/changeset/235"><span class="icon"></span>Filter::FFmpeg もそれに合わせて修正しました</a>。
+  <strong>
+    追記
+  </strong>
+  <br />
+  宮川さんが
+  <a class="ext-link" href="http://plagger.org/trac/changeset/1593">
+    <span class="icon"></span>
+    Changeset 1593
+  </a>
+  にて早速対応してくれました。はやっ。
+  <br />
+  というわけで、
+  <a class="ext-link" href="http://trac.mizzy.org/public/changeset/235">
+    <span class="icon"></span>
+    Filter::FFmpeg もそれに合わせて修正しました
+  </a>
+  。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/08/26/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/08/23/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/08/23/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/08/26/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

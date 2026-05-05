@@ -1,168 +1,209 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Dockerコンテナに入るなら SSH より nsinit が良さそう - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2014/06/22/1">Dockerコンテナに入るなら SSH より nsinit が良さそう</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <h2>追記</h2>
-
-<p><a href="http://b.hatena.ne.jp/entry/mizzy.org/blog/2014/06/22/1/">はてブでつっこみもらいました</a> が、実行するカレントディレクトリは /var/lib/docker/execdriver/native/$id を使うのが正しいようです。（情報読み違えてた。）こちらには <code>container.json</code> があるので、ソースツリーからコピーしてくる必要ないですね。</p>
-
-<p>また、コンテナ ID 取得は、<code>docker ps -q --no-trunc</code> の方が良い、とも教えていただきました。</p>
-
-<p>つっこみにしたがって、最後の方の説明とシェル関数書き換えました。</p>
-
-<p>つっこみありがとうございます！</p>
-
-<hr>
-
-<h2>tl; dr</h2>
-
-<p>タイトルまま</p>
-
-<hr>
-
-<h2>経緯</h2>
-
-<p>Docker でつくったコンテナの中に入って状態を確認するために、コンテナ内で sshd を立ち上げてアクセスする、ってなことを以前やってたんですが、コンテナ内で sshd を立ち上げる、というやり方がいまいちだし、そもそもコンテナの仕組みから考えれば、別に sshd を立ち上げなくても、コンテナと同じ namespace と rootfs に bash なりのプロセスを閉じ込めてやれば良いわけで、そういったことは既に考えている人はいるだろうし、ツールとかありそうだな、ってことで、</p>
-
-<blockquote class="twitter-tweet" lang="en"><p>Dockerで中を見たいコンテナのPID namespaceとchrootをカレントシェルに割り当てることが簡単にできるようなツールがあれば、中でsshとか立てなくていいかな。</p>&mdash; Gosuke Miyashita (@gosukenator) <a href="https://twitter.com/gosukenator/statuses/479289206108217344">June 18, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>とつぶやいてみたら、</p>
-
-<blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/gosukenator">@gosukenator</a> nsenter -- chroot /bin/bash とかでいけないですかねー</p>&mdash; TenForward (@ten_forward) <a href="https://twitter.com/ten_forward/statuses/479297375115042817">June 18, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>と、nsenter なるものの存在を教えて頂いた。</p>
-
-<blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/gosukenator">@gosukenator</a> nsenter はちょっと新しい util-linux にしかないので、ソースからコンパイルする必要あると思います。&#10;RHEL/CentOS7 は知らないですけど、Ubuntu 14.04 にはありませんでした。</p>&mdash; TenForward (@ten_forward) <a href="https://twitter.com/ten_forward/statuses/479297956969869312">June 18, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>で、これを見るとちょっと面倒かな、と思ったけど、</p>
-
-<blockquote class="twitter-tweet" data-conversation="none" lang="en"><p><a href="https://twitter.com/gosukenator">@gosukenator</a> docker 的にはそのページに書かれている nsinit を使うのが正解かもしれませんね。docker のソースツリーに入ってるツールですし :-)&#10;(nsinit すっかり忘れてた)</p>&mdash; TenForward (@ten_forward) <a href="https://twitter.com/ten_forward/statuses/479304239584251904">June 18, 2014</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>この nsinit は golang 製なので、golang が動く環境であれば go get で入れることができて楽そうなので、nsinit を試してみることにした。</p>
-
-<hr>
-
-<h2>nsinit の使い方</h2>
-
-<p>golang 環境は既に整っていて、GOPATH が設定されていて、PATH に $GOPATH/bin が含まれている、という前提。</p>
-
-<p><code>go get</code> で <code>nsinit</code> を入れる。</p>
-
-<pre><code>$ go get github.com/docker/libcontainer/nsinit
-</code></pre>
-
-<p>こんな感じで実行。</p>
-
-<pre><code>$ sudo -s
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Dockerコンテナに入るなら SSH より nsinit が良さそう - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Dockerコンテナに入るなら SSH より nsinit が良さそう"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2014/06/22/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2014/06/22/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Dockerコンテナに入るなら SSH より nsinit が良さそう"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2014/06/22/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2014/06/22/1">
+          Dockerコンテナに入るなら SSH より nsinit が良さそう
+        </a>
+      </h1>
+      <div class="byline">
+        22 June 2014
+      </div>
+      <h2>
+        追記
+      </h2>
+      <p>
+        <a href="http://b.hatena.ne.jp/entry/mizzy.org/blog/2014/06/22/1/">
+          はてブでつっこみもらいました
+        </a>
+        が、実行するカレントディレクトリは /var/lib/docker/execdriver/native/$id を使うのが正しいようです。（情報読み違えてた。）こちらには
+        <code>container.json</code>
+        があるので、ソースツリーからコピーしてくる必要ないですね。
+      </p>
+      <p>
+        また、コンテナ ID 取得は、
+        <code>docker ps -q --no-trunc</code>
+        の方が良い、とも教えていただきました。
+      </p>
+      <p>
+        つっこみにしたがって、最後の方の説明とシェル関数書き換えました。
+      </p>
+      <p>
+        つっこみありがとうございます！
+      </p>
+      <hr />
+      <h2>
+        tl; dr
+      </h2>
+      <p>
+        タイトルまま
+      </p>
+      <hr />
+      <h2>
+        経緯
+      </h2>
+      <p>
+        Docker でつくったコンテナの中に入って状態を確認するために、コンテナ内で sshd を立ち上げてアクセスする、ってなことを以前やってたんですが、コンテナ内で sshd を立ち上げる、というやり方がいまいちだし、そもそもコンテナの仕組みから考えれば、別に sshd を立ち上げなくても、コンテナと同じ namespace と rootfs に bash なりのプロセスを閉じ込めてやれば良いわけで、そういったことは既に考えている人はいるだろうし、ツールとかありそうだな、ってことで、
+      </p>
+      <blockquote class="twitter-tweet" lang="en">
+        <p>
+          Dockerで中を見たいコンテナのPID namespaceとchrootをカレントシェルに割り当てることが簡単にできるようなツールがあれば、中でsshとか立てなくていいかな。
+        </p>
+        &mdash; Gosuke Miyashita (@gosukenator)
+        <a href="https://twitter.com/gosukenator/statuses/479289206108217344">
+          June 18, 2014
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        とつぶやいてみたら、
+      </p>
+      <blockquote class="twitter-tweet" data-conversation="none" lang="en">
+        <p>
+          <a href="https://twitter.com/gosukenator">
+            @gosukenator
+          </a>
+          nsenter -- chroot /bin/bash とかでいけないですかねー
+        </p>
+        &mdash; TenForward (@ten_forward)
+        <a href="https://twitter.com/ten_forward/statuses/479297375115042817">
+          June 18, 2014
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        と、nsenter なるものの存在を教えて頂いた。
+      </p>
+      <blockquote class="twitter-tweet" data-conversation="none" lang="en">
+        <p>
+          <a href="https://twitter.com/gosukenator">
+            @gosukenator
+          </a>
+          nsenter はちょっと新しい util-linux にしかないので、ソースからコンパイルする必要あると思います。&#10;RHEL/CentOS7 は知らないですけど、Ubuntu 14.04 にはありませんでした。
+        </p>
+        &mdash; TenForward (@ten_forward)
+        <a href="https://twitter.com/ten_forward/statuses/479297956969869312">
+          June 18, 2014
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        で、これを見るとちょっと面倒かな、と思ったけど、
+      </p>
+      <blockquote class="twitter-tweet" data-conversation="none" lang="en">
+        <p>
+          <a href="https://twitter.com/gosukenator">
+            @gosukenator
+          </a>
+          docker 的にはそのページに書かれている nsinit を使うのが正解かもしれませんね。docker のソースツリーに入ってるツールですし :-)&#10;(nsinit すっかり忘れてた)
+        </p>
+        &mdash; TenForward (@ten_forward)
+        <a href="https://twitter.com/ten_forward/statuses/479304239584251904">
+          June 18, 2014
+        </a>
+      </blockquote>
+      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <p>
+        この nsinit は golang 製なので、golang が動く環境であれば go get で入れることができて楽そうなので、nsinit を試してみることにした。
+      </p>
+      <hr />
+      <h2>
+        nsinit の使い方
+      </h2>
+      <p>
+        golang 環境は既に整っていて、GOPATH が設定されていて、PATH に $GOPATH/bin が含まれている、という前提。
+      </p>
+      <p>
+        <code>go get</code>
+        で
+        <code>nsinit</code>
+        を入れる。
+      </p>
+      <pre><code>$ go get github.com/docker/libcontainer/nsinit</code></pre>
+      <p>
+        こんな感じで実行。
+      </p>
+      <pre><code>$ sudo -s
 # docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 917756ba04a2        ubuntu:14.04        /bin/bash           51 minutes ago      Up 51 minutes                           lonely_tesla
 # cd /var/lib/docker/execdriver/native/9177*
 # nsinit exec /bin/bash
-daemon@koye:/$
-</code></pre>
-
-<p>cd して nsinit、ってやるのは、一般ユーザからだとパーミッションの関係でタブ補完が効かなくてだるいので、シェル関数書いてみた。</p>
-
-<pre><code>docker-attach()
+daemon@koye:/$</code></pre>
+      <p>
+        cd して nsinit、ってやるのは、一般ユーザからだとパーミッションの関係でタブ補完が効かなくてだるいので、シェル関数書いてみた。
+      </p>
+      <pre><code>docker-attach()
 {
   id=`sudo docker ps -q --no-trunc $1`
   root=/var/lib/docker/execdriver/native/$id
   sudo sh -c &quot;cd $root &amp;&amp; $GOPATH/bin/nsinit exec $2&quot;
-}
-</code></pre>
-
-<p>この関数つかって、コンテナIDと実行するプログラムを与えれば、一発でコンテナの中に入れて便利。</p>
-
-<pre><code>vagrant@vagrant:~$ docker-attach 9177 /bin/bash
+}</code></pre>
+      <p>
+        この関数つかって、コンテナIDと実行するプログラムを与えれば、一発でコンテナの中に入れて便利。
+      </p>
+      <pre><code>vagrant@vagrant:~$ docker-attach 9177 /bin/bash
 daemon@koye:/$
 daemon@koye:/$ ps -ef
 UID        PID  PPID  C STIME TTY          TIME CMD
 daemon       1     0  0 10:38 ?        00:00:00 /bin/bash
-daemon      14     1  0 10:44 ?        00:00:00 ps -ef
-</code></pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2014/12/25/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2014/04/21/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+daemon      14     1  0 10:44 ?        00:00:00 ps -ef</code></pre>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2014/04/21/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2014/12/25/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

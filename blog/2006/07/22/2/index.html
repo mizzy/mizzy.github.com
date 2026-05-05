@@ -1,183 +1,162 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9) - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9) - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2006/07/22/2/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2006/07/22/2/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2006/07/22/2/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2006/07/22/2">catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは <a class="ext-link" href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery"><span class="icon"></span>Account Auto-Discovery</a> データを追加するプラグインを書いてみた。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2006/07/22/2">
+    catlxom の Account Auto-Discovery プラグイン (catlxom メモ #9)
+  </a>
+</h1>
+<div class="byline">
+  22 July 2006
+</div>
 <p>
-blosxom でも <a class="ext-link" href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/account_auto_discovery"><span class="icon"></span>同様のプラグイン</a> を書いているのですが、一番大きな違いは、blosxom プラグインはテンプレートの修正が必要なのに対し、catlxom プラグインはテンプレートの修正が一切必要ありません。XML::TreeBuilder を利用して、HTML ヘッダにデータを追加するような作りにしています。
+  catlxom で RSS や TrackBack 等の Auto Discovery データを追加するためのプラグインを書こうと思い、まずは
+  <a class="ext-link" href="http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery">
+    <span class="icon"></span>
+    Account Auto-Discovery
+  </a>
+  データを追加するプラグインを書いてみた。
 </p>
-
 <p>
-利用上の注意点として、Template::TT よりも後にこのプラグインをロードしなければいけいのですが、自動ロードを有効にしてると先にロードされちゃうので、自動ロードをオフにして yaml で明示的に利用プラグインを指定する必要があります。
+  blosxom でも
+  <a class="ext-link" href="http://trac.mizzy.org/public/browser/blosxom_plugins/trunk/account_auto_discovery">
+    <span class="icon"></span>
+    同様のプラグイン
+  </a>
+  を書いているのですが、一番大きな違いは、blosxom プラグインはテンプレートの修正が必要なのに対し、catlxom プラグインはテンプレートの修正が一切必要ありません。XML::TreeBuilder を利用して、HTML ヘッダにデータを追加するような作りにしています。
 </p>
-
+<p>
+  利用上の注意点として、Template::TT よりも後にこのプラグインをロードしなければいけいのですが、自動ロードを有効にしてると先にロードされちゃうので、自動ロードをオフにして yaml で明示的に利用プラグインを指定する必要があります。
+</p>
 <pre class="wiki">
 package Catlxom::Plugin::Format::AccountAutoDiscovery;
 use strict;
 use warnings;
 use base qw/Catlxom::Plugin/;
+<p>use NEXT;<br />
+use XML::TreeBuilder;</p>
+<p>sub interpolate {<br />
+my ( $self, $c ) = @_;</p>
+<pre><code>my $accounts = $c-&amp;gt;config-&amp;gt;{account_auto_discovery};
 
-use NEXT;
-use XML::TreeBuilder;
+my $tree = XML::TreeBuilder-&amp;gt;new();
+$tree-&amp;gt;parse($c-&amp;gt;res-&amp;gt;body);
 
-sub interpolate {
-    my ( $self, $c ) = @_;
+my $head = $tree-&amp;gt;find('head');
 
-    my $accounts = $c-&gt;config-&gt;{account_auto_discovery};
+for ( @$accounts ){
+    my $rdf = XML::Element-&amp;gt;new(
+        'rdf:RDF',
+        'xmlns:rdf'  =&amp;gt; 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+        'xmlns:foaf' =&amp;gt; 'http://xmlns.com/foaf/0.1/',
+    );
 
-    my $tree = XML::TreeBuilder-&gt;new();
-    $tree-&gt;parse($c-&gt;res-&gt;body);
+    my $rdf_description = XML::Element-&amp;gt;new(
+        'rdf:Description',
+        'rdf:about' =&amp;gt; $c-&amp;gt;req-&amp;gt;uri,
+    );
 
-    my $head = $tree-&gt;find('head');
+    my $foaf_maker = XML::Element-&amp;gt;new(
+        'foaf:maker',
+        'rdf:parseType' =&amp;gt; 'Resource',
+    );
 
-    for ( @$accounts ){
-        my $rdf = XML::Element-&gt;new(
-            'rdf:RDF',
-            'xmlns:rdf'  =&gt; 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-            'xmlns:foaf' =&gt; 'http://xmlns.com/foaf/0.1/',
-        );
+    my $foaf_holds_acount = XML::Element-&amp;gt;new( 'foaf:holdsAccount' );
 
-        my $rdf_description = XML::Element-&gt;new(
-            'rdf:Description',
-            'rdf:about' =&gt; $c-&gt;req-&gt;uri,
-        );
+    my $foaf_online_account = XML::Element-&amp;gt;new(
+        'foaf:OnlineAccount',
+        'foaf:accountName' =&amp;gt; $_-&amp;gt;{account_name},
+    );
 
-        my $foaf_maker = XML::Element-&gt;new(
-            'foaf:maker',
-            'rdf:parseType' =&gt; 'Resource',
-        );
+    my $foaf_account_service_homepage = XML::Element-&amp;gt;new(
+        'foaf:accountServiceHomepage',
+        'rdf:resource' =&amp;gt; $_-&amp;gt;{account_service_homepage},
+    );
 
-        my $foaf_holds_acount = XML::Element-&gt;new( 'foaf:holdsAccount' );
-
-        my $foaf_online_account = XML::Element-&gt;new(
-            'foaf:OnlineAccount',
-            'foaf:accountName' =&gt; $_-&gt;{account_name},
-        );
-
-        my $foaf_account_service_homepage = XML::Element-&gt;new(
-            'foaf:accountServiceHomepage',
-            'rdf:resource' =&gt; $_-&gt;{account_service_homepage},
-        );
-
-        $head-&gt;push_content($rdf);
-        $rdf-&gt;push_content($rdf_description);
-        $rdf_description-&gt;push_content($foaf_maker);
-        $foaf_maker-&gt;push_content($foaf_holds_acount);
-        $foaf_holds_acount-&gt;push_content($foaf_online_account);
-        $foaf_online_account-&gt;push_content($foaf_account_service_homepage);
-    }
-
-    $c-&gt;res-&gt;{body} = $tree-&gt;as_HTML;
-    $self-&gt;NEXT::interpolate($c);
+    $head-&amp;gt;push_content($rdf);
+    $rdf-&amp;gt;push_content($rdf_description);
+    $rdf_description-&amp;gt;push_content($foaf_maker);
+    $foaf_maker-&amp;gt;push_content($foaf_holds_acount);
+    $foaf_holds_acount-&amp;gt;push_content($foaf_online_account);
+    $foaf_online_account-&amp;gt;push_content($foaf_account_service_homepage);
 }
 
-1;
-
-__END__
-
-=head1 NAME
-
-Catlxom::Plugin::Format::AccountAutoDiscovery
-
-=head1 SYNOPSIS
-
-account_auto_discovery:
-  - account_name: gosukenator
-    account_service_homepage: http://www.hatena.ne.jp/
-  - account_name: xxxx
-    account_service_homepage: http://xxx.ne.jp/
-
-=head1 DESCRIPTION
-
-This plugin inserts Account Auto-Discovery data into HTML header.
-
-=head1 AUTHOR
-
-Gosuke Miyashita
-
-=head1 SEE ALSO
-
-L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;
-
-=cut
+$c-&amp;gt;res-&amp;gt;{body} = $tree-&amp;gt;as_HTML;
+$self-&amp;gt;NEXT::interpolate($c);</code></pre>
+<p>}</p>
+<p>1;</p>
+<p><strong>END</strong></p>
+<p>=head1 NAME</p>
+<p>Catlxom::Plugin::Format::AccountAutoDiscovery</p>
+<p>=head1 SYNOPSIS</p>
+<p>account_auto_discovery:</p>
+<ul>
+<li>account_name: gosukenator<br />
+account_service_homepage: <a href="http://www.hatena.ne.jp/">http://www.hatena.ne.jp/</a></li>
+<li>account_name: xxxx<br />
+account_service_homepage: <a href="http://xxx.ne.jp/">http://xxx.ne.jp/</a></li>
+</ul>
+<p>=head1 DESCRIPTION</p>
+<p>This plugin inserts Account Auto-Discovery data into HTML header.</p>
+<p>=head1 AUTHOR</p>
+<p>Gosuke Miyashita</p>
+<p>=head1 SEE ALSO</p>
+<p>L&lt;http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery&gt;</p>
+<p>=cut<br />
 </pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2006/07/27/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2006/07/22/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2006/07/22/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2006/07/27/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

@@ -1,177 +1,186 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>serverspec が Debian 対応した（してもらった） - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      serverspec が Debian 対応した（してもらった） - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="serverspec が Debian 対応した（してもらった）"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2013/03/25/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2013/03/25/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="serverspec が Debian 対応した（してもらった）"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2013/03/25/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2013/03/25/1">
+          serverspec が Debian 対応した（してもらった）
+        </a>
+      </h1>
+      <div class="byline">
+        25 March 2013
+      </div>
+      <p>
+        <a href="/blog/2013/03/24/3/">
+          構築済みサーバを RSpec でテストする serverspec という gem をつくった
+        </a>
+        で、「Red Hat 系 Linux 前提のつくりになってしまっているので、他のディストリビューションや OS で利用したい、という方は、ぜひプルリクエストください」と書いていたら、早速
+        <a href="https://github.com/mizzy/serverspec/pull/1">
+          Debian 系 OS 対応のプルリクエスト
+        </a>
+        をいただきました。ありがとうございます！
+      </p>
+      <p>
+        単に Debian 系 OS に対応するだけではなく、他の OS にも対応できるよう拡張しやすい形に書き換えていただいたり、serverspec 自体の spec も追加していただいたりと、至れり尽くせりで感謝感謝です。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="n">c</span><span class="o">.</span><span class="n">include</span><span class="p">(</span><span class="no">Serverspec</span><span class="o">::</span><span class="no">DebianHelper</span><span class="p">,</span> <span class="ss">:os</span> <span class="o">=&gt;</span> <span class="ss">:debian</span><span class="p">)</span>
+</span></span></code></pre>
+      <p>
+        みたいな書き方も知らなかったので、大変参考になりました。
+      </p>
+      <p>
+        <a href="https://github.com/mizzy/serverspec/blob/master/README.md">
+          README
+        </a>
+        にも書いてありますが、こんな感じで OS を指定します。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;httpd&#39;</span><span class="p">,</span> <span class="ss">:os</span> <span class="o">=&gt;</span> <span class="ss">:debian</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_installed</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_enabled</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_running</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;port 80&#39;</span><span class="p">,</span> <span class="ss">:os</span> <span class="o">=&gt;</span> <span class="ss">:debian</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_listening</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;/etc/httpd/conf/httpd.conf&#39;</span><span class="p">,</span> <span class="ss">:os</span> <span class="o">=&gt;</span> <span class="ss">:debian</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_file</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">contain</span> <span class="s2">&#34;ServerName www.example.jp&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre>
+      <p>
+        <code>:os =&gt; :debian</code>
+        と何度も書くのが面倒なら、
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;www.example.jp&#39;</span><span class="p">,</span> <span class="ss">:os</span> <span class="o">=&gt;</span> <span class="ss">:debian</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;httpd&#39;</span><span class="o">.</span><span class="n">should</span> <span class="n">be_installed</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;httpd&#39;</span><span class="o">.</span><span class="n">should</span> <span class="n">be_enabled</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;httpd&#39;</span><span class="o">.</span><span class="n">should</span> <span class="n">be_running</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;port 80&#39;</span><span class="o">.</span><span class="n">should</span> <span class="n">be_listening</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">conf</span> <span class="o">=</span> <span class="s1">&#39;/etc/httpd/conf/httpd.conf&#39;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="n">conf</span><span class="o">.</span><span class="n">should</span> <span class="n">be_file</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="n">conf</span><span class="o">.</span><span class="n">should</span> <span class="n">contain</span> <span class="s2">&#34;ServerName www.example.jp&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre>
+      <p>
+        とか書いてもいいですし、
+      </p>
+      <p>
+        <code>serverspec-init</code>
+        で生成される spec/spec_helper.rb に
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;serverspec&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;pathname&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="no">RSpec</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+</span></span><span class="line"><span class="cl">  <span class="n">c</span><span class="o">.</span><span class="n">include</span><span class="p">(</span><span class="no">Serverspec</span><span class="o">::</span><span class="no">DebianHelper</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">c</span><span class="o">.</span><span class="n">before</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="n">c</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="no">Pathname</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">example</span><span class="o">.</span><span class="n">metadata</span><span class="o">[</span><span class="ss">:location</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">dirname</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">end</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre>
+      <p>
+        な感じで
+        <code>c.include(Serverspec::DebianHelper)</code>
+        を追加して、
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;httpd&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_installed</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_enabled</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_running</span>   <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;port 80&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_listening</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">describe</span> <span class="s1">&#39;/etc/httpd/conf/httpd.conf&#39;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_file</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">contain</span> <span class="s2">&#34;ServerName www.example.jp&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">end</span>
+</span></span></code></pre>
+      <p>
+        といった感じで、spec 内では OS は指定しない、といった書き方もできます。
+      </p>
+      <p>
+        好きなスタイルを選んでください。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2013/03/24/4" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2013/03/25/1">serverspec が Debian 対応した（してもらった）</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="/blog/2013/03/24/3/">構築済みサーバを RSpec でテストする serverspec という gem をつくった</a> で、「Red Hat 系 Linux 前提のつくりになってしまっているので、他のディストリビューションや OS で利用したい、という方は、ぜひプルリクエストください」と書いていたら、早速 <a href="https://github.com/mizzy/serverspec/pull/1">Debian 系 OS 対応のプルリクエスト</a> をいただきました。ありがとうございます！</p>
-
-<p>単に Debian 系 OS に対応するだけではなく、他の OS にも対応できるよう拡張しやすい形に書き換えていただいたり、serverspec 自体の spec も追加していただいたりと、至れり尽くせりで感謝感謝です。</p>
-
-<pre><code class="ruby">c.include(Serverspec::DebianHelper, :os =&gt; :debian)
-</code></pre>
-
-<p>みたいな書き方も知らなかったので、大変参考になりました。</p>
-
-<p><a href="https://github.com/mizzy/serverspec/blob/master/README.md">README</a> にも書いてありますが、こんな感じで OS を指定します。</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe &#39;httpd&#39;, :os =&gt; :debian do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;port 80&#39;, :os =&gt; :debian do
-  it { should be_listening }
-end
-
-describe &#39;/etc/httpd/conf/httpd.conf&#39;, :os =&gt; :debian do
-  it { should be_file }
-  it { should contain &quot;ServerName www.example.jp&quot; }
-end
-</code></pre>
-
-<p><code>:os =&gt; :debian</code> と何度も書くのが面倒なら、</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe &#39;www.example.jp&#39;, :os =&gt; :debian do
-  it do
-    &#39;httpd&#39;.should be_installed
-  end
-  it do
-    &#39;httpd&#39;.should be_enabled
-  end
-  it do
-    &#39;httpd&#39;.should be_running
-  end
-
-  it do
-    &#39;port 80&#39;.should be_listening
-  end
-
-  conf = &#39;/etc/httpd/conf/httpd.conf&#39;
-  it do
-    conf.should be_file
-  end
-  it do
-    conf.should contain &quot;ServerName www.example.jp&quot;
-  end
-end
-</code></pre>
-
-<p>とか書いてもいいですし、</p>
-
-<p><code>serverspec-init</code> で生成される spec/spec_helper.rb に</p>
-
-<pre><code class="ruby">require &#39;serverspec&#39;
-require &#39;pathname&#39;
-
-RSpec.configure do |c|
-  c.include(Serverspec::DebianHelper)
-  c.before do
-    c.host = File.basename(Pathname.new(example.metadata[:location]).dirname)
-  end
-end
-</code></pre>
-
-<p>な感じで <code>c.include(Serverspec::DebianHelper)</code> を追加して、</p>
-
-<pre><code class="ruby">require &#39;spec_helper&#39;
-
-describe &#39;httpd&#39; do
-  it { should be_installed }
-  it { should be_enabled   }
-  it { should be_running   }
-end
-
-describe &#39;port 80&#39; do
-  it { should be_listening }
-end
-
-describe &#39;/etc/httpd/conf/httpd.conf&#39; do
-  it { should be_file }
-  it { should contain &quot;ServerName www.example.jp&quot; }
-end
-</code></pre>
-
-<p>といった感じで、spec 内では OS は指定しない、といった書き方もできます。</p>
-
-<p>好きなスタイルを選んでください。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2013/03/27/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2013/03/24/4" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2013/03/27/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

@@ -1,104 +1,143 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2014/04/19/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2014/04/19/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2014/04/19/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2014/04/19/1">
+          WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた
+        </a>
+      </h1>
+      <div class="byline">
+        19 April 2014
+      </div>
+      <p>
+        最初に書いておくと、発売は4/24(木)です。（こういうエントリを見て、お、もう出たのか、と思って書店に行ったらまだだった、みたいな経験よくあるのであらかじめ。）
+      </p>
+      <p>
+        <a href="http://gihyo.jp/magazine/wdpress/archive/2014/vol80">
+          <img src="http://image.gihyo.co.jp/assets/images/cover/2014/thumb/TH160_9784774163987.jpg" />
+        </a>
+      </p>
+      <p>
+        Software Design 誌では何度か書かせてもらっていたのですが、WEB+DB PRESS は初めてです。（
+        <a href="http://gihyo.jp/lifestyle/serial/01/shukatsu_joshi/0004">
+          インタビュー記事
+        </a>
+        が載ったり、他の方の記事で
+        <a href="https://gihyo.jp/dev/feature/01/webservice-guide/0002">
+          自分の名前が出たり
+        </a>
+        、
+        <a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol76">
+          自分が開発してるソフトウェアをとりあげてもらったり
+        </a>
+        はしましたが。）
+      </p>
+      <p>
+        で、内容は読んでもらうとして、補足を。
+      </p>
+      <h2>
+        サンプルで利用してる CentOS がなぜ最新ではなく 6.4 なのか
+      </h2>
+      <p>
+        執筆当初は、最新バージョンである 6.5 で進めていたのですが、DigitalOcean 上にある 6.5 のイメージには rsync が入っておらず、Vagrant によるプロビジョニングがエラーになる、ということが起きたため、rsync が入っている 6.4 に変更しました。
+      </p>
+      <p>
+        6.5 のままで行くためには、元のイメージに rsync を入れて、そのスナップショットをとって…みたいな作業が必要になって、それは本特集の趣旨から脱線するので、6.4 で行くことにしました。
+      </p>
+      <p>
+        Vagrant 1.5 からは Box に rsync が入っていない場合に自動で入れてくれる機能があるのですが、
+        <a href="https://github.com/smdahlen/vagrant-digitalocean">
+          vagrant-digitalocean
+        </a>
+        を利用していると、この機能が発動しないんですよね。で、vagrant-digitalocean 利用時も自動で rsync を入れるための
+        <a href="https://github.com/smdahlen/vagrant-digitalocean/pull/103">
+          プルリクエスト
+        </a>
+        を送っていて、+1 がいくつかついてるけど、まだマージされてないです。これがマージされてリリースされれば、rsync が入っていないイメージであっても、本特集に書いた手順そのままでいけるようになるはずです。
+      </p>
+      <h2>
+        サンプルコード
+      </h2>
+      <p>
+        <a href="http://gihyo.jp/magazine/wdpress/archive/2014/vol80/support#supportDownload">
+          gihyo.jp のサポートページ
+        </a>
+        でも公開されてますが、
+        <a href="https://github.com/mizzy/test-driven-infra">
+          GitHub 上にも置いておきます
+        </a>
+        。本特集通りに操作した履歴になっていますし、
+        <a href="https://github.com/mizzy/test-driven-infra/releases">
+          章ごとにタグを打ってあります
+        </a>
+        。
+      </p>
+      <h2>
+        その他
+      </h2>
+      <p>
+        その他、読んでいて何か気になる点、お気づきの点などありましたら、
+        <a href="https://twitter.com/gosukenator">
+          @gosukenator
+        </a>
+        までお知らせください。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2014/04/18/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2014/04/19/1">WEB+DB PRESS Vol.80 に「実践 テスト駆動インフラ＆CI」という特集記事を書いた</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>最初に書いておくと、発売は4/24(木)です。（こういうエントリを見て、お、もう出たのか、と思って書店に行ったらまだだった、みたいな経験よくあるのであらかじめ。）</p>
-
-<p><a href="http://gihyo.jp/magazine/wdpress/archive/2014/vol80"><img src="http://image.gihyo.co.jp/assets/images/cover/2014/thumb/TH160_9784774163987.jpg" /></a></p>
-
-<p>Software Design 誌では何度か書かせてもらっていたのですが、WEB+DB PRESS は初めてです。（<a href="http://gihyo.jp/lifestyle/serial/01/shukatsu_joshi/0004">インタビュー記事</a>が載ったり、他の方の記事で<a href="https://gihyo.jp/dev/feature/01/webservice-guide/0002">自分の名前が出たり</a>、<a href="http://gihyo.jp/magazine/wdpress/archive/2013/vol76">自分が開発してるソフトウェアをとりあげてもらったり</a>はしましたが。）</p>
-
-<p>で、内容は読んでもらうとして、補足を。</p>
-
-<h2>サンプルで利用してる CentOS がなぜ最新ではなく 6.4 なのか</h2>
-
-<p>執筆当初は、最新バージョンである 6.5 で進めていたのですが、DigitalOcean 上にある 6.5 のイメージには rsync が入っておらず、Vagrant によるプロビジョニングがエラーになる、ということが起きたため、rsync が入っている 6.4 に変更しました。</p>
-
-<p>6.5 のままで行くためには、元のイメージに rsync を入れて、そのスナップショットをとって…みたいな作業が必要になって、それは本特集の趣旨から脱線するので、6.4 で行くことにしました。</p>
-
-<p>Vagrant 1.5 からは Box に rsync が入っていない場合に自動で入れてくれる機能があるのですが、<a href="https://github.com/smdahlen/vagrant-digitalocean">vagrant-digitalocean</a> を利用していると、この機能が発動しないんですよね。で、vagrant-digitalocean 利用時も自動で rsync を入れるための<a href="https://github.com/smdahlen/vagrant-digitalocean/pull/103">プルリクエスト</a> を送っていて、+1 がいくつかついてるけど、まだマージされてないです。これがマージされてリリースされれば、rsync が入っていないイメージであっても、本特集に書いた手順そのままでいけるようになるはずです。</p>
-
-<h2>サンプルコード</h2>
-
-<p><a href="http://gihyo.jp/magazine/wdpress/archive/2014/vol80/support#supportDownload">gihyo.jp のサポートページ</a> でも公開されてますが、<a href="https://github.com/mizzy/test-driven-infra">GitHub 上にも置いておきます</a>。本特集通りに操作した履歴になっていますし、<a href="https://github.com/mizzy/test-driven-infra/releases">章ごとにタグを打ってあります</a>。</p>
-
-<h2>その他</h2>
-
-<p>その他、読んでいて何か気になる点、お気づきの点などありましたら、<a href="https://twitter.com/gosukenator">@gosukenator</a> までお知らせください。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2014/04/21/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2014/04/18/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2014/04/21/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

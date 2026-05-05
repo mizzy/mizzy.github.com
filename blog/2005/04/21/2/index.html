@@ -1,104 +1,91 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>ウェブサイトのスタイルというものについて考えてみる　#0 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      ウェブサイトのスタイルというものについて考えてみる　#0 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="ウェブサイトのスタイルというものについて考えてみる　#0"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2005/04/21/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2005/04/21/2/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="ウェブサイトのスタイルというものについて考えてみる　#0"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2005/04/21/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2005/04/21/2">
+          ウェブサイトのスタイルというものについて考えてみる　#0
+        </a>
+      </h1>
+      <div class="byline">
+        21 April 2005
+      </div>
+      <p class="entryBody">
+        <a href="/index.xhtml" target="_blank">
+          旧サイト
+        </a>
+        から今のブログ形式に移行した理由のひとつは、ウェブサイトはどうあるべきか、という問いに対して、サイトスタイルを変えてみることにより、何か見えてくるものがあるんじゃないか、という実験的なものだったりします。
+      </p>
+      <p class="entryBody">
+        旧サイトの様に、トップページがあり、また各テーマ毎のページがあり、トップにメニューを置いて各テーマに対してリンクする（または更にサブメニューがある）、というスタイルは俺がウェブサイトを作り始めた95年あたりでもごく普通のものだったし、今でも変わらずそうなんじゃないかと思う。
+      </p>
+      <p class="entryBody">
+        これはこれでサイトのスタイルとしては一般的だし、一般的だからこそ分かりやすい、必要な情報にたどりつきやすいものだと思って、内容やデザインは違えど、今までずっとこのスタイルで通してきたわけですが、果たして本当に、このスタイルが一番いいものなのだろうか？と疑問を抱いたのが、ブログへの移行のきっかけのひとつだったりします。
+      </p>
+      <p class="entryBody">
+        移行するのは別にブログでなくても、他のスタイルでもよかったのですが、画期的なスタイルをつくれるほどの創造性が俺にあるわけでもないので、とりあえずブログ形式を選択してみた、という感じです。要するに何でもいいからスタイルを変えてみて、そこから何かが見えるのか、あるいは見えないのか、とりあえずやってみようぜ、と。
+      </p>
+      <p class="entryBody">
+        で、この２週間ほど、blosxomを導入して、既成のプラグインをつっこんでみたり改造してみたり、自分でプラグインをつくってみたり、ちょっとajax的なものを入れてみたり、という感じで自分なりのブログスタイルみたいなものをつくってきたわけですが、今までのスタイルと比較しての、ブログスタイルのメリット、デメリットみたいなものがちょっと見えてきた気がするので、まずはそれについて整理をしてみたいな、と。
+      </p>
+      <p class="entryBody">
+        続く。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2005/04/21/1" rel="next">
+        ← older
       </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2005/04/21/2">ウェブサイトのスタイルというものについて考えてみる　#0</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p class="entryBody">
-<a href="/index.xhtml" target="_blank">旧サイト</a>から今のブログ形式に移行した理由のひとつは、ウェブサイトはどうあるべきか、という問いに対して、サイトスタイルを変えてみることにより、何か見えてくるものがあるんじゃないか、という実験的なものだったりします。
-</p>
-
-<p class="entryBody">
-旧サイトの様に、トップページがあり、また各テーマ毎のページがあり、トップにメニューを置いて各テーマに対してリンクする（または更にサブメニューがある）、というスタイルは俺がウェブサイトを作り始めた95年あたりでもごく普通のものだったし、今でも変わらずそうなんじゃないかと思う。
-</p>
-
-<p class="entryBody">
-これはこれでサイトのスタイルとしては一般的だし、一般的だからこそ分かりやすい、必要な情報にたどりつきやすいものだと思って、内容やデザインは違えど、今までずっとこのスタイルで通してきたわけですが、果たして本当に、このスタイルが一番いいものなのだろうか？と疑問を抱いたのが、ブログへの移行のきっかけのひとつだったりします。
-</p>
-
-<p class="entryBody">
-移行するのは別にブログでなくても、他のスタイルでもよかったのですが、画期的なスタイルをつくれるほどの創造性が俺にあるわけでもないので、とりあえずブログ形式を選択してみた、という感じです。要するに何でもいいからスタイルを変えてみて、そこから何かが見えるのか、あるいは見えないのか、とりあえずやってみようぜ、と。
-</p>
-
-<p class="entryBody">
-で、この２週間ほど、blosxomを導入して、既成のプラグインをつっこんでみたり改造してみたり、自分でプラグインをつくってみたり、ちょっとajax的なものを入れてみたり、という感じで自分なりのブログスタイルみたいなものをつくってきたわけですが、今までのスタイルと比較しての、ブログスタイルのメリット、デメリットみたいなものがちょっと見えてきた気がするので、まずはそれについて整理をしてみたいな、と。
-</p>
-
-<p class="entryBody">
-続く。
-</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2005/04/21/3">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2005/04/21/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2005/04/21/3">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

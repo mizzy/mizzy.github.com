@@ -1,90 +1,90 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Webiblo - web to ebook project - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2012/01/10/1">Webiblo - web to ebook project</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>久々に日本語で書きます。（後で英語でも書く。）</p>
-
-<p><a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">Web-to-mobi</a> を焼き直して、<a href="https://github.com/mizzy/webiblo">Webiblo</a> というプロジェクトを立ち上げてみました。</p>
-
-<p>基本的には GitHub の README に書いてある通りなんですが、ウェブサイトについて記述された JSON を喰わせることによって、Kindle で読める mobipocket フォーマットの電子書籍データを作ろう、また、様々なサイト対応の JSON データを集めたい、というのがこのプロジェクトの趣旨です。</p>
-
-<p>現在は、</p>
-
-<pre><code>$ webiblo.pl http://mizzy.org/webiblo/data/Getting_Real.json
-</code></pre>
-
-<p>といった感じで、JSON が記述された URL を指定するか、</p>
-
-<pre><code>$ cat data.json | webiblo.pl
-</code></pre>
-
-<p>といった形で JSON を標準入力から渡してやれば、与えられたデータにしたがって、mobipocket 形式のデータを生成します。（<a href="http://www.amazon.com/gp/feature.html?docId=1000234621">KindleGen</a> が必要です。）</p>
-
-<p>JSON データは以下のようになっています。</p>
-
-<pre><code>{
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Webiblo - web to ebook project - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="Webiblo - web to ebook project"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2012/01/10/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2012/01/10/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Webiblo - web to ebook project"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2012/01/10/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2012/01/10/1">
+          Webiblo - web to ebook project
+        </a>
+      </h1>
+      <div class="byline">
+        10 January 2012
+      </div>
+      <p>
+        久々に日本語で書きます。（後で英語でも書く。）
+      </p>
+      <p>
+        <a href="/blog/2012/01/09/web-to-mobi-a-script-for-converting-web-sites-to-mobipocket-format/">
+          Web-to-mobi
+        </a>
+        を焼き直して、
+        <a href="https://github.com/mizzy/webiblo">
+          Webiblo
+        </a>
+        というプロジェクトを立ち上げてみました。
+      </p>
+      <p>
+        基本的には GitHub の README に書いてある通りなんですが、ウェブサイトについて記述された JSON を喰わせることによって、Kindle で読める mobipocket フォーマットの電子書籍データを作ろう、また、様々なサイト対応の JSON データを集めたい、というのがこのプロジェクトの趣旨です。
+      </p>
+      <p>
+        現在は、
+      </p>
+      <pre><code>$ webiblo.pl http://mizzy.org/webiblo/data/Getting_Real.json</code></pre>
+      <p>
+        といった感じで、JSON が記述された URL を指定するか、
+      </p>
+      <pre><code>$ cat data.json | webiblo.pl</code></pre>
+      <p>
+        といった形で JSON を標準入力から渡してやれば、与えられたデータにしたがって、mobipocket 形式のデータを生成します。（
+        <a href="http://www.amazon.com/gp/feature.html?docId=1000234621">
+          KindleGen
+        </a>
+        が必要です。）
+      </p>
+      <p>
+        JSON データは以下のようになっています。
+      </p>
+      <pre><code>{
     &quot;title&quot;       : &quot;Structure and Interpretation of Computer Programs&quot;,
     &quot;authors&quot;     : [
         &quot;Harold Abelson&quot;,
@@ -114,70 +114,133 @@
             ]
         }
     ]
-}
-</code></pre>
-
-<p>ざっくり構造としては、以下のようになっています。</p>
-
-<ul>
-<li>書籍データ
-
-<ul>
-<li>本のタイトル</li>
-<li>著者</li>
-<li>表紙画像</li>
-<li>コンテンツとして抜き出す部分の XPath（オプショナル）</li>
-<li>コンテンツから除外したい部分の XPath（オプショナル）</li>
-<li>章
-
-<ul>
-<li>章タイトル</li>
-<li>章ページの URI</li>
-<li>セクション</li>
-<li>セクションタイトル</li>
-<li>セクションページの URI</li>
-<li>サブセクション
-
-<ul>
-<li>サブセクションタイトル</li>
-<li>サブセクションページの URI</li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
-
-<p>JSON データは現在のところ、<a href="http://gettingreal.37signals.com/toc.php">Getting Real</a> 用のものと <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">SICP</a> 用のものを <a href="http://mizzy.org/webiblo/">こちら</a> で公開しています。</p>
-
-<p>JSON データは GitHub リポジトリの gh-pages ブランチに置いてあるので、独自の JSON データを作成した方は pull request 送ってもらえるとうれしいです。</p>
-
-<p>webiblo で生成したデータを Kindle Previewer で見ると、こういった感じになります。</p>
-
-<p><img src="/images/2012/01/sicp_cover.png" width="250" title="SICP Cover" >
-<img src="/images/2012/01/sicp_toc.png" width="250" title="SICP TOC" >
-<img src="/images/2012/01/sicp_content.png" width="250" title="SICP Content" ></p>
-
-<p>元々は、単に Getting Real 英語版のデータを mobipocket 形式に変換したかっただけなんですが、Facebook での otsune さんのアドバイスにより、こういった形で、書籍固有のデータを分離する形でつくってみました。</p>
-
-<p>また、<a href="http://twitter.com/hotchpotch">@hotchpotch</a> さんから、<a href="http://subtech.g.hatena.ne.jp/motemen/20110915/1316088362">Autopagerize の SITEINFO を活用したアプローチ</a> もあるよ、と教えて頂き、うおー、これはエレガントだ、と思ったんですが、こちらは目次ページを作成する機能がなさそうだったので、とりあえず当初の JSON を利用するというコンセプトのまま開発を進めました。</p>
-
-<p>今後の TODO としては、以下のものを考えてます。</p>
-
-<ul>
-<li>EPUB3 など、mobipocket 以外のフォーマット対応</li>
-<li>CLI から JSON カタログを検索して、簡単にデータ生成できるようにする</li>
-</ul>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2012/01/10/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2012/01/09/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+}</code></pre>
+      <p>
+        ざっくり構造としては、以下のようになっています。
+      </p>
+      <ul>
+        <li>
+          書籍データ
+          <ul>
+            <li>
+              本のタイトル
+            </li>
+            <li>
+              著者
+            </li>
+            <li>
+              表紙画像
+            </li>
+            <li>
+              コンテンツとして抜き出す部分の XPath（オプショナル）
+            </li>
+            <li>
+              コンテンツから除外したい部分の XPath（オプショナル）
+            </li>
+            <li>
+              章
+              <ul>
+                <li>
+                  章タイトル
+                </li>
+                <li>
+                  章ページの URI
+                </li>
+                <li>
+                  セクション
+                  <ul>
+                    <li>
+                      セクションタイトル
+                    </li>
+                    <li>
+                      セクションページの URI
+                    </li>
+                    <li>
+                      サブセクション
+                      <ul>
+                        <li>
+                          サブセクションタイトル
+                        </li>
+                        <li>
+                          サブセクションページの URI
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p>
+        JSON データは現在のところ、
+        <a href="http://gettingreal.37signals.com/toc.php">
+          Getting Real
+        </a>
+        用のものと
+        <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html">
+          SICP
+        </a>
+        用のものを
+        <a href="http://mizzy.org/webiblo/">
+          こちら
+        </a>
+        で公開しています。
+      </p>
+      <p>
+        JSON データは GitHub リポジトリの gh-pages ブランチに置いてあるので、独自の JSON データを作成した方は pull request 送ってもらえるとうれしいです。
+      </p>
+      <p>
+        webiblo で生成したデータを Kindle Previewer で見ると、こういった感じになります。
+      </p>
+      <p>
+        {% img /images/2012/01/sicp_cover.png 250 SICP Cover %}
+        <br />
+        {% img /images/2012/01/sicp_toc.png 250 SICP TOC %}
+        <br />
+        {% img /images/2012/01/sicp_content.png 250 SICP Content %}
+      </p>
+      <p>
+        元々は、単に Getting Real 英語版のデータを mobipocket 形式に変換したかっただけなんですが、Facebook での otsune さんのアドバイスにより、こういった形で、書籍固有のデータを分離する形でつくってみました。
+      </p>
+      <p>
+        また、
+        <a href="http://twitter.com/hotchpotch">
+          @hotchpotch
+        </a>
+        さんから、
+        <a href="http://subtech.g.hatena.ne.jp/motemen/20110915/1316088362">
+          Autopagerize の SITEINFO を活用したアプローチ
+        </a>
+        もあるよ、と教えて頂き、うおー、これはエレガントだ、と思ったんですが、こちらは目次ページを作成する機能がなさそうだったので、とりあえず当初の JSON を利用するというコンセプトのまま開発を進めました。
+      </p>
+      <p>
+        今後の TODO としては、以下のものを考えてます。
+      </p>
+      <ul>
+        <li>
+          EPUB3 など、mobipocket 以外のフォーマット対応
+        </li>
+        <li>
+          CLI から JSON カタログを検索して、簡単にデータ生成できるようにする
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2012/01/09/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2012/01/10/2">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

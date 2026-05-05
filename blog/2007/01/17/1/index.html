@@ -1,75 +1,70 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Assurer - サーバテスティングフレームワーク #4 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    Assurer - サーバテスティングフレームワーク #4 - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="Assurer - サーバテスティングフレームワーク #4"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2007/01/17/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2007/01/17/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Assurer - サーバテスティングフレームワーク #4"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2007/01/17/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/01/17/1">Assurer - サーバテスティングフレームワーク #4</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-<a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer"><span class="icon"></span>Assurer</a> (<a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/"><span class="icon"></span>SVN</a>) を修正。テストのターゲットとなるホストを、以下の3つのパターンのいずれかで指定できるようにしてみました。
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2007/01/17/1">
+    Assurer - サーバテスティングフレームワーク #4
+  </a>
+</h1>
+<div class="byline">
+  17 January 2007
+</div>
+<p>
+  <a class="ext-link" href="http://trac.mizzy.org/public/browser/library/perl/trunk/Assurer">
+    <span class="icon"></span>
+    Assurer
+  </a>
+  (
+  <a class="ext-link" href="http://svn.mizzy.org/public/library/perl/trunk/Assurer/">
+    <span class="icon"></span>
+    SVN
+  </a>
+  ) を修正。テストのターゲットとなるホストを、以下の3つのパターンのいずれかで指定できるようにしてみました。
 </p>
-
-<h3 id="config.yaml中のテストプラグイン設定で直接指定">config.yaml 中のテストプラグイン設定で直接指定</h3>
-
+<h3 id="config.yaml中のテストプラグイン設定で直接指定">
+  config.yaml 中のテストプラグイン設定で直接指定
+</h3>
 <pre class="wiki">
 test:
   - module: HTTP
@@ -77,94 +72,88 @@ test:
       host: svn.mizzy.org
       content: It works!
 </pre>
-
 <p>
-一番オーソドックスなパターンですね。
+  一番オーソドックスなパターンですね。
 </p>
-
-<h3 id="コマンドラインオプションで指定">コマンドラインオプションで指定</h3>
-
+<h3 id="コマンドラインオプションで指定">
+  コマンドラインオプションで指定
+</h3>
 <pre class="wiki">
 test:
   - module: HTTP
     config:
       content: It works!
 </pre>
-
 <p>
-といった感じで config.yaml には host を書かずに、
+  といった感じで config.yaml には host を書かずに、
 </p>
-
 <pre class="wiki">
 $ ./assurer.pl --config=configy.yaml --host=svn.mizzy.org
 </pre>
-
 <p>
-とコマンド実行時に指定。同じテストを複数のホストに対して実行する場合、いちいち config.yaml を書き換えるよりも、こっちの方が楽ですね。
+  とコマンド実行時に指定。同じテストを複数のホストに対して実行する場合、いちいち config.yaml を書き換えるよりも、こっちの方が楽ですね。
 </p>
-
-<h3 id="config.yamlでターゲットホストをリストで指定">config.yaml でターゲットホストをリストで指定</h3>
-
+<h3 id="config.yamlでターゲットホストをリストで指定">
+  config.yaml でターゲットホストをリストで指定
+</h3>
 <pre class="wiki">
 test:
   - module: HTTP
     config:
       content: It works!
-
-hosts:
-  - svn.mizzy.org
-  - trac.mizzy.org
+<p>hosts:</p>
+<ul>
+<li>svn.mizzy.org</li>
+<li>trac.mizzy.org<br />
 </pre>
-
 <p>
-2番目のパターンと同じ用に、テストプラグインの設定には host を記述しませんが、別なところにターゲットホストをリストアップしておきます。複数のホストに対して一気に実行するのであれば、この方法が楽ですね。
+  2番目のパターンと同じ用に、テストプラグインの設定には host を記述しませんが、別なところにターゲットホストをリストアップしておきます。複数のホストに対して一気に実行するのであれば、この方法が楽ですね。
 </p>
-
 <p>
-これの変形で、
-</p>
-
-<pre class="wiki">
+  これの変形で、
+</p><pre class="wiki">
 test:
   - module: HTTP
     role: web
     config:
       contnet: It works!
-
-  - module: MySQL
-    role: mysql
-
-hosts:
-  web:
-    - svn.mizzy.org
-    - trac.mizzy.org
-  mysql:
-    - mysql.mizzy.org
+<ul>
+<li>module: MySQL<br />
+role: mysql</li>
+</ul>
+<p>hosts:<br />
+web:<br />
+- svn.mizzy.org<br />
+- trac.mizzy.org<br />
+mysql:<br />
+- mysql.mizzy.org<br />
 </pre>
-
 <p>
-といった感じで設定すると、HTTP のテストは svn.mizzy.org と trac.mizzy.org に、MySQL のテストは mysql.mizzy.org に対して実行される、という動作になります。（MySQL テスト用プラグインはまだ存在しませんが。）
+  といった感じで設定すると、HTTP のテストは svn.mizzy.org と trac.mizzy.org に、MySQL のテストは mysql.mizzy.org に対して実行される、という動作になります。（MySQL テスト用プラグインはまだ存在しませんが。）
 </p>
-
 <p>
-複数の役割の異なるホストに対してテストを実行するには、このパターンで。
+  複数の役割の異なるホストに対してテストを実行するには、このパターンで。
 </p>
-
 <p>
-最後のやつは <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175"><span class="icon"></span>Archer</a> からのインスパイヤです。
+  最後のやつは
+  <a class="ext-link" href="http://d.hatena.ne.jp/tokuhirom/20060929/1159495175">
+    <span class="icon"></span>
+    Archer
+  </a>
+  からのインスパイヤです。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/01/18/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/01/14/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2007/01/14/1" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2007/01/18/1">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>

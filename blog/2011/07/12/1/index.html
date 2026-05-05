@@ -1,74 +1,66 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>DotCloudCliSourceCodeReading00 - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2011/07/12/1">DotCloudCliSourceCodeReading00</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>I wonder how &quot;dotcloud push&quot; acts, especially on uploading files, so I read the <a href="http://pypi.python.org/pypi/dotcloud.cli">dotcloud.cli source code</a>.</p>
-
-<p>If you execute &quot;dotcloud push&quot; with --export option, you&#39;ll get the response like this.</p>
-
-<pre><code>$ dotcloud --export push helloworldapp
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      DotCloudCliSourceCodeReading00 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="DotCloudCliSourceCodeReading00"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2011/07/12/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2011/07/12/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="DotCloudCliSourceCodeReading00"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2011/07/12/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2011/07/12/1">
+          DotCloudCliSourceCodeReading00
+        </a>
+      </h1>
+      <div class="byline">
+        12 July 2011
+      </div>
+      <p>
+        I wonder how &quot;dotcloud push&quot; acts, especially on uploading files, so I read the
+        <a href="http://pypi.python.org/pypi/dotcloud.cli">
+          dotcloud.cli source code
+        </a>
+        .
+      </p>
+      <p>
+        If you execute &quot;dotcloud push&quot; with --export option, you'll get the response like this.
+      </p>
+      <pre><code>$ dotcloud --export push helloworldapp
 {
     &quot;data&quot;: [
         [
@@ -92,44 +84,44 @@
         ]
     ], 
     &quot;type&quot;: &quot;cmd&quot;
-}
-</code></pre>
-
-<p>So you know that dotcloud command will run Remote.upload() method.(See DotCloudCliBehaviorOverView.)</p>
-
-<p>You can see the upload() method in dotcloud/cli/remote.py.</p>
-
-<pre><code>#!python
+}</code></pre>
+      <p>
+        So you know that dotcloud command will run Remote.upload() method.(See DotCloudCliBehaviorOverView.)
+      </p>
+      <p>
+        You can see the upload() method in dotcloud/cli/remote.py.
+      </p>
+      <pre><code>#!python
     def upload(self, local_dir, destination, args):
-        if args.get(&#39;check&#39;):
+        if args.get('check'):
             local_dir = self.check_pushdir(local_dir)
-        self.info(&#39;# upload {0} {1}&#39;.format(local_dir, destination))
-        if os.path.isdir(os.path.join(local_dir, &#39;.hg&#39;)):
-            return self.hg(local_dir, destination, args.get(&#39;hg&#39;, {}))
-        if os.path.isdir(os.path.join(local_dir, &#39;.git&#39;)):
-            return self.git(local_dir, destination, args.get(&#39;git&#39;, {}))
-        return self.rsync(local_dir, destination, args.get(&#39;rsync&#39;, {}))
-</code></pre>
-
-<p>If you have .hg directory, dotcloud command runs self.hg().If you have .git directory, dotcloud command runs self.git().Otherwise dotcloud command runs self.rsync().</p>
-
-<p>You can see these methods in the same file.</p>
-
-<pre><code>#!python
+        self.info('# upload {0} {1}'.format(local_dir, destination))
+        if os.path.isdir(os.path.join(local_dir, '.hg')):
+            return self.hg(local_dir, destination, args.get('hg', {}))
+        if os.path.isdir(os.path.join(local_dir, '.git')):
+            return self.git(local_dir, destination, args.get('git', {}))
+        return self.rsync(local_dir, destination, args.get('rsync', {}))</code></pre>
+      <p>
+        If you have .hg directory, dotcloud command runs self.hg().If you have .git directory, dotcloud command runs self.git().Otherwise dotcloud command runs self.rsync().
+      </p>
+      <p>
+        You can see these methods in the same file.
+      </p>
+      <pre><code>#!python
     def rsync(self, local_dir, destination, args):
-        self.info(&#39;# rsync&#39;)
-        excludes = args.get(&#39;excludes&#39;)
+        self.info('# rsync')
+        excludes = args.get('excludes')
         url = utils.parse_url(destination)
-        ssh = &#39; &#39;.join(self._ssh_options)
-        ssh += &#39; -p {0}&#39;.format(url[&#39;port&#39;])
-        if not os.path.isfile(local_dir) and not local_dir.endswith(&#39;/&#39;):
-            local_dir += &#39;/&#39;
+        ssh = ' '.join(self._ssh_options)
+        ssh += ' -p {0}'.format(url['port'])
+        if not os.path.isfile(local_dir) and not local_dir.endswith('/'):
+            local_dir += '/'
         rsync = (
-                    &#39;rsync&#39;, &#39;-lpthrvz&#39;, &#39;--delete&#39;, &#39;--safe-links&#39;,
-                ) + tuple(&#39;--exclude={0}&#39;.format(e) for e in excludes) + (
-                    &#39;-e&#39;, ssh, local_dir,
-                    &#39;{user}@{host}:{dest}/&#39;.format(user=url[&#39;user&#39;],
-                        host=url[&#39;host&#39;], dest=url[&#39;path&#39;])
+                    'rsync', '-lpthrvz', '--delete', '--safe-links',
+                ) + tuple('--exclude={0}'.format(e) for e in excludes) + (
+                    '-e', ssh, local_dir,
+                    '{user}@{host}:{dest}/'.format(user=url['user'],
+                        host=url['host'], dest=url['path'])
                 )
         try:
             ret = subprocess.call(rsync, close_fds=True)
@@ -137,47 +129,49 @@
                 self.warning_ssh()
             return ret
         except OSError:
-            self.die(&#39;rsync&#39;)
+            self.die('rsync')
 
     def hg(self, local_dir, destination, args):
-        self.info(&#39;# hg&#39;)
+        self.info('# hg')
         with utils.cd(local_dir):
             try:
-                ssh = &#39; &#39;.join(self._ssh_options)
-                args = (&#39;hg&#39;, &#39;push&#39;, &#39;--ssh&#39;, ssh, &#39;-f&#39;, destination)
+                ssh = ' '.join(self._ssh_options)
+                args = ('hg', 'push', '--ssh', ssh, '-f', destination)
                 ret = subprocess.call(args, close_fds=True)
                 if ret != 0:
                     self.warning_ssh()
                 return ret
             except OSError:
-                self.die(&#39;hg&#39;)
+                self.die('hg')
 
     def git(self, local_dir, destination, args):
-        self.info(&#39;# git&#39;)
+        self.info('# git')
         with utils.cd(local_dir):
             try:
-                os.environ[&#39;GIT_SSH&#39;] = &#39;__dotcloud_git_ssh&#39;
-                os.environ[&#39;DOTCLOUD_SSH_KEY&#39;] = config.CONFIG_KEY
-                ret = subprocess.call((&#39;git&#39;, &#39;push&#39;, &#39;-f&#39;, &#39;--all&#39;,
+                os.environ['GIT_SSH'] = '__dotcloud_git_ssh'
+                os.environ['DOTCLOUD_SSH_KEY'] = config.CONFIG_KEY
+                ret = subprocess.call(('git', 'push', '-f', '--all',
                     destination), close_fds=True)
                 if ret != 0:
                     self.warning_ssh()
                 return ret
             except OSError:
-                self.die(&#39;git&#39;)
-</code></pre>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2011/07/17/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2011/07/10/2" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+                self.die('git')</code></pre>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2011/07/10/2" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2011/07/17/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

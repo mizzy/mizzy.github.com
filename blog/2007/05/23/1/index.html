@@ -1,139 +1,140 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>write はユーザプロセスを待たせない？ - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
-</head>
-
-<body>
-  <section class="sidebar">
-    <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
-    </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/05/23/1">write はユーザプロセスを待たせない？</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p><a href="http://naoya.g.hatena.ne.jp/naoya/20070522/1179830475">naoyaグループ - naoyaの日記 -  I/O, iowait</a> にちょっと反応してみます。</p>
-
-<blockquote>
-<p>write はページに dirty フラグを立てるだけなので決してユーザープロセスを待たせない</p>
-</blockquote>
-
-<p>って、本当にそうなんでしょうか？（否定しているわけではなく、純粋な疑問です。）</p>
-
-<p>最近、書き込みの多いメールサーバのディスク I/O 周りを調査していて、実際にどのプロセスの書き込みが多いのかを調べる方法がわからなかったため、I/O 待ちになっているプロセスをカウントして、そこから類推してみようと、まずは</p>
-
-<pre><code>while [ 1 ]
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      write はユーザプロセスを待たせない？ - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="A fantastic blog that is fantastic."/>
+    <!-- OGP -->
+    <meta property="og:title" content="write はユーザプロセスを待たせない？"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2007/05/23/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2007/05/23/1/ogp.png"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="write はユーザプロセスを待たせない？"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2007/05/23/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <span class="name">
+        Gosuke Miyashita
+      </span>
+      <span class="nav">
+        <a href="/">
+          posts
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2007/05/23/1">
+          write はユーザプロセスを待たせない？
+        </a>
+      </h1>
+      <div class="byline">
+        23 May 2007
+      </div>
+      <p>
+        <a href="http://naoya.g.hatena.ne.jp/naoya/20070522/1179830475">
+          naoyaグループ - naoyaの日記 -  I/O, iowait
+        </a>
+        にちょっと反応してみます。
+      </p>
+      <blockquote>
+        <p>
+          write はページに dirty フラグを立てるだけなので決してユーザープロセスを待たせない
+        </p>
+      </blockquote>
+      <p>
+        って、本当にそうなんでしょうか？（否定しているわけではなく、純粋な疑問です。）
+      </p>
+      <p>
+        最近、書き込みの多いメールサーバのディスク I/O 周りを調査していて、実際にどのプロセスの書き込みが多いのかを調べる方法がわからなかったため、I/O 待ちになっているプロセスをカウントして、そこから類推してみようと、まずは
+      </p>
+      <pre><code>while [ 1 ]
   do
     ps -eo comm,state|grep D|grep -v COMMAND &gt;&gt; ps.txt
     sleep 1
-  done
-</code></pre>
-
-<p>な感じで STAT が D のプロセスを記録するスクリプトをしばらく走らせておいて、</p>
-
-<pre><code>sort ps.txt | uniq -c | sort -gr| more
-</code></pre>
-
-<p>でカウントしてみると、</p>
-
-<pre><code>9129 kjournald       D
+  done</code></pre>
+      <p>
+        な感じで STAT が D のプロセスを記録するスクリプトをしばらく走らせておいて、
+      </p>
+      <pre><code>sort ps.txt | uniq -c | sort -gr| more</code></pre>
+      <p>
+        でカウントしてみると、
+      </p>
+      <pre><code>9129 kjournald       D
 6576 qmail-queue     D
 2017 multilog        D
 1897 pdflush         D
 1373 qmail-send      D
 1094 procmail        D
-1032 syslogd         D
-</code></pre>
-
-<p>な感じで、kjournald と qmail-queue が圧倒的に多い。これってどっちも書き込みがメインの仕事のはず。</p>
-
-<p>man ps で見ても、</p>
-
-<pre><code>D    Uninterruptible sleep (usually IO)
-</code></pre>
-
-<p>なので、書き込みでプロセスが待たされてるのだと思うのですが、何か間違ってますでしょうか？</p>
-
-<p>ちなみに、書き込みが多いというのはどれぐらいかというと、iostat での r/s と w/s の比率が 1:7 ぐらいです。</p>
-
-<p>また、free の結果はこんな感じなので、メモリに余裕はあるみたいです。</p>
-
-<pre><code># free
+1032 syslogd         D</code></pre>
+      <p>
+        な感じで、kjournald と qmail-queue が圧倒的に多い。これってどっちも書き込みがメインの仕事のはず。
+      </p>
+      <p>
+        man ps で見ても、
+      </p>
+      <pre><code>D    Uninterruptible sleep (usually IO)</code></pre>
+      <p>
+        なので、書き込みでプロセスが待たされてるのだと思うのですが、何か間違ってますでしょうか？
+      </p>
+      <p>
+        ちなみに、書き込みが多いというのはどれぐらいかというと、iostat での r/s と w/s の比率が 1:7 ぐらいです。
+      </p>
+      <p>
+        また、free の結果はこんな感じなので、メモリに余裕はあるみたいです。
+      </p>
+      <pre><code># free
              total       used       free     shared    buffers     cached
 Mem:       2043756    2011160      32596          0     351016     847776
 -/+ buffers/cache:     812368    1231388
-Swap:      1052248
-</code></pre>
-
-<p>ここ数日 I/O まわりを追いかけていたので、naoya さんのエントリはタイムリーでとてもためになります。ついでに色々教えてもらおうという甘い考えで、疑問に感じたことを書いてみました。</p>
-
-<p><strong><em>追記</em></strong></p>
-
-<p>もしかして「write はユーザプロセスを待たせない」というのは、非同期 I/O の話？であれば納得はいく。</p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/05/25/1">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/05/13/1" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
+Swap:      1052248</code></pre>
+      <p>
+        ここ数日 I/O まわりを追いかけていたので、naoya さんのエントリはタイムリーでとてもためになります。ついでに色々教えてもらおうという甘い考えで、疑問に感じたことを書いてみました。
+      </p>
+      <p>
+        <em>
+          <strong>
+            追記
+          </strong>
+        </em>
+      </p>
+      <p>
+        もしかして「write はユーザプロセスを待たせない」というのは、非同期 I/O の話？であれば納得はいく。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2007/05/13/1" rel="next">
+        ← older
+      </a>
+      <span>
+        mizzy.org · since 2005
+      </span>
+      <a href="/blog/2007/05/25/1">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
 </html>

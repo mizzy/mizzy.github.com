@@ -1,123 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>puppet の通信の仕組みにちょっと立ち入ってみる - Gosuke Miyashita</title>
-  <!-- TODO: change name and description -->
-  <meta name="author" content="Gosuke Miyashita" />
-  <meta name="description" content="A fantastic blog that is fantastic." />
-
-  <link rel="alternate" type="application/rss+xml" href="/atom.xml" />
-
-  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/pygments.css" type="text/css" />
-  <link media="only screen and (max-device-width: 480px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link media="only screen and (device-width: 768px)" href="/css/iphone.css" type="text/css" rel="stylesheet" />
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/application.js"></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>
+    puppet の通信の仕組みにちょっと立ち入ってみる - Gosuke Miyashita
+  </title>
+  <meta name="author" content="Gosuke Miyashita"/>
+  <meta name="description" content="A fantastic blog that is fantastic."/>
+  <!-- OGP -->
+  <meta property="og:title" content="puppet の通信の仕組みにちょっと立ち入ってみる"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mizzy.org/blog/2007/03/21/1/"/>
+  <meta property="og:image" content="https://mizzy.org/blog/2007/03/21/1/ogp.png"/>
+  <meta property="og:site_name" content="Gosuke Miyashita"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="puppet の通信の仕組みにちょっと立ち入ってみる"/>
+  <meta name="twitter:image" content="https://mizzy.org/blog/2007/03/21/1/ogp.png"/>
+  <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+  <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+  <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="icon" href="/favicon.png" type="image/png"/>
 </head>
-
 <body>
-  <section class="sidebar">
+<header class="head">
+  <span class="name">
+    Gosuke Miyashita
+  </span>
+  <span class="nav">
     <a href="/">
-      <!-- TODO: change this gravatar URL -->
-      <img src="https://s.gravatar.com/avatar/0d5d8fb9cc4c06f581825f5a61d3f5f1?s=150" height="75" width="75" class="avatar" />
+      posts
     </a>
-
-    <!-- TODO: change name -->
-    <section class="name">
-      <a href="/">
-        <span id="zach">Gosuke</span>
-        <span id="holman">Miyashita</span>
-      </a>
-    </section>
-
-    <!-- TODO: change links -->
-    <section class="meta">
-      <a href="https://github.com/mizzy"><img src="/images/github.png" /></a>
-      <a href="https://twitter.com/gosukenator"><img src="/images/twitter.png"></a>
-      <a href="/atom.xml"><img src="/images/rss.png" /></a>
-    </section>
-
-    <!--
-    <section class="sections">
-      <ul>
-        <li><a href="/about.html">about</a></li>
-        <li><a href="/">posts</a></li>
-      </ul>
-    </section>
-    -->
-
-  </section>
-
-<section class="content autopagerize_page_element">
-  <h1>
-    <a href="/blog/2007/03/21/1">puppet の通信の仕組みにちょっと立ち入ってみる</a>
-  </h1>
-
-  <section class="byline">
-    
-  </section>
-
-  <p>
-puppet のクライアント/サーバ間通信は https + XMLRPC で、認証は SSLv3 の証明書認証が利用されています。
-</p>
-
+    <a href="https://gosu.ke/" target="_blank" rel="noopener">
+      about
+    </a>
+    <a href="/atom.xml">
+      feed
+    </a>
+  </span>
+</header>
+<article>
+<h1>
+  <a href="/blog/2007/03/21/1">
+    puppet の通信の仕組みにちょっと立ち入ってみる
+  </a>
+</h1>
+<div class="byline">
+  21 March 2007
+</div>
 <p>
-通常、SSLv3 で証明書認証とかいうと、CA とか、自己署名証明書とか、色々めんどくさかったりしますが、puppet はこの辺りはほとんど自動で処理してくれるので、とても楽です。
+  puppet のクライアント/サーバ間通信は https + XMLRPC で、認証は SSLv3 の証明書認証が利用されています。
 </p>
-
 <p>
-例えば、puppet サーバ側では、puppetmasterd をはじめて起動した時に、CA 関連ファイルや自己署名証明書などを、/etc/puppet/ssl 以下に勝手に作ってくれます。
+  通常、SSLv3 で証明書認証とかいうと、CA とか、自己署名証明書とか、色々めんどくさかったりしますが、puppet はこの辺りはほとんど自動で処理してくれるので、とても楽です。
 </p>
-
+<p>
+  例えば、puppet サーバ側では、puppetmasterd をはじめて起動した時に、CA 関連ファイルや自己署名証明書などを、/etc/puppet/ssl 以下に勝手に作ってくれます。
+</p>
 <pre class="wiki">
 $ ls -R /etc/puppet/ssl
 /etc/puppet/ssl:
 ca/  certs/  csr_kenny.southpark.pem  private/  private_keys/  public_keys/
-
-/etc/puppet/ssl/ca:
-ca_crl.pem  ca_key.pem  inventory.txt  requests/  signed/
-ca_crt.pem  ca_pub.pem  private/       serial
-
-/etc/puppet/ssl/ca/private:
-ca.pass
-
-/etc/puppet/ssl/ca/requests:
-
-/etc/puppet/ssl/ca/signed:
-kenny.southpark.pem
-
-/etc/puppet/ssl/certs:
-ca.pem  kenny.southpark.pem
-
-/etc/puppet/ssl/private:
-
-/etc/puppet/ssl/private_keys:
-kenny.southpark.pem
-
-/etc/puppet/ssl/public_keys:
-kenny.southpark.pem 
+<p>/etc/puppet/ssl/ca:<br />
+ca_crl.pem  ca_key.pem  inventory.txt  requests/  signed/<br />
+ca_crt.pem  ca_pub.pem  private/       serial</p>
+<p>/etc/puppet/ssl/ca/private:<br />
+ca.pass</p>
+<p>/etc/puppet/ssl/ca/requests:</p>
+<p>/etc/puppet/ssl/ca/signed:<br />
+kenny.southpark.pem</p>
+<p>/etc/puppet/ssl/certs:<br />
+ca.pem  kenny.southpark.pem</p>
+<p>/etc/puppet/ssl/private:</p>
+<p>/etc/puppet/ssl/private_keys:<br />
+kenny.southpark.pem</p>
+<p>/etc/puppet/ssl/public_keys:<br />
+kenny.southpark.pem<br />
 </pre>
-
 <p>
-あれ、CA 証明書っぽいものが二つある、と思ったら、ca/ca_crt.pem と certs/ca.pem はまったく同じものでした。
+  あれ、CA 証明書っぽいものが二つある、と思ったら、ca/ca_crt.pem と certs/ca.pem はまったく同じものでした。
 </p>
-
 <p>
-また、CA 証明書とは別に、kenny.southpark.pem というものができていますが、これはおそらく、自身が puppet クライアントになる時に利用するものと思われます。
+  また、CA 証明書とは別に、kenny.southpark.pem というものができていますが、これはおそらく、自身が puppet クライアントになる時に利用するものと思われます。
 </p>
-
 <p>
-CA 証明書の中身を覗いてみるとこんな感じ。
-</p>
-
-<pre class="wiki">
+  CA 証明書の中身を覗いてみるとこんな感じ。
+</p><pre class="wiki">
 $ sudo openssl x509 -text -in /etc/puppet/ssl/ca/ca_crt.pem
 Certificate:
     Data:
@@ -176,12 +146,9 @@ Ik9SpQa9iExliZ6YTMuCzglQ4EtnWR7XJnUvbz3T1JJVeQZeVjkrFbBn2QB5CTeG
 GqEw4M7oKwoWknOjuB8WyGD3fcUkCWY=
 -----END CERTIFICATE-----    
 </pre>
-
 <p>
-次にクライアント側ですが、こちらもはじめて puppetd（クライアント側で起動するデーモン）を実行した時に、秘密鍵、公開鍵、CSR を自動的に作成し、サーバに対して CSR への署名を求めることが、起動時のメッセージから読み取れます。
-</p>
-
-<pre class="wiki">
+  次にクライアント側ですが、こちらもはじめて puppetd（クライアント側で起動するデーモン）を実行した時に、秘密鍵、公開鍵、CSR を自動的に作成し、サーバに対して CSR への署名を求めることが、起動時のメッセージから読み取れます。
+</p><pre class="wiki">
 $ sudo /usr/sbin/puppetd --server mizzy.org --test
 err: No certificate; running with reduced functionality.
 info: Creating a new SSL key at /var/lib/puppet/ssl/private_keys/cartman.southpark.pem
@@ -190,43 +157,35 @@ info: Requesting certificate
 warning: peer certificate won't be verified in this SSL session
 notice: Did not receive certificate
 </pre>
-
 <p>
-サーバ側では、証明書リクエストが来ていることを、次のようなコマンドで確認できます。
-</p>
-
-<pre class="wiki">
+  サーバ側では、証明書リクエストが来ていることを、次のようなコマンドで確認できます。
+</p><pre class="wiki">
 $ sudo puppetca --list
 cartman.southpark
 </pre>
-
 <p>
-これに署名するには、
-</p>
-
-<pre class="wiki">
+  これに署名するには、
+</p><pre class="wiki">
 $ sudo puppetca --sign cartman.southpark
 </pre>
-
 <p>
-と実行するだけです。これで puppet クライアント/サーバ間で無事通信できるようになります。
+  と実行するだけです。これで puppet クライアント/サーバ間で無事通信できるようになります。
 </p>
-
 <p>
-セキュアな通信が割りと簡単に実現できていい感じ。
+  セキュアな通信が割りと簡単に実現できていい感じ。
 </p>
-
-
-  <div class="pagination">
-    
-    <a href="/blog/2007/03/21/2">↑ newer post</a>
-    
-
-    
-    <a href="/blog/2007/03/19/3" rel="next">older post ↓</a>
-    
-  </div>
-
-</body>
-
-</html>
+<footer class="foot">
+  <a href="/blog/2007/03/19/3" rel="next">
+    ← older
+  </a>
+  <span>
+    mizzy.org · since 2005
+  </span>
+  <a href="/blog/2007/03/21/2">
+    newer →
+  </a>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({startOnLoad: true, theme: 'dark'});
+</script>
