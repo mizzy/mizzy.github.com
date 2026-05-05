@@ -22,7 +22,8 @@ body {
   padding-bottom: 14px;
   margin-bottom: 60px;
 }
-.head .name { font-weight: 700; letter-spacing: .5px; font-size: 14px; }
+.head .name { font-weight: 700; letter-spacing: .5px; font-size: 14px; color: #000; text-decoration: none; }
+.head .name:hover { text-decoration: underline; }
 .head .nav { margin-left: auto; font-size: 13px; color: #888; }
 .head .nav a { color: #888; text-decoration: none; margin-left: 16px; }
 .head .nav a:hover { color: #000; text-decoration: underline; }
@@ -127,6 +128,8 @@ article th { background: #f4f4f4; }
 }
 .foot a { color: #000; text-decoration: none; }
 .foot a:hover { text-decoration: underline; }
+.foot .home { color: #888; }
+.foot .home:hover { color: #000; text-decoration: underline; }
 
 @media screen and (max-width: 700px) {
   body { margin: 40px auto; padding: 0 20px; }
