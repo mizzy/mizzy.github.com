@@ -45,322 +45,6 @@
     </entry>
 
     <entry>
-        <title type="html"><![CDATA[CDK/Pulumi/Terraform/Carinaの言語設計比較メモ]]></title>
-        <link href="https://mizzy.org/blog/2026/05/21/1/"/>
-        <updated>2026-05-21T13:09:04+09:00</updated>
-        <id>https://mizzy.org/blog/2026/05/21/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://fortee.jp/dai-kichijojipm-2026/">大吉祥寺.pm 2026</a>のCFPに「Terraform/CDK/Pulumiを比べて気づいた、変わらないものと変わるもの — CarinaのDSLを設計するにあたって」というタイトルで応募していたけど、残念ながら落選してしまった。せっかく考えた内容を寝かせておくのももったいないので、ブログに書いておくことにする。</p>
-<p>元ネタは生成AIとの対話で論点を積み上げた作業ノートで、トークの形にまとめ直す前の状態。なのでこの記事もそのまま「メモ」の雰囲気が残っていて、観点ごとに話があちこち飛ぶし、Carinaの設計と関係ない脱線も結構ある。あと、長い。きれいなまとめになっていない点はあらかじめご了承を。</p>
-<hr />
-<h2>なぜ比較したのか</h2>
-<p><a href="https://github.com/carina-rs/carina">Carina</a>は「ベターTerraform」を目指して個人で作っているクラウドインフラ構成管理ツールで、独自DSLを採用している。開発を進めるうちに「Terraformの限界を構成している要因のひとつがHCLの言語仕様にあるのではないか」という仮説を持つようになった。</p>
-<p>それを確かめるには、Terraform単独で考えるより、別の設計判断をしているツールと並べて見るのが手っ取り早い。なので、汎用言語ベースの代表としてCDKとPulumiを並べ、4ツールのDSLを「記述言語」「抽象化機構」「記述自由度」の3つの観点で比較してみた。</p>
-<p>並べてみると、4ツール共通の構造（リソースを宣言的に記述する、リソース間の依存関係を記述する）と、選んだ言語によって大きく異なる部分（複数リソースを束ねる仕組み、ユーザがどこまで動的に書けるか、など）が見えてきた。</p>
-<p>なお、IaCツールの比較論点は他にもいろいろある（評価モデル、型と未知値、stateの所有、identityと安定性、など）。それらは別の機会に整理するとして、この記事ではまず「ユーザが日々書くコードの表層に直接効く部分」、つまり言語表層に絞って整理する。Carinaの設計判断のうち、ユーザが最初に触る部分（DSLの書き味）に効く論点はここに集中しているので、出発点としてもちょうど良い。</p>
-<p>言語そのものの選択基準も、実務上は他にも色々ある（学習コスト、既存人材との適合、エコシステム・ライブラリ流通、テスト容易性、IDE/LSP統合、CI/CD統合、デバッグ性、セキュアデフォルト、運用責任分界、ガバナンス容易性、など）。ただ、これらは主観や状況依存になりやすく、4ツールで構造的に比較するのが難しい。</p>
-<p>この記事では、構造的に比較しやすく、かつ自分がCarinaの設計で一番大事にしたい評価基準として、<strong>コードから「どんなリソースが、どんな設定で作られるか」がどれくらい読み取りやすいか</strong>を置く。「記述言語」「抽象化機構」「記述自由度」の3観点は、この基準で4ツールを見ていく際の切り口、という関係になる。</p>
-<p>なお、筆者は普段の仕事ではTerraformを主に使っていて、CDK/Pulumiは実務で触り込んでいるわけではない。整理は公式ドキュメントとソースコード、それと生成AIとの対話で確認しながら進めたが、慣れていないツールについての記述にはどうしても粒度の粗さや誤りが混じる可能性がある。気付かれた方はそっと教えてもらえるとありがたい。</p>
-<hr />
-<h2>観点1: 記述言語</h2>
-<p>まずは記述言語そのもの。4ツールはこんな感じで分かれる。</p>
-<table>
-<thead>
-<tr>
-<th>ツール</th>
-<th>記述言語</th>
-<th>ワークフロー</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Terraform</td>
-<td>HCL（専用DSL）</td>
-<td>plan → apply</td>
-</tr>
-<tr>
-<td>CDK</td>
-<td>TS / Python / Java / C# / Go（汎用言語）</td>
-<td>synth → diff → deploy</td>
-</tr>
-<tr>
-<td>Pulumi</td>
-<td>TS / Python / Go / .NET / Java（汎用言語）</td>
-<td>preview → up</td>
-</tr>
-<tr>
-<td>Carina</td>
-<td>Carina DSL（専用DSL）</td>
-<td>plan → apply</td>
-</tr>
-</tbody>
-</table>
-<p>ざっくり言うと<strong>外部DSL派 (Terraform / Carina)</strong> と<strong>汎用言語派 (CDK / Pulumi)</strong> に分かれる。CDK/Pulumiは厳密には「SDKが提供する内部DSL風のAPI + ホスト言語の機能をそのまま使ったコードのハイブリッド」で、ユーザはAPIを呼ぶだけのコードも書けるし、<code>for</code>/<code>if</code>/関数定義・クラス・型・外部ライブラリなど、ホスト言語の機能をフルに使ったコードも書ける。</p>
-<p>汎用言語を取ると、関数・クラス・ジェネリクス・型システムといった言語そのものの抽象化機構をそのまま流用できる。一方で外部DSLを取ると、抽象化機構を自前で設計しなければならない代わりに、<strong>文法レベルで「望ましくない書き方」を禁止できる</strong>。ここはトレードオフの出発点になる。</p>
-<h3>多言語提供の仕組み</h3>
-<p>CDK/Pulumiが「複数の汎用言語をサポート」と言うとき、その実現方法は2つに分かれていておもしろい。</p>
-<ul>
-<li><strong>CDK の jsii</strong>: 実装はTypeScriptで書かれていて、<a href="https://github.com/aws/jsii">jsii</a>がそれをPython/Java/C#/Goに bridging する。APIのセマンティクスはTSが原本で、他言語からはjsiiランタイム経由でTS実装を呼ぶ</li>
-<li><strong>Pulumi の MLC (Multi-Language Components)</strong>: TSで書いたComponentを Pulumi schema 化して、各言語（Python/Go/Java/.NET）のSDKを自動生成する。各言語のSDKは独立したネイティブ実装で、engineとはgRPCで通信する</li>
-</ul>
-<p>ゴール（1言語で書いたものを多言語ユーザに提供）は同じだけど、jsiiが「言語橋渡し」なのに対しMLCは「schema経由のRPC + 各言語ネイティブSDK」と、アプローチが全く違う。</p>
-<p>Carinaは独自DSLを実装するという道を選んでいて、記述言語が1つに固定されている。記述言語を1つに固定するか複数の汎用言語をサポートするかは、設計の最初の分岐の一つ。</p>
-<hr />
-<h2>観点2: 抽象化機構</h2>
-<p>次に「複数リソースを束ねる抽象化」をどう提供しているか。</p>
-<h3>デプロイ単位と再利用単位</h3>
-<p>各ツールの抽象化は、役割で2種類に分けられる。</p>
-<ul>
-<li><strong>デプロイ単位</strong>: <code>apply</code> / <code>deploy</code> / <code>up</code> の対象となるまとまり</li>
-<li><strong>再利用単位</strong>: 別の場所から呼び出して使い回すまとまり</li>
-</ul>
-<p>並べるとこんな感じ。</p>
-<table>
-<thead>
-<tr>
-<th>ツール</th>
-<th>デプロイ単位</th>
-<th>再利用単位</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Terraform</td>
-<td>root module</td>
-<td>子 module</td>
-</tr>
-<tr>
-<td>CDK</td>
-<td>Stack</td>
-<td>ユーザ定義 Construct / L2 Construct / L3 Construct</td>
-</tr>
-<tr>
-<td>Pulumi</td>
-<td>Stack</td>
-<td>ユーザ定義 ComponentResource / 既製 Component</td>
-</tr>
-<tr>
-<td>Carina</td>
-<td>root module</td>
-<td>子 module</td>
-</tr>
-</tbody>
-</table>
-<p>CDKとPulumiは両方とも「Stack」という名前を使っているが、中身はだいぶ違う。CDKのStackはCFNスタック1個に対応する<strong>TypeScriptクラス</strong>で、<code>extends Stack</code>でユーザが定義する。Pulumiの場合はクラスではなく、<strong>設定とデプロイ環境の単位</strong>（1 Stack = 1デプロイ環境、例えば<code>dev</code> / <code>staging</code> / <code>prod</code>）として<code>pulumi stack</code>コマンドで管理する。立て付けはかなり違うが、どちらも「<code>apply</code> / <code>deploy</code> / <code>up</code> の対象となるまとまり」という意味では Terraform/Carina の root module に相当する。</p>
-<h3>読み込みとインスタンス化</h3>
-<p>次に、その単位をどうやって読み込んで呼び出すか。</p>
-<table>
-<thead>
-<tr>
-<th>ツール</th>
-<th>読み込み + インスタンス化の構文</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Terraform</td>
-<td><code>module &quot;vpc&quot; { source = &quot;./modules/vpc&quot;; ... }</code>（読み込みと呼び出しが一体）</td>
-</tr>
-<tr>
-<td>CDK</td>
-<td>ホスト言語の<code>import</code> + <code>new VpcComponent(scope, 'vpc', props)</code></td>
-</tr>
-<tr>
-<td>Pulumi</td>
-<td>ホスト言語の<code>import</code> + <code>new VpcComponent('vpc', args, opts)</code></td>
-</tr>
-<tr>
-<td>Carina</td>
-<td>読み込み: <code>let vpc = use { source = './modules/vpc' }</code><br>インスタンス化: <code>vpc { ... }</code></td>
-</tr>
-</tbody>
-</table>
-<p>Terraformは<code>module</code>ブロック1個で読み込みとインスタンス化を一体化している。CDK/Pulumiはホスト言語の<code>import</code>と<code>new</code>に乗っかる。Carinaは<strong>DSLレベルで<code>use</code>と呼び出し構文を分離</strong>しているのが特徴で、こんな感じになる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="na">vpc</span> <span class="o">=</span> <span class="k">use</span> <span class="p">{</span> <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;./modules/vpc&#39;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">prod</span> <span class="o">=</span> <span class="nv">vpc</span> <span class="p">{</span> <span class="na">cidr_block</span> <span class="o">=</span> <span class="s1">&#39;10.0.0.0/16&#39;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">stg</span>  <span class="o">=</span> <span class="nv">vpc</span> <span class="p">{</span> <span class="na">cidr_block</span> <span class="o">=</span> <span class="s1">&#39;10.1.0.0/16&#39;</span> <span class="p">}</span>
-</span></span></code></pre><p>同じテンプレートから複数インスタンス化できる、というのはCDK/Pulumiでは普通にクラスを<code>new</code>すれば実現できる。Terraformでも<code>module</code>ブロックを別名で複数書けばいいし、要素数が動的なら<code>for_each</code>/<code>count</code>も使える。Carinaは<code>use</code>で一旦bindingしておいてから呼び出す形にしたので、<code>source</code>を都度書かずに済む、というのが小さな違い。</p>
-<h3>「動的選択」を二段構えで遮断している</h3>
-<p>ここがCarinaの設計判断として一番Terraformに近い部分。<code>use</code>式を導入したけど、ホスト言語のクラスのように自由に取り回しできるわけではなく、二段構えで動的選択を遮断してある。</p>
-<p><strong>1. <code>use</code>式は<code>let</code>束縛のRHSにしか書けない</strong> (<a href="https://github.com/carina-rs/carina/issues/2233">carina#2233</a>で文法レベルで制限)。</p>
-<p>書けるのはこの形だけ。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="na">vpc</span> <span class="o">=</span> <span class="k">use</span> <span class="p">{</span> <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;./modules/vpc&#39;</span> <span class="p">}</span>
-</span></span></code></pre><p>これらは全部文法エラーになる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># 関数引数の中に書く</span>
-</span></span><span class="line"><span class="cl"><span class="nv">some_fn</span><span class="p">(</span><span class="k">use</span> <span class="p">{</span> <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;./modules/vpc&#39;</span> <span class="p">})</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c"># if/for の中に書く</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">vpc</span> <span class="o">=</span> <span class="k">if</span> <span class="nv">env</span> <span class="o">==</span> <span class="s1">&#39;prod&#39;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">use</span> <span class="p">{</span> <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;./modules/vpc-prod&#39;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">use</span> <span class="p">{</span> <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;./modules/vpc-dev&#39;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c"># exports で公開する</span>
-</span></span><span class="line"><span class="cl"><span class="k">exports</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">vpc_template</span> <span class="o">=</span> <span class="k">use</span> <span class="p">{</span> <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;./modules/vpc&#39;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><strong>2. <code>source</code>フィールドはリテラル文字列のみ。</strong></p>
-<p>変数を渡したり、条件分岐の結果を入れたりすることもできない。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># 変数参照は parse error</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">path</span> <span class="o">=</span> <span class="s1">&#39;./modules/vpc&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">vpc</span> <span class="o">=</span> <span class="k">use</span> <span class="p">{</span> <span class="na">source</span> <span class="o">=</span> <span class="nv">path</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c"># 条件分岐の結果を入れるのも parse error</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">vpc</span> <span class="o">=</span> <span class="k">use</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">source</span> <span class="o">=</span> <span class="k">if</span> <span class="nv">env</span> <span class="o">==</span> <span class="s1">&#39;prod&#39;</span> <span class="p">{</span> <span class="s1">&#39;./modules/vpc-prod&#39;</span> <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="s1">&#39;./modules/vpc-dev&#39;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>これはTerraformの<code>source</code>制約と同じ方向。Terraformでは<code>source</code>にconst expression（<code>const = true</code>が付いた変数とリテラルからなる式）は使えるものの、ランタイム値による動的選択は禁止されていて、initフェーズで静的に解決される必要がある。Carinaは「リテラル文字列のみ」とTerraformよりさらに厳しいが、目指している性質は同じで、「<strong>どのmoduleを読み込むかは、コードを読んだ時点で静的に決まる</strong>」というのを文法レベルで保証している。CDK/PulumiならTSの世界で<code>const ComponentClass = condition ? A : B; new ComponentClass(...)</code>のように動的選択が普通にできるが、Carina/Terraformではこれが書けない。これは次の「記述自由度」の話の伏線でもある。</p>
-<h3>個別リソース層と束ねる層は構文で分かれるか</h3>
-<p>ここまで「複数リソースを束ねる層」を見てきたが、それとは別に「個別リソース層」（<code>aws_s3_bucket</code>のような単一AWSリソースに対応する宣言）がある。両者の構文を並べるとこうなる。</p>
-<table>
-<thead>
-<tr>
-<th>層</th>
-<th>Terraform</th>
-<th>CDK</th>
-<th>Pulumi</th>
-<th>Carina</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>束ねる層</td>
-<td><code>module &quot;...&quot; { ... }</code></td>
-<td>Stack / ユーザ定義 Construct / L3</td>
-<td>Stack / ComponentResource / 既製 Component</td>
-<td><code>use { source = &quot;...&quot; }</code> + <code>name { ... }</code></td>
-</tr>
-<tr>
-<td>個別リソース層</td>
-<td><code>resource &quot;aws_s3_bucket&quot; &quot;foo&quot; { ... }</code></td>
-<td>L1 (<code>new CfnBucket(...)</code>) / L2 (<code>new s3.Bucket(...)</code>)</td>
-<td><code>new aws.s3.Bucket(...)</code></td>
-<td><code>aws.s3.Bucket { ... }</code></td>
-</tr>
-</tbody>
-</table>
-<p>Terraformは <code>resource</code> と <code>module</code> のキーワードで2つの層が明確に分かれる。Carinaは個別リソース呼び出し（ドット区切りの型名）とmodule呼び出し（<code>use</code>で束縛した名前）で表記が分かれるが、構文形式自体は同じ <code>name { ... }</code>。CDK/Pulumiはどちらも同じ<code>new</code>構文で、構文だけからは個別リソースなのか束ねた抽象なのかは判別できず、Pulumiなら<code>CustomResource</code>か<code>ComponentResource</code>か、CDKなら<code>CfnResource</code>か<code>Construct</code>か、というクラス階層の差で決まる。</p>
-<p>ただし「構文で分かれていること」がそのまま読み取りやすさに直結するわけでもない。Terraform/Carinaのmoduleでも、呼び出し側からは中身が単一リソースか複数リソース束ねかは見えない、という意味では大差ない。あくまで構文の階層が明示されているかどうかの差で、それが実際の読み取りやすさにどこまで貢献するかは、ユーザのコードベースの書き方次第。</p>
-<hr />
-<h2>観点3: 記述自由度</h2>
-<p>「ユーザがどこまで動的に書けるか」を、graph形状（どんなリソースがいくつ作られ、どう繋がるか）と属性値（各リソースの設定値）の両方で見ていく。比較する自由度は以下の3つ。</p>
-<ul>
-<li><strong>抽象化の追加</strong>: ユーザが新しい抽象（ヘルパー関数 / クラス / wrapper）を足せるか</li>
-<li><strong>複数量の制御</strong>: 同じ要素を何個展開するかを動的に決められるか</li>
-<li><strong>使う部品の切替</strong>: どの部品（module / Componentクラス / ヘルパー関数など）を使うかを動的に決められるか</li>
-</ul>
-<p>並べるとこうなる。</p>
-<table>
-<thead>
-<tr>
-<th>自由度</th>
-<th>Terraform</th>
-<th>CDK</th>
-<th>Pulumi</th>
-<th>Carina</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>抽象化の追加</td>
-<td>言語: 組込み関数のみ、ユーザ定義関数なし</td>
-<td>規約: TSの関数/クラス/高階関数で自由</td>
-<td>規約: 同左</td>
-<td>言語: <code>fn</code>でユーザ定義関数は書けるが、中身は組込み関数の組み合わせ止まり</td>
-</tr>
-<tr>
-<td>複数量の制御</td>
-<td>言語: <code>for_each</code> / <code>count</code> / <code>dynamic</code>の専用構文</td>
-<td>規約: TSの<code>for</code> / <code>map</code> / <code>filter</code>で自由</td>
-<td>規約: 同左</td>
-<td>言語: <code>for</code>式 / <code>if</code>式の専用構文</td>
-</tr>
-<tr>
-<td>使う部品の切替</td>
-<td>言語: <code>source</code>はリテラルのみ</td>
-<td>規約: 普通のクラス選択で自由</td>
-<td>規約: 同左</td>
-<td>言語: <code>source</code>はリテラルのみ + <code>use</code>式は<code>let</code>束縛RHS限定</td>
-</tr>
-</tbody>
-</table>
-<p>何が「言語」で何が「規約」なのか、というのが大事なポイント。</p>
-<h3>「言語が決める」 vs 「規約に委ねる」</h3>
-<p>ユーザの自由度を制限する手段は、大きく2つに分かれる。</p>
-<ul>
-<li><strong>言語が決める</strong>: 文法・評価器・型検査で選択肢が制限される。書けない（文法エラー / 型エラー）</li>
-<li><strong>規約に委ねる</strong>: 文法上は何でも書けるが、lint・コードレビュー・社内ガイドラインで縛る。書けるが組織内で許されない</li>
-</ul>
-<p>両者とも「ユーザの選択肢を狭める」方向の制約だけど、強制力と組織コストが大きく違う。</p>
-<p>これに当てはめると、4ツールは以下のように整理できる。</p>
-<ul>
-<li><strong>言語が決める派 (Terraform / Carina)</strong>: 文法レベルで動的選択を遮断する</li>
-<li><strong>規約に委ねる派 (CDK / Pulumi)</strong>: ホスト言語の機能をフルに使えるので、規約で縛る</li>
-</ul>
-<h3>それぞれのトレードオフ</h3>
-<p>「言語が決める」ことの利点は、<strong>「読めない書き方」を構造的に書けないこと</strong>。ベテランも新人も同じ表現力に揃うし、静的解析・LSP・自動修正ツールも効きやすい。レビュアーが「文法が通っているなら最低ラインは満たす」と判断できる。</p>
-<p>逆に欠点は<strong>逃げ道がないこと</strong>。複雑な構成を表現したいとき、文法の表現力を超えると別アプローチに逃げる必要がある。Terraformだと<code>dynamic</code>ブロックの表現力に苦しんで結局外部スクリプトで生成したり、<code>for_each</code>の制約と格闘したりすることになりがち。</p>
-<p>「規約に委ねる」のはその逆で、<strong>何でも書ける</strong>代わりに<strong>規約の維持コストを組織が負担する</strong>。lintルール、コードレビュー、オンボーディング教育、すべて組織側で頑張る必要がある。</p>
-<hr />
-<h2>「DSLだから読みやすい」のではなく、「『言語が決める』範囲が広いから読みやすい」</h2>
-<p>自分はTerraformのコードは「だいたい誰が書いても同じくらいの読みやすさになる」と感じているけど、それは<strong>HCLが専用DSLだから</strong>ではなく、<strong>HCLの言語仕様が動的な書き方を文法で禁止しているから</strong>そう感じるのだ、という捉え方ができる。</p>
-<p>「記述言語」と「記述自由度の所在」の2軸で4象限を作ると、こんなマトリクスになる。</p>
-<table>
-<thead>
-<tr>
-<th>記述言語</th>
-<th>記述自由度の所在</th>
-<th>例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>外部DSL</td>
-<td>言語が決める</td>
-<td>Terraform / Carina</td>
-</tr>
-<tr>
-<td>外部DSL</td>
-<td>規約に委ねる</td>
-<td>（該当ツールなし）</td>
-</tr>
-<tr>
-<td>汎用言語</td>
-<td>言語が決める</td>
-<td>（該当するIaCツールなし）</td>
-</tr>
-<tr>
-<td>汎用言語</td>
-<td>規約に委ねる</td>
-<td>CDK / Pulumi</td>
-</tr>
-</tbody>
-</table>
-<p>「外部DSL × 規約に委ねる」は淘汰圧の結果として空席だと思う。専用文法を作っておきながら任意の動的選択を許すなら、汎用言語を使うほうが経済的で、わざわざ外部DSLを作る意味が薄い。</p>
-<p>「汎用言語 × 言語が決める」もIaC界隈では事実上空席。PulumiやCDKでSDK側で型を提供してホスト言語の型システムを使うパターンはあるけど、これは（a）静的型言語かつ（b）ユーザが型を書く慣習を採用したときにのみ効くので、言語レベルで制約を課しているとは言いにくい。設計余地として残っている象限。</p>
-<hr />
-<h2>Carinaの現在地</h2>
-<p>Carinaは「<strong>外部DSL × 言語が決める</strong>」位置取り。</p>
-<p>複数量の制御と使う部品の切替は文法レベルで制限してある。抽象化の追加は中間的で、ユーザ定義関数<code>fn</code>（型注釈・再帰検出含む）、関数合成<code>&gt;&gt;</code>、パイプ<code>|&gt;</code>、部分適用（closure）は実装済み。ただし<code>fn</code>の中身は組込み関数の組み合わせ程度で、高階関数（関数を引数/戻り値に取る）や一級関数値は未実装。Terraformで「同じ命名処理を何度も書いてる」みたいなときに<code>fn</code>で名前を付けて切り出せる、というくらいの自由度。</p>
-<p>「ベターTerraform」を目指す以上、Terraformの「読みやすさ」の源泉である「言語が決める」をベースに置いた上で、Terraformで詰まりがちなところ（ユーザ定義関数の不在による属性値計算の窮屈さ）だけ少し緩める、という方向にしている。</p>
-<p>高階関数や module 一級値化は将来の選択肢として開いてあるけど、入れるとしても**「規約に委ねる」側に寄りすぎない範囲で**入れることになると思う。</p>
-<hr />
-<h2>まとめ</h2>
-<p>3観点での4ツール整理から見えてきたことを並べておく。</p>
-<ul>
-<li><strong>記述言語</strong>（外部DSL or 汎用言語）と<strong>記述自由度の所在</strong>（言語が決める or 規約に委ねる）は概念的には独立だけど、実態としては強い相関がある</li>
-<li>「DSLだから読みやすい」というよりは、「『言語が決める』範囲が広いから読みやすい」と言ったほうが正確</li>
-<li>「言語が決める」は表現力に上限がある代わりに、組織コストが低い。「規約に委ねる」は逃げ道がある代わりに、組織が規約を維持し続ける必要がある</li>
-<li>Carinaは「外部DSL × 言語が決める」をベースに、Terraformで窮屈なところだけ少しずつ緩める方向</li>
-</ul>
-<p>整理した内容自体はCarinaの設計判断を言語化する上で役に立った。冒頭で書いたように、言語表層以外の論点（評価モデル、型と未知値、stateの所有、identityと安定性）もそれぞれ整理してあるので、いずれ別記事として書いていきたい。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
         <title type="html"><![CDATA[Carinaのwait構文]]></title>
         <link href="https://mizzy.org/blog/2026/05/17/1/"/>
         <updated>2026-05-17T18:08:30+09:00</updated>
@@ -1169,6 +853,95 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 </ul>
 <hr />
 <p>これらの改善は、Terraformのplan表示を参考にしつつ、ツリー表示やTUIのようなCarina独自の機能も加えている。applyする前にリソースの全体像を把握しやすくなった。</p>
+
+]]></content>
+    </entry>
+
+    <entry>
+        <title type="html"><![CDATA[Carinaの開発状況（2月下旬〜3月中旬）]]></title>
+        <link href="https://mizzy.org/blog/2026/03/20/1/"/>
+        <updated>2026-03-20T17:56:56+09:00</updated>
+        <id>https://mizzy.org/blog/2026/03/20/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://mizzy.org/blog/2026/02/21/1/">前回の記事</a>ではClaude Codeによるイシュー駆動開発について書いた。あの時点では90個のイシューが登録され67個がクローズされた、というところだったが、あれから約1ヶ月、さらに約280個のイシューがクローズされ、約320個のPRがマージされた。</p>
+<p>この1ヶ月でやったことを振り返っておく。</p>
+<hr />
+<h2>AWS providerの本格整備</h2>
+<p>aws providerは以前からあったが、スキーマの手書き部分が多く、テストも不十分だった。この1ヶ月で本格的に整備した。</p>
+<p>まず、<a href="https://github.com/aws/api-models-aws">Smithyモデル</a>からスキーマを自動生成する仕組みを入れた（<a href="https://github.com/carina-rs/carina/issues/461">#461</a>）。awscc providerのCloudFormationスキーマからの自動生成と同じ考え方で、AWS SDKの元になっているSmithyモデルから、リソーススキーマとread関数を自動生成する。手書きのスキーマは信用できないので、できるだけ自動生成に寄せていきたい。</p>
+<hr />
+<h2>Acceptance testの拡充</h2>
+<p>AWS providerとAWSCC providerの両方で、acceptance testを大幅に増やした。前回の記事時点ではAWSCC providerの39ファイルだけだったが、AWS providerのテスト追加とシナリオの拡充で172ファイルになった（AWSCC: 120、AWS: 52）。基本的なCRUDに加えて、タグの削除、in-place update、create-before-destroy、属性の削除といったシナリオを整備している。</p>
+<p>特に大きかったのは、in-place updateのテストの追加。リソースを作成した後、属性を変更してもう一度applyし、replaceではなくin-place updateが正しく行われることを確認するテスト。これを入れたことで、AWSCC providerのupdate処理にあったバグが大量に見つかった。</p>
+<ul>
+<li>Cloud Control APIのupdate用patch documentにread-onlyプロパティが含まれていた（<a href="https://github.com/carina-rs/carina/issues/807">#807</a>）</li>
+<li>create-onlyプロパティもpatchに含まれていた（<a href="https://github.com/carina-rs/carina/issues/810">#810</a>）</li>
+<li>JSON Patchのreplaceではなくaddオペレーションを使うべきだった（<a href="https://github.com/carina-rs/carina/issues/795">#795</a>）</li>
+<li>変更のない属性もpatchに含まれていた（<a href="https://github.com/carina-rs/carina/issues/737">#737</a>）</li>
+<li>属性の削除がpatchに反映されていなかった（<a href="https://github.com/carina-rs/carina/issues/736">#736</a>）</li>
+</ul>
+<p>multi-stepテスト（create → update → destroy）のインフラも整備した。テストスクリプトのシグナルハンドリング（<a href="https://github.com/carina-rs/carina/issues/793">#793</a>）、destroy失敗時の検出（<a href="https://github.com/carina-rs/carina/issues/855">#855</a>）、orphanedリソースの防止（<a href="https://github.com/carina-rs/carina/issues/812">#812</a>）など、テストの信頼性を上げるための改善も多い。</p>
+<hr />
+<h2>Anonymous resourceの識別と置き換え</h2>
+<p>Carinaでは、Terraformと異なり、リソースに名前をつけなくてもよい。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># Terraformだと aws_vpc.main のように名前が必要だが、Carinaでは不要</span>
+</span></span><span class="line"><span class="cl"><span class="nc">awscc.ec2_vpc</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="na">cidr_block</span> <span class="o">=</span> <span class="s2">&#34;10.0.0.0/16&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre><p>ただし、内部的には<code>.crn</code>ファイルに書かれたリソースとstateに保存されたリソースを突き合わせるためのidentifierが必要になる。Terraformは人間がつけた名前（<code>aws_vpc.main</code>の<code>main</code>の部分）をidentifierとして使うが、Carinaのanonymous resourceにはそれがない。</p>
+<p>そこで、スキーマのcreate-onlyプロパティ（作成後に変更できない属性）の値からハッシュを計算してidentifierとしている。ただ、create-onlyプロパティが変更された場合、ハッシュが変わってidentifierも変わる。するとdifferは、<code>.crn</code>ファイルにある「新しいidentifierのリソース」とstateにある「古いidentifierのリソース」を同じリソースだと認識できず、「新しいリソースの作成」と「古いリソースの削除」という無関係な2つの操作として扱ってしまう。本来は「同じリソースの置き換え（Replace）」として認識させる必要がある。</p>
+<p>そこで、<code>reconcile_anonymous_identifiers()</code>という仕組みを入れた（<a href="https://github.com/carina-rs/carina/issues/540">#540</a>）。create-onlyプロパティの一部が一致し一部が異なる場合、同じリソースの変更であると判定し、stateにある旧identifierを引き継ぐことでReplaceとして扱う。</p>
+<p>さらに、create-onlyプロパティを持たないリソース（EC2 EIPなど）に対しては、全属性の<a href="https://en.wikipedia.org/wiki/SimHash">SimHash</a>（locality-sensitive hash）をidentifierとして使うようにした（<a href="https://github.com/carina-rs/carina/issues/592">#592</a>）。通常のハッシュは1ビットでも入力が変わると出力が大きく変わるが、SimHashは入力の類似度を保存する。属性を1つ変更しても数ビットしか変わらないので、Hamming距離で同一リソースかどうかを判定できる。ただし、tagsのようなMap属性をそのまま1つのfeature（ハッシュの入力単位）としてハッシュすると、tag1つの変更でも相対的な変化が大きくなりすぎて閾値を超えてしまう問題があった。Map/List値を個々のエントリに展開（flatten）してそれぞれ別のfeatureとすることで修正した（<a href="https://github.com/carina-rs/carina/issues/885">#885</a>）。</p>
+<p>Terraformにはanonymous resourceの概念がないので、Carina独自の設計判断が多く、バグも出やすい領域だった。</p>
+<hr />
+<h2>Create-before-destroyの名前衝突回避とカスケード更新</h2>
+<p>リソースのReplace（置き換え）を実行するcreate-before-destroyでも、Terraformにはない仕組みを入れた。</p>
+<p>Terraformではcreate-before-destroyの際、名前の衝突は人間が<code>name_prefix</code>等で回避する必要がある。Carinaでは、リソースの<code>name_attribute</code>（S3なら<code>bucket_name</code>、IAMなら<code>role_name</code>）をスキーマから自動判定し、replaceの際に一時名を自動生成する（<a href="https://github.com/carina-rs/carina/issues/405">#405</a>）。名前がupdatable（create-onlyでない）なら、旧リソース削除後に本来の名前にリネームする。create-onlyな場合はリネームできないので一時名のまま残る。</p>
+<p>依存リソースのカスケードアップデートも入れた（<a href="https://github.com/carina-rs/carina/issues/404">#404</a>）。create-before-destroyでは「新リソース作成→依存リソース更新→旧リソース削除」という順序で実行する必要があるが、この中間ステップの依存リソース更新をdifferが依存グラフから検出してplanに含める。</p>
+<hr />
+<h2>LSPの強化</h2>
+<p>エディタ上での開発体験を良くするために、LSP（Language Server Protocol）まわりを大幅に改善した。</p>
+<ul>
+<li>プロバイダーブロックの補完（<a href="https://github.com/carina-rs/carina/issues/899">#899</a>）</li>
+<li>リソース参照の型ベース補完（<a href="https://github.com/carina-rs/carina/issues/914">#914</a>） — <code>route_table_id</code>に対してRouteTableを返すリソースだけを候補に出す</li>
+<li>read-only属性をリソースブロック内の補完候補から除外（<a href="https://github.com/carina-rs/carina/issues/921">#921</a>）</li>
+<li>属性ホバーで間違った説明を表示していた問題の修正（<a href="https://github.com/carina-rs/carina/issues/924">#924</a>）</li>
+<li>未定義参照の検出強化（<a href="https://github.com/carina-rs/carina/issues/871">#871</a>）</li>
+<li>重複letバインディングの検出（<a href="https://github.com/carina-rs/carina/issues/916">#916</a>）</li>
+<li>未使用letバインディングの警告（<a href="https://github.com/carina-rs/carina/issues/530">#530</a>）</li>
+<li>ネストされたstructブロックの任意深さでの補完・診断（<a href="https://github.com/carina-rs/carina/issues/400">#400</a>、<a href="https://github.com/carina-rs/carina/issues/402">#402</a>）</li>
+<li>非ASCII文字によるbyte/charインデックスのずれの修正（<a href="https://github.com/carina-rs/carina/issues/666">#666</a>）</li>
+</ul>
+<hr />
+<h2>コード生成の強化</h2>
+<p>CloudFormationスキーマとSmithyモデルからのコード生成器（codegen）に、バリデーション制約のサポートを追加した。文字列長（minLength/maxLength）、配列長（minItems/maxItems）、正規表現パターン、フォーマット制約（int64、URIなど）、デフォルト値、複数制約の合成（pattern + lengthなど）をサポートしている（<a href="https://github.com/carina-rs/carina/issues/628">#628</a>〜<a href="https://github.com/carina-rs/carina/issues/636">#636</a>）。</p>
+<p>これにより、<code>carina validate</code>で実際にAWSにリクエストを投げる前に、かなり細かいバリデーションができるようになった。</p>
+<hr />
+<h2>State管理の改善</h2>
+<p>本番運用を見据えたstate管理の改善も進めた。</p>
+<ul>
+<li>state lockの改善 — TTLを60分に延長し、lock renewalとconditional writeを追加（<a href="https://github.com/carina-rs/carina/issues/857">#857</a>）</li>
+<li>アトミックなstate書き込み — ローカルバックエンドのstate書き込みをatomicに（<a href="https://github.com/carina-rs/carina/issues/849">#849</a>）</li>
+<li><code>--lock=false</code>オプション — state lockのスキップ（<a href="https://github.com/carina-rs/carina/issues/893">#893</a>）</li>
+<li>orphanedリソースの検出 — <code>.crn</code>ファイルから消えたリソースの自動検出・削除（<a href="https://github.com/carina-rs/carina/issues/853">#853</a>）</li>
+<li>state refreshコマンド — AWSの実際の状態とstateの同期（<a href="https://github.com/carina-rs/carina/issues/395">#395</a>）</li>
+<li>エラーパスでのlock解放保証（<a href="https://github.com/carina-rs/carina/issues/779">#779</a>）</li>
+<li>プロバイダースコープのstate identity — マルチプロバイダー構成でのstate破損防止（<a href="https://github.com/carina-rs/carina/issues/854">#854</a>）</li>
+</ul>
+<hr />
+<h2>その他の新機能</h2>
+<ul>
+<li><strong>フォーマッター</strong> — list-of-mapsをblock構文に変換（<a href="https://github.com/carina-rs/carina/issues/911">#911</a>）</li>
+<li><strong>block構文</strong> — <code>List&lt;Struct&gt;</code>属性に対するブロック構文のサポートと、codegenでの自動block_name生成（<a href="https://github.com/carina-rs/carina/issues/381">#381</a>、<a href="https://github.com/carina-rs/carina/issues/759">#759</a>）</li>
+<li><strong>前方参照</strong> — 宣言順序に依存しないパーサー（<a href="https://github.com/carina-rs/carina/issues/876">#876</a>）</li>
+<li><strong>循環依存検出</strong> — リソース間の循環依存をエラーとして報告（<a href="https://github.com/carina-rs/carina/issues/665">#665</a>）</li>
+<li><strong>型認識diff</strong> — differが型情報を持って意味的な比較を行うように（<a href="https://github.com/carina-rs/carina/issues/613">#613</a>）</li>
+<li><strong>ordered/unordered list</strong> — AWSCCスキーマのリストに順序付き/順序なしのセマンティクスを追加（<a href="https://github.com/carina-rs/carina/issues/873">#873</a>）</li>
+</ul>
+<hr />
+<h2>リファクタリング</h2>
+<p>コードベースが大きくなってきたので、構造的な整理も進めた。main.rs（4000行）、awscc provider.rs（3500行）、differ.rs、diagnostics.rs、completion.rsなどの大きなファイルを分割し、carina-coreからvalidation、resolver、deps、config_loaderなどのモジュールを抽出した（<a href="https://github.com/carina-rs/carina/issues/382">#382</a>〜<a href="https://github.com/carina-rs/carina/issues/392">#392</a>、<a href="https://github.com/carina-rs/carina/issues/673">#673</a>、<a href="https://github.com/carina-rs/carina/issues/787">#787</a>）。</p>
+<p>また、CLIやLSPのコードに<code>&quot;aws&quot;</code>や<code>&quot;awscc&quot;</code>といったプロバイダー名が直接書かれていたのを、<code>ProviderFactory</code>トレイト経由で動的に解決するように変更した（<a href="https://github.com/carina-rs/carina/issues/364">#364</a>、<a href="https://github.com/carina-rs/carina/issues/367">#367</a>）。新しいプロバイダーを追加してもCLIやLSPのコードを変更する必要がなくなった。</p>
 
 ]]></content>
     </entry>
