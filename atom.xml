@@ -36,8 +36,9 @@
 <p>名前はギリシャ神話の百の目を持つ巨人アルゴス（Argus）から。コードを隈なく見通すツールとしてしっくりくるし、アルゴス自身がアルゴ船を造った船大工でもあるので、<a href="https://github.com/carina-rs/carina">Carina</a>（アルゴ船の竜骨座）との系譜もきれいにつながる。</p>
 <hr />
 <h2>Iris</h2>
-<p><img src="/images/2026/06/iris-screenshot.png" alt="Irisのスクリーンショット" /></p>
-<p><a href="https://github.com/mizzy/iris">Iris</a>はgitのdiff出力にシンタックスハイライトをかけるツール。<code>git config --global core.pager iris</code>と設定すると、すべてのgitサブコマンドのページャーとして使えるようになる。</p>
+<p><a href="https://github.com/mizzy/iris">Iris</a>はgitのdiff出力にシンタックスハイライトをかけるツール。</p>
+<p><img src="/images/2026/06/iris-screenshot.png" alt="Irisのスクリーンショット" /><br />
+<code>git config --global core.pager iris</code>と設定すると、すべてのgitサブコマンドのページャーとして使えるようになる。</p>
 <p>stdinからunified diffを読んで、変更されたファイルの拡張子から言語を検出し、シンタックスハイライトをかけた状態で出力する。diffのフォーマット自体（ヘッダー、<code>+</code>/<code>-</code>マーカー、ハンク情報）はそのまま残す。</p>
 <p>シンタックスハイライトには<a href="https://github.com/trishume/syntect">syntect</a>を使っている。カラーテーマは<code>IRIS_THEME</code>環境変数で指定できて、デフォルトは<code>base16-ocean.dark</code>。</p>
 <pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">IRIS_THEME</span><span class="o">=</span><span class="s2">&#34;Solarized (dark)&#34;</span>
