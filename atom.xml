@@ -22,7 +22,7 @@
 <p><a href="https://github.com/mizzy/pyxis">Pyxis</a>はLLM推論エンジン。<a href="https://github.com/huggingface/candle">candle</a>も<a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a>も使わずに、トランスフォーマーのパイプライン全体（アテンション、KVキャッシュ、RoPE、サンプリング）を自前実装する、というプロジェクト。</p>
 <p>つくりはじめたきっかけは、<a href="https://connpass.com/event/395614/">コーディングのためのローカルLLM勉強会 in 福岡</a>に参加して、<a href="https://x.com/monochromegane">@monochromegane</a>さんと<a href="https://x.com/kis">@kis</a>さんと懇親会で話したこと。Carinaのplan表示をわかりやすくしたいという話を@monochromeganeさんとしていたら、生成AIに解説させるというアプローチを提案してもらった。その場ではGitHub ActionsでAIを呼び出す方向で考えていたけど、Carina自体に機能を持たせればいいんじゃないかと思った。また、@kisさんと@monochromeganeさんが推論エンジンについて会話しているのを横で聞いていて「ぜんぜんわからない」と言ったら、@kisさんから「6回実装してみればわかりますよ」と言われた。じゃあ、Carina自体にplan等をAIに解説させる機能を組み込んで、その推論エンジンも自前で実装してしまえ、と思ってつくりはじめた。</p>
 <p>今の状態は、safetensorsのパーサーと、テンソル一覧のテーブル表示あたりが動いている段階。safetensorsファイルからテンソルデータをF32/BF16/F16として読み込む部分も実装中。推論エンジンの仕組みを学習する、という目的もあり、Claude Codeに実装と解説をさせ、ひとつひとつ理解しながらなので、亀の歩みではある。</p>
-<p>名前は羅針盤座（Pyxis）から。<a href="https://github.com/carina-rs/carina">Carina</a>が船骨座で、どちらも、現在は4つの星座に分割されたアルゴ座（Argo Navis）の一部にあたる星座。CarinaのplanをAIが解説する、つまり羅針盤が船に方向を示す、という対比でつけた。</p>
+<p>名前は羅針盤座（Pyxis）から。<a href="https://github.com/carina-rs/carina">Carina</a>がりゅうこつ座で、どちらも、現在は4つの星座に分割されたアルゴ座（Argo Navis）の一部にあたる星座。CarinaのplanをAIが解説する、つまり羅針盤が船に方向を示す、という対比でつけた。</p>
 <hr />
 <h2>Argus</h2>
 <p><a href="https://github.com/mizzy/argus">Argus</a>はシンタックスハイライトとgit diff表示を備えたページャー。</p>
