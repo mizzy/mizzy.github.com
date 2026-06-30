@@ -3,12 +3,98 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-06-30T14:40:07+09:00</updated>
+    <updated>2026-06-30T22:01:50+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Pyxisの開発: テンソルデータの読み込み]]></title>
+        <link href="https://mizzy.org/blog/2026/06/30/2/"/>
+        <updated>2026-06-30T22:01:50+09:00</updated>
+        <id>https://mizzy.org/blog/2026/06/30/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/06/30/1/">前回の記事</a>でsafetensorsのヘッダーをパースしてテンソルのメタデータ（名前、dtype、shape、オフセット）を取り出すところまで書いた。今回はその次のステップで、実際のテンソルデータをバイト列からf32の数値配列として読み込む部分を実装した。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/16">#16</a>。</p>
+<hr />
+<h2>SafeTensors構造体の導入</h2>
+<p>前回は<code>parse_header</code>関数でヘッダーを読んでメタデータを返すだけだったので、ファイルをすぐ閉じてよかった。今回はテンソルデータの本体も読みに行くので、ファイルへのアクセスを保持し続ける必要がある。そこで<code>SafeTensors</code>構造体を導入して、ファイルアクセスとメタデータをまとめて持つようにした。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">SafeTensors</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">mmap</span>: <span class="nc">memmap2</span>::<span class="n">Mmap</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">data_offset</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">tensors</span>: <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="n">TensorInfo</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p><code>mmap</code>がファイルの中身へのアクセス。<code>data_offset</code>はヘッダーの終わり（= テンソルデータの先頭）の位置で、8バイトのサイズフィールド + ヘッダーのJSONバイト数。<code>tensors</code>が前回の<code>parse_header</code>で取得していたテンソルのメタデータ（dtype、shape、オフセット）。</p>
+<p>前回の<code>parse_header</code>のロジックは<code>SafeTensors::load()</code>メソッドに移動していて、ヘッダーをパースしてメタデータを取り出す処理自体は同じ。</p>
+<p>ファイルアクセスには<code>memmap2</code>クレートを使ってメモリマップしている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span>::<span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">mmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">memmap2</span>::<span class="n">Mmap</span>::<span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="n">file</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">};</span><span class="w">
+</span></span></span></code></pre><p>メモリマップはファイルの中身をプロセスの仮想アドレス空間にマッピングする仕組みで、OSのページキャッシュを介してアクセスされる。ファイル全体を一気にメモリに読まなくても、アクセスしたページだけが物理メモリに載る。モデルファイルは数GBになるので、全部メモリに読み込むのは現実的ではないが、メモリマップなら必要な部分だけが透過的に読み込まれる。</p>
+<hr />
+<h2>Dtype enum</h2>
+<p>前回は<code>dtype</code>を<code>String</code>で持っていたけど、テンソルデータを読むにはdtypeごとにバイト列の解釈を変える必要がある。文字列のまま<code>match</code>するのは型安全でないので、<code>Dtype</code> enumに変えた。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#[serde(rename_all = </span><span class="s">&#34;UPPERCASE&#34;</span><span class="cp">)]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">Dtype</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">F32</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">F16</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="no">BF16</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">impl</span><span class="w"> </span><span class="n">Dtype</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">element_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">usize</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">match</span><span class="w"> </span><span class="bp">self</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Dtype</span>::<span class="n">F32</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Dtype</span>::<span class="n">F16</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Dtype</span>::<span class="no">BF16</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p><code>element_size()</code>は1要素あたりのバイト数を返す。F32は4バイト、F16とBF16は2バイト。テンソルデータを読み込むときに、バイト列をこのサイズごとに区切って数値に変換する。バイト長がこのサイズの倍数になっているかのバリデーションにも使う。</p>
+<p>safetensorsのフォーマット仕様ではF32/F16/BF16以外にもI64、U8、BOOLなど<a href="https://github.com/huggingface/safetensors/blob/main/safetensors/src/tensor.rs">22種類のdtype</a>が定義されている。Pyxisではさしあたり必要なF32/F16/BF16だけをサポートして、それ以外のdtypeのテンソルはスキップするようにした。他のdtypeは必要になったら対応する。</p>
+<hr />
+<h2>テンソルデータの読み込み</h2>
+<p><code>tensor_f32()</code>メソッドがこのPRの本体。テンソル名を指定すると、そのテンソルのバイト列をdtypeに応じてf32に変換して返す。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">tensor_f32</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">name</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">tensors</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">).</span><span class="n">ok_or_else</span><span class="p">(</span><span class="o">||</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">io</span>::<span class="n">Error</span>::<span class="n">new</span><span class="p">(</span><span class="n">io</span>::<span class="n">ErrorKind</span>::<span class="n">NotFound</span><span class="p">,</span><span class="w"> </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;tensor not found: </span><span class="si">{name}</span><span class="s">&#34;</span><span class="p">))</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">})</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="p">[</span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="n">end</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="n">data_offsets</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">data_offset</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">start</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">data_offset</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">end</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">mmap</span><span class="p">[</span><span class="n">start</span><span class="o">..</span><span class="n">end</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="n">dtype</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Dtype</span>::<span class="n">F32</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bytes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">chunks_exact</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">c</span><span class="o">|</span><span class="w"> </span><span class="kt">f32</span>::<span class="n">from_le_bytes</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]]))</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">collect</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Dtype</span>::<span class="n">F16</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bytes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">chunks_exact</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">c</span><span class="o">|</span><span class="w"> </span><span class="n">half</span>::<span class="n">f16</span>::<span class="n">from_le_bytes</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]]).</span><span class="n">to_f32</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">collect</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Dtype</span>::<span class="no">BF16</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bytes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">chunks_exact</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">c</span><span class="o">|</span><span class="w"> </span><span class="n">half</span>::<span class="n">bf16</span>::<span class="n">from_le_bytes</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]]).</span><span class="n">to_f32</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">collect</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nb">Ok</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p>やっていることはシンプルで、ヘッダーに記録されている<code>data_offsets</code>にデータ領域の開始位置を足して、mmap上の該当バイト列をスライスする。あとはdtypeに応じてバイトの解釈を変えるだけ。</p>
+<ul>
+<li><strong>F32</strong>: <code>chunks_exact(4)</code>で4バイトずつに切り、<code>f32::from_le_bytes</code>でリトルエンディアンのf32に変換する</li>
+<li><strong>F16</strong>: <code>chunks_exact(2)</code>で2バイトずつに切り、<code>half::f16::from_le_bytes</code>でF16に変換してから<code>.to_f32()</code>でf32にする</li>
+<li><strong>BF16</strong>: 同様に2バイトずつに切り、<code>half::bf16::from_le_bytes</code>でBF16に変換してから<code>.to_f32()</code>でf32にする</li>
+</ul>
+<p><code>chunks_exact</code>がバイト列を1要素あたりのバイト数（前述の<code>element_size()</code>、F32なら4、F16/BF16なら2）ごとに分割し、<code>from_le_bytes</code>がそのバイト列をリトルエンディアンの数値として解釈する、という二段階の処理。F16とBF16の変換には<code>half</code>クレートを使っている。</p>
+<p>この時点ではすべてのテンソルをf32に変換して読み込んでいる。Rustの標準ライブラリにはBF16の型がなく、F16の型（<code>f16</code>）もnightly限定の実験的APIでstableでは使えない。<code>half</code>クレートがBF16/F16の型と算術演算を提供しているが、<a href="https://github.com/starkat99/half-rs/blob/main/src/bfloat.rs">演算の実装</a>はf32に変換してから計算してBF16/F16に戻す、というもの。最初からf32で持てばRustのプリミティブ型の演算がそのまま使えて、変換の往復が不要になる。メモリ効率の面ではBF16のまま持って計算時にf32に変換する方が有利だけど、まずは動くものを作るのが優先なので、ここはシンプルな方を選んだ（後のPRでBF16のまま持つ最適化を入れている）。</p>
+<hr />
+<p>これで、safetensorsファイルからテンソルの数値データをf32として取り出せるようになった。次回はこのデータを使って、トークンIDからベクトルを引くembeddingテーブルルックアップの実装について書く。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Pyxisの開発: safetensorsパーサー実装]]></title>
@@ -838,101 +924,6 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 <li><a href="https://mizzy.org/blog/2016/04/01/1/">フリーランスになって2年が経った - Gosuke Miyashita</a></li>
 <li><a href="https://mizzy.org/blog/2015/04/01/1/">フリーランスになって1年が経った - Gosuke Miyashita</a></li>
 </ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Carinaのシークレット管理]]></title>
-        <link href="https://mizzy.org/blog/2026/03/28/1/"/>
-        <updated>2026-03-28T14:52:19+09:00</updated>
-        <id>https://mizzy.org/blog/2026/03/28/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/carina-rs/carina">Carina</a>にシークレット管理の仕組みを設計・実装しているので、Terraformとの設計の違いについて書いておく。</p>
-<hr />
-<h2>Terraformのシークレット問題</h2>
-<p>Terraformにおけるシークレット管理は長年の課題だった。<a href="https://github.com/hashicorp/terraform/issues/516">GitHub issue #516</a>は2014年10月に作成され、250以上のコメントがついている。</p>
-<p>問題の根本は、Terraformのstateにシークレットが平文で保存されることにある。<code>sensitive</code>フラグをつけても、plan出力がマスクされるだけで、stateには平文のまま残る。<code>aws_kms_secrets</code>データソースを使っても、復号結果はstateに平文で保存される。</p>
-<p>この問題に対してTerraformは段階的に対処してきた。</p>
-<ul>
-<li><strong>sensitive</strong>（Terraform 0.14、2020年）: plan出力のマスク。stateは平文のまま</li>
-<li><strong>ephemeral</strong>（Terraform 1.10、2024年11月）: stateに一切保存しない値。<code>ephemeral</code>リソースやephemeral変数として使う</li>
-<li><strong>write-only</strong>（Terraform 1.11、2025年3月）: リソース属性の値をstateに保存しない仕組み</li>
-</ul>
-<p>問題提起から約10年かけて、ようやく「stateに保存しない」という本質的な解決策にたどり着いた形になる。</p>
-<hr />
-<h2>Terraformのwrite-only</h2>
-<p>write-onlyはTerraform 1.11で導入された仕組みで、リソースの属性値をstateに一切保存しないようにする。例えばSSM Parameterにシークレットを保存する場合、従来は値がstateに平文で残っていたが、write-onlyを使うとこうなる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">data</span> <span class="s2">&#34;aws_kms_secrets&#34; &#34;example&#34;</span> {
-</span></span><span class="line"><span class="cl">  <span class="k">secret</span> {
-</span></span><span class="line"><span class="cl"><span class="n">    name</span>    <span class="o">=</span> <span class="s2">&#34;db_password&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">    payload</span> <span class="o">=</span> <span class="s2">&#34;AQICAHh...&#34;</span>
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_ssm_parameter&#34; &#34;db_password&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  name</span>             <span class="o">=</span> <span class="s2">&#34;/myapp/db_password&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">  type</span>             <span class="o">=</span> <span class="s2">&#34;SecureString&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">  value_wo</span>         <span class="o">=</span> <span class="k">data</span><span class="p">.</span><span class="k">aws_kms_secrets</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">plaintext</span><span class="p">[</span><span class="s2">&#34;db_password&#34;</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">  value_wo_version</span> <span class="o">=</span> <span class="m">1</span>
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>stateに値を保存しないので安全だが、代わりに変更検知ができなくなるという問題がある。そこで<code>value_wo_version</code>という数値を手動で管理する。値を変更したらこれを1から2にインクリメントする。Terraformはこのバージョン番号の変更を検知して、プロバイダーに新しい値を送る。</p>
-<p>実際にversionを変更してplanすると、こうなる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c1">  # aws_ssm_parameter.db_password will be updated in-place
-</span></span></span><span class="line"><span class="cl">  <span class="err">~</span> <span class="k">resource</span> <span class="s2">&#34;aws_ssm_parameter&#34; &#34;db_password&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">      ~ has_value_wo</span>     <span class="o">=</span> <span class="kt">true</span> <span class="err">-&gt;</span> <span class="p">(</span><span class="k">known</span> <span class="k">after</span> <span class="k">apply</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">        id</span>               <span class="o">=</span> <span class="s2">&#34;/tf-write-only-test/db_password&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">        name</span>             <span class="o">=</span> <span class="s2">&#34;/tf-write-only-test/db_password&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">      ~ value_wo_version</span> <span class="o">=</span> <span class="m">1</span> <span class="err">-&gt;</span> <span class="m">2</span><span class="c1">
-</span></span></span><span class="line"><span class="cl"><span class="c1">        # (12 unchanged attributes hidden)
-</span></span></span><span class="line"><span class="cl">    }
-</span></span></code></pre><p><code>value_wo_version</code>の変更は表示されるが、<code>value_wo</code>自体の値や変更内容は一切表示されない。</p>
-<p>この設計にはいくつかの問題がある。</p>
-<ul>
-<li>バージョンのインクリメントを忘れると、実際の値が変わっていてもTerraformは変更を検知しない</li>
-<li>リソースタイプごとに個別にwrite-only対応が必要で、対応はまだ一部のリソースに限られる</li>
-<li><code>_wo</code>サフィックスの命名規則により、既存の属性名とは別の属性が必要になる</li>
-</ul>
-<p>なお、<a href="https://developer.hashicorp.com/terraform/plugin/framework/resources/write-only-arguments">プラグインフレームワークのドキュメント</a>では、private stateにハッシュを保存して変更を検知するアプローチもベストプラクティスとして紹介されている。ただし、少なくともAWS providerでは現時点ではこの方式は採用されていないようだ。</p>
-<hr />
-<h2>Carinaのsecret() + decrypt()</h2>
-<p>Carinaでは同じことを<code>secret()</code>（<a href="https://github.com/carina-rs/carina/issues/1238">#1238</a>）と<code>decrypt()</code>（<a href="https://github.com/carina-rs/carina/issues/1240">#1240</a>）の組み合わせで実現する。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.ssm.parameter</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">name</span>  <span class="o">=</span> <span class="s2">&#34;/myapp/db_password&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="na">type</span>  <span class="o">=</span> <span class="s2">&#34;SecureString&#34;</span>
-</span></span><span class="line"><span class="cl">  <span class="na">value</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">decrypt</span><span class="p">(</span><span class="s2">&#34;AQICAHh...&#34;</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>decrypt()</code>はapply時にプロバイダーの暗号化サービス（AWS KMS等）を使って復号する。<code>secret()</code>で包むことで、復号後の値はstateにハッシュとしてのみ保存される。</p>
-<p><code>secret()</code>の動作は以下の通り。</p>
-<ul>
-<li><strong>apply時</strong>: <code>secret()</code>をアンラップして実際の値をプロバイダーに送る</li>
-<li><strong>state</strong>: 値そのものではなくArgon2idハッシュのみを保存する。ソルトはリソースタイプ・リソース名・属性キーから生成するので、同じ値でもリソースごとに異なるハッシュになる</li>
-<li><strong>plan出力</strong>: 値の代わりに<code>(secret)</code>と表示する。変更時は<code>(secret) → (secret)</code>と表示され、値は見えないが変更があったことはわかる</li>
-<li><strong>diff</strong>: ハッシュの比較で変更を自動検知する</li>
-</ul>
-<p>Terraformのwrite-onlyとの違いをまとめると以下の通り。</p>
-<ul>
-<li>ハッシュをstateに保存することで変更検知を自動化。バージョン番号を手動で管理する必要がない</li>
-<li>ハッシュから元の値を復元することはできないので、stateからシークレットが漏洩するリスクもない</li>
-<li><code>secret()</code>は組み込み関数なので、プロバイダー側の個別対応は不要。どのリソースのどの属性にも使える</li>
-<li>Terraformでは復号用のデータソースを別途定義する必要があるが、Carinaでは属性値に直接書ける</li>
-<li><code>decrypt()</code>はプロバイダー非依存の設計で、AWS KMS、GCP Cloud KMS、Azure Key Vaultなどプロバイダーの暗号化サービスに自動的に委譲する予定</li>
-</ul>
-<hr />
-<h2>env()との組み合わせ</h2>
-<p>暗号文を<code>.crn</code>ファイルに書きたくない場合は、<code>env()</code>関数（<a href="https://github.com/carina-rs/carina/issues/1239">#1239</a>、実装済み）で環境変数から渡すこともできる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="nc">awscc.rds.db_instance</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">master_password</span> <span class="o">=</span> <span class="nv">secret</span><span class="p">(</span><span class="nv">env</span><span class="p">(</span><span class="s2">&#34;DB_PASSWORD&#34;</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><hr />
-<h2>設計の違いまとめ</h2>
-<p>Carinaのシークレット管理は、<code>secret()</code>と<code>decrypt()</code>の2つの関数で実現する。</p>
-<ul>
-<li><code>secret(value)</code> — 値をシークレットとしてマーク。stateにはハッシュのみ保存</li>
-<li><code>decrypt(ciphertext)</code> — プロバイダーの暗号化サービスで復号</li>
-</ul>
-<p>これらに<code>env()</code>のような汎用関数を組み合わせることもできる。それぞれが単一の責務を持ち、自由に組み合わせられる。Terraformでは<code>sensitive</code>、<code>ephemeral</code>、write-only、<code>aws_kms_secrets</code>データソースと、歴史的経緯から複数の仕組みが並立している。Carinaは後発の利点を活かして、最初からシンプルな設計にできた、と思う。</p>
-<p>ただし、これはあくまで現段階の設計であり、より安全で良い方法が見つかれば変更する可能性はある。</p>
 
 ]]></content>
     </entry>
