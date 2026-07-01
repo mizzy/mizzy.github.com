@@ -3,12 +3,55 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-06-30T22:01:50+09:00</updated>
+    <updated>2026-07-01T09:05:29+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Pyxisの開発: Embeddingテーブルルックアップ]]></title>
+        <link href="https://mizzy.org/blog/2026/07/01/1/"/>
+        <updated>2026-07-01T09:05:29+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/01/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/06/30/2/">前回の記事</a>でsafetensorsからテンソルデータをf32として読み込めるようになった。今回はそのデータを使った最初の計算として、embeddingテーブルルックアップを実装した。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/17">#17</a>。</p>
+<p>embeddingテーブルルックアップとは、入力のトークンIDを浮動小数点のベクトルに変換する処理のこと。LLMの推論パイプラインの入口にあたる。</p>
+<hr />
+<h2>トークナイザーとBPE</h2>
+<p>LLMはテキストをそのまま処理するのではなく、まずトークナイザーでトークンIDの列に変換する。トークナイザーはテキストをトークンに分割して、それぞれに整数のIDを振る。たとえばQwen3のトークナイザーだと「tokenization」は<code>['token', 'ization']</code> → <code>[5839, 2022]</code>のように分割される。「unbelievable」なら<code>['un', 'belie', 'vable']</code> → <code>[359, 31798, 23760]</code>と3つに分かれる。</p>
+<p>分割のアルゴリズムとして広く使われているのがBPE（Byte Pair Encoding）。元々は1994年にPhilip Gageがデータ圧縮のアルゴリズムとして<a href="https://dl.acm.org/doi/10.5555/177910.177914">発表</a>したもので、2015年にRico Sennrichらが<a href="https://arxiv.org/abs/1508.07909">ニューラル機械翻訳のためのサブワード分割に応用</a>し、その後GPT-2をはじめとするLLMのトークナイザーにも採用された。最初は1文字ずつ（<code>a</code>, <code>b</code>, <code>c</code>, ...）の辞書から始めて、訓練データ中で隣り合う頻出ペアを繰り返しマージして辞書を大きくしていく。たとえば<code>t</code>と<code>h</code>のペアが最も多ければ<code>th</code>を辞書に追加、次に<code>th</code>と<code>e</code>が多ければ<code>the</code>を追加、という具合に繰り返す。よく出る文字列ほど早くマージされて1トークンになり、珍しい単語はマージが進まず細かいトークンに分割されたまま残る。マージの回数が辞書のサイズを決める。各トークンに0から始まる整数IDが割り当てられる。この辞書に含まれるトークンの総数をvocab_sizeと呼ぶ。</p>
+<p>実際のLLMでは、BPEで一から辞書を構築するのではなく、既存の辞書をベースに拡張することもある。<a href="https://arxiv.org/abs/2309.16609">Qwen Technical Report</a>によると、Qwen3ではOpenAIのtiktoken（cl100k_base、約10万トークン）をベースに、中国語の常用漢字・単語や他の言語のトークンを追加し、数字を1桁ずつに分割するようにした結果、トークン数は151643になった。config上のvocab_sizeは151936で、これは151643を128の倍数に切り上げた値。GPUのTensor Coresは行列の次元が64や128の倍数のとき効率が良いので、embeddingテーブルのサイズをそれに合わせている。</p>
+<hr />
+<h2>Embeddingとは</h2>
+<p>トークンIDは単なる整数のインデックスで、数値の大小に意味がない（ID 5839がID 5838より何か「大きい」わけではない）。LLMの推論は浮動小数点の行列演算なので、トークンIDをそのまま入力に使うことはできない。各トークンIDを固定長の浮動小数点ベクトルに変換する必要があって、この変換を行うのがembeddingテーブル。</p>
+<p>embeddingテーブルは<code>vocab_size × hidden_dim</code>の二次元行列で、各行がひとつのトークンに対応するベクトルになっている。hidden_dimはモデル内部で使われるベクトルの次元数で、Qwen3-1.7Bでは2048。vocab_sizeが151936、hidden_dimが2048なら、151936個のトークンそれぞれに2048次元のベクトルが割り当てられている。トークンID <code>n</code>の入力に対しては、テーブルのn行目のベクトルをそのまま取り出す。これがembeddingルックアップ。</p>
+<hr />
+<h2>実装</h2>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Embedding</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">weights</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">vocab_size</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">hidden_dim</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p><code>weights</code>がembeddingテーブルの本体で、<code>vocab_size × hidden_dim</code>個のf32値が一次元のフラット配列として入っている。前回実装した<code>SafeTensors::tensor_f32()</code>で読み込んだデータがそのまま入る。</p>
+<p>ルックアップはこれだけ。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">lookup</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">token_id</span>: <span class="kt">usize</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">assert!</span><span class="p">(</span><span class="n">token_id</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">vocab_size</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">token_id</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">weights</span><span class="p">[</span><span class="n">start</span><span class="o">..</span><span class="n">end</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p><code>token_id * hidden_dim</code>で行の先頭位置を計算して、そこから<code>hidden_dim</code>個分のスライスを返す。フラット配列を二次元テーブルとして扱っているだけなので、コピーは発生しない。</p>
+<p>たとえばvocab_size=3、hidden_dim=4のテーブルなら、weightsは12個のf32値が並んでいて:</p>
+<p><img src="/images/2026/07/embedding-weights.png" alt="embeddingテーブルのweights配列" /></p>
+<p><code>lookup(1)</code>は<code>weights[4..8]</code>、つまり<code>[4.0, 5.0, 6.0, 7.0]</code>を返す。</p>
+<hr />
+<p>embeddingルックアップ自体は単なる配列のインデックスアクセスで、計算らしい計算はない。ただ、これがトランスフォーマーのパイプライン全体の入口になる。次回はこのベクトルに対して最初に適用されるRMSNormの実装について書く。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Pyxisの開発: テンソルデータの読み込み]]></title>
@@ -883,47 +926,6 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 <h2>現状</h2>
 <p>現時点では、aws providerとawscc providerの両方がWasmで動作している。プロセスベースの実装はすでに削除済み。</p>
 <p>Wasmへの移行は単純に技術的な興味からだったが、結果的にサンドボックスによるセキュリティが手に入ったのはよい副産物だった。サードパーティproviderを受け入れる上で、providerのコードが任意のファイルやネットワークにアクセスできないことが保証されているのは安心感がある。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[法人化して10年が経った]]></title>
-        <link href="https://mizzy.org/blog/2026/04/01/1/"/>
-        <updated>2026-04-01T13:26:35+09:00</updated>
-        <id>https://mizzy.org/blog/2026/04/01/1/</id>
-        <content type="html"><![CDATA[
-<p><img src="/images/2026/04/bookkeeping-shelf.jpg" alt="領収書と10年分の決算報告書" /></p>
-<p>領収書と10年分の決算報告書。領収書はこれ以外にもたくさんある。法人化してからの年月が物理的に可視化されている棚。</p>
-<hr />
-<p>4月1日に備忘録的にふりかえりエントリを書いていたが、<a href="/blog/2021/04/01/1/">前回</a> から5年も空いてしまった。</p>
-<p>フリーランスになったのが2014年4月なので、フリーランスとしては12年。<a href="/blog/2016/04/01/1/">フリーランスになって2年が経った</a> で書いたように2016年2月に法人登記したので、法人化してからは10年が経ったことになる。フリーランス12年より法人化10年の方がキリがいいので、今回はそちらをタイトルにした。</p>
-<hr />
-<h2>12年続いている理由</h2>
-<p><a href="https://note.com/suthio/n/n7b889ef3bbf9">僕がフリーランスを続けなかった構造的な理由</a> というすてぃおさんの記事との対比で書いてみる。すてぃおさんが1年半のフリーランス経験を経て、業務委託として働くスタイルを長期的にはオススメできない、と書いていて、構造的な問題として挙げられているのは以下の3つ。</p>
-<ol>
-<li>挑戦させてもらいづらい</li>
-<li>社会的な評価が蓄積されにくい</li>
-<li>マネジメントや組織の意思決定に関われない</li>
-</ol>
-<p>加えて、「即戦力の罠」によるスキルの切り売り感や、社会資本が蓄積されにくい、といった問題も挙げられている。例外として「希少人材」であれば構造を超えられる可能性がある、とも。</p>
-<p>自分は12年続いている側なので、それぞれについて書いてみる。</p>
-<p>まず「挑戦させてもらいづらい」について。自分の場合、経験のないプログラミング言語や技術領域の仕事を任せてもらうこともある。なので、この問題はあてはまらない。「確実にできることしか任せてもらえない」という状況にはなっていない。また、同じ技術領域であっても会社によって解決したい課題は異なるので、そういう意味でも新しい経験は得られている。同様に「即戦力の罠」によるスキルの切り売り感もあまりない。</p>
-<p>「社会的な評価が蓄積されにくい」については、もう十分蓄積されているので、これ以上蓄積しなくてもよさそう、というのが正直なところ。</p>
-<p>「マネジメントや組織の意思決定に関われない」については、むしろマネジメントしたくないからフリーランスをやっている。これはデメリットではなく、自分にとってはメリット。</p>
-<p>「社会資本が蓄積されない」については、自分の場合、そもそも信頼関係や評判の基盤が会社ではなくオープンな技術コミュニティにあるので、契約が終わったらリセットされる、ということがない。</p>
-<p>元記事では「希少人材であれば構造を超えられる」とあるが、まあ、自分はそこに該当するのだと思う。自分で言うのもどうかと思うけど、12年続いているという事実がそれを裏付けているのだろう。</p>
-<p>ただ、元記事の主張自体は理解できる。自分のケースが一般化できるとは思っていない。</p>
-<hr />
-<h2>関連エントリ</h2>
-<ul>
-<li><a href="https://mizzy.org/blog/2021/04/01/1/">大学院に入学した/フリーランスになって7年が経った - Gosuke Miyashita</a></li>
-<li><a href="https://mizzy.org/blog/2019/04/01/1/">フリーランスになって5年が経った - Gosuke Miyashita</a></li>
-<li><a href="https://mizzy.org/blog/2018/04/02/1/">フリーランスになって4年が経った - Gosuke Miyashita</a></li>
-<li><a href="https://mizzy.org/blog/2017/04/01/1/">フリーランスになって3年が経った - Gosuke Miyashita</a></li>
-<li><a href="https://mizzy.org/blog/2016/04/01/1/">フリーランスになって2年が経った - Gosuke Miyashita</a></li>
-<li><a href="https://mizzy.org/blog/2015/04/01/1/">フリーランスになって1年が経った - Gosuke Miyashita</a></li>
-</ul>
 
 ]]></content>
     </entry>
