@@ -3,12 +3,107 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-03T19:35:00+09:00</updated>
+    <updated>2026-07-03T21:30:00+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[個人用メモアプリをつくっている]]></title>
+        <link href="https://mizzy.org/blog/2026/07/03/2/"/>
+        <updated>2026-07-03T21:30:00+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/03/2/</id>
+        <content type="html"><![CDATA[
+<p>Obsidianの代替として、個人用のメモツールWebアプリをつくりはじめた。リポジトリは<a href="https://github.com/mizzy/memo">mizzy/memo</a>。Cloudflare上で動かしている。</p>
+<p><img src="/images/2026/07/memo-desktop.png" alt="memoアプリのデスクトップ表示" /></p>
+<hr />
+<h2>なぜつくったか</h2>
+<p>ObsidianはMarkdownが書けるメモツールとして常用していて、PC上での利用には特に不満はない。ただ、Obsidianの豊富な機能を使いこなしているわけでもなくて、メモを書いて読む、という基本的な使い方しかしていない。</p>
+<p>問題はiOSアプリで、挙動が不安定。特に、開いたときにindexingという表示のまま進まないことがよくある。同期まわりの問題だと思うけど、外出先でさっとメモを確認したいときに待たされていらつく。</p>
+<p>自分が求めているのは、Markdownで書けてPCとiPhoneで同期ができるメモツールなので、Obsidianを使い続けなくても、自分の使い方だけに特化したシンプルなツールをつくったほうがいいのでは、と考えた。データをサーバ側のDBに置くWebアプリなら、そもそも同期という概念自体が消える。PWAとしてiPhoneのホーム画面に追加すれば、起動もネイティブアプリに近い体験にできる。</p>
+<p>あと、<a href="/blog/2026/06/16/1/">ホテルメモサイトをAstroで作り直した</a>ときにもObsidianの利用をやめたのだけど、生成AIのおかげで「既製ツールの不満を我慢しながら使い続ける」より「自分のユースケースだけ満たす専用ツールをさくっとつくる」ほうが早い、という状況になってきていると思う。</p>
+<hr />
+<h2>技術スタック</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Tech</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API</td>
+<td>Hono + TypeScript</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td>React + Vite + TypeScript</td>
+</tr>
+<tr>
+<td>Editor</td>
+<td>Tiptap (ProseMirrorベース)</td>
+</tr>
+<tr>
+<td>DB</td>
+<td>Cloudflare D1 + Drizzle ORM</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>Cloudflare R2 (画像添付)</td>
+</tr>
+<tr>
+<td>Hosting</td>
+<td>Cloudflare Workers</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Cloudflare Access</td>
+</tr>
+<tr>
+<td>Infra</td>
+<td>Terraform (stateはR2に保存)</td>
+</tr>
+</tbody>
+</table>
+<p>1つのWorkerで静的アセット(SPA)とAPIの両方を配信する、単一Worker構成にしている。当初はPagesとWorkersを分ける構成を考えていたけど、同一オリジンならCORSの設定が不要になるし、認証Cookieも何も考えなくても全リクエストに付いてくる。個人ツールでフロントとAPIを別々に更新したい場面はそもそも少ないので、分離は必要になってからで遅くない、という判断。</p>
+<p>認証まわりのコードはアプリ内には一切なくて、前段のCloudflare Accessで自分のGmailアカウントだけを許可している。アプリ本体は認証のことを何も知らないまま、Cloudflareのログイン画面で守られる。個人ツールならこれで十分。</p>
+<hr />
+<h2>機能</h2>
+<p>今のところ実装しているのはこのあたり。</p>
+<ul>
+<li>メモの作成・編集・一覧・検索</li>
+<li>Vault機能(Obsidianと同様、常に1つのVaultを開いてスイッチャーで切り替える)</li>
+<li>フォルダ機能(Vault内に任意深さのフォルダ木を持ち、デスクトップではフォルダツリー/メモ一覧/エディタの3ペイン構成)</li>
+<li>画像添付(R2にアップロード)</li>
+<li>PWA対応(iPhoneのホーム画面に追加して利用)</li>
+</ul>
+<p>デスクトップはこんな感じ。左上のVaultスイッチャーでVaultを切り替える。</p>
+<p><img src="/images/2026/07/memo-vault-switcher.png" alt="Vaultスイッチャー" /></p>
+<p>モバイルはこんな感じ。ホームがフォルダツリーで、フォルダを開くとメモ一覧、メモを開くとエディタ、という画面遷移にしている。</p>
+<div style="display:flex;gap:12px;">
+<img src="/images/2026/07/memo-mobile-home.png" alt="モバイルのフォルダツリー" style="width:calc(50% - 6px);max-width:280px;height:auto;">
+<img src="/images/2026/07/memo-mobile-editor.png" alt="モバイルのエディタ" style="width:calc(50% - 6px);max-width:280px;height:auto;">
+</div>
+<hr />
+<h2>デザイン</h2>
+<p>見た目がそれっぽくないとモチベーションが上がらない、というのはホテルメモのときと同じなので、今回もビジュアルデザインはClaude Designにお願いした。まず方向性の違う3案(A: 紙とインク、B: ターミナル、C: 夜の書斎)のモックをHTMLでつくってもらって、並べて比較した。</p>
+<p><img src="/images/2026/07/memo-design-compare.png" alt="デザイン方向性の比較" /></p>
+<p>BとCで迷った結果、Cの雰囲気にBの道具っぽさを足したハイブリッドのD案「夜の書斎×道具」に決めた。ミッドナイトブルーの地にランプの琥珀色、本文はZen Kaku Gothic New、日付などのメタ情報はIBM Plex Mono、ロゴだけFraunces、という使い分けにしている。B案にあったプロンプト風の装飾やstatuslineみたいな、見た目だけターミナルをなぞった要素は、検討の過程で結局外した。</p>
+<p>ホテルメモのときは、Claude Designがローカルファイルを直接編集できないので、デザインを直すたびにClaude Designで実装指示書をつくってClaude Codeに渡し直す、というのが面倒だった。今はClaude CodeとClaude Designの連携がしやすくなっていて、Claude Codeからデザインファイルを直接Claude Designのプロジェクトに同期できる。なので今回は、モックや現状UIのスナップショットをリポジトリの<code>design/</code>に置いてClaude Design側と同期し、Claude Designが出してきた改善版デザインをClaude Codeが実装する、という流れで回している。</p>
+<hr />
+<h2>今後</h2>
+<p>まだつくりはじめたばかりなので、しばらくは自分で使いながら不満点を潰していく予定。Obsidianに溜まっている既存のメモの移行もこれから。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/memo">mizzy/memo</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[プレゼンツールPeithoをつくっている]]></title>
@@ -621,226 +716,6 @@ Total: 311 tensors
 </tbody>
 </table>
 <p>ACM以外にも、EC2の<code>running</code>待ち、RDSの<code>available</code>待ち、Lambdaの<code>Active</code>待ち、など同じパターンが他のサービスでも使える。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Carinaのupstream state機能]]></title>
-        <link href="https://mizzy.org/blog/2026/05/04/1/"/>
-        <updated>2026-05-04T08:47:03+09:00</updated>
-        <id>https://mizzy.org/blog/2026/05/04/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/carina-rs/carina">Carina</a>に<code>upstream_state</code>という機能を入れた。別のCarinaコンポーネントのstateを参照するための仕組みで、Terraformでいう<code>terraform_remote_state</code>に相当する。</p>
-<p>ただ、Terraformのremote stateを使っていて気になる点があったので、Carinaでは少し違う設計にしてみた。その違いについて書いておく。</p>
-<hr />
-<h2>Terraformのremote stateのおさらい</h2>
-<p>Terraformで別コンポーネントのstateを参照するときは、<code>terraform_remote_state</code> data sourceを使う。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">data</span> <span class="s2">&#34;terraform_remote_state&#34; &#34;network&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  backend</span> <span class="o">=</span> <span class="s2">&#34;s3&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">  config</span> <span class="o">=</span> {
-</span></span><span class="line"><span class="cl"><span class="n">    bucket</span> <span class="o">=</span> <span class="s2">&#34;my-tfstate&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">    key</span>    <span class="o">=</span> <span class="s2">&#34;network/terraform.tfstate&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">    region</span> <span class="o">=</span> <span class="s2">&#34;ap-northeast-1&#34;</span>
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_security_group&#34; &#34;web&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  vpc_id</span> <span class="o">=</span> <span class="k">data</span><span class="p">.</span><span class="k">terraform_remote_state</span><span class="p">.</span><span class="k">network</span><span class="p">.</span><span class="k">outputs</span><span class="p">.</span><span class="k">vpc_id</span>
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>参照元のoutputsを<code>data.terraform_remote_state.network.outputs.vpc_id</code>のような形で読む。参照される側は<code>output</code>ブロックで値を公開する。</p>
-<p>使っていて気になる点がいくつかある。</p>
-<h3>参照する側がbackendの設定を知っている必要がある</h3>
-<p>networkコンポーネントのbackendがS3なのか、バケット名は何か、キーは何か、といった情報を、それを使うweb側のコードにも書く必要がある。参照元のnetwork側ではこう書いて、</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c1"># network/main.tf
-</span></span></span><span class="line"><span class="cl"><span class="k">terraform</span> {
-</span></span><span class="line"><span class="cl">  <span class="k">backend</span> <span class="s2">&#34;s3&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">    bucket</span> <span class="o">=</span> <span class="s2">&#34;my-tfstate&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">    key</span>    <span class="o">=</span> <span class="s2">&#34;network/terraform.tfstate&#34;</span>
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>参照する側のweb側ではこう書く。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c1"># web/main.tf
-</span></span></span><span class="line"><span class="cl"><span class="k">data</span> <span class="s2">&#34;terraform_remote_state&#34; &#34;network&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  backend</span> <span class="o">=</span> <span class="s2">&#34;s3&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">  config</span> <span class="o">=</span> {
-</span></span><span class="line"><span class="cl"><span class="n">    bucket</span> <span class="o">=</span> <span class="s2">&#34;my-tfstate&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">    key</span>    <span class="o">=</span> <span class="s2">&#34;network/terraform.tfstate&#34;</span>
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>bucketとkeyが両方に登場しているのが分かる。実質的に同じ情報を二重管理している状態になる。</p>
-<h3>呼び出すのに長い文字列を書く必要がある</h3>
-<p>参照するときの記述が<code>data.terraform_remote_state.network.outputs.vpc_id</code>となって、なかなか長い。<code>data.terraform_remote_state.</code>と<code>.outputs.</code>が毎回ついてくる。</p>
-<p>複数の値を参照していると、この長い名前があちこちに出てきて冗長になる。localsで別名をつけて短くする、みたいな回避策を取ることになる。</p>
-<h3>補完が効かない</h3>
-<p><code>outputs</code>の中身は実際のstateを読まないと分からないので、エディタで補完が効かない。</p>
-<p>補完が効かないので、typoしても実行するまで気付けない。<code>terraform validate</code>は実際のremote stateを読まずに構文チェックだけするので、ここでは検出されない。別コンポーネントで<code>output</code>の名前を変えたときに、参照側が壊れていることを<code>plan</code>や<code>apply</code>のタイミングで初めて知ることになる。</p>
-<h3>参照元が未applyだとplanできない</h3>
-<p>共通の通知基盤となるSNS topicをmonitoringコンポーネントで管理し、各サービス側のCloudWatchアラームからそのtopicを参照する、という構成を考える。</p>
-<p>monitoring側に新しい通知先（たとえば<code>critical_alerts_topic_arn</code>）を追加し、同じPRでweb側の新しいアラームからそれを参照する、というPRを出したとする。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c1"># monitoring/main.tf
-</span></span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_sns_topic&#34; &#34;critical_alerts&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  name</span> <span class="o">=</span> <span class="s2">&#34;critical-alerts&#34;</span>
-</span></span><span class="line"><span class="cl">}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">output</span> <span class="s2">&#34;critical_alerts_topic_arn&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  value</span> <span class="o">=</span> <span class="k">aws_sns_topic</span><span class="p">.</span><span class="k">critical_alerts</span><span class="p">.</span><span class="k">arn</span>
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><pre class="chroma"><code><span class="line"><span class="cl"><span class="c1"># web/main.tf
-</span></span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_cloudwatch_metric_alarm&#34; &#34;web_5xx&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  alarm_name</span>  <span class="o">=</span> <span class="s2">&#34;web-5xx&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">  metric_name</span> <span class="o">=</span> <span class="s2">&#34;5XXError&#34;</span><span class="c1">
-</span></span></span><span class="line"><span class="cl"><span class="c1">  # ...
-</span></span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">  alarm_actions</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">    <span class="k">data</span><span class="p">.</span><span class="k">terraform_remote_state</span><span class="p">.</span><span class="k">monitoring</span><span class="p">.</span><span class="k">outputs</span><span class="p">.</span><span class="k">critical_alerts_topic_arn</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="p">]</span>
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>このPRをCIで<code>plan</code>にかけると、monitoring側がまだ<code>apply</code>されていないので新しいoutputがstateに存在せず、web側の<code>plan</code>はエラーになる。</p>
-<p>planエラーを回避したい場合、以下のように<code>try()</code>でフォールバックする、という手もある。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="n">alarm_actions</span> <span class="o">=</span> <span class="k">try</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="p">[</span><span class="k">data</span><span class="p">.</span><span class="k">terraform_remote_state</span><span class="p">.</span><span class="k">monitoring</span><span class="p">.</span><span class="k">outputs</span><span class="p">.</span><span class="k">critical_alerts_topic_arn</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="p">[],</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span></code></pre><p>ただ、これだとPRレビュー時に見えるplanは<code>alarm_actions = []</code>になり、monitoringを<code>apply</code>した後の本来のplanとは異なる。</p>
-<p>結局、monitoring側のPRとweb側のPRを2回に分けてマージする、という対応になりがち。</p>
-<p>そもそもremote stateで参照するほど密に依存しているなら、コンポーネントを分割している設計自体を見直したほうがいいケースもある。ただ、stateを分けざるを得ない事情（チーム境界、applyの責任範囲、リソースへのアクセス権限を分けたい都合など）もあり、そういう場合はこの面倒さと付き合うしかない。</p>
-<p>remote stateの代わりに、data sourceで名前やタグから引く、という方法もある。これだとremote stateのように「outputが追加されたか」は気にしなくていい。ただし結局、参照先のリソースが実在していないとdata sourceの読み込みに失敗するので、upstreamを先に<code>apply</code>する必要があるのは変わらない。</p>
-<p>さらにdata sourceはstateではなく実際のAWS APIを叩いてリソース情報を取得するので、参照が増えるとstate refreshが遅くなる。どちらを取るかは悩ましい。</p>
-<hr />
-<h2>Carinaのupstream_state</h2>
-<p>Carinaでは、参照する側はupstreamコンポーネントの<strong>ディレクトリを指すだけ</strong>にした。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="na">network</span> <span class="o">=</span> <span class="k">upstream_state</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;../network&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nc">awscc.ec2.SecurityGroup</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">group_description</span> <span class="o">=</span> <span class="s1">&#39;Web security group&#39;</span>
-</span></span><span class="line"><span class="cl">  <span class="na">vpc_id</span>            <span class="o">=</span> <span class="nv">network</span><span class="p">.</span><span class="nv">vpc_id</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="na">tags</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="na">Name</span> <span class="o">=</span> <span class="s1">&#39;web-sg&#39;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>source</code>はupstreamコンポーネントのディレクトリで、<code>.crn</code>ファイルからの相対パスで解決される。<code>let</code>で束縛した名前（この例では<code>network</code>）を通じて、upstream側が公開している値にアクセスできる。</p>
-<p>ディレクトリ参照なので、別リポジトリにあるコンポーネントを参照するにはsubtreeで取り込むなどの工夫がいる。自分にはリポジトリをまたいでstateを参照したいニーズがないので、いまはこれで割り切っている。必要になったらそのとき考える。</p>
-<p>公開する側はこんな感じ。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">backend</span> <span class="nv">s3</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">bucket</span> <span class="o">=</span> <span class="s1">&#39;my-carina-state&#39;</span>
-</span></span><span class="line"><span class="cl">  <span class="na">key</span>    <span class="o">=</span> <span class="s1">&#39;network/carina.state.json&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">main</span> <span class="o">=</span> <span class="nc">awscc.ec2.Vpc</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">cidr_block</span> <span class="o">=</span> <span class="s1">&#39;10.0.0.0/16&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">exports</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">vpc_id</span> <span class="o">=</span> <span class="nv">main</span><span class="p">.</span><span class="nv">vpc_id</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>exports</code>ブロックで公開したい値を宣言する。Terraformの<code>output</code>ブロックに相当する。型は自動的に推論されるので、この例では<code>vpc_id</code>は<code>VpcId</code>型として公開される。</p>
-<hr />
-<h2>Terraformと違うところ</h2>
-<p>先に挙げた4つの点が、それぞれ<code>upstream_state</code>ではどうなっているかを書いていく。</p>
-<h3>backend設定を書かなくていい</h3>
-<p>参照する側に書くのは<code>source</code>（ディレクトリ）だけ。backend設定は書かない。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># web/main.crn</span>
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">network</span> <span class="o">=</span> <span class="k">upstream_state</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">source</span> <span class="o">=</span> <span class="s1">&#39;../network&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>Carinaは<code>source</code>で指定されたディレクトリの<code>.crn</code>ファイルを読み込み、そこに書かれている<code>backend</code>ブロックを解決し、stateを読み出す。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="c"># network/main.crn</span>
-</span></span><span class="line"><span class="cl"><span class="k">backend</span> <span class="nv">s3</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">bucket</span> <span class="o">=</span> <span class="s1">&#39;my-carina-state&#39;</span>
-</span></span><span class="line"><span class="cl">  <span class="na">key</span>    <span class="o">=</span> <span class="s1">&#39;network/carina.state.json&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p>つまり、backendの場所を知っているのはupstream側だけで、参照する側はそれを意識しなくていい。</p>
-<p>ディレクトリ参照なので、LSPでパス補完が効く。さらに、存在しないパスを指定した場合は<code>carina validate</code>の時点でエラーになる。エディタ上でも赤線で知らせてくれる。</p>
-<p>いっぽうTerraformの<code>terraform_remote_state</code>の<code>config</code>は、bucket名やkeyをtypoしていても構文的には通るので、<code>plan</code>を実行してbackendを叩きに行くまで間違いに気付けない。</p>
-<h3>呼び出しが短い</h3>
-<p><code>let network = upstream_state { source = '../network' }</code>と束縛しておけば、参照は<code>network.vpc_id</code>で済む。<code>data.terraform_remote_state.</code>や<code>.outputs.</code>のような定型的な部分がない。</p>
-<p><code>let</code>で束縛する名前は自由につけられるので、短くしたければ<code>net</code>でも何でもいい。</p>
-<h3>補完が効く</h3>
-<p><code>upstream_state</code>は<code>source</code>でupstreamのディレクトリを指しているので、Carinaはupstreamの<code>.crn</code>ファイルを直接読める。stateを読まずとも、<code>exports</code>ブロックの宣言だけで、何が公開されているかが分かる。</p>
-<p>さらにCarinaのDSLは静的な型を持っているので、<code>exports</code>で公開される値にも型がつく。型がついていれば、参照側で必要としている型と照合できる。</p>
-<p>たとえば参照側で<code>awscc.ec2.SecurityGroup</code>の<code>vpc_id</code>（型は<code>VpcId</code>）を埋めようとすると、同じ<code>VpcId</code>型を持つupstreamのexportsがLSPの補完候補に上がってくる。</p>
-<p><img src="/images/2026/05/upstream-state-completion.png" alt="upstream_stateのexportsがLSPの補完候補に出る様子" /></p>
-<p>存在しないexportを参照すればエラーになる。typoしている場合は近い名前の候補も提示される。</p>
-<p><img src="/images/2026/05/upstream-state-undefined-export.png" alt="存在しないexportを参照したときのエラー" /></p>
-<p>型が合わない場合もエラーになる（<code>vpc_id: String = main.vpc_id</code>のように型アノテーションをつけた場合の例）。</p>
-<p><img src="/images/2026/05/upstream-state-type-mismatch.png" alt="型が合わないときのエラー" /></p>
-<p>未定義のexport参照や型不一致は<code>carina validate</code>でもエラーになるので、<code>plan</code>や<code>apply</code>を待たずに検出できる。<code>source</code>パスが存在しない場合も同様に<code>carina validate</code>で検出される。</p>
-<h3>参照元が未applyでもplanできる</h3>
-<p><code>carina validate</code>はstateの内容は見ず、正しい型でexportされているかどうかだけをチェックするので、参照元が未applyでも当然動く。ではplanの場合はどうか。</p>
-<p>upstream側のstate自体がまだ存在しない状態でplanを実行すると、こんな出力になる。</p>
-<pre><code><span style="color: #d4a017;">Warning: upstream_state 'network': no state found at /path/to/network;
-dependent values will display as `(known after upstream apply: ...)`</span>
-
-Refreshing state...
-  ✓ awscc.ec2.SecurityGroup.ec2_security_group_39f08cea [0.0s]
-
-Execution Plan:
-
-  + awscc.ec2.SecurityGroup ec2_security_group_39f08cea
-      group_description: "Web security group"
-      tags:
-        Name: "web-sg"
-      <span style="color: #00aaaa;">vpc_id: (known after upstream apply: network.vpc_id)</span>
-      group_id: (known after apply)
-      id: (known after apply)
-
-Plan: 1 to add, 0 to change, 0 to destroy.
-</code></pre>
-<p>upstream側のstateが無くてもplanは止まらず、参照値は<code>(known after upstream apply: network.vpc_id)</code>というプレースホルダで表示される。「この値はupstreamを<code>apply</code>すれば確定する」というのが<code>plan</code>時点で見える。</p>
-<p>upstream側のstateは存在するが、新しいexport値がまだ入っていない（exportを追加してまだ再applyしていない）場合も、Warningが出ないだけで参照値は同じプレースホルダで表示される。</p>
-<pre><code>Refreshing state...
-  ✓ awscc.ec2.SecurityGroup.ec2_security_group_39f08cea [0.0s]
-
-Execution Plan:
-
-  + awscc.ec2.SecurityGroup ec2_security_group_39f08cea
-      group_description: "Web security group"
-      tags:
-        Name: "web-sg"
-      <span style="color: #00aaaa;">vpc_id: (known after upstream apply: network.vpc_id)</span>
-      group_id: (known after apply)
-      id: (known after apply)
-
-Plan: 1 to add, 0 to change, 0 to destroy.
-</code></pre>
-<p>Terraformでは参照先のstateが無いとremote stateの読み込みで失敗してplan自体が出せないが、Carinaはプレースホルダで表示するので、planは出せる。前述の<code>try()</code>での回避策のように「実際とは違うplan」が表示されるわけでもない。upstreamを<code>apply</code>した後にもう一度planを取れば、プレースホルダが実際の値に置き換わるだけ。</p>
-<hr />
-<h2>まとめ</h2>
-<p>Terraformのremote stateで気になる点と、Carinaの<code>upstream_state</code>での対応を並べるとこんな感じ。</p>
-<table>
-<thead>
-<tr>
-<th>Terraformのremote state</th>
-<th>Carinaのupstream_state</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>参照側がbackend設定を書く必要があり、設定のtypoは<code>plan</code>まで気付けない</td>
-<td><code>source</code>にディレクトリを指定するだけ。パスの間違いは<code>carina validate</code>で検出できる</td>
-</tr>
-<tr>
-<td><code>data.terraform_remote_state.network.outputs.vpc_id</code>と長い</td>
-<td><code>let</code>で束縛して<code>network.vpc_id</code></td>
-</tr>
-<tr>
-<td><code>outputs</code>の中身はstateを読むまで分からず補完が効かない</td>
-<td><code>exports</code>は型付きで補完が効く</td>
-</tr>
-<tr>
-<td>typoや存在しないoutput参照は<code>plan</code>/<code>apply</code>まで気付けない</td>
-<td>未定義のexport参照や型不一致は<code>carina validate</code>で検出できる</td>
-</tr>
-<tr>
-<td>参照元が未applyだとplanすら失敗する</td>
-<td><code>(known after upstream apply: ...)</code>として未確定値で表示され、planは通る</td>
-</tr>
-</tbody>
-</table>
 
 ]]></content>
     </entry>
