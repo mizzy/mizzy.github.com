@@ -3,12 +3,60 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-03T21:30:00+09:00</updated>
+    <updated>2026-07-04T19:00:00+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peithoの発表者ツールをつくっている]]></title>
+        <link href="https://mizzy.org/blog/2026/07/04/1/"/>
+        <updated>2026-07-04T19:00:00+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/04/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/07/03/1/">前回の記事</a>でプレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>を紹介した。前回はスライドを書いて生成するところ（Markdownを書いてビルドすると型検査つきでHTMLが出てくる話）が中心だったので、今回は発表するところ、つまり発表者ツールまわりについて書く。</p>
+<p>前回、Peithoをつくった動機として「プレゼンツールも自分が使いやすいものがほしくなった」というのを挙げたけど、それがまさにこの部分。</p>
+<p><code>peitho present deck.md</code>を実行するとローカルサーバが立ち上がって、スライドと発表者ツールがそれぞれ別のChromeウィンドウで開く。外部ディスプレイがあればそちらにスライドがフルスクリーンで表示され、発表者ツールはメインディスプレイに開く。発表者ツールの見た目はこんな感じ。</p>
+<p><img src="/images/2026/07/peitho-presenter-overview.png" alt="Peithoの発表者ツール" /></p>
+<p>左に現在のスライドとスピーカーノート、右に次のスライド、タイマーとトラッカー、セクション別の時間を並べたアジェンダ、操作ボタン、という構成。ダーク基調のデザインは<a href="https://claude.ai/design">Claude Design</a>でモックをつくって、それを反映した。以下、各パーツを見ていく。</p>
+<hr />
+<h2>タイマーとトラッカー</h2>
+<p><img src="/images/2026/07/peitho-presenter-timer.png" alt="タイマーとトラッカー" /></p>
+<p>発表の予定時間はデッキのfrontmatterに書く（<code>time: 5m</code>、<code>90s</code>、<code>1h30m</code>のような書き方）。それがタイマーの計画時間になっていて、経過時間・残時間・超過時間が表示される。超過すると赤くなって<code>+00:30</code>のように追加表示。</p>
+<p>その下の細長い帯がトラッカー。かめ🐢が経過時間（フィルバーの先端と一緒に動く）、うさぎ🐰がスライドの進捗（10枚中3枚目なら30%の位置）。うさぎがかめより先にいれば余裕あり、かめに追い越されていれば遅れ気味、というのがひと目でわかる。</p>
+<p>操作ボタンはStart/Pause/Resumeが1個にまとまっていて、押すたびに次のアクションが自動で決まる。</p>
+<hr />
+<h2>セクション別の時間を並べたアジェンダ</h2>
+<p><img src="/images/2026/07/peitho-presenter-agenda.png" alt="アジェンダ" /></p>
+<p>デッキのスライドの先頭にコメントでセクションの区切りを書いておくと、発表者ツールにアジェンダが出る。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">&lt;!-- {&#34;section&#34;:&#34;Setup&#34;,&#34;time&#34;:&#34;1m&#34;} --&gt;
+</span></span><span class="line"><span class="cl"><span class="gh"># スライドはMarkdownで書きたい
+</span></span></span></code></pre><p>セクション名と持ち時間はセットで書く決まり。各セクションの計画時間・実績時間・その差分が並んで、今どこにいるかがハイライトされる。</p>
+<p>frontmatterの<code>time</code>（デッキ全体の予定時間）とセクション合計がズレているとビルドが止まる。「4分の発表のはずが、セクション合計が5分になっている」みたいな取り違いに、開いた瞬間ではなくビルドの瞬間に気づける。前回書いたスロット契約と同じで、「黙って何かが起きる」経路を残さない、というPeithoの基本方針の延長。</p>
+<hr />
+<h2>スピーカーノート</h2>
+<p><img src="/images/2026/07/peitho-presenter-notes.png" alt="スピーカーノート" /></p>
+<p>書き方は<a href="https://marp.app/">Marp</a>や<a href="https://github.com/k1LoW/deck">k1LoW/deck</a>と同じで、スライドの中にHTMLコメントを書くだけ。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="gh"># スライドはMarkdownで書きたい
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;!-- 自己紹介は10秒で切り上げる。「スライド作りで消耗した経験、ありますよね」と会場に問いかけてから本題へ。 --&gt;
+</span></span></code></pre><p>JSON形式のコメントはページ設定、それ以外がスピーカーノート、という使い分け。ノートはビルドの配布物には混ざらないようにしてあって、<code>peitho present</code>のときだけ発表者ツールに読み込まれる。</p>
+<hr />
+<h2>現在/次スライドのプレビュー</h2>
+<p><img src="/images/2026/07/peitho-presenter-next.png" alt="次スライドのプレビュー" /></p>
+<p>左の大きい方が現在のスライド、右上の小さい方が次のスライド。実際に配布されているスライドHTMLをそのまま埋め込んでいるので、プレビュー用に別レンダリングされたものではなく本物と同じ見た目。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="/blog/2026/07/03/1/">前回の記事: プレゼンツールPeithoをつくっている</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[個人用メモアプリをつくっている]]></title>
@@ -585,137 +633,6 @@ Total: 311 tensors
 <li><a href="https://astro.build/">Astro</a></li>
 <li><a href="https://www.anthropic.com/news/claude-design-anthropic-labs">Claude Design</a></li>
 </ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Carinaのwait構文]]></title>
-        <link href="https://mizzy.org/blog/2026/05/17/1/"/>
-        <updated>2026-05-17T18:08:30+09:00</updated>
-        <id>https://mizzy.org/blog/2026/05/17/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="https://github.com/carina-rs/carina">Carina</a>に<code>wait</code>という構文を入れた。「あるリソースが特定の状態になるまで、それに依存するリソースの作成をブロックする」ための仕組みで、Terraformでいうと<code>aws_acm_certificate_validation</code>のような「待ち合わせ専用リソース」に相当する。</p>
-<p>現在構築中のCarina provider registry（Carina自身で管理している）でCloudFront + ACMの構成を組んでいて、ACM証明書がISSUEDになるまでCloudFrontの作成を待ちたい、というのが直接のきっかけ。Terraform流の「待ち合わせリソース」をproviderに足すアプローチも検討したけど、結局DSL側に<code>wait</code>構文を入れる方向にした。その経緯と設計について書いておく。</p>
-<hr />
-<h2>ACM + CloudFrontでの待ち合わせ問題</h2>
-<p>ACMでDNS検証を使ってCloudFront用の証明書を発行する場合、流れはこうなる。</p>
-<ol>
-<li>ACM証明書をリクエストする</li>
-<li>証明書のレスポンスに含まれる検証情報から、検証用のCNAMEレコードの内容を取得する</li>
-<li>Route 53にその検証用CNAMEレコードを作る</li>
-<li>ACMがそのレコードを観測して証明書のステータスを<code>PENDING_VALIDATION</code> → <code>ISSUED</code>に遷移させる</li>
-<li>CloudFrontなど下流のリソースが<code>ISSUED</code>になった証明書のARNを使い始める</li>
-</ol>
-<p>問題は4と5の間で、証明書がまだ<code>ISSUED</code>になっていないうちにCloudFrontの作成が走ってしまうケース。CloudFrontはviewer certificateに<code>ISSUED</code>済みの証明書しか受け付けないので、<code>PENDING_VALIDATION</code>のままの証明書を渡すと作成自体が失敗する。なので「証明書が<code>ISSUED</code>になるまでCloudFrontの作成を止める」という同期点が必要になる。</p>
-<p>Terraformでは<code>aws_acm_certificate_validation</code>という専用のリソースを介してこれを実現している。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_acm_certificate&#34; &#34;cert&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  domain_name</span>       <span class="o">=</span> <span class="s2">&#34;registry.carina-rs.dev&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">  validation_method</span> <span class="o">=</span> <span class="s2">&#34;DNS&#34;</span>
-</span></span><span class="line"><span class="cl">}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_route53_record&#34; &#34;validation&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  zone_id</span> <span class="o">=</span> <span class="k">aws_route53_zone</span><span class="p">.</span><span class="k">zone</span><span class="p">.</span><span class="k">id</span>
-</span></span><span class="line"><span class="cl"><span class="n">  name</span>    <span class="o">=</span> <span class="k">tolist</span><span class="p">(</span><span class="k">aws_acm_certificate</span><span class="p">.</span><span class="k">cert</span><span class="p">.</span><span class="k">domain_validation_options</span><span class="p">)[</span><span class="m">0</span><span class="p">].</span><span class="k">resource_record_name</span>
-</span></span><span class="line"><span class="cl"><span class="n">  type</span>    <span class="o">=</span> <span class="k">tolist</span><span class="p">(</span><span class="k">aws_acm_certificate</span><span class="p">.</span><span class="k">cert</span><span class="p">.</span><span class="k">domain_validation_options</span><span class="p">)[</span><span class="m">0</span><span class="p">].</span><span class="k">resource_record_type</span>
-</span></span><span class="line"><span class="cl"><span class="n">  records</span> <span class="o">=</span> <span class="p">[</span><span class="k">tolist</span><span class="p">(</span><span class="k">aws_acm_certificate</span><span class="p">.</span><span class="k">cert</span><span class="p">.</span><span class="k">domain_validation_options</span><span class="p">)[</span><span class="m">0</span><span class="p">].</span><span class="k">resource_record_value</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">  ttl</span>     <span class="o">=</span> <span class="m">60</span>
-</span></span><span class="line"><span class="cl">}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_acm_certificate_validation&#34; &#34;cert&#34;</span> {
-</span></span><span class="line"><span class="cl"><span class="n">  certificate_arn</span>         <span class="o">=</span> <span class="k">aws_acm_certificate</span><span class="p">.</span><span class="k">cert</span><span class="p">.</span><span class="k">arn</span>
-</span></span><span class="line"><span class="cl"><span class="n">  validation_record_fqdns</span> <span class="o">=</span> <span class="p">[</span><span class="k">aws_route53_record</span><span class="p">.</span><span class="k">validation</span><span class="p">.</span><span class="k">fqdn</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">resource</span> <span class="s2">&#34;aws_cloudfront_distribution&#34; &#34;dist&#34;</span> {<span class="c1">
-</span></span></span><span class="line"><span class="cl"><span class="c1">  # ...
-</span></span></span><span class="line"><span class="cl">  <span class="k">viewer_certificate</span> {
-</span></span><span class="line"><span class="cl"><span class="n">    acm_certificate_arn</span> <span class="o">=</span> <span class="k">aws_acm_certificate_validation</span><span class="p">.</span><span class="k">cert</span><span class="p">.</span><span class="k">certificate_arn</span><span class="c1">
-</span></span></span><span class="line"><span class="cl"><span class="c1">    # 直接 aws_acm_certificate.cert.arn を参照すると ISSUED 前に作成が走る
-</span></span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre><p>下流のCloudFrontは<code>aws_acm_certificate.cert.arn</code>ではなく、<code>aws_acm_certificate_validation.cert.certificate_arn</code>を参照する。<code>aws_acm_certificate_validation</code>が「ISSUEDになるまでブロックする」という役割を担っている。</p>
-<p>ただ、この<code>aws_acm_certificate_validation</code>という設計には少し違和感がある。</p>
-<ul>
-<li>AWS側に対応する実リソースが無い。<code>aws_acm_certificate_validation</code>という名前のものがAWSに作られるわけではなく、実体は「証明書がISSUEDになるまで待つ」という処理でしかない。「リソース」と書いてあるのに実体がないので、初見だと何をしているリソースなのか分かりにくい</li>
-<li>同じパターンが他のサービスでも繰り返される。RDSの<code>available</code>待ち、EC2の<code>running</code>待ち、Lambdaの<code>Active</code>待ち、など、各providerに似たような「待ち合わせ専用リソース」が並ぶことになる</li>
-</ul>
-<p>これは<code>aws_acm_certificate_validation</code>に限った話ではなく、Terraformでは「実体のない繋ぎ・待ち合わせ用のリソース」というパターンが広く使われている。<code>time_sleep</code>（指定秒数待つ）、<code>null_resource</code>、<code>terraform_data</code>あたりが代表例で、いずれもAWS等に対応する実体は無く、依存関係のエッジを足したり処理をフックしたりするためだけに「リソース」の形を借りている。</p>
-<p>これ自体は実害があるというより、使う側として「これは何のリソースなんだろう」と一瞬考えさせられる、という類の引っかかり。Terraformのリソースモデルが表現力豊かなので、本来リソースでないものまでリソースの形で書けてしまう、とも言える。</p>
-<p>Carinaでも同じく専用リソース (<code>aws.acm.CertificateValidation</code>) を足す手もあったけど、実体のない待ち合わせ処理をリソースとして表現するのは、やはり違和感がある。Terraformと同じ妥協を後発のCarinaでわざわざ持ち込まなくてもいいのでは、と考えて、「待ち合わせ」をDSLの第一級構文として導入することにした。設計の詳細は<a href="https://github.com/carina-rs/carina/blob/main/notes/specs/2026-05-09-wait-construct-design.md">notes/specs/2026-05-09-wait-construct-design.md</a>に書いてある。</p>
-<hr />
-<h2>Carinaの<code>wait</code>構文</h2>
-<p>実際の構文はこんな感じ。実際に運用しているACM証明書の定義から抜粋。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="na">cert</span> <span class="o">=</span> <span class="nc">aws.acm.Certificate</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">domain_name</span>       <span class="o">=</span> <span class="nv">domain_name</span>
-</span></span><span class="line"><span class="cl">  <span class="na">validation_method</span> <span class="o">=</span> <span class="nv">dns</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">validation_record</span> <span class="o">=</span> <span class="nc">aws.route53.RecordSet</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">hosted_zone_id</span>   <span class="o">=</span> <span class="nv">zone</span><span class="p">.</span><span class="nv">id</span>
-</span></span><span class="line"><span class="cl">  <span class="na">name</span>             <span class="o">=</span> <span class="nv">cert</span><span class="p">.</span><span class="nv">domain_validation_options</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nv">resource_record</span><span class="p">.</span><span class="nv">name</span>
-</span></span><span class="line"><span class="cl">  <span class="na">type</span>             <span class="o">=</span> <span class="nv">cname</span>
-</span></span><span class="line"><span class="cl">  <span class="na">ttl</span>              <span class="o">=</span> <span class="mi">300</span>
-</span></span><span class="line"><span class="cl">  <span class="na">resource_records</span> <span class="o">=</span> <span class="p">[</span><span class="nv">cert</span><span class="p">.</span><span class="nv">domain_validation_options</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nv">resource_record</span><span class="p">.</span><span class="nv">value</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">let</span> <span class="na">cert_issued</span> <span class="o">=</span> <span class="nv">wait</span> <span class="nv">cert</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">until</span>      <span class="o">=</span> <span class="nv">cert</span><span class="p">.</span><span class="nv">status</span> <span class="o">==</span> <span class="nc">aws.acm.Certificate.Status.issued</span>
-</span></span><span class="line"><span class="cl">  <span class="na">depends_on</span> <span class="o">=</span> <span class="p">[</span><span class="nv">validation_record</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="na">timeout</span>    <span class="o">=</span> <span class="err">75</span><span class="nv">min</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>let &lt;name&gt; = wait &lt;target&gt; { ... }</code>という形で、ターゲットとなるリソースのbinding名 (<code>cert</code>) を<code>wait</code>の直後に置く。ブロックの中には待ち合わせの挙動を指定する属性を書く。</p>
-<ul>
-<li><code>until</code> — <code>read()</code>の結果がこの述語を満たすまで待つ</li>
-<li><code>depends_on</code> — pollを始める前に完了させておきたいbinding。任意。指定しなくても<code>until</code>が満たされるまで待つので最終結果は変わらないが、ACMの場合、検証レコードが作られるまではどう頑張ってもISSUEDにならない。その間pollし続けても無駄だし、<code>timeout</code>のカウントも進んでしまう。検証レコードの作成完了を待ってからpollを始めるよう、<code>depends_on = [validation_record]</code>を指定しておく</li>
-<li><code>timeout</code> — 待ち時間の上限。省略するとリソースのスキーマで宣言されたデフォルトが使われる。ACM Certificateは75分にしてある。これは特に深い根拠があるわけではなく、Terraformの<code>aws_acm_certificate_validation</code>のデフォルトタイムアウトが75分なので、それに揃えただけ</li>
-</ul>
-<p>下流のCloudFrontは<code>cert.certificate_arn</code>ではなく<code>cert_issued.certificate_arn</code>を参照する。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">let</span> <span class="na">distribution</span> <span class="o">=</span> <span class="nc">awscc.cloudfront.Distribution</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="na">distribution_config</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c"># ...</span>
-</span></span><span class="line"><span class="cl">    <span class="na">viewer_certificate</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="na">acm_certificate_arn</span>      <span class="o">=</span> <span class="nv">cert_issued</span><span class="p">.</span><span class="nv">certificate_arn</span>
-</span></span><span class="line"><span class="cl">      <span class="na">ssl_support_method</span>       <span class="o">=</span> <span class="nv">sni_only</span>
-</span></span><span class="line"><span class="cl">      <span class="na">minimum_protocol_version</span> <span class="o">=</span> <span class="nv">tlsv1_2_2021</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>cert_issued</code>は値としては<code>cert</code>のpassthroughで、<code>cert_issued.certificate_arn</code>は<code>cert.certificate_arn</code>と同じ文字列を返す。違うのは依存関係のエッジだけで、<code>cert_issued</code>を参照したリソースは「<code>cert</code>が<code>ISSUED</code>になるまでブロックされる」という同期契約を継承する。</p>
-<hr />
-<h2>providerには手を入れない</h2>
-<p><code>wait</code>の実装はすべてcarina-core側（executor）で行う。providerには手を入れていない。</p>
-<p>executorは<code>wait</code>エフェクトを以下の手順で処理する。</p>
-<ol>
-<li><code>depends_on</code>に指定されたエフェクト（ターゲットの<code>Create</code>/<code>Update</code>、ユーザー指定の追加依存）が完了するまで待つ</li>
-<li><code>provider.read(target_id, ...)</code>を呼ぶ</li>
-<li>返ってきた<code>State.attributes</code>に対して<code>until</code>述語を評価する</li>
-<li>真なら成功。そのときの<code>State</code>スナップショットを下流参照用にキャプチャする</li>
-<li>偽なら、経過時間が<code>timeout</code>を超えていればタイムアウトエラー、超えていなければ<code>interval</code>だけ<code>sleep</code>して2に戻る</li>
-</ol>
-<p>providerに対して呼ばれるのは普通の<code>read()</code>だけで、provider側は<code>wait</code>の存在を知らない。Terraformのように待ち合わせ専用のリソースをproviderごとに実装しなくても、どのproviderのどのリソースでも<code>wait</code>できる、というのが地味にうれしいポイント。</p>
-<hr />
-<h2>まとめ</h2>
-<p>Terraformの<code>aws_acm_certificate_validation</code>とCarinaの<code>wait</code>の違いを並べるとこんな感じ。</p>
-<table>
-<thead>
-<tr>
-<th>Terraformの<code>aws_acm_certificate_validation</code></th>
-<th>Carinaの<code>wait</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>providerごとに専用リソース (<code>~Validation</code>、<code>~Ready</code> など) を足す必要がある</td>
-<td>DSLの第一級構文。どのproviderのどのリソースにも使える</td>
-</tr>
-<tr>
-<td><code>aws_acm_certificate_validation</code>の作成処理が同期するため、providerの責務にwait処理が入る</td>
-<td>wait処理はexecutor側にあり、providerはwaitしない</td>
-</tr>
-</tbody>
-</table>
-<p>ACM以外にも、EC2の<code>running</code>待ち、RDSの<code>available</code>待ち、Lambdaの<code>Active</code>待ち、など同じパターンが他のサービスでも使える。</p>
 
 ]]></content>
     </entry>
