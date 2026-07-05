@@ -3,12 +3,67 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-04T19:00:00+09:00</updated>
+    <updated>2026-07-05T19:00:00+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peitho発表者ツールのタイマー詳細]]></title>
+        <link href="https://mizzy.org/blog/2026/07/05/1/"/>
+        <updated>2026-07-05T19:00:00+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/05/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/07/04/1/">前回の記事</a>で自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の発表者ツールを紹介した。スライドとスピーカーノートが並んで、タイマーやアジェンダも出る、というよくある構成のやつ。</p>
+<p><img src="/images/2026/07/peitho-timer-presenter-full.png" alt="Peithoの発表者ツール" /></p>
+<p>前回の記事ではひと通りのパーツを軽く紹介する形にしたけど、発表者ツールをつくるにあたって一番手をかけたのがタイマーまわりなので、今回はタイマーだけに絞って書く。</p>
+<p>そもそもPeithoをつくりはじめた理由のひとつが、これまで使ってきたプレゼンツールで、タイマーが使いやすいと思ったことが一度もなかったから。経過時間は出るけど残り時間が出ない、逆に残り時間しか出ない、超過してるのかどうかが色や表示ではっきりわからない、発表のペース（スライドの進み具合と時間の進み具合のバランス）が視覚的に見えない、みたいな不満がずっとあった。</p>
+<p>発表中はスクリーンが後方にあることが多いので、そちらを見ると聴衆から顔を背ける形になってしまうし、あまり見ないようにしたい。なので手元の発表者ツールに、今どのスライドで、何分経っていて、あと何分残っていて、ペースは間に合っているのか、といった発表中に把握しておきたい情報がすべて載っているようにしたい。</p>
+<hr />
+<h2>経過・計画・超過の表示</h2>
+<p><img src="/images/2026/07/peitho-timer-running.png" alt="タイマー" /></p>
+<p>タイマーには経過時間、計画時間、超過時間を並べて出している。</p>
+<p>発表の予定時間はデッキのfrontmatterに書く。<code>time: 5m</code>のような書き方で、<code>90s</code>や<code>1h30m</code>のように秒や時分の表記も使える。この値がタイマーの計画時間になる。</p>
+<p>経過時間は大きく出る。ここが一番よく見る数字。その横に計画時間が「<code>/ MM:SS</code>」の形で小さく出るので、経過と計画を並べて見比べれば、あとどれくらい残っているかがすぐわかる。予定時間を超えると、超過時間が<code>+MM:SS</code>のように追加で出る。</p>
+<p><img src="/images/2026/07/peitho-timer-overrun.png" alt="超過時間が出ているタイマー" /></p>
+<hr />
+<h2>残り時間で色が変わるタイマー</h2>
+<p>タイマーは残り時間に応じて色が変わる。</p>
+<ul>
+<li>残り3分まで: 白</li>
+<li>残り3分〜1分: オレンジ</li>
+<li>残り1分以下: 赤</li>
+<li>超過中: 赤（<code>+MM:SS</code>が併記される）</li>
+</ul>
+<p>残り1分と超過は同じ赤なので、色だけでは区別がつかない。ただ超過中は<code>+MM:SS</code>が併記されるので、そこを見れば「まだ残ってる赤」なのか「すでに押してる赤」なのかは判別できる。また、次に説明するトラッカーの色でも判別できる。</p>
+<p><img src="/images/2026/07/peitho-timer-states.png" alt="残り時間ごとのタイマーの色" /></p>
+<hr />
+<h2>かめ🐢とうさぎ🐰のトラッカー</h2>
+<p>タイマーの下に細長い帯が伸びていて、そこにかめ🐢とうさぎ🐰が並んで動く。</p>
+<p><img src="/images/2026/07/peitho-timer-tracker.png" alt="トラッカー" /></p>
+<p>かめは経過時間を、うさぎはスライドの進捗を表している。うさぎがかめより前に出ていれば「スライドの方が時間より進んでいる」ということで余裕あり、かめに追い越されていれば「時間の方がスライドより進んでいる」ということで遅れ気味、というのがひと目でわかる。</p>
+<p>この形態のトラッカーはおそらく<a href="https://rabbit-shocker.org/ja/">Rabbit</a>発祥で、他のプレゼンツールでも見かけることがある（かめとうさぎが別のキャラクターになっているものもある）。自分もGoogle SlidesとChrome拡張を組み合わせて使ってみたことがある。ただ、これらはメインスクリーンの方に表示されるので、発表者ツールを見てもペースがわからない、メインスクリーンの方を振り返らないと確認できない、というのが不満だった。なのでPeithoでは発表者ツール側にトラッカーを置いている。</p>
+<p>タイマーの数字とスライド番号を頭の中で突き合わせて「今のペースで大丈夫か」を計算する、というのを発表中にやりたくない。かめとうさぎの位置関係だけでそれが読み取れる。</p>
+<p>そして超過するとトラッカーの色が変わる。前のセクションで書いたタイマーの赤（残り1分と超過が同じ赤）を、トラッカーの色の変化と合わせて見ることで「すでに押している」がはっきりわかるようになっている。</p>
+<p><img src="/images/2026/07/peitho-timer-tracker-overrun.png" alt="超過時のトラッカー" /></p>
+<hr />
+<h2>超過したセクションが赤くなるアジェンダ</h2>
+<p>前回の記事でも触れたセクション別の時間を並べたアジェンダ。ここでも超過を色で表現している。</p>
+<p><img src="/images/2026/07/peitho-timer-agenda-overrun.png" alt="超過中のセクションが赤くなっているアジェンダ" /></p>
+<p>トラッカーは全体としてペースが遅れているか進んでいるかしかわからない。デッキ全体をセクションで区切ってセクションごとの遅れ・進み具合を判別できるようにしたのがこのアジェンダで、トラッカーを補完する位置付けになっている。</p>
+<p>各セクションには計画時間・実績時間・その差分が並んでいて、実績が計画を超えたら行が赤くなる。終わったセクションだけでなく、発表中のセクションも計画時間を超えた瞬間から赤くなるので、進行中にオーバーしていることがその場でわかる。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="/blog/2026/07/04/1/">前回の記事: Peithoの発表者ツールをつくっている</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peithoの発表者ツールをつくっている]]></title>
@@ -600,40 +655,6 @@ Total: 311 tensors
 </span></span><span class="line"><span class="cl">iris --list-themes  <span class="c1"># 利用可能なテーマ一覧</span>
 </span></span></code></pre><p>Argusを使っていて、同じようにgit diff等でもシンタックスハイライトされるといいな、と思ってつくった。こちらも既成ツールはあるけど、どれも見た目がリッチすぎてごちゃついて見えるので、gitの出力そのままにシンタックスハイライトするだけのシンプルなものが欲しくてつくった。</p>
 <p>名前はギリシャ神話の虹の女神アイリス（Iris）から。虹の多色性がシンタックスハイライトとかかっているし、irisには眼の虹彩という意味もあるので、色と「見る」の両方に二重にかかっている。百の目を持つArgusと並べると、どちらも「見る／目」のモチーフが揃うのも気に入っている。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[ホテルメモサイトをAstroで作り直した]]></title>
-        <link href="https://mizzy.org/blog/2026/06/16/1/"/>
-        <updated>2026-06-16T12:24:46+09:00</updated>
-        <id>https://mizzy.org/blog/2026/06/16/1/</id>
-        <content type="html"><![CDATA[
-<p>去年の8月に<a href="/blog/2025/08/30/1/">ObsidianとQuartz 4でつくる雑なメモサイト</a>というエントリを書いて、<a href="https://hotel-memo.github.io/">ホテルメモ</a>というサイトをObsidian + Quartz 4で運用していたのだけど、これをAstroで作り直した。リポジトリは元と同じ<a href="https://github.com/hotel-memo/hotel-memo.github.io">hotel-memo/hotel-memo.github.io</a>で、サイトのURLも<a href="https://hotel-memo.github.io/">https://hotel-memo.github.io/</a>のまま。</p>
-<p>ビフォーアフターはこんな感じ。</p>
-<p><em>Before（Quartz 4）</em><br />
-<img src="/images/2026/06/hotel-memo-quartz.png" alt="Quartz 4で作っていた頃のホテルメモ" /></p>
-<p><em>After（Astro）</em><br />
-<img src="/images/2026/06/hotel-memo-astro.png" alt="Astroで作り直したホテルメモ" /></p>
-<hr />
-<h2>作り直した動機</h2>
-<p>ひとつめは、見た目の話。元々Obsidianでメモしていたものをそのまま公開したかったので、Obsidian Publishのクローン的な位置付けのQuartzを選んだ、という流れだった。ただ、別に見た目までObsidian Publishに寄せたかったわけではなくて、特に右サイドのグラフビューは自分のユースケース的に不要なのに、画面の幅をそれなりに占有していてうっとうしかった。コンフィグでいじれる範囲に限界があって、踏み込もうとするとQuartzのコードに手を入れることになりそうで、upstreamと乖離していくのが懸念だった。</p>
-<p>もうひとつは、Obsidianを使う必然性が無くなったこと。最初にこの仕組みを作ったときはメモを自分でObsidianに書いていたので、Obsidian → Markdown → Quartzという流れに意味があった。でも今はメモの中身も生成AIに書いてもらうことが多くて、AIが書いたMarkdownを最終的にGitHubのリポジトリに置ければそれでいい、という状態になっている。Obsidianを経由する必要が無い。</p>
-<p>それなら、ビルドはもっと素直な静的サイトジェネレータでやって、デザインやレイアウトも自分で決められる方が気持ちいい。ということでAstroで書き直すことにした。</p>
-<hr />
-<h2>ビジュアルデザインはClaude Designにやってもらった</h2>
-<p>雑なメモサイトとはいえ、見た目がそれっぽくないとモチベーションも上がらないので、ビジュアルデザインは<a href="https://www.anthropic.com/news/claude-design-anthropic-labs">Claude Design</a>にやってもらった。</p>
-<p>まず最初にClaude CodeにAstroで雑に作ってもらい、Claude Designには「ホテルのワークチェアについてのメモサイトを作りたい」みたいな感じで方向性を伝えつつ、Claude Codeが生成したファイルを渡すと、いくつかデザインのパターンを出してくれる。そこから気に入ったものを選んで、何度かやり取りして方向性を固めていった。</p>
-<p>そこからはページ種別ごとに繰り返し作業で、トップページ、地域別ページ、ホテルブランドページ、ホテルページ、部屋ページといった単位でClaude Designにコンテンツやデザインファイルを読み込ませつつデザインを提案してもらい、Claude Code向けの実装指示書を作ってもらって、それをClaude Codeに渡して実装する、という流れ。自分がやり方を知らないだけかもしれないけど、ローカルファイルを直接編集することはできないようなので、「ここを直したい」となるたびにClaude Designで作成した指示書をClaude Codeに渡し直す必要があって、そこは少し面倒だった。</p>
-<hr />
-<p>参考：</p>
-<ul>
-<li><a href="https://hotel-memo.github.io/">ホテルメモ</a></li>
-<li><a href="https://github.com/hotel-memo/hotel-memo.github.io">hotel-memo/hotel-memo.github.io</a></li>
-<li><a href="https://astro.build/">Astro</a></li>
-<li><a href="https://www.anthropic.com/news/claude-design-anthropic-labs">Claude Design</a></li>
-</ul>
 
 ]]></content>
     </entry>
