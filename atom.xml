@@ -3,12 +3,57 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-05T19:00:00+09:00</updated>
+    <updated>2026-07-05T21:00:00+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peithoでカスタムシンタックスハイライトができるようにした]]></title>
+        <link href="https://mizzy.org/blog/2026/07/05/2/"/>
+        <updated>2026-07-05T21:00:00+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/05/2/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話をここ数日続けて書いているけど、今日もうひとつ機能を入れたのでその話。デッキと同じディレクトリに<code>syntaxes/</code>を置くと、そこに入れた<code>.sublime-syntax</code>ファイルをシンタックスハイライトに使ってくれる、という機能。</p>
+<p>Peithoが使っている<a href="https://github.com/trishume/syntect">syntect</a>のデフォルトのシンタックスセットには、当然マイナーな言語や独自DSLは入っていない。Peithoは言語タグの付いたコードブロックのハイライトに未知の言語が指定されるとビルドエラーにする（黙って何もハイライトしないよりは気づけたほうがいい、という方針）ので、この機能が無いとそういう言語のコードブロックはタグなしで書くしかなくて、当然色は付かない。</p>
+<hr />
+<h2>syntaxes/を置くだけ</h2>
+<p>やることはシンプルで、デッキファイルと同じディレクトリに<code>syntaxes/</code>ディレクトリを置いて、そこに<code>*.sublime-syntax</code>ファイルを入れておくだけ。</p>
+<pre><code>deck.md
+syntaxes/
+  crn.sublime-syntax
+layouts/
+css/
+</code></pre>
+<p>Peithoはビルド時にこのディレクトリを自動で見にいって、中の<code>.sublime-syntax</code>ファイルを組み込みのシンタックスセットに追加する。あとはコードブロックに<code>crn</code>と書けば普通にハイライトされる（言語タグは<code>.sublime-syntax</code>の中で宣言する<code>name</code>や<code>file_extensions</code>で決まる）。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="s">```crn
+</span></span></span><span class="line"><span class="cl"><span class="nv">resource</span> <span class="s2">&#34;aws_s3_bucket&#34;</span> <span class="s2">&#34;example&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="na">bucket</span> <span class="o">=</span> <span class="s2">&#34;my-bucket&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="s">```</span>
+</span></span></code></pre><p>CLIフラグは足していない。Peithoは<code>layouts/</code>や<code>css/</code>もデッキと同じディレクトリにあれば自動で拾う規約になっていて、それと同じ形にした。</p>
+<p>実際にこの機能を使って<a href="https://decks.gosu.ke/carina/">Carinaを紹介するデッキ</a>をビルドしてみたのがこちら。<code>.crn</code>のブロックにちゃんと色が付いている。</p>
+<p><img src="/images/2026/07/peitho-custom-syntax-crn.png" alt="Peithoでハイライトされた.crnコードブロック" /></p>
+<p><code>.sublime-syntax</code>はYAMLで書ける形式で、既存の言語であればGitHubを漁ればだいたい誰かが書いたものが見つかる（syntectはそれをそのまま読める）。独自DSLだったら自分で書くことになるけど、普通のYAMLファイル1枚で済む。</p>
+<p>CSSも基本的には追加不要。Peithoはsyntectのscope名（<code>keyword</code>、<code>string</code>、<code>comment</code>、<code>storage</code>等）をそのまま<code>hl-*</code>クラスに変換して吐いていて、デフォルトテーマがその基本scopeに色を当てている。<code>.sublime-syntax</code>側で標準的なscope名を使っていれば、そのまま色が付く。</p>
+<hr />
+<h2>壊れたファイルは黙って落とさない</h2>
+<p><code>.sublime-syntax</code>ファイルの読み込みでミスがあったとき（YAMLがパースできない、必須フィールドが無い等）は、行番号つきのビルドエラーにするようにした。</p>
+<p><code>SyntaxSetBuilder::add_from_folder</code>は素直に使うと壊れたファイルを黙って読み飛ばすんだけど、それをやってしまうと「シンタックスを追加したはずなのに効いていない」という状況になって、原因の特定に時間がかかる。ここは「黙って何かが起きる」経路を残さない、というPeithoの他の部分と同じ方針にした。ビルドを止めれば、少なくとも書いた本人はその場で気づける。</p>
+<hr />
+<h2>参考</h2>
+<ul>
+<li><a href="https://github.com/mizzy/peitho/pull/122">PR #122</a> — 今回のシンタックスハイライトまわりの変更</li>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+<li><a href="https://github.com/trishume/syntect">syntect</a> — Rust製のシンタックスハイライタ。ArgusやIrisと同じものを使っている</li>
+<li><a href="https://www.sublimetext.com/docs/syntax.html">Sublime Text: Syntax Definitions</a> — <code>.sublime-syntax</code>の書き方</li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peitho発表者ツールのタイマー詳細]]></title>
@@ -616,45 +661,6 @@ model.layers.0.input_layernorm.weight  BF16          [2048]  622329856..62233395
 Total: 311 tensors
 </code></pre>
 <p>テンソルの名前、dtype、shape、データのオフセット範囲が一覧で確認できる。311個のテンソルが含まれていることがわかる。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[最近つくっているOSS 3つ - Pyxis / Argus / Iris]]></title>
-        <link href="https://mizzy.org/blog/2026/06/23/1/"/>
-        <updated>2026-06-23T21:03:56+09:00</updated>
-        <id>https://mizzy.org/blog/2026/06/23/1/</id>
-        <content type="html"><![CDATA[
-<p>最近つくっているOSSをまとめて紹介しておく。</p>
-<hr />
-<h2>Pyxis</h2>
-<p><a href="https://github.com/mizzy/pyxis">Pyxis</a>はLLM推論エンジン。<a href="https://github.com/huggingface/candle">candle</a>も<a href="https://github.com/ggml-org/llama.cpp">llama.cpp</a>も使わずに、トランスフォーマーのパイプライン全体（アテンション、KVキャッシュ、RoPE、サンプリング）を自前実装する、というプロジェクト。</p>
-<p>つくりはじめたきっかけは、<a href="https://connpass.com/event/395614/">コーディングのためのローカルLLM勉強会 in 福岡</a>に参加して、<a href="https://x.com/monochromegane">@monochromegane</a>さんと<a href="https://x.com/kis">@kis</a>さんと懇親会で話したこと。Carinaのplan表示をわかりやすくしたいという話を@monochromeganeさんとしていたら、生成AIに解説させるというアプローチを提案してもらった。その場ではGitHub ActionsでAIを呼び出す方向で考えていたけど、Carina自体に機能を持たせればいいんじゃないかと思った。また、@kisさんと@monochromeganeさんが推論エンジンについて会話しているのを横で聞いていて「ぜんぜんわからない」と言ったら、@kisさんから「6回実装してみればわかりますよ」と言われた。じゃあ、Carina自体にplan等をAIに解説させる機能を組み込んで、その推論エンジンも自前で実装してしまえ、と思ってつくりはじめた。</p>
-<p>今の状態は、safetensorsのパーサーと、テンソル一覧のテーブル表示あたりが動いている段階。safetensorsファイルからテンソルデータをF32/BF16/F16として読み込む部分も実装中。推論エンジンの仕組みを学習する、という目的もあり、Claude Codeに実装と解説をさせ、ひとつひとつ理解しながらなので、亀の歩みではある。</p>
-<p>名前は羅針盤座（Pyxis）から。<a href="https://github.com/carina-rs/carina">Carina</a>がりゅうこつ座で、どちらも、現在は4つの星座に分割されたアルゴ座（Argo Navis）の一部にあたる星座。CarinaのplanをAIが解説する、つまり羅針盤が船に方向を示す、という対比でつけた。</p>
-<hr />
-<h2>Argus</h2>
-<p><a href="https://github.com/mizzy/argus">Argus</a>はシンタックスハイライトとgit diff表示を備えたページャー。</p>
-<p><img src="/images/2026/06/argus-screenshot.png" alt="Argusのスクリーンショット" /></p>
-<p>ファイルを指定して開くCLIツールで、以下のように使う。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">argus &lt;file&gt;
-</span></span><span class="line"><span class="cl">argus --rev HEAD~1 &lt;file&gt;
-</span></span><span class="line"><span class="cl">argus --rev HEAD~3..HEAD &lt;file&gt;
-</span></span></code></pre><p>未コミットの変更があるファイルを開くと、diff領域が自動的にハイライトされる。<code>--rev</code>を指定すれば、コミット済みの変更をdiffとして表示することもできる。変更のかたまり（チェンジグループ）間を<code>n</code>/<code>N</code>でジャンプできたり、インクリメンタルサーチが使えたりする。また、word-level diffも実装している。</p>
-<p>git diffだと差分周辺しか表示されないけど、それより広い範囲でコードを確認したいことがよくある。そのためにエディタを開いたりlessを使ったりしていたけど、最近コードを書くのはターミナルだけで済んでいるので、そのためにエディタを開くのもだるい。かといってlessはファイルをそのまま表示するだけで、差分が追いにくいし、シンタックスハイライトがないので読みにくい。ターミナルで差分表示するツールは色々あるけれど、どれも自分にはリッチすぎる。シンタックスハイライトと差分表示に対応したページャー程度のものがあればいいな、と思ってつくった。</p>
-<p>名前はギリシャ神話の百の目を持つ巨人アルゴス（Argus）から。コードを隈なく見通すツールとしてしっくりくるし、アルゴス自身がアルゴ船を造った船大工でもあるので、<a href="https://github.com/carina-rs/carina">Carina</a>（アルゴ船の竜骨座）との系譜もきれいにつながる。</p>
-<hr />
-<h2>Iris</h2>
-<p><a href="https://github.com/mizzy/iris">Iris</a>はgitのdiff出力にシンタックスハイライトをかけるツール。</p>
-<p><img src="/images/2026/06/iris-screenshot.png" alt="Irisのスクリーンショット" /><br />
-<code>git config --global core.pager iris</code>と設定すると、すべてのgitサブコマンドのページャーとして使えるようになる。</p>
-<p>stdinからunified diffを読んで、変更されたファイルの拡張子から言語を検出し、シンタックスハイライトをかけた状態で出力する。diffのフォーマット自体（ヘッダー、<code>+</code>/<code>-</code>マーカー、ハンク情報）はそのまま残す。</p>
-<p>シンタックスハイライトには<a href="https://github.com/trishume/syntect">syntect</a>を使っている。カラーテーマは<code>IRIS_THEME</code>環境変数で指定できて、デフォルトは<code>base16-ocean.dark</code>。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">IRIS_THEME</span><span class="o">=</span><span class="s2">&#34;Solarized (dark)&#34;</span>
-</span></span><span class="line"><span class="cl">iris --list-themes  <span class="c1"># 利用可能なテーマ一覧</span>
-</span></span></code></pre><p>Argusを使っていて、同じようにgit diff等でもシンタックスハイライトされるといいな、と思ってつくった。こちらも既成ツールはあるけど、どれも見た目がリッチすぎてごちゃついて見えるので、gitの出力そのままにシンタックスハイライトするだけのシンプルなものが欲しくてつくった。</p>
-<p>名前はギリシャ神話の虹の女神アイリス（Iris）から。虹の多色性がシンタックスハイライトとかかっているし、irisには眼の虹彩という意味もあるので、色と「見る」の両方に二重にかかっている。百の目を持つArgusと並べると、どちらも「見る／目」のモチーフが揃うのも気に入っている。</p>
 
 ]]></content>
     </entry>
