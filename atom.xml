@@ -3,12 +3,101 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-05T21:00:00+09:00</updated>
+    <updated>2026-07-07T20:16:02+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[PeithoにPDFエクスポート機能を入れた]]></title>
+        <link href="https://mizzy.org/blog/2026/07/07/1/"/>
+        <updated>2026-07-07T20:16:02+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/07/1/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話がここのところ続いているけど、今日はPDFエクスポート機能について。<code>peitho export pdf deck.md -o out.pdf</code>でデッキをPDFに書き出せるようにした。</p>
+<hr />
+<h2>ヘッドレスChromeに印刷させる</h2>
+<p>PDFの生成はヘッドレスChromeにやらせている。<code>peitho build</code>と同じパイプライン（parse → map → check → render）でデッキをレンダリングしたあと、PDF用のエントリHTML（pdf.html）を一時ディレクトリに書き出して、そこにChromeを<code>--print-to-pdf</code>で向ける、という流れ。</p>
+<pre><code>$CHROME --headless=new \
+        --disable-gpu \
+        --no-sandbox \
+        --no-pdf-header-footer \
+        --virtual-time-budget=10000 \
+        --user-data-dir=&lt;tmp&gt;/chrome-profile \
+        --print-to-pdf=&lt;out&gt; \
+        file://&lt;tmp&gt;/pdf.html
+</code></pre>
+<p>PeithoのスライドはそもそもHTML/CSSでブラウザ描画前提でつくっているので、ブラウザにそのまま描画させて印刷させるのが素直だった。</p>
+<hr />
+<h2>PDF専用のエントリHTML</h2>
+<p>PDF用には<code>pdf.html</code>という専用のエントリHTMLを生成している。通常の<code>peitho build</code>の出力と並べるとこんな構成。</p>
+<pre><code># peitho build の出力
+index.html      # ビューワのガワ。スライド本体は入っていない
+manifest.json   # スライド一覧などのメタデータ
+slides/         # スライド1枚ごとのHTML断片
+peitho.css
+assets/
+fonts/
+
+# peitho export pdf が一時ディレクトリに書き出すもの
+pdf.html        # 全スライドのHTMLをインラインで抱えた静的な1枚もの
+peitho.css
+assets/
+fonts/
+</code></pre>
+<p><code>peitho.css</code>（テーマCSS）、<code>assets/</code>（画像）、<code>fonts/</code>は両者共通で、同じコードでコピーしている。違うのはエントリHTMLまわり。</p>
+<p>buildの<code>index.html</code>は中身が空のビューワで、開くとJavaScriptが<code>manifest.json</code>と<code>slides/*.html</code>をfetchして、1枚ずつcanvasに表示し、キー操作でページを送る。fetchするのでHTTPで配信する前提のつくり。</p>
+<p><code>pdf.html</code>はその逆で、全スライドのHTMLを最初から埋め込んであって、fetchもmanifestも無い。なので<code>file://</code>でそのまま開けて、ローカルサーバーを立てる必要もない。</p>
+<p>そして1スライドが1PDFページになるように、<code>@page</code>でページサイズをスライドと同じアスペクト比にして、スライドごとに<code>page-break-after: always</code>で改ページを入れている。Chromeはこれをそのまま印刷するだけ。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">@page {
+</span></span><span class="line"><span class="cl">  size: 1920px 1080px;
+</span></span><span class="line"><span class="cl">  margin: 0;
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">.peitho-slide-wrap {
+</span></span><span class="line"><span class="cl">  page-break-after: always;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre><hr />
+<p>基本的な仕組みはここまで。素直に<code>--print-to-pdf</code>を叩けば出力自体は得られるんだけど、実際に出てきたPDFを使おうとするといろいろな問題を踏んだ。ここからは、こういう問題が出たのでこういう対応をした、という話を順番に。</p>
+<hr />
+<h2>グラデーションでPreview.appが重くなる</h2>
+<p>まず、exportしたPDFをmacOSのPreview.appで開くと、やたら重い。同じPDFをChromeで開くと何ともないので、PDF自体が壊れているわけではない。</p>
+<p>ChromeのPDF生成はSkia（Chromeの2D描画ライブラリ）が担っている。画面に表示するときは、レイアウト計算の結果から「ここに矩形を塗る」「ここにテキストを描く」といった描画命令の列が作られて、Skiaがそれをピクセルに変換する。PDF出力のときも描画命令を作るところまでは同じで、最後だけSkiaの<code>SkPDF</code>バックエンドがピクセルではなくPDFの描画命令に変換してファイルに書き出す。</p>
+<p>ピクセル化せずPDFの命令として出すということは、その命令をPDF viewer側が解釈することになる。CSSのgradientはPDFのShading Patternとして埋め込まれて、仕様上は正しいPDFなんだけど、Preview.appはこのShading Patternの評価が異様に遅い。</p>
+<p>なので、印刷経路に入る直前にin-pageスクリプトでgradientを画像に事前ラスタ化して、SkPDFがShading Patternを使わない経路に落ちるようにした（<a href="https://github.com/mizzy/peitho/pull/144">PR #144</a>）。</p>
+<hr />
+<h2>box-shadowが黒い矩形になる</h2>
+<p>次に、<code>box-shadow</code>を使っているところが、Preview.appで黒い矩形になって表示される。これもChromeで開けば普通に影として描画される。</p>
+<p>SkPDFは<code>box-shadow</code>を「黒いべた塗り + 透明度の分布を持つSoft Mask（<code>/S /Luminosity</code>）」の組み合わせとして吐く。これも仕様上は正しいんだけど、Quartz（macOSの描画エンジン）がこのSMaskの合成に失敗する。本来は縁に向かって透明になっていくぼかしとして描かれるはずの影が、ぼかしの情報を持つSMaskが効かないまま下地だけ描画された結果、不透明の黒いべた塗りの長方形として出てしまう。Luminosity SMaskはPDFの正式な仕様なので、これは仕様通りのPDFを描画できていないQuartz側のバグと言っていいと思う。とはいえQuartzを直すわけにはいかないので、PDFを吐く側で回避するしかない。</p>
+<p>これもgradientと同じ形で、印刷時に<code>box-shadow</code>を事前ラスタ化してSMaskを使わない経路に落とした（<a href="https://github.com/mizzy/peitho/pull/153">PR #153</a>）。</p>
+<p>ここで得た学びは、同じPDFでも開くviewerによって見え方が変わる、ということ。PDFは画像のようにピクセルが固定されたものではなく、viewerが命令を解釈して描画するものなので、viewerの実装差がそのまま見た目の差になる。なのでexportしたPDFをChromeで開いて確認できても安心はできなくて、配布先で使われそうなviewer、特にPreview.appでも開いて確認する必要がある。</p>
+<hr />
+<h2>ラスタ化がLinuxでは効いていなかった</h2>
+<p>さらに厄介だったのが、この<code>box-shadow</code>のラスタ化がmacOSでは効いているのにLinuxでは効いていない、という現象。手元のmacOSではPreview.appで黒矩形が消えているのに、CI（Linux）で生成したPDFにはまだ黒矩形が出ていた。</p>
+<p>原因はラスタ化スクリプトの待ち方にあった。この処理は、影を画像に変換して、元の影と差し替える、というもの。画像への変換自体はLinuxでも正常に完了していて、画像データはできていた。ただ、差し替える前に「画像が描画に使える状態になったか」を<code>image.decode()</code>というAPIで確認していて、これがLinuxのヘッドレスChromeでは完了もせずエラーにもならず、黙って止まる。画像はできているのに完了報告だけが来ない状態で、エラーにならないので<code>catch</code>でも拾えず、最後の差し替えが実行されない。</p>
+<p>そしてChromeの<code>--print-to-pdf</code>は、ページの処理が一定時間で終わらなければ、その時点の状態のまま印刷する、という挙動をする。なのでスクリプトが止まったままタイムアウトして、影がラスタ化されていないPDFが、何のエラーも出さずに吐かれていた。macOSでは<code>image.decode()</code>が正常に完了するので、この問題はLinuxでexportしたときにだけ起きる。</p>
+<p>修正としては、ハングするのはChromium側の挙動でこちらからは直せないので、<code>image.decode()</code>に依存するのをやめて、画像のloadイベントを待つ形に変えた（<a href="https://github.com/mizzy/peitho/pull/157">PR #157</a>）。loadイベントはLinuxでも正常に発火するし、印刷に使う画像の準備確認としてはこれで十分だった。あわせて、それまでLinux CIで一度も走っていなかったChrome実行E2Eをちゃんと動かすようにジョブを追加した。「無音でスキップされる」経路を残すと、こういう環境差のバグが検出されないままリリースされてしまう。</p>
+<hr />
+<h2>exportする環境によってフォントが変わってしまう</h2>
+<p>もうひとつハマったのがフォント。手元のmacOSでexportしたPDFは日本語がちゃんと出るのに、Linux CIでexportしたPDFは中華フォント（WenQuanYi Zen Hei）や欧文フォント（DejaVu Sans）にfallbackしていて、見た目が全然違うものになる、という現象。</p>
+<p>Chromeは<code>--print-to-pdf</code>のときにシステムに入っているフォントを埋め込む挙動なので、そもそもホストにフォントが無いとfallbackが走る。macOSにはヒラギノや游ゴシックが入っているけどLinux CIには入っていない、というただそれだけの環境差で、同じデッキから別物のPDFが出てしまう。</p>
+<p>対処として、frontmatterに<code>fonts:</code>キーを足して、デッキと一緒にフォントファイル自体を持ち運ぶようにした（<a href="https://github.com/mizzy/peitho/pull/160">PR #160</a>）。デッキと同じディレクトリに<code>fonts/</code>があれば自動で拾うし、明示的にパスを指定してもいい。ファイル単体でもディレクトリでも受ける（<code>@fontsource/inter/</code>のようなネスト構造もOK）。<code>peitho build</code>はもちろん、<code>peitho export pdf</code>の一時ディレクトリにも、発表用キャッシュにもコピーされるので、ホスト環境に依存せずサイト/PDF/発表者ツールで同じフォントで描画される。</p>
+<p>使う側は、デッキ用のCSSに<code>@font-face { src: url(&quot;fonts/NotoSansJP.woff2&quot;) }</code>のように書くだけ。出力先では<code>peitho.css</code>と<code>fonts/</code>が同じディレクトリに並ぶので、この相対パスがそのまま解決される。</p>
+<hr />
+<h2>参考</h2>
+<ul>
+<li><a href="https://github.com/mizzy/peitho/pull/139">PR #139</a> — PDFエクスポート本体</li>
+<li><a href="https://github.com/mizzy/peitho/pull/144">PR #144</a> — グラデーションのラスタ化</li>
+<li><a href="https://github.com/mizzy/peitho/pull/153">PR #153</a> — box-shadowのラスタ化</li>
+<li><a href="https://github.com/mizzy/peitho/pull/157">PR #157</a> — Linuxでの<code>image.decode()</code>ハング修正とLinux CI E2E追加</li>
+<li><a href="https://github.com/mizzy/peitho/pull/160">PR #160</a> — <code>fonts:</code>キーの追加でホスト環境非依存に</li>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peithoでカスタムシンタックスハイライトができるようにした]]></title>
@@ -555,112 +644,6 @@ css/
 <p>この時点ではすべてのテンソルをf32に変換して読み込んでいる。Rustの標準ライブラリにはBF16の型がなく、F16の型（<code>f16</code>）もnightly限定の実験的APIでstableでは使えない。<code>half</code>クレートがBF16/F16の型と算術演算を提供しているが、<a href="https://github.com/starkat99/half-rs/blob/main/src/bfloat.rs">演算の実装</a>はf32に変換してから計算してBF16/F16に戻す、というもの。最初からf32で持てばRustのプリミティブ型の演算がそのまま使えて、変換の往復が不要になる。メモリ効率の面ではBF16のまま持って計算時にf32に変換する方が有利だけど、まずは動くものを作るのが優先なので、ここはシンプルな方を選んだ（後のPRでBF16のまま持つ最適化を入れている）。</p>
 <hr />
 <p>これで、safetensorsファイルからテンソルの数値データをf32として取り出せるようになった。次回はこのデータを使って、トークンIDからベクトルを引くembeddingテーブルルックアップの実装について書く。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Pyxisの開発: safetensorsパーサー実装]]></title>
-        <link href="https://mizzy.org/blog/2026/06/30/1/"/>
-        <updated>2026-06-30T14:40:07+09:00</updated>
-        <id>https://mizzy.org/blog/2026/06/30/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/06/23/1/">前回の記事</a>でPyxisを軽く紹介した。LLM推論エンジンを自前実装するプロジェクトで、今回はその最初のステップであるsafetensorsパーサーの実装について書く。</p>
-<hr />
-<h2>safetensorsとは</h2>
-<p>LLMの重みファイルのフォーマットはいくつかあるが、HuggingFaceが策定した<a href="https://github.com/huggingface/safetensors">safetensors</a>が量子化されていないモデルの配布フォーマットとして現在のデファクトになっている。名前の通り、従来のPickleベースのフォーマット（PyTorchの<code>.pt</code>ファイル）に比べて安全で、任意コードの実行ができない。</p>
-<p>バイナリフォーマットの構造はシンプルで、こうなっている。</p>
-<pre><code>[ 8 bytes : header size (u64 LE) ]
-[ N bytes : JSON header          ]
-[ tensor data                    ]
-</code></pre>
-<p>最初の8バイトにヘッダーのサイズがリトルエンディアンのu64で入っていて、その後ろにそのサイズ分のJSONが続く。JSONの中に各テンソルのメタデータ（名前、dtype、shape、データのオフセット）が入っている。テンソルの実データはJSONの後ろにそのまま並んでいる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;__metadata__&#34;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&#34;format&#34;</span><span class="p">:</span> <span class="s2">&#34;pt&#34;</span><span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nt">&#34;model.embed_tokens.weight&#34;</span><span class="p">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;dtype&#34;</span><span class="p">:</span> <span class="s2">&#34;BF16&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;shape&#34;</span><span class="p">:</span> <span class="p">[</span><span class="mi">151936</span><span class="p">,</span> <span class="mi">2048</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">    <span class="nt">&#34;data_offsets&#34;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">622329856</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre><p><code>dtype</code>はテンソルの要素の数値型。主なものはこんな感じ。</p>
-<table>
-<thead>
-<tr>
-<th>dtype</th>
-<th>ビット数</th>
-<th>説明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>F32</code></td>
-<td>32bit</td>
-<td>単精度浮動小数点。指数部8bit、仮数部23bit。精度が高いが重い</td>
-</tr>
-<tr>
-<td><code>F16</code></td>
-<td>16bit</td>
-<td>半精度浮動小数点。指数部5bit、仮数部10bit</td>
-</tr>
-<tr>
-<td><code>BF16</code></td>
-<td>16bit</td>
-<td>Brain Float 16。Google Brainが考案（現在はGoogle DeepMindに統合）。指数部8bit、仮数部7bit。F32と指数部の幅が同じなので表現できる数値のスケールがF32と同じ（最大値約3.38×10^38、最小値約1.17×10^-38）。精度はF32より低いがスケールを保ったままメモリを半分に抑えられるため、LLMの学習・推論では広く使われる</td>
-</tr>
-<tr>
-<td><code>I8</code></td>
-<td>8bit</td>
-<td>8ビット整数。量子化済みモデルで使われる</td>
-</tr>
-</tbody>
-</table>
-<p>BF16はF32の指数部をそのままに仮数部を23bitから7bitに切り詰めた、いわばF32の軽量版。メモリ使用量はF32の半分になりながら、数値のスケール（桁の範囲）はF32と同じに保てる。LLMの学習では勾配の値が幅広い範囲に散らばるため、スケールを保ったBF16はF32からの置き換えとして相性がよく、最近のモデルはBF16で配布されているものが多い。F16も同じ16bitだが指数部が5bitと狭く、スケールはBF16より大幅に小さい。</p>
-<p><code>shape</code>はテンソルの次元数と各次元のサイズで、たとえば<code>[151936, 2048]</code>なら151936行×2048列の行列を表す。</p>
-<hr />
-<h2>実装</h2>
-<p>パーサー本体はこんな感じ。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">parse_header</span><span class="p">(</span><span class="n">path</span>: <span class="kp">&amp;</span><span class="nc">Path</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="n">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="n">TensorInfo</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span>::<span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">size_buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="k">u8</span><span class="p">;</span><span class="w"> </span><span class="mi">8</span><span class="p">];</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">read_exact</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">size_buf</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">header_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">u64</span>::<span class="n">from_le_bytes</span><span class="p">(</span><span class="n">size_buf</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">header_buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">0</span><span class="k">u8</span><span class="p">;</span><span class="w"> </span><span class="n">header_size</span><span class="p">];</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">read_exact</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">header_buf</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">header_json</span>: <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="n">serde_json</span>::<span class="n">Value</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">serde_json</span>::<span class="n">from_slice</span><span class="p">(</span><span class="o">&amp;</span><span class="n">header_buf</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">tensors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HashMap</span>::<span class="n">new</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">header_json</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&#34;__metadata__&#34;</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">info</span>: <span class="nc">TensorInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">serde_json</span>::<span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">tensors</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nb">Ok</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>ファイルを開いて最初の8バイトを読んでヘッダーサイズを得る、ヘッダーサイズ分のバイトを読んでJSONとしてパースする、<code>__metadata__</code>キーをスキップして各テンソルのメタデータを取り出す、という流れ。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#[derive(Debug, Clone, Deserialize)]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">TensorInfo</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">dtype</span>: <span class="nb">String</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">shape</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">usize</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">data_offsets</span>: <span class="p">[</span><span class="kt">usize</span><span class="p">;</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>実際にQwen3-1.7BのモデルファイルにこのCLIを通してみると、こんな出力が得られる。</p>
-<pre><code>Tensor                                Dtype           Shape               Offsets
----------------------------------------------------------------------------------
-lm_head.weight                         BF16  [151936, 2048]          0..622329856
-model.embed_tokens.weight              BF16  [151936, 2048]          0..622329856
-model.layers.0.input_layernorm.weight  BF16          [2048]  622329856..622333952
-...
-Total: 311 tensors
-</code></pre>
-<p>テンソルの名前、dtype、shape、データのオフセット範囲が一覧で確認できる。311個のテンソルが含まれていることがわかる。</p>
 
 ]]></content>
     </entry>
