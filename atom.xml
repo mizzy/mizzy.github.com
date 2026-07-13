@@ -3,12 +3,105 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-07T20:16:02+09:00</updated>
+    <updated>2026-07-13T20:27:17+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[SRE NEXT 2026に参加してきた]]></title>
+        <link href="https://mizzy.org/blog/2026/07/13/1/"/>
+        <updated>2026-07-13T20:27:17+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/13/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="https://sre-next.dev/2026/">SRE NEXT 2026</a>に参加してきた雑なメモ。セッション聴きたくて行ったというより、人に会いたくて行ったので、セッションレポート的なものではないです。そういったものを期待されている方は、読まずに離れることをおすすめします。本当に雑な個人日記です。</p>
+<h2>前日</h2>
+<p>会場が有明で、日帰りで行ける距離ではあるのだけど、片道ドアツードアで2時間近くかかるし、新宿乗り換えになるので、特に朝のラッシュ時は人が多すぎて大変だし、2日間開催で2日も往復4時間かけるのが嫌だったので、前日から移動してホテルに宿泊した。</p>
+<p>昨年は電車で行ったけど、今年は車で行った。車の運転、嫌いではないのだけど、リスクが高いので避けがち。だけどせっかく車があるのに使わないのももったいないよな、と思って今回は車で。ホテルが提携してる駐車場、Google Mapsで口コミ等見る限りは狭そうだな、と思ったので、空いてるであろう夜に到着して駐車場に停めておくことにした。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">SRE NEXT 前泊 <a href="https://t.co/6bKjVg0XF8">pic.twitter.com/6bKjVg0XF8</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2075187627687563577?ref_src=twsrc%5Etfw">July 9, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>ホテルのフロントでチェックイン手続きをしていると、あいにく満室で、アップグレードのご案内ができないのですが、明日であれば空きがあるのでご案内できます、とのこと。今回は基本的に寝るだけだし、別にアップグレードはなくてもいいんだけどな、部屋移動するのも面倒だし、と思ったけど、せっかくの提案だし、泊まったことのない部屋なので、申し出を受けることにした。</p>
+<h2>1日目</h2>
+<p>ダイヤモンド会員で朝食無料なので、朝食はホテルのラウンジで。ビュッフェ形式はついつい取りすぎてしまうので、意識して抑えめにした。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ラウンジで朝飯。ビュッフェは取りすぎてしまうので抑えめに。 <a href="https://t.co/sQJuoyqO3v">pic.twitter.com/sQJuoyqO3v</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2075349409429324008?ref_src=twsrc%5Etfw">July 9, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>このホテルのラウンジの朝食は、自分好みの牛丼がつくれるのが気に入っている。納豆、キムチ、紅ショウガ、七味唐辛子を乗せた牛丼にした。卵も乗せよう、と思ったら生ではなく茹でだったのは想定外だった。</p>
+<p>満室というだけあって、いつもは（といっても過去2回しか宿泊してないが）朝食時のラウンジは空いているのだけど、この日は混雑してた。</p>
+<p>会場には早めについて、受付を済ませ、名札に名前を書き（名札入れにプレーリーカード入れたら隠れて見えなくなったけど）、会場内で<a href="https://tsunagi.me/">ツナギメエフエム</a>のアカセさんにお会いして、最近色んなところでお会いしますね、などと雑談。そこに<a href="https://x.com/yuuk1t">ゆううきさん</a>が通りかかり、アカセさんとは初対面とのことなので、「大学院の研究室の先輩であるゆううきさんです」とアカセさんに紹介するなどしていた。</p>
+<p>あと、<a href="https://x.com/_y_ohgi">y-ohgi</a>さんにもお会いして、年齢がちょうど20歳違いますね、とか、健康が大事、といった話をした。</p>
+<p>y-ohgiさんはこのポストがきっかけで、2022年からフォローしていたのだけど、実際にお会いしたのは昨年のSRE NEXT 2025が初めてだった気がする。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">非常に近くにIaCやっている方がいるのでリツイートしときます。 <a href="https://t.co/oxE7TBu1IX">https://t.co/oxE7TBu1IX</a></p>&mdash; kikuzokikuzo (@kikuzokikuzo) <a href="https://x.com/kikuzokikuzo/status/1530369930864267266?ref_src=twsrc%5Etfw">May 28, 2022</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>聴講したセッションについても軽く触れておこう。</p>
+<p>まず荒引さんのセッションなんだけど、セッション前に廊下ですれ違って、ご無沙汰してます、とご挨拶して軽く雑談。自分は業務委託で2014年〜2016年の2年間クックパッドで仕事をしていて、その時に荒引さんも在籍していた。といっても、仕事で絡んだ記憶もなく、まともに会話したことも確かないはず（あったらごめんなさい）。なので、自分のことを覚えているかな、と若干不安に思いつつ話しかけたが、覚えてくださっていてうれしかった。そしてそれは荒引さんも同じように思っていたっぽい。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">本日の SRE NEXT の発表資料をアップロードしました！発表後に色んな方とお話しさせていただきましたが、今回の発表がTerraform CI/CD の設定を見直すきっかけになった方もいたようで、大変光栄でした。聴きに来てくださったみなさん、ありがとうございました！ <a href="https://x.com/hashtag/srenext?src=hash&amp;ref_src=twsrc%5Etfw">#srenext</a> <a href="https://t.co/buvBoRvWQT">https://t.co/buvBoRvWQT</a></p>&mdash; Takeshi Arabiki (@a_bicky) <a href="https://x.com/a_bicky/status/2075544888507343019?ref_src=twsrc%5Etfw">July 10, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>雑な感想をXにポストした。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">荒引さんのTerraform権限管理の話、とてもよかった。サービスに求められるセキュリティ要件が厳しいから、というのもあるのだろうけど、すごくしっかりと管理されている。</p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2075452748175495412?ref_src=twsrc%5Etfw">July 10, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>セッション後にも荒引さんにお会いして、とてもよかったです、すごくしっかり管理されてますね、自分は結構雑にやっちゃってます、という話をした。また、セッションでは出なかった話として、applyの権限どうしてますか？難しいですよね、やっぱそうですよね、みたいな会話もした。</p>
+<p>もうひとつ、現在カケハシで業務委託で仕事していることもあって、カケハシの<a href="https://x.com/mmority_1048">森藤さん</a>のBPCに関するセッションを聴講した。森藤さんは別チームで仕事で絡んだこともなく、面識もないのだけど、今後カケハシで仕事をする上で、知っておいた方が良いだろう、と思って。</p>
+<script defer class="speakerdeck-embed" data-id="c9af99de308443c98d2da413100b7aaf" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<p>その後、知り合いを探してスポンサーブースをふらふらしていたら、<a href="https://x.com/kani_b">カルビ生焼け王</a>こと星くんがいたので話しかける。星くん、CISOとかVPoEとかなんとか室長とかなんとか本部長とか、色々な肩書きを持っていて忙しそう。最近技術やれてる？やれてないです、みたいな会話をした。あと、そういえば<a href="https://x.com/sakajunquality">sakajunさん</a>が最近LayerX行ったよね、そうです、それでSREグループマネージャーの肩書き外れました、とか、この後sakajunさんのセッションあるね、とか、そのセッションとの絡みで、転職先の会社で、前に勤めてた会社のツールや文化を持ち込む、みたいなことはよくあるよね、といった会話もした気がする。</p>
+<p>そしてそのまま、sakajunさんのセッションを聴きに行った。</p>
+<script defer class="speakerdeck-embed" data-id="b8a0995cef44450aaf33536e255db017" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<p>星くんと話してた、前の会社のツールや文化、と言ってたのは、sakajunさんのセッションに出てきたService Consoleというやつのことを言っていて、要するにこういうこと。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">hako-console <a href="https://t.co/zylnN4eyJo">https://t.co/zylnN4eyJo</a> が2018年にあったのすごくて (&quot;platform engineering&quot;がない時代) service-consoleの土台になっています <a href="https://x.com/hashtag/srenext?src=hash&amp;ref_src=twsrc%5Etfw">#srenext</a> <a href="https://x.com/hashtag/srenext_c?src=hash&amp;ref_src=twsrc%5Etfw">#srenext_c</a></p>&mdash; いたこ (@itkq) <a href="https://x.com/itkq/status/2075495015284162654?ref_src=twsrc%5Etfw">July 10, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>あと、<a href="https://x.com/hymaaa_k">hymさん</a>、<a href="https://x.com/bells17">bells17</a>さんと、<a href="https://x.com/nwiizo">ニュイゾーさん</a>はレアキャラ、といった会話をした気がする。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">カンファレンスでスリーシェイクの方に会うたびに、今日はニュイゾーさん来てないんですか？って聞くのが習慣になっている</p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2075487443822997684?ref_src=twsrc%5Etfw">July 10, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>で、1日目の閉会式後、Discussion Nightというやつが開催されていたのだけど、それには参加せず、ユナイテッド・シネマ アクアシティお台場にFLEXOUNDの設備があって、これで映画マイケル観たら最高では、と思って観に行くことにした。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">これね <a href="https://t.co/BICS1zH2Cy">https://t.co/BICS1zH2Cy</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2075535355202461701?ref_src=twsrc%5Etfw">July 10, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>これで映画マイケルは4回目（ScreenX 2D x 2、4DX x 1、FLEXOUND x 1）。</p>
+<p>映画に行く前に、ホテルに戻ろうと会場を出たところ、<a href="https://x.com/fujiwara">fujiwaraさん</a>がいらっしゃったので、駅まで会話しながらご一緒する。</p>
+<p>ホテルではその日に部屋をアップグレードしてもらうことになっていて、荷物と鍵をフロントに預けていたので、鍵を受け取るためにフロントに立ち寄る。荷物は新しい部屋に入れておいてくれる、という手はずになっていたが、先方の想定よりも早く帰ってきてしまったようで（夜に帰ると伝えていた）、まだフロントにお荷物あります、申し訳ありません、と謝罪されてしまった。全然大丈夫ですよ、自分で運びます、といって荷物を受け取り新しい部屋へ。1ベッドルームから高層階の2ベッドルームの部屋へのアップグレードで、部屋は若干広くなったけど、ベッドが増えた分実質的なスペースはかえって狭くなった感じ。なので、アップグレードしなくても別に良かったかな、と思ったが、このタイプの部屋はこんな感じなんだな、ということが知れたのはよかった。</p>
+<p>という感じで1日目は終わり。他にも会場でお会いした方がいるはずだけど、漏れていたらごめんなさい。</p>
+<h2>2日目</h2>
+<p><a href="https://x.com/ymotongpoo">ymotongpooさん</a>の発表に間に合えばいいかな、と思っていたけど、早く目が覚めたので、ホテルのラウンジで朝食をとった後、部屋でのんびりしてから会場に向かった。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">朝飯 <a href="https://t.co/oIlppTgOxe">pic.twitter.com/oIlppTgOxe</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2075715729853501932?ref_src=twsrc%5Etfw">July 10, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>朝一の<a href="https://x.com/kur">木浦 幹雄さん</a>のキーノートがとても良かったので、終わって席を立った後、すぐ後ろにいたアカセさんに思わず「めっちゃ良かったですね」と話しかけた。</p>
+<script defer class="speakerdeck-embed" data-id="971caade9ab1478e9d4be034a9b9fa06" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<p>次のとんぷーさんのセッション、自分はあまりこの辺りやってないこともあるのと、学生時代、統計の授業の成績が良くなかったのもあって、よくわからん、実際に必要になったら改めて見返してみよう、と思った。</p>
+<script defer class="speakerdeck-embed" data-id="a9ec7f8ce1b94371b64c35878693494e" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<p>次はランチセッション。3種類あるお弁当から選べるのだけど、<a href="https://x.com/syossan27">しょっさんさん</a>がお弁当を手に取ったときに、別の方から「こっちの方がいいと思いますよ」と肉多めの弁当をおすすめされてたのにウケた。</p>
+<p>ランチセッションはカケハシの小野田さんのセッションを聴講。いつもお世話になっております、という気持ちで聴いていた。</p>
+<script defer class="speakerdeck-embed" data-id="af068aec279940b788d425c4bb0b672f" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ランチセッションでカケハシの小野田さんのセッションに来た。お弁当だけじゃなく、カケハシブレンドもいただけてとても嬉しい <a href="https://t.co/AN5okThF3O">https://t.co/AN5okThF3O</a> <a href="https://t.co/IGJgue8eKD">pic.twitter.com/IGJgue8eKD</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2075780555250323821?ref_src=twsrc%5Etfw">July 11, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p><a href="https://x.com/ogijun">ogijunさん</a>プロデュースのカケハシブレンドももらえて最高だった。これ本当に美味しいんだよね。</p>
+<iframe class="hatenablogcard" style="width:100%;height:155px;max-width:680px;" src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fkakehashi-dev.hatenablog.com%2Fentry%2Fdrip-bag-coffee" frameborder="0" scrolling="no"></iframe>
+<p>次のセッション、fujiwaraさんが登壇されるパネルディスカッションに行こうかな、と思ったけど、カルビ生焼け王こと星くんのセッションも同じ時間帯だったので、こちらの方に来た。</p>
+<script defer class="speakerdeck-embed" data-id="d0f76fbc0bff49f7bf5c9ffbf33dc156" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<p>最前列に座っていたら、発表始まる前の星くんと目があったので手を振ったら、パネル行かなくていいんですか？と聞かれたのでうんうんとうなずいた（老眼で目があってるかどうかよくわからず、一瞬こちらに向かって言ってるかどうかわからなくてキョロキョロしてしまった）。</p>
+<p>1日目の星くんとの雑談で、技術やれてないです、と言ってたけど、ガチ技術の話でとても良かった。</p>
+<p>星くんのセッション後に廊下でゆううき先輩に会ったので立ち話をしていたら、 <a href="https://x.com/maruloop">maruさん</a>と<a href="https://x.com/at_sushi_at">Mori Atsushiさん</a> も合流して雑談。この雑談が面白すぎて、次のセッションを聴き逃した。雑談の断片が、maruさんの参加レポートやXポストにあるので、興味のある方はそちらをどうぞ。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr"><a href="https://x.com/hashtag/srenext?src=hash&amp;ref_src=twsrc%5Etfw">#srenext</a> SRE NEXT2026の参加レポートです！<br>書ききれないことも多かったんですが、あまりにも長文すぎたので、これで一旦放流します・・・。改めて、みなさんありがとうございました！<a href="https://t.co/o27g9WLeOe">https://t.co/o27g9WLeOe</a></p>&mdash; maru (@maruloop) <a href="https://x.com/maruloop/status/2076165193885942005?ref_src=twsrc%5Etfw">July 12, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>これに関して、ふと思ったことを自分もポストしてみたけど、整理してブログ記事にしてもいいかもな、と思ったりしているが、たぶん面倒なのでやらない。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr"><a href="https://t.co/mGZbILmQRK">https://t.co/mGZbILmQRK</a> にある「開発の時系列上の役割と、技術レイヤーの話が混ざっている」という話、maruさん、yuukiさん、moriさんと立ち話してた時に出た話で、DevOpsもそうだよね、という話になったのだけど、DevOpsも元々は、組織とか部門の話のはずなんだよね</p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076516038792114264?ref_src=twsrc%5Etfw">July 13, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">DevOpsが「開発と運用」って訳されてるのが悪い気もするので、この訳語で日本に持ち込んだやつが悪い、って思ったけど、それは多分俺なんだよね。なので俺が悪いのか。でもそれ以外に訳しようもない気がするので、誰が訳してもこうなる気はする <a href="https://t.co/avBDi1JOsK">https://t.co/avBDi1JOsK</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076520504828281047?ref_src=twsrc%5Etfw">July 13, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>そうこうしてたら、maruさんとMori Atsushiさんのセッションの時間が近づいてきたので、雑談を切り上げてセッション会場へ。</p>
+<script defer class="speakerdeck-embed" data-id="75af9ecb4c1246bbbfe5f1fb10aa761e" data-ratio="1.7777777777777777" src="//speakerdeck.com/assets/embed.js"></script>
+<p>maruさんのセッションはいつも面白くて外れがないのだけど、今回も面白かった。といっても、今回はMoriさんがメインで話をして、途中途中maruさんがslidoで来た質問を拾っていく、という形式。発表中に質問に答えていく、というスタイルはあまり見たことがなく新鮮だった。</p>
+<p>セッションが終わったら、またスポンサーブースをふらふら。1日目にセッションを聴講させていただいた、カケハシの森藤さんがいらっしゃったので、はじめまして、と話しかけた。森藤さんは広島在住とのことで、地方の技術コミュニティの話なんかをしていたら、その流れで8月に広島で行われる<a href="https://2026.pycon.jp/ja">PyCon JP 2026</a>に参加することにした。</p>
+<p>そうこうしてると、Topotalの<a href="https://x.com/nari_ex">高村さん</a>（仕事のミーティングで毎週顔を合わせているが、今回初めて実際にお会いした）のLTがはじまるところだったので、空いていた一番前の席に座ったら、すぐ後ろにはとんぷーさんや<a href="https://x.com/netmarkjp">ばばさん</a>が座っていて、意図せず圧をかけることになってしまった。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">このLTでは、有名な章はあえて取り扱わず、SRE本の16章以降の内容からピックアップしていきます（今資料つくってる） <a href="https://x.com/hashtag/srenext?src=hash&amp;ref_src=twsrc%5Etfw">#srenext</a> <a href="https://t.co/DWHzghhiD6">https://t.co/DWHzghhiD6</a></p>&mdash; Narimichi Takamura (@nari_ex) <a href="https://x.com/nari_ex/status/2075778507238723684?ref_src=twsrc%5Etfw">July 11, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>今年のSRE NEXTでは、スポンサーブース会場の一角でmini LTというものが開催されていて、hymさんが<a href="https://github.com/mizzy/peitho">拙作のツール</a>をつかってくださっていた。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">え、そうだったんですか、見たかった！自分よりも先に実践で使ってらっしゃるwちゃんと動いてましたか？</p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076076240214384798?ref_src=twsrc%5Etfw">July 11, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p><a href="https://x.com/yutadayo">堀井 雄太さん</a>をお見かけしたので、YAPCぶりですね、と話しかける。そこに<a href="https://x.com/941">941さん</a>も合流。941さんがぶら下げていた光る名札のことなど、色々雑談。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr"><a href="https://x.com/hashtag/srenext?src=hash&amp;ref_src=twsrc%5Etfw">#srenext</a> の会場で名札をビカビカ光らせながら<br><br>「これはRubyKaigiでスマートバンクさんが配ってたやつなんですよー、スマートバンクを宜しくお願いします！」<br><br>と宣伝して歩いてたらCTOの <a href="https://x.com/yutadayo?ref_src=twsrc%5Etfw">@yutadayo</a> に会った。YAY!ありがてえ <a href="https://t.co/iNW5NgKsJS">pic.twitter.com/iNW5NgKsJS</a></p>&mdash; 941 / kushii (@941) <a href="https://x.com/941/status/2075851153494159373?ref_src=twsrc%5Etfw">July 11, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>そうこうしてたらスポンサーブースの片付けが始まったので、B会場に移動してクロージングキーノートと閉会式。大学院の研究室仲間の<a href="https://x.com/hiroyanoe">Onoeさん</a>から、事前に廊下で会ったときに、来年チェアをやるんです、という話を聞いていて、それに関する発表があった。</p>
+<p>閉会式が終わったら懇親会へ。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">懇親会はじまった時に、提供場所が一番近かったのですぐ食えるかな、と思って並んだけど、後続もすごい行列できてるのに、ケバブ受け取る前にアンケート的なものにステッカー貼らせてて列捌くの遅くなってるし、SREやってない俺は知らんよ、って感じのアンケートだしで、それも含めてかなり印象が悪い</p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076481248973975565?ref_src=twsrc%5Etfw">July 13, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>これは不快ではあったが、懇親会そのものは、いろいろな人とお話できて楽しかった。ぼっちになったら切り上げてまた映画マイケル観に行こうかな、と思っていたけど、幸いなことにそうはならなかった。</p>
+<p>ばばさんと話をしていたら、<a href="https://x.com/adachin0817">adachinさん</a>がばばさんに話しかけてきて、その横で話を聞いていたのだけど、名札を見せて自己紹介したら、え、あのmizzyさん？という反応をいただき恐縮した。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">今日の懇親会でmizzyさんに会えたので感激した</p>&mdash; adachin👾SRE (@adachin0817) <a href="https://x.com/adachin0817/status/2075909350452007133?ref_src=twsrc%5Etfw">July 11, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>adachinさんからの自己紹介で、この名前見たことありますか、と聞かれてありますあります、と答えたのだけど、あるどころか、SRE Kaigi 2026でセッション聴講してた、ということをこの後で思い出した。</p>
+<iframe class="hatenablogcard" style="width:100%;height:155px;max-width:680px;" src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fblog.adachin.me%2Farchives%2F56040" frameborder="0" scrolling="no"></iframe>
+<p>懇親会の終盤は、カケハシで自分が所属しているチームのテックリードである<a href="https://x.com/_manji0">まんじまるさん</a>、ばばさん、高村さんと話をしていたら時間になったので解散。</p>
+<h2>翌日</h2>
+<p>ダイヤモンド会員がもらえるコーヒーチケットを使って、ロビーラウンジでコーヒーを飲んでから帰宅。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">SRE NEXT 2026楽しかった。無料コーヒー飲んだら帰る。 <a href="https://t.co/JYLuOOYekX">pic.twitter.com/JYLuOOYekX</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076096110276571342?ref_src=twsrc%5Etfw">July 12, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>と思ったら、駐車場から出られないトラブルが。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">管理人の方に直接お金を払って、手書きの領収書をもらって、ゲート開けてもらって出られた</p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076145668792697302?ref_src=twsrc%5Etfw">July 12, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>その後は特に問題なく帰宅。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[PeithoにPDFエクスポート機能を入れた]]></title>
@@ -558,92 +651,6 @@ css/
 <p><code>lookup(1)</code>は<code>weights[4..8]</code>、つまり<code>[4.0, 5.0, 6.0, 7.0]</code>を返す。</p>
 <hr />
 <p>embeddingルックアップ自体は単なる配列のインデックスアクセスで、計算らしい計算はない。ただ、これがトランスフォーマーのパイプライン全体の入口になる。次回はこのベクトルに対して最初に適用されるRMSNormの実装について書く。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Pyxisの開発: テンソルデータの読み込み]]></title>
-        <link href="https://mizzy.org/blog/2026/06/30/2/"/>
-        <updated>2026-06-30T22:01:50+09:00</updated>
-        <id>https://mizzy.org/blog/2026/06/30/2/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/06/30/1/">前回の記事</a>でsafetensorsのヘッダーをパースしてテンソルのメタデータ（名前、dtype、shape、オフセット）を取り出すところまで書いた。今回はその次のステップで、実際のテンソルデータをバイト列からf32の数値配列として読み込む部分を実装した。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/16">#16</a>。</p>
-<hr />
-<h2>SafeTensors構造体の導入</h2>
-<p>前回は<code>parse_header</code>関数でヘッダーを読んでメタデータを返すだけだったので、ファイルをすぐ閉じてよかった。今回はテンソルデータの本体も読みに行くので、ファイルへのアクセスを保持し続ける必要がある。そこで<code>SafeTensors</code>構造体を導入して、ファイルアクセスとメタデータをまとめて持つようにした。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">SafeTensors</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">mmap</span>: <span class="nc">memmap2</span>::<span class="n">Mmap</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">data_offset</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">tensors</span>: <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nb">String</span><span class="p">,</span><span class="w"> </span><span class="n">TensorInfo</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p><code>mmap</code>がファイルの中身へのアクセス。<code>data_offset</code>はヘッダーの終わり（= テンソルデータの先頭）の位置で、8バイトのサイズフィールド + ヘッダーのJSONバイト数。<code>tensors</code>が前回の<code>parse_header</code>で取得していたテンソルのメタデータ（dtype、shape、オフセット）。</p>
-<p>前回の<code>parse_header</code>のロジックは<code>SafeTensors::load()</code>メソッドに移動していて、ヘッダーをパースしてメタデータを取り出す処理自体は同じ。</p>
-<p>ファイルアクセスには<code>memmap2</code>クレートを使ってメモリマップしている。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span>::<span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">mmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">memmap2</span>::<span class="n">Mmap</span>::<span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="n">file</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">};</span><span class="w">
-</span></span></span></code></pre><p>メモリマップはファイルの中身をプロセスの仮想アドレス空間にマッピングする仕組みで、OSのページキャッシュを介してアクセスされる。ファイル全体を一気にメモリに読まなくても、アクセスしたページだけが物理メモリに載る。モデルファイルは数GBになるので、全部メモリに読み込むのは現実的ではないが、メモリマップなら必要な部分だけが透過的に読み込まれる。</p>
-<hr />
-<h2>Dtype enum</h2>
-<p>前回は<code>dtype</code>を<code>String</code>で持っていたけど、テンソルデータを読むにはdtypeごとにバイト列の解釈を変える必要がある。文字列のまま<code>match</code>するのは型安全でないので、<code>Dtype</code> enumに変えた。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="cp">#[serde(rename_all = </span><span class="s">&#34;UPPERCASE&#34;</span><span class="cp">)]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">enum</span> <span class="nc">Dtype</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">F32</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">F16</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="no">BF16</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">impl</span><span class="w"> </span><span class="n">Dtype</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">element_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">usize</span> <span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">match</span><span class="w"> </span><span class="bp">self</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Dtype</span>::<span class="n">F32</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Dtype</span>::<span class="n">F16</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Dtype</span>::<span class="no">BF16</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p><code>element_size()</code>は1要素あたりのバイト数を返す。F32は4バイト、F16とBF16は2バイト。テンソルデータを読み込むときに、バイト列をこのサイズごとに区切って数値に変換する。バイト長がこのサイズの倍数になっているかのバリデーションにも使う。</p>
-<p>safetensorsのフォーマット仕様ではF32/F16/BF16以外にもI64、U8、BOOLなど<a href="https://github.com/huggingface/safetensors/blob/main/safetensors/src/tensor.rs">22種類のdtype</a>が定義されている。Pyxisではさしあたり必要なF32/F16/BF16だけをサポートして、それ以外のdtypeのテンソルはスキップするようにした。他のdtypeは必要になったら対応する。</p>
-<hr />
-<h2>テンソルデータの読み込み</h2>
-<p><code>tensor_f32()</code>メソッドがこのPRの本体。テンソル名を指定すると、そのテンソルのバイト列をdtypeに応じてf32に変換して返す。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">tensor_f32</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">name</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">tensors</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">).</span><span class="n">ok_or_else</span><span class="p">(</span><span class="o">||</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">io</span>::<span class="n">Error</span>::<span class="n">new</span><span class="p">(</span><span class="n">io</span>::<span class="n">ErrorKind</span>::<span class="n">NotFound</span><span class="p">,</span><span class="w"> </span><span class="fm">format!</span><span class="p">(</span><span class="s">&#34;tensor not found: </span><span class="si">{name}</span><span class="s">&#34;</span><span class="p">))</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">})</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="p">[</span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="n">end</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="n">data_offsets</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">data_offset</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">start</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">data_offset</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">end</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">mmap</span><span class="p">[</span><span class="n">start</span><span class="o">..</span><span class="n">end</span><span class="p">];</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="n">dtype</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Dtype</span>::<span class="n">F32</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bytes</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">chunks_exact</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">c</span><span class="o">|</span><span class="w"> </span><span class="kt">f32</span>::<span class="n">from_le_bytes</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]]))</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">collect</span><span class="p">(),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Dtype</span>::<span class="n">F16</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bytes</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">chunks_exact</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">c</span><span class="o">|</span><span class="w"> </span><span class="n">half</span>::<span class="n">f16</span>::<span class="n">from_le_bytes</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]]).</span><span class="n">to_f32</span><span class="p">())</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">collect</span><span class="p">(),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Dtype</span>::<span class="no">BF16</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">bytes</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">chunks_exact</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">c</span><span class="o">|</span><span class="w"> </span><span class="n">half</span>::<span class="n">bf16</span>::<span class="n">from_le_bytes</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]]).</span><span class="n">to_f32</span><span class="p">())</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">collect</span><span class="p">(),</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nb">Ok</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>やっていることはシンプルで、ヘッダーに記録されている<code>data_offsets</code>にデータ領域の開始位置を足して、mmap上の該当バイト列をスライスする。あとはdtypeに応じてバイトの解釈を変えるだけ。</p>
-<ul>
-<li><strong>F32</strong>: <code>chunks_exact(4)</code>で4バイトずつに切り、<code>f32::from_le_bytes</code>でリトルエンディアンのf32に変換する</li>
-<li><strong>F16</strong>: <code>chunks_exact(2)</code>で2バイトずつに切り、<code>half::f16::from_le_bytes</code>でF16に変換してから<code>.to_f32()</code>でf32にする</li>
-<li><strong>BF16</strong>: 同様に2バイトずつに切り、<code>half::bf16::from_le_bytes</code>でBF16に変換してから<code>.to_f32()</code>でf32にする</li>
-</ul>
-<p><code>chunks_exact</code>がバイト列を1要素あたりのバイト数（前述の<code>element_size()</code>、F32なら4、F16/BF16なら2）ごとに分割し、<code>from_le_bytes</code>がそのバイト列をリトルエンディアンの数値として解釈する、という二段階の処理。F16とBF16の変換には<code>half</code>クレートを使っている。</p>
-<p>この時点ではすべてのテンソルをf32に変換して読み込んでいる。Rustの標準ライブラリにはBF16の型がなく、F16の型（<code>f16</code>）もnightly限定の実験的APIでstableでは使えない。<code>half</code>クレートがBF16/F16の型と算術演算を提供しているが、<a href="https://github.com/starkat99/half-rs/blob/main/src/bfloat.rs">演算の実装</a>はf32に変換してから計算してBF16/F16に戻す、というもの。最初からf32で持てばRustのプリミティブ型の演算がそのまま使えて、変換の往復が不要になる。メモリ効率の面ではBF16のまま持って計算時にf32に変換する方が有利だけど、まずは動くものを作るのが優先なので、ここはシンプルな方を選んだ（後のPRでBF16のまま持つ最適化を入れている）。</p>
-<hr />
-<p>これで、safetensorsファイルからテンソルの数値データをf32として取り出せるようになった。次回はこのデータを使って、トークンIDからベクトルを引くembeddingテーブルルックアップの実装について書く。</p>
 
 ]]></content>
     </entry>
