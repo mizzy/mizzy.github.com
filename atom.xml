@@ -3,12 +3,111 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-13T20:27:17+09:00</updated>
+    <updated>2026-07-13T23:08:56+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[DevOpsとは何だったのか]]></title>
+        <link href="https://mizzy.org/blog/2026/07/13/2/"/>
+        <updated>2026-07-13T23:08:56+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/13/2/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/07/13/1/">SRE NEXT 2026の記事</a>で、maruさん、ゆううきさん、Moriさんとの立ち話から、こんなポストをした、ということを書いた。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr"><a href="https://t.co/mGZbILmQRK">https://t.co/mGZbILmQRK</a> にある「開発の時系列上の役割と、技術レイヤーの話が混ざっている」という話、maruさん、yuukiさん、moriさんと立ち話してた時に出た話で、DevOpsもそうだよね、という話になったのだけど、DevOpsも元々は、組織とか部門の話のはずなんだよね</p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076516038792114264?ref_src=twsrc%5Etfw">July 13, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>整理してブログ記事にしてもいいかもな、たぶん面倒なのでやらない、と書いたけど、songmuさんのこのポストに触発されたこともあって、書くことにした。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">小文字のdevopsという考え方、僕は素敵だと思っているのだけど、あまり語られているのを見たことはない</p>&mdash; songmu (@songmu) <a href="https://x.com/songmu/status/2076556588610162714?ref_src=twsrc%5Etfw">July 13, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>小文字のdevopsとは何なのか、も含めて、DevOpsという言葉が元々何を指していたのか、それがどう変わっていったのか、という話。</p>
+<hr />
+<h2>DevOpsの原点</h2>
+<p>DevOpsの起源としてよく挙げられるのは、次の3つの出来事。</p>
+<p>まず2008年、トロントで開催されたAgile 2008で、Andrew Clay Shafer氏が「Agile Infrastructure」というBoFセッションを企画した。だけど反応があまりに少なくて、Shafer氏本人は自分のセッションに現れなかった。そして会場に足を運んだのはたった一人、Patrick Debois氏だった。Debois氏はそれで諦めず、廊下でShafer氏を捕まえて話し込んだ。これがきっかけで、二人はAgile Systems Administrationというグループを立ち上げた。</p>
+<p>Agile Infrastructureというテーマが示す通り、二人の問題意識は、開発の世界で広まっていたアジャイルのやり方を、インフラ運用の世界にも持ち込めないか、というものだった。アジャイルのカンファレンスでこのテーマに人が集まらなかったこと自体が、当時の開発と運用のコミュニティの距離を物語っている。</p>
+<p>次に2009年6月のVelocity 2009で、FlickrのJohn Allspaw氏とPaul Hammond氏が、有名な「<a href="https://www.youtube.com/watch?v=LdOe18KhtT4">10+ Deploys per Day: Dev and Ops Cooperation at Flickr</a>」という発表をした。開発者と運用者が対立するのではなく、協力することで1日10回以上のデプロイを実現している、という話。</p>
+<p>そしてこの発表に触発されたDebois氏が、2009年10月にベルギーのゲントで開催したのが、最初の<a href="https://devopsdays.org/about/">devopsdays</a>。devとopsにdaysをつけてdevopsdays。DevOpsという言葉はこのカンファレンス名から生まれた。</p>
+<p>この経緯からわかるのは、DevOpsは元々、アジャイルを運用の世界まで広げたい、開発部門と運用部門という組織の分断をどうにかしたい、という問題意識から生まれた言葉だ、ということ。技術スタックのどこかのレイヤーを指す言葉でも、開発の時系列上のどこかの工程を指す言葉でも、特定のツール群を指す言葉でもない。</p>
+<p>ちなみに自分がこの言葉に出会ったのは2010年3月で、当時<a href="/blog/2010/03/25/1/">DevOpsについての記事</a>を書いている。そこでは「開発者と運用者の間の壁を取り払うためのベストプラクティス」と自分なりにまとめていた。</p>
+<hr />
+<h2>CAMS——初期の定義の輪郭</h2>
+<p>DevOpsとは何か、を初期に言語化したものとしては、John Willis氏が2010年7月に書いた「<a href="https://www.chef.io/blog/what-devops-means-to-me">What Devops Means to Me</a>」がある。ここで示されたのがCAMS、すなわちCulture（文化）、Automation（自動化）、Measurement（計測）、Sharing（共有）の4つ。</p>
+<p>注目したいのは、Cultureが先頭に来ていて、Automationは4つのうちの1つでしかない、というところ。ツールによる自動化はDevOpsの一部ではあるけど、それがDevOpsなのではない、ということが、この時点でははっきりしていた。</p>
+<p>同じ2010年には、広まりはじめたDevOpsに対する批判も出てきていた。そのひとつ「<a href="http://www.rationalsurvivability.com/blog/2010/05/incomplete-thought-the-devops-disconnect/">Incomplete Thought: The DevOps Disconnect</a>」という記事のコメント欄で、Velocity 2009の発表者本人であるJohn Allspaw氏がこう書いている。</p>
+<blockquote>
+<p>It's not abstraction. It's not even &quot;infrastructure as code&quot;. It's not any single tool. It's not about provisioning. It's not about deployment. It's not about a job description or position. ... It <em>is</em> about the collaborative and communicative culture and the tools and process that arise from that culture. Nothing more.</p>
+</blockquote>
+<p>抽象化のことではない。Infrastructure as Codeのことですらない。特定のツールのことでも、プロビジョニングやデプロイのことでも、職種や役職のことでもない。協力とコミュニケーションの文化、そしてその文化から生まれるツールやプロセスのことだ。それ以上ではない——と、「DevOpsではないもの」を徹底的に列挙した上で、文化の話であると断言している。</p>
+<p>このコメント、自分は<a href="/blog/2011/06/25/1/">2011年6月のDevOpsカンファレンスでの発表</a>で引用していて、さらに<a href="https://mizzy.tumblr.com/post/37557718970/its-not-abstraction-its-not-even">2012年にはtumblrにもリポストしていた</a>。</p>
+<hr />
+<h2>モノの名前になっていくDevOps</h2>
+<p>その後どうなったかは、みなさんご存知の通り。組織文化の運動だったはずのDevOpsという言葉は、具体的なモノの名前として消費されるようになっていく。というより、Allspaw氏が2010年の時点でわざわざ「ツールのことではない、職種や役職のことではない」と列挙して否定しなければならなかったこと自体が、当時から既にそう受け取る人がいた、ということの現れでもある。その流れは押しとどめられることなく、そのまま定着していった。</p>
+<p>どうモノの名前になっていったのかは、2016年に出た『<a href="https://www.oreilly.co.jp/books/9784873118352/">Effective DevOps</a>』（Jennifer Davis、Ryn Daniels著、日本語版は2018年）の5章「devopsに対する誤解とアンチパターン」が列挙する「よくある誤解」を見るとよくわかる。「devopsはチームである」「devopsは肩書だ」「devopsには認定資格が必要だ」「devopsはツールの問題だ」。部署名、職種名、資格名、ツール名。さらに「devopsとは自動化のことだ」という誤解も挙げられていて、CAMSでは4分の1でしかなかったAutomationがdevopsそのものと同一視されるところまで来ていたことがわかる。また「はじめに」にも「全部入りのdevopsだとかdevops-as-a-serviceといったものを提供することはない」という一節があって、売り買いされる商品としてのDevOpsも、当時すでに存在していたことがうかがえる。2016年の時点で、この流れはすでに一章を割いて反論しなければならないほど進行していた。そして今では、これらは誤解と指摘されることすらなく、当たり前のものとして定着している。</p>
+<hr />
+<h2>小文字のdevops</h2>
+<p>『Effective DevOps』本文中では一貫して、DevOpsではなく小文字のdevopsと表記されている。上に書いた5章のタイトルが「devopsに対する誤解とアンチパターン」なのもそのため。</p>
+<p>これは意識的な選択で、「はじめに」には「Devops、devops、DevOps: どれがよいか」というコラムまであって、そこで理由が説明されている。要約すると、</p>
+<ul>
+<li>表記についてはオンライン投票までやっていて、結果はDevOpsの圧勝だった。だけどDevOpsという表記は、企業の中でDevとOpsに重点が置かれていることの現れでもある。DevOpsではDevとOps以外が排除されてしまうので、DevSecOpsやDevQAOpsといった言葉を作る動きもある</li>
+<li>Twitterの#devopsハッシュタグは、こちら対あちらという対話のあり方を変えて、人を重視した持続可能な仕事の方法を実現したい人たちをつなぐために使われていた。それに倣った</li>
+<li>プロジェクトの成功には組織全体の人たちのインプットや知見、コラボレーションが必要で、組織固有の問題は開発チームと運用チームの対立に限らないかもしれない</li>
+</ul>
+<p>という3点。その上で、コラムはこう締めくくられている。</p>
+<blockquote>
+<p>devopsは、排除ではなく開放のための運動だという私たちの考え方を反映させるために、本書全体を通じて意識的にdevopsという小文字表記を使うことにした。</p>
+</blockquote>
+<p>つまり小文字のdevopsという綴りには、「これは特定の職種やチームやツールの名前ではなく、組織全体の文化的な運動である」という、原点の定義そのものが埋め込まれている。実際、同じ「はじめに」の中で、devopsという言葉自体もこう定義されている。</p>
+<blockquote>
+<p>devopsは情報のサイロを壊し、関係を観察し、チーム間で発生する誤解を解消するための反復的な取り組みを強調するプロフェッショナルで文化的な運動だ。</p>
+</blockquote>
+<p>職種でもチームでもツールでもなく、あくまで「プロフェッショナルで文化的な運動」。</p>
+<hr />
+<h2>訳の問題でも、言語の問題でもない</h2>
+<p>ただ、結果を見れば、小文字のdevopsが定着することはなかった。もっとも、本のコラムにあった通りオンライン投票ではDevOpsの圧勝だったわけで、DとOを大文字にしたDevOpsという表記は当時から標準だった。そしてそれはその後も変わっていない。AWSのドキュメントも、Google CloudのDORAが長年出してきたState of DevOps Reportも、みんなDevOps表記だ。小文字表記を貫いたこの本の方が、最初からずっと例外だった。</p>
+<p>冒頭の立ち話の流れで、こんなポストもしていた。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">DevOpsが「開発と運用」って訳されてるのが悪い気もするので、この訳語で日本に持ち込んだやつが悪い、って思ったけど、それは多分俺なんだよね。なので俺が悪いのか。でもそれ以外に訳しようもない気がするので、誰が訳してもこうなる気はする <a href="https://t.co/avBDi1JOsK">https://t.co/avBDi1JOsK</a></p>&mdash; mizzy (@gosukenator) <a href="https://x.com/gosukenator/status/2076520504828281047?ref_src=twsrc%5Etfw">July 13, 2026</a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>だけどこれは的を外している。まず、2010年3月の自分の記事を読み返すと、実際には「開発と運用」ではなく「開発者と運用者」という言葉で紹介していた。そしてそもそも、訳は関係ない。ここまで見てきた通り、訳が介在しない英語圏でも、まったく同じ誤解が広がっているのだから。</p>
+<p>日本語だと、大文字と小文字の使い分けという慣習自体がないので、日本語版『Effective DevOps』が章タイトルまで小文字のdevopsを保っていても、その意図は本文の説明を読んで初めてわかる。だけど、綴りで意図を表現できる英語圏でも、その意図は広まっていないように見える。訳の問題でも、言語の問題でもない。</p>
+<p>文化の運動という掴みどころのないものより、職種やツールや資格という、名乗れるもの・買えるものの方が流通しやすい。それだけの話なのだと思う。</p>
+<hr />
+<h2>別の言葉へと分解されていくDevOps</h2>
+<p>その後の流れを見ていくと、DevOpsという言葉が包含していたものが、それぞれ別の言葉として具体化されていったことがわかる。Velocity 2009のFlickrの発表で「ツール」として挙げられていた要素を、いま流通している言葉と突き合わせてみると、</p>
+<ul>
+<li>インフラの自動化 → Infrastructure as Code</li>
+<li>ワンステップビルド＆デプロイ → CI/CD</li>
+<li>機能フラグ → フィーチャーフラグ（専用のSaaSまである）</li>
+<li>メトリックの共有 → オブザーバビリティ、DORAの4キーメトリクス</li>
+<li>IRCやIMのロボット → ChatOps</li>
+</ul>
+<p>という感じで、ほぼすべてが独立した言葉になり、実践とツールと市場を持つ領域に育った。（発表のリストにはもうひとつ「共有されたバージョンコントロール」があるけど、これは当たり前になりすぎて、対応する言葉を挙げるまでもない。）Infrastructure as Codeのように、言葉自体は当時からあったものもある（先に引用したAllspaw氏の2010年のコメントにも出てくる）ので、言葉の新しさがポイントではない。DevOpsの文脈の中の一要素だったものが、それぞれ、DevOpsという言葉を持ち出さなくても語れる独立した領域になった、ということがポイント。発表の核心にあった「安定性をとるか、変化をとるか」というDevとOpsの対立も、SREのエラーバジェットという形で仕組みに落とし込まれた。この構図を端的に表しているのが、GoogleがSRE本の文脈で使った「class SRE implements DevOps」という整理で、SREはDevOpsという抽象クラスの実装である、ということ。DevOpsは、具体的な実装を持つ言葉たちの上に浮かぶ抽象概念、という位置づけになった。</p>
+<p>そして、抽象概念だけになった言葉は、だんだん使われなくなっていく。Platform Engineeringの文脈では「DevOpsは死んだ」といった言説も見かけるようになった。2022年には「DevOps is dead, long live Platform Engineering!」という<a href="https://x.com/sidpalas/status/1580978289534914561">Sid Palas氏のポスト</a>が大きな論争になったし、The New Stackの「<a href="https://thenewstack.io/devops-is-dead-embrace-platform-engineering/">DevOps Is Dead. Embrace Platform Engineering</a>」という記事や、<a href="https://www.cncf.io/online-programs/cncf-on-demand-webinar-devops-is-dead-embrace-platform-engineering/">同名のCNCFのウェビナー</a>もあった。象徴的なのはDORAの動きで、DORAはDevOps Research and Assessmentの頭字語で、毎年「Accelerate State of DevOps Report」という調査レポートを出していたのだけど、<a href="https://dora.dev/insights/dora-2025-year-in-review/">2025年にレポート名を「State of AI-assisted Software Development」に変更した</a>。あわせてDORA自体も、頭字語ではない単独の名前ということになった。DevOpsという言葉は、レポートの名前からも、組織の名前からも消えたことになる。</p>
+<hr />
+<h2>問題は解決したのか</h2>
+<p>ただ、何が具体化されて、何が残ったのかを見てみると、別の言葉になったのはどれも、ツールやプラクティスや職種として名前を付けられる部分——名乗れる部分、売り買いできる部分——だということに気づく。CAMSで言えば、AutomationとMeasurementには立派な後継の言葉ができた。だけど先頭にあったCulture、つまり部門間の分断や対立をどうにかする、という部分を引き受けた言葉は、見当たらない。</p>
+<p>じゃあ、引き受ける言葉が必要ないくらいその問題は解決したのか、というと、そうは見えない。</p>
+<p>たとえばDevSecOps。この言葉が生まれたのは2013年頃とされていて、DevOpsの誕生からわずか4年ほどで、セキュリティを仲間に入れるための新しい言葉が必要とされていたことになる。部門の壁を壊す運動が機能しているのなら、セキュリティも当然そこに含まれているはずだ。先に見た通り、『Effective DevOps』の著者たちが小文字のdevopsを選んだ理由のひとつは、まさにこの語を作る動きへの応答だった。そしてDevSecOpsという言葉が<a href="https://www.practical-devsecops.com/devsecops-statistics-2026/">今も使われ続けている</a>のは、壁が残り続けていることの現れだと思う。</p>
+<p>Platform Engineeringもそう。DevOpsの実践は「You build it, you run it」のような、開発者がインフラ運用まで担う方向に進んだ。その結果、今度は開発者側にインフラ運用の認知負荷が寄りすぎて、それをプラットフォームチームが引き受け直そう、というのがPlatform Engineering。この「プロダクトチームに責任が移った結果、インフラへの認知負荷が増えたので、プラットフォームで引き受け直す」という認識は、<a href="https://tag-app-delivery.cncf.io/whitepapers/platforms/">CNCFのPlatforms White Paper</a>にも書かれている。インフラ運用を誰がどこまで担うのか、という分担の問題が、名前と形を変えて続いている、とも言える。そして、冒頭のポストで触れたmaruさんの<a href="https://sizu.me/maruloop/posts/kiiwa97nez3u">SRE NEXT 2026の参加レポート</a>には、開発の時系列上の役割と、技術レイヤーと、組織上のロールは本来別々の軸である、という話が書かれていて、軸を混ぜてしまうと何が起きるかについて、こんな一節がある。</p>
+<blockquote>
+<p>この二つを混ぜてしまうと、SREは「運用の問題をソフトウェアエンジニアリングで解決するプラクティス」ではなく、「インフラレイヤーを担当する職種」になってしまいます。</p>
+</blockquote>
+<p>これはまさに、DevOpsに起きたことと同じことが、SREという言葉でも起きている、ということだと思う。文化やプラクティスの話が、職種や技術レイヤーの名前として消費されていく。そしてそれが混乱として認識されるくらいには、組織の話と技術の話を切り分けて語るための語彙が、いまも足りていない。</p>
+<p><a href="/blog/2011/06/25/1/">2011年のDevOpsカンファレンスの記事</a>を読み返すと、帰り際に<a href="https://x.com/marqs">marqsさん</a>と、みんな同じような問題意識を抱えていたのに、それを適切に表す言葉がいままでなかった、DevOpsという言葉が与えられたことで、それが共通認識としてはっきり浮かび上がった、それって素晴らしいことだよね、という話をして握手した、と書いてあった。DevOpsという言葉の一番の価値は、名前のなかった問題に名前を与えたことだったのだと思う。そして、その名前がモノの名前として消費し尽くされた今、問題は解決されないまま、また名前を失いつつあるのかもしれない。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://newrelic.com/blog/news/devops-name">The Incredible True Story of How DevOps Got Its Name - New Relic</a></li>
+<li><a href="https://devops.com/the-origins-of-devops-whats-in-a-name/">The Origins of DevOps: What's in a Name? - DevOps.com</a></li>
+<li><a href="https://www.youtube.com/watch?v=LdOe18KhtT4">10+ Deploys per Day: Dev and Ops Cooperation at Flickr (YouTube)</a></li>
+<li><a href="https://paulhammond.org/2009/06/velocity/10deploys.pdf">10+ Deploys per Day 発表スライド (PDF)</a></li>
+<li><a href="https://www.chef.io/blog/what-devops-means-to-me">What Devops Means to Me - Chef Blog</a></li>
+<li><a href="https://devopsdays.org/about/">about devopsdays</a></li>
+<li><a href="https://www.oreilly.co.jp/books/9784873118352/">Effective DevOps ―4本柱による持続可能な組織文化の育て方 - O'Reilly Japan</a></li>
+<li><a href="/blog/2010/03/25/1/">DevOps (2010年3月に自分が書いた記事)</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[SRE NEXT 2026に参加してきた]]></title>
@@ -608,49 +707,6 @@ css/
 </ul>
 <p>名前に「layernorm」とあるが、実際の処理はRMSNorm。これはLLaMAのアーキテクチャに由来する命名で、Qwen3もこれを踏襲している。名前はモデルの構造をそのまま反映していて、<code>model.layers.0</code>が0番目のトランスフォーマー層、<code>input_layernorm</code>/<code>post_attention_layernorm</code>がその層の中の各RMSNorm、<code>weight</code>がそのパラメータ、を意味する。トランスフォーマー層は複数あり（Qwen3-1.7Bでは28層）、各層がそれぞれ別のRMSNorm weightを持っている。</p>
 <p>次回はアテンションの実装について書く。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Pyxisの開発: Embeddingテーブルルックアップ]]></title>
-        <link href="https://mizzy.org/blog/2026/07/01/1/"/>
-        <updated>2026-07-01T09:05:29+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/01/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/06/30/2/">前回の記事</a>でsafetensorsからテンソルデータをf32として読み込めるようになった。今回はそのデータを使った最初の計算として、embeddingテーブルルックアップを実装した。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/17">#17</a>。</p>
-<p>embeddingテーブルルックアップとは、入力のトークンIDを浮動小数点のベクトルに変換する処理のこと。LLMの推論パイプラインの入口にあたる。</p>
-<hr />
-<h2>トークナイザーとBPE</h2>
-<p>LLMはテキストをそのまま処理するのではなく、まずトークナイザーでトークンIDの列に変換する。トークナイザーはテキストをトークンに分割して、それぞれに整数のIDを振る。たとえばQwen3のトークナイザーだと「tokenization」は<code>['token', 'ization']</code> → <code>[5839, 2022]</code>のように分割される。「unbelievable」なら<code>['un', 'belie', 'vable']</code> → <code>[359, 31798, 23760]</code>と3つに分かれる。</p>
-<p>分割のアルゴリズムとして広く使われているのがBPE（Byte Pair Encoding）。元々は1994年にPhilip Gageがデータ圧縮のアルゴリズムとして<a href="https://dl.acm.org/doi/10.5555/177910.177914">発表</a>したもので、2015年にRico Sennrichらが<a href="https://arxiv.org/abs/1508.07909">ニューラル機械翻訳のためのサブワード分割に応用</a>し、その後GPT-2をはじめとするLLMのトークナイザーにも採用された。最初は1文字ずつ（<code>a</code>, <code>b</code>, <code>c</code>, ...）の辞書から始めて、訓練データ中で隣り合う頻出ペアを繰り返しマージして辞書を大きくしていく。たとえば<code>t</code>と<code>h</code>のペアが最も多ければ<code>th</code>を辞書に追加、次に<code>th</code>と<code>e</code>が多ければ<code>the</code>を追加、という具合に繰り返す。よく出る文字列ほど早くマージされて1トークンになり、珍しい単語はマージが進まず細かいトークンに分割されたまま残る。マージの回数が辞書のサイズを決める。各トークンに0から始まる整数IDが割り当てられる。この辞書に含まれるトークンの総数をvocab_sizeと呼ぶ。</p>
-<p>実際のLLMでは、BPEで一から辞書を構築するのではなく、既存の辞書をベースに拡張することもある。<a href="https://arxiv.org/abs/2309.16609">Qwen Technical Report</a>によると、Qwen3ではOpenAIのtiktoken（cl100k_base、約10万トークン）をベースに、中国語の常用漢字・単語や他の言語のトークンを追加し、数字を1桁ずつに分割するようにした結果、トークン数は151643になった。config上のvocab_sizeは151936で、これは151643を128の倍数に切り上げた値。GPUのTensor Coresは行列の次元が64や128の倍数のとき効率が良いので、embeddingテーブルのサイズをそれに合わせている。</p>
-<hr />
-<h2>Embeddingとは</h2>
-<p>トークンIDは単なる整数のインデックスで、数値の大小に意味がない（ID 5839がID 5838より何か「大きい」わけではない）。LLMの推論は浮動小数点の行列演算なので、トークンIDをそのまま入力に使うことはできない。各トークンIDを固定長の浮動小数点ベクトルに変換する必要があって、この変換を行うのがembeddingテーブル。</p>
-<p>embeddingテーブルは<code>vocab_size × hidden_dim</code>の二次元行列で、各行がひとつのトークンに対応するベクトルになっている。hidden_dimはモデル内部で使われるベクトルの次元数で、Qwen3-1.7Bでは2048。vocab_sizeが151936、hidden_dimが2048なら、151936個のトークンそれぞれに2048次元のベクトルが割り当てられている。トークンID <code>n</code>の入力に対しては、テーブルのn行目のベクトルをそのまま取り出す。これがembeddingルックアップ。</p>
-<hr />
-<h2>実装</h2>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Embedding</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">weights</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">vocab_size</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">hidden_dim</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p><code>weights</code>がembeddingテーブルの本体で、<code>vocab_size × hidden_dim</code>個のf32値が一次元のフラット配列として入っている。前回実装した<code>SafeTensors::tensor_f32()</code>で読み込んだデータがそのまま入る。</p>
-<p>ルックアップはこれだけ。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">lookup</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">token_id</span>: <span class="kt">usize</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">assert!</span><span class="p">(</span><span class="n">token_id</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">vocab_size</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">token_id</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">weights</span><span class="p">[</span><span class="n">start</span><span class="o">..</span><span class="n">end</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p><code>token_id * hidden_dim</code>で行の先頭位置を計算して、そこから<code>hidden_dim</code>個分のスライスを返す。フラット配列を二次元テーブルとして扱っているだけなので、コピーは発生しない。</p>
-<p>たとえばvocab_size=3、hidden_dim=4のテーブルなら、weightsは12個のf32値が並んでいて:</p>
-<p><img src="/images/2026/07/embedding-weights.png" alt="embeddingテーブルのweights配列" /></p>
-<p><code>lookup(1)</code>は<code>weights[4..8]</code>、つまり<code>[4.0, 5.0, 6.0, 7.0]</code>を返す。</p>
-<hr />
-<p>embeddingルックアップ自体は単なる配列のインデックスアクセスで、計算らしい計算はない。ただ、これがトランスフォーマーのパイプライン全体の入口になる。次回はこのベクトルに対して最初に適用されるRMSNormの実装について書く。</p>
 
 ]]></content>
     </entry>
