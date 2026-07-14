@@ -27,12 +27,12 @@
 <p>まず2008年、トロントで開催されたAgile 2008で、Andrew Clay Shafer氏が「Agile Infrastructure」というBoFセッションを企画した。だけど反応があまりに少なくて、Shafer氏本人は自分のセッションに現れなかった。そして会場に足を運んだのはたった一人、Patrick Debois氏だった。Debois氏はそれで諦めず、廊下でShafer氏を捕まえて話し込んだ。これがきっかけで、二人はAgile Systems Administrationというグループを立ち上げた。（この経緯は<a href="https://newrelic.com/blog/news/devops-name">New Relic</a>や<a href="https://devops.com/the-origins-of-devops-whats-in-a-name/">DevOps.com</a>の記事に詳しい。）</p>
 <p>Agile Infrastructureというテーマが示す通り、二人の問題意識は、開発の世界で広まっていたアジャイルのやり方を、インフラ運用の世界にも持ち込めないか、というものだった。アジャイルのカンファレンスでこのテーマに人が集まらなかったこと自体が、当時の開発と運用のコミュニティの距離を物語っている。</p>
 <p>次に2009年6月のVelocity 2009で、FlickrのJohn Allspaw氏とPaul Hammond氏が、有名な「<a href="https://www.youtube.com/watch?v=LdOe18KhtT4">10+ Deploys per Day: Dev and Ops Cooperation at Flickr</a>」という発表をした。開発者と運用者が対立するのではなく、協力することで1日10回以上のデプロイを実現している、という話。</p>
-<p>そしてこの発表に触発されたDebois氏が、2009年10月にベルギーのゲントで開催したのが、最初の<a href="https://devopsdays.org/about/">devopsdays</a>。devとopsにdaysをつけてdevopsdays。DevOpsという言葉はこのカンファレンス名から生まれた。</p>
+<p>そしてこの発表に触発されたDebois氏が、2009年10月にベルギーのゲントで開催したのが、最初の<a href="https://devopsdays.org/about/">devopsdays</a>。devとopsにdaysをつけてdevopsdays。DevOpsという言葉はこのカンファレンス名から生まれた。もっともDebois氏自身は、後の<a href="https://www.youtube.com/watch?v=6oxNdNRBQhA">インタビュー</a>で、「Agile System Administration Days」では名前が長すぎたので短くしただけで、業界用語にするつもりはなかった、と語っている。（このインタビューは<a href="https://x.com/nihonbuson/status/2076819621127377264">nihonbusonさんに教えてもらった</a>。）</p>
 <p>この経緯からわかるのは、DevOpsは元々、アジャイルを運用の世界まで広げたい、開発部門と運用部門という組織の分断をどうにかしたい、という問題意識から生まれた言葉だ、ということ。技術スタックのどこかのレイヤーを指す言葉でも、開発の時系列上のどこかの工程を指す言葉でも、特定のツール群を指す言葉でもない。</p>
 <p>ちなみに自分がこの言葉に出会ったのは2010年3月で、当時<a href="/blog/2010/03/25/1/">DevOpsについての記事</a>を書いている。そこでは「開発者と運用者の間の壁を取り払うためのベストプラクティス」と自分なりにまとめていた。</p>
 <hr />
 <h2>CAMS——初期の定義の輪郭</h2>
-<p>DevOpsとは何か、を初期に言語化したものとしては、John Willis氏が2010年7月に書いた「<a href="https://www.chef.io/blog/what-devops-means-to-me">What Devops Means to Me</a>」がある。ここで示されたのがCAMS、すなわちCulture（文化）、Automation（自動化）、Measurement（計測）、Sharing（共有）の4つ。</p>
+<p>言葉の生みの親であるDebois氏は、あえてdevopsを定義しなかった。定義を固定すると解釈を巡って争いが起き、新しいアイデアを取り入れる余地がなくなると考えたからだ（本人の理解は「サイロ間の摩擦を取り除くこと」だと、先のインタビューで語っている）。なので、初期の言語化は他の人たちが担うことになる。そのひとつが、John Willis氏が2010年7月に書いた「<a href="https://www.chef.io/blog/what-devops-means-to-me">What Devops Means to Me</a>」で、ここで示されたのがCAMS、すなわちCulture（文化）、Automation（自動化）、Measurement（計測）、Sharing（共有）の4つ。</p>
 <p>注目したいのは、Cultureが先頭に来ていて、Automationは4つのうちの1つでしかない、というところ。ツールによる自動化はDevOpsの一部ではあるけど、それがDevOpsなのではない、ということが、この時点でははっきりしていた。</p>
 <p>同じ2010年には、広まりはじめたDevOpsに対する批判も出てきていた。そのひとつ「<a href="http://www.rationalsurvivability.com/blog/2010/05/incomplete-thought-the-devops-disconnect/">Incomplete Thought: The DevOps Disconnect</a>」という記事のコメント欄で、Velocity 2009の発表者本人であるJohn Allspaw氏がこう書いている。</p>
 <blockquote>
@@ -103,6 +103,7 @@
 <li><a href="https://www.youtube.com/watch?v=LdOe18KhtT4">10+ Deploys per Day: Dev and Ops Cooperation at Flickr (YouTube)</a></li>
 <li><a href="https://paulhammond.org/2009/06/velocity/10deploys.pdf">10+ Deploys per Day 発表スライド (PDF)</a></li>
 <li><a href="https://devopsdays.org/about/">about devopsdays</a></li>
+<li><a href="https://www.youtube.com/watch?v=6oxNdNRBQhA">Patrick Debois氏へのインタビュー (YouTube)</a></li>
 <li><a href="/blog/2010/03/25/1/">DevOps (2010年3月に自分が書いた記事)</a></li>
 <li><a href="https://www.chef.io/blog/what-devops-means-to-me">What Devops Means to Me - Chef Blog</a></li>
 <li><a href="http://www.rationalsurvivability.com/blog/2010/05/incomplete-thought-the-devops-disconnect/">Incomplete Thought: The DevOps Disconnect - Rational Survivability</a></li>
