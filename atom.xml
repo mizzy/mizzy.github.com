@@ -3,12 +3,76 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-18T12:52:28+09:00</updated>
+    <updated>2026-07-18T17:44:35+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peithoにスライドのはみ出し検査（peitho lint）を入れた]]></title>
+        <link href="https://mizzy.org/blog/2026/07/18/2/"/>
+        <updated>2026-07-18T17:44:35+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/18/2/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話の続き。今回は<code>peitho lint</code>というサブコマンドを追加した話。スライドの中身がスライドの枠からはみ出していないかを検査する機能。</p>
+<hr />
+<h2>peitho lintの仕組み</h2>
+<p>内部でやっていることは、ざっくりこんな流れ。</p>
+<ol>
+<li><code>peitho build</code>と同じパイプライン（parse → map → check → render）でデッキをビルド</li>
+<li>検査用のHTMLを一時ディレクトリに書き出す</li>
+<li>ヘッドレスChromeでそのHTMLを開いて、各スライドのサイズを測定</li>
+<li>はみ出しがあれば警告を出して、exit code 1で終了</li>
+</ol>
+<p>ポイントは、実際にブラウザでレンダリングして測るところ。フォントの違いや複雑なCSSレイアウトによるずれも、ブラウザが実際に描画した結果をそのまま見るので、正確に検出できる。</p>
+<hr />
+<h2>検査用HTML</h2>
+<p>検査用には専用のHTML（<code>lint.html</code>）を生成している。PDFエクスポートの<code>pdf.html</code>と似た構造で、全スライドのHTMLをインラインで持った静的な1枚もの。ただしPDFとは違って<code>overflow: hidden</code>やページ区切りのラッパーを付けていない。はみ出しを検出したいので、はみ出しを隠す要素があっては困る。</p>
+<p>各スライドには<code>transform: scale(1)</code>というidentity transformをかけている。見た目にも計算にも何も影響しないけど、これがないと絶対配置（<code>position: absolute</code>等）された子要素が自分のスライドではなくページ全体を基準に配置されてしまい、2枚目以降のスライドで偽のはみ出しを検出してしまう。実際の発表画面やPDFでもスライドにtransformがかかっているので、同じ条件にしている。</p>
+<hr />
+<h2>実際にはみ出しを見つけた</h2>
+<p><code>peitho lint</code>を入れてすぐ、リポジトリの<code>examples/peitho-tour</code>デッキ（Peitho自体を紹介するデッキ）で走らせたら、こうなった。</p>
+<pre><code>warning: slide 16 content overflows the slide box vertically by 50px (content 770px, box 720px)
+  help: shrink or split the slide content, or adjust the layout CSS
+warning: slide 18 content overflows the slide box vertically by 104px (content 824px, box 720px)
+  help: shrink or split the slide content, or adjust the layout CSS
+checked 20 slide(s): 2 overflow warning(s)
+</code></pre>
+<p>スクリーンショットを大きく載せているスライドが2枚、垂直方向にはみ出していた。CSSの問題でスクリーンショット画像が縮小されずに元のサイズのまま表示されていたのが原因。</p>
+<p>修正前のスライド16。タイトルの下にスクリーンショットと本文テキストが入るはずだが、スクリーンショットが大きすぎて本文テキストが表示されず、下もはみ出している。</p>
+<p><img src="/images/2026/07/peitho-lint-before-preview.png" alt="修正前のスライド16" /></p>
+<p>修正後。スクリーンショットが縮小されて枠内に収まり、本文テキストも表示されている。</p>
+<p><img src="/images/2026/07/peitho-lint-after-preview.png" alt="修正後のスライド16" /></p>
+<p>CSSを1箇所直して解消（<a href="https://github.com/mizzy/peitho/pull/295">PR #295</a>）。</p>
+<pre><code>checked 23 slide(s): no overflow
+</code></pre>
+<p>このデッキはAIに生成させていてちゃんとチェックしていなかったので気づいていなかった。こういうケースこそ自動検査が効く。</p>
+<hr />
+<h2>ビルドパイプラインの検査との棲み分け</h2>
+<p>Peithoには<code>peitho lint</code>以外にも、<code>peitho build</code>で走る検査がいくつかある。</p>
+<ul>
+<li><strong>スロット契約の検査</strong>: スロットの型やarityの不一致をビルドエラーにする。例えばコードブロックが0〜1個のスロットに2個書くとエラー</li>
+<li><strong>未割り当てコンテンツの検出</strong>: Markdownに書いた要素がどのスロットにも割り当てられなければビルドエラー</li>
+<li><strong>生HTML禁止</strong>: HTMLコメント（ページ設定やスピーカーノート）以外のHTMLがMarkdownに書かれていたらビルドエラー。コンテンツとデザインの分離を徹底するため</li>
+<li><strong>未知のコード言語</strong>: シンタックスハイライトで未知の言語タグが指定されていたらビルドエラー</li>
+<li><strong>重複スライドキー</strong>: 同じキーが複数のスライドに振られていたらビルドエラー</li>
+<li><strong>CSS検査</strong>: レイアウトのルートクラスが<code>.peitho-slide</code>と異なる<code>width</code>/<code>height</code>を指定していないか、<code>[data-slide-key=...]</code>セレクタが存在しないキーを参照していないか、など</li>
+<li><strong>セクション時間の整合性検査</strong>: セクションごとの<code>time</code>の合計がfrontmatterの<code>time</code>と一致しなければビルドエラー</li>
+<li><strong>画像の参照検査</strong>: 参照している画像が存在するかの検査</li>
+</ul>
+<p>これらは構造的な整合性の検査で、HTMLをレンダリングしなくてもソースコードの解析だけで検出できる。一方<code>peitho lint</code>は、実際にレンダリングしないとわからない物理的なはみ出しを検出する。検査のレイヤーが違うので、別サブコマンドにしている。ビルドの検査はビルド時に必ず走るけど、lintはChromeが必要なので明示的に実行する形。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+<li><a href="/blog/2026/07/18/1/">前回の記事: Peithoにスマホからスライド操作できる機能を入れた</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peithoにスマホからスライド操作できる機能を入れた]]></title>
@@ -586,125 +650,6 @@ css/
 <p>参考:</p>
 <ul>
 <li><a href="https://github.com/mizzy/memo">mizzy/memo</a></li>
-</ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[プレゼンツールPeithoをつくっている]]></title>
-        <link href="https://mizzy.org/blog/2026/07/03/1/"/>
-        <updated>2026-07-03T19:35:00+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/03/1/</id>
-        <content type="html"><![CDATA[
-<p><strong>追記</strong>: 発表者ツールまわりについて詳しく書いた記事「<a href="/blog/2026/07/04/1/">Peithoの発表者ツールをつくっている</a>」も書いた。</p>
-<p><a href="/blog/2026/06/23/1/">前回の記事</a>でPyxis/Argus/Irisという最近つくっているOSSを紹介したけど、もうひとつ新しいものをつくりはじめた。<a href="https://github.com/mizzy/peitho">Peitho</a>というプレゼンテーションツールで、Markdownをsource of truthとして、HTMLネイティブなスライドを生成し、ブラウザでの発表までやる。</p>
-<p>ビルドするとどんなスライドになるのかは、デモサイト<a href="https://peitho.gosu.ke/">peitho.gosu.ke</a>で見られる。リポジトリの<code>examples/</code>を<code>peitho build</code>してそのまま配信したもの。発表のほうは手元でChromeで操作するので、これは後述する。</p>
-<p><img src="/images/2026/07/peitho-demo-landing.png" alt="Peithoのデモサイト" /></p>
-<hr />
-<h2>なぜつくったか</h2>
-<p>スライドをMarkdownで書く、というのはずっとやっていて、<a href="https://www.deckset.com/">Deckset</a>から<a href="https://github.com/k1LoW/deck">k1LoW/deck</a>へとたどってきた。Decksetはデザインの自由度がなくて、「ここがもっとこうなると見やすくなるのに」というところが変更できない、かゆいところに手が届かない感が不満だった。</p>
-<p>k1LoW/deckは「コンテンツとデザインの分離」という思想が最高にかっこいい。Markdownで書いたコンテンツをGoogle Slidesに反映するツールで、内容はgitで管理しつつ、デザインはGoogle Slidesに任せる、という分担がきれいに決まっている。</p>
-<p>k1LoW/deckは最高なんだけど、Google Slidesでデザインを手動調整するのは、かゆいところに手が届く反面、面倒さもともなう。これがPeithoをつくりはじめた動機。今なら、ここは生成AIに任せたい。デザイン成果物がHTML/CSSというただのコードなら、AIに書かせることができるし、gitで管理してdiffを取ったりレビューしたりもできる。</p>
-<p>なので、k1LoW/deckの思想は受け継ぎつつ、デザインの側をGoogle SlidesではなくHTML/CSSで持つ、という形にした。Peithoの設計は三本柱にしている。</p>
-<ol>
-<li><strong>コンテンツとデザインの分離</strong> — コンテンツはMarkdown、デザインはレイアウトHTMLとCSS。両者を混ぜない（k1LoW/deckリスペクト）</li>
-<li><strong>git管理可能なHTML/CSSレイアウト</strong> — デザイン成果物はただのHTML/CSS。diffが取れ、レビューできる</li>
-<li><strong>型検査されるスロット契約</strong> — レイアウトはスロット（タイトル・本文・コードなど、コンテンツの挿し込み口）を持ち、そこに何をいくつ書けるかを宣言する。Markdownの内容がその宣言に合わないときは、黙って捨てられる代わりに行番号とヒント付きのビルドエラーになる</li>
-</ol>
-<p>もうひとつ、プレゼンツールも自分が使いやすいものがほしくなった、という動機もある。ただ、まだどういう仕様にするかは詰め切れていないので、これからブラッシュアップしていく。</p>
-<hr />
-<h2>デッキの書き方</h2>
-<p>デッキは素のMarkdownで書ける。<code>---</code>で区切ったかたまりが1枚のスライドになり、最も浅い見出しはタイトル、コードブロックはcodeスロット、残りはbodyスロットへ、という規約で自動的に割り当てられる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="gh"># タイトル
-</span></span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">本文の段落。
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">-</span> リストも
-</span></span><span class="line"><span class="cl"><span class="k">-</span> 使える
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">---
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="gh"># 次のスライド
-</span></span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="s">```rust
-</span></span></span><span class="line"><span class="cl"><span class="k">enum</span> <span class="nc">Phase</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Parsed</span><span class="p">,</span><span class="w"> </span><span class="n">Mapped</span><span class="p">,</span><span class="w"> </span><span class="n">Checked</span><span class="p">,</span><span class="w"> </span><span class="n">Rendered</span><span class="w"> </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="s">```</span>
-</span></span></code></pre><p><code>peitho build deck.md</code>で<code>dist/</code>に配布物（スライドHTML断片+manifest.json+index.html+CSS）が生成される。manifest.jsonはデッキの目次にあたるファイルで、スライドの順序やキー、各HTML断片のパスを持っていて、index.htmlはこれを読んでスライドを順に表示する。レイアウトとテーマはバイナリに内蔵されたデフォルトがあるので、デッキファイルがひとつあればどこでも動く。差し替えたいときはデッキファイルと同じディレクトリに<code>layouts/</code>と<code>css/</code>を置けば自動検出される、というゼロコンフィグ規約にしている。</p>
-<hr />
-<h2>レイアウト自身がスキーマ</h2>
-<p>デザインの単位はレイアウトで、ただのHTMLファイル。Web Componentsの<code>&lt;slot&gt;</code>を借用した記法で、スロットの名前・受け入れるコンテンツ型・個数（arity）を宣言する。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;peitho-slide&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;&lt;</span><span class="nt">slot</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;title&#34;</span> <span class="na">accepts</span><span class="o">=</span><span class="s">&#34;inline&#34;</span> <span class="na">arity</span><span class="o">=</span><span class="s">&#34;1&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">slot</span><span class="p">&gt;&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;body&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">slot</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;body&#34;</span> <span class="na">accepts</span><span class="o">=</span><span class="s">&#34;blocks&#34;</span> <span class="na">arity</span><span class="o">=</span><span class="s">&#34;0..*&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">slot</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">figure</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;code&#34;</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">slot</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;code&#34;</span> <span class="na">accepts</span><span class="o">=</span><span class="s">&#34;code&#34;</span> <span class="na">arity</span><span class="o">=</span><span class="s">&#34;0..1&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">slot</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">figure</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
-</span></span></code></pre><p>これはPeithoに内蔵されているデフォルトレイアウトそのもの。ポイントは、このHTML自身がスキーマを兼ねているところ。ビルド時にPeithoがこのレイアウトをパースして、「titleはインライン要素がちょうど1個、bodyはブロック要素がいくつでも、codeはコードブロックが0〜1個」という契約を取り出し、Markdownで書いた内容がそれを満たしているかを検査する。</p>
-<p>たとえばcodeスロットは<code>arity=&quot;0..1&quot;</code>なので、このレイアウトのスライドにコードブロックを2つ書くとビルドが止まる。</p>
-<pre><code>error: slide 2 ('code-slide'), line 7: slot 'code' got 2 item(s), but layout 'title-body-code' allows 0..1
-  = help: use a layout with more code capacity or remove one code block
-</code></pre>
-<p>Rustコンパイラ風に、行番号とhelpつきでエラーになる。<code>('code-slide')</code>は該当スライドに振ったキーで、これは次で説明する。</p>
-<hr />
-<h2>キー付きper-slide調整</h2>
-<p>「このスライドだけコードの背景色を変えたい」みたいな個別調整は、まずMarkdown側で、スライドの先頭にページ設定コメントを書いて安定キーを振る。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">&lt;!-- {&#34;key&#34;:&#34;payoff&#34;} --&gt;
-</span></span><span class="line"><span class="cl"><span class="gh"># The compiler reviews every caller
-</span></span></span></code></pre><p>キーを振ったスライドは、生成されるHTMLの要素に<code>data-slide-key=&quot;payoff&quot;</code>という属性が付く。CSS側では、この属性を目印にして、そのスライドだけにスタイルを当てる。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="o">[</span><span class="nt">data-slide-key</span><span class="o">=</span><span class="s2">&#34;payoff&#34;</span><span class="o">]</span> <span class="p">.</span><span class="nc">slot-code</span> <span class="p">{</span> <span class="k">background</span><span class="p">:</span> <span class="mh">#0d2822</span><span class="p">;</span> <span class="p">}</span>
-</span></span></code></pre><p>このCSSも<code>peitho build</code>の検査対象になっていて、デッキに存在しないキーを指定しているとビルド時にエラーになる。スライドを消したり書き換えたりしてキーが無くなったのに、それを指定したCSSが参照切れのまま静かに残り続ける、ということもない。</p>
-<hr />
-<h2>複数レイアウトと型駆動ディスパッチ</h2>
-<p>レイアウトは複数持てて、どのスライドにどのレイアウトが適用されるかは次の順で決まる。</p>
-<ol>
-<li>ページ設定コメント<code>&lt;!-- {&quot;layout&quot;:&quot;cover&quot;} --&gt;</code>による明示指定</li>
-<li>レイアウトが1枚だけなら無条件にそれ</li>
-<li>複数枚なら、スライドの内容の形（タイトルだけ・本文あり・コードあり等）にスロット契約が一致するレイアウトへ自動で振り分ける</li>
-</ol>
-<p>3の型駆動ディスパッチは、ちょうど1枚に一致することが条件で、複数一致（曖昧）も0枚一致も黙って解決せずビルドエラーにして明示指定を促す。ここもk1LoW/deckのページ設定の仕組みを参考にしつつ、「黙って何かが起きる」経路を残さないようにした。</p>
-<hr />
-<h2>peitho present</h2>
-<p>ビルドだけでなく発表もカバーしていて、<code>peitho present deck.md</code>でローカルサーバを立ててブラウザを起動する。外部ディスプレイがあればそちらにスライドをフルスクリーン、手元のディスプレイに発表者ビュー（現在/次スライド・ノート・タイマー）を自動配置する。Escで全ウィンドウとサーバがまとめて終了する。Keynote的な発表体験をブラウザでやる、というもの。</p>
-<p>実行するとこんな感じ。1画面のMacに仮想ディスプレイを足して、それを外部ディスプレイに見立てた環境での録画。スライドが仮想ディスプレイ側にフルスクリーンで出て、手元に発表者ビューが開き、Escでまとめて終了する。</p>
-<p><video src="/images/2026/07/peitho-present.mp4" controls muted playsinline style="max-width:100%"></video></p>
-<hr />
-<h2>サンプル</h2>
-<p>Peithoのリポジトリの<code>examples/</code>に、内容もレイアウト構造もテーマも異なるサンプルを置いていて、<a href="https://peitho.gosu.ke/">デモサイト</a>でそのまま見られる。</p>
-<p><em>Keynote</em> — クリーム地+セリフ体+中央寄せ。cover（タイトルのみ）とstatement（タイトル+本文）の2レイアウト構成で、型駆動ディスパッチが内容の形からレイアウトを振り分ける。</p>
-<p><img src="/images/2026/07/peitho-keynote.png" alt="Keynoteサンプル" /></p>
-<p><em>Code Walkthrough</em> — ターミナル風2カラムのコード解説。codeスロットが<code>arity=&quot;1&quot;</code>なので、毎スライドにコードが必須。シンタックスハイライトは<a href="https://github.com/trishume/syntect">syntect</a>（ArgusやIrisと同じ）でビルド時にかけていて、実行時JSは無く、色はテーマCSSで定義する。</p>
-<p><img src="/images/2026/07/peitho-code-walkthrough.png" alt="Code Walkthroughサンプル" /></p>
-<p><em>Lightning Talk</em> — ダーク+大型タイポのLT向けデザイン。レイアウトにcodeスロットが無いので、コードを書くとビルドエラーになる。</p>
-<p><img src="/images/2026/07/peitho-lightning-talk.png" alt="Lightning Talkサンプル" /></p>
-<p>この「コードを書くとビルドエラーになるレイアウト」というのが、レイアウトがスキーマを兼ねることの面白いところだと思っている。レイアウトが「このスライドに何を書けるか」を決めて、それをビルドが守らせる。</p>
-<hr />
-<h2>実装</h2>
-<p>ビルドコアはRust。デッキを表す型が、パース済み（<code>Parsed</code>）→スロット割り当て済み（<code>Mapped</code>）→検査済み（<code>Checked</code>）→レンダリング済み（<code>Rendered</code>）と、パイプラインの段階ごとに分かれていて、レンダラは検査済みの型しか受け取れない。つまり、検査をすっ飛ばしてレンダリングするようなコードは、実行時エラーになるのではなく、そもそもコンパイルが通らない。いわゆるtypestateパターン。Rustのdoctestには「このコードはコンパイルに失敗するはず」を検証できる<code>compile_fail</code>という仕組みがあるので、検査前のデッキをレンダラに渡すコードが実際にコンパイルエラーになること自体もテストで固定している。</p>
-<p>一方、<code>peitho present</code>の発表時にブラウザ側で動く部分（スライド表示、キー操作、タイマー、画面間の同期）はTypeScriptで書いている。RustとTypeScriptの両方で、ビルドが出力するmanifest等の同じデータ構造を扱うことになるので、型定義はRust側にだけ置いて、TypeScript側の型は<a href="https://github.com/Aleph-Alpha/ts-rs">ts-rs</a>で自動生成している。手書きの型が2つあるとズレていくので、生成した型がRust側と一致しているかをCIで検査する。</p>
-<hr />
-<h2>名前の由来</h2>
-<p>Peitho（ペイトー）は、力ではなく言葉で人の心を動かすことを司るギリシャ神話の女神から。プレゼンテーションはまさに言葉で人の心を動かす行為なので、ぴったりだと思ってつけた。Carina、Pyxis、Argus、Irisと続いてきた神話シリーズの並びでもある。</p>
-<hr />
-<h2>今後</h2>
-<ul>
-<li>実際の発表スライドを公開するサイト（スライドのMarkdownをリポジトリにpushしたら、CIがビルド=契約検査して、そのままサイトで公開されるところまで自動化したい）</li>
-<li>スピーカーノートのMarkdown記法（発表者ビューの表示側はできていて、記法だけ未決）</li>
-<li>2カラムなど規約で曖昧になるレイアウト向けの、fenced divによる明示スロット記法</li>
-<li>プレゼンツールとしての機能充実</li>
-</ul>
-<p>などなど。</p>
-<p>ちなみに、プレゼンツールつくってるけど、次のプレゼンの予定は今のところ特にない。</p>
-<hr />
-<p>参考:</p>
-<ul>
-<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
-<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
-<li><a href="https://github.com/k1LoW/deck">k1LoW/deck</a></li>
-<li><a href="https://www.docswell.com/s/Songmu/K137GV-about-deck">k1LoW/deckの紹介とチュートリアル</a></li>
 </ul>
 
 ]]></content>
