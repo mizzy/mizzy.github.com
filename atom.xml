@@ -3,12 +3,49 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-13T23:08:56+09:00</updated>
+    <updated>2026-07-18T12:52:28+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peithoにスマホからスライド操作できる機能を入れた]]></title>
+        <link href="https://mizzy.org/blog/2026/07/18/1/"/>
+        <updated>2026-07-18T12:52:28+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/18/1/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話の続き。今回はスマホからスライドを操作できるようにした話。</p>
+<p><code>peitho present deck.md --host</code>で起動すると、ターミナルにQRコードが表示される。これをスマホで読み取ると、スマホがスライドのリモコンになる。</p>
+<hr />
+<h2>--hostでLANに公開する</h2>
+<p>通常の<code>peitho present</code>はlocalhostにしかバインドしない。<code>--host</code>をつけると、LANに向けたリスナーも追加で立ち上がる。IPアドレスを明示的に指定することもできるけど、<code>--host</code>だけ渡せば自動で適切なアドレスを選んでくれる。TailscaleなどのメッシュVPNのアドレスがあればそれを優先し、なければLANのアドレスを使う。</p>
+<p>起動するとターミナルにQRコードとURLが表示される。</p>
+<p><img src="/images/2026/07/peitho-remote-qr.png" alt="ターミナルに表示されるQRコード" /></p>
+<hr />
+<h2>スマホ側の画面</h2>
+<p>QRコードを読み取ると<code>/remote</code>ページが開く。縦持ちだとこんな感じ。</p>
+<p><img src="/images/2026/07/peitho-remote-portrait.png" alt="スマホリモコン（縦持ち）" /></p>
+<p>上からスライドプレビュー、タイトルとスライド番号、かめとうさぎのトラッカー、タイマー操作、スピーカーノート、Previous/Nextボタン、という構成。PC側の発表者ツールに出ている情報がほぼそのままスマホに載っている。</p>
+<p>スライドプレビューは実際のスライドHTMLをそのまま縮小表示しているので、本物と同じ見た目。</p>
+<p>横持ちにするとレイアウトが切り替わる。</p>
+<p><img src="/images/2026/07/peitho-remote-landscape.png" alt="スマホリモコン（横持ち）" /></p>
+<p>左にプレビューとトラッカー、中央にスピーカーノート、右にPrevious/Nextボタン、という3カラム構成になる。</p>
+<hr />
+<h2>ホーム画面に追加できる</h2>
+<p><code>/remote</code>ページはPWA（Progressive Web App）として動くようにしてある。iOSの「ホーム画面に追加」で登録すると、次からSafariのアドレスバーなしのフルスクリーンで開く。</p>
+<p><code>--host</code>のポートはデフォルトで6173に固定されているので、URLが再起動で変わらない。一度ホーム画面に追加しておけば、次の発表のときもそのまま使える。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+<li><a href="/blog/2026/07/07/1/">前回の記事: PeithoにPDFエクスポート機能を入れた</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[DevOpsとは何だったのか]]></title>
@@ -669,64 +706,6 @@ css/
 <li><a href="https://github.com/k1LoW/deck">k1LoW/deck</a></li>
 <li><a href="https://www.docswell.com/s/Songmu/K137GV-about-deck">k1LoW/deckの紹介とチュートリアル</a></li>
 </ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Pyxisの開発: RMSNorm]]></title>
-        <link href="https://mizzy.org/blog/2026/07/01/2/"/>
-        <updated>2026-07-01T21:10:07+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/01/2/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/07/01/1/">前回の記事</a>でembeddingテーブルルックアップを実装して、トークンIDからベクトルを取り出せるようになった。今回はそのベクトルに対して最初に適用される正規化処理、RMSNormを実装した。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/18">#18</a>。</p>
-<hr />
-<h2>RMSNormとは</h2>
-<p>RMSNormは2019年にBiao ZhangとRico Sennrichが<a href="https://arxiv.org/abs/1910.07467">提案</a>した正規化手法。LLaMA以降のLLM（Mistral、Gemma、Qwen、DeepSeekなど）で広く採用されている。</p>
-<p>正規化とは、ベクトルの各要素の値の大きさを一定の基準に揃える処理。学習時に値が大きくなりすぎたり小さくなりすぎたりするのを防ぐために導入された手法で、モデルは正規化が入った状態で訓練されている。推論時にも同じ正規化を適用しないと正しい結果が出ないので、Pyxisでも実装する必要がある。</p>
-<p>RMSNormは2つのステップからなる。まず各要素をRMS（二乗平均平方根）で割る。RMSは各要素を二乗して平均を取り、その平方根を取った値。たとえば<code>[1.0, 3.0, -2.0, 4.0]</code>のRMSは、二乗して<code>[1.0, 9.0, 4.0, 16.0]</code>、平均が<code>(1.0 + 9.0 + 4.0 + 16.0) / 4 = 7.5</code>、平方根を取って<code>sqrt(7.5) ≈ 2.74</code>。各要素をこのRMSで割ると<code>[0.37, 1.10, -0.73, 1.46]</code>になる。要素間の比率は保ったまま、正規化後のベクトルのRMSが1.0になる。</p>
-<p>次に、学習済みのweightを要素ごとに掛ける。このweightはsafetensorsファイルにテンソルとして保存されているパラメータで、各要素の重要度に応じた調整を行う。</p>
-<p>もともとよく使われていたのはLayerNormで、計算式はこうなる。</p>
-<pre><code>y[i] = (x[i] - mean(x)) / sqrt(var(x) + ε) * weight[i] + bias[i]
-</code></pre>
-<p>まず平均を引いて（re-centering）、標準偏差で割って（re-scaling）正規化し、そこに学習済みのweightとbiasを適用する。biasはweightと同様の学習済みパラメータで、足し算でオフセットを加える。RMSNormはLayerNormを簡略化したもので、平均を引く処理とbiasを省いて、二乗平均平方根（Root Mean Square）で割るだけにしている。Zhang &amp; Sennrichの論文では、平均を引く処理はなくても性能に影響しないことが実験で示されていて、計算量を7〜64%削減できるとしている。</p>
-<hr />
-<h2>計算</h2>
-<p>RMSNormの計算式はこうなる。</p>
-<pre><code>y[i] = x[i] / sqrt(mean(x²) + ε) * weight[i]
-</code></pre>
-<ol>
-<li>入力ベクトル<code>x</code>の全要素を二乗して平均を取る（= 二乗平均）</li>
-<li>それにε（小さい定数、ゼロ除算防止）を足してから平方根を取る（= RMS）</li>
-<li>各要素をRMSで割る</li>
-<li>学習済みの重み<code>weight</code>を要素ごとに掛ける</li>
-</ol>
-<p>εはゼロ除算を防ぐための定数で、Qwen3では1e-6が使われている。前のセクションの具体例ではεを省略したが、実際の計算ではRMSに加算される。</p>
-<hr />
-<h2>実装</h2>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">RmsNorm</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">weight</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">eps</span>: <span class="kt">f32</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p><code>weight</code>が学習済みパラメータで、<code>eps</code>がε。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">forward</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">x</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">(),</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">weight</span><span class="p">.</span><span class="n">len</span><span class="p">());</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">mean_square</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">iter</span><span class="p">().</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">value</span><span class="o">|</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">value</span><span class="p">).</span><span class="n">sum</span>::<span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">f32</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">mean_square</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">eps</span><span class="p">).</span><span class="n">sqrt</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">weight</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">iter_mut</span><span class="p">().</span><span class="n">zip</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">weight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="o">*</span><span class="n">value</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">weight</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><hr />
-<p>Qwen3では、トランスフォーマーの各層の中でRMSNormが2回適用される。embeddingで取り出したベクトルが0番目の層に入ると、まずRMSNormで正規化され、アテンション（トークン間の関連度を計算する処理、次回の記事で詳しく書く）に渡される。アテンションの出力は再びRMSNormで正規化され、FFN（フィードフォワードネットワーク、ベクトルを非線形変換する処理）に渡される。それぞれのRMSNormは別の学習済みweightを持っていて、Qwen3ではsafetensorsファイルに以下の名前で格納されている。</p>
-<ul>
-<li>アテンションの前: <code>model.layers.0.input_layernorm.weight</code></li>
-<li>FFNの前: <code>model.layers.0.post_attention_layernorm.weight</code></li>
-</ul>
-<p>名前に「layernorm」とあるが、実際の処理はRMSNorm。これはLLaMAのアーキテクチャに由来する命名で、Qwen3もこれを踏襲している。名前はモデルの構造をそのまま反映していて、<code>model.layers.0</code>が0番目のトランスフォーマー層、<code>input_layernorm</code>/<code>post_attention_layernorm</code>がその層の中の各RMSNorm、<code>weight</code>がそのパラメータ、を意味する。トランスフォーマー層は複数あり（Qwen3-1.7Bでは28層）、各層がそれぞれ別のRMSNorm weightを持っている。</p>
-<p>次回はアテンションの実装について書く。</p>
 
 ]]></content>
     </entry>
