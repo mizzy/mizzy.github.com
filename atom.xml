@@ -3,12 +3,98 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-18T17:44:35+09:00</updated>
+    <updated>2026-07-21T21:06:51+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Pyxisの開発: アテンション]]></title>
+        <link href="https://mizzy.org/blog/2026/07/21/1/"/>
+        <updated>2026-07-21T21:06:51+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/21/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/07/01/2/">前回の記事</a>でRMSNormを実装した。今回はトランスフォーマーの中核であるアテンションを実装した。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/19">#19</a>。</p>
+<hr />
+<h2>アテンションとは</h2>
+<p>ここまでの処理では、各トークンのベクトルはそのトークン単体の情報しか持っていない。embeddingテーブルから取り出したベクトルはトークンの種類だけで決まっていて、前後にどんなトークンが並んでいるかは反映されていない。アテンションは、各トークンが文脈中の他のトークンの情報を取り込むための仕組み。「文脈中のどのトークンにどれだけ注目するか」を計算して、注目先のトークンの情報を自分のベクトルに混ぜ込む。</p>
+<p>アテンション自体は2014年にBahdanauらが<a href="https://arxiv.org/abs/1409.0473">機械翻訳のために提案</a>したもので、2017年の<a href="https://arxiv.org/abs/1706.03762">&quot;Attention Is All You Need&quot;</a>がアーキテクチャ全体をアテンション中心に組み立てた。これがトランスフォーマーで、現在のLLMの基礎になっている。</p>
+<hr />
+<h2>Q/K/V</h2>
+<p>アテンションでは、各トークンのベクトルにそれぞれ別の重み行列（<code>wq</code>/<code>wk</code>/<code>wv</code>）を掛けて、Q・K・Vという3種類のベクトルを作る。あるトークンのQと全トークンのKの内積を取ると、トークン間の関連度に相当するスコアが得られる。このスコアをsoftmax（数値の列を合計1の重みに変換する関数）にかけて、その重みで全トークンのVを加重平均したものが、そのトークンの新しいベクトルになる。</p>
+<p>Q・K・Vの名前はそれぞれQuery・Key・Valueの略だが、これはこの構造がなぜ機能するかを人間が理解するための後付けの解釈で、動作の本質は「入力に別々の重みを掛けて得たベクトルの内積を関連度として使う」というだけ。<code>wq</code>/<code>wk</code>/<code>wv</code>はモデルの訓練時に、次トークン予測の精度が上がるように学習された結果としてそういう役割を担うようになっている。式で書くとこうなる。</p>
+<pre><code>Attention(Q, K, V) = softmax(QKᵀ / sqrt(head_dim)) V
+</code></pre>
+<p>内積を<code>sqrt(head_dim)</code>で割っているのは、次元数が大きくなるほど内積の値も大きくなり、softmaxの出力が極端な分布（ほぼ1つのトークンだけに全部の重みが集中する）になってしまうのを防ぐため。scaled dot-product attentionと呼ばれる。</p>
+<hr />
+<h2>因果マスク</h2>
+<p>上の式のままだと、各トークンは自分の前後の全トークンにアテンションできる。<code>QKᵀ</code>は各トークンのQと全トークンのKの内積を取るので、<code>seq_len × seq_len</code>のスコア行列になる。</p>
+<p><img src="/images/2026/07/attention-scores.svg" alt="因果マスク適用前のスコア行列。全てのマスにsijが埋まっている" /></p>
+<p>たとえばQ<sub>1</sub>（1番目のトークンのQuery）は、自分より後ろのK<sub>2</sub>/K<sub>3</sub>/K<sub>4</sub>/K<sub>5</sub>とも内積を取ってしまう。ここには「前しか見ない」という制約は入っていない。</p>
+<p>しかしLLMのテキスト生成では、各トークンは自分より後ろのトークンを参照してはいけない。生成時点ではまだ存在しないトークンだから、参照しようがない。学習時と推論時で条件を揃えるため、学習時も未来のトークンは見せない、というルールにする。</p>
+<p>そのために使うのが因果マスク（causal masking）。位置<code>pos</code>のトークンは位置<code>0..=pos</code>のトークンだけにアテンションする、という制約を入れる。具体的には、スコア行列の上三角部分（s<sub>ij</sub>で<code>j &gt; i</code>のところ）を<code>-∞</code>にしておく。<code>-∞</code>はsoftmaxを通すと0になるので、未来のトークンの重みは0になり、実質的にアテンションの対象から除外される。</p>
+<p><img src="/images/2026/07/attention-causal-mask.svg" alt="因果マスクを適用したスコア行列。対角線とその下は通常のスコア（sij）、上三角部分は-∞で潰されている" /></p>
+<hr />
+<h2>マルチヘッドアテンション</h2>
+<p>ここまでは「1つのトークンから1つのQベクトルができる」という前提で話してきた。実際には、そのQベクトル（Qwen3-1.7Bだとhidden_dim = 2048次元）を、head_dim = 128次元ずつ16個に分割して使う。分割したそれぞれを「ヘッド」と呼ぶ。K・Vも同じように分割される。</p>
+<p>各ヘッドで独立にアテンション（<code>softmax(QKᵀ / sqrt(head_dim)) V</code>）を計算して、最後に全ヘッドの結果を連結して1つのベクトルに戻す。連結後にさらに出力用の重み行列（<code>wo</code>）を掛けて、最終的な出力ができる。</p>
+<p>なぜ分割するのかというと、実験的にその方が性能が上がるから。<a href="https://arxiv.org/abs/1706.03762">&quot;Attention Is All You Need&quot;</a>で提案された仕組みで、なぜ機能するかは「ヘッドごとに違う観点でトークン間の関連を捉えられるから」という直感的な説明がよくされるが、これは後付けの解釈で、実際のところは分かっていない。ヘッドの多くは冗長で削除しても性能が落ちない、という<a href="https://arxiv.org/abs/1905.10650">報告</a>もある。</p>
+<hr />
+<h2>GQA</h2>
+<p>素直に実装すると、Q・K・Vを全部同じヘッド数（Qwen3-1.7Bなら16個）作ることになる。この構成をMulti-Head Attention（MHA）と呼ぶ。</p>
+<p>Qwen3はさらに一歩進んで、GQA（Grouped Query Attention、<a href="https://arxiv.org/abs/2305.13245">Ainslieらが2023年に提案</a>）という構成を使っている。Qwen3-1.7BではQが16ヘッドあるのに対して、K/Vは8ヘッドしかない。2つのQヘッドが同じ1つのK/Vヘッドを共有する（Qヘッド0と1がK/Vヘッド0を、Qヘッド2と3がK/Vヘッド1を、という具合に）。</p>
+<p>なぜK/Vのヘッド数を減らすかというと、K/Vはメモリを食うから。特に推論時にはKVキャッシュ（過去のトークンのK/Vを保存して再利用する仕組み、後のPRで実装）で大きなメモリを消費するので、K/Vのヘッド数を減らすことでメモリ使用量を抑えられる。</p>
+<hr />
+<h2>RoPE</h2>
+<p>アテンションの計算は内積の集まりなので、そのままではトークンの並び順が結果に影響しない。「AがBを」でも「BがAを」でも同じ計算結果になってしまう。なので位置情報を何らかの形でベクトルに埋め込む必要があって、Qwen3ではRoPE（Rotary Position Embedding、<a href="https://arxiv.org/abs/2104.09864">Suらが2021年に提案</a>）が使われている。</p>
+<p>RoPEは、QとKのベクトルをトークンの位置に応じた角度で回転させる手法。ベクトルの要素を2つずつペアにして、各ペアを2次元平面上の点とみなして回転する。回転角は「位置 × 周波数」で決まり、周波数はペアごとに異なる。周波数の基準となる定数がrope_thetaで、Qwen3では1000000。</p>
+<p>内積は2つのベクトルの相対的な角度差に依存するので、位置に応じて回転させておくと、QとKの内積に位置の差（相対位置）の情報が乗る。これがRoPEの仕組み。</p>
+<p>なお、このPRの実装は隣り合う要素（0番目と1番目、2番目と3番目、...）をペアにして回転していたが、HuggingFaceの参照実装は前半と後半の要素（0番目とhead_dim/2番目、...）をペアにする方式で、このズレは後のPRで修正している。</p>
+<hr />
+<h2>実装</h2>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Attention</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">wq</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">wk</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">wv</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">wo</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">num_q_heads</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">num_kv_heads</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">head_dim</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">rope_theta</span>: <span class="kt">f32</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p><code>wq</code>/<code>wk</code>/<code>wv</code>がQ/K/Vを作るための重み行列で、Qwen3では<code>model.layers.0.self_attn.q_proj.weight</code>のような名前でsafetensorsファイルに格納されている。<code>wo</code>は出力用の重み行列で、全ヘッドの結果を連結したものに掛けて最終的な出力を作る。</p>
+<p><code>forward()</code>の流れはこうなる。</p>
+<ol>
+<li>各位置の入力ベクトルに<code>wq</code>/<code>wk</code>/<code>wv</code>を掛けてQ/K/Vを作る</li>
+<li>QとKにRoPEを適用する</li>
+<li>各位置・各Qヘッドについて、自分以前の位置のKとの内積を取り、<code>sqrt(head_dim)</code>で割ってスコアにする</li>
+<li>スコアをsoftmaxで重みに変換する</li>
+<li>重みでVを加重平均する</li>
+<li>全ヘッドの結果を連結して<code>wo</code>を掛ける</li>
+</ol>
+<p>スコア計算の部分を抜粋するとこうなっている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">scores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="kt">f32</span>::<span class="no">NEG_INFINITY</span><span class="p">;</span><span class="w"> </span><span class="n">seq_len</span><span class="p">];</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">key_pos</span><span class="p">,</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">scores</span><span class="p">.</span><span class="n">iter_mut</span><span class="p">().</span><span class="n">enumerate</span><span class="p">().</span><span class="n">take</span><span class="p">(</span><span class="n">pos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">k_start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key_pos</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kv_dim</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">kv_head</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">head_dim</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">dot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="bp">self</span><span class="p">.</span><span class="n">head_dim</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">dim</span><span class="o">|</span><span class="w"> </span><span class="n">queries</span><span class="p">[</span><span class="n">q_start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dim</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">keys</span><span class="p">[</span><span class="n">k_start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dim</span><span class="p">])</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">.</span><span class="n">sum</span>::<span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">*</span><span class="n">score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">scale</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">softmax</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">scores</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre><p>因果マスクは、スコアを<code>NEG_INFINITY</code>で初期化して、自分以前の位置（<code>take(pos + 1)</code>）だけスコアを計算する、という形で実装している。<code>NEG_INFINITY</code>はsoftmaxを通すと0になるので、未来のトークンの重みは0になる。</p>
+<p>GQAは、Qヘッドの番号から対応するK/Vヘッドの番号を求めることで実現している。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="kd">let</span><span class="w"> </span><span class="n">kv_head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">q_head</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">num_kv_heads</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">num_q_heads</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre><p>Qが16ヘッド、K/Vが8ヘッドなら、Qヘッド0と1がK/Vヘッド0を、Qヘッド2と3がK/Vヘッド1を使う。</p>
+<hr />
+<p>これで、各トークンのベクトルに、文脈中の他のトークンの情報を関連度に応じて混ぜ込む仕組みができた。次回はトランスフォーマー層のもうひとつの構成要素であるFFN（SwiGLU）の実装について書く。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peithoにスライドのはみ出し検査（peitho lint）を入れた]]></title>
@@ -555,101 +641,6 @@ css/
 <li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
 <li><a href="/blog/2026/07/03/1/">前回の記事: プレゼンツールPeithoをつくっている</a></li>
 <li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
-</ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[個人用メモアプリをつくっている]]></title>
-        <link href="https://mizzy.org/blog/2026/07/03/2/"/>
-        <updated>2026-07-03T21:30:00+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/03/2/</id>
-        <content type="html"><![CDATA[
-<p>Obsidianの代替として、個人用のメモツールWebアプリをつくりはじめた。リポジトリは<a href="https://github.com/mizzy/memo">mizzy/memo</a>。Cloudflare上で動かしている。</p>
-<p><img src="/images/2026/07/memo-desktop.png" alt="memoアプリのデスクトップ表示" /></p>
-<hr />
-<h2>なぜつくったか</h2>
-<p>ObsidianはMarkdownが書けるメモツールとして常用していて、PC上での利用には特に不満はない。ただ、Obsidianの豊富な機能を使いこなしているわけでもなくて、メモを書いて読む、という基本的な使い方しかしていない。</p>
-<p>問題はiOSアプリで、挙動が不安定。特に、開いたときにindexingという表示のまま進まないことがよくある。同期まわりの問題だと思うけど、外出先でさっとメモを確認したいときに待たされていらつく。</p>
-<p>自分が求めているのは、Markdownで書けてPCとiPhoneで同期ができるメモツールなので、Obsidianを使い続けなくても、自分の使い方だけに特化したシンプルなツールをつくったほうがいいのでは、と考えた。データをサーバ側のDBに置くWebアプリなら、そもそも同期という概念自体が消える。PWAとしてiPhoneのホーム画面に追加すれば、起動もネイティブアプリに近い体験にできる。</p>
-<p>あと、<a href="/blog/2026/06/16/1/">ホテルメモサイトをAstroで作り直した</a>ときにもObsidianの利用をやめたのだけど、生成AIのおかげで「既製ツールの不満を我慢しながら使い続ける」より「自分のユースケースだけ満たす専用ツールをさくっとつくる」ほうが早い、という状況になってきていると思う。</p>
-<hr />
-<h2>技術スタック</h2>
-<table>
-<thead>
-<tr>
-<th>Layer</th>
-<th>Tech</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>API</td>
-<td>Hono + TypeScript</td>
-</tr>
-<tr>
-<td>Frontend</td>
-<td>React + Vite + TypeScript</td>
-</tr>
-<tr>
-<td>Editor</td>
-<td>Tiptap (ProseMirrorベース)</td>
-</tr>
-<tr>
-<td>DB</td>
-<td>Cloudflare D1 + Drizzle ORM</td>
-</tr>
-<tr>
-<td>Storage</td>
-<td>Cloudflare R2 (画像添付)</td>
-</tr>
-<tr>
-<td>Hosting</td>
-<td>Cloudflare Workers</td>
-</tr>
-<tr>
-<td>Auth</td>
-<td>Cloudflare Access</td>
-</tr>
-<tr>
-<td>Infra</td>
-<td>Terraform (stateはR2に保存)</td>
-</tr>
-</tbody>
-</table>
-<p>1つのWorkerで静的アセット(SPA)とAPIの両方を配信する、単一Worker構成にしている。当初はPagesとWorkersを分ける構成を考えていたけど、同一オリジンならCORSの設定が不要になるし、認証Cookieも何も考えなくても全リクエストに付いてくる。個人ツールでフロントとAPIを別々に更新したい場面はそもそも少ないので、分離は必要になってからで遅くない、という判断。</p>
-<p>認証まわりのコードはアプリ内には一切なくて、前段のCloudflare Accessで自分のGmailアカウントだけを許可している。アプリ本体は認証のことを何も知らないまま、Cloudflareのログイン画面で守られる。個人ツールならこれで十分。</p>
-<hr />
-<h2>機能</h2>
-<p>今のところ実装しているのはこのあたり。</p>
-<ul>
-<li>メモの作成・編集・一覧・検索</li>
-<li>Vault機能(Obsidianと同様、常に1つのVaultを開いてスイッチャーで切り替える)</li>
-<li>フォルダ機能(Vault内に任意深さのフォルダ木を持ち、デスクトップではフォルダツリー/メモ一覧/エディタの3ペイン構成)</li>
-<li>画像添付(R2にアップロード)</li>
-<li>PWA対応(iPhoneのホーム画面に追加して利用)</li>
-</ul>
-<p>デスクトップはこんな感じ。左上のVaultスイッチャーでVaultを切り替える。</p>
-<p><img src="/images/2026/07/memo-vault-switcher.png" alt="Vaultスイッチャー" /></p>
-<p>モバイルはこんな感じ。ホームがフォルダツリーで、フォルダを開くとメモ一覧、メモを開くとエディタ、という画面遷移にしている。</p>
-<div style="display:flex;gap:12px;">
-<img src="/images/2026/07/memo-mobile-home.png" alt="モバイルのフォルダツリー" style="width:calc(50% - 6px);max-width:280px;height:auto;">
-<img src="/images/2026/07/memo-mobile-editor.png" alt="モバイルのエディタ" style="width:calc(50% - 6px);max-width:280px;height:auto;">
-</div>
-<hr />
-<h2>デザイン</h2>
-<p>見た目がそれっぽくないとモチベーションが上がらない、というのはホテルメモのときと同じなので、今回もビジュアルデザインはClaude Designにお願いした。まず方向性の違う3案(A: 紙とインク、B: ターミナル、C: 夜の書斎)のモックをHTMLでつくってもらって、並べて比較した。</p>
-<p><img src="/images/2026/07/memo-design-compare.png" alt="デザイン方向性の比較" /></p>
-<p>BとCで迷った結果、Cの雰囲気にBの道具っぽさを足したハイブリッドのD案「夜の書斎×道具」に決めた。ミッドナイトブルーの地にランプの琥珀色、本文はZen Kaku Gothic New、日付などのメタ情報はIBM Plex Mono、ロゴだけFraunces、という使い分けにしている。B案にあったプロンプト風の装飾やstatuslineみたいな、見た目だけターミナルをなぞった要素は、検討の過程で結局外した。</p>
-<p>ホテルメモのときは、Claude Designがローカルファイルを直接編集できないので、デザインを直すたびにClaude Designで実装指示書をつくってClaude Codeに渡し直す、というのが面倒だった。今はClaude CodeとClaude Designの連携がしやすくなっていて、Claude Codeからデザインファイルを直接Claude Designのプロジェクトに同期できる。なので今回は、モックや現状UIのスナップショットをリポジトリの<code>design/</code>に置いてClaude Design側と同期し、Claude Designが出してきた改善版デザインをClaude Codeが実装する、という流れで回している。</p>
-<hr />
-<h2>今後</h2>
-<p>まだつくりはじめたばかりなので、しばらくは自分で使いながら不満点を潰していく予定。Obsidianに溜まっている既存のメモの移行もこれから。</p>
-<hr />
-<p>参考:</p>
-<ul>
-<li><a href="https://github.com/mizzy/memo">mizzy/memo</a></li>
 </ul>
 
 ]]></content>

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 380" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="18">
+  <defs>
+    <style>
+      .cell { fill: #e6f2ff; stroke: #4a90e2; stroke-width: 1.5; }
+      .cell-text { fill: #1a3a5c; }
+      .axis-label { fill: #333333; font-weight: 600; }
+      .sub { font-size: 12px; baseline-shift: sub; }
+    </style>
+  </defs>
+
+  <!-- Column headers (K1..K5) -->
+  <g class="axis-label" text-anchor="middle">
+    <text x="130" y="50">K<tspan class="sub">1</tspan></text>
+    <text x="200" y="50">K<tspan class="sub">2</tspan></text>
+    <text x="270" y="50">K<tspan class="sub">3</tspan></text>
+    <text x="340" y="50">K<tspan class="sub">4</tspan></text>
+    <text x="410" y="50">K<tspan class="sub">5</tspan></text>
+  </g>
+
+  <!-- Row headers (Q1..Q5) -->
+  <g class="axis-label" text-anchor="middle">
+    <text x="60" y="97">Q<tspan class="sub">1</tspan></text>
+    <text x="60" y="147">Q<tspan class="sub">2</tspan></text>
+    <text x="60" y="197">Q<tspan class="sub">3</tspan></text>
+    <text x="60" y="247">Q<tspan class="sub">4</tspan></text>
+    <text x="60" y="297">Q<tspan class="sub">5</tspan></text>
+  </g>
+
+  <!-- Row 1: Q1 -->
+  <rect class="cell" x="100" y="75" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="130" y="102" text-anchor="middle">s<tspan class="sub">11</tspan></text>
+  <rect class="cell" x="170" y="75" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="200" y="102" text-anchor="middle">s<tspan class="sub">12</tspan></text>
+  <rect class="cell" x="240" y="75" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="270" y="102" text-anchor="middle">s<tspan class="sub">13</tspan></text>
+  <rect class="cell" x="310" y="75" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="340" y="102" text-anchor="middle">s<tspan class="sub">14</tspan></text>
+  <rect class="cell" x="380" y="75" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="410" y="102" text-anchor="middle">s<tspan class="sub">15</tspan></text>
+
+  <!-- Row 2: Q2 -->
+  <rect class="cell" x="100" y="125" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="130" y="152" text-anchor="middle">s<tspan class="sub">21</tspan></text>
+  <rect class="cell" x="170" y="125" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="200" y="152" text-anchor="middle">s<tspan class="sub">22</tspan></text>
+  <rect class="cell" x="240" y="125" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="270" y="152" text-anchor="middle">s<tspan class="sub">23</tspan></text>
+  <rect class="cell" x="310" y="125" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="340" y="152" text-anchor="middle">s<tspan class="sub">24</tspan></text>
+  <rect class="cell" x="380" y="125" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="410" y="152" text-anchor="middle">s<tspan class="sub">25</tspan></text>
+
+  <!-- Row 3: Q3 -->
+  <rect class="cell" x="100" y="175" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="130" y="202" text-anchor="middle">s<tspan class="sub">31</tspan></text>
+  <rect class="cell" x="170" y="175" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="200" y="202" text-anchor="middle">s<tspan class="sub">32</tspan></text>
+  <rect class="cell" x="240" y="175" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="270" y="202" text-anchor="middle">s<tspan class="sub">33</tspan></text>
+  <rect class="cell" x="310" y="175" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="340" y="202" text-anchor="middle">s<tspan class="sub">34</tspan></text>
+  <rect class="cell" x="380" y="175" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="410" y="202" text-anchor="middle">s<tspan class="sub">35</tspan></text>
+
+  <!-- Row 4: Q4 -->
+  <rect class="cell" x="100" y="225" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="130" y="252" text-anchor="middle">s<tspan class="sub">41</tspan></text>
+  <rect class="cell" x="170" y="225" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="200" y="252" text-anchor="middle">s<tspan class="sub">42</tspan></text>
+  <rect class="cell" x="240" y="225" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="270" y="252" text-anchor="middle">s<tspan class="sub">43</tspan></text>
+  <rect class="cell" x="310" y="225" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="340" y="252" text-anchor="middle">s<tspan class="sub">44</tspan></text>
+  <rect class="cell" x="380" y="225" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="410" y="252" text-anchor="middle">s<tspan class="sub">45</tspan></text>
+
+  <!-- Row 5: Q5 -->
+  <rect class="cell" x="100" y="275" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="130" y="302" text-anchor="middle">s<tspan class="sub">51</tspan></text>
+  <rect class="cell" x="170" y="275" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="200" y="302" text-anchor="middle">s<tspan class="sub">52</tspan></text>
+  <rect class="cell" x="240" y="275" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="270" y="302" text-anchor="middle">s<tspan class="sub">53</tspan></text>
+  <rect class="cell" x="310" y="275" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="340" y="302" text-anchor="middle">s<tspan class="sub">54</tspan></text>
+  <rect class="cell" x="380" y="275" width="60" height="40" rx="4"/>
+  <text class="cell-text" x="410" y="302" text-anchor="middle">s<tspan class="sub">55</tspan></text>
+</svg>
