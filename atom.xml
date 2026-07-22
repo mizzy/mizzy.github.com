@@ -3,12 +3,91 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-21T21:06:51+09:00</updated>
+    <updated>2026-07-22T21:46:47+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Pyxisの開発: FFN (SwiGLU)]]></title>
+        <link href="https://mizzy.org/blog/2026/07/22/1/"/>
+        <updated>2026-07-22T21:46:47+09:00</updated>
+        <id>https://mizzy.org/blog/2026/07/22/1/</id>
+        <content type="html"><![CDATA[
+<p><a href="/blog/2026/07/21/1/">前回の記事</a>でアテンションを実装した。今回はトランスフォーマー層のもうひとつの構成要素、FFN（Feed-Forward Network）を実装した。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/20">#20</a>。</p>
+<hr />
+<h2>FFNとは</h2>
+<p>トランスフォーマーの各層は、アテンションとFFNの2つのサブレイヤーからなる。アテンションが「トークン間で情報を混ぜる」役割だったのに対して、FFNは「各トークンのベクトル自体を非線形変換する」役割を担う。</p>
+<p>計算の性質にも違いがある。アテンションは<code>QKᵀ</code>のようにトークン間の相互作用を扱うのでトークン列全体を見る必要がある。一方FFNは各トークンのベクトルを独立に処理する（トークンAのFFNの計算にトークンBは関与しない）。位置ごとに同じ計算をするだけなので、実装もシンプル。</p>
+<p>FFN自体は&quot;<a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>&quot;のオリジナルのトランスフォーマーから存在していて、そこでは2層の線形変換の間にReLUを挟むだけの構造だった。</p>
+<pre><code>FFN(x) = max(0, x × W1 + b1) × W2 + b2
+</code></pre>
+<p>やっていることは:</p>
+<ol>
+<li>入力<code>x</code>（<code>hidden_dim</code>次元）に重み行列<code>W1</code>を掛けてバイアス<code>b1</code>を足し、<code>hidden_dim</code>より大きい中間層の次元に変換する</li>
+<li>その結果にReLU（<code>max(0, x)</code>）を適用する</li>
+<li>さらに重み行列<code>W2</code>を掛けてバイアス<code>b2</code>を足し、元の<code>hidden_dim</code>次元に戻す</li>
+</ol>
+<p>元論文では<code>hidden_dim = 512</code>、中間層の次元 = 2048で、中間層で4倍に次元を広げてから元に戻す構造。「中間で次元を広げてから戻す」というのが、表現力を確保するための工夫。</p>
+<p>ReLU（Rectified Linear Unit）は<code>max(0, x)</code>という単純な活性化関数で、負の値は0にして、正の値はそのまま通す。</p>
+<p>活性化関数というのは、線形変換（行列の掛け算）の出力に対してかける非線形な関数のこと。ニューラルネットワークでは、線形変換だけを重ねても表現力が上がらない（何層重ねても1つの線形変換と等価になってしまう）ので、間に非線形な関数を挟む必要がある。ReLUはその代表例で、実装が単純で計算も速いため広く使われてきた。</p>
+<p>現代のLLMでは、この単純な構造は改良されている。Qwen3を含むLLaMA以降のLLMではSwiGLUという構造が使われている。</p>
+<hr />
+<h2>SwiGLU</h2>
+<p>SwiGLUは2020年にNoam Shazeerが<a href="https://arxiv.org/abs/2002.05202">&quot;GLU Variants Improve Transformer&quot;</a>で提案した。GLU（Gated Linear Unit）というゲート機構と、Swish（SiLUとも呼ばれる）という活性化関数を組み合わせたもの。</p>
+<p>計算はこうなる。</p>
+<pre><code>SwiGLU(x) = down_proj(SiLU(gate_proj(x)) * up_proj(x))
+</code></pre>
+<p>3つの重み行列（<code>gate_proj</code>、<code>up_proj</code>、<code>down_proj</code>）が使われる。</p>
+<ol>
+<li><code>x</code>（hidden_dim次元）に<code>gate_proj</code>と<code>up_proj</code>をそれぞれ掛けて、2つの中間ベクトル（intermediate_size次元）を作る</li>
+<li><code>gate_proj(x)</code>にSiLUを適用する</li>
+<li>その結果と<code>up_proj(x)</code>を要素ごとに掛ける（ここがゲート機構）</li>
+<li>結果に<code>down_proj</code>を掛けて<code>hidden_dim</code>次元に戻す</li>
+</ol>
+<p>Qwen3-1.7Bでは<code>hidden_dim = 2048</code>、<code>intermediate_size = 6144</code>。つまりFFNの中で一度2048次元から6144次元に「広げて」計算を行い、また2048次元に「戻す」という構造。中間で次元を広げることで表現力を高める、というのは元のFFNから引き継がれている考え方。</p>
+<p>SiLUは<code>x * sigmoid(x)</code>という活性化関数で、値の範囲を非線形に潰す役割。ReLUと違って負の値も少し通す滑らかな関数で、<a href="https://arxiv.org/abs/1710.05941">2017年にGoogleが提案した</a>。SiLUとSwishは同じ関数で、別々のグループがほぼ同時期に提案して名前が2つ付いた（後にSwishはSiLUに統一される流れになった）。</p>
+<p>「なぜSwiGLUが良いのか」については、論文自体が「we offer no explanation as to why these architectures seem to work; we attribute their success, as all else, to divine benevolence.（なぜこれらのアーキテクチャが機能するのか説明できない。他のあらゆることと同じく、神の恩寵によるものとしておく）」と書いているくらいで、明確な理論的根拠はなく、経験的に性能が良いことが分かっている、という状態。</p>
+<hr />
+<h2>実装</h2>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Ffn</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">gate_proj</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">up_proj</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">down_proj</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">hidden_dim</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">intermediate_size</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p>3つの重み行列と、それぞれの次元を持つだけのシンプルな構造。Qwen3では<code>model.layers.0.mlp.gate_proj.weight</code>のような名前でsafetensorsに格納されている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">forward</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">x</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">(),</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">gate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">gate_proj</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">intermediate_size</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">up_proj</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">intermediate_size</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">gate_value</span><span class="p">,</span><span class="w"> </span><span class="n">up_value</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">gate</span><span class="p">.</span><span class="n">iter_mut</span><span class="p">().</span><span class="n">zip</span><span class="p">(</span><span class="n">up</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="o">*</span><span class="n">gate_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">silu</span><span class="p">(</span><span class="o">*</span><span class="n">gate_value</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">up_value</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">matmul</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="o">&amp;</span><span class="n">gate</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">down_proj</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">intermediate_size</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p>計算式そのままで、<code>gate_proj</code>と<code>up_proj</code>で中間ベクトルを2本作り、片方にSiLUをかけてもう片方と要素ごとの積を取り、<code>down_proj</code>で元の次元に戻す。</p>
+<p>SiLUの実装はこれ。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">silu</span><span class="p">(</span><span class="n">x</span>: <span class="kt">f32</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">f32</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">).</span><span class="n">exp</span><span class="p">())</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre><p><code>x * sigmoid(x)</code>と等価だが、<code>sigmoid(x) = 1 / (1 + exp(-x))</code>を展開して<code>x / (1 + exp(-x))</code>と書いている。sigmoid関数を経由せずに一つの式で書けるので簡潔。</p>
+<hr />
+<p>これでトランスフォーマー層を構成する主要な要素（RMSNorm、アテンション、FFN）がすべて揃った。次回はこれらを組み合わせて実際のトランスフォーマー層を組み立てる。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Pyxisの開発: アテンション]]></title>
@@ -592,54 +671,6 @@ css/
 <ul>
 <li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
 <li><a href="/blog/2026/07/04/1/">前回の記事: Peithoの発表者ツールをつくっている</a></li>
-<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
-</ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Peithoの発表者ツールをつくっている]]></title>
-        <link href="https://mizzy.org/blog/2026/07/04/1/"/>
-        <updated>2026-07-04T19:00:00+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/04/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/07/03/1/">前回の記事</a>でプレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>を紹介した。前回はスライドを書いて生成するところ（Markdownを書いてビルドすると型検査つきでHTMLが出てくる話）が中心だったので、今回は発表するところ、つまり発表者ツールまわりについて書く。</p>
-<p>前回、Peithoをつくった動機として「プレゼンツールも自分が使いやすいものがほしくなった」というのを挙げたけど、それがまさにこの部分。</p>
-<p><code>peitho present deck.md</code>を実行するとローカルサーバが立ち上がって、スライドと発表者ツールがそれぞれ別のChromeウィンドウで開く。外部ディスプレイがあればそちらにスライドがフルスクリーンで表示され、発表者ツールはメインディスプレイに開く。発表者ツールの見た目はこんな感じ。</p>
-<p><img src="/images/2026/07/peitho-presenter-overview.png" alt="Peithoの発表者ツール" /></p>
-<p>左に現在のスライドとスピーカーノート、右に次のスライド、タイマーとトラッカー、セクション別の時間を並べたアジェンダ、操作ボタン、という構成。ダーク基調のデザインは<a href="https://claude.ai/design">Claude Design</a>でモックをつくって、それを反映した。以下、各パーツを見ていく。</p>
-<hr />
-<h2>タイマーとトラッカー</h2>
-<p><img src="/images/2026/07/peitho-presenter-timer.png" alt="タイマーとトラッカー" /></p>
-<p>発表の予定時間はデッキのfrontmatterに書く（<code>time: 5m</code>、<code>90s</code>、<code>1h30m</code>のような書き方）。それがタイマーの計画時間になっていて、経過時間・残時間・超過時間が表示される。超過すると赤くなって<code>+00:30</code>のように追加表示。</p>
-<p>その下の細長い帯がトラッカー。かめ🐢が経過時間（フィルバーの先端と一緒に動く）、うさぎ🐰がスライドの進捗（10枚中3枚目なら30%の位置）。うさぎがかめより先にいれば余裕あり、かめに追い越されていれば遅れ気味、というのがひと目でわかる。</p>
-<p>操作ボタンはStart/Pause/Resumeが1個にまとまっていて、押すたびに次のアクションが自動で決まる。</p>
-<hr />
-<h2>セクション別の時間を並べたアジェンダ</h2>
-<p><img src="/images/2026/07/peitho-presenter-agenda.png" alt="アジェンダ" /></p>
-<p>デッキのスライドの先頭にコメントでセクションの区切りを書いておくと、発表者ツールにアジェンダが出る。</p>
-<pre class="chroma"><code><span class="line"><span class="cl">&lt;!-- {&#34;section&#34;:&#34;Setup&#34;,&#34;time&#34;:&#34;1m&#34;} --&gt;
-</span></span><span class="line"><span class="cl"><span class="gh"># スライドはMarkdownで書きたい
-</span></span></span></code></pre><p>セクション名と持ち時間はセットで書く決まり。各セクションの計画時間・実績時間・その差分が並んで、今どこにいるかがハイライトされる。</p>
-<p>frontmatterの<code>time</code>（デッキ全体の予定時間）とセクション合計がズレているとビルドが止まる。「4分の発表のはずが、セクション合計が5分になっている」みたいな取り違いに、開いた瞬間ではなくビルドの瞬間に気づける。前回書いたスロット契約と同じで、「黙って何かが起きる」経路を残さない、というPeithoの基本方針の延長。</p>
-<hr />
-<h2>スピーカーノート</h2>
-<p><img src="/images/2026/07/peitho-presenter-notes.png" alt="スピーカーノート" /></p>
-<p>書き方は<a href="https://marp.app/">Marp</a>や<a href="https://github.com/k1LoW/deck">k1LoW/deck</a>と同じで、スライドの中にHTMLコメントを書くだけ。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="gh"># スライドはMarkdownで書きたい
-</span></span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">&lt;!-- 自己紹介は10秒で切り上げる。「スライド作りで消耗した経験、ありますよね」と会場に問いかけてから本題へ。 --&gt;
-</span></span></code></pre><p>JSON形式のコメントはページ設定、それ以外がスピーカーノート、という使い分け。ノートはビルドの配布物には混ざらないようにしてあって、<code>peitho present</code>のときだけ発表者ツールに読み込まれる。</p>
-<hr />
-<h2>現在/次スライドのプレビュー</h2>
-<p><img src="/images/2026/07/peitho-presenter-next.png" alt="次スライドのプレビュー" /></p>
-<p>左の大きい方が現在のスライド、右上の小さい方が次のスライド。実際に配布されているスライドHTMLをそのまま埋め込んでいるので、プレビュー用に別レンダリングされたものではなく本物と同じ見た目。</p>
-<hr />
-<p>参考:</p>
-<ul>
-<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
-<li><a href="/blog/2026/07/03/1/">前回の記事: プレゼンツールPeithoをつくっている</a></li>
 <li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
 </ul>
 
