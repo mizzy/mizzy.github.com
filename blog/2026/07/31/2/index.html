@@ -93,21 +93,24 @@
         <code>lang=&quot;ja&quot;</code>
         が要る。Peithoの出力は
         <code>&lt;html lang=&quot;en&quot;&gt;</code>
-        で固定、かつスライドのHTMLに自分で
-        <code>lang</code>
-        属性を足す手段もないので、テーマのCSSで
+        で固定なので、テーマのCSSで
         <code>word-break: auto-phrase</code>
-        を指定してもどのスライドにも効かない。
+        を指定しても、そのままではどのスライドにも効かない。
       </p>
       <p>
+        逃げ道が全くないわけではない。
         <code>peitho build</code>
-        の出力なら、生成後のHTMLを自分で書き換えて
+        の出力なら生成後のHTMLを書き換えて
         <code>lang=&quot;ja&quot;</code>
-        にする、という逃げ道が一応ある。ただし
+        にできるし、レイアウトHTMLは属性がそのまま出力されるので、カスタムレイアウトのルートの
+        <code>&lt;section&gt;</code>
+        に
+        <code>lang=&quot;ja&quot;</code>
+        を書けばスライド単位で言語を宣言することもできる。ただ、前者は
         <code>peitho preview</code>
         や
         <code>peitho present</code>
-        は内部でHTMLを組み立ててそのまま配信するので、手の出しようがない。結果として、previewで見ている画面と手直しした配布用HTMLとで、日本語の改行位置が変わってしまう。
+        には効かないし、後者は言語を伝えるためだけにレイアウトを自前で持つことになる。デッキの言語はレイアウトの都合ではなくデッキ自体の属性なので、frontmatterで宣言できるのが筋だろう、ということで今回の機能を入れた。
       </p>
       <hr />
       <h2>
