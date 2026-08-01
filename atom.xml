@@ -3,12 +3,70 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-07-31T19:11:44+09:00</updated>
+    <updated>2026-08-01T23:36:55+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peithoに段階表示（reveal）とコード行の強調を入れた]]></title>
+        <link href="https://mizzy.org/blog/2026/08/01/1/"/>
+        <updated>2026-08-01T23:36:55+09:00</updated>
+        <id>https://mizzy.org/blog/2026/08/01/1/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話の続き。発表中にスライドの内容を段階的に見せる機能をふたつ入れた。ひとつは箇条書きなどを1ステップずつ出す「段階表示」（<a href="https://github.com/mizzy/peitho/pull/341">PR #341</a>ほか）、もうひとつはコードブロックの特定の行を強調する機能（<a href="https://github.com/mizzy/peitho/pull/381">PR #381</a>）。</p>
+<hr />
+<h2>段階表示: <code>::: {reveal}</code></h2>
+<p>箇条書きを一気に全部見せると、聞いている側は先の項目を読み始めてしまって、話している内容と視線がずれる。よくあるやつなので、<code>peitho present</code>で1ステップずつ出せるようにした。</p>
+<p>書き方は<code>::: {reveal}</code>で囲むだけ。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="gh"># Agenda
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">::: {reveal}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">-</span> Background
+</span></span><span class="line"><span class="cl"><span class="k">-</span> Current problems
+</span></span><span class="line"><span class="cl"><span class="k">-</span> Proposal
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">:::
+</span></span></code></pre><p>グループの直下のブロックがそれぞれ1ステップになる。リストだけは例外で、トップレベルの項目1つが1ステップ、ネストした子項目は親と一緒に出る。グループの外に書いたものは常に見えている状態で、1枚のスライドに複数のグループを置いた場合はソース順にステップ番号が続く。</p>
+<p>囲む対象は箇条書きに限らない。段落もコードブロックも画像も対象になるし、グループの中のブロックが別々のスロットに割り当たっても構わない（2カラムレイアウトで、テキストの後に画像を出す、みたいなことができる）。</p>
+<p><code>:::</code>という記法は、既にPeithoにあった明示的スロット指定（<code>::: {slot=left}</code>）と同じもの。「これらのブロックはひとまとまりの並び」という構造の宣言であって、いつどう出すかはシェル側の仕事、という切り分けにしてある。</p>
+<h3>配布物には出ない</h3>
+<p>段階表示が効くのは<code>peitho present</code>だけで、<code>peitho preview</code>、PDFエクスポート、<code>peitho lint</code>、公開用の<code>dist/</code>は全部最終状態（全部見えている状態）になる。</p>
+<p>これは実装上そうなる、というのが正しい。レンダラが吐くのは<code>data-reveal-step=&quot;N&quot;</code>という属性だけで、それを見て何かを隠すCSSは出力に入っていない。つまり生成されたHTMLは、そのまま開けば全部見えている状態になる。発表用のシェルだけがこの属性を見て<code>data-reveal-hidden</code>をトグルし、隠す処理を行う（<code>display</code>ではなく<code>visibility</code>で隠しているので、レイアウトは動かない）。</p>
+<hr />
+<h2>コード行の強調</h2>
+<p>もうひとつはコードブロック。長いコードを「今この行の話をしています」と示したい、というやつ。</p>
+<p>コードフェンスの言語タグの後ろに、波括弧で行番号を書く。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">``<span class="sb">`rust {3}
+</span></span></span><span class="line"><span class="cl"><span class="sb">pub struct Deck&lt;Phase&gt; {
+</span></span></span><span class="line"><span class="cl"><span class="sb">    slides: Vec&lt;Slide&gt;,
+</span></span></span><span class="line"><span class="cl"><span class="sb">    _phase: PhantomData&lt;Phase&gt;,
+</span></span></span><span class="line"><span class="cl"><span class="sb">}
+</span></span></span><span class="line"><span class="cl"><span class="sb">`</span>``
+</span></span></code></pre><p><code>|</code>で区切ると、グループごとに1ステップになって、強調が移動していく。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">``<span class="sb">`rust {2|4-6|9}
+</span></span></span><span class="line"><span class="cl"><span class="sb">`</span>``
+</span></span></code></pre><p>これで、ステップ1で2行目、ステップ2で4〜6行目、ステップ3で9行目、という具合。</p>
+<p>実際の見た目はこんな感じ。強調されている行に背景色と左端のマーカーが付いて、それ以外の行は薄くなる。まずステップ1。</p>
+<p><img src="/images/2026/08/peitho-code-emphasis-step1.png" alt="コード行強調のステップ1。2行目だけが強調されている" /></p>
+<p>「次へ」を押すとステップ2。強調が4〜6行目に移り、さっきまで強調されていた2行目は他の行と同じように薄くなる。</p>
+<p><img src="/images/2026/08/peitho-code-emphasis-step2.png" alt="コード行強調のステップ2。強調が4〜6行目に移動している" /></p>
+<p>グループの中では<code>,</code>で列挙、<code>-</code>で範囲を指定できるので、<code>{2,5-7|9}</code>のような書き方もできる。言語タグは省略できて、<code>```{1,4-5}</code>のようにハイライトなしのブロックにも効く。</p>
+<p><code>|</code>が無い静的な強調は「この行が重要な行です」というコンテンツの性質なので、PDFや公開出力にも入る。<code>|</code>付きの強調は話の進行を追うポインタなので、その任意の一瞬をPDFに焼き付けても、書いた本人が主張していないことを伝えてしまう。なので配布物では強調なしになる。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="https://peitho.gosu.ke/examples/incremental-reveal/">段階表示のサンプルデッキ</a></li>
+<li><a href="https://peitho.gosu.ke/examples/code-emphasis/">コード行強調のサンプルデッキ</a></li>
+<li><a href="/blog/2026/07/31/2/">前回の記事: Peithoにデッキの言語指定（lang frontmatter）を入れた</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peithoにデッキの言語指定（lang frontmatter）を入れた]]></title>
@@ -560,43 +618,6 @@ checked 20 slide(s): 2 overflow warning(s)
 <li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
 <li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
 <li><a href="/blog/2026/07/18/1/">前回の記事: Peithoにスマホからスライド操作できる機能を入れた</a></li>
-</ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Peithoにスマホからスライド操作できる機能を入れた]]></title>
-        <link href="https://mizzy.org/blog/2026/07/18/1/"/>
-        <updated>2026-07-18T12:52:28+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/18/1/</id>
-        <content type="html"><![CDATA[
-<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話の続き。今回はスマホからスライドを操作できるようにした話。</p>
-<p><code>peitho present deck.md --host</code>で起動すると、ターミナルにQRコードが表示される。これをスマホで読み取ると、スマホがスライドのリモコンになる。</p>
-<hr />
-<h2>--hostでLANに公開する</h2>
-<p>通常の<code>peitho present</code>はlocalhostにしかバインドしない。<code>--host</code>をつけると、LANに向けたリスナーも追加で立ち上がる。IPアドレスを明示的に指定することもできるけど、<code>--host</code>だけ渡せば自動で適切なアドレスを選んでくれる。TailscaleなどのメッシュVPNのアドレスがあればそれを優先し、なければLANのアドレスを使う。</p>
-<p>起動するとターミナルにQRコードとURLが表示される。</p>
-<p><img src="/images/2026/07/peitho-remote-qr.png" alt="ターミナルに表示されるQRコード" /></p>
-<hr />
-<h2>スマホ側の画面</h2>
-<p>QRコードを読み取ると<code>/remote</code>ページが開く。縦持ちだとこんな感じ。</p>
-<p><img src="/images/2026/07/peitho-remote-portrait.png" alt="スマホリモコン（縦持ち）" /></p>
-<p>上からスライドプレビュー、タイトルとスライド番号、かめとうさぎのトラッカー、タイマー操作、スピーカーノート、Previous/Nextボタン、という構成。PC側の発表者ツールに出ている情報がほぼそのままスマホに載っている。</p>
-<p>スライドプレビューは実際のスライドHTMLをそのまま縮小表示しているので、本物と同じ見た目。</p>
-<p>横持ちにするとレイアウトが切り替わる。</p>
-<p><img src="/images/2026/07/peitho-remote-landscape.png" alt="スマホリモコン（横持ち）" /></p>
-<p>左にプレビューとトラッカー、中央にスピーカーノート、右にPrevious/Nextボタン、という3カラム構成になる。</p>
-<hr />
-<h2>ホーム画面に追加できる</h2>
-<p><code>/remote</code>ページはPWA（Progressive Web App）として動くようにしてある。iOSの「ホーム画面に追加」で登録すると、次からSafariのアドレスバーなしのフルスクリーンで開く。</p>
-<p><code>--host</code>のポートはデフォルトで6173に固定されているので、URLが再起動で変わらない。一度ホーム画面に追加しておけば、次の発表のときもそのまま使える。</p>
-<hr />
-<p>参考:</p>
-<ul>
-<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
-<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
-<li><a href="/blog/2026/07/07/1/">前回の記事: PeithoにPDFエクスポート機能を入れた</a></li>
 </ul>
 
 ]]></content>
