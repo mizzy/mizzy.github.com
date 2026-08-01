@@ -3,12 +3,62 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-08-01T23:36:55+09:00</updated>
+    <updated>2026-08-02T00:19:16+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[peitho lintに検査を2つ足した]]></title>
+        <link href="https://mizzy.org/blog/2026/08/02/1/"/>
+        <updated>2026-08-02T00:19:16+09:00</updated>
+        <id>https://mizzy.org/blog/2026/08/02/1/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話の続き。<a href="/blog/2026/07/18/2/">以前入れた</a><code>peitho lint</code>に検査を2つ足した。ひとつは文字が小さすぎないかの検査（<a href="https://github.com/mizzy/peitho/pull/386">PR #386</a>）、もうひとつはスロット単位のはみ出し検査（<a href="https://github.com/mizzy/peitho/pull/389">PR #389</a>）。</p>
+<hr />
+<h2>文字サイズの検査</h2>
+<p>24ptを下回るテキストがあるスライドに警告を出すようにした。24ptという数字は、学会や大学が出している発表のアクセシビリティガイドラインでよく見る下限を採ったもの（<a href="https://www.arl.org/accessibility-guidelines-for-powerpoint-presentations/">ARLのガイドライン</a>は「All slides should use a minimum font size of 24 points.」と書いている）。とはいえ普遍的な基準というわけでもなくて、用途別に12pt以上でいいとする資料もあれば、会場が大きいなら30pt以上と言う資料もある。閾値は固定にしていて、今のところ設定で変えることはできない。必要になったらfrontmatterで指定できるようにすればいいので、まずは設定を増やさない側に倒している。</p>
+<pre><code>warning: slide 3 has text at 18pt, below the recommended 24pt: &quot;Some long caption that was shrunk to f…&quot;
+  help: raise the font size in the layout CSS, or move content to another slide instead of shrinking it
+</code></pre>
+<p>既存のはみ出し検査は「枠から出ている」という見た目の破綻を捕まえるので、手元で見れば分かる。一方こっちは、手元のディスプレイでは普通に読めてしまう。会場の後ろから読めないことに気づくのは本番中、というやつ。</p>
+<p>小さくすること自体が悪いわけではなくて、意図的に縮めている場面はいくらでもある。ただ、意図的かどうかとは無関係に「後ろの席から読めるか」は決まるので、閾値を切って機械に見てもらう価値がある。</p>
+<h3>CSSを読むのではなくブラウザに測らせる</h3>
+<p>実装は、CSSの静的解析ではなく、既存のlintのヘッドレスChrome実行に相乗りする形にした。スライドごとにテキストノードを走査して、その親要素の計算済み<code>font-size</code>を読む。</p>
+<p>CSSを解析する方向は最初から捨てた。原理的にはできなくはないんだろうけど、カスケードや継承を自前で解決して、<code>em</code>や<code>%</code>や<code>clamp()</code>を実効値まで畳んで……とやっていくと、結局ブラウザのやっていることを再実装することになる。しかもlintはもともとヘッドレスChromeを起動しているので、<code>getComputedStyle</code>を呼べば答えが返ってくる。</p>
+<hr />
+<h2>スロット単位のはみ出し検査</h2>
+<p>もうひとつは、既存のはみ出し検査に空いていた穴を塞ぐもの。既存のものはスライドの枠からはみ出したかを見る検査で、今回足したのはその内側、スロットからはみ出したかを見る検査になる。</p>
+<p>Peithoのスロットのコンテナには<code>overflow: hidden</code>が効いている。すると、あふれた中身は描画されないので、要素の大きさをブラウザに問い合わせても、あふれたぶんまで含んだ大きさは返ってこない。既存の検査はスライドの枠を基準に測っていたので、スロットの中で静かに切れているぶんには何も検出できていなかった。</p>
+<p>どのくらい検出できていなかったかというと、こう。12項目の箇条書きを1枚に置いただけのデッキ（デフォルトのテーマとレイアウト）で、</p>
+<p><img src="/images/2026/08/peitho-lint-slot-overflow.png" alt="12項目の箇条書きで最後の項目が下端で切れているスライド" /></p>
+<p>12個目が半分に切れている。この状態で、以前の<code>peitho lint</code>は「はみ出しなし」と言っていた。スライドの枠自体は超えていないので、当時の測り方では何も起きない。</p>
+<p>今は、要素ごとに「中身の本来の大きさ」（<code>scrollHeight</code>/<code>scrollWidth</code>）と「見えている領域の大きさ」（<code>clientHeight</code>/<code>clientWidth</code>）を比べて、実際にクリップが起きている要素を探している。差が出ていれば、そのぶんが隠れている。同じデッキがこう出る。</p>
+<pre><code>warning: slide 1 content overflows the `body` slot vertically by 17px
+  help: shrink or split the slide content, or adjust the layout CSS
+</code></pre>
+<h3>警告であってエラーではない</h3>
+<p>これはビルドエラーにはしていない。Peithoは「黙って何かが起きる」経路を潰す方針で、パーサが未知の構造を飲み込むとか、スロット契約の違反を無視するとかはビルドエラーにしている。ただしそれらはPeitho自身が決められる、答えの決まっている話。</p>
+<p>スロットのはみ出しはブラウザのレンダリング結果で、フォントやテーマCSSや環境で変わるし、意図的なこともある（長いログを枠に収めて見せる、とか）。判断が要るものは警告、というのが既存のはみ出し検査や文字サイズ検査と揃った扱いになる。</p>
+<p>実際、これを入れたらPeitho自身の紹介に使っているサンプルデッキで、コードブロックが14px切れているスライドが見つかった。CSSを調整して直した。</p>
+<hr />
+<h2>報告されるpx数は多めに出る</h2>
+<p>「17px切れている」と報告していても、実際に見えなくなっているテキストがちょうど17px分あるとは限らない。多めに出る。</p>
+<p>はみ出した量として測っているものに、最後の段落の下マージンが混ざるため。マージンは何も描画しないので、そのぶんは「切れているテキスト」ではない。手元で試した例だと、47pxと報告されたうち、本当に見えなくなっていたのは24px分だった。</p>
+<p>極端な話、テキストは全部収まっていてマージンだけが枠を越えている場合でも警告が出る。実際に描画されているものだけを測ろうとすると機構がだいぶ増えるので、今のところは受け入れている。</p>
+<hr />
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+<li><a href="https://www.arl.org/accessibility-guidelines-for-powerpoint-presentations/">ARL: PowerPoint Guidelines for Presenters</a> — 24ptの根拠にしたガイドライン</li>
+<li><a href="/blog/2026/07/18/2/">前回のlintの記事: Peithoにスライドのはみ出し検査（peitho lint）を入れた</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peithoに段階表示（reveal）とコード行の強調を入れた]]></title>
@@ -555,70 +605,6 @@ Post-Norm: Norm(x + サブレイヤー(x))
 </span></span></span></code></pre><p>Qが16ヘッド、K/Vが8ヘッドなら、Qヘッド0と1がK/Vヘッド0を、Qヘッド2と3がK/Vヘッド1を使う。</p>
 <hr />
 <p>これで、各トークンのベクトルに、文脈中の他のトークンの情報を関連度に応じて混ぜ込む仕組みができた。次回はトランスフォーマー層のもうひとつの構成要素であるFFN（SwiGLU）の実装について書く。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Peithoにスライドのはみ出し検査（peitho lint）を入れた]]></title>
-        <link href="https://mizzy.org/blog/2026/07/18/2/"/>
-        <updated>2026-07-18T17:44:35+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/18/2/</id>
-        <content type="html"><![CDATA[
-<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話の続き。今回は<code>peitho lint</code>というサブコマンドを追加した話。スライドの中身がスライドの枠からはみ出していないかを検査する機能。</p>
-<hr />
-<h2>peitho lintの仕組み</h2>
-<p>内部でやっていることは、ざっくりこんな流れ。</p>
-<ol>
-<li><code>peitho build</code>と同じパイプライン（parse → map → check → render）でデッキをビルド</li>
-<li>検査用のHTMLを一時ディレクトリに書き出す</li>
-<li>ヘッドレスChromeでそのHTMLを開いて、各スライドのサイズを測定</li>
-<li>はみ出しがあれば警告を出して、exit code 1で終了</li>
-</ol>
-<p>ポイントは、実際にブラウザでレンダリングして測るところ。フォントの違いや複雑なCSSレイアウトによるずれも、ブラウザが実際に描画した結果をそのまま見るので、正確に検出できる。</p>
-<hr />
-<h2>検査用HTML</h2>
-<p>検査用には専用のHTML（<code>lint.html</code>）を生成している。PDFエクスポートの<code>pdf.html</code>と似た構造で、全スライドのHTMLをインラインで持った静的な1枚もの。ただしPDFとは違って<code>overflow: hidden</code>やページ区切りのラッパーを付けていない。はみ出しを検出したいので、はみ出しを隠す要素があっては困る。</p>
-<p>各スライドには<code>transform: scale(1)</code>というidentity transformをかけている。見た目にも計算にも何も影響しないけど、これがないと絶対配置（<code>position: absolute</code>等）された子要素が自分のスライドではなくページ全体を基準に配置されてしまい、2枚目以降のスライドで偽のはみ出しを検出してしまう。実際の発表画面やPDFでもスライドにtransformがかかっているので、同じ条件にしている。</p>
-<hr />
-<h2>実際にはみ出しを見つけた</h2>
-<p><code>peitho lint</code>を入れてすぐ、リポジトリの<code>examples/peitho-tour</code>デッキ（Peitho自体を紹介するデッキ）で走らせたら、こうなった。</p>
-<pre><code>warning: slide 16 content overflows the slide box vertically by 50px (content 770px, box 720px)
-  help: shrink or split the slide content, or adjust the layout CSS
-warning: slide 18 content overflows the slide box vertically by 104px (content 824px, box 720px)
-  help: shrink or split the slide content, or adjust the layout CSS
-checked 20 slide(s): 2 overflow warning(s)
-</code></pre>
-<p>スクリーンショットを大きく載せているスライドが2枚、垂直方向にはみ出していた。CSSの問題でスクリーンショット画像が縮小されずに元のサイズのまま表示されていたのが原因。</p>
-<p>修正前のスライド16。タイトルの下にスクリーンショットと本文テキストが入るはずだが、スクリーンショットが大きすぎて本文テキストが表示されず、下もはみ出している。</p>
-<p><img src="/images/2026/07/peitho-lint-before-preview.png" alt="修正前のスライド16" /></p>
-<p>修正後。スクリーンショットが縮小されて枠内に収まり、本文テキストも表示されている。</p>
-<p><img src="/images/2026/07/peitho-lint-after-preview.png" alt="修正後のスライド16" /></p>
-<p>CSSを1箇所直して解消（<a href="https://github.com/mizzy/peitho/pull/295">PR #295</a>）。</p>
-<pre><code>checked 23 slide(s): no overflow
-</code></pre>
-<p>このデッキはAIに生成させていてちゃんとチェックしていなかったので気づいていなかった。こういうケースこそ自動検査が効く。</p>
-<hr />
-<h2>ビルドパイプラインの検査との棲み分け</h2>
-<p>Peithoには<code>peitho lint</code>以外にも、<code>peitho build</code>で走る検査がいくつかある。</p>
-<ul>
-<li><strong>スロット契約の検査</strong>: スロットの型やarityの不一致をビルドエラーにする。例えばコードブロックが0〜1個のスロットに2個書くとエラー</li>
-<li><strong>未割り当てコンテンツの検出</strong>: Markdownに書いた要素がどのスロットにも割り当てられなければビルドエラー</li>
-<li><strong>生HTML禁止</strong>: HTMLコメント（ページ設定やスピーカーノート）以外のHTMLがMarkdownに書かれていたらビルドエラー。コンテンツとデザインの分離を徹底するため</li>
-<li><strong>未知のコード言語</strong>: シンタックスハイライトで未知の言語タグが指定されていたらビルドエラー</li>
-<li><strong>重複スライドキー</strong>: 同じキーが複数のスライドに振られていたらビルドエラー</li>
-<li><strong>CSS検査</strong>: レイアウトのルートクラスが<code>.peitho-slide</code>と異なる<code>width</code>/<code>height</code>を指定していないか、<code>[data-slide-key=...]</code>セレクタが存在しないキーを参照していないか、など</li>
-<li><strong>セクション時間の整合性検査</strong>: セクションごとの<code>time</code>の合計がfrontmatterの<code>time</code>と一致しなければビルドエラー</li>
-<li><strong>画像の参照検査</strong>: 参照している画像が存在するかの検査</li>
-</ul>
-<p>これらは構造的な整合性の検査で、HTMLをレンダリングしなくてもソースコードの解析だけで検出できる。一方<code>peitho lint</code>は、実際にレンダリングしないとわからない物理的なはみ出しを検出する。検査のレイヤーが違うので、別サブコマンドにしている。ビルドの検査はビルド時に必ず走るけど、lintはChromeが必要なので明示的に実行する形。</p>
-<hr />
-<p>参考:</p>
-<ul>
-<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
-<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
-<li><a href="/blog/2026/07/18/1/">前回の記事: Peithoにスマホからスライド操作できる機能を入れた</a></li>
-</ul>
 
 ]]></content>
     </entry>
