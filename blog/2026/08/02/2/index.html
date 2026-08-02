@@ -1,0 +1,633 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Pyxisの開発: トークナイザー - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="前回の記事 でTransformer本体ができた。ただしこの時点でPyxisが受け取れるのはトークンIDの列だけで、テキストを渡すことはできない。今回はその入口にあたるトークナイザーを組み込んだ。対応するPRは #23 。 BPEそのものに…"/>
+    <meta name="Hatena::Bookmark" content="nocomment"/>
+    <link rel="author" href="https://www.hatena.ne.jp/MIZZY/"/>
+    <!-- OGP -->
+    <meta property="og:title" content="Pyxisの開発: トークナイザー"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2026/08/02/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2026/08/02/2/ogp.png"/>
+    <meta property="og:description" content="前回の記事 でTransformer本体ができた。ただしこの時点でPyxisが受け取れるのはトークンIDの列だけで、テキストを渡すことはできない。今回はその入口にあたるトークナイザーを組み込んだ。対応するPRは #23 。 BPEそのものに…"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Pyxisの開発: トークナイザー"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2026/08/02/2/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <a href="/" class="name">
+        Gosuke Miyashita
+      </a>
+      <span class="nav">
+        <a href="/archive/">
+          archive
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2026/08/02/2">
+          Pyxisの開発: トークナイザー
+        </a>
+      </h1>
+      <div class="byline">
+        2 August 2026
+      </div>
+      <p>
+        <a href="/blog/2026/07/23/1/">
+          前回の記事
+        </a>
+        でTransformer本体ができた。ただしこの時点でPyxisが受け取れるのはトークンIDの列だけで、テキストを渡すことはできない。今回はその入口にあたるトークナイザーを組み込んだ。対応するPRは
+        <a href="https://github.com/mizzy/pyxis/pull/23">
+          #23
+        </a>
+        。
+      </p>
+      <p>
+        BPEそのものについては
+        <a href="/blog/2026/07/01/1/">
+          embeddingの記事
+        </a>
+        で一度書いたので、今回はその先、実際のトークナイザーファイルの中に何が入っていて、テキストがどういう順序でトークンIDになるのかを見ていく。
+      </p>
+      <hr />
+      <h2>
+        トークナイザーは訓練済みのデータ
+      </h2>
+      <p>
+        トークナイザーというと文字列を分割するロジックを思い浮かべるが、モデルと一緒に配布される
+        <code>tokenizer.json</code>
+        の中身は
+        <strong>
+          全部データ
+        </strong>
+        だった。
+      </p>
+      <p>
+        BPEは「訓練データ中で隣り合う頻出ペアを繰り返しマージする」というアルゴリズムだが、これはトークナイザーを作るとき（訓練時）に済ませておく処理で、推論時に走らせるわけではない。推論時に必要なのは、その訓練の結果として得られた2つのテーブル。
+      </p>
+      <ul>
+        <li>
+          <strong>
+            vocab
+          </strong>
+          : トークン文字列 → トークンIDの対応表
+        </li>
+        <li>
+          <strong>
+            merges
+          </strong>
+          : どのペアをどの順番でマージするか、という規則の列
+        </li>
+      </ul>
+      <p>
+        Qwen3-1.7Bの
+        <code>tokenizer.json</code>
+        を実際に覗いてみると、vocabが151643エントリ、mergesが151387エントリ入っていた。ファイルサイズは11MBほどある。
+      </p>
+      <p>
+        このファイルには他に
+        <code>normalizer</code>
+        、
+        <code>pre_tokenizer</code>
+        、
+        <code>decoder</code>
+        といった項目もあるが、中身はこんな調子。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="s2">&#34;normalizer&#34;</span><span class="err">:</span> <span class="p">{</span><span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;NFC&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;decoder&#34;</span><span class="err">:</span> <span class="p">{</span><span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;ByteLevel&#34;</span><span class="p">,</span> <span class="nt">&#34;add_prefix_space&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nt">&#34;trim_offsets&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nt">&#34;use_regex&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">}</span>
+</span></span></code></pre>
+      <p>
+        処理の名前と、必要ならそのパラメータが書いてあるだけで、処理そのものは書かれていない。
+        <code>{&quot;type&quot;: &quot;NFC&quot;}</code>
+        は「Unicode正規化のNFCをかけろ」という指示であって、NFCが何をするかはこのファイルの外にある。つまり
+        <code>tokenizer.json</code>
+        が持っているのは、どの処理を使えという指示と、訓練で得られたテーブルだけ。処理の中身は、これを読む側が実装しておく必要がある。
+      </p>
+      <p>
+        mergesの先頭はこうなっている。
+      </p>
+      <pre><code>[&quot;Ġ&quot;, &quot;Ġ&quot;], [&quot;ĠĠ&quot;, &quot;ĠĠ&quot;], [&quot;i&quot;, &quot;n&quot;], [&quot;Ġ&quot;, &quot;t&quot;], [&quot;ĠĠĠĠ&quot;, &quot;ĠĠĠĠ&quot;], [&quot;e&quot;, &quot;r&quot;]</code></pre>
+      <p>
+        <code>Ġ</code>
+        は半角スペースを表す記号（後述）。スペース2個、スペース4個、
+        <code>in</code>
+        、
+        <code>t</code>
+        、スペース8個、
+        <code>er</code>
+        という順に並んでいる。訓練データ中でこの順に頻出だった、ということがそのまま規則の順序になっている。インデント由来と思われるスペースの連結が上位を占めているのが、いかにも実データという感じで面白い。
+      </p>
+      <hr />
+      <h2>
+        マージを追ってみる
+      </h2>
+      <p>
+        「マージ」というのは、隣り合った2つの要素をくっつけて1つにする操作のこと。訓練時は「データ中で最も頻出するペアをマージする」を繰り返し、マージしたペアを順にmergesへ書き足していく。Qwen3では151387回繰り返した結果があのテーブル、ということになる。
+      </p>
+      <p>
+        一方、推論時はこのテーブルを引く側になる。入力に対して
+        <strong>
+          mergesに載っているマージだけを適用していく
+        </strong>
+        、という手順になる。
+      </p>
+      <ol>
+        <li>
+          入力をバラバラの要素に分解する
+        </li>
+        <li>
+          隣り合うペアのうち、mergesに載っているものを探す
+        </li>
+        <li>
+          複数見つかったら、mergesの中で順位が最も早いものをマージする
+        </li>
+        <li>
+          2に戻る。どのペアも載っていなければ終了
+        </li>
+      </ol>
+      <p>
+        <code>like</code>
+        で追ってみる。Qwen3のmergesを実際に引くと、
+        <code>(l,i)</code>
+        が486番目、
+        <code>(i,k)</code>
+        が1323番目、
+        <code>(k,e)</code>
+        が184番目、
+        <code>(li,ke)</code>
+        が4547番目だった。
+      </p>
+      <pre><code>l i k e
+  ↓ (k,e) が184番目で最も早い
+l i ke
+  ↓ (l,i) が486番目
+li ke
+  ↓ (li,ke) が4547番目
+like</code></pre>
+      <p>
+        3回のマージで1トークンになった。ここで注意したいのは、左から順に処理しているわけではないこと。最初にくっつくのは
+        <code>li</code>
+        ではなく
+        <code>ke</code>
+        で、あくまでmergesの順位が早い順に適用される。
+        <code>(i,k)</code>
+        も1323番目に載ってはいるが、先に
+        <code>(k,e)</code>
+        と
+        <code>(l,i)</code>
+        が適用されて
+        <code>i</code>
+        と
+        <code>k</code>
+        が隣り合わなくなるので、出番が来ないまま終わる。
+      </p>
+      <p>
+        ここで
+        <code>like</code>
+        が1トークンまで到達できたのは、必要なマージが3つとも載っていたから。載っていないペアに当たれば、そこでマージが尽きて複数トークンのまま終わる。
+      </p>
+      <hr />
+      <h2>
+        byte-level BPE
+      </h2>
+      <p>
+        embeddingの記事でBPEを説明したときに「最初は1文字ずつの辞書から始めて」と書いたが、現代のLLMのトークナイザーは正確には文字単位ではなく
+        <strong>
+          バイト単位
+        </strong>
+        から始める。byte-level BPEと呼ばれる方式で、GPT-2で採用されて以降、広く使われている。
+      </p>
+      <p>
+        まず前提として、トークンの種類は無制限に増やせるわけではない。トークナイザーを作るときに「何種類まで」という上限を決めていて、これを
+        <code>vocab_size</code>
+        と呼ぶ。Qwen3-1.7Bなら151936で、トークンIDは0から151935の範囲に収まる（先ほどのvocabの151643に特殊トークン26個を足しても151669にしかならないが、残りは128の倍数に切り上げるための余白で、実際には使われていない）。
+      </p>
+      <p>
+        なぜ上限が要るかというと、この数がそのままモデルのサイズに効いてくるため。モデルはトークンIDを受け取ると、
+        <a href="/blog/2026/07/01/1/">
+          embeddingテーブル
+        </a>
+        からそのIDに対応するベクトルを引いて計算を始める。このテーブルはトークン1つにつき1行を持つ
+        <code>vocab_size × hidden_dim</code>
+        の行列なので、トークンの種類が増えればその分だけ行が増える。Qwen3-1.7Bは
+        <code>hidden_dim</code>
+        が2048なので、151936行 × 2048列で約3.1億個の数値がこのテーブルに入っていることになる。この「訓練で学習された数値ひとつひとつ」がパラメータで、モデル名の「1.7B」もパラメータの総数（17億）を指している。
+      </p>
+      <p>
+        3.1億がどれくらいかというと、Transformerブロック1層分（アテンション+FFNで約5000万）の6層分に相当する。ブロックは全部で28層なので、embeddingテーブル1枚でその2割強を別に抱えている勘定。トークンの種類を増やすコストはそれなりに重い。
+      </p>
+      <p>
+        その前提で文字単位のBPEを考えると、初期辞書にUnicodeの全文字を入れる必要がある。Unicodeで割り当て済みのコードポイントは29万個以上あり、そのうち文字（Letter）だけでも14万個ある。15万の枠のうち14万を初期辞書が占めてしまい、マージして語彙を育てる余地がほとんど残らない。かといって一部の文字だけを入れると、辞書にない文字が来たときに表現できず、
+        <code>&lt;unk&gt;</code>
+        （unknown）という「知らない文字」トークンに潰すしかない。
+      </p>
+      <p>
+        byte-level BPEでは、テキストをUTF-8のバイト列に変換してから、その256種類のバイトを初期辞書にする。どんな文字列も最終的にはバイトの列なので、初期辞書が256個あればあらゆる入力を表現できる。絵文字だろうが未知の言語だろうが、必ず何らかのトークン列になり、
+        <code>&lt;unk&gt;</code>
+        が原理的に発生しない。
+      </p>
+      <p>
+        ここでひとつ問題がある。バイト値の中には制御文字（改行、タブなど）や、そもそも単体では正しいUTF-8にならないバイトが含まれていて、これらをそのまま辞書のキーとしてJSONに書き出すのは扱いにくい。そこでGPT-2では、256個のバイトそれぞれを「印字可能なUnicode文字」に1対1で対応づけてから辞書に載せる、という方式を取っている。
+      </p>
+      <p>
+        <code>tokenizer.json</code>
+        の中で見かける
+        <code>Ġ</code>
+        はこれ。半角スペース（バイト値0x20）に対応づけられた文字で、スペースそのものではない。同様に
+        <code>Ċ</code>
+        が改行に対応する。日本語のトークンが
+        <code>ãģĵãĤĵãģ«ãģ¡ãģ¯</code>
+        のような文字化けした見た目になっているのも同じ理由で、これは「こんにちは」のUTF-8バイト列を1バイトずつこの対応表で変換した結果。文字化けしているのではなく、そういう表記法になっている。
+      </p>
+      <hr />
+      <h2>
+        前処理の正規表現
+      </h2>
+      <p>
+        もうひとつ、BPEの前段に
+        <strong>
+          pre-tokenizer
+        </strong>
+        という処理が入る。
+      </p>
+      <p>
+        先ほどのマージの手順を、テキスト全体に対して無制限にかけると困ったことが起きる。
+        <code>I like this</code>
+        をバラすと
+        <code>I ␣ l i k e ␣ t h i s</code>
+        となるが、ここでは
+        <code>like</code>
+        の
+        <code>e</code>
+        と次の
+        <code>␣</code>
+        も「隣り合うペア」になってしまう。訓練データに
+        <code>like this</code>
+        が頻出していればこのペアがマージされ、単語の境界をまたいだ塊が1トークンになりうる。
+      </p>
+      <p>
+        これを防ぐのがpre-tokenizer。BPEにかける前に、正規表現でテキストを大まかに区切っておく。
+      </p>
+      <pre><code>[I] [␣like] [␣this]</code></pre>
+      <p>
+        そしてマージは、この区切られた塊の中だけで行う。塊が違えば隣り合っているとみなさないので、
+        <code>e</code>
+        と
+        <code>␣</code>
+        のペアはそもそも候補に上がらず、
+        <code>like this</code>
+        という1トークンは原理的に生成されない。
+      </p>
+      <p>
+        区切っておく利点は他にもある。
+        <code>like this</code>
+        や
+        <code>like that</code>
+        のような組み合わせを辞書に入れ始めると際限がなく、15万しかない語彙の枠を食い潰してしまう。また、
+        <code>like</code>
+        が単独では1トークン、
+        <code>like this</code>
+        の中では別トークンの一部、となるとモデルから見た単語の同一性も崩れる。
+      </p>
+      <p>
+        Qwen3の
+        <code>tokenizer.json</code>
+        に入っている正規表現がこれ。
+      </p>
+      <pre><code>(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+</code></pre>
+      <p>
+        パイプ区切りで、先頭から順に:
+      </p>
+      <ol>
+        <li>
+          <code>'s</code>
+          や
+          <code>'ll</code>
+          などの英語の短縮形
+        </li>
+        <li>
+          直前に記号を1つ許した文字の連続（
+          <code>\p{L}</code>
+          はUnicodeの「文字」カテゴリ）— スペース+単語がここで1つの塊になる
+        </li>
+        <li>
+          数字1桁（
+          <code>\p{N}</code>
+          ）
+        </li>
+        <li>
+          スペースを1つ許した記号の連続
+        </li>
+        <li>
+          改行、末尾のスペース、その他の空白
+        </li>
+      </ol>
+      <p>
+        3番目が「数字1桁」なのがポイントで、これによって数字は必ず1桁ずつのトークンに分割される。
+        <code>2026</code>
+        は
+        <code>2</code>
+        ,
+        <code>0</code>
+        ,
+        <code>2</code>
+        ,
+        <code>6</code>
+        の4トークン、
+        <code>1234567</code>
+        なら7トークンになる。
+        <a href="https://arxiv.org/abs/2309.16609">
+          Qwen Technical Report
+        </a>
+        にある「数字を1桁ずつに分割するようにした」というのは、辞書側ではなくこの正規表現で実現されている。
+      </p>
+      <p>
+        2番目のパターンで単語の直前のスペースが単語側に取り込まれるので、英語では「スペース+単語」が1トークンになりやすい。
+        <code>Ġworld</code>
+        のようなトークンが辞書にあるのはそのため。
+      </p>
+      <hr />
+      <h2>
+        実際に分割してみる
+      </h2>
+      <p>
+        実際のQwen3のトークナイザーで試してみた結果。
+      </p>
+      <pre><code>'Hello'
+  → ['Hello']  → [9707]
+
+'Hello, Pyxis!'
+  → ['Hello', ',', 'ĠPy', 'xis', '!']  → [9707, 11, 5355, 7191, 0]
+
+'こんにちは'
+  → ['ãģĵãĤĵãģ«ãģ¡ãģ¯']  → [89015]
+
+'日本語のトークン化'
+  → ['æĹ¥æľ¬', 'èªŀ', 'ãģ®', 'ãĥĪãĥ¼', 'ãĤ¯', 'ãĥ³', 'åĮĸ']
+  → [101059, 102819, 15767, 137084, 28120, 15698, 32108]</code></pre>
+      <p>
+        <code>Hello</code>
+        は1トークンだが、
+        <code>Pyxis</code>
+        は
+        <code>ĠPy</code>
+        +
+        <code>xis</code>
+        の2トークンに割れている。
+        <code>(ĠPy, xis)</code>
+        というペアがmergesに載っていないためで、そこでマージが尽きて止まっている。頻出する単語ほど訓練時に深くマージされてテーブルを辿りきり1トークンに収まるが、珍しい単語は途中で尽きて複数トークンのまま残る、というBPEの性質がそのまま出ている。
+        <code>ĠPy</code>
+        の先頭に
+        <code>Ġ</code>
+        が付いているのは、前段の正規表現で直前のスペースが取り込まれたため。
+      </p>
+      <p>
+        日本語は「こんにちは」が1トークンなのに対して、「日本語のトークン化」は9文字で7トークンに割れている。トークンごとに区切るとこうなる。
+      </p>
+      <pre><code>日本 / 語 / の / トー / ク / ン / 化</code></pre>
+      <p>
+        「日本」は2文字で1トークンにまとまっているのに、「トークン」の4文字は
+        <code>トー</code>
+        <code>ク</code>
+        <code>ン</code>
+        と3トークンに分解されている。日本語の扱いはこれ以外にも調べていて面白かったので、
+        <a href="/blog/2026/08/02/3/">
+          別記事
+        </a>
+        にまとめた。
+      </p>
+      <hr />
+      <h2>
+        特殊トークン
+      </h2>
+      <p>
+        BPEのvocabは151643エントリだが、その後ろに特殊トークンが26個、
+        <code>tokenizer.json</code>
+        の
+        <code>added_tokens</code>
+        として別途定義されている。IDは151643から151668まで。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">151643</span><span class="p">,</span> <span class="nt">&#34;content&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;|endoftext|&gt;&#34;</span><span class="p">,</span> <span class="nt">&#34;special&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">151644</span><span class="p">,</span> <span class="nt">&#34;content&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;|im_start|&gt;&#34;</span><span class="p">,</span> <span class="nt">&#34;special&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">151645</span><span class="p">,</span> <span class="nt">&#34;content&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;|im_end|&gt;&#34;</span><span class="p">,</span> <span class="nt">&#34;special&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
+</span></span></code></pre>
+      <p>
+        <code>&lt;|im_start|&gt;</code>
+        と
+        <code>&lt;|im_end|&gt;</code>
+        はチャット形式のマークアップで、会話のロール（system/user/assistant）の区切りを表す。OpenAIのChatMLに由来する形式で、Qwen3のchat templateもこれを使っている。このうち
+        <code>&lt;|im_end|&gt;</code>
+        （151645）は、モデルが「発話が終わった」ことを示すために出力するトークンでもある。生成ループはこれが出たら打ち切ればいい、という合図になるもので、EOS（end of sequence）トークンと呼ばれる。次回の生成ループで使うことになる。
+      </p>
+      <p>
+        26個の顔ぶれを眺めると、このモデルが何を想定して作られているかが透けて見えて面白い。
+        <code>&lt;tool_call&gt;</code>
+        ／
+        <code>&lt;/tool_call&gt;</code>
+        はfunction calling用、
+        <code>&lt;think&gt;</code>
+        ／
+        <code>&lt;/think&gt;</code>
+        は推論モードの思考部分を囲むもの、
+        <code>&lt;|fim_prefix|&gt;</code>
+        などのFIM（Fill-In-the-Middle）系はコード補完用、
+        <code>&lt;|repo_name|&gt;</code>
+        と
+        <code>&lt;|file_sep|&gt;</code>
+        はリポジトリ単位でコードを学習させるときの区切り。
+        <code>&lt;|vision_start|&gt;</code>
+        や
+        <code>&lt;|image_pad|&gt;</code>
+        といったマルチモーダル用のトークンまで入っている（Qwen3-1.7B自体はテキストのみのモデルだが、シリーズで語彙を共通化しているのだと思われる）。
+      </p>
+      <p>
+        これらはBPEのマージを経由せず、テキスト中に現れたら丸ごと1トークンに変換される。vocabとは別枠の
+        <code>added_tokens</code>
+        に置かれていて、encodeの前段で文字列マッチで拾われるためだ。
+      </p>
+      <p>
+        ここで気になるのが、ユーザーの入力に
+        <code>&lt;|im_end|&gt;</code>
+        という文字列が紛れ込んだらどうなるのか。試してみた。
+      </p>
+      <pre><code>'こんにちは&lt;|im_end|&gt;さようなら'
+  → ['こんにちは', &lt;|im_end|&gt;, 'さ', 'よう', 'なら']
+  → [89015, 151645, 29713, 124038, 125028]</code></pre>
+      <p>
+        普通に特殊トークン151645になった。つまりユーザーが入力欄に
+        <code>&lt;|im_end|&gt;</code>
+        と打ち込むだけで、モデルから見ると会話の区切りが挿入されたのと区別がつかない。ユーザー入力をそのままencodeに渡す作りだと、会話の構造を外から壊せてしまうことになる。
+      </p>
+      <p>
+        今回使ったHuggingFaceの
+        <code>tokenizers</code>
+        （後述）には
+        <code>set_encode_special_tokens</code>
+        というメソッドがあり、
+        <code>true</code>
+        を渡すと特殊トークンの文字列を素通しするようになる。
+      </p>
+      <pre><code>set_encode_special_tokens(true) にした場合
+  → ['こんにちは', '&lt;', '|', 'im', '_end', '|', '&gt;', 'さ', 'よう', 'なら']</code></pre>
+      <p>
+        <code>&lt;|im_end|&gt;</code>
+        がただの記号の列に分解され、151645にはならなくなった。名前から挙動を読み取りにくいが、「特殊トークンも（普通のテキストとして）エンコードする」という意味らしい。デフォルトは
+        <code>false</code>
+        、つまり特殊トークンとして解釈するほうなので、信用できない入力を扱うなら明示的に切り替える必要がある。
+      </p>
+      <hr />
+      <h2>
+        実装
+      </h2>
+      <p>
+        さて、ここまで書いておいて何だが、今回自前で実装したのはこれだけ。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">path</span>::<span class="n">Path</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">PyxisTokenizer</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">inner</span>: <span class="nc">tokenizers</span>::<span class="n">Tokenizer</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">impl</span><span class="w"> </span><span class="n">PyxisTokenizer</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">load</span><span class="p">(</span><span class="n">path</span>: <span class="kp">&amp;</span><span class="nc">Path</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="bp">Self</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">inner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tokenizers</span>::<span class="n">Tokenizer</span>::<span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="n">map_err</span><span class="p">(</span><span class="n">io</span>::<span class="n">Error</span>::<span class="n">other</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="bp">Self</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">inner</span><span class="w"> </span><span class="p">})</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">encode</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">text</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">inner</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">).</span><span class="n">unwrap</span><span class="p">().</span><span class="n">get_ids</span><span class="p">().</span><span class="n">to_vec</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">decode</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">token_ids</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="kt">u32</span><span class="p">])</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">inner</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token_ids</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">).</span><span class="n">unwrap</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre>
+      <p>
+        HuggingFaceの
+        <a href="https://github.com/huggingface/tokenizers">
+          tokenizers
+        </a>
+        crateの薄いラッパー。21行。
+      </p>
+      <p>
+        Pyxisは「LLMの推論を自分で実装して理解する」というのが目的なので、本来ならBPEも自分で書くべきところだけど、ここは既存のcrateに任せることにした。理由は、トークナイザーは推論の本体ではなく前処理・後処理であること、そして
+        <code>tokenizer.json</code>
+        のフォーマット（normalizer、pre_tokenizer、decoderの組み合わせ）を正確に再現するのが、得られる理解に対して手間が大きすぎると判断したため。ここでの1バイトのズレは全く違うトークンIDになって、モデル本体が正しくても出力が壊れる。デバッグしたい対象はそこじゃない、という気持ちがある。
+      </p>
+      <p>
+        <code>encode</code>
+        の第2引数
+        <code>false</code>
+        は
+        <code>add_special_tokens</code>
+        で、
+        <code>&lt;|im_start|&gt;</code>
+        などを自動で付けないという指定。今回は素のテキストをそのまま推論に流したいので付けない。チャット形式で使うときはテンプレートを別途組み立てる必要があるが、それは後回し。
+      </p>
+      <p>
+        <code>decode</code>
+        の第2引数
+        <code>true</code>
+        は
+        <code>skip_special_tokens</code>
+        で、こちらは逆に特殊トークンを出力から除去する指定。生成結果に
+        <code>&lt;|im_end|&gt;</code>
+        のような文字列がそのまま混ざるのを防ぐ。
+      </p>
+      <p>
+        <code>unwrap()</code>
+        しているのは、
+        <code>tokenizers</code>
+        のエラー型が
+        <code>Box&lt;dyn Error&gt;</code>
+        で
+        <code>io::Error</code>
+        に素直に変換できないため。ここは後で見直すかもしれない。
+      </p>
+      <p>
+        依存は
+        <code>default-features = false</code>
+        にして
+        <code>onig</code>
+        だけを有効にしている。デフォルトでは
+        <code>onig</code>
+        に加えて
+        <code>progressbar</code>
+        （indicatif）と
+        <code>esaxx_fast</code>
+        （C++実装のsuffix array、トークナイザーの訓練で使う）が有効になるが、どちらも推論には要らないので切った。
+      </p>
+      <hr />
+      <h2>
+        テスト
+      </h2>
+      <p>
+        テストはこう書いた。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#[test]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">decode_roundtrips_with_encode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_test_tokenizer</span><span class="p">()</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;Hello, Pyxis!&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">token_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tokenizer</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tokenizer</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token_ids</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre>
+      <p>
+        実際のQwen3-1.7Bの
+        <code>tokenizer.json</code>
+        を読み込んで、encodeしてdecodeすると元に戻ることを確認している。byte-level BPEは情報を落とさない変換なので、往復すれば必ず元通りになるはず、という性質のテスト。
+      </p>
+      <p>
+        <code>load_test_tokenizer()</code>
+        がOptionを返していて、ファイルが無ければテストを素通りさせている。11MBのモデルファイルをリポジトリに置くわけにもいかず、手元にモデルをダウンロードしていない環境ではスキップしたいため。ただしこれは「テストが通っている」のか「テストが走っていない」のかが区別できない書き方なので、あまり良くはない。CIを整備するときに考え直す予定。
+      </p>
+      <hr />
+      <p>
+        これで入口（テキスト → トークンID）ができた。あとは出口、つまりTransformerの出力ベクトルからトークンIDを選ぶ処理を書けば、テキストからテキストへの推論がつながる。次回は出力ヘッドとサンプリングを実装する。
+      </p>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2026/08/02/1" rel="next">
+        ← older
+      </a>
+      <a href="/" class="home">
+        mizzy.org · since 2005
+      </a>
+      <a href="/blog/2026/08/02/3">
+        newer →
+      </a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
+</html>
