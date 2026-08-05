@@ -3,12 +3,93 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-08-02T11:59:12+09:00</updated>
+    <updated>2026-08-05T20:13:04+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peithoにツイートやリンクの埋め込み機能を入れた]]></title>
+        <link href="https://mizzy.org/blog/2026/08/05/1/"/>
+        <updated>2026-08-05T20:13:04+09:00</updated>
+        <id>https://mizzy.org/blog/2026/08/05/1/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の話の続き。スライドの中にツイートやYouTubeの動画を埋め込む機能を入れた（<a href="https://github.com/mizzy/peitho/pull/401">PR #401</a>、<a href="https://github.com/mizzy/peitho/pull/403">#403</a>、<a href="https://github.com/mizzy/peitho/pull/404">#404</a>）。</p>
+<p>書き方はこう。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="s">```embed
+</span></span></span><span class="line"><span class="cl">https://x.com/gosukenator/status/2074821309259973046
+</span></span><span class="line"><span class="cl"><span class="s">```</span>
+</span></span></code></pre><p><code>embed</code>というタグのコードフェンスにURLを1行書くだけ。ビルド時に解決されて、present、preview、PDFエクスポート、公開用の<code>dist/</code>のどれでも同じものが出る。</p>
+<hr />
+<h2>出力にスクリプトを入れない</h2>
+<p>まず前提として、Peithoでは本文にHTMLタグを書くとビルドエラーになる。CommonMarkはHTMLをそのまま出力に通す仕様だけど、Peithoでは怒られて止まる（コメントだけは例外で、ページ設定と発表者ノートに使っている）。なので、Xが配っている公式の埋め込みコードを貼る、という選択肢は最初からない。</p>
+<p>仮に許したとしても動かない。公式の埋め込みは、blockquoteと<code>widgets.js</code>の読み込みをセットで貼る形になっていて、スクリプトがページ全体からそのblockquoteを探し出して中身を差し替える、という段取りで動く。ところがPeithoはスライドを1枚ずつShadow DOMの中に入れて、デッキのCSSもその中に流し込んでいる。デッキのスタイルが発表者ツールなどのシェル側のUIに漏れ出さないように、また逆にシェル側のスタイルがスライドに効かないようにするため。Shadow DOMの中身は外から普通に検索しても引っかからないので、<code>widgets.js</code>は差し替える相手を見つけられないまま終わる。</p>
+<p>そもそも、スライドを表示するたびにスクリプトが走って埋め込みを組み立てる、という作りには無理がある。ネットワークのない会場では<code>widgets.js</code>をXから取ってくるところで止まるし、Xの側で表示のされ方が変われば、過去のスライドの見た目も変わる。PDFエクスポートも、スクリプトの実行を待ちきれるかどうかというタイミングの問題を抱え込むことになる。発表の当日に埋め込みが出るかどうかが、その場の環境次第になってしまう。</p>
+<p>なので全部ビルド時に解決して、出力には静的な成果物だけが入るようにした。</p>
+<hr />
+<h2>埋め込みは3種類</h2>
+<p>同じ<code>embed</code>と書いても、出来上がるものは3種類ある。書いたURLと、オプションを付けたかどうかで決まる。</p>
+<h3>ツイートのスクリーンショット（デフォルト）</h3>
+<p>X（Twitter）のステータスURLをオプションなしで書くと、ビルド時にヘッドレスChromeで公式のウィジェットを描画して、そのPNGを撮る。撮った画像はキャッシュされて、以降のビルドではネットワークに出ない。</p>
+<p><img src="/images/2026/08/peitho-embed-screenshot.png" alt="公式のXウィジェットのスクリーンショットが貼られたスライド" /></p>
+<p>アイコンも動画のサムネイルも、いいねの数や「Read 1 reply」まで、公式の埋め込みの見た目そのまま入る。</p>
+<p>自分でスクリーンショットを撮っていたのを、機械にやらせるようにしただけとも言える。</p>
+<p>ツイートが消されていたり非公開だったりして、ウィジェットがいつまでも描画されない場合は、行番号つきのビルドエラーにしている。空白の画像が黙って出るよりは、ビルドが落ちたほうがいい。</p>
+<h3>カードモード</h3>
+<p><code>mode=card</code>を付けると、スクリーンショットではなくHTMLのカードになる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">``<span class="sb">`embed mode=card
+</span></span></span><span class="line"><span class="cl"><span class="sb">https://x.com/gosukenator/status/2074821309259973046
+</span></span></span><span class="line"><span class="cl"><span class="sb">`</span>``
+</span></span></code></pre><p>こっちはoEmbedのAPIを叩いてデータを取ってきて、Peitho側でカードのHTMLを組み立てる。画像ではなく本文なので、テキストが選択できるし、デッキのテーマの色とフォントに従う。Chromeを起動しないので、カードだけのデッキならChromeなしでビルドできる。</p>
+<p><img src="/images/2026/08/peitho-embed-card.png" alt="カードモードで描画された同じツイート。デッキのフォントと色になっている" /></p>
+<p>同じツイートだけど、さっきのスクリーンショットとは見た目が違う。アイコンもXのロゴも入っていないし、フォントはデッキのもの。本物そっくりではないかわりに、スライドの中で浮かない。</p>
+<p>oEmbedのAPIが返してくるJSONには、投稿者名や日付といったデータに混じって、<code>html</code>というフィールドが入っている。中身は結局あの公式の埋め込みコードで、blockquoteがそのまま文字列で入っている。これをスライドに貼れば手っ取り早いけど、そうはしていない。</p>
+<p>このHTMLは表示するためのものとしては扱わず、データとして読むだけにしている。本文とリンクだけを抜き出して、あとは投稿者名などのJSONのフィールドと組み合わせ、カードのHTMLはPeitho側で組み立て直す。抜き出した文字列はすべてエスケープしてから埋める。Xから受け取ったHTMLが、そのままの形で出力に出ていくことはない。自分で書いたHTMLすらビルドエラーで弾いているのに、外から取ってきたHTMLを素通しするのでは筋が通らない。</p>
+<h3>汎用のoEmbedカード</h3>
+<p>X以外のURLをオプションなしで書くと、汎用のカードになる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="s">```embed
+</span></span></span><span class="line"><span class="cl">https://www.youtube.com/watch?v=dQw4w9WgXcQ
+</span></span><span class="line"><span class="cl"><span class="s">```</span>
+</span></span></code></pre><p>ビルド時にまずそのページのHTMLを取ってきて、<code>&lt;link rel=&quot;alternate&quot; type=&quot;application/json+oembed&quot;&gt;</code>という行を探す。oEmbedに対応しているサイトは、埋め込み用のデータをどこから取れるかを、この形でページ内に書いている。あとはそこに書かれているURLを叩けば、カードに必要なデータが返ってくる。</p>
+<p>なので、Peithoの側に「対応サービス一覧」のようなものはない。YouTubeやMastodonを名指しで書いてあるわけではなく、この行が置いてあるページなら何でも通る。</p>
+<p>返ってきたデータにサムネイル画像が入っていればそれを使ったカードに、入っていなければタイトルと投稿者とサービス名（「YouTube」など）だけのテキストカードになる。</p>
+<p><img src="/images/2026/08/peitho-embed-generic-card.png" alt="YouTubeの動画がサムネイル付きのカードとして描画されたスライド" /></p>
+<p>サムネイルはビルド時にダウンロードして、自分で<code>![]()</code>で貼った画像と同じ扱いで、ハッシュ名のローカルアセットとして公開される。リンク先は常にデッキに書いたURLで、oEmbedのレスポンスに入っているURLで上書きはしない。</p>
+<p>こっちはスクリーンショットを撮らない。返ってくる<code>html</code>も使っていない。YouTubeのそれは動画プレイヤーのiframeで、Mastodonのそれは「View on Mastodon」と書かれた枠と、それを実際の投稿に置き換えるスクリプトのセットになっている。どちらも表示にはネットワークかスクリプトが要るので、ビルド時に静的な成果物を作る、という方針とは噛み合わない。かといって、Xと同じようにスクリーンショットを撮る方向にも行きにくい。Xの公式ウィジェットは描画が終わったことを自分で教えてくれるので、それを待ってから撮ればいい。ところが一般のiframeにそういう仕組みはない。読み込みが終わったことは分かっても、中身が描画し終えたかどうかは外から知りようがないので、適当に何秒か待って撮る、みたいな作りになってしまう。なので汎用側は常にPeithoが組み立てたカード、と割り切った。</p>
+<hr />
+<h2>URLを1つ書くだけの記法にした</h2>
+<p>記法をどうするかは少し考えた。</p>
+<p>本文中にURLをそのまま書いたら自動で埋め込みになる、という案は却下した。「ここはただのリンクにしたい」と区別がつかないし、書いていないことが黙って起きるのはPeithoの方針に合わない。</p>
+<p><code>![](https://...)</code>の画像記法を拡張する案も却下。Peithoの<code>![]()</code>はリモートURLを受け付けないし、拡張子もpngやjpgといった画像のものしか受け付けない。ツイートのURLを書く場所としては、どちらの条件にも合っていない。</p>
+<p>結果として<code>embed</code>という専用のフェンスになった。既に<code>mermaid</code>や<code>math</code>がフェンスのタグで組み込みのレンダラに振り分けられる仕組みがあるので、そこに<code>embed</code>を足す形で収まっている。<code>code_images.embed:</code>で外部コマンドに差し替えるのも、他のタグと同じようにできる。</p>
+<p>オプションをどこに書くかも、実装の途中で変えた。最初は本文の、URLの次の行に書く案だった。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="s">```embed
+</span></span></span><span class="line"><span class="cl">https://x.com/gosukenator/status/2074821309259973046
+</span></span><span class="line"><span class="cl">mode: card
+</span></span><span class="line"><span class="cl"><span class="s">```</span>
+</span></span></code></pre><p>これだと本文の中に「URLの行」と「オプションの行」という2つの文法が混ざる。今は<code>embed</code>と書いている行に、続けて書くようにしている。</p>
+<pre class="chroma"><code><span class="line"><span class="cl">``<span class="sb">`embed mode=card
+</span></span></span><span class="line"><span class="cl"><span class="sb">https://x.com/gosukenator/status/2074821309259973046
+</span></span></span><span class="line"><span class="cl"><span class="sb">`</span>``
+</span></span></code></pre><p>本文は常にURLが1行だけ、という状態を保てるし、後から<code>theme</code>や<code>width</code>を足すときも文法を作り直さなくて済む。</p>
+<hr />
+<h2>キャッシュの置き場所</h2>
+<p>取ってきたものは<code>.peitho/embeds-cache/</code>に置いている。スクリーンショットのPNG、oEmbedのレスポンス、ダウンロードしたサムネイル画像がここに入る。全部揃っていればオフラインでビルドできるし、足りないものだけを取りに行く。</p>
+<p>有効期限のようなものはなく、勝手に取り直したりもしない。更新したいときは消す。何かに失敗したときのエラーには、消すべきキャッシュファイルのパスをそのまま出すようにしてある。</p>
+<hr />
+<p>サンプルデッキは<a href="https://peitho.gosu.ke/examples/tweet-embed/">Tweet Embedの例</a>に置いてある。3枚のスライドで、スクリーンショット、カードモード、汎用のoEmbedカードがそれぞれ出る。</p>
+<p>参考:</p>
+<ul>
+<li><a href="https://github.com/mizzy/peitho">mizzy/peitho</a></li>
+<li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
+<li><a href="https://peitho.gosu.ke/examples/tweet-embed/">Tweet Embedのサンプルデッキ</a></li>
+<li><a href="/blog/2026/08/02/1/">前回の記事: peitho lintに検査を2つ足した</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Qwen3のトークナイザーは日本語をどう扱うか]]></title>
@@ -644,126 +725,6 @@ like
 <p>このあと入院して手術を受けることになった。特に問題がなければ3泊4日の想定。</p>
 <p>症状に気づいてすぐに最初のクリニックを受診してから手術が決まるまで3ヶ月、クリニックを2軒と大病院を回って、レントゲン、投薬、筋電図、MRIと一通りの検査を経て、ようやくここまで来た。手術はさらに1ヶ月後になる予定。</p>
 <p>余談だけど、整形外科クリニックの医師2人と大病院の医師1人、計3人から、レントゲンを見て「骨折したことありますか」と聞かれた。3人とも同じことを聞いてくるくらいなので、レントゲンに何かそれらしい痕跡があるのだと思うけど、自分にはまったく身に覚えがない。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Pyxisの開発: Transformerブロック]]></title>
-        <link href="https://mizzy.org/blog/2026/07/23/1/"/>
-        <updated>2026-07-23T20:55:03+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/23/1/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/07/22/1/">前回の記事</a>でFFN（SwiGLU）を実装した。これでTransformerを構成する主要な要素（RMSNorm、アテンション、FFN）がすべて揃ったので、今回はそれらを組み合わせて1つのTransformerブロックを組み立て、さらにブロックを積み重ねてTransformer全体を作る。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/21">#21</a>。</p>
-<hr />
-<h2>Transformerブロックの構造</h2>
-<p>1つのTransformerブロックは、RMSNormとアテンションとFFNを組み合わせたもの。Qwen3を含むLLaMA以降のLLMでは、以下の構造になっている。</p>
-<pre><code>入力 x
-  ↓
-  RMSNorm (input_layernorm)
-  ↓
-  アテンション
-  ↓
-  + 残差接続 (入力 x を足す)
-  ↓
-  RMSNorm (post_attention_layernorm)
-  ↓
-  FFN
-  ↓
-  + 残差接続 (直前の値を足す)
-  ↓
-出力
-</code></pre>
-<p>Qwen3-1.7Bならこのブロックが28層積み重なっている。層の入出力はどちらも<code>hidden_dim = 2048</code>次元のベクトル列で、各層でその2048次元のベクトルが少しずつ変換されていく。</p>
-<hr />
-<h2>残差接続</h2>
-<p>このブロックで重要なのが残差接続（residual connection、skip connectionとも呼ばれる）。図中で「+ 残差接続」と書いた部分で、サブレイヤー（アテンションやFFN）の出力に、そのサブレイヤーの入力をそのまま足している。</p>
-<pre><code>出力 = 入力 + サブレイヤー(入力)
-</code></pre>
-<p>サブレイヤーが何を計算しても、その結果に元の入力を足すことで、入力の情報が層をまたいで直接下流に伝わるようにする、というのが残差接続の役割。</p>
-<p>もともとは画像認識のResNet（<a href="https://arxiv.org/abs/1512.03385">He et al., 2015</a>）で提案されたテクニックで、深いネットワーク（何十層、何百層と重ねる）を安定して学習できるようにするための工夫。深い層になるほど勾配が消失（値が小さくなりすぎて学習信号が伝わらなくなる）する問題があったが、残差接続で入力を直接下流に流すルートを作ることで、勾配も直接伝わるようになり、深いネットワークが学習可能になった。</p>
-<p>Transformerは各ブロックにアテンションとFFNの2つのサブレイヤーがあり、それぞれに残差接続が付いている。Qwen3-1.7Bなら28ブロック × 2 = 56個の残差接続がある。</p>
-<hr />
-<h2>Pre-Norm</h2>
-<p>もうひとつの重要な設計選択がPre-Norm。「RMSNormをサブレイヤーの前に適用する」という配置のこと。</p>
-<p>先ほどの図を見ると、RMSNormがアテンションやFFNの<strong>前</strong>に来ている。これがPre-Norm。</p>
-<p>対比としてPost-Normという配置もあって、こちらはサブレイヤーの<strong>後</strong>（残差接続の後）にNormを適用する。</p>
-<pre><code>Pre-Norm:  x + サブレイヤー(Norm(x))
-Post-Norm: Norm(x + サブレイヤー(x))
-</code></pre>
-<p>オリジナルの&quot;Attention Is All You Need&quot;はPost-Normだったが、その後の研究で「Post-Normは学習が不安定になりやすく、深いモデルでは特にPre-Normの方が安定する」ことが分かってきて、現代のLLMはほぼPre-Normを採用している（<a href="https://arxiv.org/abs/2002.04745">On Layer Normalization in the Transformer Architecture, Xiong et al., 2020</a>）。</p>
-<p>Pre-Normでは、残差接続のルートに何も演算を挟まない（<code>x</code>がそのまま下流に流れる）ため、深く積み重ねても勾配が素直に伝わる、というのが安定性の理由。</p>
-<hr />
-<h2>実装</h2>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">TransformerBlock</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">input_norm</span>: <span class="nc">RmsNorm</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">attention</span>: <span class="nc">Attention</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">post_attn_norm</span>: <span class="nc">RmsNorm</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">ffn</span>: <span class="nc">Ffn</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>4つの構成要素をそのまま持つだけの構造体。</p>
-<p><code>forward()</code>の中身はこう。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">forward</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">x</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">seq_len</span>: <span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">hidden_dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">seq_len</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// アテンションブロック
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">to_vec</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">chunks_exact_mut</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">input_norm</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">position</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">attention_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">attention</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">seq_len</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">((</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">residual</span><span class="p">),</span><span class="w"> </span><span class="n">attention</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">iter_mut</span><span class="p">().</span><span class="n">zip</span><span class="p">(</span><span class="n">residual</span><span class="p">).</span><span class="n">zip</span><span class="p">(</span><span class="n">attention_output</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="o">*</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">residual</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">attention</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// FFNブロック
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">to_vec</span><span class="p">();</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">chunks_exact_mut</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">post_attn_norm</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">position</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">position_idx</span><span class="p">,</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">chunks_exact_mut</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">).</span><span class="n">enumerate</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">ffn_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">ffn</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">position</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">position_idx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hidden_dim</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">((</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">residual</span><span class="p">),</span><span class="w"> </span><span class="n">ffn</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">position</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">iter_mut</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">zip</span><span class="p">(</span><span class="o">&amp;</span><span class="n">residual</span><span class="p">[</span><span class="n">start</span><span class="o">..</span><span class="n">start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">hidden_dim</span><span class="p">])</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="n">zip</span><span class="p">(</span><span class="n">ffn_output</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="o">*</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">residual</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ffn</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>前半がアテンションブロック、後半がFFNブロック。それぞれ:</p>
-<ol>
-<li>残差接続用に入力<code>x</code>のコピーを<code>residual</code>として取っておく</li>
-<li><code>x</code>にRMSNormを適用（各トークン位置ごとに独立に）</li>
-<li>サブレイヤー（アテンションまたはFFN）を適用</li>
-<li>サブレイヤーの出力に<code>residual</code>を足す</li>
-</ol>
-<p>RMSNormとFFNは1つのトークン位置のベクトルに対して独立に適用できるので、<code>chunks_exact_mut(hidden_dim)</code>でトークンごとに区切って処理している。アテンションはトークン間の相互作用を扱うので、全トークン分の<code>x</code>と<code>seq_len</code>をまとめて渡す。</p>
-<hr />
-<h2>Transformerの組み立て</h2>
-<p>複数のブロックを積み重ねて、最後にRMSNormをかけたものがTransformer全体。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Transformer</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">blocks</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">TransformerBlock</span><span class="o">&gt;</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">final_norm</span>: <span class="nc">RmsNorm</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">hidden_dim</span>: <span class="kt">usize</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">impl</span><span class="w"> </span><span class="n">Transformer</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">forward</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">x</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">seq_len</span>: <span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">block</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="n">blocks</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">block</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">seq_len</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">chunks_exact_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">hidden_dim</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="bp">self</span><span class="p">.</span><span class="n">final_norm</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">position</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>各ブロックを順に適用してから、最後にもう一度RMSNormをかける。この最後のRMSNormは<code>model.norm.weight</code>という名前でsafetensorsに格納されていて、Transformer全体の出力を正規化する役割。</p>
-<p>Qwen3-1.7Bなら28個のブロックが積み重なっていて、embeddingで取り出したベクトル列がこの28層を順に流れて変換され、最後のRMSNormで整えられて出力される、という流れ。</p>
-<hr />
-<p>これでTransformer本体ができた。次回はトークナイザーを組み込んで、テキストからトークンIDへの変換を実装する。</p>
 
 ]]></content>
     </entry>
