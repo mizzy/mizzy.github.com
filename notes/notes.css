@@ -1,0 +1,366 @@
+/* notes.css — mizzy.org/notes の共通土台
+ *
+ * 各ノートのHTMLはこれを読み込み、ページ固有の図解CSSだけを <style> で足す。
+ * 色は必ずここのCSS変数を経由すること（ダークモード追従のため）。
+ */
+
+/* ---- トークン ---- */
+
+:root {
+  --bg:        #fdfcfa;
+  --surface:   #ffffff;
+  --sunken:    #f4f2ee;
+  --text:      #1c1b19;
+  --muted:     #6b6862;
+  --faint:     #94908a;
+  --rule:      #e2ded7;
+  --accent:    #9a4a1f;
+  --accent-bg: #f7ede6;
+  --link:      #8a3f18;
+
+  --sans: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --measure: 34rem;
+  --radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #161513;
+    --surface:   #1e1d1a;
+    --sunken:    #252320;
+    --text:      #e8e5df;
+    --muted:     #a09b93;
+    --faint:     #757068;
+    --rule:      #33302b;
+    --accent:    #e0895a;
+    --accent-bg: #2a211b;
+    --link:      #e59a70;
+  }
+}
+
+/* ---- ベース ---- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.85;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--link); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+/* ---- ヘッダ ---- */
+
+header.site {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 0;
+  font-size: 0.875rem;
+}
+
+header.site .home {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+header.site a:not(.home) { color: var(--muted); text-decoration: none; }
+header.site a:not(.home):hover { color: var(--link); }
+header.site .home::after {
+  content: "";
+  display: inline-block;
+  width: 1px; height: 0.9em;
+  margin-left: 1.25rem;
+  vertical-align: -0.1em;
+  background: var(--rule);
+}
+
+/* ---- 記事 ---- */
+
+article.note {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 6rem;
+}
+
+article.note > * { max-width: 100%; }
+
+h1 {
+  font-size: 1.9rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.75rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin: 3rem 0 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+
+h3 {
+  font-size: 1rem;
+  margin: 2rem 0 0.5rem;
+}
+
+p { margin: 0 0 1.25rem; }
+
+p.meta {
+  margin: 0 0 2.5rem;
+  color: var(--faint);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+ul, ol { padding-left: 1.4em; margin: 0 0 1.25rem; }
+li { margin-bottom: 0.4rem; }
+
+strong { font-weight: 700; }
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+}
+blockquote p:last-child { margin-bottom: 0; }
+blockquote cite { display: block; font-size: 0.8125rem; font-style: normal; }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+/* ---- コード ---- */
+
+code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  background: var(--sunken);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: var(--sunken);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* ---- 表 ---- */
+
+.scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+th {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom-width: 2px;
+}
+
+/* 対比用。2列目以降が「選択肢」になる比較表 */
+table.compare td:first-child { color: var(--muted); width: 30%; }
+
+/* ---- 図解パーツ ---- */
+
+/* 誤解 / 実際は の2カラム */
+.contrast {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.contrast > div {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+.contrast > div > h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.contrast > .yes { border-color: var(--accent); background: var(--accent-bg); }
+.contrast p:last-child { margin-bottom: 0; }
+
+/* 番号付きステップ */
+ol.steps { list-style: none; padding: 0; margin: 1.5rem 0; counter-reset: step; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 1.25rem 2.75rem;
+  margin: 0;
+  border-left: 1px solid var(--rule);
+  margin-left: 0.85rem;
+}
+ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: -0.85rem;
+  top: 0.15rem;
+  width: 1.7rem; height: 1.7rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ol.steps > li > strong { display: block; }
+
+/* 補足・余談 */
+aside.note-aside {
+  background: var(--sunken);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin: 1.5rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+aside.note-aside p:last-child { margin-bottom: 0; }
+
+/* 図。SVGは fill/stroke に var(--...) を使うこと */
+figure { margin: 2rem 0; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--faint);
+}
+
+/* ---- 関連リンク / タグ ---- */
+
+nav.links {
+  margin-top: 3.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+nav.links h2 {
+  margin: 0 0 0.6rem;
+  padding: 0;
+  border: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav.links ul { list-style: none; padding: 0; margin: 0; }
+nav.links li { margin-bottom: 0.3rem; font-size: 0.9375rem; }
+
+/* まだ書いていないノートへの参照。「いつか書く」の印 */
+nav.links li.unwritten { color: var(--faint); }
+nav.links li.unwritten::after {
+  content: "未執筆";
+  margin-left: 0.5rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  vertical-align: 0.1em;
+}
+
+p.tags { margin-top: 1.5rem; font-size: 0.8125rem; }
+p.tags a {
+  display: inline-block;
+  margin-right: 0.4rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--muted);
+  text-decoration: none;
+}
+p.tags a:hover { border-color: var(--accent); color: var(--link); }
+
+/* ---- index ---- */
+
+.index-head { max-width: var(--measure); margin: 0 auto; padding: 2.5rem 1.5rem 0; }
+.index-head h1 { margin-bottom: 0.5rem; }
+.index-head p { color: var(--muted); }
+
+.cards {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1rem 1.5rem 6rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.cards a.card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  text-decoration: none;
+  color: inherit;
+}
+.cards a.card:hover { border-color: var(--accent); }
+.cards .card h2 {
+  margin: 0 0 0.3rem;
+  padding: 0;
+  border: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--link);
+}
+.cards .card p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.cards .card .tags {
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+/* ---- 狭い画面 ---- */
+
+@media (max-width: 34rem) {
+  body { font-size: 15.5px; line-height: 1.8; }
+  h1 { font-size: 1.55rem; }
+  .contrast { grid-template-columns: 1fr; }
+}

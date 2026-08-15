@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>冪等性は「2回目が何もしない」ことではない - notes</title>
+<meta name="description" content="冪等性を「2回目は何もしない」と説明すると、実装が満たすべき条件が見えなくなる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* このページ固有: 収束の図 */
+  .converge text { font-family: var(--sans); font-size: 11px; }
+  .converge .box  { fill: var(--surface); stroke: var(--rule); }
+  .converge .goal { fill: var(--accent-bg); stroke: var(--accent); }
+  .converge .lbl  { fill: var(--text); }
+  .converge .dim  { fill: var(--faint); font-size: 10px; }
+  .converge .arrow { stroke: var(--faint); fill: none; }
+  .converge .hit  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+</style>
+</head>
+<body>
+<header class="site">
+  <a class="home" href="/notes/">notes</a>
+  <a href="https://mizzy.org/">mizzy.org</a>
+</header>
+
+<article class="note">
+  <h1>冪等性は「2回目が何もしない」ことではない</h1>
+  <p class="meta"><time datetime="2026-08-16">2026-08-16</time></p>
+
+  <p>冪等性を「同じ操作を2回やっても壊れない」「2回目は何もしない」と説明されることが多い。間違ってはいないが、これは<strong>結果</strong>を述べているだけで、実装が満たすべき条件になっていない。この説明だけを持って実装すると、「2回目に来たら何もしない」分岐を書いてしまう。</p>
+
+  <div class="contrast">
+    <div>
+      <h3>よくある説明</h3>
+      <p>2回目の実行では何も起きない。</p>
+      <p class="dim"><em>回数</em>に注目している。</p>
+    </div>
+    <div class="yes">
+      <h3>実際の定義</h3>
+      <p><code>f(f(x)) = f(x)</code><br>1回適用した後の状態が、何回適用した後の状態とも等しい。</p>
+      <p><em>状態</em>に注目している。</p>
+    </div>
+  </div>
+
+  <p>「2回目」が特別なのではなく、回数が状態に影響しないというのが本体。</p>
+
+  <h2>実装がずれる例</h2>
+
+  <p>「2回目は何もしない」と読むと、実行回数を数えるコードになる。</p>
+
+  <ul>
+    <li>実行済みフラグを持ち、立っていたら <code>return</code> する</li>
+    <li>前回の実行ログを見て、あれば skip する</li>
+  </ul>
+
+  <p>これは冪等ではなく<strong>重複実行の抑制</strong>で、別のもの。フラグと現実の状態がずれた瞬間に壊れる。誰かが手で設定を変えても、フラグは立ったままなので直らない。</p>
+
+  <p>正しくは、実行のたびに<strong>現在の状態を観測して、あるべき状態との差分だけを適用する</strong>。2回目に何も起きないのは、差分が無いという観測の結果であって、2回目だから抑制したのではない。</p>
+
+  <ol class="steps">
+    <li><strong>観測する</strong>現在の状態を読む。前回自分が何をしたかは見ない。</li>
+    <li><strong>差分を取る</strong>あるべき状態と比べる。</li>
+    <li><strong>差分だけ適用する</strong>差が無ければ、結果として何も起きない。</li>
+  </ol>
+
+  <h2>見分け方</h2>
+
+  <p>その操作が冪等かどうかは、「2回叩いてみる」では判定できない。<strong>途中まで適用された状態から叩いて、正しい状態に収束するか</strong>で判定する。</p>
+
+  <figure>
+    <svg class="converge" viewBox="0 0 560 200" role="img" aria-label="未適用・途中・適用済みのどの状態から実行しても、あるべき状態に収束することを示す図">
+      <!-- 出発点3つ -->
+      <rect class="box" x="8"  y="16"  width="120" height="34" rx="4"/>
+      <text class="lbl" x="68" y="37" text-anchor="middle">未適用</text>
+
+      <rect class="box" x="8"  y="83"  width="120" height="34" rx="4"/>
+      <text class="lbl" x="68" y="104" text-anchor="middle">途中で落ちた状態</text>
+
+      <rect class="box" x="8"  y="150" width="120" height="34" rx="4"/>
+      <text class="lbl" x="68" y="171" text-anchor="middle">適用済み</text>
+
+      <!-- 実行 -->
+      <rect class="box" x="222" y="83" width="116" height="34" rx="4"/>
+      <text class="lbl" x="280" y="104" text-anchor="middle">実行</text>
+
+      <!-- 収束先 -->
+      <rect class="goal" x="432" y="83" width="120" height="34" rx="4"/>
+      <text class="lbl" x="492" y="104" text-anchor="middle">あるべき状態</text>
+
+      <!-- 矢印 -->
+      <path class="arrow" d="M128 33 C 180 33, 180 100, 218 100"/>
+      <path class="arrow" d="M128 100 H 218"/>
+      <path class="arrow" d="M128 167 C 180 167, 180 100, 218 100"/>
+      <path class="hit"   d="M338 100 H 428"/>
+      <path class="hit"   d="M420 94 l 8 6 l -8 6"/>
+
+      <text class="dim" x="280" y="140" text-anchor="middle">どこから来たかを問わない</text>
+    </svg>
+    <figcaption>冪等な実行は、出発点がどれであっても同じ状態に収束する。回数を数える実装は、真ん中の「途中で落ちた状態」から復帰できない。</figcaption>
+  </figure>
+
+  <p>1回目が途中で落ちた後の状態は、未適用でも適用済みでもない。回数を数える実装はここで必ず壊れる。差分を見る実装はここで直る。この「収束するか」という問いのほうが、冪等性の実用的な意味に近い。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li class="unwritten">宣言的とは何か</li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/index.html">#infra</a>
+    <a href="/notes/index.html">#idempotency</a>
+  </p>
+</article>
+</body>
+</html>
