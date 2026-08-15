@@ -183,9 +183,8 @@ th, td {
   border-bottom: 1px solid var(--rule);
 }
 th {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
   color: var(--muted);
   font-weight: 600;
   border-bottom-width: 2px;
@@ -214,9 +213,8 @@ table.compare td:first-child { color: var(--muted); width: 30%; }
 }
 .contrast > div > h3 {
   margin: 0 0 0.5rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.03em;
   color: var(--muted);
 }
 .contrast > .yes { border-color: var(--accent); background: var(--accent-bg); }
@@ -249,6 +247,65 @@ ol.steps > li::before {
   justify-content: center;
 }
 ol.steps > li > strong { display: block; }
+
+/* 精度ノート。AI との対話による探索記録の、確度の但し書き */
+.accuracy {
+  background: var(--sunken);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.3rem;
+  margin: 2rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+.accuracy > h2 {
+  margin: 0 0 0.6rem;
+  padding: 0;
+  border: 0;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.accuracy dl { margin: 0; }
+.accuracy dt {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 0.8rem;
+}
+.accuracy dt:first-child { margin-top: 0; }
+.accuracy dd { margin: 0.15rem 0 0; }
+.accuracy p:last-child, .accuracy ul:last-child { margin-bottom: 0; }
+
+/* ドキュメントの状態 */
+.status {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  color: var(--muted);
+  background: var(--surface);
+}
+.status.done { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+/* 章・サブドキュメントの一覧 */
+.toc { margin: 2rem 0; display: grid; gap: 0.5rem; }
+.toc a {
+  display: block;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.8rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  background: var(--surface);
+}
+.toc a:hover { border-color: var(--accent); }
+.toc .t { color: var(--link); font-weight: 600; font-size: 0.9375rem; }
+.toc .d { display: block; color: var(--muted); font-size: 0.875rem; line-height: 1.6; margin-top: 0.2rem; }
 
 /* 補足・余談 */
 aside.note-aside {
@@ -284,9 +341,8 @@ nav.links h2 {
   margin: 0 0 0.6rem;
   padding: 0;
   border: 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
   color: var(--muted);
 }
 nav.links ul { list-style: none; padding: 0; margin: 0; }

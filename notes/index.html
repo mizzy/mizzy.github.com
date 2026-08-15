@@ -16,15 +16,35 @@
 
 <div class="index-head">
   <h1>notes</h1>
-  <p>考えたことを概念ごとに1枚ずつ書いて、互いにリンクしている場所。書きかけのまま置いてあるものも多い。</p>
+  <p>考えたことを書いて置いてある場所。書きかけのまま置いてあるものも多い。</p>
+  <p>いまのところ中身はIaCツールとDSLの設計についての、生成AIとの対話による探索記録。
+  結論の確定ではなく論点の整理で、各ノートの冒頭に、どこまで確認済みでどこからが推測かを書いた精度ノートがある。</p>
 </div>
 
 <div class="cards">
 
-  <a class="card" href="/notes/idempotence-is-not-about-the-second-run.html">
-    <h2>冪等性は「2回目が何もしない」ことではない</h2>
-    <p>冪等性を「同じ操作を2回やっても壊れない」と説明すると、実装が満たすべき条件が見えなくなる。結果の話と実装の話を分ける。</p>
-    <span class="tags">#infra #idempotency</span>
+  <a class="card" href="/notes/cdk-pulumi-terraform-carina-comparison.html">
+    <h2>CDK / Pulumi / Terraform / Carina の設計比較</h2>
+    <p>インフラ管理ツールの設計判断は、何を選び何を捨てているか。記述言語・抽象化機構・記述自由度の所在・結果予測性の4軸で横断比較する。第1章のみ第一稿完成、以降は探索メモ。</p>
+    <span class="tags">#iac #dsl #探索ノート</span>
+  </a>
+
+  <a class="card" href="/notes/cross-dsl-design-position.html">
+    <h2>Cross-DSL 設計位置取り分析</h2>
+    <p>「記述言語 × 記述自由度の所在」の2×2が、IaC以外の構成記述DSLでも成り立つかの検証。Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helm の11本を同じ枠組みで観察する。</p>
+    <span class="tags">#dsl #設計 #探索ノート</span>
+  </a>
+
+  <a class="card" href="/notes/carina-type-system-type-theory.html">
+    <h2>Carina 型システムの型理論的分析</h2>
+    <p>CarinaのDSLを二段階の言語（静的段階 = validate/plan、動的段階 = apply）として読む。意味論的型付け・篩型・Unknownの意味論、全域性のPulumi / CDK比較、plan = 中間言語へのコンパイル。</p>
+    <span class="tags">#型システム #iac #探索ノート</span>
+  </a>
+
+  <a class="card" href="/notes/world-acquisition-incremental-plan.html">
+    <h2>plan(source, world) の world を速くする</h2>
+    <p>world取得の「信頼性 = 全リソースの同期GET」をほどく。dirty bit・増分ビュー維持・リース / OCC・所有権によるrefresh省略という異分野の知見の適用可能性。実装も実測もしていないアイデアの列挙。</p>
+    <span class="tags">#iac #増分計算 #探索ノート</span>
   </a>
 
 </div>
