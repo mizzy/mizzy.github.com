@@ -21,7 +21,8 @@
   --sans: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --measure: 34rem;
+  --measure: 52rem;   /* 本文の幅 */
+  --wide: 68rem;      /* 図・表・比較カードがはみ出せる幅 */
   --radius: 6px;
 }
 
@@ -167,7 +168,7 @@ pre code { background: none; padding: 0; font-size: inherit; }
 
 /* ---- 表 ---- */
 
-.scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+.scroll { overflow-x: auto; margin-bottom: 1.5rem; }
 
 table {
   border-collapse: collapse;
@@ -200,7 +201,8 @@ table.compare td:first-child { color: var(--muted); width: 30%; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin: 1.5rem 0;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 .contrast > div {
   background: var(--surface);
@@ -261,10 +263,11 @@ aside.note-aside {
 aside.note-aside p:last-child { margin-bottom: 0; }
 
 /* 図。SVGは fill/stroke に var(--...) を使うこと */
-figure { margin: 2rem 0; }
+figure { margin-top: 2.5rem; margin-bottom: 2.5rem; }
 figure svg { display: block; width: 100%; height: auto; }
 figcaption {
-  margin-top: 0.75rem;
+  max-width: var(--measure);
+  margin: 0.75rem auto 0;
   font-size: 0.8125rem;
   line-height: 1.6;
   color: var(--faint);
@@ -357,10 +360,28 @@ p.tags a:hover { border-color: var(--accent); color: var(--link); }
   color: var(--faint);
 }
 
+/* ---- はみ出し ----
+ * 図・比較カード・表は本文(--measure)より広く、--wide まで取れる。
+ * margin-inline を使うのは、後続ルールの margin ショートハンドで
+ * 打ち消されないようにするため。このブロックは必ずファイル末尾に置く。
+ */
+
+figure, .contrast, .scroll, .bleed {
+  width: min(var(--wide), 100vw - 3rem);
+  margin-left: 50%;
+  translate: -50% 0;
+}
+
 /* ---- 狭い画面 ---- */
 
-@media (max-width: 34rem) {
+@media (max-width: 44rem) {
   body { font-size: 15.5px; line-height: 1.8; }
   h1 { font-size: 1.55rem; }
   .contrast { grid-template-columns: 1fr; }
+  /* 狭い画面でははみ出さず本文幅に揃える */
+  figure, .contrast, .scroll, .bleed {
+    width: auto;
+    margin-left: 0;
+    translate: none;
+  }
 }
