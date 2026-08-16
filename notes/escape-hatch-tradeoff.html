@@ -45,6 +45,62 @@
 
   <p><strong>規約に委ねる</strong>(CDK / Pulumi)は鏡像になる。得るのは逃げ道 — 何でも書けるので複雑な構成も表現でき、社内のベテランがutilを作れば全員が使える。言語のエコシステムと統合され、IDE/デバッガ/テストフレームワークが普通に使え、ツール側の実装コストも低い。失うのは、「読めない書き方」を防げないこと、lintルール・コードレビュー・オンボーディング教育という<strong>規約の維持コストを組織が負担する</strong>こと、「ベテランしか保守できないコード」が生まれやすいこと、そして<strong>表現力の差がチーム内のスキル差として顕在化する</strong>ことである。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="言語が決める側は表現力に上限が立ち文法を超えた要求は外部スクリプトなどへ逃げるしかない代わりに組織側の負担が軽く、規約に委ねる側は表現力に上限がない代わりにlintとレビューと教育の維持コストを組織が負い続けることを示す図">
+      <style>
+        .eh text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .eh .box { fill: var(--surface); stroke: var(--rule); }
+        .eh .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .eh .ttl { font-size: 13px; font-weight: 600; }
+        .eh .dim { fill: var(--faint); font-size: 11px; }
+        .eh .cap { stroke: var(--accent); fill: none; stroke-width: 2; }
+        .eh .open { stroke: var(--accent); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .eh .arw { stroke: var(--faint); fill: none; }
+        .eh .a2t { fill: var(--accent-2); font-size: 11px; }
+        .eh .bar { fill: var(--accent-2); }
+        .eh .hd  { fill: var(--muted); font-size: 11px; }
+        .eh .sep { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="eh">
+        <text class="hd" x="12" y="20">払うもの / 受け取るもの</text>
+
+        <text class="ttl" x="12" y="46">言語が決める — Terraform / Carina</text>
+        <text class="ttl" x="368" y="46">規約に委ねる — CDK / Pulumi</text>
+        <path class="sep" d="M352 32 V 288"/>
+
+        <text class="dim" x="12" y="70">表現力</text>
+        <rect class="hi" x="12" y="78" width="200" height="74" rx="4"/>
+        <text x="112" y="104" text-anchor="middle">文法で書ける範囲</text>
+        <text class="dim" x="112" y="124" text-anchor="middle">全員が同じ表現力に揃う</text>
+        <path class="cap" d="M12 76 H 212"/>
+        <text class="a2t" x="222" y="80">上限</text>
+        <path class="arw" d="M112 152 V 176"/>
+        <text class="a2t" x="112" y="192" text-anchor="middle">超える要求はmodule分割・</text>
+        <text class="a2t" x="112" y="208" text-anchor="middle">外部スクリプトへ逃げる</text>
+
+        <text class="dim" x="12" y="242">組織が負うもの</text>
+        <rect class="box" x="12" y="250" width="200" height="26" rx="4"/>
+        <text class="dim" x="112" y="268" text-anchor="middle">規約も教育も要らない</text>
+
+        <text class="dim" x="368" y="70">表現力</text>
+        <rect class="box" x="368" y="78" width="200" height="74" rx="4"/>
+        <text x="468" y="104" text-anchor="middle">言語で書ける範囲すべて</text>
+        <text class="dim" x="468" y="124" text-anchor="middle">複雑な構成も表現できる</text>
+        <path class="open" d="M368 76 H 568"/>
+        <text class="dim" x="578" y="80">上限なし</text>
+        <text class="dim" x="368" y="192">「読めない書き方」も同じだけ書ける</text>
+        <text class="dim" x="368" y="208">表現力の差がスキル差として顕在化する</text>
+
+        <text class="dim" x="368" y="242">組織が負うもの</text>
+        <rect class="box" x="368" y="250" width="200" height="38" rx="4"/>
+        <rect class="bar" x="368" y="250" width="4" height="38"/>
+        <text x="474" y="266" text-anchor="middle">lintルール・レビュー・教育</text>
+        <text class="dim" x="474" y="282" text-anchor="middle">維持し続ける限り払い続ける</text>
+      </g>
+    </svg>
+    <figcaption>両側とも制約は同じ量だけ存在していて、置き場所だけが違う。片方は上限として言語に固定され、もう片方は続く支出として組織に残る。</figcaption>
+  </figure>
+
   <p>つまり交換されているのは「表現力の上限」と「組織コスト」であり、どちらかが単純に優れているのではない。</p>
 
   <nav class="links">

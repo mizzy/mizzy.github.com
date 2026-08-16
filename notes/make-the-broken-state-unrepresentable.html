@@ -35,6 +35,70 @@
     <li><strong>パーサの段階(パース直後 / 推論後)は型パラメータで区別される。</strong></li>
   </ul>
 
+  <figure>
+    <svg viewBox="0 0 700 290" role="img" aria-label="規約に依存する設計では未正規化の識別子がそのまま比較に届く経路が残るのに対し、typestateでは未解決識別子と解決済み正規形を別型にし、解決済みの値を作れるのがリゾルバだけなので比較へ至る経路がリゾルバ以外に存在しないことを示す図">
+      <style>
+        .ts text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ts .box { fill: var(--surface); stroke: var(--rule); }
+        .ts .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .ts .ttl { font-size: 13px; font-weight: 600; }
+        .ts .dim { fill: var(--faint); font-size: 11px; }
+        .ts .ty  { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+        .ts .arw { stroke: var(--faint); fill: none; }
+        .ts .ok  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .ts .bad { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .ts .a2t { fill: var(--accent-2); font-size: 11px; }
+        .ts .sep { stroke: var(--rule); fill: none; }
+        .ts .no  { stroke: var(--accent); fill: none; stroke-width: 2; }
+      </style>
+      <g class="ts">
+        <text class="ttl" x="12" y="22">規約で守る — 「比較の前に正規化する」</text>
+
+        <rect class="box" x="12" y="34" width="150" height="48" rx="4"/>
+        <text x="87" y="55" text-anchor="middle">DSL綴りの識別子</text>
+        <text class="ty" x="87" y="73" text-anchor="middle">EnumValue</text>
+
+        <rect class="box" x="238" y="34" width="130" height="48" rx="4"/>
+        <text class="ttl" x="303" y="55" text-anchor="middle">リゾルバ</text>
+        <text class="dim" x="303" y="73" text-anchor="middle">正規形へ解決</text>
+
+        <rect class="box" x="444" y="34" width="130" height="48" rx="4"/>
+        <text class="ttl" x="509" y="64" text-anchor="middle">比較・直列化</text>
+
+        <path class="arw" d="M162 58 H 234"/>
+        <path class="arw" d="M368 58 H 440"/>
+        <path class="bad" d="M120 82 C 120 110, 480 110, 480 84"/>
+        <text class="a2t" x="300" y="128" text-anchor="middle">忘れられる経路が残る — 未正規化のまま比較に届く</text>
+
+        <path class="sep" d="M12 148 H 688"/>
+
+        <text class="ttl" x="12" y="176">typestate — 型が違えば届かない</text>
+
+        <rect class="box" x="12" y="188" width="150" height="48" rx="4"/>
+        <text x="87" y="209" text-anchor="middle">未解決識別子</text>
+        <text class="ty" x="87" y="227" text-anchor="middle">Unresolved</text>
+
+        <rect class="hi" x="238" y="188" width="130" height="48" rx="4"/>
+        <text class="ttl" x="303" y="209" text-anchor="middle">リゾルバ</text>
+        <text class="dim" x="303" y="227" text-anchor="middle">唯一の構築子</text>
+
+        <rect class="hi" x="444" y="188" width="130" height="48" rx="4"/>
+        <text x="509" y="209" text-anchor="middle">比較・直列化</text>
+        <text class="ty" x="509" y="227" text-anchor="middle">Resolvedしか受けない</text>
+
+        <path class="ok" d="M162 212 H 234"/>
+        <path class="ok" d="M368 212 H 440"/>
+        <text class="dim" x="404" y="202" text-anchor="middle">Resolved</text>
+
+        <path class="bad" d="M120 236 C 120 258, 480 258, 480 238"/>
+        <path class="no" d="M288 240 L 312 260"/>
+        <path class="no" d="M312 240 L 288 260"/>
+        <text class="dim" x="300" y="278" text-anchor="middle">この経路は型が構成できない</text>
+      </g>
+    </svg>
+    <figcaption>不変条件を守る力が、各消費地点の記憶から型の構成可能性へ移る。下段では迂回路が禁止されているのではなく、書き表せない。</figcaption>
+  </figure>
+
   <h2>「覚えている」に依存しないこと</h2>
 
   <p>いずれの例も、対応する不変条件は「各消費地点が処理を忘れないこと」でも守れる。列挙値は比較の前に正規化する、μ型の参照は照合の前に展開する、と規約に書くこともできる。</p>

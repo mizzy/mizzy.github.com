@@ -28,6 +28,72 @@
 
   <p>desiredとworldの差分(= plan)を、worldの変更イベントが届くたびに増分更新し続ける。すると<code>carina plan</code>は「計算する」コマンドから「<strong>維持されている差分を表示する</strong>」コマンドになる。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 290" role="img" aria-label="従来のplanは呼び出しのたびに全GETでworldを作り差分を一から計算するのに対し、常駐クエリではworldの変更イベントが届くたびに差分が増分更新され続け、planコマンドは維持されている差分を読み出すだけになることを示す図">
+      <style>
+        .sq text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .sq .box { fill: var(--surface); stroke: var(--rule); }
+        .sq .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .sq .ttl { font-size: 13px; font-weight: 600; }
+        .sq .dim { fill: var(--faint); font-size: 11px; }
+        .sq .arw { stroke: var(--faint); fill: none; }
+        .sq .flow { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .sq .cost { fill: var(--accent-2); font-size: 11px; }
+        .sq .lbl { fill: var(--muted); font-size: 11px; }
+        .sq .sep { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="sq">
+        <text class="ttl" x="12" y="24">いまのplan — 呼ばれてから計算する</text>
+
+        <rect class="box" x="12" y="36" width="104" height="46" rx="4"/>
+        <text x="64" y="57" text-anchor="middle">source</text>
+        <text class="dim" x="64" y="74" text-anchor="middle">変わらない</text>
+
+        <rect class="box" x="12" y="92" width="104" height="46" rx="4"/>
+        <text x="64" y="113" text-anchor="middle">world</text>
+        <text class="cost" x="64" y="130" text-anchor="middle">毎回、全GET</text>
+
+        <path class="arw" d="M116 59 C 150 59, 160 87, 196 87"/>
+        <path class="arw" d="M116 115 C 150 115, 160 87, 196 87"/>
+
+        <rect class="box" x="196" y="60" width="150" height="54" rx="4"/>
+        <text class="ttl" x="271" y="82" text-anchor="middle">差分を一から計算</text>
+        <text class="cost" x="271" y="102" text-anchor="middle">コストはリソース総数に比例</text>
+
+        <path class="arw" d="M346 87 H 400"/>
+        <rect class="box" x="400" y="60" width="96" height="54" rx="4"/>
+        <text class="ttl" x="448" y="91" text-anchor="middle">plan</text>
+        <text class="lbl" x="508" y="91">この結果は捨てられる</text>
+
+        <path class="sep" d="M12 156 H 688"/>
+
+        <text class="ttl" x="12" y="184">常駐クエリ — 維持されている差分を表示する</text>
+
+        <rect class="box" x="12" y="196" width="104" height="34" rx="4"/>
+        <text x="64" y="217" text-anchor="middle">source</text>
+
+        <rect class="hi" x="12" y="238" width="104" height="42" rx="4"/>
+        <text x="64" y="258" text-anchor="middle">変更イベント</text>
+        <text class="dim" x="64" y="274" text-anchor="middle">変わったものだけ</text>
+
+        <path class="arw" d="M116 213 C 150 213, 160 240, 196 240"/>
+        <path class="flow" d="M116 259 C 150 259, 160 240, 196 240"/>
+
+        <rect class="hi" x="196" y="212" width="150" height="56" rx="4"/>
+        <text class="ttl" x="271" y="234" text-anchor="middle">維持されている差分</text>
+        <text class="dim" x="271" y="252" text-anchor="middle">影響を受けたノードだけ</text>
+        <text class="dim" x="271" y="266" text-anchor="middle">無効化して再計算</text>
+
+        <path class="flow" d="M346 240 H 400"/>
+        <rect class="hi" x="400" y="212" width="96" height="56" rx="4"/>
+        <text class="ttl" x="448" y="246" text-anchor="middle">plan</text>
+        <text class="lbl" x="508" y="235">コマンドは読み出すだけ</text>
+        <text class="lbl" x="508" y="253">コストは変更数に比例</text>
+      </g>
+    </svg>
+    <figcaption>計算の総量が減るのではなく、計算が起きるタイミングが移る。planの呼び出しではなくworldの変更が計算の引き金になり、コマンド側には読み出ししか残らない。</figcaption>
+  </figure>
+
   <p>ここで言語側の性質が効く。<strong>増分化が安全なのは参照透明な計算だけ</strong>であり、planが(source, world)の純関数であること — 静的段階の全域性と純粋性 — は、この最適化の前提条件をちょうど満たしている。汎用言語埋め込み型のツール(synthが外界を読みうる)では、この変換は同じ安全性では成立しない。つまり純粋性は「読みやすさ」や「検証しやすさ」だけの性質ではなく、<strong>性能最適化の可能性そのものを開く条件</strong>である。</p>
 
   <p>よりエンジニアリング寄りの実現形は、コンパイラ/ビルドシステムの依存追跡である。Build systems à la carte、Salsa(rustcのクエリ基盤)、self-adjusting computation (Acar)の核は「入力が変わっていなければ再計算しない、変わっても依存の影響範囲だけ再計算する」ことにある。world側の変更イベントと組み合わせると、「VPCの1属性が変わった → それに依存する差分計算ノードだけ無効化 → planの大半はキャッシュヒット」という増分planが組める。</p>

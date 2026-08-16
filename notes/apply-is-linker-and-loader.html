@@ -28,6 +28,81 @@
 
   <p>plan中のdeferred参照(<code>vpc.vpc_id</code>の穴)は<strong>未解決シンボル</strong>であり、Unknownはその表示名である。applyは依存DAGの位相順 — リンク順 — にノードを実行し、各ノードの実行が完了するたびに、その出力(プロバイダが採番した実値)で後続ノードの穴を埋める。これは<strong>再配置(relocation)</strong> — オブジェクトファイル中の「あとで実アドレスを入れる」印に、ロード時に実値を書き込む操作 — の正確な対応物である。シンボルが解決できない構成(相互依存)はリンク不能としてエラーになる(循環依存検出)。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 340" role="img" aria-label="planの中でsubnetのvpc_idとinstanceのsubnet_idがUnknownという未解決シンボルとして空いており、applyが依存DAGの位相順にvpc・subnet・instanceを実行し、各ノードの完了ごとにプロバイダが採番した実値で後続ノードの穴を書き込んでいく再配置の過程を示す図">
+      <style>
+        .ln text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ln .box { fill: var(--surface); stroke: var(--rule); }
+        .ln .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .ln .ttl { font-size: 12.5px; font-weight: 600; }
+        .ln .dim { fill: var(--faint); font-size: 11px; }
+        .ln .m   { font-family: var(--mono); font-size: 10.5px; fill: var(--text); }
+        .ln .mu  { font-family: var(--mono); font-size: 10.5px; fill: var(--accent-2); }
+        .ln .mf  { font-family: var(--mono); font-size: 10.5px; fill: var(--accent); }
+        .ln .edge { stroke: var(--faint); fill: none; }
+        .ln .fill { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .ln .hole { fill: none; stroke: var(--accent-2); stroke-width: 1; stroke-dasharray: 3 2; }
+        .ln .a2t { fill: var(--accent-2); font-size: 11px; }
+        .ln .step { fill: var(--muted); font-size: 11px; }
+        .ln .done { fill: var(--accent); font-size: 11px; }
+        .ln .sep { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="ln">
+        <text class="ttl" x="12" y="20">plan — 穴の空いたオブジェクト</text>
+        <text class="dim" x="200" y="20">deferred参照が未解決シンボルとして残っている</text>
+
+        <rect class="box" x="12" y="32" width="200" height="56" rx="4"/>
+        <text class="ttl" x="24" y="52">vpc</text>
+        <text class="m" x="24" y="70">cidr = "10.0.0.0/16"</text>
+        <text class="dim" x="24" y="82">未解決シンボルなし</text>
+
+        <rect class="box" x="250" y="32" width="200" height="56" rx="4"/>
+        <text class="ttl" x="262" y="52">subnet</text>
+        <rect class="hole" x="260" y="58" width="180" height="16" rx="2"/>
+        <text class="mu" x="264" y="70">vpc_id = Unknown(vpc.vpc_id)</text>
+        <text class="a2t" x="262" y="86">← 未解決</text>
+
+        <rect class="box" x="478" y="32" width="210" height="56" rx="4"/>
+        <text class="ttl" x="490" y="52">instance</text>
+        <rect class="hole" x="488" y="58" width="190" height="16" rx="2"/>
+        <text class="mu" x="492" y="70">subnet_id = Unknown(subnet.id)</text>
+        <text class="a2t" x="490" y="86">← 未解決</text>
+
+        <path class="edge" d="M212 60 H 246"/>
+        <path class="edge" d="M450 60 H 474"/>
+        <text class="dim" x="12" y="112">依存DAGのエッジ = シンボル参照。相互依存はリンク不能(循環依存)としてここで落ちる。</text>
+
+        <path class="sep" d="M12 132 H 688"/>
+
+        <text class="ttl" x="12" y="158">apply — 位相順に実行し、完了ごとに後続の穴を書き込む</text>
+
+        <text class="step" x="12" y="188">1</text>
+        <rect class="hi" x="30" y="172" width="182" height="42" rx="4"/>
+        <text class="ttl" x="42" y="190">vpcを実行</text>
+        <text class="mf" x="42" y="206">→ vpc-0a1b</text>
+        <path class="fill" d="M212 193 C 236 193, 236 193, 258 193"/>
+        <text class="done" x="268" y="190">subnetの穴へ書き込む</text>
+        <text class="dim" x="268" y="206">再配置 — 印に実値が入る</text>
+
+        <text class="step" x="12" y="244">2</text>
+        <rect class="hi" x="30" y="228" width="182" height="42" rx="4"/>
+        <text class="ttl" x="42" y="246">subnetを実行</text>
+        <text class="mf" x="42" y="262">vpc_id = vpc-0a1b → subnet-9f</text>
+        <path class="fill" d="M212 240 C 236 240, 236 240, 258 240"/>
+        <text class="done" x="268" y="246">instanceの穴へ書き込む</text>
+        <text class="dim" x="268" y="262">埋まってから実行される</text>
+
+        <text class="step" x="12" y="300">3</text>
+        <rect class="hi" x="30" y="284" width="182" height="42" rx="4"/>
+        <text class="ttl" x="42" y="302">instanceを実行</text>
+        <text class="mf" x="42" y="318">subnet_id = subnet-9f</text>
+        <text class="dim" x="268" y="302">穴はすべて埋まった</text>
+        <text class="a2t" x="268" y="320">書き込まれた値を検証する者はいない</text>
+      </g>
+    </svg>
+    <figcaption>順序が要るのは実行のためではなく解決のためである。あるノードの穴は先行ノードが実値を返すまで埋まらず、その書き込みが進むことで次の実行が可能になる。</figcaption>
+  </figure>
+
   <p>プロバイダは<strong>ターゲットアーキテクチャ</strong>である。同じIRがaws / awscc / mockという異なるバックエンドで「実行」でき、mockはエミュレータに当たる。プロバイダがWASMプラグインであることは、バックエンドがプラグイン化されたコンパイラ基盤(LLVMのターゲット追加)に似た構造で、WITプロトコルはその<strong>ABI</strong>である。</p>
 
   <p>ABIとして読むと、境界での型消去も見慣れた現象になる。プラグイン境界で型情報の一部が不可逆に失われるのは、ABIが表現できる型がソース言語の型より粗いという、コンパイラでは日常的な事態(名前マングリングで失われる情報、C ABIに落ちるときに消えるジェネリクス)に対応する。<code>protocol_version</code>の照合はABIバージョニングである。</p>

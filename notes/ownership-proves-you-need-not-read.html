@@ -30,6 +30,70 @@
 
   <p>型システムの角度から見ると、これはRustの所有権が「排他なら同期不要」をコンパイル時に証明するのと同じ形である。リソースごとに「<strong>書き手は誰か</strong>」を宣言のレベルで持たせ、自分(このstate)が排他所有するリソースはrefresh不要(自分の記録が真)とし、共有(コンソール操作や他パイプラインがありうる)と宣言されたリソースだけをイベント購読や同期GETの対象にする。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="排他所有と宣言されたリソースは書き手がこのstateだけなのでstateの記録が真でありrefreshが不要になるのに対し、共有と宣言されたリソースはコンソール操作や他パイプラインという別の書き手がありうるためイベント購読か同期GETで読みに行く必要があることを示す図">
+      <style>
+        .ow text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ow .box { fill: var(--surface); stroke: var(--rule); }
+        .ow .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .ow .ttl { font-size: 13px; font-weight: 600; }
+        .ow .dim { fill: var(--faint); font-size: 11px; }
+        .ow .arw { stroke: var(--faint); fill: none; }
+        .ow .wr  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .ow .wr2 { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .ow .no  { stroke: var(--accent); fill: none; stroke-width: 2; }
+        .ow .a2t { fill: var(--accent-2); font-size: 11px; }
+        .ow .sep { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="ow">
+        <text class="ttl" x="12" y="24">排他所有と宣言されたリソース</text>
+
+        <rect class="hi" x="12" y="38" width="128" height="46" rx="4"/>
+        <text class="ttl" x="76" y="59" text-anchor="middle">このstate</text>
+        <text class="dim" x="76" y="76" text-anchor="middle">唯一の書き手</text>
+
+        <path class="wr" d="M140 61 H 236"/>
+        <text class="dim" x="188" y="52" text-anchor="middle">書く</text>
+
+        <rect class="hi" x="236" y="38" width="140" height="46" rx="4"/>
+        <text class="ttl" x="306" y="66" text-anchor="middle">リソース</text>
+
+        <path class="no" d="M396 46 L 424 76"/>
+        <path class="no" d="M424 46 L 396 76"/>
+        <text class="ttl" x="440" y="58">読まなくてよい</text>
+        <text class="dim" x="440" y="78">stateの記録がそのまま真</text>
+
+        <text class="dim" x="12" y="106">IAM / SCPで「このロールしか書けない」が強制されていれば、この前提は自己申告ではなく検証可能になる</text>
+
+        <path class="sep" d="M12 128 H 688"/>
+
+        <text class="ttl" x="12" y="156">共有と宣言されたリソース</text>
+
+        <rect class="box" x="12" y="170" width="128" height="40" rx="4"/>
+        <text class="ttl" x="76" y="195" text-anchor="middle">このstate</text>
+
+        <rect class="box" x="12" y="220" width="128" height="34" rx="4"/>
+        <text x="76" y="242" text-anchor="middle">コンソール操作</text>
+
+        <rect class="box" x="12" y="262" width="128" height="34" rx="4"/>
+        <text x="76" y="284" text-anchor="middle">他パイプライン</text>
+
+        <path class="wr" d="M140 190 C 190 190, 200 218, 236 218"/>
+        <path class="wr2" d="M140 237 H 236"/>
+        <path class="wr2" d="M140 279 C 190 279, 200 246, 236 246"/>
+        <text class="a2t" x="152" y="292">別の書き手がありうる</text>
+
+        <rect class="box" x="236" y="192" width="140" height="52" rx="4"/>
+        <text class="ttl" x="306" y="224" text-anchor="middle">リソース</text>
+
+        <path class="arw" d="M376 218 H 428"/>
+        <text class="ttl" x="440" y="212">読みに行く</text>
+        <text class="dim" x="440" y="232">イベント購読、または同期GET</text>
+      </g>
+    </svg>
+    <figcaption>読む必要を決めているのはリソースの種類ではなく、書き手が一つに限られるかどうかである。排他が示せた範囲だけがAPI呼び出しの対象から外れる。</figcaption>
+  </figure>
+
   <p>この宣言は単なる自己申告に留めなくてよい。<strong>IAM / SCPで「このロールしか書けない」が実際に強制されていれば、排他所有は運用上の仮定ではなく検証可能な前提になる</strong>。並行プログラム検証のrely-guarantee推論 — 環境の干渉をこの範囲と仮定して証明する枠組み — のIaC版である。</p>
 
   <p>宣言された前提を機構で裏づけるこの形は、公称軸の部分型付けと同じ設計の型である。名前で宣言された区別を、その名前が指す実体の側で保証する。</p>

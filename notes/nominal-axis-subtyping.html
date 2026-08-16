@@ -33,6 +33,61 @@
 
   <p>これは公称型に<strong>幅部分型付け(width subtyping)を一軸ずつ載せた構造</strong>である。<code>aws.iam.Role.Arn &lt;: Arn</code>(provider非依存のArn)のような包摂が成り立ち、provider無指定のbare identityは実質的にそのkindの上限(top)として機能する。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 320" role="img" aria-label="provider軸とsegments軸を指定しないbare Arnが上限として振る舞い、aws.iam.Role.ArnからArnへの代入は受け側が軸を特定していないので通るが、逆向きの代入とaws.RegionからgcpのRegionへの代入は受け側の特定した軸が一致しないため弾かれることを示す図">
+      <style>
+        .na text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .na .box { fill: var(--surface); stroke: var(--rule); }
+        .na .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .na .ttl { font-size: 13px; font-weight: 600; }
+        .na .dim { fill: var(--faint); font-size: 11px; }
+        .na .ty  { font-family: var(--mono); font-size: 11.5px; fill: var(--text); }
+        .na .tyd { font-family: var(--mono); font-size: 11px; fill: var(--faint); }
+        .na .ok  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .na .ng  { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .na .okt { fill: var(--accent); font-size: 11px; }
+        .na .a2t { fill: var(--accent-2); font-size: 11px; }
+        .na .sep { stroke: var(--rule); fill: none; }
+        .na .hd  { fill: var(--muted); font-size: 11px; }
+      </style>
+      <g class="na">
+        <text class="hd" x="12" y="20">軸: provider / segments / kind — 受け側が特定している軸だけ一致を要求する</text>
+
+        <rect class="hi" x="248" y="34" width="204" height="52" rx="4"/>
+        <text class="ty" x="350" y="55" text-anchor="middle">Arn</text>
+        <text class="dim" x="350" y="74" text-anchor="middle">provider無指定 — kindの上限</text>
+
+        <path class="ok" d="M120 152 C 120 110, 246 106, 246 62"/>
+        <text class="okt" x="128" y="112">通る</text>
+        <path class="ok" d="M580 152 C 580 110, 454 106, 454 62"/>
+        <text class="okt" x="536" y="112">通る</text>
+
+        <rect class="box" x="12" y="152" width="216" height="56" rx="4"/>
+        <text class="ty" x="120" y="176" text-anchor="middle">aws.iam.Role.Arn</text>
+        <text class="tyd" x="120" y="196" text-anchor="middle">provider=aws, kind=Arn</text>
+
+        <rect class="box" x="472" y="152" width="216" height="56" rx="4"/>
+        <text class="ty" x="580" y="176" text-anchor="middle">gcp.iam.Role.Arn</text>
+        <text class="tyd" x="580" y="196" text-anchor="middle">provider=gcp, kind=Arn</text>
+
+        <path class="ng" d="M228 180 H 468"/>
+        <text class="a2t" x="348" y="172" text-anchor="middle">弾かれる</text>
+        <text class="dim" x="348" y="198" text-anchor="middle">両者ともprovider軸を特定していて不一致</text>
+
+        <path class="sep" d="M12 232 H 688"/>
+
+        <text class="ttl" x="12" y="258">方向が効く — 受け側が何を特定しているか</text>
+
+        <text class="ty" x="12" y="282">role_arn: Arn = role.arn</text>
+        <text class="okt" x="230" y="282">通る — 受け側はprovider軸を問わない</text>
+
+        <text class="ty" x="12" y="306">x: aws.Region = gcp_region</text>
+        <text class="a2t" x="230" y="306">弾かれる — 受け側がaws側に特定している</text>
+      </g>
+    </svg>
+    <figcaption>包摂の向きを決めているのは型名の見た目ではなく、受け側が値を持っている軸の集合である。軸を落とした型が上、埋めた型が下に来る。</figcaption>
+  </figure>
+
   <h2>二つの要求を一つの機構で</h2>
 
   <p>一方で<code>aws.Region</code>と<code>gcp.Region</code>のように両軸が特定されていれば別型であり、provider越しの混同は型として弾かれる。</p>

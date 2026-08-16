@@ -35,6 +35,63 @@
     <li><strong>量の壁</strong>: CloudTrailは読み取りを含む全API呼び出しを記録するため、ログが膨大になる</li>
   </ul>
 
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="CloudTrailはAPI呼び出し単位のログでリソース表現がサービスごとに不揃いなため対応づけに失敗し量も膨大になるのに対し、Config/Cloud Controlはリソース型とIDをキーにした変更フィードなのでstateのアドレスに直接一致することを示す図">
+      <style>
+        .db text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .db .box { fill: var(--surface); stroke: var(--rule); }
+        .db .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .db .ttl { font-size: 13px; font-weight: 600; }
+        .db .dim { fill: var(--faint); font-size: 11px; }
+        .db .ev  { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+        .db .evk { font-family: var(--mono); font-size: 10.5px; fill: var(--text); }
+        .db .arw { stroke: var(--faint); fill: none; }
+        .db .ok  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .db .ng  { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .db .ngt { fill: var(--accent-2); font-size: 11px; }
+        .db .lane { fill: var(--sunken); stroke: none; }
+      </style>
+      <g class="db">
+        <text class="ttl" x="14" y="38">CloudTrail — API呼び出しのログ</text>
+        <rect class="box" x="14" y="48" width="286" height="76" rx="4"/>
+        <text class="ev" x="26" y="66">CreateBucket { bucket: "logs-1" }</text>
+        <text class="ev" x="26" y="84">RunInstances { instancesSet: [...] }</text>
+        <text class="ev" x="26" y="102">GetObject / DescribeVpcs / ...</text>
+        <text class="ev" x="26" y="118">ModifyVpcAttribute { vpcId: "vpc-0a" }</text>
+
+        <path class="ng" d="M300 72 H 392"/>
+        <text class="ngt" x="346" y="64" text-anchor="middle">同定の壁</text>
+        <text class="dim" x="346" y="90" text-anchor="middle">表現がサービスごとに</text>
+        <text class="dim" x="346" y="105" text-anchor="middle">不揃い</text>
+        <path class="ng" d="M300 122 H 392"/>
+        <text class="ngt" x="346" y="136" text-anchor="middle">量の壁 — 読み取りも全部載る</text>
+
+        <rect class="box" x="404" y="48" width="282" height="76" rx="4"/>
+        <text class="ttl" x="418" y="68">stateのアドレス</text>
+        <text class="dim" x="418" y="88">どのリソースが変わったか</text>
+        <text class="ngt" x="418" y="110">対応づけられない → 全GETに戻る</text>
+
+        <text class="ttl" x="14" y="184">Config / Cloud Control — リソース指向の変更フィード</text>
+        <rect class="hi" x="14" y="194" width="286" height="76" rx="4"/>
+        <text class="evk" x="26" y="214">AWS::S3::Bucket / logs-1</text>
+        <text class="evk" x="26" y="232">AWS::EC2::VPC / vpc-0a</text>
+        <text class="evk" x="26" y="250">AWS::IAM::Role / app-runner</text>
+        <text class="dim" x="26" y="266">リソース型 + ID、構成変更だけ</text>
+
+        <path class="ok" d="M300 232 H 392"/>
+        <text x="346" y="222" text-anchor="middle">そのまま一致</text>
+
+        <rect class="hi" x="404" y="194" width="282" height="76" rx="4"/>
+        <text class="ttl" x="418" y="214">stateのアドレス</text>
+        <text class="dim" x="418" y="234">同じ語彙で最初から揃っている</text>
+        <text x="418" y="258">dirtyなリソースだけGET</text>
+
+        <text class="dim" x="14" y="292">供給源の違いは量の問題ではなく、イベントが何を単位に語るかの違いである。</text>
+      </g>
+    </svg>
+    <figcaption>上下の差は情報量ではなく単位にある。呼び出しを単位にすると同定にサービスごとの解釈が要り、リソースを単位にするとstateの識別子とそのまま噛み合う。</figcaption>
+  </figure>
+
   <p>したがってdirty bitの供給源は、<strong>API呼び出しログではなくリソース指向の変更フィード</strong>にすべきである。AWS Configのconfiguration item、またはEventBridgeで書き込み系・対象リソース型に絞ったルールを一次チャネルに置く。Configは「リソース型 + リソースID」をキーに構成変更だけを配信するので、量の壁は構造的に小さく、同定の壁もリソースの語彙に最初から揃っている。</p>
 
   <p>さらにawsccプロバイダはCloud Control APIの上にあり、すべてのリソースが「リソース型(AWS::EC2::VPC)+ primary identifier」という一様な同定子を持つ。stateが保持する識別子とConfigイベントの語彙がほぼ一致するため、CloudTrailで問題になった対応づけが構造的に易しくなる可能性がある。それでも残る不一致(識別子の表記揺れ、複合識別子)に対しては、購読対象をstateに存在するリソース型・識別子の集合へ事前に絞り込み、対応づけられないイベントは「不明な変更 → 反エントロピー同期の対象」へ落とす、という保守的な設計で吸収する。</p>

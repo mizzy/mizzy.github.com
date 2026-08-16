@@ -30,6 +30,79 @@
 
   <p>ただし「依存関係グラフの記述」には精密化が要る。<strong>エッジの大半はユーザーが明示するのではなく、値の参照(<code>vpc.vpc_id</code>)から推論される</strong>。つまり言語がユーザーに記述させるのは「グラフそのもの」ではなく「<strong>グラフが一意に定まるだけの情報</strong>」である。ユーザーはノードを宣言し、他ノードの属性を参照する。エッジはその参照から導出される。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 312" role="img" aria-label="ユーザーはノードの宣言と他ノードの属性参照だけを書き、エッジはその参照から導出されて依存グラフが一意に定まることを示す図。関数やループなどの機構はノードの並びへ展開されるだけで意味的本体には残らない">
+      <style>
+        .gc text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .gc .box { fill: var(--surface); stroke: var(--rule); }
+        .gc .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .gc .ttl { font-size: 13px; font-weight: 600; }
+        .gc .dim { fill: var(--faint); font-size: 11px; }
+        .gc .m   { font-family: var(--mono); font-size: 10.5px; fill: var(--text); }
+        .gc .mr  { font-family: var(--mono); font-size: 10.5px; fill: var(--accent); }
+        .gc .arw { stroke: var(--faint); fill: none; }
+        .gc .der { stroke: var(--accent); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .gc .edg { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .gc .nd  { fill: var(--accent-bg); stroke: var(--accent); }
+        .gc .okt { fill: var(--accent); font-size: 11px; }
+        .gc .hd  { fill: var(--muted); font-size: 11px; }
+      </style>
+      <g class="gc">
+        <text class="ttl" x="12" y="20">ユーザーが書くもの</text>
+        <text class="hd" x="12" y="38">ノードの宣言と、他ノードの属性への参照だけ</text>
+
+        <rect class="box" x="12" y="48" width="228" height="46" rx="3"/>
+        <text class="m" x="24" y="66">resource vpc "main" {</text>
+        <text class="m" x="24" y="84">  cidr = "10.0.0.0/16" }</text>
+
+        <rect class="box" x="12" y="106" width="228" height="60" rx="3"/>
+        <text class="m" x="24" y="124">resource subnet "app" {</text>
+        <text class="mr" x="24" y="142">  vpc_id = vpc.main.vpc_id</text>
+        <text class="m" x="24" y="160">  az = "ap-northeast-1a" }</text>
+
+        <rect class="box" x="12" y="178" width="228" height="60" rx="3"/>
+        <text class="m" x="24" y="196">resource instance "web" {</text>
+        <text class="mr" x="24" y="214">  subnet_id = subnet.app.id</text>
+        <text class="m" x="24" y="232">  ami = "ami-0c1d" }</text>
+
+        <text class="dim" x="12" y="258">エッジを書く構文はない。</text>
+        <text class="dim" x="12" y="274">書いてあるのは「グラフが一意に定まるだけの情報」。</text>
+
+        <path class="der" d="M240 140 C 276 140, 276 132, 304 132"/>
+        <text class="okt" x="272" y="76" text-anchor="middle">参照から</text>
+        <text class="okt" x="272" y="92" text-anchor="middle">エッジを導出</text>
+
+        <rect class="box" x="304" y="60" width="152" height="152" rx="4"/>
+        <text class="ttl" x="380" y="84" text-anchor="middle">導出されたエッジ</text>
+        <text class="m" x="318" y="116">subnet.app</text>
+        <text class="mr" x="318" y="134">    → vpc.main</text>
+        <text class="m" x="318" y="164">instance.web</text>
+        <text class="mr" x="318" y="182">    → subnet.app</text>
+        <text class="dim" x="380" y="204" text-anchor="middle">参照1本につきエッジ1本</text>
+
+        <path class="der" d="M456 136 H 496"/>
+
+        <text class="ttl" x="512" y="80">意味的本体</text>
+
+        <rect class="nd" x="560" y="96" width="112" height="32" rx="4"/>
+        <text x="616" y="117" text-anchor="middle">vpc.main</text>
+        <rect class="nd" x="560" y="164" width="112" height="32" rx="4"/>
+        <text x="616" y="185" text-anchor="middle">subnet.app</text>
+        <rect class="nd" x="560" y="232" width="112" height="32" rx="4"/>
+        <text x="616" y="253" text-anchor="middle">instance.web</text>
+
+        <path class="edg" d="M616 164 V 132"/>
+        <path class="edg" d="M616 232 V 200"/>
+
+        <text class="dim" x="304" y="252">関数・モジュール・ループは</text>
+        <text class="dim" x="304" y="268">左端をノードの並びへ</text>
+        <text class="dim" x="304" y="284">展開するだけで、</text>
+        <text class="dim" x="304" y="300">ここには残らない</text>
+      </g>
+    </svg>
+    <figcaption>ソースからグラフへの経路には導出が一段挟まっている。ユーザーが宣言するのはノードと参照で、エッジはその参照が置かれた位置から機械的に決まる。</figcaption>
+  </figure>
+
   <p>この立場を採ると、いくつかの派生的な性質が説明として自動的に出てくる。型を付けるべき「プログラム」が実質存在しないため、型検査は項ベースの体系をほぼ必要とせず、検査対象はグラフそのもの — ノード上の値の所属とエッジ両端の型の適合 — に還元される。汎用言語が提供する高階関数・クラス・任意計算とパッケージエコシステムは、「失ったもの」ではなく「このドメインでは要らないもの」として数えられる。</p>
 
   <nav class="links">
