@@ -526,38 +526,59 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   font-size: 16px;
 }
 
-/* 一覧は箱で並べず、罫で区切った紙面の記事一覧にする */
+/* 一覧はカードで並べる。
+   Broadsheetは罫と箱でページを構造化しないが、.card は
+   「listings のような個別の項目」のための唯一の箱として用意されている。
+   ノート1本ずつは独立した項目なので、ここは .card を使ってよい場面。 */
 .cards {
   max-width: var(--measure);
   margin: 0 auto;
   padding: var(--space-6) var(--space-4) 6rem;
+  display: grid;
+  /* min() で、ビューポートが 24rem より狭いときはカードを縮められるようにする。
+     minmax(24rem, …) のままだと狭い画面でカードが画面幅を超える。 */
+  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
+  gap: var(--space-4);
+  align-items: stretch;
 }
 .cards a.card {
-  display: block;
-  padding: var(--space-4) 0;
-  border-top: 1px solid var(--color-divider);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
   text-decoration: none;
   color: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 120ms ease, background-color 120ms ease;
 }
-.cards a.card:first-child { border-top: 1px solid var(--color-text); }
-.cards a.card:last-child { border-bottom: 1px solid var(--color-divider); }
+.cards a.card:hover {
+  background: var(--color-neutral-100);
+  box-shadow: var(--shadow-md);
+}
 .cards .card h2 {
-  margin: 0 0 var(--space-2);
-  font-size: 23px;
-  line-height: 1.45;
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.35;
   color: var(--color-accent-700);
 }
 .cards a.card:hover h2 { color: var(--color-accent-2-700); }
 .cards .card p {
   margin: 0;
-  font-size: 15px;
-  line-height: 1.8;
-  color: color-mix(in srgb, var(--color-text) 72%, transparent);
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.75;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
 }
 .cards .card .tags {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: auto;
+  padding-top: var(--space-1);
+  font-size: 11px;
+  letter-spacing: 0.02em;
   color: color-mix(in srgb, var(--color-text) 50%, transparent);
 }
 
