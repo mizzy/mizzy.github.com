@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である - notes</title>
+<meta name="description" content="UnknownReasonの10変種を「誰がいつ埋めるか」で並べると三群+誤りに割れる。二段階の間の窓に該当するのは上流参照系の3つだけである。">
+<meta property="og:title" content="Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/unknown-reasons-are-not-one-kind.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/unknown-reasons-are-not-one-kind.png">
+<meta property="og:description" content="UnknownReasonの10変種を「誰がいつ埋めるか」で並べると三群+誤りに割れる。二段階の間の窓に該当するのは上流参照系の3つだけである。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/unknown-reasons-are-not-one-kind.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* 解決経路の図 — 静的段階で消える群と、applyまで残る群を左右で分ける */
+  .rp text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .rp .ttl { font-size: 13px; font-weight: 600; }
+  .rp .dim { fill: var(--faint); font-size: 11px; }
+  .rp .mut { fill: var(--muted); font-size: 11px; }
+  .rp .mono { font-family: var(--mono); font-size: 11px; }
+  .rp .stage { fill: var(--surface); stroke: var(--rule); }
+  .rp .gone { fill: var(--sunken); stroke: var(--rule); }
+  .rp .live { fill: var(--bg); stroke: var(--accent); stroke-width: 1.5; }
+  .rp .err  { fill: var(--bg); stroke: var(--accent-2); stroke-width: 1.5; stroke-dasharray: 5 3; }
+  .rp .arw { stroke: var(--faint); fill: none; }
+  .rp .arwa { stroke: var(--accent); fill: none; }
+  .rp .sep { stroke: var(--rule); fill: none; }
+  .rp .acc { fill: var(--accent); font-size: 11px; }
+  .rp .ac2 { fill: var(--accent-2); font-size: 11px; }
+
+  /* 時間の向きが逆であることの図 */
+  .tv text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .tv .ttl { font-size: 13px; font-weight: 600; }
+  .tv .dim { fill: var(--faint); font-size: 11px; }
+  .tv .mono { font-family: var(--mono); font-size: 11px; }
+  .tv .line { stroke: var(--rule); fill: none; }
+  .tv .box { fill: var(--surface); stroke: var(--rule); }
+  .tv .mark { fill: var(--accent); }
+  .tv .mark2 { fill: var(--accent-2); }
+  .tv .arwa { stroke: var(--accent); fill: none; }
+  .tv .arw2 { stroke: var(--accent-2); fill: none; }
+  .tv .acc { fill: var(--accent); font-size: 11px; }
+  .tv .ac2 { fill: var(--accent-2); font-size: 11px; }
+
+  /* 群ごとの色分けを表にも効かせる（凡例と対応させる） */
+  .grp { white-space: nowrap; font-size: 13px; }
+  .grp.a { color: var(--color-accent-700); }
+  .grp.b { color: var(--color-accent-2); }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>carina-core/src/resource/mod.rs</code> <code>UnknownReason</code> / <code>parser/ast.rs</code> <code>substitute_placeholder</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a>は、Unknownが⊥ではなく<strong>理由を持ち運ぶ</strong>ことを診断品質の観点から書いた。「なぜ不明なのか・いつ確定するのか」をユーザーに示せる、という利点である。</p>
+
+  <p>ただし理由の集合を実際に並べてみると、これは診断のための注釈ではない。<strong>どの理由かによって、誰がその値を埋めるのか、そもそも埋まるのかが違う。</strong><code>UnknownReason</code>は理由を記録するenumというより、未確定値の<strong>解決経路の分類</strong>である。</p>
+
+  <h2>三つの群に割れる</h2>
+
+  <p><code>substitute_placeholder</code>は、for展開のときに値を埋める関数である。この関数がどの理由を処理するかを見ると、10個の変種が綺麗に三群に割れる。コード中のコメント自身がその区別を書いている。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 330" role="img" aria-label="UnknownReasonの10変種が解決経路で三群に割れることを示す図。for束縛の4変種と関数の2変種は静的段階の中でsubstitute_placeholderや関数評価によって埋められて消える。上流参照2変種とPostCreateReadIncompleteはapplyまで残りplanに表示される。EmptyInterpolationは誰も埋めない編集途中の印である。">
+      <g class="rp">
+        <text class="ttl" x="8" y="16">静的段階（パース・評価）</text>
+        <text class="ttl" x="470" y="16">動的段階（apply）</text>
+        <path class="sep" d="M446 26 V 300"/>
+
+        <!-- 群1: for束縛 -->
+        <rect class="stage" x="8" y="32" width="250" height="70" rx="4"/>
+        <text class="ttl" x="20" y="52">for束縛のプレースホルダ</text>
+        <text class="mono" x="20" y="70">ForValue ForKey ForIndex</text>
+        <text class="mono" x="20" y="86">ForValuePath</text>
+
+        <path class="arw" d="M258 67 H 300" marker-end="url(#rpa)"/>
+        <rect class="gone" x="304" y="46" width="130" height="42" rx="4"/>
+        <text x="369" y="63" text-anchor="middle">for展開が埋める</text>
+        <text class="dim" x="369" y="79" text-anchor="middle">ここで消える</text>
+
+        <!-- 群2: 関数 -->
+        <rect class="stage" x="8" y="114" width="250" height="60" rx="4"/>
+        <text class="ttl" x="20" y="134">関数のプレースホルダ</text>
+        <text class="mono" x="20" y="153">FnParam FnLocal</text>
+
+        <path class="arw" d="M258 144 H 300" marker-end="url(#rpa)"/>
+        <rect class="gone" x="304" y="123" width="130" height="42" rx="4"/>
+        <text x="369" y="140" text-anchor="middle">関数評価が埋める</text>
+        <text class="dim" x="369" y="156" text-anchor="middle">ここで消える</text>
+
+        <!-- 群3: 段階を跨ぐ -->
+        <rect class="live" x="8" y="186" width="250" height="74" rx="4"/>
+        <text class="ttl" x="20" y="206">段階を跨ぐ穴</text>
+        <text class="mono" x="20" y="224">UpstreamRef UpstreamBareRef</text>
+        <text class="mono" x="20" y="240">PostCreateReadIncomplete</text>
+
+        <path class="arwa" d="M258 220 H 466" marker-end="url(#rpb)"/>
+        <text class="acc" x="290" y="212">素通し（何もしない）</text>
+        <rect class="live" x="470" y="199" width="222" height="42" rx="4"/>
+        <text x="581" y="216" text-anchor="middle">applyが埋める</text>
+        <text class="dim" x="581" y="232" text-anchor="middle">planに表示される</text>
+
+        <!-- 誤り -->
+        <rect class="err" x="8" y="272" width="250" height="46" rx="4"/>
+        <text class="ttl" x="20" y="291">誤り</text>
+        <text class="mono" x="20" y="309">EmptyInterpolation</text>
+        <text class="ac2" x="272" y="299">誰も埋めない — 書きかけの印</text>
+
+        <defs>
+          <marker id="rpa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 z" fill="var(--faint)"/>
+          </marker>
+          <marker id="rpb" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+      </g>
+    </svg>
+    <figcaption>上の二群は静的段階の中で生まれて消える。縦線を越えるのは三群目だけである。</figcaption>
+  </figure>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>群</th><th>変種</th><th>誰が埋めるか</th><th>いつ</th></tr></thead>
+      <tbody>
+        <tr><td><span class="grp">for束縛のプレースホルダ</span></td><td><code>ForValue</code> <code>ForKey</code> <code>ForIndex</code> <code>ForValuePath</code></td><td>for展開</td><td>静的段階(パース中)</td></tr>
+        <tr><td><span class="grp">関数のプレースホルダ</span></td><td><code>FnParam</code> <code>FnLocal</code></td><td>ユーザー定義関数の評価</td><td>静的段階(パース中)</td></tr>
+        <tr><td><span class="grp a">段階を跨ぐ穴</span></td><td><code>UpstreamRef</code> <code>UpstreamBareRef</code> <code>PostCreateReadIncomplete</code></td><td>apply(上流または次回)</td><td>動的段階</td></tr>
+        <tr><td><span class="grp b">誤り</span></td><td><code>EmptyInterpolation</code></td><td>誰も埋めない</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>前の二群は<strong>静的段階の中で消える</strong>。<code>for v in iterable</code>を書いた時点では要素がまだ分からないので、パーサは<code>ForValue</code>を置いておき、iterableが解決したら<code>substitute_placeholder</code>が実際の要素で置き換える。関数引数も同じで、関数本体をパースする時点では実引数が無いから<code>FnParam</code>を置き、呼び出しの評価時に埋める。つまりこれらは<strong>評価順序の都合で一時的に空いている穴</strong>であり、planに出てはいけない。</p>
+
+  <p><code>UpstreamRef</code>は違う。同じ関数がこれを見ても<strong>何もしない</strong> — コードのコメントが「upstream and empty-interpolation unknowns are not for-expansion placeholders」と明記している。上流applyの結果は静的段階の中ではどうやっても手に入らないので、planまで生き延びて<code>(known after upstream apply: network.vpc_id)</code>として表示される。</p>
+
+  <h2>「二段階の間の窓」なのは三つだけ</h2>
+
+  <p><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a>の言う窓 — 静的段階と動的段階の間に開いた、静的近似が確定できなかった箇所 — に該当するのは、実は<code>UpstreamRef</code> / <code>UpstreamBareRef</code> / <code>PostCreateReadIncomplete</code>の三つだけである。</p>
+
+  <p>残りは窓ではない。for束縛と関数のプレースホルダは、<strong>同じ静的段階の中で生まれて消える</strong>。「まだ評価していないから今は無い」だけであって、段階を跨いでいない。<a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a>が「for変数由来のUnknownなどは型が構文から決まるので窓の外である」と書いているのと同じ線が、値の側にも引ける。</p>
+
+  <p>同じ<code>Value::Unknown</code>という表現に乗ってはいるが、<strong>乗っているものの素性が違う</strong>。<a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a>が「未確定を表す表現が四つある」ことを漸進的型付けの境界が引けていない徴候として挙げたが、その四つのうち「Unknown値」と数えられた一つの内部が、さらにこの線で割れている。</p>
+
+  <h2><code>EmptyInterpolation</code>は誰も埋めない</h2>
+
+  <p>四群目は一つだけで、性質が他と違う。<code>${}</code>と書きかけて中身が空の状態、つまり<strong>編集途中の構文</strong>である。誰かが後で埋める値ではなく、コードがまだ書き終わっていないことの印である。</p>
+
+  <p>これがUnknownとして表現されているのは、LSPが<code>${}</code>の位置に診断を出すためと、下流のリゾルバが落ちずに済むためである。エラーとして即座に弾かず、値として持ち回って「不明」に合流させておくと、編集中の壊れたファイルでも残りの解析が進む。エディタ体験のための設計判断であって、未確定値の意味論の話ではない。</p>
+
+  <h2><code>PostCreateReadIncomplete</code>だけ時間の向きが逆</h2>
+
+  <p>段階を跨ぐ群の三つ目は、他の二つと生まれる時点が違う。<code>UpstreamRef</code>は<strong>applyの前</strong>に「この値は後で決まる」として生まれるが、<code>PostCreateReadIncomplete</code>は<strong>createが終わった後</strong>に生まれる。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 210" role="img" aria-label="時間軸上での二つのUnknownの発生位置を比べた図。UpstreamRefはplanの時点、つまりapplyより前に生まれてapplyで解決する。PostCreateReadIncompleteはcreateが完了した後、post-create readが失敗した時点で生まれ、次のapplyまで残る。">
+      <g class="tv">
+        <!-- 時間軸 -->
+        <path class="line" d="M20 118 H 680" marker-end="url(#tva)"/>
+        <text class="dim" x="660" y="138">時間</text>
+
+        <text class="dim" x="60" y="138" text-anchor="middle">plan</text>
+        <text class="dim" x="300" y="138" text-anchor="middle">apply: create</text>
+        <text class="dim" x="470" y="138" text-anchor="middle">post-create read</text>
+        <text class="dim" x="620" y="138" text-anchor="middle">次のplan</text>
+        <path class="line" d="M60 112 V 124"/>
+        <path class="line" d="M300 112 V 124"/>
+        <path class="line" d="M470 112 V 124"/>
+        <path class="line" d="M620 112 V 124"/>
+
+        <!-- 上: UpstreamRef -->
+        <text class="ttl" x="20" y="26">applyの<tspan class="acc">前</tspan>に生まれる</text>
+        <circle class="mark" cx="60" cy="62" r="5"/>
+        <text class="mono" x="74" y="52">UpstreamRef</text>
+        <text class="dim" x="74" y="68">「この値は後で決まる」</text>
+        <path class="arwa" d="M60 70 V 100 H 296" marker-end="url(#tvb)"/>
+        <text class="acc" x="150" y="94">applyで解決</text>
+
+        <!-- 下: PostCreateReadIncomplete -->
+        <text class="ttl" x="360" y="196">createの<tspan class="ac2">後</tspan>に生まれる</text>
+        <circle class="mark2" cx="470" cy="166" r="5"/>
+        <path class="arw2" d="M470 130 V 158" marker-end="url(#tvc)"/>
+        <text class="mono" x="484" y="164">PostCreateReadIncomplete</text>
+        <text class="dim" x="484" y="180">「作られたが読めなかった」</text>
+      </g>
+      <defs>
+        <marker id="tva" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" fill="var(--rule)"/>
+        </marker>
+        <marker id="tvb" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" fill="var(--accent)"/>
+        </marker>
+        <marker id="tvc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2)"/>
+        </marker>
+      </defs>
+    </svg>
+    <figcaption>片方は「まだ無い」を先に宣言する印、もう片方は「作ったが読めなかった」を後から記録する印である。</figcaption>
+  </figure>
+
+  <p>由来は具体的で、CloudControlのcreate handlerが内部で複数のAWS APIを順に呼ぶ構造にある。実体を作り、activeになるまで待ち、最後にpost-create validationのreadを行う。この最終readが権限不足などで失敗すると、handlerはFailedを返すが、<strong>AWS側にリソースの実体は既に存在し続けている</strong>。実際に報告された例では、<code>2m 47.2s</code>待った末にAccessDeniedで失敗しているが、<code>describe-load-balancers</code>を叩けば<code>State.Code = active</code>のLBが見つかる。</p>
+
+  <p>ここで属性値を「無い」ことにすると、次のplanは同じリソースをもう一度createしようとする。「作られたが読めなかった」を表現する語彙としてUnknownが再利用されている。<a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a>が言う「エンジンが同じリソースとみなすもの」を保つための使い方であり、段階分離の帰結として開いた窓ではなく、<strong>部分的な失敗を記録するための窓</strong>である。</p>
+
+  <p>したがって「Unknownは二段階の間に開いた窓」という説明は、この変種にはそのまま当てはまらない。同じ表現が、段階分離とは別の問題にも使われている。</p>
+
+  <h2>表現が一つであることの効き目</h2>
+
+  <p>理由がこれだけ異種混交でありながら、<code>Value::Unknown</code>という<strong>一つの表現</strong>に乗っていることには意味がある。等価性の不成立が<code>Value</code>の<code>PartialEq</code>に手書きで実装されており、Unknownはどの理由であっても何とも等しくならない。<code>#[serde(skip)]</code>が付いているので、どの理由であってもstateには書かれない。</p>
+
+  <p>つまり<a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a>の「検査は素通し、等価性は不成立」という規律は、<strong>理由の別に関わらず一律に効く</strong>。理由は診断とplan表示のためだけに持ち回られ、意味論は理由を見ない。10個に割れているのは人間に見せる側の都合で、差分計算から見れば全部同じ「不明」である。</p>
+
+  <p>分類が意味論に漏れていないことが、この設計の効き目である。理由ごとに等価性やstate書き出しの扱いが変わる設計だったら、<a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a>の指摘する境界の見えにくさはもっと深刻になっていた。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+
+    <p><code>UnknownReason</code>が10変種であること、<code>substitute_placeholder</code>がfor束縛の4つと関数の2つを静的段階で埋め、上流参照と<code>EmptyInterpolation</code>と<code>PostCreateReadIncomplete</code>を素通しすることは、2026-08-16時点のソースで確認済み(<code>carina-core/src/resource/mod.rs</code>、<code>carina-core/src/parser/ast.rs</code>)。<code>#[serde(skip)]</code>と手書き<code>PartialEq</code>のnever-equal不変条件も同ファイルで確認(RFC #2371)。plan表示文言は<code>carina-core/src/value.rs</code>の<code>render_unknown</code>。</p>
+
+    <p><code>PostCreateReadIncomplete</code>の由来とELBv2の事例は<code>notes/specs/2026-06-15-partial-create-outcome-design.md</code>(awscc#369)による。<strong>この仕様は「設計提案」ステータスであり、実装状況は未確認。</strong>変種自体はenumに存在するが、記載どおりの経路で運用されているかは追っていない。</p>
+
+    <p>「理由の集合は解決経路の分類である」という読み、および三群+誤りへの割り方は解釈である。コード側にこの4分類が明示されているわけではない(コメントはfor展開 / 関数 / それ以外の3分類までを書いている)。</p>
+
+    <p><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a>が「7種の理由」と書いているのは執筆時点の変種数で、現在は10になっている。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-unknown">#unknown</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-段階分離">#段階分離</a>
+    <a href="/notes/#tag-carina">#carina</a>
+  </p>
+</article>
+</body>
+</html>

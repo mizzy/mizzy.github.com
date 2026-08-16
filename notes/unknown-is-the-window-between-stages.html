@@ -49,7 +49,7 @@
 
   <h2>Unknownは⊥ではない</h2>
 
-  <p>Unknownが単なる⊥(情報なしの底値)ではなく、<strong>理由を持ち運ぶ</strong>点は実務的に優れている。上流参照、for変数、編集途中の補間など7種の理由が区別されており、近似が確定できなかった箇所の診断品質を支えている。「値が不明である」だけを伝える表現なら、なぜ不明なのか・いつ確定するのかをユーザーに示せない。理由付きのUnknownは、静的近似の失敗を診断可能な形で持ち運ぶ設計である。</p>
+  <p>Unknownが単なる⊥(情報なしの底値)ではなく、<strong>理由を持ち運ぶ</strong>点は実務的に優れている。上流参照、for変数、編集途中の補間など10種の理由が区別されており、近似が確定できなかった箇所の診断品質を支えている。「値が不明である」だけを伝える表現なら、なぜ不明なのか・いつ確定するのかをユーザーに示せない。理由付きのUnknownは、静的近似の失敗を診断可能な形で持ち運ぶ設計である。この理由の集合は診断のための注釈にとどまらず、解決経路の分類になっている — <a href="/notes/unknown-reasons-are-not-one-kind.html">Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である</a></p>
 
   <figure>
     <svg viewBox="0 0 700 300" role="img" aria-label="静的段階と動的段階の間に開いた窓を、情報を持たない底値⊥で埋める場合と、上流参照やfor変数など理由を持ち運ぶUnknownで埋める場合を対比し、後者だけが「なぜ不明か・いつ確定するか」を診断として下流に渡せることを示す図">
@@ -99,7 +99,7 @@
         <rect class="tag" x="242" y="228" width="102" height="22" rx="3"/>
         <text class="tagt" x="293" y="243" text-anchor="middle">編集途中の補間</text>
         <rect class="tag" x="356" y="228" width="102" height="22" rx="3"/>
-        <text class="tagt" x="407" y="243" text-anchor="middle">ほか計7種</text>
+        <text class="tagt" x="407" y="243" text-anchor="middle">ほか計10種</text>
 
         <path class="oline" d="M472 202 H 520 V 150"/>
         <text class="out" x="528" y="154">診断として出せる</text>
@@ -112,7 +112,7 @@
         <text class="dim" x="8" y="288">窓が開くこと自体は二段階言語の構造から必然で、問いは「窓に何を置くか」の側にある。</text>
       </g>
     </svg>
-    <figcaption>同じ窓でも、置く値が型付きで出自を持つかどうかで下流に渡せる情報が変わる。7種の理由の区別が、診断の質をそのまま決めている。</figcaption>
+    <figcaption>同じ窓でも、置く値が型付きで出自を持つかどうかで下流に渡せる情報が変わる。10種の理由の区別が、診断の質をそのまま決めている。</figcaption>
   </figure>
 
   <p>この設計は、未知値をホスト言語の<code>string</code>に偽装するCDKのTokenや、型付きコンテナに包むPulumiの<code>Output&lt;T&gt;</code>とは別の位置にある。未知値をどう扱うかが言語の意味論として固定されている、という点が要である。</p>
@@ -139,6 +139,7 @@
       <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
     
       <li><a href="/notes/iac-processor-does-not-end-at-evaluation.html">構成データ出力DSLから貰えるのは評価段階だけである</a></li>
+      <li><a href="/notes/unknown-reasons-are-not-one-kind.html">Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である</a></li>
     </ul>
   </div>
 
