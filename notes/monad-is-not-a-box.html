@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>モナドは箱ではなく合成戦略である - notes</title>
+<meta name="description" content="箱の比喩はIOや関数モナドで壊れる。実態は「次に何をするか」の繋ぎ方の共通形で、文脈固有のロジックはbindの定義1箇所に入る。">
+<meta property="og:title" content="モナドは箱ではなく合成戦略である">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/monad-is-not-a-box.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/monad-is-not-a-box.png">
+<meta property="og:description" content="箱の比喩はIOや関数モナドで壊れる。実態は「次に何をするか」の繋ぎ方の共通形で、文脈固有のロジックはbindの定義1箇所に入る。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="モナドは箱ではなく合成戦略である">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/monad-is-not-a-box.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* bindの中身だけが差し替わることを示す図 */
+  .bindfig text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .bindfig .m    { font-family: var(--mono); font-size: 12.5px; fill: var(--text); }
+  .bindfig .lbl  { fill: var(--faint); font-size: 11.5px; }
+  .bindfig .box  { fill: var(--surface); stroke: var(--rule); }
+  .bindfig .slot { fill: var(--sunken); stroke: var(--accent); stroke-dasharray: 4 3; }
+  .bindfig .slotv { font-family: var(--mono); font-size: 11.5px; fill: var(--accent); }
+  .bindfig .note { fill: var(--faint); font-size: 11px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>モナドは箱ではなく合成戦略である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>既存ノート群がモナドを前提として使っているので、その前提を独立させたもの</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p>モナドを「値を入れる箱」と説明するのが一番よく見る入り方だが、この比喩は早い段階で壊れる。<code>IO a</code> から <code>a</code> は取り出せないし、関数モナド <code>(-&gt;) r</code> に至っては中に何も入っていない。箱として理解しようとすると、箱として振る舞わない例に当たった時点で行き止まる。</p>
+
+  <p>実際のモナドは容器ではなく、<strong>「次に何をするか」の繋ぎ方の共通形</strong>である。繋ぎ方に、その文脈固有のロジックを1箇所だけ差し込める、という構造をしている。</p>
+
+  <h2>定義は二つの操作だけ</h2>
+
+  <p>型構築子 <code>M</code> がモナドであるとは、次の二つを持ち、後述の法則を満たすこと:</p>
+
+<pre><code>return :: a -&gt; M a                    -- 素の値を文脈に持ち上げる
+(&gt;&gt;=)  :: M a -&gt; (a -&gt; M b) -&gt; M b    -- 「文脈つきの値」と
+                                      -- 「値を受けて文脈つきの値を返す関数」を繋ぐ</code></pre>
+
+  <p>要は <code>&gt;&gt;=</code>(bind)である。右辺が<strong>関数</strong>であることが全部で、<code>M a</code> の中身を取り出して関数に渡し、返ってきた <code>M b</code> を返す。ただし<strong>取り出し方と返し方は <code>M</code> ごとに違い、そこがその文脈のロジックになる</strong>。</p>
+
+  <figure>
+    <svg class="bindfig" viewBox="0 0 620 250" role="img" aria-label="bindの型は共通で、Maybe・List・Stateはそれぞれ異なる実装を同じ穴に差し込むことを示す図。差し込まれた実装が失敗の打ち切り・平坦化・状態の受け渡しという振る舞いを生む">
+      <text class="lbl" x="0" y="12">共通の骨格 — 型はどのMでも同じ</text>
+      <rect class="box" x="0" y="24" width="620" height="34" rx="3"/>
+      <text class="m" x="14" y="46">m &gt;&gt;= f  ::  M a -&gt; (a -&gt; M b) -&gt; M b</text>
+
+      <text class="lbl" x="0" y="86">差し替わるのはこの1箇所だけ</text>
+
+      <!-- Maybe -->
+      <rect class="slot" x="0" y="98" width="196" height="60" rx="3"/>
+      <text class="slotv" x="12" y="118">Just x  &gt;&gt;= f = f x</text>
+      <text class="slotv" x="12" y="136">Nothing &gt;&gt;= f = Nothing</text>
+      <text class="note"  x="12" y="152">↑ 関数を呼ばずに打ち切る</text>
+
+      <!-- List -->
+      <rect class="slot" x="212" y="98" width="196" height="60" rx="3"/>
+      <text class="slotv" x="224" y="118">xs &gt;&gt;= f =</text>
+      <text class="slotv" x="224" y="136">  concat (map f xs)</text>
+      <text class="note"  x="224" y="152">↑ 適用して平坦化する</text>
+
+      <!-- State -->
+      <rect class="slot" x="424" y="98" width="196" height="60" rx="3"/>
+      <text class="slotv" x="436" y="118">m &gt;&gt;= f = \s -&gt;</text>
+      <text class="slotv" x="436" y="136">  let (a,s') = m s ...</text>
+      <text class="note"  x="436" y="152">↑ 状態を次へ配線する</text>
+
+      <!-- 結果として現れる振る舞い -->
+      <text class="lbl" x="0" y="188">利用側に現れる振る舞い</text>
+
+      <text class="m" x="0"   y="212">Maybe</text>
+      <text class="note" x="0" y="230">失敗が最後まで抜ける</text>
+
+      <text class="m" x="212" y="212">List</text>
+      <text class="note" x="212" y="230">全組み合わせが並ぶ</text>
+
+      <text class="m" x="424" y="212">State</text>
+      <text class="note" x="424" y="230">配線がコードに現れない</text>
+    </svg>
+    <figcaption>骨格は共通で、差し替わるのは <code>&gt;&gt;=</code> の定義だけ。「打ち切り」「分岐」「配線」の違いは全部そこに入っている。</figcaption>
+  </figure>
+
+  <h2>差し込まれるロジックの実例</h2>
+
+  <p><strong>Maybe — 失敗の伝播。</strong> <code>Nothing</code> が来たら <code>f</code> を呼ばない。だから <code>m &gt;&gt;= f &gt;&gt;= g &gt;&gt;= h</code> と書くだけで、途中の失敗が自動的に最後まで抜ける。nullチェックを各行に書く代わりに、<code>&gt;&gt;=</code> の定義1箇所に閉じ込めている。</p>
+
+  <p><strong>List — 可能性の分岐。</strong> <code>xs &gt;&gt;= f = concat (map f xs)</code>。各要素に適用して平坦化する。結果として全組み合わせが列挙される(baseの実装はリスト内包表記だが外延的には同じ。下記参照)。</p>
+
+  <p><strong>State / IO — 状態と順序の受け渡し。</strong> <code>&gt;&gt;=</code> が状態を次に渡す配線を担う。ユーザーのコードにはその配線が現れない。</p>
+
+  <p>同じ <code>&gt;&gt;=</code> という記法で「打ち切り」「分岐」「配線」が書ける。違いは全部 <code>&gt;&gt;=</code> の定義の中にある。これが「合成戦略」と呼ぶ意味である。</p>
+
+  <h2>モナド則は「繋ぎ方が素直であること」の要求</h2>
+
+  <div class="scroll narrow">
+  <table>
+    <thead><tr><th>法則</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td><code>return a &gt;&gt;= f</code> ≡ <code>f a</code></td><td>左単位元 — 持ち上げてすぐ繋ぐのは、直接呼ぶのと同じ</td></tr>
+      <tr><td><code>m &gt;&gt;= return</code> ≡ <code>m</code></td><td>右単位元 — 何もしない継続を繋いでも変わらない</td></tr>
+      <tr><td><code>(m &gt;&gt;= f) &gt;&gt;= g</code> ≡ <code>m &gt;&gt;= (\x -&gt; f x &gt;&gt;= g)</code></td><td>結合律 — 括り方が結果を変えない</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>三つ目が効く。<strong>括り方が結果を変えない</strong>ので、<code>do</code> 記法のような「上から順に書く」構文に安全に脱糖できる。逆に言えば、法則を満たさないものを <code>&gt;&gt;=</code> の形で書くと、リファクタリングで括りを変えた瞬間に意味が変わる。</p>
+
+  <p>JavaScriptの <code>Promise.then</code> はこの意味では厳密にモナドではない。resolveがthenableを見つけると再帰的に同化するので <code>Promise&lt;Promise&lt;T&gt;&gt;</code> が作れず、値がthenableのときに左単位元 — <code>Promise.resolve(v).then(f)</code> と <code>f(v)</code> — が食い違う。法則は「すべての値について」成り立たねばならないので、この一例で落ちる。動機は同じだが、法則を落としている例として見ておくとよい。</p>
+
+  <h2>「モナド = 副作用」でもない</h2>
+
+  <div class="contrast">
+    <div>
+      <h3>よくある理解</h3>
+      <p>モナドとは副作用を扱うための仕組みである。<code>IO</code> がその代表で、純粋関数型言語が副作用を型で囲い込むために導入した。</p>
+    </div>
+    <div class="yes">
+      <h3>実際は</h3>
+      <p><code>Maybe</code> も <code>List</code> も副作用と無関係である。<code>IO</code> がたまたまモナドなだけで、そこから「モナドとは副作用のことだ」と読むのは、例を定義と取り違えている。</p>
+    </div>
+  </div>
+
+  <p>一文でいうなら、<strong><code>flatMap</code> が定義できて、それが素直に振る舞う型</strong>のことである。Rustの <code>Option</code>/<code>Result</code> と <code>?</code> 演算子、<code>Array.prototype.flatMap</code> はどれもこの形の具体例になっている。</p>
+
+  <h2>この定義がIaCの議論に効く場所</h2>
+
+  <p>ここで押さえた「右辺が関数である」という一点が、そのまま<a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a>の主題になる。継続を関数として持てるかどうかが、成果物を実行前に全部見られるかどうかを決めている。</p>
+
+  <p>Pulumiの <code>Output&lt;T&gt;</code> が意図的に <code>then</code> を持たないのは、この構造への対応として読める。<code>then</code> があると <code>await</code> できてしまい、未知値が素の値として漏れる。<code>apply</code> だけを入口にすることで、bindを通る経路を1本に絞っている。<a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>三つのモナド則は <a href="https://www.haskell.org/onlinereport/haskell2010/haskellch6.html#x13-1330006.3.6">Haskell 2010 Language Report §6.3.6</a> に等式として載っている。ただし<strong>左単位元 / 右単位元 / 結合律という呼び名はReportには無い</strong> — Reportは三本の等式を名前なしで並べているだけで、この名前は <a href="https://wiki.haskell.org/Typeclassopedia#Monad">Typeclassopedia</a> 以降の慣用である。</p>
+    <p><code>Maybe</code> のbindは <code>GHC.Internal.Base</code> の定義そのまま。<code>List</code> は実際にはリスト内包表記 <code>xs &gt;&gt;= f = [y | x &lt;- xs, y &lt;- f x]</code> で定義されている(内包表記が <code>&gt;&gt;=</code> に脱糖されると無限ループになるため、と実装にコメントがある)。本文に書いた <code>concat (map f xs)</code> は外延的に等しい説明用の形で、baseの字面ではない。</p>
+    <p>なお本文の <code>M</code> はGHCの現在の <code>Monad</code> を念頭に置いている。Haskell 2010の <code>Monad</code> クラスは <code>fail</code> を持ち <code>Applicative</code> を上位クラスに持たないので、Reportはあくまで法則の出典として引いている。</p>
+    <p>Promiseがモナド則を満たさないことは、resolveがthenableを再帰的に同化することから従う既知の議論。仕様上の該当箇所は <a href="https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-createresolvingfunctions">ECMA-262 CreateResolvingFunctions</a> で、<code>Get(resolution, "then")</code> が callable なら値として履行せず <code>NewPromiseResolveThenableJob</code> に回す。かつて "Promise Resolve Functions" と呼ばれていた節で、その名前でのアンカーは現在は別名として残っているだけである。</p>
+    <p><code>Output&lt;T&gt;</code> が <code>then</code> を持たないことは、Pulumiの実装位置(Proxyで <code>then</code> を <code>undefined</code> に潰す)を参照ノートに記録してある。</p>
+    <p>「箱ではなく合成戦略」という言い方は説明のための整理であって、圏論側の定式化(自己関手の圏のモノイド対象)とは別の切り口である。関数モナド <code>(-&gt;) r</code> を「中に何も入っていない」と書いたのも同じく口語で、正確には値を蓄えるのではなく<strong>環境への依存</strong>が文脈になっている、という意味である(<code>instance Monad ((-&gt;) r) where f &gt;&gt;= k = \r -&gt; k (f r) r</code>)。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    </ul>
+  </nav>
+  <p class="tags"><a href="/notes/#tag-モナド">#モナド</a> <a href="/notes/#tag-構造">#構造</a> <a href="/notes/#tag-型システム">#型システム</a></p>
+</article>
+</body>
+</html>
