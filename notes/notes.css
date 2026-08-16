@@ -676,6 +676,69 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   color: color-mix(in srgb, var(--color-text) 42%, transparent);
 }
 
+/* 本文の検索。タグの絞り込みと併用でき、両方に合うものだけが残る。
+   罫と箱で構造化しないのがBroadsheetの原則なので、入力欄も箱にせず、
+   下に罫1本だけ引く（紙面の記入欄の見え方）。 */
+.search {
+  max-width: var(--index-wide);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) 0;
+}
+.search .field { display: block; }
+.search input {
+  font: inherit;
+  font-size: 15px;
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-neutral-400);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.search input::placeholder { color: color-mix(in srgb, var(--color-text) 38%, transparent); }
+.search input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+/* 検索欄は打つそばから結果が変わるので、件数を出さないと
+   「何も出ない」のか「絞り込めている」のかが分からない。
+   `.status` は書きかけを示すチップで別物なので、名前を分けている。 */
+.search .hits {
+  margin: var(--space-2) 0 0;
+  min-height: 1.4em;
+  font-size: 12px;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+/* 0本はマゼンタ。稀な状態を示す第二のスポットカラー */
+.search .hits.none { color: var(--color-accent-2-700); }
+
+/* 一致箇所。カード本文の抜粋にだけ出る */
+.cards .card mark {
+  background: var(--color-accent-200);
+  color: inherit;
+}
+/* 抜粋は要約より長さがまちまちなので、行数を抑えて
+   カードの高さが揃うようにする（揃わないと一覧が段違いに見える） */
+.cards .card p.excerpt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* タグの絞り込み。ノートが増えると一覧だけでは辿れないため。 */
 .filters {
   max-width: var(--index-wide);
