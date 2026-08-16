@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>previewはapplyのコールバックを近似しない、実行しない - notes</title>
+<meta name="description" content="入力が未知のとき、Pulumiのpreviewはapplyのコールバックに一歩も入らない。評価されるのは精度の落ちたプログラムではなく、長さの違うプログラムである。">
+<meta property="og:title" content="previewはapplyのコールバックを近似しない、実行しない">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/preview-does-not-run-the-callback.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/preview-does-not-run-the-callback.png">
+<meta property="og:description" content="入力が未知のとき、Pulumiのpreviewはapplyのコールバックに一歩も入らない。評価されるのは精度の落ちたプログラムではなく、長さの違うプログラムである。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="previewはapplyのコールバックを近似しない、実行しない">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/preview-does-not-run-the-callback.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* up と preview で制御が通る道が違うことを示す図 */
+  .pathfig text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .pathfig .m    { font-family: var(--mono); font-size: 12px; fill: var(--text); }
+  .pathfig .lbl  { fill: var(--faint); font-size: 11.5px; }
+  .pathfig .box  { fill: var(--surface); stroke: var(--rule); }
+  .pathfig .live { fill: var(--surface); stroke: var(--accent); }
+  .pathfig .skip { fill: var(--sunken); stroke: var(--rule); stroke-dasharray: 4 3; }
+  .pathfig .skipt{ fill: var(--faint); font-family: var(--mono); font-size: 12px; }
+  .pathfig .arr  { stroke: var(--rule); fill: none; }
+  .pathfig .arrl { stroke: var(--accent); fill: none; }
+  .pathfig .note { fill: var(--faint); font-size: 11px; }
+  .pathfig .acc  { fill: var(--accent); font-size: 11.5px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>previewはapplyのコールバックを近似しない、実行しない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>既存ノート群が「近似」と書いていた箇所を、SDKの実挙動まで下ろしたもの</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p>このノート群では、Pulumiの <code>Output.apply</code> について「previewは原理的に<strong>近似</strong>になる」と繰り返し書いてきた。この言い方は結論としては正しいが、機序としては誤解を招く。近似という語は「同じプログラムを精度を落として評価した」と読ませるが、実際に起きているのはそれではない。</p>
+
+  <p><strong>入力が未知のとき、previewはコールバックの中に一歩も入らない。</strong>評価されるのは精度の落ちたプログラムではなく、<strong>長さの違うプログラム</strong>である。</p>
+
+  <h2>何が起きているか</h2>
+
+  <p><code>apply(func)</code> は <code>func</code> を即座に呼ばない。入力Outputの解決を待ってから呼ぶ。preview時、依存リソースがまだ作られていなければ入力は未知であり、SDKは <code>func</code> を呼ばずに「未知」を表すOutputをそのまま返す。</p>
+
+  <figure>
+    <svg class="pathfig" viewBox="0 0 620 240" role="img" aria-label="upではapplyのコールバックが実行され戻り値がOutputになるが、previewでは入力が未知のためコールバックが呼ばれず、未知のOutputが素通りすることを示す図">
+      <!-- up -->
+      <text class="lbl" x="0" y="12">up — 入力が解決している</text>
+
+      <rect class="box"  x="0"   y="24" width="118" height="36" rx="3"/>
+      <text class="m"    x="59"  y="46" text-anchor="middle">入力: 値</text>
+
+      <path class="arrl" d="M124 42 L166 42" marker-end="url(#ah-a)"/>
+
+      <rect class="live" x="172" y="24" width="200" height="36" rx="3"/>
+      <text class="m"    x="272" y="46" text-anchor="middle">func(値) を実行</text>
+
+      <path class="arrl" d="M378 42 L420 42" marker-end="url(#ah-a)"/>
+
+      <rect class="box"  x="426" y="24" width="194" height="36" rx="3"/>
+      <text class="m"    x="523" y="46" text-anchor="middle">戻り値 → Output</text>
+
+      <!-- preview -->
+      <text class="lbl" x="0" y="106">preview — 入力が未知</text>
+
+      <rect class="box"  x="0"   y="118" width="118" height="36" rx="3"/>
+      <text class="m"    x="59"  y="140" text-anchor="middle">入力: 未知</text>
+
+      <!-- 迂回する矢印 -->
+      <path class="arr" d="M124 136 C 150 136, 150 176, 176 176 L 368 176 C 394 176, 394 136, 420 136" marker-end="url(#ah)"/>
+
+      <rect class="skip" x="172" y="118" width="200" height="36" rx="3"/>
+      <text class="skipt" x="272" y="140" text-anchor="middle">func は呼ばれない</text>
+
+      <rect class="box"  x="426" y="118" width="194" height="36" rx="3"/>
+      <text class="m"    x="523" y="140" text-anchor="middle">未知のOutput</text>
+
+      <text class="note" x="272" y="196" text-anchor="middle">迂回する — 中のコードには到達しない</text>
+
+      <text class="lbl"  x="0" y="224">SDKの判定は一行:</text>
+      <text class="m"    x="112" y="224">doApply = isKnown || runWithUnknowns</text>
+
+      <defs>
+        <marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 z" fill="var(--rule)"/>
+        </marker>
+        <marker id="ah-a" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+    </svg>
+    <figcaption>previewでは制御がコールバックを迂回する。表示から漏れるのではなく、そのコードに到達していない。</figcaption>
+  </figure>
+
+  <p>だから <code>func</code> の中に何を書いても — リソース生成でも、HTTP呼び出しでも、<code>console.log</code> でも — previewには一切現れない。表示から漏れるのではなく、<strong>そのコードに到達していない</strong>。</p>
+
+  <p><code>pulumi.all([...]).apply(...)</code> の場合、既知性の集約は <code>every</code> である。<strong>入力が1つでも未知なら全体が未知になり、コールバックは飛ぶ。</strong>複数の値をまとめて待つほど、コールバックが走らない確率は上がる。</p>
+
+  <h2>「近似」と言うと何を取り違えるか</h2>
+
+  <p>近似という語には、元の対象と近似の間に<strong>誤差</strong>という連続量があり、努力すれば縮まるという含みがある。実際にはそうではない。</p>
+
+  <div class="scroll">
+  <table class="compare">
+    <thead>
+      <tr><th></th><th>近似だとしたら</th><th>実際</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>previewが見ているもの</td><td>同じプログラムの粗い評価</td><td>コールバックを含まない別の(短い)プログラム</td></tr>
+      <tr><td>誤差の性質</td><td>量的 — 詰めれば縮む</td><td>質的 — 実行していないので誤差以前</td></tr>
+      <tr><td>改善の方向</td><td>精度を上げる</td><td>原理的に上げられない。走らせれば副作用が出る</td></tr>
+      <tr><td>ユーザーができること</td><td>精度設定を上げる</td><td>コールバックに書かない、しかない</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>previewが <code>func</code> を実行しないのは実装の手抜きではなく、そうするしかないからである。previewは世界を変えないことを約束している。<code>func</code> は任意のコードなので、実行すればその約束を破りうる。<strong>「実行しない」は約束を守るための唯一の選択肢</strong>であり、だから精度の問題として改善できない。</p>
+
+  <h2>未知でなければ走る</h2>
+
+  <p>ここは正確に書いておく。<strong>「previewではコールバックが走らない」は無条件ではない。</strong>条件は「入力が未知であること」であって「previewであること」ではない。</p>
+
+  <p>前回の <code>up</code> で既に作られたリソースの属性など、preview時点で値が判明していれば入力は既知であり、<code>func</code> はpreview中に実行される。公式ドキュメントが「applyの中で作られたリソースは、<strong>outputの値が既にわかっている場合を除き</strong><code>pulumi preview</code> に現れない」と条件付きで書いているのはこのためである。</p>
+
+  <p>これは実務上やっかいな性質を生む。同じコードが、初回のpreviewでは走らず、2回目以降のpreviewでは走る。<strong>previewの副作用の有無がstateの履歴に依存する</strong>。</p>
+
+  <h2>planをレビューするワークフローへの帰結</h2>
+
+  <p><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a>に「成果物にプログラム片が残る設計では、IRダンプを見せてもそれは近似の提示にとどまる」と書いた。ここを言い換えると、提示されているのは近似ではなく、<strong>まだ実行されていないコードを除いた残り</strong>である。</p>
+
+  <p>レビュー可能性の観点ではこの差が効く。近似なら「誤差はあるが全体は見えている」だが、実際は「見えていない領域があり、その広さはコードを読まないと分からない」である。レビュアーが <code>apply</code> のコールバックを見つけたとき、planの表示からその中身について言えることは何もない。<a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+
+    <p><code>sdk/nodejs/output.ts</code> の <code>applyHelperAsync</code>(master <code>cd514ac1d</code> 時点でL490-523)で確認済み。判定は <code>const doApply = isKnown || runWithUnknowns</code> の一行で、偽なら <code>func</code> を呼ばずに <code>{ value: undefined, isKnown: false, isSecret }</code> を返す。クラスのコメントが意図をそのまま書いている — 「previewでは値が未知でありうるので、<code>.apply</code> を実行したくない。コールバックがundefinedを想定していないかもしれないからだ」。</p>
+
+    <p><strong>条件は <code>isKnown</code> であってpreviewフラグではない。</strong> <code>isKnown</code> はエンジンから来た値をそのまま使うのではなく、コンストラクタ(L246-248)で <code>containsUnknowns(val)</code> をANDして再計算している。</p>
+
+    <p><code>runWithUnknowns</code> は公開シグネチャに現れない内部の抜け穴で(<code>apply&lt;U&gt;(func, runWithUnknowns?)</code>)、SDK内の唯一の呼び手はプロパティ持ち上げのProxy自身である。この経路ではコールバックに未知のセンチネル値が渡る。<strong>通常のユーザーコードからは効かない</strong>ので、本文の「未知なら入らない」はユーザーから見た挙動としては正しい。</p>
+
+    <p>「applyの中でリソースを作るのは避けよ」の原文は <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a> の "Creating resources inside an <code>apply</code> should be avoided whenever possible" で、"unless the output's value is already known" という留保も原文にある。なお隣接して<strong>禁止</strong>と書かれているものが1つある — stack outputsを<code>apply</code>の中で作ることはできない。「避けよ」と「できない」が併記されているので、混ぜないこと。</p>
+
+    <p><code>then</code> が無いことの経緯も辿れた。Proxyの <code>get</code> トラップで <code>if (prop === "then") return undefined</code> としており(L301-306)、コメントは「他のシステムがPromiseかどうかを判定するのに使うので、そうだと示したくない」。これはプロパティ持ち上げのProxyを入れたPR #2510(2019-03)で同時に入っている。任意のプロパティ名を <code>apply</code> に持ち上げる仕組みなので、素通しすると <code>then</code> まで持ち上がってawaitが壊れる。<strong>持ち上げの副作用を塞ぐための処置</strong>であって、最初からモナド的規律のために置かれたものではない。</p>
+
+    <p>この確認の副産物として、<a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a>の「<code>toString</code>は例外を投げる」が誤りだと分かった。既定では投げず、エラー文言を<strong>文字列として返す</strong>。投げるのは <code>utils.errorOutputString</code> が設定されているときだけで、既定では <code>`${output}`</code> がエラーメッセージをそのまま埋め込む。同日、あちらの本文と精度ノートを直した。</p>
+
+    <p>行番号は以前記録したものから概ね+1ずれている。<code>liftInnerOutput</code> の520は呼び出し側で、定義はL461。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a></li>
+      <li><a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a></li>
+      <li><a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+    </ul>
+  </nav>
+  <p class="tags"><a href="/notes/#tag-unknown">#unknown</a> <a href="/notes/#tag-plan">#plan</a> <a href="/notes/#tag-iac">#iac</a></p>
+</article>
+</body>
+</html>

@@ -93,7 +93,7 @@
 
   <p><strong>CDKのToken</strong> は未解決値のプレースホルダだが、型上はただの<code>string</code>である。<code>Token.asString()</code>等で生成され、内部にプレースホルダ文字列(<code>${Token[Bucket.Arn.0]}</code>のような形)を持ち、synth時にCloudFormationテンプレートの<code>Fn::GetAtt</code>や<code>Fn::Join</code>へ変換される。ところが<code>if (vpcId === "...")</code>のような分岐や比較に使ってもコンパイルも実行も通り、<code>bucket.bucketArn.split(':')[5]</code>のような文字列操作も呼べてしまう。プレースホルダ文字列への操作として<strong>黙って間違った結果を返す</strong>のがCDKの有名な落とし穴で、汎用言語に埋め込むと未知値の意味論をホスト言語の制御フローに守らせる手段がない、ということの帰結である。</p>
 
-  <p><strong>Pulumiの<code>Output&lt;T&gt;</code></strong> はCDKより規律が強い。型付きのコンテナなので、TypeScript上で<code>Output&lt;string&gt;</code>を素の<code>string</code>として使えば型エラーになり、値に触るには<code>apply()</code>を経由するしかない。<code>then</code>を持たないことで<code>await</code>が不可能になり、<code>toString</code>は例外を投げる。文字列補間も<code>pulumi.interpolate</code>を経由する必要がある。未知値の型レベルの規律という一点では<strong>三者で最も明示的</strong>とも言える。</p>
+  <p><strong>Pulumiの<code>Output&lt;T&gt;</code></strong> はCDKより規律が強い。型付きのコンテナなので、TypeScript上で<code>Output&lt;string&gt;</code>を素の<code>string</code>として使えば型エラーになり、値に触るには<code>apply()</code>を経由するしかない。<code>then</code>を持たないことで<code>await</code>が不可能になる。文字列補間も<code>pulumi.interpolate</code>を経由する必要がある。ただし<code>toString</code>は既定では例外を投げず、エラー文言を文字列として返す(投げるのは<code>utils.errorOutputString</code>設定時のみ) — つまり <code>`${output}`</code> は既定ではエラーメッセージを黙って埋め込む。<a href="/notes/preview-does-not-run-the-callback.html">previewはapplyのコールバックを近似しない、実行しない</a>未知値の型レベルの規律という一点では<strong>三者で最も明示的</strong>とも言える。</p>
 
   <h2>規律の代価</h2>
 
@@ -122,7 +122,9 @@
 
     <p>CDKのcontext lookupも<a href="https://docs.aws.amazon.com/cdk/v2/guide/context.html">公式のcontextページ</a>で確認済み。ただし挙動は当初の理解より一段細かい。<strong>synth中のプログラム自身がAWSを呼ぶのではない</strong> — 値が無いとき、appはCDK Toolkitに「contextが足りない」と通知し、<strong>CLIがAWSアカウントに問い合わせて<code>cdk.context.json</code>に保存し、その値を渡してappを再実行する</strong>。結果はキャッシュされ、以降のsynthは同じ値を使う(<code>cdk context --reset</code> / <code>--clear</code>で明示的に捨てるまで)。<code>Vpc.fromLookup</code>のAPI docも「このメソッドを呼ぶとCDK CLI実行時にlookupが起きる」「VPC情報は<code>cdk.context.json</code>にキャッシュされ、以降の実行でも同じVPCが使われる」としている。</p>
 
-    <p>この訂正はこのノートの主張を弱めない。むしろ経路が具体化する — キャッシュがある以上、synthの出力は「ソースの純関数」ではなく<strong>ソースと<code>cdk.context.json</code>の関数</strong>であり、その<code>cdk.context.json</code>はある時点の外界の写しである。だから公式ドキュメント自身が「アプリケーションの状態の一部なので、ソース管理にコミットせよ」と言っている。<a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a>の「synthの出力は外界に依存しうる」はこの経路を指す。</p>
+    <p>初稿は<code>Output&lt;T&gt;</code>の<code>toString</code>が「例外を投げる」としていたが、これは誤り。既定では投げず、エラー文言を文字列として返す(<code>sdk/nodejs/output.ts</code> L23-54、投げるのは<code>utils.errorOutputString</code>設定時のみ)。規律の強さの評価としてはむしろ弱くなる方向の訂正で、既定では <code>`${output}`</code> が黙って通る。2026-08-16に本文を直した。<a href="/notes/preview-does-not-run-the-callback.html">previewはapplyのコールバックを近似しない、実行しない</a></p>
+
+    <p>CDKのcontext lookupの訂正はこのノートの主張を弱めない。むしろ経路が具体化する — キャッシュがある以上、synthの出力は「ソースの純関数」ではなく<strong>ソースと<code>cdk.context.json</code>の関数</strong>であり、その<code>cdk.context.json</code>はある時点の外界の写しである。だから公式ドキュメント自身が「アプリケーションの状態の一部なので、ソース管理にコミットせよ」と言っている。<a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a>の「synthの出力は外界に依存しうる」はこの経路を指す。</p>
   </div>
 
   <nav class="links">
@@ -141,6 +143,7 @@
     <ul>
       <li><a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a></li>
       <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/preview-does-not-run-the-callback.html">previewはapplyのコールバックを近似しない、実行しない</a></li>
       <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
       <li><a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a></li>
       <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
