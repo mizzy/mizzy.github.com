@@ -774,8 +774,13 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   min-height: 100vh;
   display: grid;
   /* 広い画面で4〜5列。min() は、ビューポートが最小幅より狭いときに
-     カードを縮められるようにするため（無いと狭い画面で画面幅を超える）。 */
-  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+     カードを縮められるようにするため（無いと狭い画面で画面幅を超える）。
+
+     auto-fill であって auto-fit ではない。auto-fit は余った列を潰すので、
+     絞り込みで1〜2本になると残ったカードが横いっぱいに伸びて、
+     同じカードが検索のたびに違う幅になる。auto-fill は空の列を残すため、
+     何本に絞っても幅が変わらない。 */
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
   gap: var(--space-4);
   align-items: stretch;
 }
