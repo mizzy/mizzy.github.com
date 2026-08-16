@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>変性は書かれていないだけで、既に決まっている - notes</title>
+<meta name="description" content="List/Mapの変性はコードのどこにも書かれていないが、代入可能性判定の再帰の向きから読み取れば全て共変である。しかもそれを確定させたのは、別の目的の修正の副産物だった。">
+<meta property="og:title" content="変性は書かれていないだけで、既に決まっている">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/variance-is-implicit-not-absent.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/variance-is-implicit-not-absent.png">
+<meta property="og:description" content="List/Mapの変性はコードのどこにも書かれていないが、代入可能性判定の再帰の向きから読み取れば全て共変である。しかもそれを確定させたのは、別の目的の修正の副産物だった。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="変性は書かれていないだけで、既に決まっている">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/variance-is-implicit-not-absent.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>変性は書かれていないだけで、既に決まっている</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.3 (k), §6 / carina-core/src/schema/mod.rs (2026-08-16時点)</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p><code>List&lt;T&gt;</code>や<code>Map&lt;K,V&gt;</code>のような型構成子を持つ型システムには、必ず<strong>変性(variance)</strong>の問いが付いてくる。<code>T &lt;: U</code>のとき<code>List&lt;T&gt; &lt;: List&lt;U&gt;</code>は成り立つか(共変)、逆向きになるか(反変)、どちらでもないか(不変)である。</p>
+
+  <p>Carinaはこの問いに答えを持っている。ただし<strong>その答えはコードのどこにも書かれておらず、代入可能性判定の再帰の向きから読み取るしかない</strong>。「変性が未定義」なのではなく、<strong>未文書のまま確定している</strong>というのが正確な状態である。</p>
+
+  <p>しかも確定したのは、変性を決めるための検討によってではない。別の目的の修正が判定の形を変えた結果、<strong>副作用として決まった</strong>。決定と、決定するはずだった議論が、別の場所で進んでいる。</p>
+
+  <h2>実装が選んでいる答え</h2>
+
+  <p>代入可能性判定のコンテナのアームは、要素型を送り側から受け側の向きにそのまま再帰する。</p>
+
+  <pre><code>// List: 要素型を source → sink の向きで再帰
+(List { element_type: source_element, .. },
+ List { element_type: sink_element,   .. })
+  =&gt; source_element.is_assignable_to(sink_element)
+
+// Map: キーも値も source → sink の向きで再帰
+(Map { key: source_key, value: source_value },
+ Map { key: sink_key,   value: sink_value })
+  =&gt; source_key.is_assignable_to(sink_key)
+     &amp;&amp; source_value.is_assignable_to(sink_value)</code></pre>
+
+  <p>外側の向きと内側の向きが一致している。つまり<strong>リストは要素について共変、マップはキーについても値についても共変</strong>である。反変の位置は型システム全体に一つも無い。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="外側のコンテナ型の代入方向と、内側の要素型の代入方向が同じ向きに揃っている図。これが共変であることを意味する">
+      <style>
+  .var-dir text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .var-dir .box { fill: var(--surface); stroke: var(--rule); }
+  .var-dir .ttl { font-size: 13px; font-weight: 600; }
+  .var-dir .dim { fill: var(--faint); font-size: 11px; }
+  .var-dir .arw { stroke: var(--accent); fill: none; }
+  .var-dir .arwhead { fill: var(--accent); stroke: none; }
+  .var-dir .lbl { fill: var(--muted); font-size: 11px; }
+  .var-dir .cap { fill: var(--accent); font-size: 11px; font-weight: 600; }
+  .var-dir .frame { fill: none; stroke: var(--rule); stroke-dasharray: 3 3; }
+      </style>
+      <g class="var-dir">
+        <rect class="frame" x="8" y="16" width="256" height="150" rx="4"/>
+        <rect class="frame" x="376" y="16" width="256" height="150" rx="4"/>
+        <text class="dim" x="20" y="36">送り側 (source)</text>
+        <text class="dim" x="388" y="36">受け側 (sink)</text>
+
+        <rect class="box" x="24" y="48" width="224" height="40" rx="4"/>
+        <text class="ttl" x="40" y="73">List&lt;T&gt;</text>
+        <rect class="box" x="392" y="48" width="224" height="40" rx="4"/>
+        <text class="ttl" x="408" y="73">List&lt;U&gt;</text>
+
+        <rect class="box" x="48" y="110" width="176" height="40" rx="4"/>
+        <text x="64" y="135">要素型 T</text>
+        <rect class="box" x="416" y="110" width="176" height="40" rx="4"/>
+        <text x="432" y="135">要素型 U</text>
+
+        <path class="arw" d="M256 68 H 380"/>
+        <path class="arwhead" d="M380 68 l -9 -5 v 10 z"/>
+        <text class="lbl" x="272" y="60">外側の代入方向</text>
+
+        <path class="arw" d="M232 130 H 404"/>
+        <path class="arwhead" d="M404 130 l -9 -5 v 10 z"/>
+        <text class="lbl" x="272" y="122">内側の再帰方向</text>
+
+        <text class="cap" x="24" y="188">向きが揃っている = 共変。反転していれば反変、要求しなければ不変。</text>
+      </g>
+    </svg>
+    <figcaption>代入可能性判定が要素型を送り側→受け側の向きに再帰することが、そのまま「共変」の定義になっている。</figcaption>
+  </figure>
+
+  <p>注意すべきは、<code>Map</code>の<strong>キーが共変であること</strong>が値の共変以上に強い主張である点である。キーは<code>AttributeType</code>をまるごと取れるので、篩型で絞ったキー型(ARNの形をした文字列など)を持つマップが書ける。「キーがARNのマップ」を「キーが任意文字列のマップ」として渡せる、という包摂がここで成立している。</p>
+
+  <h2>構造再帰になって初めて変性が問題になった</h2>
+
+  <p>この読み取りが意味を持つようになったのは最近である。以前は<code>List&lt;T&gt;</code>の代入可能性が<a href="/notes/stringly-typed-assignability.html">型名の文字列比較</a>で、型名を文字列連結して比較していた。文字列一致は要素型の包摂を一切見ないので、<strong>変性以前に共変も不変も表現されていなかった</strong> — 実質的に「名前が同じときだけ通す」という不変に近い挙動である。</p>
+
+  <p>2026-08-15の修正でコンテナが構造再帰になり(<code>d15d8ce8</code>、スキーマを跨いだ<code>Ref</code>名の偽の受理を塞ぐのが主目的)、そこで初めて要素型の包摂が判定に効くようになった。<strong>共変はその修正の副産物として入っている。</strong> コミットメッセージが明示的に固定した差分は「識別付きの要素が匿名の受け側へ広がる」ことと「要素の区間包含が効くようになる」ことの二点で、変性そのものには触れていない。</p>
+
+  <p>ここが本ノートの要点である。変性を決めるための議論は<strong>3か月前からissueとして存在していた</strong>(<a href="https://github.com/carina-rs/carina/issues/3210">carina#3210</a>、2026-05-23)。にもかかわらず、実際に変性を確定させた変更はそのissueを参照せず、別の目的の修正のついでに起きた。<strong>決定が議論の外側で行われた</strong>というのが正確な構図で、「まだ決めていない」でも「決めて書いていない」でもない。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 190" role="img" aria-label="2026-05-23に変性を決めるissueが立ち、2026-08-15に別目的の修正が変性を確定させ、2026-08-16時点でissueは未着手のまま、という時系列">
+      <style>
+  .var-tl text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .var-tl .axis { stroke: var(--rule); }
+  .var-tl .dot { fill: var(--accent); }
+  .var-tl .dot-open { fill: var(--bg); stroke: var(--accent-2); }
+  .var-tl .date { fill: var(--faint); font-size: 11px; font-family: var(--mono); }
+  .var-tl .ev { font-size: 12px; }
+  .var-tl .gap { stroke: var(--accent-2); stroke-dasharray: 4 3; fill: none; }
+  .var-tl .gaplbl { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="var-tl">
+        <line class="axis" x1="40" y1="96" x2="608" y2="96"/>
+
+        <circle class="dot-open" cx="96" cy="96" r="6"/>
+        <text class="date" x="96" y="126" text-anchor="middle">2026-05-23</text>
+        <text class="ev" x="96" y="72" text-anchor="middle">issue #3210 が立つ</text>
+        <text class="date" x="96" y="144" text-anchor="middle">(未着手)</text>
+
+        <circle class="dot" cx="456" cy="96" r="6"/>
+        <text class="date" x="456" y="126" text-anchor="middle">2026-08-15</text>
+        <text class="ev" x="456" y="72" text-anchor="middle">別目的の修正が変性を確定</text>
+        <text class="date" x="456" y="144" text-anchor="middle">(#3210 を参照せず)</text>
+
+        <circle class="dot-open" cx="576" cy="96" r="6"/>
+        <text class="date" x="576" y="126" text-anchor="middle">08-16</text>
+        <text class="ev" x="576" y="72" text-anchor="middle">なお open</text>
+
+        <path class="gap" d="M96 40 H 456"/>
+        <text class="gaplbl" x="276" y="32" text-anchor="middle">議論はここで止まったまま、決定だけが先に起きた</text>
+      </g>
+    </svg>
+    <figcaption>変性を決めるはずだったissueと、実際に変性を決めた変更が、別の場所で進んでいる。</figcaption>
+  </figure>
+
+  <p>負債の順序としては筋が通っている — 文字列比較という粗い近似を構造再帰に直したのは正しい方向で、その結果として変性という次の問いが<strong>初めて意味を持つようになった</strong>。文字列を比較している間は、変性を議論しても答えようがなかった。</p>
+
+  <p>なお文字列比較を潰すためのissue <a href="https://github.com/carina-rs/carina/issues/3209">carina#3209</a>はまだopenである。コンテナは構造再帰になったが、判定の最終アームには<code>self.attr.type_name() == sink.attr.type_name()</code>が残っており、<a href="/notes/stringly-typed-assignability.html">文字列比較のノート</a>が指摘する網羅性の問題はそこで生きている。<strong>部分的に直った、というのが正確な状態</strong>である。</p>
+
+  <h2>共変が今のところ安全な理由と、その境界</h2>
+
+  <p>共変な可変コンテナは古典的な不健全性の源である。Javaの配列共変が教科書例で、<code>Object[] a = new String[1]; a[0] = 1;</code> が型検査を通って実行時に落ちる。共変が安全なのは<strong>読み出し専用のときだけ</strong>で、書き戻しが入ると壊れる。</p>
+
+  <p>IaCの値は<strong>基本的には</strong>読み出し専用なので、現状この罠は踏んでいない。プロバイダのスキーマから来た値を読み、比較し、直列化するのが主な流れである。</p>
+
+  <p>ただし「基本的に」が効いている。issue <a href="https://github.com/carina-rs/carina/issues/3210">carina#3210</a>はplan/applyの経路について、<strong>「読み出し方向が支配的だが、純粋な読み出し専用ではない」</strong>と書いている — stateからコンテナの値を読んでプロバイダのビルダに渡す流れが主で、state v3経由の書き戻しが時折ある、という整理である。つまり不健全性の前提条件は「存在しない」のではなく「<strong>まだ点検されていない</strong>」。</p>
+
+  <p>そして問題の核心はそこにある。<strong>「読み出し専用だから共変で安全」という条件が、どこにも書かれていないだけでなく、成り立っているかを確かめてもいない</strong>。これは言語の不変条件ではなく、現在の使われ方についての未検証の観察である。同issueが最初の作業として挙げているのも、リスト・マップの要素を読む位置と書き戻す位置を全て洗い出し、各位置を共変/反変/不変に分類することである。書き戻しを伴う機能 — 属性の部分更新、リストへの要素追加を型の上で表す構文、可変な参照 — を一つ入れた時点で、共変は不健全になる。そのとき壊れるのは新機能ではなく、<strong>既存の代入可能性判定</strong>である。</p>
+
+  <p>これは<a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていない</a>のと同じ形をしている。規則の集合が満たすべき性質が、人間の注意にだけ載っていて機械には載っていない。反射性・推移性・反対称性が試験に書かれていないのと同様、「共変が許されるのは読み出し専用だから」という前提も、破ったときに誰も教えてくれない場所にある。</p>
+
+  <h2>直す方向</h2>
+
+  <p>変性を<strong>型の側に書く</strong>ことである。<code>List&lt;T&gt;</code>の<code>T</code>が共変であることを型構成子の定義に注記し、その注記に沿って再帰の向きを決めるようにすれば、新しい構成子を足すときに変性を決めることが強制される。今は再帰を素直に書けば共変になってしまうので、<strong>既定値が暗黙に選ばれる</strong>構造になっている。</p>
+
+  <p>issue #3210はこの方向をほぼそのまま提案している — 位置ごとに変性を分類し、構成子ごとの既定を文書に固定し、選んだ変性に沿った性質試験を置く。不健全な経路が見つかった場合の手当てとして<strong>その経路だけ不変にする</strong>(安い)か、可変コンテナを別の構成子(<code>MutList&lt;T&gt;</code> / <code>MutMap&lt;K,V&gt;</code>)として分ける(重い)かの二案まで書かれている。後者は<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>の適用そのもので、「今は書き戻しが無いから大丈夫」を「書き戻せるコンテナは別の型だから大丈夫」に変えることである。</p>
+
+  <p><strong>issueは2026-05-23に立って今もopenであり、着手されていない。</strong> 変性が未文書のままなのは見落としではなく、優先度が付かないまま3か月弱が経っているという状態である。実害が出ていないので急がない、という判断としては筋が通るが、その「実害が出ていない」の根拠自体が未点検であることは上に書いたとおりである。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+
+    <p>再帰の向きと<code>Map</code>のキーが共変であることは2026-08-16時点のソース(<code>carina-core/src/schema/mod.rs</code>の<code>is_assignable_to_resolved</code>)で確認済み。構造再帰になった日付とその主目的はコミット<code>d15d8ce8</code>(2026-08-15)による。issue #3210 / #3209がopenであること、および#3210の本文(「読み出し方向が支配的だが純粋な読み出し専用ではない」、位置ごとの分類、<code>MutList</code>案)はGitHub APIで確認済み。</p>
+
+    <p><strong>「変性が選択として議論された形跡がない」は、コードとコミットの範囲に限った話である。</strong> <code>carina-core/src/</code>と<code>notes/</code>のどちらにも<code>variance</code>/<code>covariant</code>/<code>contravariant</code>の語が現れないこと、<code>d15d8ce8</code>のコミットメッセージが変性に触れていないことは確認したが、<strong>issue #3210の存在は「議論が無い」わけではない</strong>ことを示している。正確には「変性を決める議論はissueとして立っているが、コードに反映されておらず、コンテナを構造再帰にした変更もその議論を参照していない」ということになる。</p>
+
+    <p><code>Map</code>のキーが共変であることの<strong>実害</strong>は未確認。<code>AttributeType</code>をキーに取れる以上、篩型で絞ったキーを持つマップは表現可能だが、それがプロバイダのスキーマに実際に現れるか、共変が問題を起こす組み合わせが存在するかは調べていない。</p>
+
+    <p>「書き戻しが入れば不健全になる」はJava配列共変からの類推である。#3210が言う「state v3経由の書き戻し」が具体的にどの経路で、それが部分型付けされた位置に当たるかどうかは、issue本文の記述をそのまま引いただけで自分では追っていない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+    <a href="/notes/#tag-設計負債">#設計負債</a>
+  </p>
+</article>
+</body>
+</html>

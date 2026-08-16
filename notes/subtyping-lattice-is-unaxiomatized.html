@@ -42,7 +42,7 @@
 
   <p>性質の欠落は抽象的なリスクではない。公称識別の軸で<strong>反対称性が破れている実例</strong>が既に見つかっている(抽象型から具体型への代入が通る)。反対称性の性質試験があれば機械的に検出できた種類の破れである。</p>
 
-  <p>同型の未形式化はもう一箇所ある。<strong>変性(共変・反変)がコード上に明示されていない</strong>。<code>List&lt;T&gt;</code>や<code>Map&lt;K,V&gt;</code>の変性がどうなっているかは実装を読んで推測するしかなく、現状はおそらく全て共変で動いている。IaCの値は基本的に読み出し専用なので実害は出ていないが、これはJava配列の共変性と同じ不健全性の罠が置かれている状態である。読むだけなら共変で安全、書き戻しがあれば危険、という境界がどこにも書かれていない。</p>
+  <p>同型の未形式化はもう一箇所ある。<strong>変性(共変・反変)がコード上に明示されていない</strong>。<code>List&lt;T&gt;</code>や<code>Map&lt;K,V&gt;</code>の変性がどうなっているかは代入可能性判定の再帰の向きから読み取るしかない。読み取れば答えは出る — 全て共変である — が、それは決定が書かれていることを意味しない(<a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a>)。IaCの値は基本的に読み出し専用なので実害は出ていないものの、Java配列の共変性と同じ不健全性の罠が置かれた状態であり、読むだけなら安全・書き戻しがあれば危険という境界がどこにも書かれていない。</p>
 
   <h2>公理化が回帰ネットになる</h2>
 
@@ -58,6 +58,7 @@
       <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
       <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
       <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+          <li><a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
     </ul>
   </nav>
 
@@ -68,6 +69,7 @@
       <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
       <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
       <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+          <li><a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
     </ul>
   </div>
 

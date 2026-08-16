@@ -30,8 +30,8 @@
   <h1>同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</h1>
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
-    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.3 (n), §5</code>
-    <span class="dates"><time datetime="2026-05-23">2026-05-23</time> 作成</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.3 (n), §5 / carina-core/src/schema/type_identity.rs (2026-08-16時点)</code>
+    <span class="dates"><time datetime="2026-05-23">2026-05-23</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
   </p>
 
   <p>公称識別の軸ごとの包摂は、設計としては方向付きである。受け側が特定している軸は送り側も一致していなければならず、受け側が特定していない軸は問わない。ところが<strong>その判定に使われている関数は対称な同値関係として書かれている</strong>。</p>
@@ -99,6 +99,14 @@ role_arn.is_assignable_to(&amp;generic)   // 通る (これは正しい)</code><
 
   <p>だから検出は性質側からしか来ない。反対称性の性質試験があれば、<code>a ≤ b</code> かつ <code>b ≤ a</code> なのに <code>a ≠ b</code> という組を機械的に見つけられた。設計意図と実装挙動のずれが試験の欠落によって見えていなかった、という構図そのものである。</p>
 
+  <h2>現状(2026-08-16)</h2>
+
+  <p><strong>この漏れは塞がれている。</strong> 上に書いた方向 — 対称な<code>same_type</code>と方向付きの<code>assignable_to</code>を別の関数に分離する — がそのまま実装され、<code>TypeIdentity::assignable_to</code>は「受け側が<code>segments</code>を持つなら送り側も同じ<code>segments</code>を持たねばならない」という非対称な規則になった。方向性を確かめる単体試験も入っている(<code>assignable_to_is_directional_on_segments</code>)。</p>
+
+  <p>ただし直ったのは<strong>この一件だけ</strong>である。修正の要点だった「区別を型に昇格させる」は起きていない — 対称な関係と方向付きの関係は今も同じ<code>&amp;self, &amp;TypeIdentity -&gt; bool</code>というシグネチャを持ち、判定の位置に取り違えて置いても実装言語の型は何も言わない。上の「バグクラスとしての形」はそのまま残っている。<a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係の公理化</a>が求める反対称性の性質試験も入っていないので、<strong>同じクラスの次の一件を機械的に捕まえる網はまだ無い</strong>。</p>
+
+  <p>同じ構図は<a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つある</a>ノートにも記録がある。そちらは<code>identity: None</code>の三つの意味を分けないまま判定側だけを直した点を指摘していて、表現を変えずに症状を消したという評価が本ノートと一致する。</p>
+
   <nav class="links">
     <h2>関連</h2>
     <ul>
@@ -107,6 +115,7 @@ role_arn.is_assignable_to(&amp;generic)   // 通る (これは正しい)</code><
       <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
       <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
       <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+          <li><a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a></li>
     </ul>
   </nav>
 

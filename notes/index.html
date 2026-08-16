@@ -85,7 +85,7 @@
 </div>
 
 <div class="index-head">
-  <h2 class="all">すべてのノート <span class="count">94本</span> <span class="order">更新が新しい順</span></h2>
+  <h2 class="all">すべてのノート <span class="count">95本</span> <span class="order">更新が新しい順</span></h2>
 </div>
 
 <div class="search">
@@ -109,6 +109,30 @@
 </div>
 
 <div class="cards">
+  <a class="card verified" href="/notes/variance-is-implicit-not-absent.html" data-tags="型システム 部分型 設計負債">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>変性は書かれていないだけで、既に決まっている</h2>
+      <p>List/Mapは全て共変で、Mapはキーも共変。だがそれを確定させたのは変性を決めるための検討ではなく、別目的の修正の副産物だった。</p>
+      <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#設計負債</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/ref-carina-issue-index.html" data-tags="参照 issue carina">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>探索から出たissue索引</h2>
+      <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
+      <span class="tags"><span>#参照</span> <span>#issue</span> <span>#carina</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/abstract-to-concrete-leak.html" data-tags="型システム バグクラス 部分型">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</h2>
+      <p>公称識別の軸ごとの包摂は、設計としては方向付きである。受け側が特定している軸は送り側も一致していなければならず、受け側が特定していない軸は問わない。ところがその判定に使われている関数は対称な同値関係として書かれている。</p>
+      <span class="tags"><span>#型システム</span> <span>#バグクラス</span> <span>#部分型</span></span>
+    </span>
+  </a>
   <a class="card verified" href="/notes/four-kinds-of-undetermined.html" data-tags="型システム 漸進的型付け 設計負債">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -509,14 +533,6 @@
       <span class="tags"><span>#型システム</span> <span>#篩型</span> <span>#型理論</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/ref-carina-issue-index.html" data-tags="参照 issue carina">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>探索から出たissue索引</h2>
-      <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
-      <span class="tags"><span>#参照</span> <span>#issue</span> <span>#carina</span></span>
-    </span>
-  </a>
   <a class="card normative" href="/notes/provenance-should-be-a-type.html" data-tags="型システム 差分 設計方向">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -643,14 +659,6 @@
       <h2>構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</h2>
       <p>構造体の値検証は、必須フィールドの存在を確かめ、未知のフィールドを拒否する(似た名前があれば候補として提示する)。つまり幅部分型付け(width subtyping)を負の方向にしか許さない。</p>
       <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#トレードオフ</span></span>
-    </span>
-  </a>
-  <a class="card verified" href="/notes/abstract-to-concrete-leak.html" data-tags="型システム バグクラス 部分型">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</h2>
-      <p>公称識別の軸ごとの包摂は、設計としては方向付きである。受け側が特定している軸は送り側も一致していなければならず、受け側が特定していない軸は問わない。ところがその判定に使われている関数は対称な同値関係として書かれている。</p>
-      <span class="tags"><span>#型システム</span> <span>#バグクラス</span> <span>#部分型</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/two-by-two-is-per-freedom.html" data-tags="設計空間 比較軸 方法論">
