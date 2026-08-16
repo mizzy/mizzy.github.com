@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>変性は選ぶものではなく、位置が決めるものである - notes</title>
+<meta name="description" content="共変・反変・不変の三択は好みで選ぶものではない。型引数が「出てくる位置」にあるか「入っていく位置」にあるかで決まってしまう。">
+<meta property="og:title" content="変性は選ぶものではなく、位置が決めるものである">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/variance-is-forced-by-position.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/variance-is-forced-by-position.png">
+<meta property="og:description" content="共変・反変・不変の三択は好みで選ぶものではない。型引数が「出てくる位置」にあるか「入っていく位置」にあるかで決まってしまう。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="変性は選ぶものではなく、位置が決めるものである">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/variance-is-forced-by-position.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>変性は選ぶものではなく、位置が決めるものである</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>既存ノートが前提として使っていた概念を独立させたもの。一次情報はJLS §4.10.3 / §10.5、Software Foundations <em>Sub</em>、Tour of Scala、Microsoft Learn、TypeScript TSConfig reference</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p><code>T</code>が<code>U</code>の部分型であるとき(<code>T &lt;: U</code>と書く)、<code>T</code>を包んだ型<code>F&lt;T&gt;</code>と<code>F&lt;U&gt;</code>の間に部分型関係はあるか。この問いへの答え方が<strong>変性(variance)</strong>である。</p>
+
+  <p>答えは三通りしかない。</p>
+
+  <div class="scroll narrow">
+  <table>
+    <thead><tr><th>呼び名</th><th><code>T &lt;: U</code>のとき</th><th>直感</th></tr></thead>
+    <tbody>
+      <tr><td><strong>共変</strong>(covariant)</td><td><code>F&lt;T&gt; &lt;: F&lt;U&gt;</code></td><td>中身の向きがそのまま外に出る</td></tr>
+      <tr><td><strong>反変</strong>(contravariant)</td><td><code>F&lt;U&gt; &lt;: F&lt;T&gt;</code></td><td>中身の向きが外で反転する</td></tr>
+      <tr><td><strong>不変</strong>(invariant)</td><td>どちらも成り立たない</td><td>中身が違えば別型</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>用語に引きずられやすいが、<strong>「不変(invariant)」は「イミュータブル」という意味ではない</strong>。ここでの不変は「部分型関係を伝えない」であって、値が書き換わるかどうかの話ではない。むしろ後述するとおり、書き換えられる型ほど不変にせざるを得ない。</p>
+
+  <h2>選択ではなく帰結である</h2>
+
+  <p>変性は設計者が好みで決める旋回ダイヤルに見えるが、実際は<strong><code>T</code>が<code>F</code>の中のどの位置に現れるかで決まってしまう</strong>。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 250" role="img" aria-label="型引数が出てくる位置にあれば共変、入っていく位置にあれば反変、両方にあれば不変になることを示す図">
+      <style>
+  .pos text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .pos .box { fill: var(--surface); stroke: var(--rule); }
+  .pos .ttl { font-size: 13px; font-weight: 600; }
+  .pos .dim { fill: var(--faint); font-size: 11px; }
+  .pos .res { font-size: 13px; font-weight: 600; fill: var(--accent); }
+  .pos .arw { stroke: var(--accent); fill: none; }
+  .pos .head { fill: var(--accent); stroke: none; }
+  .pos .inv { fill: var(--accent-2); font-size: 13px; font-weight: 600; }
+  .pos .arw2 { stroke: var(--accent-2); fill: none; }
+  .pos .head2 { fill: var(--accent-2); stroke: none; }
+      </style>
+      <g class="pos">
+        <rect class="box" x="8" y="24" width="180" height="62" rx="4"/>
+        <text class="ttl" x="24" y="48">読み出しだけ</text>
+        <text class="dim" x="24" y="70">T は出てくる位置にある</text>
+        <path class="arw" d="M204 55 H 300"/>
+        <path class="head" d="M300 55 l -9 -5 v 10 z"/>
+        <text class="res" x="316" y="50">共変</text>
+        <text class="dim" x="316" y="70">Box&lt;犬&gt; &lt;: Box&lt;動物&gt;</text>
+
+        <rect class="box" x="8" y="102" width="180" height="62" rx="4"/>
+        <text class="ttl" x="24" y="126">書き込みだけ</text>
+        <text class="dim" x="24" y="148">T は入っていく位置にある</text>
+        <path class="arw" d="M204 133 H 300"/>
+        <path class="head" d="M300 133 l -9 -5 v 10 z"/>
+        <text class="res" x="316" y="128">反変</text>
+        <text class="dim" x="316" y="148">Sink&lt;動物&gt; &lt;: Sink&lt;犬&gt;</text>
+
+        <rect class="box" x="8" y="180" width="180" height="62" rx="4"/>
+        <text class="ttl" x="24" y="204">読み書き両方</text>
+        <text class="dim" x="24" y="226">T が両方の位置にある</text>
+        <path class="arw2" d="M204 211 H 300"/>
+        <path class="head2" d="M300 211 l -9 -5 v 10 z"/>
+        <text class="inv" x="316" y="206">不変</text>
+        <text class="dim" x="316" y="226">両方の要求は同時に満たせない</text>
+      </g>
+    </svg>
+    <figcaption>変性は型構成子の性質ではなく、その中で型引数がどの位置に置かれたかの帰結である。</figcaption>
+  </figure>
+
+  <p>理由は「その型の値に対して何ができるか」を考えれば出る。<code>犬 &lt;: 動物</code>として、</p>
+
+  <p><strong>読み出しだけの箱</strong>を考える。<code>Box&lt;犬&gt;</code>から取り出せるのは犬で、犬は動物なのだから、<code>動物</code>が欲しい人に<code>Box&lt;犬&gt;</code>を渡しても困らない。だから<code>Box&lt;犬&gt; &lt;: Box&lt;動物&gt;</code>、共変である。</p>
+
+  <p><strong>書き込みだけの受け口</strong>を考える。<code>Sink&lt;犬&gt;</code>(犬を入れる先)が必要な場面で、<code>Sink&lt;動物&gt;</code>を渡しても困らない — 動物なら何でも受け取るのだから、犬も当然受け取る。だから<code>Sink&lt;動物&gt; &lt;: Sink&lt;犬&gt;</code>である。</p>
+
+  <p>逆向きは壊れる。<code>Sink&lt;動物&gt;</code>が必要な場面 — つまり猫も入れるかもしれない場面 — に<code>Sink&lt;犬&gt;</code>を渡すと、猫を入れた時点で破綻する。<strong>中身の向き(<code>犬 &lt;: 動物</code>)に対して、外側の向きが反転している</strong>。これが反変である。</p>
+
+  <p><strong>読み書き両方できる箱</strong>は、上の二つを同時に要求する。<code>RW&lt;犬&gt; &lt;: RW&lt;動物&gt;</code>(読み出し側の要求)と<code>RW&lt;動物&gt; &lt;: RW&lt;犬&gt;</code>(書き込み側の要求)が両立するのは両者が同じ型のときだけなので、結論は不変になる。</p>
+
+  <p>つまり<strong>可変なコンテナが不変になるのは、設計判断ではなく算術の結果</strong>である。</p>
+
+  <h2>関数型がこの規則の純粋形である</h2>
+
+  <p>一番きれいに現れるのは関数型<code>A -&gt; B</code>である。引数<code>A</code>は入っていく位置、戻り値<code>B</code>は出てくる位置なので、</p>
+
+  <pre><code>A' &lt;: A   かつ   B &lt;: B'
+------------------------------
+      (A -&gt; B) &lt;: (A' -&gt; B')</code></pre>
+
+  <p><strong>引数については反変、戻り値については共変</strong>になる。日常的な言い方をすれば、「より広い引数を受け取り、より狭い値を返す関数」は、いつでも代わりに使える。より多くを受け付けて、より確かなものを返すのだから、置き換えて困る場面がない。</p>
+
+  <p>これは型理論の標準的な規則(<code>S-Arrow</code>)で、Pierceらの記述がそのまま「関数構成子は第一引数について反変、第二引数について共変である」と言っている(<a href="https://softwarefoundations.cis.upenn.edu/plf-current/Sub.html">Software Foundations, <em>Sub: Subtyping</em></a>)。Scalaの<code>Function1</code>はこの規則を型定義そのものに書いていて、<code>trait Function1[-T1, +R]</code>と、引数に反変(<code>-</code>)、戻り値に共変(<code>+</code>)の印が付く(<a href="https://github.com/scala/scala/blob/2.13.x/src/library/scala/Function1.scala">scala/scala</a>)。</p>
+
+  <p>この規則は関数型言語に限った話ではない。メソッドのオーバーライドで戻り値を狭められる(共変戻り値)のに引数は狭められない、というよくある制約は、同じ規則の別の顔である。</p>
+
+  <h2>だから読み出し専用は特別扱いできる</h2>
+
+  <p>「読み出し専用なら共変で安全」という言い回しがよく出てくるのは、この位置の規則の系である。書き込み位置が無ければ反変の要求が発生しないので、共変の要求だけが残って矛盾しない。</p>
+
+  <blockquote>
+    <p>主な問題は、<strong>共変な可変コレクションが型安全性を壊しうる</strong>ことである。これが、<code>List</code>が共変なコレクションであるのに対し、<code>scala.collection.mutable.ListBuffer</code>が不変なコレクションである理由である。</p>
+    <p>不変性(immutability)は、変性を使うという設計判断の重要な部分を構成している。</p>
+    <cite><a href="https://docs.scala-lang.org/tour/variances.html">Tour of Scala — Variances</a></cite>
+  </blockquote>
+
+  <p>同じ<code>List</code>という概念でも、読み出し専用の方は共変にでき、可変の方はできない。<strong>変性は型構成子の名前ではなく、その型が許す操作で決まる</strong>ということである。</p>
+
+  <p>裏返せば、<strong>共変にしておいた型にあとから書き込み経路を足すと、その瞬間に健全性が壊れる</strong>。壊れるのは新しく足した操作ではなく、既にあった部分型関係の方である。これは<a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a>でCarinaについて書いた懸念とまったく同じ形であり、そこでの「読み出し専用だから今は安全」という前提が、なぜ前提として明記されなければならないかの理由でもある。</p>
+
+  <h2>言語ごとの現れ方</h2>
+
+  <p><strong>宣言側に注釈を書かせる</strong>方式が主流である。Scalaは型引数に<code>+T</code>(共変)/ <code>-T</code>(反変)を付け、既定は不変である — 「Scalaでは型引数は既定で不変であり、型引数どうしの部分型関係はパラメータ化された型に反映されない」(<a href="https://docs.scala-lang.org/tour/variances.html">Tour of Scala — Variances</a>)。C#は同じことを<code>out</code>(共変)/ <code>in</code>(反変)で書く(<a href="https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/covariance-contravariance/creating-variant-generic-interfaces">Microsoft Learn</a>)。</p>
+
+  <p>注目すべきは、<strong>C#が変性の注釈を「位置の制約」として実装している</strong>ことである。共変(<code>out</code>)と印を付けた型引数は<strong>戻り値の位置にしか書けない</strong>。</p>
+
+  <pre><code>interface ICovariant&lt;out R&gt;
+{
+    R GetSomething();
+    // 次の行はコンパイルエラーになる
+    // void SetSomething(R sampleArg);
+}</code></pre>
+
+  <p>上の「位置が変性を決める」という規則が、そのまま検査規則になっている。だから<code>IEnumerable&lt;T&gt;</code>や<code>IReadOnlyList&lt;T&gt;</code>は共変にできるのに、<code>Add(T)</code>を持つ<code>IList&lt;T&gt;</code>は共変にできない。</p>
+
+  <p>一方<strong>使用側で指定する</strong>方式もある。Javaのジェネリクスは宣言時には変性を持たず、<code>Integer</code>が<code>Number</code>の部分型であっても「<code>List&lt;Integer&gt;</code>は<code>List&lt;Number&gt;</code>の部分型ではなく、実際この二つの型は無関係である」(<a href="https://docs.oracle.com/javase/tutorial/java/generics/subtyping.html">The Java Tutorials</a>)。代わりに使う側が<code>? extends</code>(共変として使う)/ <code>? super</code>(反変として使う)と書く。</p>
+
+  <p>宣言側で決める方式(Scala、C#)は一度決めれば使用側が考えなくてよい代わりに、同じ型を両方の向きで使いたいときに困る。使用側で決める方式(Java)はその逆で、柔軟だが使うたびに書く必要がある。<strong>どちらも「位置が変性を決める」規則は同じで、その規則をいつ適用するかが違うだけ</strong>である。</p>
+
+  <p>Carinaはどれでもない。注釈も無く、既定を不変に倒してもおらず、<strong>判定の再帰の向きが結果として共変を選んでいて、それが文書化されていない</strong>という状態である(<a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a>)。</p>
+
+  <h2>なぜ間違えると静かに壊れるか</h2>
+
+  <p>変性の誤りが厄介なのは、<strong>型検査を通ってしまう</strong>ところにある。共変であるべき場所を不変にすれば、通るべき代入が拒否されるだけで、書き手は不便を感じてすぐ気づく。逆に<strong>不変であるべき場所を共変にすると、通ってはいけない代入が通る</strong> — そして壊れるのは代入の瞬間ではなく、ずっと後の書き込みの瞬間である。</p>
+
+  <p>一番有名な実例がJavaの配列である。Javaは配列を共変にしていて、要素型に部分型関係があれば配列にも伝わる(JLS §4.10.3)。可変なのに共変なので、上の算術に反する。その結果、<strong>書き込みの検査を実行時まで遅らせるしかなくなっている</strong> — 「配列の要素への代入は実行時に検査され、代入される値が要素型に代入互換でなければ<code>ArrayStoreException</code>が投げられる」(<a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-10.html#jls-10.5">JLS §10.5</a>)。仕様書自身が挙げている例がこれである。</p>
+
+  <pre><code>ColoredPoint[] cpa = new ColoredPoint[10];
+Point[] pa = cpa;          // 共変なので通る
+pa[0] = new Point();       // 実行時に ArrayStoreException</code></pre>
+
+  <p>型システムが止められなかったものを、実行時検査で受け止めている。<strong>共変にした代償を、全ての配列書き込みが恒久的に払っている</strong>という形である。</p>
+
+  <p>同じ判断が意図的に行われている例もある。TypeScriptは既定で引数の検査が双変(bivariant)で、<code>strictFunctionTypes</code>を付けると関数型の引数が反変になる。ただしこの旗は<strong>メソッド構文には適用されない</strong> — 「この機能の開発中に、DOMを含む本質的に安全でないクラス階層が多数見つかった。そのため、この設定は<em>関数</em>構文で書かれた関数にのみ適用され、<em>メソッド</em>構文のものには適用されない」(<a href="https://www.typescriptlang.org/tsconfig/strictFunctionTypes.html">TSConfig reference</a>)。既存コードとの兼ね合いで、不健全と分かった上で残している箇所である。</p>
+
+  <p>だから変性は、規則を書いておくだけでは足りず、<strong>性質として機械的に検査される</strong>ところまで持っていかないと守られない。<a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a>が反射性・推移性・反対称性について言っているのと同じことが、変性についても言える。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+
+    <p>三種の定義と位置による決定則は型理論の標準的な内容で、特定の実装に依存しない。引用した一次情報はいずれも原文で確認済み — 関数型の規則はSoftware Foundations(Pierceら)、Scalaの変性注釈と可変コレクションの件はTour of Scala、C#の<code>in</code>/<code>out</code>と位置制約はMicrosoft Learn、Javaのジェネリクス不変性はThe Java Tutorials、配列共変と<code>ArrayStoreException</code>はJLS §4.10.3 / §10.5、TypeScriptの<code>strictFunctionTypes</code>はTSConfig reference。</p>
+
+    <p>いくつか<strong>確認できなかった</strong>ことがあるので、断定を避けた箇所がある。</p>
+
+    <ul>
+      <li><strong>JLSに「ジェネリクスは不変である」と書いた一文は見つからなかった。</strong> JLSは§4.5.1で型引数の包含として構造的に表現しており、引用したのは平易に書いてあるJava Tutorialsの方である</li>
+      <li><strong>TAPLの<code>S-Arrow</code>のページ番号は未確認。</strong> 規則そのものと「反変・共変」という言い回しはSoftware Foundations(同じPierceらの記述)で確認したが、書籍のページは参照していない</li>
+      <li><strong><code>IList&lt;T&gt;</code>が共変にできない理由を「可変だから」と書いたMicrosoftの文は無い。</strong> C#の文書は「共変の型は戻り値の位置にしか使えない」という規則の形で述べていて、可変性との結び付きを言葉で言っているのはScalaの文書の方である。本文もその通りに書き分けた</li>
+    </ul>
+
+    <p>「可変コンテナは不変になる」は読み書き両方の位置に同じ型引数が現れる場合の帰結である。実際の言語では読み出し専用インタフェースを別に切って共変にする(<code>IReadOnlyList&lt;T&gt;</code>、<code>List</code> vs <code>ListBuffer</code>)、使用側で変性を指定する(Javaの<code>? extends</code>)などの手段があるので、<strong>「可変だから常に不変」ではなく「読み書き両方の位置に同じ型引数が現れるなら不変」</strong>が正確な言い方である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+    <a href="/notes/#tag-型理論">#型理論</a>
+  </p>
+</article>
+</body>
+</html>

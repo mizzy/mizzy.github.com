@@ -34,7 +34,7 @@
     <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
   </p>
 
-  <p><code>List&lt;T&gt;</code>や<code>Map&lt;K,V&gt;</code>のような型構成子を持つ型システムには、必ず<strong>変性(variance)</strong>の問いが付いてくる。<code>T &lt;: U</code>のとき<code>List&lt;T&gt; &lt;: List&lt;U&gt;</code>は成り立つか(共変)、逆向きになるか(反変)、どちらでもないか(不変)である。</p>
+  <p><code>List&lt;T&gt;</code>や<code>Map&lt;K,V&gt;</code>のような型構成子を持つ型システムには、必ず<strong>変性(variance)</strong>の問いが付いてくる。<code>T &lt;: U</code>のとき<code>List&lt;T&gt; &lt;: List&lt;U&gt;</code>は成り立つか(共変)、逆向きになるか(反変)、どちらでもないか(不変)である(この三択がなぜ三択で、何が答えを決めるのかは<a href="/notes/variance-is-forced-by-position.html">変性は選ぶものではなく、位置が決めるものである</a>に書いた)。</p>
 
   <p>Carinaはこの問いに答えを持っている。ただし<strong>その答えはコードのどこにも書かれておらず、代入可能性判定の再帰の向きから読み取るしかない</strong>。「変性が未定義」なのではなく、<strong>未文書のまま確定している</strong>というのが正確な状態である。</p>
 
@@ -190,6 +190,7 @@
       <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
       <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
       <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+          <li><a href="/notes/variance-is-forced-by-position.html">変性は選ぶものではなく、位置が決めるものである</a></li>
     </ul>
   </nav>
 
@@ -203,6 +204,7 @@
       <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
       <li><a href="/notes/open-questions.html">未解決の問い</a></li>
       <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+          <li><a href="/notes/variance-is-forced-by-position.html">変性は選ぶものではなく、位置が決めるものである</a></li>
     </ul>
   </div>
 
