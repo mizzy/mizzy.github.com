@@ -41,13 +41,13 @@
       <thead><tr><th>出力形態</th><th>内容</th><th>例</th></tr></thead>
       <tbody>
         <tr><td><strong>構成データ出力</strong></td><td>値ツリー(JSON/YAML/設定値)</td><td>Pkl, KCL, CUE, Dhall, Jsonnet, Nickel</td></tr>
-        <tr><td><strong>graph出力</strong></td><td>ノード + edgeの宣言</td><td>Terraform, CDK, Pulumi, Carina, Bicep, cdktf, cdk8s, Crossplane, Helm</td></tr>
+        <tr><td><strong>graph出力</strong></td><td>ノード + エッジの宣言</td><td>Terraform, CDK, Pulumi, Carina, Bicep, cdktf, cdk8s, Crossplane, Helm</td></tr>
       </tbody>
     </table>
   </div>
 
   <figure>
-    <svg viewBox="0 0 640 250" role="img" aria-label="構成データ出力DSLは値ツリーを出すだけでノード間の関係を持たないのに対し、graph出力DSLはノード集合とedgeを出す。graphに至る経路はツールごとに異なるがapply時点ではどれもresource graphになることを示す図">
+    <svg viewBox="0 0 640 250" role="img" aria-label="構成データ出力DSLは値ツリーを出すだけでノード間の関係を持たないのに対し、graph出力DSLはノード集合とエッジを出す。graphに至る経路はツールごとに異なるがapply時点ではどれもresource graphになることを示す図">
       <style>
         .go text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
         .go .box { fill: var(--surface); stroke: var(--rule); }
@@ -70,14 +70,14 @@
         <text class="dim" x="228" y="80">ノード間の関係という構造を持たない</text>
         <text class="dim" x="228" y="100">効くのは「最終valueの集合サイズ」だけ</text>
 
-        <text class="ttl" x="8" y="140">graph出力 — ノード + edge</text>
+        <text class="ttl" x="8" y="140">graph出力 — ノード + エッジ</text>
         <rect class="node" x="70" y="154" width="62" height="24" rx="3"/>
         <rect class="node" x="70" y="200" width="62" height="24" rx="3"/>
         <rect class="node" x="164" y="177" width="62" height="24" rx="3"/>
         <path class="edge" d="M132 166 C 150 166, 150 187, 162 187"/>
         <path class="edge" d="M132 212 C 150 212, 150 191, 162 191"/>
         <text class="dim" x="252" y="170">(a)ノード集合 = type + 属性値</text>
-        <text class="dim" x="252" y="190">(b)edge = 参照 / depends_on / opts.parent</text>
+        <text class="dim" x="252" y="190">(b)エッジ = 参照 / depends_on / opts.parent</text>
         <text class="dim" x="252" y="210">自由度がノード数・identity・依存関係に効く</text>
 
         <text class="dim" x="8" y="242">経路は直接出力 / ツリー→synth / RPCストリーム / YAML pipelineと分かれるが、applyの段階ではどれもresource graphを扱う</text>
@@ -86,7 +86,7 @@
     <figcaption>値ツリーと依存グラフは同じ「出力」でもレイヤが違う。同じ「複数量の制御」という自由度を当てても、効く先が別物になる。</figcaption>
   </figure>
 
-  <p>graph出力DSLのコードが出すのは、<strong>(a)ノード集合</strong>(リソース宣言 = type + 属性値)と<strong>(b) edge</strong>(リソース間の依存関係 — 参照、<code>depends_on</code>、<code>opts.parent</code>)である。構成データ出力DSLは値ツリーを出すだけで、ノード間の関係という構造を持たない。</p>
+  <p>graph出力DSLのコードが出すのは、<strong>(a)ノード集合</strong>(リソース宣言 = type + 属性値)と<strong>(b)エッジ</strong>(リソース間の依存関係 — 参照、<code>depends_on</code>、<code>opts.parent</code>)である。構成データ出力DSLは値ツリーを出すだけで、ノード間の関係という構造を持たない。</p>
 
   <p>この区別は、3自由度の評価が「何に効くか」を決める。graph出力DSLでは自由度がノード数・identity・依存関係に効くが、構成データ出力DSLでは「最終valueの集合サイズ」にしか効かない。同じ「複数量の制御」という軸を当てても、意味するものが違う。</p>
 

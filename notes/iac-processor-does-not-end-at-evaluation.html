@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>構成データ出力DSLから貰えるのは評価段階だけである - notes</title>
-<meta name="description" content="構成データ出力DSLをIaCのfront endに採っても、貰えるのは評価段階だけである。identity・差分・state・Unknownは線の向こう側に残り、辺の検査は言語境界で失われる。">
+<meta name="description" content="構成データ出力DSLをIaCのfront endに採っても、貰えるのは評価段階だけである。identity・差分・state・Unknownは線の向こう側に残り、エッジの検査は言語境界で失われる。">
 <meta property="og:title" content="構成データ出力DSLから貰えるのは評価段階だけである">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://mizzy.org/notes/iac-processor-does-not-end-at-evaluation.html">
 <meta property="og:image" content="https://mizzy.org/notes/ogp/iac-processor-does-not-end-at-evaluation.png">
-<meta property="og:description" content="構成データ出力DSLをIaCのfront endに採っても、貰えるのは評価段階だけである。identity・差分・state・Unknownは線の向こう側に残り、辺の検査は言語境界で失われる。">
+<meta property="og:description" content="構成データ出力DSLをIaCのfront endに採っても、貰えるのは評価段階だけである。identity・差分・state・Unknownは線の向こう側に残り、エッジの検査は言語境界で失われる。">
 <meta property="og:site_name" content="notes — mizzy.org">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="構成データ出力DSLから貰えるのは評価段階だけである">
@@ -102,7 +102,7 @@
         <path class="sep" d="M12 218 H 688"/>
 
         <text class="dim" x="12" y="242">評価の後ろに続く段はどれも自前になる。しかもfront endの型情報は境界で失われているので、</text>
-        <text class="dim" x="12" y="260">辺の検査(参照先が実在し、型が合い、applyまでに値を持つこと)はもう一度やり直すことになる。</text>
+        <text class="dim" x="12" y="260">エッジの検査(参照先が実在し、型が合い、applyまでに値を持つこと)はもう一度やり直すことになる。</text>
         <text class="dim" x="12" y="286">値ツリーは評価が終われば完成しているので、Unknown — まだ無いが後で値を持つ — を置く場所も無い。</text>
       </g>
     </svg>
@@ -127,13 +127,13 @@
 
   <p><strong>ここでは意図的にその線を越えている。</strong> DSL同士を比較するときは越えるべきでないが、「既存DSLを front end に採用できるか」を問うときは、越えた先の面積こそが判断材料だからである。線の向こう側が自前になるなら、front endの流用で浮くコストはその分だけ小さい。</p>
 
-  <h2>消えるのは辺の検査である</h2>
+  <h2>消えるのはエッジの検査である</h2>
 
-  <p>値ツリーとして出せることと、出した後も検査が効くことは別である。IaCで効かせたい性質は<strong>辺</strong>にある — <code>subnet.vpc_id</code> の参照先が実在し、型が合っており、apply時には値を持つ、という性質である。</p>
+  <p>値ツリーとして出せることと、出した後も検査が効くことは別である。IaCで効かせたい性質は<strong>エッジ</strong>にある — <code>subnet.vpc_id</code> の参照先が実在し、型が合っており、apply時には値を持つ、という性質である。</p>
 
-  <p>構成データ出力DSLの中では、この辺は書けても<strong>辺として残らない</strong>。JSONに落ちた時点で参照は文字列か、消費側ツール独自の補間構文を埋めた文字列になる。DSLの型システムはドキュメントを検査し終えて退場しており、辺の正しさを見るのは消費側の仕事として残る。<a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a>が言っているのと同じ損失が、言語境界をまたぐ地点で起きる。</p>
+  <p>構成データ出力DSLの中では、このエッジは書けても<strong>エッジとして残らない</strong>。JSONに落ちた時点で参照は文字列か、消費側ツール独自の補間構文を埋めた文字列になる。DSLの型システムはドキュメントを検査し終えて退場しており、エッジの正しさを見るのは消費側の仕事として残る。<a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a>が言っているのと同じ損失が、言語境界をまたぐ地点で起きる。</p>
 
-  <p>これは identity についても効く。<a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a>はノードと辺までを扱ってidentityに触れていないが、<a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a>が言う「エンジンが同じリソースとみなすもの」は、値ツリーには現れない。同じJSONを二度出しても、それが同じリソースの二度目なのか別物なのかは、ドキュメントの側からは決まらない。</p>
+  <p>これは identity についても効く。<a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a>はノードとエッジまでを扱ってidentityに触れていないが、<a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a>が言う「エンジンが同じリソースとみなすもの」は、値ツリーには現れない。同じJSONを二度出しても、それが同じリソースの二度目なのか別物なのかは、ドキュメントの側からは決まらない。</p>
 
   <h2>Unknownを表現する語彙が無い</h2>
 
@@ -149,7 +149,7 @@
 
   <h2>帰結</h2>
 
-  <p>構成データ出力DSLを front end に採用しても、手に入るのは「評価してツリーを出す」までである。identity・差分・state・Unknownはどのみち自前で持つことになり、しかも front end の型情報は境界で失われているので、<strong>辺の検査をもう一度やり直す</strong>ことになる。</p>
+  <p>構成データ出力DSLを front end に採用しても、手に入るのは「評価してツリーを出す」までである。identity・差分・state・Unknownはどのみち自前で持つことになり、しかも front end の型情報は境界で失われているので、<strong>エッジの検査をもう一度やり直す</strong>ことになる。</p>
 
   <p>これは<a href="/notes/adopting-a-language-means-subtracting-from-it.html">既存言語を採用してもフル機能は使わせられない</a>と対になる論点である。向こうは言語表面の話(採っても使わせられない)、こちらは処理系の話(採っても難しい部分は貰えない)。汎用言語埋め込みと構成データ出力DSLという別々の選択肢に対して、それぞれ別の理由で「既存のものを流用する」が期待ほど効かない。</p>
 
