@@ -116,7 +116,13 @@
 
   <div class="accuracy">
     <h2>根拠の確度</h2>
-    <p>CDKのTokenが文字列操作で無音に壊れることは、公式ドキュメントと複数の日本語記事で確認済み。Pulumi <code>Output.apply</code>のデプロイ中実行とpreviewの近似性の詳細、CDKのcontext lookupの挙動詳細はAIの学習データ由来で一次ソース未確認。</p>
+    <p>CDKのTokenが文字列操作で無音に壊れることは、公式ドキュメントと複数の日本語記事で確認済み。</p>
+
+    <p>Pulumi <code>Output.apply</code>のデプロイ中実行とpreviewの近似性も、<a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">公式のapplyページ</a>で一次ソース確認済み。「<code>pulumi up</code>でプログラムが実行されるとき、<code>apply</code>関数はリソースが作られてプロパティが解決するまで待つ」「<strong><code>apply</code>の中で作られたリソースは、outputの値が既にわかっている場合を除き<code>pulumi preview</code>に現れない</strong>」「<code>apply</code>の中でリソースを作ることは可能な限り避けるべきで、preview出力が実際の<code>pulumi up</code>の変更と一致しないことがある」と明記されている。SDK側の裏付けは<a href="/notes/ref-source-pointers.html">出典ポインタ集</a>にある — <code>applyHelperAsync</code>がpreview時に<code>func</code>を実行せず<code>isKnown: false</code>のOutputを返す。</p>
+
+    <p>CDKのcontext lookupも<a href="https://docs.aws.amazon.com/cdk/v2/guide/context.html">公式のcontextページ</a>で確認済み。ただし挙動は当初の理解より一段細かい。<strong>synth中のプログラム自身がAWSを呼ぶのではない</strong> — 値が無いとき、appはCDK Toolkitに「contextが足りない」と通知し、<strong>CLIがAWSアカウントに問い合わせて<code>cdk.context.json</code>に保存し、その値を渡してappを再実行する</strong>。結果はキャッシュされ、以降のsynthは同じ値を使う(<code>cdk context --reset</code> / <code>--clear</code>で明示的に捨てるまで)。<code>Vpc.fromLookup</code>のAPI docも「このメソッドを呼ぶとCDK CLI実行時にlookupが起きる」「VPC情報は<code>cdk.context.json</code>にキャッシュされ、以降の実行でも同じVPCが使われる」としている。</p>
+
+    <p>この訂正はこのノートの主張を弱めない。むしろ経路が具体化する — キャッシュがある以上、synthの出力は「ソースの純関数」ではなく<strong>ソースと<code>cdk.context.json</code>の関数</strong>であり、その<code>cdk.context.json</code>はある時点の外界の写しである。だから公式ドキュメント自身が「アプリケーションの状態の一部なので、ソース管理にコミットせよ」と言っている。<a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a>の「synthの出力は外界に依存しうる」はこの経路を指す。</p>
   </div>
 
   <nav class="links">

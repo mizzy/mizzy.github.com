@@ -91,6 +91,18 @@
     <li>内部にplaceholder文字列 <code>${Token[Bucket.Arn.0]}</code> を持ち、synth時にCFNテンプレートの <code>Fn::GetAtt</code>, <code>Fn::Join</code> 等に変換される</li>
   </ul>
 
+  <h3>context lookup</h3>
+
+  <ul>
+    <li>公式<a href="https://docs.aws.amazon.com/cdk/v2/guide/context.html">Context values</a></li>
+    <li>経路: contextが不足しているとappがCDK Toolkitに通知 → <strong>CLIがAWSアカウントに問い合わせ</strong> → <code>cdk.context.json</code>に保存 → <strong>その値を渡してappを再実行</strong>。AWSを呼ぶのはCLIであって、synth中のapp自身ではない</li>
+    <li>キャッシュ: 一度取れた値は<code>cdk.context.json</code>に凍結され、以降のsynthは同じ値を使う。<code>cdk context --reset &lt;key&gt;</code> / <code>cdk context --clear</code> で明示的に捨てるまで更新されない。狙いは「AZが増えた」等の外界の変化が予期せぬdiffになるのを防ぐこと</li>
+    <li>キー形式: <code>availability-zones:account=123456789012:region=eu-central-1</code> のようにaccountとregionを含む(環境ごとに衝突しないため)</li>
+    <li>lookupを起こすメソッド: <code>HostedZone.fromLookup</code> / <code>stack.availabilityZones</code> / <code>StringParameter.valueFromLookup</code> / <code>Vpc.fromLookup</code> / <code>LookupMachineImage</code></li>
+    <li><code>Vpc.fromLookup</code> の<a href="https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ec2.Vpc.html">API doc</a>: 「CDK CLI実行時にlookupが起きる。したがってCloudFormation実行時にしか判明しない値(Token)は渡せない」</li>
+    <li><code>cdk.json</code> / <code>cdk.context.json</code> は「アプリケーションの状態の一部」としてソース管理へのコミットが要求されている。コミットしないとCIなど別環境で結果が食い違う</li>
+  </ul>
+
   <h3>Best practices</h3>
 
   <ul>
@@ -135,7 +147,8 @@
     <li>内部状態: <code>isSecret: Promise&lt;boolean&gt;</code> (L84)、<code>isKnown: Promise&lt;boolean&gt;</code> (L96、preview時に未確定ならfalse)、<code>promise: () =&gt; Promise&lt;T&gt;</code> (L110)、<code>resources: () =&gt; Set&lt;Resource&gt;</code> (L124)、<code>allResources?: () =&gt; Promise&lt;Set&lt;Resource&gt;&gt;</code> (L144)</li>
     <li><code>Input&lt;T&gt;</code>: <code>export type Input&lt;T&gt; = T | Promise&lt;T&gt; | OutputInstance&lt;T&gt;</code> (L935)</li>
     <li>連鎖メソッド: <code>apply()</code> (L369), <code>pulumi.all()</code> (L771-792), <code>pulumi.interpolate</code> (L1248), <code>concat</code> (L1232)</li>
-    <li>preview時の挙動: <code>applyHelperAsync</code> で <code>if (!doApply) return { value: undefined, isKnown: false, ... }</code> (L499-507) — <code>func</code> を実行せず未知Outputを返す</li>
+    <li>preview時の挙動: <code>applyHelperAsync</code> で <code>if (!doApply) return { value: undefined, isKnown: false, ... }</code> (L499-507) — <code>func</code> を実行せず未知Outputを返す。公式docsの記述も一致する: 「<code>apply</code>の中で作られたリソースは、outputの値が既にわかっている場合を除き<code>pulumi preview</code>に現れない」「<code>apply</code>の中でリソースを作ることは可能な限り避けるべき」「preview出力が実際の<code>pulumi up</code>の変更と一致しないことがある」(<a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a>)</li>
+    <li>deploy中実行: 「<code>pulumi up</code>でプログラムが実行されるとき、<code>apply</code>関数はリソースが作られてプロパティが解決するまで待ってから目的の値を出力する」(同上)</li>
     <li><code>toString</code> / <code>toJSON</code>: <code>OutputToStringError</code> を投げる(L22-53, L167, L190)</li>
     <li>secret伝播: <code>applyHelperAsync</code> の戻り <code>liftInnerOutput(allResources, transformed, true, isSecret)</code> (L520)。<code>all</code> では <code>some(isSecret)</code> でOR集約(L854)</li>
     <li>公式docs: <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/">inputs-outputs</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/all/">allページ</a></li>
