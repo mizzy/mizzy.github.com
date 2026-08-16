@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である - notes</title>
-<meta name="description" content="Carinaの型システムには「まだ確定していない」を表す表現が四つ独立に存在する。">
+<meta name="description" content="Carinaの型システムには「まだ確定していない」を表す表現が四つ独立に存在する。目指す形は設計文書で決まっているが、3か月弱を経てコードは1つも動いていない。">
 <meta property="og:title" content="「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://mizzy.org/notes/four-kinds-of-undetermined.html">
 <meta property="og:image" content="https://mizzy.org/notes/ogp/four-kinds-of-undetermined.png">
-<meta property="og:description" content="Carinaの型システムには「まだ確定していない」を表す表現が四つ独立に存在する。">
+<meta property="og:description" content="Carinaの型システムには「まだ確定していない」を表す表現が四つ独立に存在する。目指す形は設計文書で決まっているが、3か月弱を経てコードは1つも動いていない。">
 <meta property="og:site_name" content="notes — mizzy.org">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である">
@@ -30,8 +30,8 @@
   <h1>「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</h1>
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
-    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.2 (h), §6</code>
-    <span class="dates"><time datetime="2026-05-23">2026-05-23</time> 作成</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.2 (h), §6</code> / <code>specs/2026-05-23-gradual-typing-design.md</code> / carina#3212
+    <span class="dates"><time datetime="2026-05-23">2026-05-23</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
   </p>
 
   <p>Carinaの型システムには「まだ確定していない」を表す表現が<strong>四つ独立に存在する</strong>。</p>
@@ -93,11 +93,163 @@
 
   <p>Carinaはそうなっていない。四つの表現は層も違う — 値の側にあるもの(deferred、Unknown)と型の側にあるもの(識別なしのカスタム型、注釈の未知型)が混在し、静的段階のどの時点で解消されるかもそれぞれ違う。結果として「この値は今どういう意味で未確定なのか」を答えるには、四つのうちどれかを特定する必要がある。</p>
 
+  <h2>本当の軸は「層」ではなく「解決時期」である</h2>
+
+  <p>四つを「値の側/型の側」で割るのは、実は粗い。設計文書がコードと突き合わせて精密化した分類を見ると、<strong>同じ<code>DeferredValue::Unknown</code>に同居しているものどうしでも解決経路が違う</strong>。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>形</th><th>層</th><th>いつ解決するか</th></tr></thead>
+      <tbody>
+        <tr><td><code>DeferredValue::ResourceRef</code> / <code>BindingRef</code> / <code>Interpolation</code> / <code>FunctionCall</code></td><td>値(式)</td><td>参照解決時</td></tr>
+        <tr><td><code>DeferredValue::Unknown(UpstreamRef / UpstreamBareRef)</code></td><td>値(apply待ち)</td><td>上流apply時</td></tr>
+        <tr><td><code>DeferredValue::Unknown(ForKey / ForIndex / ForValue / ForValuePath)</code></td><td>値(式)</td><td>iterable解決時</td></tr>
+        <tr><td><code>DeferredValue::Unknown(EmptyInterpolation)</code></td><td>値(パースエラー)</td><td>解決しない(診断のみ)</td></tr>
+        <tr><td><code>DeferredValue::Secret</code></td><td>値(直交)</td><td>中身に依存</td></tr>
+        <tr><td><code>Custom { identity: None }</code></td><td>型(静的)</td><td>解決しない(不変)</td></tr>
+        <tr><td><code>TypeExpr::Unknown</code></td><td>型(推論エラー復旧)</td><td>解決しない(エラー復旧)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>つまり<strong>「未確定」という一語が、正常な未確定・エラー復旧の番人・直交する属性という三つの違う役割を兼ねている</strong>。<code>EmptyInterpolation</code>と<code>TypeExpr::Unknown</code>はどちらも「誰も埋めない」が、前者は編集途中の値、後者は推論失敗の印で、正常系に残るかどうかが違う。<a href="/notes/unknown-reasons-are-not-one-kind.html">Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である</a>が<code>UnknownReason</code>の10変種を解決経路で割ったのと同じ線が、四つの表現をまたいでも引ける。</p>
+
+  <h2>型安全性は層ごとに評価が割れる</h2>
+
+  <p>同じ設計文書が、階層ごとの型安全性をA〜Dで採点している。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 210" role="img" aria-label="階層ごとの型安全性の採点。ValueのConcrete/Deferred軸がA、DeferredValueの変種別がB+、UnknownReasonの変種別がB、TypeExpr::Unknownの伝播とCustomのidentity Noneの意味がC、階層間の関係性だけがDで最下位であることを示す図">
+      <style>
+        .gr text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .gr .lbl { font-size: 12px; }
+        .gr .bar { fill: var(--accent-bg); stroke: var(--accent); }
+        .gr .bard { fill: var(--bg); stroke: var(--accent-2); stroke-width: 1.5; }
+        .gr .gd { font-size: 12px; font-weight: 600; fill: var(--accent); }
+        .gr .gdd { font-size: 12px; font-weight: 600; fill: var(--accent-2); }
+        .gr .dim { fill: var(--faint); font-size: 11px; }
+      </style>
+      <g class="gr">
+        <text class="lbl" x="8" y="26">Value の Concrete/Deferred 軸</text>
+        <rect class="bar" x="330" y="14" width="300" height="16" rx="3"/>
+        <text class="gd" x="642" y="27">A</text>
+
+        <text class="lbl" x="8" y="54">DeferredValue の変種別</text>
+        <rect class="bar" x="330" y="42" width="255" height="16" rx="3"/>
+        <text class="gd" x="642" y="55">B+</text>
+
+        <text class="lbl" x="8" y="82">UnknownReason の変種別</text>
+        <rect class="bar" x="330" y="70" width="225" height="16" rx="3"/>
+        <text class="gd" x="642" y="83">B</text>
+
+        <text class="lbl" x="8" y="110">TypeExpr::Unknown の伝播</text>
+        <rect class="bar" x="330" y="98" width="150" height="16" rx="3"/>
+        <text class="gd" x="642" y="111">C</text>
+
+        <text class="lbl" x="8" y="138">Custom { identity: None } の意味</text>
+        <rect class="bar" x="330" y="126" width="150" height="16" rx="3"/>
+        <text class="gd" x="642" y="139">C</text>
+
+        <text class="lbl" x="8" y="166">階層間の関係性</text>
+        <rect class="bard" x="330" y="154" width="75" height="16" rx="3"/>
+        <text class="gdd" x="642" y="167">D</text>
+
+        <text class="dim" x="8" y="196">個々の層は型で守られている。守られていないのは、層をまたぐ整合性だけである。</text>
+      </g>
+    </svg>
+    <figcaption>「境界が見えにくい」は主観的な読みにくさではなく、この最下位の一行に対応している。</figcaption>
+  </figure>
+
+  <p><code>Custom { identity: None }</code>の<code>None</code>に混ざっている三つとは、codegenが生成した匿名の篩型・パーサが生成した解決中のもの・provider軸を持たない組み込み型(<code>Ipv4Cidr</code>等)である。同じ<code>None</code>が「識別を持たせる意義がない」「まだ解決していない」「その軸で区別しない」を兼ねている。</p>
+
   <h2>整理が先、統合は後</h2>
 
   <p>解の方向は二段階になる。まず<strong>四つの意味論を一枚にまとめる</strong> — それぞれが何を表し、いつ・誰によって解消され、検査と等価性でどう扱われるかを並べて書く。この整理だけでも、どの二つが実は同じものかが見える。その上で、統合できる組があれば一本化する。</p>
 
   <p>整理が先に来るのは、四つのうちどれが本質的な区別でどれが実装の都合かが、現状では書き出されていないからである。Unknownが理由を持ち運ぶ設計であることや、識別なしのカスタム型が明示キャストなしでは識別付きの受け側に流せないことは、いずれも意図された意味論である。一方でdeferredと注釈側の未知型の関係は説明されていない。<strong>区別が意図的なのか偶然なのかを分けることが、統合の可否を決める</strong>。</p>
+
+  <h2>目指す形は決まっているが、着手されていない</h2>
+
+  <p>上の「整理が先」に対する答えは、実は<strong>同じ日のうちに設計文書として書かれている</strong>。四つの不変条件と四段階のロードマップが引かれ、それぞれ目指すコードの形まで提示されている。</p>
+
+  <ol>
+    <li><strong>解決時期を型で区別する</strong> — <code>Value</code>を<code>Concrete</code> / <code>Reference</code> / <code>ApplyTime</code> / <code>Secret</code>に割り直し、参照解決で消えるものとapplyまで残るものを別の型にする</li>
+    <li><strong>型レベルの不在と値レベルの不在を統一する</strong> — <code>TypeExpr::Unknown</code>を廃し、推論失敗は<code>Result</code>で表す(異常系を正常系の語彙で表さない)</li>
+    <li><strong><code>identity: None</code>の三つの意味を分ける</strong> — <code>CustomTypeOrigin</code>という<code>Anonymous</code> / <code>Builtin</code> / <code>Provider</code>の三値に置き換える</li>
+    <li><strong>解決段階を型相(typestate)に持ち上げる</strong> — <code>StagedValue&lt;Raw / Inferred / ResolvedRefs / Applied&gt;</code>で、関数シグネチャが段階を要求できるようにする。<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>が挙げる手口を、未確定という軸にも当てるということである</li>
+  </ol>
+
+  <p>方向としては、この4つ目がノートの言う「境界を引く」ことそのものである。<code>Dynamic</code>型1本への集約ではなく、<strong>未確定を消す順序の側を型にする</strong>という別の解き方になっている。IaCの未確定は<code>?</code>のように「いつまでも動的」ではなく、段階を追って必ず消えるものだからで、<a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a>の構造に素直に対応している。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 200" role="img" aria-label="四つの不変条件の実装状況。不変条件1のValue再分割、2のTypeExpr::Unknown廃止、3のCustomTypeOrigin導入はいずれも未着手で、コードを変えないPhase 1の文書整理すら完了していない。">
+      <style>
+        .rd text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .rd .ttl { font-size: 13px; font-weight: 600; }
+        .rd .dim { fill: var(--faint); font-size: 11px; }
+        .rd .todo { fill: var(--bg); stroke: var(--accent-2); stroke-dasharray: 5 3; }
+        .rd .done { fill: var(--accent-bg); stroke: var(--accent); }
+        .rd .ac2 { fill: var(--accent-2); font-size: 11px; }
+        .rd .acc { fill: var(--accent); font-size: 11px; }
+        .rd .mono { font-family: var(--mono); font-size: 11px; }
+      </style>
+      <g class="rd">
+        <text class="ttl" x="8" y="18">2026-08-16 時点の実装状況</text>
+
+        <rect class="todo" x="8" y="32" width="330" height="34" rx="4"/>
+        <text x="20" y="54">不変条件1 — Value を Reference / ApplyTime に割る</text>
+        <text class="ac2" x="350" y="54">未着手</text>
+
+        <rect class="todo" x="8" y="74" width="330" height="34" rx="4"/>
+        <text x="20" y="96">不変条件2 — TypeExpr::Unknown を廃す</text>
+        <text class="ac2" x="350" y="96">未着手</text>
+
+        <rect class="todo" x="8" y="116" width="330" height="34" rx="4"/>
+        <text x="20" y="138">不変条件3 — CustomTypeOrigin を導入</text>
+        <text class="ac2" x="350" y="138">未着手</text>
+
+        <text class="dim" x="8" y="176">コードを変えない Phase 1（文書整理）すら完了していない — carina#3212 は今も open</text>
+      </g>
+    </svg>
+    <figcaption>設計は3か月弱前に決まっている。動いていないのは実装の側である。</figcaption>
+  </figure>
+
+  <p><strong>ただし2026-08-16時点で、コードは1つも動いていない。</strong></p>
+
+  <ul>
+    <li><code>TypeExpr::Unknown</code>は健在(不変条件2は未着手)</li>
+    <li><code>CustomTypeOrigin</code>は存在せず、<code>identity: Option&lt;TypeIdentity&gt;</code>のまま(不変条件3は未着手)</li>
+    <li><code>Value</code>は<code>Concrete</code> / <code>Deferred</code>の2軸のままで、<code>Reference</code> / <code>ApplyTime</code>への再分割は起きていない(不変条件1は未着手)</li>
+  </ul>
+
+  <p>コードを変えない<strong>Phase 1(用語と文書整理)すら完了していない</strong>。完了基準に挙げられた<code>carina-core/docs/gradual-typing.md</code>は存在せず、module docからのリンクも無い。対応するissue <a href="https://github.com/carina-rs/carina/issues/3212">carina#3212</a>「Document the four forms of 'unknown' in carina's gradual type system」は2026-05-23に立って<strong>今もopen</strong>である。</p>
+
+  <h2>動いたのは隣接する二つだけ</h2>
+
+  <p>この期間に完了したのは、四つの統合ではなく周辺の個別修正である。</p>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/carina/issues/2972">carina#2972</a> — <code>Value</code>をConcrete/Deferred軸に分離。<strong>closed</strong>。上の採点でAが付いているのはこの成果で、四つのうち「deferredな値」を型レベルの軸に昇格させた</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3218">carina#3218</a> — <code>TypeIdentity::same_type</code>が対称になっていて包摂が方向を持たない健全性の穴。<strong>closed</strong></li>
+  </ul>
+
+  <p>注意すべきは#3218の直し方で、<strong><code>identity: None</code>の三つの意味を分けないまま判定側だけを直している</strong>。設計文書は「#3218の修正をこの新しい型(<code>CustomTypeOrigin</code>)に乗せて実装する」と書いていたが、実際には表現を変えずに閉じられた。症状は消えたが、<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>の意味での<strong>壊れた状態は依然として書ける</strong>まま残っている。</p>
+
+  <p>結果として、四つという数は3か月弱を経ても四つのままである。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+
+    <p>四つの表現が現在も並存すること、<code>TypeExpr::Unknown</code>と<code>identity: Option&lt;TypeIdentity&gt;</code>が健在で<code>CustomTypeOrigin</code>が存在しないこと、<code>Value</code>が<code>Concrete</code> / <code>Deferred</code>の2軸であることは、2026-08-16時点のソースで確認済み(<code>carina-core/src/parser/ast.rs</code>、<code>carina-core/src/schema/mod.rs</code>、<code>carina-core/src/resource/mod.rs</code>)。</p>
+
+    <p>解決時期の表と型安全性のA〜D採点は<code>notes/specs/2026-05-23-gradual-typing-design.md</code> §1.1 / §1.2 の引き写しで、四つの不変条件とロードマップも同文書 §3 / §4 による。issue #3212 / #2972 / #3218 の状態はGitHub APIで確認済み。</p>
+
+    <p><code>carina-core/docs/gradual-typing.md</code>が無いことは確認したが、<strong>Phase 1の実質的な内容が別の場所で果たされている可能性は追っていない</strong>(設計文書そのものが§1.1の表を持っているので、形式的な完了基準を満たしていないだけ、という読み方もできる)。</p>
+
+    <p>「動いたのは隣接する二つだけ」は、この四つに直接関わるものに限った話。型システム全般では他にも変更が入っている。</p>
+
+    <p>#3218を表現を変えずに閉じたことへの評価は解釈である。判定側だけの修正で健全性が回復しているなら、それで足りるという立場もありうる。</p>
+  </div>
 
   <nav class="links">
     <h2>関連</h2>
@@ -107,6 +259,9 @@
       <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
       <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
       <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/unknown-reasons-are-not-one-kind.html">Unknownの理由は診断文言ではなく「誰がいつ埋めるか」の分類である</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
     </ul>
   </nav>
 
