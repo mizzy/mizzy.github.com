@@ -242,7 +242,17 @@ pre code { background: none; padding: 0; font-size: inherit; }
 /* ---- 表 ---- */
 /* 見出し行の下だけ罫を引く。セルを箱で囲わない。 */
 
-.scroll { overflow-x: auto; margin-bottom: var(--space-6); }
+.scroll {
+  overflow-x: auto;
+  margin-bottom: var(--space-6);
+  /* 横スクロールできることを示す影。右端に余白があるときは消える。 */
+  background:
+    linear-gradient(to right, var(--color-bg) 30%, transparent) left / 40px 100% no-repeat,
+    linear-gradient(to left,  var(--color-bg) 30%, transparent) right / 40px 100% no-repeat,
+    radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--color-text) 18%, transparent), transparent) left / 14px 100% no-repeat,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--color-text) 18%, transparent), transparent) right / 14px 100% no-repeat;
+  background-attachment: local, local, scroll, scroll;
+}
 
 table {
   border-collapse: collapse;
@@ -250,12 +260,35 @@ table {
   font-size: 15px;
   line-height: 1.7;
 }
+
+/* 狭い画面での表。
+   列数が少ない表は詰めれば収まるので枠内に収める。
+   列数が多い表を無理に収めると1文字ずつ改行されて読めなくなるので、
+   横スクロール（.scroll が担当）に任せ、最低幅を確保する。 */
+@media (max-width: 50rem) {
+  table { font-size: 14px; }
+  th, td { padding: var(--space-1) var(--space-2); }
+
+  /* 2〜3列は枠内に収める */
+  .scroll.narrow table { table-layout: fixed; width: 100%; max-width: 100%; }
+
+  /* 4列以上は各列に最低幅を与えて横スクロールさせる */
+  .scroll:not(.narrow) table { min-width: 34rem; }
+  .scroll:not(.narrow) th,
+  .scroll:not(.narrow) td { min-width: 6.5rem; }
+}
 th, td {
   text-align: left;
   vertical-align: top;
   padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--color-divider);
+  /* 狭い画面で表が横に伸びるのを防ぐ。
+     セル内の長い識別子（carina.state.json 等）が分割できないと、
+     列がその幅で固定され、表全体がビューポートを超える。 */
+  overflow-wrap: anywhere;
 }
+/* 表の中のコードは折り返しを許す（本文中のコードはそのまま） */
+td code, th code { overflow-wrap: anywhere; white-space: normal; }
 th {
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
