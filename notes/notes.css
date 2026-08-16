@@ -721,14 +721,6 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   background: var(--color-accent-200);
   color: inherit;
 }
-/* 抜粋は要約より長さがまちまちなので、行数を抑えて
-   カードの高さが揃うようにする（揃わないと一覧が段違いに見える） */
-.cards .card p.excerpt {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-  overflow: hidden;
-}
 
 .visually-hidden {
   position: absolute;
@@ -777,6 +769,9 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   max-width: var(--index-wide);
   margin: 0 auto;
   padding: var(--space-6) var(--space-4) 6rem;
+  /* 絞り込んで1本になってもページが極端に縮まないよう、一画面ぶん確保する。
+     縮みすぎるとスクロール位置が文書の外に出て、ブラウザが上へ引き戻す。 */
+  min-height: 100vh;
   display: grid;
   /* 広い画面で4〜5列。min() は、ビューポートが最小幅より狭いときに
      カードを縮められるようにするため（無いと狭い画面で画面幅を超える）。 */
@@ -786,9 +781,13 @@ p.tags a:hover { color: var(--color-accent-2-700); }
 }
 /* カードは影で浮かせず、細罫1本で囲む（Broadsheetは影ではなく罫線）。
    天の3pxの罫が確信度を示す。順序ではなく種類なので、罫の高さは全部同じ。 */
+/* 高さは固定。要約と抜粋は長さがまちまちなので、内容で高さが決まると
+   検索欄に1文字打つたびに全カードの背が変わって紙面が揺れる。
+   高さを内容から切り離しておけば、絞り込みで残ったカードが動かない。 */
 .cards a.card {
   display: flex;
   flex-direction: column;
+  height: 17rem;
   padding: 0 0 var(--space-3);
   border: 1px solid var(--color-neutral-300);
   border-radius: var(--radius-md);
@@ -821,11 +820,17 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   padding: var(--space-3) var(--space-4) 0;
   flex: 1;
 }
+/* 題は3行まで。いま一番長い題が3行なので、切れる題は無い。
+   行数を決めておかないと、題の長さでカードの背が変わる。 */
 .cards .card h2 {
   margin: 0;
   font-size: 15px;
   line-height: 1.4;
   color: var(--color-accent-700);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 .cards a.card:hover h2 { color: var(--color-accent-2-700); }
 .cards .card p {
@@ -834,6 +839,10 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   font-size: 12.5px;
   line-height: 1.7;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
+  /* 溢れたぶんは切る。カードの高さが固定なので、切らないと
+     タグが下へ押し出される（要約でも検索の抜粋でも同じ） */
+  min-height: 0;
+  overflow: hidden;
 }
 .cards .card .tags {
   display: flex;

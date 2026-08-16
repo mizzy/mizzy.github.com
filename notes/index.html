@@ -924,9 +924,11 @@
       if(show) shown++;
     });
 
-    if(!term && !tag){ status.textContent=''; status.classList.remove('none'); return; }
-    status.textContent = shown ? shown+'本' : '一致するノートは無い';
-    status.classList.toggle('none', shown===0);
+    if(!term && !tag){ status.textContent=''; status.classList.remove('none'); }
+    else {
+      status.textContent = shown ? shown+'本' : '一致するノートは無い';
+      status.classList.toggle('none', shown===0);
+    }
   }
 
   bs.forEach(function(b){
@@ -937,17 +939,33 @@
     });
   });
 
+  // 日本語の変換中は input が確定前の文字で何度も飛ぶ。
+  // そのまま引くと「かたけんさ」のような未確定文字で一旦0本になり、
+  // 紙面が畳まれてから戻る。変換が確定するまで引かない。
+  var composing=false;
+  q.addEventListener('compositionstart', function(){ composing=true; });
+  q.addEventListener('compositionend', function(){ composing=false; schedule(); });
+
+  var timer=null;
+  function schedule(){
+    if(composing) return;
+    clearTimeout(timer);
+    // 1文字ごとに89枚を組み直すと打鍵に対して重い。
+    // 打ち終わりに一度だけ引く。
+    timer=setTimeout(render, 120);
+  }
+
   q.addEventListener('input', function(){
     // 索引は最初の入力で初めて取りに行く。読むだけの人には落とさない
-    if(!index) load().then(render).catch(function(){
+    if(!index) load().then(schedule).catch(function(){
       status.textContent='索引を読めなかった。タイトルと要約だけで検索している';
     });
-    render();
+    schedule();
   });
 
-  // Escで検索を解除
+  // Escで検索を解除。待たせる理由が無いので即座に戻す
   q.addEventListener('keydown', function(e){
-    if(e.key==='Escape' && q.value){ q.value=''; render(); }
+    if(e.key==='Escape' && q.value){ q.value=''; clearTimeout(timer); render(); }
   });
 
   // ブラウザの戻るなどで値が残っている場合
