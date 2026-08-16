@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOCTOUドリフト検出は窓を閉じずに、窓が動いたことだけを告げる - notes</title>
+<meta name="description" content="carina planはstateロックを取らない。TOCTOU窓は開けたままにして、serialとlineageの2フィールドだけで「誰かが書いた」ことを事後に報告する。名前が付いている段と、実際に効いている段は別である。">
+<meta property="og:title" content="TOCTOUドリフト検出は窓を閉じずに、窓が動いたことだけを告げる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/toctou-drift-detection-bounds-the-window-it-cannot-close.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/toctou-drift-detection-bounds-the-window-it-cannot-close.png">
+<meta property="og:description" content="carina planはstateロックを取らない。TOCTOU窓は開けたままにして、serialとlineageの2フィールドだけで「誰かが書いた」ことを事後に報告する。名前が付いている段と、実際に効いている段は別である。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TOCTOUドリフト検出は窓を閉じずに、窓が動いたことだけを告げる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/toctou-drift-detection-bounds-the-window-it-cannot-close.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* 段の一覧表: 「効いている段」を地色で持ち上げる */
+  .stages td.eff { background: var(--accent-bg); }
+  .stages .verdict-stop { color: var(--color-accent-2-700); font-weight: 600; }
+  .stages .verdict-warn { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>TOCTOUドリフト検出は窓を閉じずに、窓が動いたことだけを告げる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>carina/CLAUDE.md「Plan Concurrency Contract」節 / carina-cli/src/commands/plan.rs / carina-cli/src/commands/apply/mod.rs</code>
+    <span class="dates"><time datetime="2026-08-17">2026-08-17</time> 作成</span>
+  </p>
+
+  <p><code>carina plan</code> はstateロックを取らない。<code>apply</code> / <code>destroy</code> は排他ロックを取るのに、planは意図的に取らない。読み取り専用の操作にロックは過剰だし、バックエンドのロックAPIが排他しか持たないため、取れば<strong>並行するplan同士が直列化され、長いplanがデプロイを止める</strong>。予測にすぎない出力のために払う代償として重すぎる。</p>
+
+  <p>その結果、planがstateを読んでから差分を表示するまでのあいだに、並行する <code>apply</code> / <code>destroy</code> がstateを書き換えうる。TOCTOU窓である。ドリフト検出は<strong>この窓を閉じる仕組みではない</strong>。窓は開けたままにして、窓の間に何か通ったかどうかだけを事後に報告する。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 190" role="img" aria-label="T0でserialとlineageの指紋を取り、ロックを取らないまま差分を計算し、表示直前のT1で読み直して比べる。窓は閉じず、窓の間に書き込みがあったかどうかだけが分かる">
+      <style>
+        .win text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .win .lane { stroke: var(--rule); fill: none; }
+        .win .mark { stroke: var(--accent); fill: var(--bg); stroke-width: 1.5; }
+        .win .lbl  { font-size: 11px; fill: var(--muted); }
+        .win .fp   { font-family: var(--mono); font-size: 11px; fill: var(--accent); }
+        .win .gap  { fill: var(--accent-bg); stroke: none; }
+        .win .intr { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .win .intrt { fill: var(--accent-2); font-size: 11px; }
+        .win .ttl  { font-size: 12px; font-weight: 600; }
+      </style>
+      <g class="win">
+        <rect class="gap" x="96" y="60" width="392" height="34" rx="3"/>
+        <path class="lane" d="M40 77 H 600"/>
+
+        <circle class="mark" cx="96" cy="77" r="6"/>
+        <text class="ttl" x="96" y="50" text-anchor="middle">T0</text>
+        <text class="fp"  x="96" y="112" text-anchor="middle">serial + lineage</text>
+        <text class="lbl" x="96" y="128" text-anchor="middle">を控える</text>
+
+        <text class="lbl" x="292" y="82" text-anchor="middle">ロックを取らずに差分を計算</text>
+
+        <circle class="mark" cx="488" cy="77" r="6"/>
+        <text class="ttl" x="488" y="50" text-anchor="middle">T1</text>
+        <text class="fp"  x="488" y="112" text-anchor="middle">読み直して比較</text>
+        <text class="lbl" x="488" y="128" text-anchor="middle">表示の直前</text>
+
+        <path class="intr" d="M292 22 V 58"/>
+        <text class="intrt" x="292" y="16" text-anchor="middle">並行するapply / destroyが書きうる</text>
+
+        <text class="lbl" x="556" y="60" text-anchor="middle">表示</text>
+        <text class="lbl" x="40" y="166">窓は閉じない。分かるのは「窓の間に誰かが書いたか」だけで、何がどう変わったかは分からない。</text>
+      </g>
+    </svg>
+    <figcaption>指紋はstate全体のハッシュではなく、<code>serial</code>(書き込みごとに単調増加)と <code>lineage</code>(stateを作り直したときだけ変わる)の2つだけ。</figcaption>
+  </figure>
+
+  <h2>仕組み</h2>
+
+  <ol>
+    <li><strong>T0で指紋を取る。</strong> 最初のstate読み込み直後に <code>StateFile</code> の <code>serial</code> と <code>lineage</code> の2つだけを控える。state全体のハッシュではない。</li>
+    <li><strong>表示直前(T1)に読み直して比べる。</strong> <code>lineage</code> の変化を <code>serial</code> の変化より優先して報告する。stateまるごとの置き換えのほうが強い信号だから。</li>
+    <li><strong>ドリフトがあれば警告を出し、planはそのまま表示する。</strong></li>
+  </ol>
+
+  <p>3つ目が肝である。<strong>ドリフトは決して致命的にならない。</strong> planは予測であり、<code>apply</code> はロックを取り直して差分を再計算してから変更するので、最終的な正しさはapply側で担保される。読み直しに失敗した場合も同じで、「ドリフトを確認できなかった」と警告するだけでplanは表示される。契約は「ロック付きの読み取り」ではなく「<strong>ベストエフォートのスナップショット＋ドリフト警告</strong>」である。</p>
+
+  <p>state自体が消えていた場合(<code>StateRemoved</code>)も検出対象に入る。逆に、T0時点でstateが無ければ検出そのものを丸ごと飛ばす — 比較の基準が無いので、陳腐化しようがないからである。</p>
+
+  <h2>指紋がserialとlineageだけである意味</h2>
+
+  <p>検出できるのは「<strong>誰かが書いた</strong>」ことであって、「<strong>何がどう変わった</strong>」ことではない。<code>serial</code> が1つ進んだという事実は、そのplanの差分計算が前提にしたstateがもう最新ではない、とだけ言う。どのリソースが動いたかは分からないし、そもそも表示中のplanと無関係な変更かもしれない。それでも十分なのは、ユーザーに求める行動が「<code>carina plan</code> をやり直す」の一つしか無いからである。<strong>判断に使わない情報は集めない。</strong></p>
+
+  <p>これは<a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立</a>と同じ非対称性の勘定に見える。偽陽性の警告(無関係な変更で再実行を促す)のコストは小さく、偽陰性(陳腐化に気づかせない)のコストは大きい。だから粗い指紋で保守側に倒す。</p>
+
+  <h2>「TOCTOUドリフト検出」は全体の一段にすぎない</h2>
+
+  <p>ここまでがコード中で唯一「TOCTOU」と名指しされている段である。しかし<strong>陳腐化した予測を実際に食い止めているのはこの段ではない</strong>。保存plan(<code>plan --out</code> → <code>apply --plan</code>)の経路には、ロック下で走る段がもう3つある。</p>
+
+  <div class="scroll">
+    <table class="stages">
+      <thead>
+        <tr><th>段</th><th>何を比べるか</th><th>ロック</th><th>不一致のとき</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>plan中(T0→T1)</td>
+          <td><code>serial</code> + <code>lineage</code></td>
+          <td>取らない</td>
+          <td class="verdict-warn">警告のみ、planは表示・保存される</td>
+        </tr>
+        <tr>
+          <td>保存planのlineage</td>
+          <td><code>state_lineage</code></td>
+          <td>取っている</td>
+          <td class="eff verdict-stop">エラー(拒否)</td>
+        </tr>
+        <tr>
+          <td>保存planのserial</td>
+          <td><code>state_serial</code></td>
+          <td>取っている</td>
+          <td class="verdict-warn">警告</td>
+        </tr>
+        <tr>
+          <td>保存planのリソース</td>
+          <td><strong>全リソースをプロバイダから実読みして属性を総当たり比較</strong></td>
+          <td>取っている</td>
+          <td class="eff verdict-stop">中止(「planをやり直せ」)</td>
+        </tr>
+        <tr>
+          <td>保存planのupstream</td>
+          <td><code>upstream_state</code> の属性マップ全体</td>
+          <td>取っている</td>
+          <td class="eff verdict-stop">中止</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>指紋で済ませているのは上の3段だけで、4段目の <code>detect_drift</code> は<strong>指紋ではない</strong> — <code>sorted_resources</code> を1つずつ <code>provider.read()</code> で生の世界から読み直し、plan時に保存した属性マップと突き合わせる。存在の有無が反転していないか、属性が変わっていないか、plan時に無かった属性が増えていないかの3種を見る。除外されるのは <code>_</code> 始まりの内部属性だけで、スキーマも見ないしUnknownの扱いも型を考えた等価性判定もしない。生の <code>!=</code> である。</p>
+
+  <p>そして<strong>通常の <code>apply</code>(保存planを使わない)にはこの段が無い</strong>。必要が無いからで、ロックを取ってから差分を丸ごと計算し直す。ドリフト検出が要るのは「plan時に凍らせた予測を、後からそのまま実行する」保存planの経路だけである。</p>
+
+  <p>だから <code>plan --out</code> はドリフトを検出しても保存plan自体は書く — 警告はstderrへ行き、planファイルはコマンドの成果物として出る。安全なのは、後段のapply側がロック下で拒否してくれるからである。</p>
+
+  <h2>保守側に倒す代償</h2>
+
+  <p><code>detect_drift</code> の比較が生の <code>!=</code> であることは、方向としては保守的で正しい(見逃すより止める)が、<strong>偽陽性を生む</strong>。プロバイダがplan時に返さなかったサーバー側計算のフィールドを後から返せば、それは「増えた属性」としてapplyを中止させる。差分計算側の比較経路(<code>differ</code>)はスキーマを見て <code>write_only</code> を尊重し型を考えた等価性を使うのに、<code>detect_drift</code> はどれもしない。同じ「変わったか」の判定なのに、片方だけが素朴なままである。</p>
+
+  <p>しかもこの段には <code>--force</code> に当たる逃げ道が無い。中止すればユーザーはplanをやり直すしかない。保守側に倒した判断の代償は「止まらなくてよい場面でも止まり、迂回する手段が無い」ことになる。</p>
+
+  <h2>「1回だけ読む」ことの帰結</h2>
+
+  <p>窓が閉じないので、T1の読み直しの直後からapplyがロックを取るまでの間にも、やはり誰かが書きうる。名前の付いた「TOCTOUドリフト検出」はこの残りの隙間を扱わない。扱う必要が無い — <a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a>の契約のもとでは、planの鮮度は正しさの問題ではなくUXの問題だからである。この段は正しさの機構ではなく、<strong>「あなたが今見ている画面はもう古いかもしれない」と伝えるためだけの機構</strong>である。</p>
+
+  <p>正しさを担保しているのは、通常のapplyではロック下での差分の再計算であり、保存planのapplyでは上の表の下3段である。<strong>名前が付いている段と、効いている段が別</strong>というのが、この仕組みを読んで一番意外だった点である。</p>
+
+  <p>裏を返せば、<a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a>で挙げたようなworld取得の近似(所有権による読み飛ばし、イベント駆動のdirty追跡)を入れても、この構造は変わらない。近似が効くのはplanがworldを組み立てる手前の段であり、その手前がどれだけ雑でも、ロック下の再計算(通常のapply)かリソース単位の実読み(保存planのapply)が最後に受け止めるからである。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>ソースで確認済み:serial / lineageの2フィールドを指紋とすること、lineageをserialより優先して報告すること(destroy + 再applyでserialは<strong>下がる</strong>ので、serialを先に見ると誤分類する)、plan中のドリフトが警告どまりであること(<code>carina-cli/src/commands/plan.rs</code>)。<code>detect_drift</code> が全リソースを <code>provider.read()</code> で実読みし、<code>_</code> 始まりの属性だけを除いて生の <code>!=</code> で比較すること、中止に逃げ道が無いこと、そしてこれが <code>run_apply_from_plan_locked</code> からのみ呼ばれる — つまり<strong>通常のapplyにはこの段が無い</strong> — こと(<code>carina-cli/src/commands/apply/mod.rs</code>)。ロックを取らない判断の理由は <code>CLAUDE.md</code> の「Plan Concurrency Contract」節に明記。</p>
+    <p>解釈:「判断に使わない情報は集めない」という読み、<a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立</a>との対応づけ、サーバー側計算フィールドによる偽陽性の見立て(差分計算側の比較経路がスキーマを見るのに <code>detect_drift</code> が見ないことは事実だが、実際に偽陽性が出た事例を確認したわけではない)。</p>
+    <p>初稿は保存planのapply時照合を「同じ2フィールドを見ている」と書いていたが、これは誤りで、実際には<strong>リソース単位の実読み比較</strong>が別に走っている。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-apply">#apply</a>
+    <a href="/notes/#tag-occ">#occ</a>
+    <a href="/notes/#tag-toctou">#toctou</a>
+  </p>
+</article>
+</body>
+</html>
