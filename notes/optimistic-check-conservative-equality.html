@@ -26,6 +26,54 @@
 
   <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、<strong>どちらも「インフラを壊さない側」に倒す</strong>という一つの原則の現れである。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="同じUnknownに対し、所属検査は楽観的に素通しして偽の型エラーを出さず、等価性検査は悲観的に不成立として変化したとみなすという逆向きの二つの扱いが、どちらも「インフラを壊さない側」という同じ傾きに収束することを示す図">
+      <style>
+        .oc text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .oc .box { fill: var(--surface); stroke: var(--rule); }
+        .oc .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .oc .ttl { font-size: 13px; font-weight: 600; }
+        .oc .dim { fill: var(--faint); font-size: 11px; }
+        .oc .mut { fill: var(--muted); font-size: 11px; }
+        .oc .arw { stroke: var(--faint); fill: none; }
+        .oc .lean { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .oc .mono { font-family: var(--mono); font-size: 11px; }
+        .oc .cost { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="oc">
+        <rect class="box" x="8" y="112" width="104" height="46" rx="4"/>
+        <text class="ttl" x="60" y="132" text-anchor="middle">Unknown</text>
+        <text class="dim" x="60" y="150" text-anchor="middle">同じ一つの値</text>
+
+        <path class="arw" d="M112 126 C 146 126, 150 66, 184 66"/>
+        <path class="arw" d="M112 144 C 146 144, 150 204, 184 204"/>
+
+        <rect class="box" x="184" y="34" width="238" height="76" rx="4"/>
+        <text class="ttl" x="200" y="56">(1)所属検査</text>
+        <text class="mut" x="200" y="78">楽観的 — 素通しする</text>
+        <text class="dim" x="200" y="98">葉の位置単位。兄弟や形状の検査は通常どおり走る</text>
+
+        <rect class="box" x="184" y="172" width="238" height="76" rx="4"/>
+        <text class="ttl" x="200" y="194">(2)等価性</text>
+        <text class="mut" x="200" y="216">悲観的 — 何とも等しくない</text>
+        <text class="dim" x="200" y="236">健全だが完全ではない。差分は多めに出る</text>
+
+        <path class="lean" d="M422 72 C 456 72, 460 132, 494 132"/>
+        <path class="lean" d="M422 210 C 456 210, 460 150, 494 150"/>
+
+        <rect class="hi" x="494" y="88" width="198" height="106" rx="4"/>
+        <text class="ttl" x="593" y="112" text-anchor="middle">同じ側へ倒す</text>
+        <text x="510" y="140">偽の型エラーを出さず</text>
+        <text x="510" y="162">怪しい差分は出す</text>
+        <text class="dim" x="593" y="184" text-anchor="middle">インフラを壊さない側</text>
+
+        <text class="cost" x="184" y="278">偽陽性の型エラーはユーザーが正しいコードを書けなくする。余分な差分表示はレビューで捨てられる。</text>
+        <text class="dim" x="184" y="296">向きが逆に見えるのは、このコストの非対称に合わせているからである。</text>
+      </g>
+    </svg>
+    <figcaption>楽観と悲観という逆向きの選択が一つの原則に収束する経路を示す。分岐しているのは判定の向きだけで、行き先は同じである。</figcaption>
+  </figure>
+
   <h2>(1)所属検査は素通しする</h2>
 
   <p>値の所属検査はUnknownを素通しする。「動的段階で解決されるはずの値」に偽の型エラーを出さない楽観的な扱いで、漸進的型付け(gradual typing)における動的型<code>?</code>と既知型の整合(consistency)関係と同型の判断である。ただしCarinaの場合これは検査を実行時へ先送りするのではなく、<strong>静的近似の精度限界を受け入れる</strong>という意味を持つ。gradual typingが実行時キャストで埋め合わせるところを、Carinaは埋め合わせない。</p>

@@ -33,6 +33,60 @@
 
   <p>この2軸は同じツールでも分離できる。例えばPulumi serviceを使うと、<strong>所有は自前だが運用責任の多くはPulumi社に委ねる</strong>という組み合わせになる。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 340" role="img" aria-label="横軸に所有(自前↔委譲)、縦軸に運用責任(自前↔委譲)を取り、Terraform・Carinaは所有も運用責任も自前、Pulumi service利用時は所有は自前のまま運用責任だけが委譲側へ寄り、CDKは両方とも委譲側に落ちることを示す2軸の図">
+      <style>
+        .ax text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ax .axis { stroke: var(--rule); fill: none; stroke-width: 1; }
+        .ax .grid { stroke: var(--rule); fill: none; stroke-dasharray: 3 4; }
+        .ax .lbl  { font-size: 13px; font-weight: 600; }
+        .ax .dim  { fill: var(--faint); font-size: 11px; }
+        .ax .mut  { fill: var(--muted); font-size: 11px; }
+        .ax .dot  { fill: var(--surface); stroke: var(--rule); }
+        .ax .hi   { fill: var(--accent-bg); stroke: var(--accent); }
+        .ax .mv   { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 5 3; }
+        .ax .mvt  { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="ax">
+        <text class="lbl" x="8" y="20">運用責任 — lock / 暗号化 / migrationを誰が担うか</text>
+
+        <path class="grid" d="M100 60 H 560"/>
+        <path class="grid" d="M100 200 H 560"/>
+        <path class="grid" d="M330 40 V 260"/>
+
+        <path class="axis" d="M100 260 H 600"/>
+        <path class="axis" d="M100 40 V 260"/>
+
+        <text class="mut" x="92" y="70" text-anchor="end">自前で担う</text>
+        <text class="mut" x="92" y="210" text-anchor="end">委譲する</text>
+        <text class="mut" x="220" y="284" text-anchor="middle">所有 = 自前</text>
+        <text class="mut" x="460" y="284" text-anchor="middle">所有 = 委譲</text>
+        <text class="lbl" x="692" y="122" text-anchor="end">所有 — どこにデータがあるか</text>
+
+        <rect class="dot" x="150" y="78" width="150" height="34" rx="4"/>
+        <text x="225" y="100" text-anchor="middle">Terraform / Carina</text>
+        <text class="dim" x="225" y="130" text-anchor="middle">tfstate・carina.state.jsonを自分で置き</text>
+        <text class="dim" x="225" y="146" text-anchor="middle">backendも自分で設計する</text>
+
+        <rect class="hi" x="150" y="176" width="150" height="34" rx="4"/>
+        <text x="225" y="198" text-anchor="middle">Pulumi service</text>
+        <text class="dim" x="225" y="228" text-anchor="middle">stateは自分のものだが</text>
+        <text class="dim" x="225" y="244" text-anchor="middle">lock・暗号化はPulumi社が担う</text>
+
+        <rect class="dot" x="390" y="176" width="150" height="34" rx="4"/>
+        <text x="465" y="198" text-anchor="middle">CDK</text>
+        <text class="dim" x="465" y="228" text-anchor="middle">CFNがstateを持ち、運用も持つ</text>
+        <text class="dim" x="465" y="244" text-anchor="middle">代わりにCFNへロックインされる</text>
+
+        <path class="mv" d="M232 78 V 60 H 300"/>
+        <text class="mvt" x="306" y="64">同じPulumiでも、所有はそのままで縦だけ動く</text>
+
+        <text class="dim" x="8" y="320">左上と右下だけでなく左下も埋まる。この二つが独立に選べることが、左下の組み合わせが存在する理由である。</text>
+      </g>
+    </svg>
+    <figcaption>横に動かず縦だけ動く点があることが、2軸が独立している証拠になっている。所有と運用責任を1本の軸に畳むと、Pulumi serviceの位置が表せなくなる。</figcaption>
+  </figure>
+
   <div class="scroll">
     <table>
       <thead><tr><th>ツール</th><th>state所有者</th><th>state形式</th><th>refresh</th><th>drift detection</th><th>lock</th><th>暗号化</th></tr></thead>

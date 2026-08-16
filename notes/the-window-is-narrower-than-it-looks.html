@@ -34,6 +34,60 @@
 
   <p>なおこの検査の被覆には実装上の欠落が確認されている。検査対象は属性のトップレベルに現れた参照だけで、リストや構造体の要素に埋まった同じ型違いの参照は素通りする(<a href="https://github.com/carina-rs/carina/issues/2786">carina#2786</a>)。またパース時に値が解決できた参照は具体値へ置換されて出自が消えるため、この検査自体に到達しない(<a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>)。いずれも設計上の窓ではなく修正可能な欠落である。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 280" role="img" aria-label="「未解決の値の周りは全部無検査」と想定される大きな窓が、宣言型ベースの別経路検査によってほとんど塞がれ、真に残るのは値依存の篩所属と宣言型のない上流exportへの参照という二つの小さな穴だけであることを示す図">
+      <style>
+        .wn text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .wn .ttl { font-size: 13px; font-weight: 600; }
+        .wn .dim { fill: var(--faint); font-size: 11px; }
+        .wn .mut { fill: var(--muted); font-size: 11px; }
+        .wn .open { fill: var(--bg); stroke: var(--accent-2); stroke-dasharray: 5 3; }
+        .wn .covered { fill: var(--surface); stroke: var(--rule); }
+        .wn .hole { fill: var(--bg); stroke: var(--accent-2); stroke-width: 1.5; }
+        .wn .arw { stroke: var(--faint); fill: none; }
+        .wn .warn { fill: var(--accent-2); font-size: 11px; }
+        .wn .chk { fill: var(--accent-bg); stroke: var(--accent); }
+        .wn .chkt { font-size: 11px; }
+      </style>
+      <g class="wn">
+        <text class="ttl" x="8" y="20">想定される窓</text>
+        <rect class="open" x="8" y="34" width="200" height="150" rx="4"/>
+        <text class="mut" x="108" y="104" text-anchor="middle">未解決の値の周りは</text>
+        <text class="mut" x="108" y="124" text-anchor="middle">まるごと無検査</text>
+        <text class="dim" x="8" y="206">値が無いのだから</text>
+        <text class="dim" x="8" y="222">照合しようがない、という想定</text>
+
+        <path class="arw" d="M212 108 H 250"/>
+
+        <rect class="chk" x="250" y="46" width="180" height="60" rx="4"/>
+        <text class="ttl" x="266" y="68">宣言型ベースの別経路検査</text>
+        <text class="chkt" x="266" y="88">値が無くても型どうしを照合する</text>
+
+        <rect class="chk" x="250" y="118" width="180" height="60" rx="4"/>
+        <text class="ttl" x="266" y="140">上流exports宣言の静的パース</text>
+        <text class="chkt" x="266" y="160">型の供給源はstateではなく設定</text>
+
+        <path class="arw" d="M434 108 H 472"/>
+
+        <text class="ttl" x="472" y="20">真に残る窓</text>
+        <rect class="covered" x="472" y="34" width="220" height="150" rx="4"/>
+        <text class="dim" x="582" y="54" text-anchor="middle">ここは塞がっている</text>
+
+        <rect class="hole" x="490" y="72" width="184" height="42" rx="4"/>
+        <text class="warn" x="502" y="90">(a)値依存の篩所属</text>
+        <text class="dim" x="502" y="107">宣言型が篩より粗いと決定できない</text>
+
+        <rect class="hole" x="490" y="126" width="184" height="42" rx="4"/>
+        <text class="warn" x="502" y="144">(b)型注釈のない上流export</text>
+        <text class="dim" x="502" y="161">比較対象が無く検査がスキップされる</text>
+
+        <text class="dim" x="250" y="206">for変数由来のUnknownは型が構文から決まるので窓の外。</text>
+        <text class="dim" x="250" y="224">carina#2786 / #3450は設計上の窓ではなく修正可能な欠落。</text>
+      </g>
+    </svg>
+    <figcaption>窓が狭いのは検査を諦めた結果ではなく、値を使わない検査が別経路で走っているからである。残る二つは、いずれも型を書かなかった箇所に対応している。</figcaption>
+  </figure>
+
   <h2>真に残る窓は二つだけ</h2>
 
   <p>(a) <strong>値依存の篩所属。</strong> 参照元の宣言型が代入先の篩より粗い場合(例:宣言上はただのStringを、長さ・パターン付きの型が期待される場所へ補間して渡す場合)、最終値が篩を満たすかは宣言型から決定できない。そして値が確定して代入された後も、Carina自身はどの経路でも再検査しない。代入の時刻は二通りあり、上流stateの値はplan時(ただし検証ステップの後)、リソース出力はapply時だが、どちらの代入点にも検証経路がなく、最終判定はプロバイダAPIのエラーに委ねられる。</p>

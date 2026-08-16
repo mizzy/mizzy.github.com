@@ -30,6 +30,70 @@
 
   <p>という形を取り、型の中に<code>Ref(名前)</code>(defsへの参照)が現れる。これは<strong>μ型を名前付き定義の組で表す、iso-recursiveな流儀</strong>に相当する。展開(unfold)を暗黙の同一視ではなく明示的な操作として扱う、という選択である。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 320" role="img" aria-label="Statementが循環する定義において、equi-recursiveな暗黙同一視ではRefと展開後を同じものとして扱うため循環をそのまま辿って無限再帰に落ちるのに対し、iso-recursiveではRefが明示的なunfold操作でしか開かれず、ホップ数の上限が循環を断ち切ることを示す図">
+      <style>
+        .mu text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .mu .box { fill: var(--surface); stroke: var(--rule); }
+        .mu .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .mu .ttl { font-size: 13px; font-weight: 600; }
+        .mu .dim { fill: var(--faint); font-size: 11px; }
+        .mu .mut { fill: var(--muted); font-size: 11px; }
+        .mu .arw { stroke: var(--faint); fill: none; }
+        .mu .mono { font-family: var(--mono); font-size: 11px; }
+        .mu .loop { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .mu .warn { fill: var(--accent-2); font-size: 11px; }
+        .mu .cut { stroke: var(--accent); fill: none; stroke-width: 2; }
+        .mu .ok { fill: var(--accent); font-size: 11px; }
+        .mu .ref { fill: var(--sunken); stroke: var(--rule); }
+      </style>
+      <g class="mu">
+        <text class="ttl" x="8" y="20">循環する定義</text>
+        <text class="mono" x="8" y="42">Schema = { root, defs }</text>
+
+        <rect class="box" x="8" y="62" width="128" height="34" rx="4"/>
+        <text class="mono" x="72" y="84" text-anchor="middle">Statement</text>
+        <path class="arw" d="M72 96 V 122"/>
+        <rect class="box" x="8" y="122" width="128" height="34" rx="4"/>
+        <text class="mono" x="72" y="144" text-anchor="middle">AndStatement</text>
+        <path class="arw" d="M72 156 V 182"/>
+        <rect class="ref" x="8" y="182" width="128" height="34" rx="4"/>
+        <text class="mono" x="72" y="204" text-anchor="middle">Ref(Statement)</text>
+        <path class="loop" d="M136 199 C 166 199, 166 79, 136 79"/>
+        <text class="warn" x="8" y="236">Refがdefsを指して戻る</text>
+        <text class="dim" x="8" y="256">この循環はどちらの流儀でも同じ</text>
+
+        <path class="arw" d="M176 140 H 186"/>
+
+        <rect class="box" x="186" y="62" width="212" height="120" rx="4"/>
+        <text class="ttl" x="202" y="86">equi-recursive</text>
+        <text class="mut" x="202" y="108">参照と展開後を暗黙に同一視</text>
+        <text class="dim" x="202" y="130">Refをただの別名として辿る</text>
+        <path class="loop" d="M232 146 C 214 168, 370 168, 352 146"/>
+        <text class="warn" x="202" y="176">停止条件が型システムの外</text>
+        <text class="warn" x="202" y="206">無限再帰(carina#3340系)</text>
+
+        <path class="arw" d="M406 140 H 448"/>
+
+        <rect class="hi" x="448" y="62" width="244" height="120" rx="4"/>
+        <text class="ttl" x="464" y="86">iso-recursive</text>
+        <text class="mut" x="464" y="108">unfoldが明示の操作</text>
+        <text class="dim" x="464" y="130">消費側は一段展開してから進む</text>
+        <path class="cut" d="M474 146 V 174"/>
+        <text class="ok" x="484" y="166">ホップ数の上限が循環を断つ</text>
+        <text class="ok" x="464" y="206">壊れた定義に対しても停止する</text>
+
+        <rect class="box" x="448" y="228" width="244" height="52" rx="4"/>
+        <text class="ttl" x="464" y="250">展開後の型ビュー</text>
+        <text class="dim" x="464" y="268">参照変種が存在せず、未展開で照合できない</text>
+        <path class="arw" d="M570 182 V 226"/>
+
+        <text class="dim" x="8" y="304">iso-recursiveは展開を一度書かせる代わりに、停止性を構造として担保する。</text>
+      </g>
+    </svg>
+    <figcaption>循環そのものはどちらの流儀でも同じで、違うのは辿り方の側にある。明示のunfoldとホップ上限が、循環を辿る操作の停止性を型の側に持ち込んでいる。</figcaption>
+  </figure>
+
   <h2>展開が明示操作であることの効果</h2>
 
   <p>型の意味を消費する操作(検証・差分・補完)は、参照をdefsに対して一段展開してから進む。展開にはホップ数の上限があるため、<strong>壊れた定義に対しても停止する</strong>。</p>

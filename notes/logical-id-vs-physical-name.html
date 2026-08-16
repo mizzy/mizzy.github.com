@@ -47,6 +47,69 @@
 
   <p>Pulumiの方がCDKよりユーザフレンドリーである。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 330" role="img" aria-label="リソース名を明示指定すれば物理名は論理IDと独立するが、省略するとconstruct pathのMD5から作られた論理IDがCFNの自動命名を通って物理名に埋め込まれ、さらにALB Target Groupの32文字制限で意味のある部分が切り詰められる経路を示す図">
+      <style>
+        .lk text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .lk .box { fill: var(--surface); stroke: var(--rule); }
+        .lk .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .lk .ttl { font-size: 13px; font-weight: 600; }
+        .lk .dim { fill: var(--faint); font-size: 11px; }
+        .lk .mut { fill: var(--muted); font-size: 11px; }
+        .lk .arw { stroke: var(--faint); fill: none; }
+        .lk .leak { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .lk .mono { font-family: var(--mono); font-size: 11px; }
+        .lk .monod { font-family: var(--mono); font-size: 11px; fill: var(--faint); }
+        .lk .cut { stroke: var(--accent-2); fill: none; stroke-width: 2; stroke-dasharray: 4 3; }
+        .lk .warn { fill: var(--accent-2); font-size: 11px; }
+        .lk .keep { fill: var(--sunken); stroke: var(--rule); }
+        .lk .drop { fill: var(--bg); stroke: var(--accent-2); stroke-dasharray: 3 3; }
+      </style>
+      <g class="lk">
+        <rect class="box" x="8" y="26" width="150" height="46" rx="4"/>
+        <text class="ttl" x="83" y="46" text-anchor="middle">construct path</text>
+        <text class="monod" x="83" y="64" text-anchor="middle">MyStack/MyBucket</text>
+
+        <path class="arw" d="M158 49 H 190"/>
+
+        <rect class="box" x="190" y="26" width="150" height="46" rx="4"/>
+        <text class="ttl" x="265" y="46" text-anchor="middle">論理ID</text>
+        <text class="monod" x="265" y="64" text-anchor="middle">MyBucketF68F3FF0</text>
+
+        <text class="mut" x="356" y="42">state / IR内部の識別子。</text>
+        <text class="mut" x="356" y="60">ここまでは物理名と別物である。</text>
+
+        <path class="arw" d="M265 72 V 100 H 520"/>
+        <text class="ttl" x="530" y="98">名前を明示すれば</text>
+        <text class="dim" x="530" y="116">bucketNameを書けば</text>
+        <text class="dim" x="530" y="132">物理名は論理IDから独立する</text>
+
+        <path class="leak" d="M265 72 V 130"/>
+        <text class="warn" x="274" y="122">名前を省略すると漏れる</text>
+
+        <rect class="hi" x="190" y="140" width="330" height="52" rx="4"/>
+        <text class="ttl" x="206" y="162">CFNが物理名を自動生成</text>
+        <text class="mono" x="206" y="182">&lt;stack&gt;-&lt;logicalId&gt;-&lt;random&gt;</text>
+
+        <path class="arw" d="M355 192 V 218"/>
+
+        <rect class="box" x="106" y="218" width="498" height="40" rx="4"/>
+        <text class="mono" x="122" y="243">MyAppProductionStack-MyServiceTargetGroupF68F3FF0</text>
+        <text class="dim" x="614" y="243">51文字</text>
+
+        <path class="cut" d="M344 212 V 300"/>
+        <text class="warn" x="352" y="292">ALB Target Groupの32文字制限で、ここから右が落ちる</text>
+
+        <rect class="keep" x="106" y="264" width="238" height="16" rx="2"/>
+        <rect class="drop" x="344" y="264" width="260" height="16" rx="2"/>
+        <text class="monod" x="122" y="277">MyAppProductionStaMyServ-XXXXXXXX</text>
+
+        <text class="dim" x="8" y="318">残るのは前半と別のハッシュで、識別に効く「MyServiceTargetGroup」の部分が消えている。</text>
+      </g>
+    </svg>
+    <figcaption>漏れは一箇所ではなく経路になっている。名前の省略で論理IDが物理名へ流れ込み、その先の長さ制限が、いちばん意味のある区間を削り落とす。</figcaption>
+  </figure>
+
   <h2>長さ制限による切り詰め(CDK特有)</h2>
 
   <p>AWSリソース名には長さ制限がある — S3が63文字、IAM Roleが64文字、Lambda Functionが64文字、そしてALB Target Groupは<strong>32文字</strong>。<code>MyAppProductionStack-MyServiceTargetGroupF68F3FF0</code>は51文字で、ALB TGの32文字制限にかかると<code>MyAppProductionStaMyServ-XXXXXXXX</code>のように真ん中が削られる。元の意味のある部分が削られて識別がより困難になる。</p>

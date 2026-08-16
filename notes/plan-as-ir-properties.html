@@ -32,6 +32,67 @@
 
   <p><strong>検査済みであること。</strong> 型検査はIR生成の最中に完了しており、applyは型を見ない。「well-typedなIRだけがバックエンドに渡る」というコンパイラの標準的な契約である。ただしこの契約は再配置(applyでの値の代入)によって破られうる、というのが別に立つ論点になる。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 320" role="img" aria-label="planというIRが、各リソースがちょうど一つのノードとして定義される単一定義性、plan --outでオブジェクトファイル相当の成果物として書き出せる直列化可能性、型検査がIR生成中に完了している検査済み性という三つの性質を同時に持ち、保存されたplanのlineageとserialをapply側が照合することがABI整合性検査に対応することを示す図">
+      <style>
+        .ir text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ir .box { fill: var(--surface); stroke: var(--rule); }
+        .ir .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .ir .ttl { font-size: 13px; font-weight: 600; }
+        .ir .dim { fill: var(--faint); font-size: 11px; }
+        .ir .mut { fill: var(--muted); font-size: 11px; }
+        .ir .arw { stroke: var(--faint); fill: none; }
+        .ir .node { fill: var(--sunken); stroke: var(--rule); }
+        .ir .mono { font-family: var(--mono); font-size: 11px; }
+        .ir .monod { font-family: var(--mono); font-size: 11px; fill: var(--faint); }
+        .ir .chk { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .ir .abi { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .ir .abit { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="ir">
+        <rect class="hi" x="150" y="30" width="400" height="150" rx="4"/>
+        <text class="ttl" x="166" y="52">plan — 中間表現</text>
+        <text class="dim" x="534" y="52" text-anchor="end">Effect 8種の列と依存DAG</text>
+
+        <rect class="node" x="176" y="76" width="96" height="30" rx="3"/>
+        <text class="mono" x="224" y="95" text-anchor="middle">Create vpc</text>
+        <rect class="node" x="302" y="76" width="96" height="30" rx="3"/>
+        <text class="mono" x="350" y="95" text-anchor="middle">Create subnet</text>
+        <rect class="node" x="428" y="76" width="96" height="30" rx="3"/>
+        <text class="mono" x="476" y="95" text-anchor="middle">Update sg</text>
+        <path class="arw" d="M272 91 H 300"/>
+        <path class="arw" d="M398 91 H 426"/>
+
+        <text class="ttl" x="176" y="132">単一定義性</text>
+        <text class="mut" x="176" y="152">各リソースはちょうど一つのノード。</text>
+        <text class="mut" x="176" y="168">他はその属性を参照するだけで、依存解析が自明になる。</text>
+
+        <path class="chk" d="M112 105 H 148"/>
+        <text class="ttl" x="8" y="96">検査済み</text>
+        <text class="dim" x="8" y="116">型検査はIR生成中に完了。</text>
+        <text class="dim" x="8" y="132">applyは型を見ない。</text>
+
+        <path class="arw" d="M350 180 V 210"/>
+        <text class="mono" x="360" y="200">plan --out</text>
+
+        <rect class="box" x="150" y="210" width="200" height="70" rx="4"/>
+        <text class="ttl" x="166" y="232">保存されたplan</text>
+        <text class="mut" x="166" y="252">= オブジェクトファイル</text>
+        <text class="monod" x="166" y="270">lineage / serial</text>
+
+        <path class="abi" d="M350 245 H 420"/>
+        <rect class="box" x="420" y="210" width="200" height="70" rx="4"/>
+        <text class="ttl" x="436" y="232">apply側の照合</text>
+        <text class="dim" x="436" y="252">系譜が違えば拒否</text>
+        <text class="dim" x="436" y="270">版がずれていれば警告</text>
+        <text class="abit" x="620" y="204" text-anchor="end">= ABI整合性検査</text>
+
+        <text class="dim" x="8" y="308">IRに継続が残らない — 効果の結果に依存する構成は静的段階で済ませてある — ことが、この三つを同時に成立させている。</text>
+      </g>
+    </svg>
+    <figcaption>三つの性質は別々の話ではない。単一定義性がDAGを成立させ、継続が残らないことが直列化を可能にし、保存されたlineageとserialの照合がリンク時の整合性検査に対応する。</figcaption>
+  </figure>
+
   <p>IRの中身は、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種の<code>Effect</code>値の列と依存DAGである。効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。IRに継続が残らない — 効果の結果に依存して次の効果を構成する部分は静的段階で済ませてある — ことが、planが検査可能・表示可能・保存可能であることを支えている。</p>
 
   <div class="accuracy">

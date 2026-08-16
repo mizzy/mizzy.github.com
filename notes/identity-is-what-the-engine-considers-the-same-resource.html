@@ -28,6 +28,57 @@
 
   <p>設計判断の中心は<strong>識別子をユーザが書くか、ツールが自動生成するか</strong>である。</p>
 
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="識別子の生成方式が、ユーザが書いた名前がそのまま識別子になる系統(Terraformのresource address、Carinaのnamed binding)と、ツールが構造から自動生成する系統(CDK論理IDのMD5、PulumiのURN、Carinaのanonymousなcontent hash)の二つに分かれ、前者は名前を変えなければ識別子が動かないのに対し、後者は入れ子や内容を変えると識別子が変わることを示す図">
+      <style>
+        .id text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .id .box { fill: var(--surface); stroke: var(--rule); }
+        .id .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .id .ttl { font-size: 13px; font-weight: 600; }
+        .id .dim { fill: var(--faint); font-size: 11px; }
+        .id .mut { fill: var(--muted); font-size: 11px; }
+        .id .arw { stroke: var(--faint); fill: none; }
+        .id .mono { font-family: var(--mono); font-size: 11px; }
+        .id .warn { fill: var(--accent-2); font-size: 11px; }
+        .id .wline { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .id .ok { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+      </style>
+      <g class="id">
+        <rect class="box" x="8" y="106" width="112" height="52" rx="4"/>
+        <text class="ttl" x="64" y="128" text-anchor="middle">書かれた設定</text>
+        <text class="dim" x="64" y="148" text-anchor="middle">名前と入れ子</text>
+
+        <path class="arw" d="M120 122 C 156 122, 160 62, 196 62"/>
+        <path class="arw" d="M120 142 C 156 142, 160 206, 196 206"/>
+
+        <rect class="hi" x="196" y="30" width="216" height="70" rx="4"/>
+        <text class="ttl" x="212" y="52">ユーザが書いた名前がそのまま</text>
+        <text class="mono" x="212" y="72">aws_s3_bucket.foo</text>
+        <text class="mono" x="212" y="90">named binding名</text>
+        <text class="mut" x="424" y="52">Terraform / Carina(named)</text>
+
+        <rect class="box" x="196" y="146" width="216" height="88" rx="4"/>
+        <text class="ttl" x="212" y="168">ツールが構造から生成</text>
+        <text class="mono" x="212" y="188">MyBucketF68F3FF0(path MD5)</text>
+        <text class="mono" x="212" y="206">urn:pulumi:…::parent$type::name</text>
+        <text class="mono" x="212" y="224">SimHash 16 hex(anonymous)</text>
+        <text class="mut" x="424" y="168">CDK / Pulumi / Carina(anonymous)</text>
+
+        <path class="ok" d="M456 76 H 490"/>
+        <text class="ttl" x="498" y="66">名前を変えなければ動かない</text>
+        <text class="dim" x="498" y="86">付け替えとして目に見える</text>
+
+        <path class="wline" d="M456 198 H 490"/>
+        <text class="ttl" x="498" y="188">入れ子や内容を変えると動く</text>
+        <text class="warn" x="498" y="208">構造を触ると別リソース扱いになりうる</text>
+        <text class="dim" x="498" y="226">識別子が見えるのは運用時だけ</text>
+
+        <text class="dim" x="8" y="272">どちらの系統も入れ子がidentityを規定する点は共通する。違うのは、その入れ子が名前として見えるか、ハッシュに畳まれるかである。</text>
+      </g>
+    </svg>
+    <figcaption>生成方式の違いは、リファクタリングで何が識別子を動かすかの違いとして現れる。ユーザ制御なら名前、自動生成なら構造や内容が引き金になる。</figcaption>
+  </figure>
+
   <div class="scroll">
     <table>
       <thead><tr><th>ツール</th><th>識別子</th><th>生成方式</th></tr></thead>
