@@ -66,7 +66,8 @@
   --radius-lg: 4px;
 
   /* コラムの幅。見出し・本文・表・図がすべてこの1本に揃う。
-     表と図がこの中に収まる必要があるので、本文だけの場合より広く取る。 */
+     本文だけを狭くしない — 狭くすると右に空白が残り、
+     表や図と左右端が食い違って紙面が裂けて見える。 */
   --measure: 62rem;
 
   /* index専用。カードを4〜5列並べるための幅。本文には使わない。 */
@@ -210,9 +211,7 @@ h4 {
   margin: var(--space-4) 0 var(--space-2);
 }
 
-/* 本文の段落だけは行長を抑える。コラム幅いっぱいだと日本語では1行が長すぎ、
-   行を追うのが難しくなる。表・図はコラム幅いっぱいを使う。 */
-p { margin: 0 0 var(--space-4); text-wrap: pretty; max-width: 46rem; }
+p { margin: 0 0 var(--space-4); text-wrap: pretty; }
 
 p.meta {
   margin: 0 0 var(--space-6);
@@ -221,7 +220,7 @@ p.meta {
   line-height: 1.7;
 }
 
-ul, ol { padding-left: 1.4em; margin: 0 0 var(--space-4); max-width: 46rem; }
+ul, ol { padding-left: 1.4em; margin: 0 0 var(--space-4); }
 li { margin-bottom: var(--space-1); }
 /* 表の中のリストは幅を制限しない */
 td ul, td ol, th ul, th ol { max-width: none; }
@@ -493,8 +492,7 @@ aside.note-aside p:last-child { margin-bottom: 0; }
 figure { margin: var(--space-8) 0; }
 figure svg { display: block; width: 100%; height: auto; }
 figcaption {
-  max-width: var(--measure);
-  margin: var(--space-3) auto 0;
+  margin: var(--space-3) 0 0;
   font-size: 14px;
   line-height: 1.7;
   color: color-mix(in srgb, var(--color-text) 55%, transparent);
