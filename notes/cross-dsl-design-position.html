@@ -140,7 +140,7 @@
 
   <p>元にした2軸はこれ。</p>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr>
@@ -352,7 +352,7 @@
 
   <h3>章1 §1-3-4の枠組みの強度評価</h3>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr>
@@ -398,7 +398,7 @@
 
   <p>なお「graph出力」という括りは中間表現の経路を粗く扱っている。<strong>最終的にresource graphになる</strong>のは共通だが、コードからgraphに至る経路はツールごとに異なる:</p>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>直接出力</td><td>Terraform, Carina, Bicep, Helm — DSL block / templateがそのままノード宣言</td></tr>
@@ -457,7 +457,7 @@
 
   <p>Carinaは現状「<strong>外部DSL × 言語が決める</strong>」象限 (3自由度すべて言語で縛る) に位置するが、抽象化追加の自由度については<strong>ハイブリッド象限の手前</strong>にいる。</p>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table>
       <thead>
         <tr><th>機能</th><th>Carinaの現状</th></tr>
@@ -594,7 +594,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span> (関数 / 高階関数 / クラス継承が自由)</td></tr>
@@ -721,7 +721,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="lang">言語が決める</span> (<code>func</code> あり、高階関数なし、クラス継承なし)</td></tr>
@@ -853,7 +853,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span> (高階関数 / lambda / schema継承 / mixin。副作用禁止だけ言語側)</td></tr>
@@ -965,7 +965,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="lang">言語が決める</span> (関数なし、unificationとdefinitionのみ)</td></tr>
@@ -1076,7 +1076,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span> (lambda / 高階関数 / record / unionが自由、ただし再帰禁止)</td></tr>
@@ -1195,7 +1195,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span> (関数 / 高階関数 / mixinが自由)</td></tr>
@@ -1303,7 +1303,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span> (関数 / 高階関数 / record / contracts)</td></tr>
@@ -1340,7 +1340,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p><strong>Pkl / KCL / Dhall / Jsonnetとの比較</strong>:</p>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>Pkl</td><td>静的型強制、構成データ計算のための関数とクラス</td></tr>
@@ -1409,7 +1409,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span></td></tr>
@@ -1494,7 +1494,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span></td></tr>
@@ -1611,7 +1611,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><strong>YAML層 = <span class="lang">言語が決める</span></strong> (関数なし) / <strong>function層 = <span class="conv">規約に委ねる</span></strong> (任意言語)</td></tr>
@@ -1723,7 +1723,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>4. 2×2配置</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="lang">言語が決める</span> (<code>define</code> あり、高階関数なし)</td></tr>
@@ -1772,7 +1772,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>章1 §1-3-4でCarinaは<strong>「外部DSL × 言語が決める」</strong>象限に位置づけられた:</p>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td>言語が決める (<code>fn</code> / <code>&gt;&gt;</code> / <code>|&gt;</code> / closure実装済み、高階関数未実装)</td></tr>
@@ -1792,7 +1792,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>5DSL (Pkl / KCL / Dhall / Jsonnet / Nickel) が独立に同じパターンに収束:</p>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span> (高階関数 / lambda / 継承などが自由)</td></tr>
@@ -1808,7 +1808,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>11DSLを「何を出力するか」で分けると、章1の3自由度では捉えきれない別レイヤの差が浮上:</p>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>構成データ出力DSL</td><td>Pkl / KCL / CUE / Dhall / Jsonnet / Nickel</td></tr>
@@ -1910,7 +1910,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <h4>取りうる立場</h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table class="compare">
       <tbody>
         <tr><td>A. 入れない (Bicep路線)</td><td>「IaCでは値計算と構成テンプレート化で十分」と割り切る。Bicep成功の経験的裏付けあり</td></tr>
@@ -2031,7 +2031,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <h4>必須7項目: <strong>7/7 ✅ 完全に揃っている</strong></h4>
 
-  <div class="scroll">
+  <div class="scroll narrow">
     <table>
       <thead>
         <tr><th>項目</th><th>状況</th></tr>

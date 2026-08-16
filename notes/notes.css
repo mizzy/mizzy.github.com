@@ -64,8 +64,8 @@
   --radius-md: 2px;
   --radius-lg: 4px;
 
-  --measure: 40rem;   /* 本文の幅 */
-  --wide: 58rem;      /* 図・表がはみ出せる幅 */
+  --measure: 46rem;   /* 本文の幅 */
+  --wide: 72rem;      /* 図・表がはみ出せる幅 */
 
   /* ---- 図（インラインSVG）用の別名 ----
    * 各ノートのページ固有CSSはこの短い名前でBroadsheetのトークンを参照する。
@@ -262,7 +262,6 @@ th {
   font-size: 14px;
   color: color-mix(in srgb, var(--color-text) 70%, transparent);
   border-bottom: 1px solid var(--color-text);
-  white-space: nowrap;
 }
 tbody tr:last-child td { border-bottom: 0; }
 
@@ -535,9 +534,15 @@ figure, .contrast, .scroll, .bleed {
   translate: -50% 0;
 }
 
+/* 2列だけの表（日付/形式/性質のようなキー・値）は広げない。
+   広げると左右の列が離れすぎて読みにくい。本文幅に留める。 */
+.scroll.narrow {
+  width: min(var(--measure), 100vw - var(--space-8));
+}
+
 /* ---- 狭い画面 ---- */
 
-@media (max-width: 44rem) {
+@media (max-width: 50rem) {
   body { font-size: 16px; line-height: 1.85; }
   h1 { font-size: 30px; }
   h2 { font-size: 23px; }
