@@ -12,8 +12,6 @@
  * 紙のみ。ダークモードは持たない（Broadsheetはダーク面を持たないシステム）。
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap');
-
 /* ---- トークン（Broadsheet） ---- */
 
 :root {
@@ -44,10 +42,13 @@
   --color-accent-2-200: #ffdee6;
   --color-accent-2-700: #aa0b56;
 
-  /* 欧文はSource Serif 4、和文は明朝体。
+  /* 欧文・和文とも明朝／セリフ。外部フォントを読み込まず、OS標準だけで組む
+     （CLAUDE.mdの「すべて自己完結」の規約）。
+     BroadsheetはSource Serif 4を指定しているが、Web配信が必要になるため
+     ここでは同系統のOS標準セリフで代える。
      日本語のフォールバックを欧文より後ろに置くことで、
-     ラテン文字だけがSource Serif 4で組まれる。 */
-  --font-body: "Source Serif 4", "Hiragino Mincho ProN", "Yu Mincho",
+     ラテン文字だけが欧文セリフで組まれる。 */
+  --font-body: Georgia, "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho",
                YuMincho, "Noto Serif JP", "Songti SC", serif;
   --font-heading: var(--font-body);
   --font-heading-weight: 600;

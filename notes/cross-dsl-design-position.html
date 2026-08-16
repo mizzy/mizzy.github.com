@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>構成記述DSL 11個を同じ枠組みで見る - notes</title>
-<meta name="description" content="記述言語 × 記述自由度の所在という2×2に、Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helm を置いてみた記録。">
+<meta name="description" content="記述言語 × 記述自由度の所在という2×2に、Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helmを置いてみた記録。">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
 <style>
@@ -102,15 +102,15 @@
 
 <article class="note">
   <h1>構成記述DSL 11個を同じ枠組みで見る</h1>
-  <p class="meta"><time datetime="2026-04-26">2026-04-26</time> · <span class="status">初稿執筆中 (2026-04-26着手)</span></p>
+  <p class="meta"><time datetime="2026-04-26">2026-04-26</time> · <span class="status">初稿執筆中(2026-04-26着手)</span></p>
 
-  <p>IaC 4ツール (CDK / Pulumi / Terraform / Carina) の比較で使った「<strong>記述言語</strong> × <strong>記述自由度の所在</strong>」という2×2が、IaC以外の構成記述系DSLでも妥当かを検証した記録。Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helmの11個を、同じ3自由度で点検する。</p>
+  <p>IaC 4ツール(CDK / Pulumi / Terraform / Carina)の比較で使った「<strong>記述言語</strong> × <strong>記述自由度の所在</strong>」という2×2が、IaC以外の構成記述系DSLでも妥当かを検証した記録。Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helmの11個を、同じ3自由度で点検する。</p>
 
   <p>章1への反映は目的ではなく、<strong>各DSLを同じ枠組みで観察することそのものが成果物</strong>。</p>
 
   <div class="accuracy">
     <h2>この記録の性質</h2>
-    <p>これは生成AI (Claude / Codex) との対話形式による探索記録で、<strong>結論の確定ではなく、論点の整理と根拠確認</strong>を目的としている。複数回の訂正・スコープ調整を経たプロセスの記録であり、引用の前提としては弱い。</p>
+    <p>これは生成AI (Claude / Codex)との対話形式による探索記録で、<strong>結論の確定ではなく、論点の整理と根拠確認</strong>を目的としている。複数回の訂正・スコープ調整を経たプロセスの記録であり、引用の前提としては弱い。</p>
   </div>
 
   <div class="toc">
@@ -136,7 +136,7 @@
     </a>
   </div>
 
-  <h2 id="framework">枠組み (再掲)</h2>
+  <h2 id="framework">枠組み(再掲)</h2>
 
   <p>元にした2軸はこれ。</p>
 
@@ -145,11 +145,11 @@
       <tbody>
         <tr>
           <td>記述言語</td>
-          <td>外部DSL (専用文法・独自パーサ) / 汎用言語 (内部DSL + ベタ書き)</td>
+          <td>外部DSL (専用文法・独自パーサ) / 汎用言語(内部DSL + ベタ書き)</td>
         </tr>
         <tr>
           <td>記述自由度の所在</td>
-          <td>言語が決める (文法・評価器・型検査) / 規約に委ねる (lint・レビュー・社内ガイドライン)</td>
+          <td>言語が決める(文法・評価器・型検査) / 規約に委ねる(lint・レビュー・社内ガイドライン)</td>
         </tr>
       </tbody>
     </table>
@@ -160,7 +160,7 @@
   <div class="scroll">
     <table>
       <thead>
-        <tr><th>記述言語</th><th>記述自由度の所在</th><th>例 (章1)</th></tr>
+        <tr><th>記述言語</th><th>記述自由度の所在</th><th>例(章1)</th></tr>
       </thead>
       <tbody>
         <tr><td>外部DSL</td><td>言語が決める</td><td>Terraform / Carina</td></tr>
@@ -176,21 +176,21 @@
   <p>graphの形を変える自由度を3つに分け、それぞれを「言語が決める」か「規約に委ねる」かで判定する。表記/抽象化の層で説明できるもの。</p>
 
   <ol class="steps">
-    <li><strong>抽象化の追加</strong>ユーザが新しい抽象 (任意ヘルパー関数 / クラス / 薄いwrapper) を足せるか</li>
-    <li><strong>複数量の制御</strong>同じ抽象を何個展開するかを動的に決められるか (ループ / <code>for_each</code> / <code>count</code> 等)</li>
-    <li><strong>実装の切替</strong>どの実装 (<code>source</code> / クラス) を選ぶかを動的に決められるか</li>
+    <li><strong>抽象化の追加</strong>ユーザが新しい抽象(任意ヘルパー関数 / クラス / 薄いwrapper)を足せるか</li>
+    <li><strong>複数量の制御</strong>同じ抽象を何個展開するかを動的に決められるか(ループ / <code>for_each</code> / <code>count</code> 等)</li>
+    <li><strong>実装の切替</strong>どの実装(<code>source</code> / クラス)を選ぶかを動的に決められるか</li>
   </ol>
 
   <aside class="note-aside">
-    <p>なお章1 §1-3 (本版) は3自由度を<strong>graph形状側</strong>と<strong>属性値側</strong>の両方に適用する形に拡張された。本cross-DSL分析の11DSL評価は主にgraph形状側に焦点を当てているが、属性値計算の自由度で見ると評価が変わるDSLもあり (特にPkl / KCL / Dhall / Jsonnet / Nickelのような構成データ出力DSL)、ここでは深追いしない (別issueで扱う余地がある)。</p>
+    <p>なお章1 §1-3 (本版)は3自由度を<strong>graph形状側</strong>と<strong>属性値側</strong>の両方に適用する形に拡張された。本cross-DSL分析の11DSL評価は主にgraph形状側に焦点を当てているが、属性値計算の自由度で見ると評価が変わるDSLもあり(特にPkl / KCL / Dhall / Jsonnet / Nickelのような構成データ出力DSL)、ここでは深追いしない(別issueで扱う余地がある)。</p>
   </aside>
 
   <h3>検証する問い</h3>
 
   <ol>
     <li>2×2マッピングは他DSLでも破綻しないか</li>
-    <li>「外部DSL × 規約に委ねる」象限 (章1で空席) は本当に空か</li>
-    <li>「汎用言語 × 言語が決める」象限 (章1で空席扱い) に該当するツールはあるか</li>
+    <li>「外部DSL × 規約に委ねる」象限(章1で空席)は本当に空か</li>
+    <li>「汎用言語 × 言語が決める」象限(章1で空席扱い)に該当するツールはあるか</li>
     <li>3自由度は構成記述系DSL全般に通じる比較軸か、IaC固有の偏りがあるか</li>
   </ol>
 
@@ -205,30 +205,30 @@
         <tr><td><strong>Terraform</strong> (章1)</td><td>言語が決める</td><td>言語が決める</td><td>言語が決める</td></tr>
         <tr><td><strong>CDK</strong> (章1)</td><td>規約に委ねる</td><td>規約に委ねる</td><td>規約に委ねる</td></tr>
         <tr><td><strong>Pulumi</strong> (章1)</td><td>規約に委ねる</td><td>規約に委ねる</td><td>規約に委ねる</td></tr>
-        <tr><td><strong>Carina</strong> (章1)</td><td>言語が決める (<code>fn</code> あり、高階関数なし)</td><td>言語が決める</td><td>言語が決める (二段)</td></tr>
+        <tr><td><strong>Carina</strong> (章1)</td><td>言語が決める(<code>fn</code> あり、高階関数なし)</td><td>言語が決める</td><td>言語が決める(二段)</td></tr>
         <tr><td><strong>Pkl</strong></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める + 標準ライブラリ</td><td>言語が決める</td></tr>
-        <tr><td><strong>Bicep</strong></td><td>言語が決める (<code>func</code> あり、高階関数なし)</td><td>言語が決める (<code>for</code>)</td><td>言語が決める</td></tr>
-        <tr><td><strong>KCL</strong></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める (comprehension)</td><td>言語が決める</td></tr>
-        <tr><td><strong>CUE</strong></td><td>言語が決める (関数なし)</td><td>言語が決める (comprehension)</td><td>言語が決める</td></tr>
-        <tr><td><strong>Dhall</strong></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める (組込み再帰子)</td><td>言語が決める</td></tr>
-        <tr><td><strong>Jsonnet</strong></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める (comprehension)</td><td>言語が決める</td></tr>
+        <tr><td><strong>Bicep</strong></td><td>言語が決める(<code>func</code> あり、高階関数なし)</td><td>言語が決める(<code>for</code>)</td><td>言語が決める</td></tr>
+        <tr><td><strong>KCL</strong></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める(comprehension)</td><td>言語が決める</td></tr>
+        <tr><td><strong>CUE</strong></td><td>言語が決める(関数なし)</td><td>言語が決める(comprehension)</td><td>言語が決める</td></tr>
+        <tr><td><strong>Dhall</strong></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める(組込み再帰子)</td><td>言語が決める</td></tr>
+        <tr><td><strong>Jsonnet</strong></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める(comprehension)</td><td>言語が決める</td></tr>
         <tr><td><strong>Nickel</strong></td><td><span class="conv">規約に委ねる</span></td><td><span class="conv">規約に委ねる</span></td><td>言語が決める</td></tr>
         <tr><td><strong>cdktf</strong></td><td>規約に委ねる</td><td>規約に委ねる + Terraform <code>for_each</code></td><td>規約に委ねる</td></tr>
         <tr><td><strong>cdk8s</strong></td><td>規約に委ねる</td><td>規約に委ねる</td><td>規約に委ねる</td></tr>
-        <tr><td><strong>Crossplane</strong></td><td>二層 (YAML言語 + function言語)</td><td>function経由</td><td>Composition Selector (動的) + function (静的)</td></tr>
-        <tr><td><strong>Helm</strong></td><td>言語が決める (<code>define</code> あり、高階関数なし)</td><td>言語が決める (<code>range</code>)</td><td>言語が決める (dependenciesリテラル)</td></tr>
+        <tr><td><strong>Crossplane</strong></td><td>二層(YAML言語 + function言語)</td><td>function経由</td><td>Composition Selector (動的) + function (静的)</td></tr>
+        <tr><td><strong>Helm</strong></td><td>言語が決める(<code>define</code> あり、高階関数なし)</td><td>言語が決める(<code>range</code>)</td><td>言語が決める(dependenciesリテラル)</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p>点線下線を引いたセルは「章1の単純2×2だと収まりが悪い」象限 (3自由度のうち抽象化追加だけ規約寄りのハイブリッド)。</p>
+  <p>点線下線を引いたセルは「章1の単純2×2だと収まりが悪い」象限(3自由度のうち抽象化追加だけ規約寄りのハイブリッド)。</p>
 
   <h3>全体の2×2マッピング</h3>
 
   <p>3自由度のうち<strong>どれが多数派か</strong>で各ツールを2×2に配置すると、こうなる。</p>
 
   <figure>
-    <svg class="quad" viewBox="0 0 700 430" role="img" aria-label="記述言語 (外部DSL / 汎用言語) と記述自由度の所在 (言語が決める / ハイブリッド / 規約に委ねる) の2軸に11DSLと章1の4ツールを配置した象限図。外部DSL × 言語が決める にTerraform / Carina / Bicep / CUE / Helm / Crossplane、外部DSL × ハイブリッド にPkl / KCL / Dhall / Jsonnet / Nickel、汎用言語 × 規約に委ねる にCDK / Pulumi / cdktf / cdk8s、汎用言語 × 言語が決める は空席。">
+    <svg class="quad" viewBox="0 0 700 430" role="img" aria-label="記述言語(外部DSL / 汎用言語)と記述自由度の所在(言語が決める / ハイブリッド / 規約に委ねる)の2軸に11DSLと章1の4ツールを配置した象限図。外部DSL × 言語が決める にTerraform / Carina / Bicep / CUE / Helm / Crossplane、外部DSL × ハイブリッド にPkl / KCL / Dhall / Jsonnet / Nickel、汎用言語 × 規約に委ねる にCDK / Pulumi / cdktf / cdk8s、汎用言語 × 言語が決める は空席。">
       <!-- 縦軸ラベル -->
       <text class="axis" x="10" y="20">記述自由度の所在 ↓</text>
       <text class="axis-b" x="10" y="112" >言語が</text>
@@ -287,7 +287,7 @@
       <!-- 区切り -->
       <line class="rule" x1="458" y1="88" x2="458" y2="400"/>
     </svg>
-    <figcaption>3自由度の多数派で配置した2×2。新たに見えたのは「外部DSL × ハイブリッド (抽象化追加だけ規約寄り)」象限で、Pkl / KCL / Dhall / Jsonnet / Nickelの5つが集まる。章1の4象限には現れていなかった位置。</figcaption>
+    <figcaption>3自由度の多数派で配置した2×2。新たに見えたのは「外部DSL × ハイブリッド(抽象化追加だけ規約寄り)」象限で、Pkl / KCL / Dhall / Jsonnet / Nickelの5つが集まる。章1の4象限には現れていなかった位置。</figcaption>
   </figure>
 
   <h2>結論</h2>
@@ -300,11 +300,11 @@
       <span class="a">部分的に破綻する</span>
     </div>
     <div>
-      <span class="q">問い2: 「外部DSL × 規約に委ねる」象限は本当に空か</span>
+      <span class="q">問い2:「外部DSL × 規約に委ねる」象限は本当に空か</span>
       <span class="a">ほぼ空 <span class="sub">— Nickelが部分的に近いが、実装切替は依然として言語が決める</span></span>
     </div>
     <div>
-      <span class="q">問い3: 「汎用言語 × 言語が決める」象限に該当するツールはあるか</span>
+      <span class="q">問い3:「汎用言語 × 言語が決める」象限に該当するツールはあるか</span>
       <span class="a">ない</span>
     </div>
     <div>
@@ -319,24 +319,24 @@
 
   <ul>
     <li>章1の単純2×2は「<strong>ツール = 1象限</strong>」を暗黙に前提していたが、多くのDSLは<strong>3自由度ごとに別の象限に落ちる</strong></li>
-    <li>特にPkl / KCL / Dhall / Jsonnet / Nickelは<strong>抽象化追加だけ「規約に委ねる」、複数量制御と実装切替は「言語が決める」</strong>という共通パターン (「外部DSL × ハイブリッド」象限)</li>
+    <li>特にPkl / KCL / Dhall / Jsonnet / Nickelは<strong>抽象化追加だけ「規約に委ねる」、複数量制御と実装切替は「言語が決める」</strong>という共通パターン(「外部DSL × ハイブリッド」象限)</li>
     <li>CrossplaneはYAML層とfunction層で<strong>別象限を同時に占める</strong> (二層構造)</li>
-    <li>cdktfは<strong>複数量制御で2経路 (ホスト言語 / Terraform)</strong> を併用できる</li>
+    <li>cdktfは<strong>複数量制御で2経路(ホスト言語 / Terraform)</strong> を併用できる</li>
   </ul>
 
   <p>→ 章1 §1-3-4の2×2を<strong>3自由度の集計値</strong>ではなく<strong>3自由度ごとに別マップ</strong>として読み替えるのが正確。</p>
 
-  <h3>問い2: 「外部DSL × 規約に委ねる」象限は本当に空か</h3>
+  <h3>問い2:「外部DSL × 規約に委ねる」象限は本当に空か</h3>
 
-  <p><strong>ほぼ空</strong>。Nickelが部分的に近い (3自由度のうち2つが規約寄り) が、実装切替 (import path) は依然として言語が決める。</p>
+  <p><strong>ほぼ空</strong>。Nickelが部分的に近い(3自由度のうち2つが規約寄り)が、実装切替(import path)は依然として言語が決める。</p>
 
-  <p>「外部DSLを作っておきながら3自由度すべてを規約に委ねる」DSLは<strong>本分析の11個には存在しない</strong>。章1の淘汰圧仮説 (専用文法を作るなら何らかの制約を文法レベルで入れるはず、さもないと汎用言語で書く方が経済的) を<strong>補強する結果</strong>。</p>
+  <p>「外部DSLを作っておきながら3自由度すべてを規約に委ねる」DSLは<strong>本分析の11個には存在しない</strong>。章1の淘汰圧仮説(専用文法を作るなら何らかの制約を文法レベルで入れるはず、さもないと汎用言語で書く方が経済的)を<strong>補強する結果</strong>。</p>
 
-  <h3>問い3: 「汎用言語 × 言語が決める」象限に該当するツールはあるか</h3>
+  <h3>問い3:「汎用言語 × 言語が決める」象限に該当するツールはあるか</h3>
 
-  <p><strong>ない</strong>。Pulumiの <code>Output&lt;T&gt;</code> やCDKの <code>BucketProps</code> のように<strong>SDK側で型を提供してホスト言語の型システムを活用する</strong>パターンはあるが、これらは (a) 静的型言語かつ (b) ユーザが型を書く慣習を採用したときにのみ効くもので、ツール側が言語を拡張して制約を課しているわけではない。よって「言語が決める」と評価するのは過大評価になる。</p>
+  <p><strong>ない</strong>。Pulumiの <code>Output&lt;T&gt;</code> やCDKの <code>BucketProps</code> のように<strong>SDK側で型を提供してホスト言語の型システムを活用する</strong>パターンはあるが、これらは(a)静的型言語かつ(b)ユーザが型を書く慣習を採用したときにのみ効くもので、ツール側が言語を拡張して制約を課しているわけではない。よって「言語が決める」と評価するのは過大評価になる。</p>
 
-  <p>これは<strong>理論的設計余地として開いている</strong>が、汎用言語のホスト機構と整合させるコストが高いと推測される。実装するとすれば「汎用言語の中にDSLを入れる」(F# のcomputation expression、Scalaのimplicit + macro等) アプローチが該当しうるが、IaC領域での全面実装例は確認できず。</p>
+  <p>これは<strong>理論的設計余地として開いている</strong>が、汎用言語のホスト機構と整合させるコストが高いと推測される。実装するとすれば「汎用言語の中にDSLを入れる」(F# のcomputation expression、Scalaのimplicit + macro等)アプローチが該当しうるが、IaC領域での全面実装例は確認できず。</p>
 
   <h3>問い4: 3自由度は構成記述系DSL全般に通じる比較軸か</h3>
 
@@ -344,8 +344,8 @@
 
   <ul>
     <li><strong>「実装の切替」(import pathの動的性)</strong> は11DSLすべてに当てはまる軸として機能</li>
-    <li><strong>「複数量の制御」</strong>も適用可能だが、IaC以外のDSL (Pkl / Cue / Dhall) では「<strong>graphの個数</strong>」ではなく「<strong>最終valueの集合サイズ</strong>」として読み替える必要</li>
-    <li><strong>「抽象化の追加」</strong>は普遍的だが、graph形状への影響はIaC以外では希薄 (Pkl / Cueはgraphを出力しない、JSON/YAMLを出力する)</li>
+    <li><strong>「複数量の制御」</strong>も適用可能だが、IaC以外のDSL (Pkl / Cue / Dhall)では「<strong>graphの個数</strong>」ではなく「<strong>最終valueの集合サイズ</strong>」として読み替える必要</li>
+    <li><strong>「抽象化の追加」</strong>は普遍的だが、graph形状への影響はIaC以外では希薄(Pkl / Cueはgraphを出力しない、JSON/YAMLを出力する)</li>
   </ul>
 
   <p>つまり3自由度は<strong>構成記述DSL全般の比較軸</strong>として有用だが、章1が前提としていた「graph形状を変えるか」という基準はIaC固有。</p>
@@ -357,15 +357,15 @@
       <tbody>
         <tr>
           <td>補強される部分</td>
-          <td>「外部DSL × 規約に委ねる」が空席である淘汰圧仮説、「汎用言語 × 言語が決める」もIaCでは事実上空席である現状認識 (<code>Output&lt;T&gt;</code> 等はSDKが活用するホスト言語型システムの慣習であってツール側の言語制約ではない、と評価を改めた)</td>
+          <td>「外部DSL × 規約に委ねる」が空席である淘汰圧仮説、「汎用言語 × 言語が決める」もIaCでは事実上空席である現状認識(<code>Output&lt;T&gt;</code> 等はSDKが活用するホスト言語型システムの慣習であってツール側の言語制約ではない、と評価を改めた)</td>
         </tr>
         <tr>
           <td>修正が要る部分</td>
-          <td>「ツール = 1象限」前提は粗い。3自由度ごとに別象限に落ちる「ハイブリッド型」DSL (Pkl / KCL / Dhall / Jsonnet / Nickel) を独立カテゴリとして認識する必要</td>
+          <td>「ツール = 1象限」前提は粗い。3自由度ごとに別象限に落ちる「ハイブリッド型」DSL (Pkl / KCL / Dhall / Jsonnet / Nickel)を独立カテゴリとして認識する必要</td>
         </tr>
         <tr>
           <td>追加が要る部分</td>
-          <td>「拡張ポイントを言語境界で開ける」設計 (Crossplaneのfunction、PulumiのMLC) は章1の2×2では捉えきれない第三の選択肢</td>
+          <td>「拡張ポイントを言語境界で開ける」設計(Crossplaneのfunction、PulumiのMLC)は章1の2×2では捉えきれない第三の選択肢</td>
         </tr>
       </tbody>
     </table>
@@ -381,7 +381,7 @@
         <tr><th>出力形態</th><th>内容</th><th>例</th></tr>
       </thead>
       <tbody>
-        <tr><td><strong>構成データ出力</strong></td><td>値ツリー (JSON/YAML/設定値)</td><td>Pkl, KCL, CUE, Dhall, Jsonnet, Nickel</td></tr>
+        <tr><td><strong>構成データ出力</strong></td><td>値ツリー(JSON/YAML/設定値)</td><td>Pkl, KCL, CUE, Dhall, Jsonnet, Nickel</td></tr>
         <tr><td><strong>graph出力</strong></td><td>ノード + edgeの宣言</td><td>Terraform, CDK, Pulumi, Carina, Bicep, cdktf, cdk8s, Crossplane, Helm</td></tr>
       </tbody>
     </table>
@@ -390,11 +390,11 @@
   <p>graph出力DSLのコードが出すのは:</p>
 
   <ul>
-    <li><strong>(a) ノード集合</strong>: リソース宣言 (type + 属性値)</li>
-    <li><strong>(b) edge</strong>: リソース間の依存関係 (参照、<code>depends_on</code>、<code>opts.parent</code>)</li>
+    <li><strong>(a)ノード集合</strong>:リソース宣言(type + 属性値)</li>
+    <li><strong>(b) edge</strong>:リソース間の依存関係(参照、<code>depends_on</code>、<code>opts.parent</code>)</li>
   </ul>
 
-  <p>これは章1の3自由度 (抽象化追加 / 複数量制御 / 実装切替) では捉えきれない別軸で、「<strong>DSLが何を出力するか</strong>」のレイヤの違い。</p>
+  <p>これは章1の3自由度(抽象化追加 / 複数量制御 / 実装切替)では捉えきれない別軸で、「<strong>DSLが何を出力するか</strong>」のレイヤの違い。</p>
 
   <p>なお「graph出力」という括りは中間表現の経路を粗く扱っている。<strong>最終的にresource graphになる</strong>のは共通だが、コードからgraphに至る経路はツールごとに異なる:</p>
 
@@ -409,16 +409,16 @@
     </table>
   </div>
 
-  <p>経路は違うが、applyされる段階ではどのツールもresource graphを扱う。本分析の主題 (3自由度) にはこの経路差は直接効かないので深追いしない。経路差自体は章1 §1-3-6 「構文と評価副作用のずれ」として他章送りされており、章2実行モデルで扱う予定。</p>
+  <p>経路は違うが、applyされる段階ではどのツールもresource graphを扱う。本分析の主題(3自由度)にはこの経路差は直接効かないので深追いしない。経路差自体は章1 §1-3-6「構文と評価副作用のずれ」として他章送りされており、章2実行モデルで扱う予定。</p>
 
-  <p>なおgraphを出力した後のstate管理 / 差分計算 / CRUD実行は<strong>DSLのレイヤではなくツール (engine / CLI) のレイヤ</strong>の話で、本分析 (DSLの比較が主題) では扱わない。</p>
+  <p>なおgraphを出力した後のstate管理 / 差分計算 / CRUD実行は<strong>DSLのレイヤではなくツール(engine / CLI)のレイヤ</strong>の話で、本分析(DSLの比較が主題)では扱わない。</p>
 
   <h3>graph出力DSL × ハイブリッド象限という空席</h3>
 
-  <p>「graph出力DSL」と「ハイブリッド象限 (抽象化追加だけ規約寄り)」を組み合わせると、本分析の11DSLの中に<strong>空席</strong>がある。</p>
+  <p>「graph出力DSL」と「ハイブリッド象限(抽象化追加だけ規約寄り)」を組み合わせると、本分析の11DSLの中に<strong>空席</strong>がある。</p>
 
   <figure>
-    <svg class="seat" viewBox="0 0 700 300" role="img" aria-label="出力形態 (構成データ出力 / graph出力) と3自由度の所在 (言語が決める / ハイブリッド / 規約に委ねる) のマトリクス。ハイブリッド × graph出力 のセルだけが空席になっている。">
+    <svg class="seat" viewBox="0 0 700 300" role="img" aria-label="出力形態(構成データ出力 / graph出力)と3自由度の所在(言語が決める / ハイブリッド / 規約に委ねる)のマトリクス。ハイブリッド × graph出力 のセルだけが空席になっている。">
       <text class="hd" x="330" y="24" text-anchor="middle">構成データ出力</text>
       <text class="hd" x="545" y="24" text-anchor="middle">graph出力</text>
       <line class="cell" x1="18" y1="34" x2="682" y2="34" stroke-width="1" fill="none"/>
@@ -455,7 +455,7 @@
 
   <h3>Carinaの進化方向との整合</h3>
 
-  <p>Carinaは現状「<strong>外部DSL × 言語が決める</strong>」象限 (3自由度すべて言語で縛る) に位置するが、抽象化追加の自由度については<strong>ハイブリッド象限の手前</strong>にいる。</p>
+  <p>Carinaは現状「<strong>外部DSL × 言語が決める</strong>」象限(3自由度すべて言語で縛る)に位置するが、抽象化追加の自由度については<strong>ハイブリッド象限の手前</strong>にいる。</p>
 
   <div class="scroll narrow">
     <table>
@@ -463,9 +463,9 @@
         <tr><th>機能</th><th>Carinaの現状</th></tr>
       </thead>
       <tbody>
-        <tr><td>関数定義 (<code>fn</code>、型注釈・再帰検出)</td><td>✅ 実装済み</td></tr>
-        <tr><td>関数合成 (<code>&gt;&gt;</code>) / パイプ (<code>|&gt;</code>) / 部分適用 (closure)</td><td>✅ 実装済み</td></tr>
-        <tr><td>高階関数 (関数を引数/戻り値に取る、関数値が一級)</td><td>❌ 未実装</td></tr>
+        <tr><td>関数定義(<code>fn</code>、型注釈・再帰検出)</td><td>✅ 実装済み</td></tr>
+        <tr><td>関数合成(<code>&gt;&gt;</code>) / パイプ(<code>|&gt;</code>) / 部分適用(closure)</td><td>✅ 実装済み</td></tr>
+        <tr><td>高階関数(関数を引数/戻り値に取る、関数値が一級)</td><td>❌ 未実装</td></tr>
       </tbody>
     </table>
   </div>
@@ -473,42 +473,42 @@
   <p>もし将来Carinaが高階関数を導入すれば、3自由度の対応は次のように変わる:</p>
 
   <ul>
-    <li><strong>抽象化の追加</strong>: 言語が決める → <strong>規約に委ねる</strong></li>
-    <li><strong>複数量の制御</strong>: 言語が決める (<code>for</code> 式) のまま</li>
-    <li><strong>実装の切替</strong>: 言語が決める (<code>source</code> リテラル + <code>use</code> の位置制限) のまま</li>
+    <li><strong>抽象化の追加</strong>:言語が決める → <strong>規約に委ねる</strong></li>
+    <li><strong>複数量の制御</strong>:言語が決める(<code>for</code> 式)のまま</li>
+    <li><strong>実装の切替</strong>:言語が決める(<code>source</code> リテラル + <code>use</code> の位置制限)のまま</li>
   </ul>
 
-  <p>これはPkl / KCL / Dhall / Jsonnet / Nickelと同じ<strong>「外部DSL × ハイブリッド (抽象化追加だけ規約寄り)」</strong>象限への合流を意味する。5DSLが独立にこの象限に収束した観察は、Carinaの進化方向とも整合する<strong>実用上の自然な落とし所</strong>と読める。</p>
+  <p>これはPkl / KCL / Dhall / Jsonnet / Nickelと同じ<strong>「外部DSL × ハイブリッド(抽象化追加だけ規約寄り)」</strong>象限への合流を意味する。5DSLが独立にこの象限に収束した観察は、Carinaの進化方向とも整合する<strong>実用上の自然な落とし所</strong>と読める。</p>
 
-  <p>ただし設計上の注意点: 高階関数を入れる際、<strong>関数値が「実装の切替」位置に染み出さないようにする境界設計</strong>が要る。例えば次のようなパターンが許されると、<code>use</code> 式のリテラル制約が骨抜きになる:</p>
+  <p>ただし設計上の注意点:高階関数を入れる際、<strong>関数値が「実装の切替」位置に染み出さないようにする境界設計</strong>が要る。例えば次のようなパターンが許されると、<code>use</code> 式のリテラル制約が骨抜きになる:</p>
 
 <pre><code>fn pick_module(env: string) -&gt; Module { ... }     # 関数が module を返す
 let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を module call の起点に</code></pre>
 
-  <p>Carinaの現行設計 (章1 §1-3-2) では <code>use</code> 式は <code>let</code> 束縛RHSにしか書けず、<code>source</code> はリテラル文字列のみ。高階関数を導入する際にこの不変条件を壊さないためには、<strong><code>Module</code> 型を関数の戻り値型に置けないようにする</strong>等の型レベル制約が候補になる。</p>
+  <p>Carinaの現行設計(章1 §1-3-2)では <code>use</code> 式は <code>let</code> 束縛RHSにしか書けず、<code>source</code> はリテラル文字列のみ。高階関数を導入する際にこの不変条件を壊さないためには、<strong><code>Module</code> 型を関数の戻り値型に置けないようにする</strong>等の型レベル制約が候補になる。</p>
 
-  <p>5DSLのうちPkl / KCL / Dhall / Nickelは<strong>構成データ計算 (JSON/YAML出力)</strong> が主でgraph形状の予測性が論点にならないが、Carinaはgraphを出すDSLなので、ハイブリッド象限へ移行する際にこの境界線をどこに引くかが具体的な設計課題になる。</p>
+  <p>5DSLのうちPkl / KCL / Dhall / Nickelは<strong>構成データ計算(JSON/YAML出力)</strong> が主でgraph形状の予測性が論点にならないが、Carinaはgraphを出すDSLなので、ハイブリッド象限へ移行する際にこの境界線をどこに引くかが具体的な設計課題になる。</p>
 
-  <h3>残された論点 (cross-DSL分析)</h3>
+  <h3>残された論点(cross-DSL分析)</h3>
 
   <ul>
-    <li><strong>Pklの構成データ計算vs IaCのresource graph</strong>: 軸の読み替え (graph形状 → 最終value形状) が章1の前提を緩めることになるが、本分析は深追いしない</li>
+    <li><strong>Pklの構成データ計算vs IaCのresource graph</strong>:軸の読み替え(graph形状 → 最終value形状)が章1の前提を緩めることになるが、本分析は深追いしない</li>
     <li><strong>Crossplaneの二層構造の評価</strong>: function言語選択は「設計判断」というより「ユーザの実装選択」で、章1の枠組みとレイヤが違う</li>
     <li><strong>lazy評価の影響</strong>: Jsonnet / Nickel / Dhallのlazy性が「複数量の制御」「実装の切替」のセマンティクスに与える影響は未検証</li>
-    <li><strong>Pulumi MLCとの比較</strong>: 章1で言及されたMLC (Pulumi) は本分析では扱わなかった (CDKのjsiiと同じ「単一原本からの自動bridging」軸)</li>
+    <li><strong>Pulumi MLCとの比較</strong>:章1で言及されたMLC (Pulumi)は本分析では扱わなかった(CDKのjsiiと同じ「単一原本からの自動bridging」軸)</li>
   </ul>
 
   <h3>範囲外</h3>
 
   <ul>
-    <li>各DSLの詳細仕様の網羅 (識別子・state・実行モデル等は本分析の対象外)</li>
+    <li>各DSLの詳細仕様の網羅(識別子・state・実行モデル等は本分析の対象外)</li>
     <li>個別DSLの優劣評価</li>
     <li>学習コスト・エコシステム等の運用論寄りの軸</li>
-    <li>章1 §1-3-4への反映 (本分析は独立完結させる)</li>
+    <li>章1 §1-3-4への反映(本分析は独立完結させる)</li>
   </ul>
 
   <aside class="note-aside">
-    <p>以降の11個は同じテンプレートで書いてある: <strong>1. 記述言語の位置づけ</strong> / <strong>2. 抽象化機構</strong> / <strong>3. 3自由度の評価</strong> / <strong>4. 2×2配置</strong> / <strong>5. 設計判断の議論</strong>。同じ順番で読めば、DSL間の差が構造として見えるようにしてある。</p>
+    <p>以降の11個は同じテンプレートで書いてある: <strong>1.記述言語の位置づけ</strong> / <strong>2.抽象化機構</strong> / <strong>3. 3自由度の評価</strong> / <strong>4. 2×2配置</strong> / <strong>5.設計判断の議論</strong>。同じ順番で読めば、DSL間の差が構造として見えるようにしてある。</p>
   </aside>
 
   <h2 id="tier1">Tier 1 — 章1 §1-3-4で名指しした4つ</h2>
@@ -517,19 +517,19 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <p class="src">公式: <a href="https://pkl-lang.org/main/current/language-reference/index.html">pkl-lang.org/main/current/language-reference/index.html</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>外部DSL</strong>。Appleが公開した構成記述専用言語で、独自パーサと評価器を持つ。汎用言語の埋め込みではない。</p>
 
   <p>評価モデルの特徴:</p>
 
   <ul>
-    <li><strong>純粋</strong> (副作用なし)。例外は <code>read()</code> による外部リソース読み込み (公式: "Resources" 章)</li>
+    <li><strong>純粋</strong> (副作用なし)。例外は <code>read()</code> による外部リソース読み込み(公式: "Resources"章)</li>
     <li><strong>late-bound</strong> (object propertiesは遅延評価)</li>
     <li>文法はJava/Scala系の見た目。<code>module</code>, <code>class</code>, <code>function</code>, <code>let</code> 等の予約語</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -537,7 +537,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
         <tr><th>単位</th><th>構文</th><th>役割</th></tr>
       </thead>
       <tbody>
-        <tr><td><strong>module</strong></td><td>ファイル単位 (<code>.pkl</code>)</td><td>設定単位 / 再利用単位</td></tr>
+        <tr><td><strong>module</strong></td><td>ファイル単位(<code>.pkl</code>)</td><td>設定単位 / 再利用単位</td></tr>
         <tr><td><strong>class</strong></td><td><code>class Foo extends Bar { ... }</code></td><td>単一継承の型定義</td></tr>
         <tr><td><strong>function</strong></td><td><code>function greet(b: Bird): String = "Hello, \(b.name)!"</code></td><td>値の計算抽象</td></tr>
         <tr><td><strong>object</strong></td><td><code>new { ... }</code> / <code>amends { ... }</code></td><td>レコード値、プロトタイプ的な拡張可</td></tr>
@@ -548,7 +548,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   <p>moduleの組み立て構文:</p>
 
   <ul>
-    <li><code>import "uri"</code> で別moduleを値として読み込む (識別子に束縛される)</li>
+    <li><code>import "uri"</code> で別moduleを値として読み込む(識別子に束縛される)</li>
     <li><code>amends "uri"</code> で別moduleをベースにし、上書き拡張する</li>
     <li><code>extends "uri"</code> で別moduleをクラス的に継承する</li>
   </ul>
@@ -560,29 +560,29 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong> (ただし純粋関数限定):</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong> (ただし純粋関数限定):</p>
 
   <ul>
-    <li>ユーザ定義関数 <code>function</code> あり (型注釈・型制約付き引数)</li>
-    <li><strong>高階関数あり</strong>: <code>Listing&lt;Bird&gt;(isDistinctBy((it) -&gt; it.name))</code> のようにラムダを引数に渡せる (公式referenceより)</li>
+    <li>ユーザ定義関数 <code>function</code> あり(型注釈・型制約付き引数)</li>
+    <li><strong>高階関数あり</strong>: <code>Listing&lt;Bird&gt;(isDistinctBy((it) -&gt; it.name))</code> のようにラムダを引数に渡せる(公式referenceより)</li>
     <li>ユーザクラス <code>class</code> あり、単一継承で組み合わせ可能</li>
     <li>副作用がないので、関数を増やしても観測可能なグラフ形状の変化は限定的</li>
   </ul>
 
-  <p>ただし「グラフ形状を変える抽象」自体がPklのスコープ外。Pklは<strong>構成データ (オブジェクトツリー) を出力する</strong>のがゴールで、IaCツールが扱う「ノードとedgeを持つresource graph」とはレイヤが違う。3自由度を機械的に当てはめると次のように見える。</p>
+  <p>ただし「グラフ形状を変える抽象」自体がPklのスコープ外。Pklは<strong>構成データ(オブジェクトツリー)を出力する</strong>のがゴールで、IaCツールが扱う「ノードとedgeを持つresource graph」とはレイヤが違う。3自由度を機械的に当てはめると次のように見える。</p>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>規約 + 言語の合わせ技</strong>:</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>規約 + 言語の合わせ技</strong>:</p>
 
   <ul>
-    <li>ループ構文 (<code>for</code>, <code>while</code>) は<strong>言語にない</strong></li>
+    <li>ループ構文(<code>for</code>, <code>while</code>)は<strong>言語にない</strong></li>
     <li>代わりに標準ライブラリの <code>map</code> / <code>filter</code> / <code>forEach</code> 系メソッドで集合操作</li>
-    <li><code>if</code> 式はあり、必ず <code>else</code> 必須 (公式: "Every if expression must have an else branch")</li>
-    <li>量を動的に決めること自体は普通に可能 (<code>List(1, 2, 3).map((i) -&gt; new Server { port = 8000 + i })</code> のように)</li>
+    <li><code>if</code> 式はあり、必ず <code>else</code> 必須(公式: "Every if expression must have an else branch")</li>
+    <li>量を動的に決めること自体は普通に可能(<code>List(1, 2, 3).map((i) -&gt; new Server { port = 8000 + i })</code> のように)</li>
   </ul>
 
   <p>つまり「量を動かすこと」は標準ライブラリで出来る、その範囲を「言語が決める」か「規約に委ねる」かは曖昧で、<strong>標準ライブラリAPIという中間層に押し込まれている</strong>。Terraformの <code>for_each</code> のような専用構文はないが、CDK/Pulumiのように <code>for</code> ループを直接書くこともない。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>言語が決める (静的のみ)</strong>:</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>言語が決める(静的のみ)</strong>:</p>
 
   <ul>
     <li><code>import "uri"</code> / <code>amends "uri"</code> / <code>extends "uri"</code> の<strong>URIは全てリテラル文字列のみ</strong>。変数や式で実行時に切り替えられない</li>
@@ -606,50 +606,50 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <p><strong>マッピング</strong>: <strong>外部DSL × 言語が決める</strong>に位置するが、抽象化の追加だけは「規約に委ねる」寄り。</p>
 
-  <p>これは章1 §1-3-4の「<strong>汎用言語 (内部DSLの型を活用) × 言語が決める</strong>象限の部分実装」の<strong>裏返しの姿</strong>とも見える: Pklは外部DSLを選んだ上で「抽象化の追加」だけは汎用言語並みの自由度を許している。</p>
+  <p>これは章1 §1-3-4の「<strong>汎用言語(内部DSLの型を活用) × 言語が決める</strong>象限の部分実装」の<strong>裏返しの姿</strong>とも見える: Pklは外部DSLを選んだ上で「抽象化の追加」だけは汎用言語並みの自由度を許している。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
-  <p>Pklの位置取りは「<strong>外部DSLを選びつつ、構成データ計算の表現力 (関数 / 高階関数 / 標準ライブラリ) は汎用言語に近づける</strong>」というハイブリッド。</p>
+  <p>Pklの位置取りは「<strong>外部DSLを選びつつ、構成データ計算の表現力(関数 / 高階関数 / 標準ライブラリ)は汎用言語に近づける</strong>」というハイブリッド。</p>
 
   <ul>
-    <li><strong>graphの形を変える3自由度の中で、最重要の「実装の切替」だけは厳格にロック</strong>: import/amends/extendsのURIリテラル制約はこれを実現している。出力されるオブジェクトツリーの<strong>構成 (どのmoduleを読み込んでいるか)</strong> が静的解析だけで決まる</li>
-    <li><strong>「複数量の制御」は標準ライブラリに集約</strong>: ループ構文を持たない設計は、評価器の表現力を絞り (停止性確保)、操作を <code>map</code>/<code>filter</code> 系に統一する効果。CueやDhallの発想と近い</li>
-    <li><strong>「抽象化の追加」は緩い</strong>: ユーザ関数 / 高階関数 / クラス継承が許されている。Pklの設計目標はIaCツールではなく「Apple内部の大規模設定ファイル群を型付きで管理する」ことなので、計算ロジックの再利用が必要 (例: 環境別ポート計算、命名規則の統一)</li>
+    <li><strong>graphの形を変える3自由度の中で、最重要の「実装の切替」だけは厳格にロック</strong>: import/amends/extendsのURIリテラル制約はこれを実現している。出力されるオブジェクトツリーの<strong>構成(どのmoduleを読み込んでいるか)</strong> が静的解析だけで決まる</li>
+    <li><strong>「複数量の制御」は標準ライブラリに集約</strong>:ループ構文を持たない設計は、評価器の表現力を絞り(停止性確保)、操作を <code>map</code>/<code>filter</code> 系に統一する効果。CueやDhallの発想と近い</li>
+    <li><strong>「抽象化の追加」は緩い</strong>:ユーザ関数 / 高階関数 / クラス継承が許されている。Pklの設計目標はIaCツールではなく「Apple内部の大規模設定ファイル群を型付きで管理する」ことなので、計算ロジックの再利用が必要(例:環境別ポート計算、命名規則の統一)</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>構成データの最終形が静的に決まる安心感 (URIが動かないので、どのmoduleが読まれるかはparse時に確定)、純粋性による再現性。</p>
+      <p>構成データの最終形が静的に決まる安心感(URIが動かないので、どのmoduleが読まれるかはparse時に確定)、純粋性による再現性。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>「実行時条件で別moduleを選ぶ」という抽象化はできない (<code>if env == "prod" then import "prod.pkl" else import "dev.pkl"</code> は不可)。代わりに<strong>ユーザはmodule内部で <code>if</code> 式や条件付き値で分岐</strong>することになる。</p>
+      <p>「実行時条件で別moduleを選ぶ」という抽象化はできない(<code>if env == "prod" then import "prod.pkl" else import "dev.pkl"</code> は不可)。代わりに<strong>ユーザはmodule内部で <code>if</code> 式や条件付き値で分岐</strong>することになる。</p>
     </div>
   </div>
 
-  <p>章1の3自由度を<strong>graph形状の自由度</strong>ではなく<strong>構成データの計算自由度</strong>として読み替えれば、Pklは「<strong>外部DSL × (一部) 言語が決める / (一部) 規約に委ねる</strong>」のハイブリッドで、章1 §1-3-4が示した4象限の単純マッピングを<strong>逸脱する例</strong>になる。これは章1が暗黙に「IaC的なresource graphを出力するDSL」を前提にしていたことの裏返しでもある。</p>
+  <p>章1の3自由度を<strong>graph形状の自由度</strong>ではなく<strong>構成データの計算自由度</strong>として読み替えれば、Pklは「<strong>外部DSL × (一部)言語が決める / (一部)規約に委ねる</strong>」のハイブリッドで、章1 §1-3-4が示した4象限の単純マッピングを<strong>逸脱する例</strong>になる。これは章1が暗黙に「IaC的なresource graphを出力するDSL」を前提にしていたことの裏返しでもある。</p>
 
-  <p class="src">引用元: Pkl Language Reference, "Modules" 節, "Imports" 節, "Methods" 節, "Type Constraints" 節 — <a href="https://pkl-lang.org/main/current/language-reference/index.html">pkl-lang.org</a></p>
+  <p class="src">引用元: Pkl Language Reference, "Modules"節, "Imports"節, "Methods"節, "Type Constraints"節 — <a href="https://pkl-lang.org/main/current/language-reference/index.html">pkl-lang.org</a></p>
 
   <h3>Bicep (Microsoft)<span class="tier-badge">TIER 1</span></h3>
 
   <p class="src">公式: <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/file">learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/file</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
-  <p><strong>外部DSL</strong>。Microsoft Azure専用、コンパイルするとARM template (JSON) を生成する。独自パーサ・コンパイラ。</p>
+  <p><strong>外部DSL</strong>。Microsoft Azure専用、コンパイルするとARM template (JSON)を生成する。独自パーサ・コンパイラ。</p>
 
   <p>評価モデル:</p>
 
   <ul>
     <li><strong>2段階</strong>: Bicepファイル → ARM template (JSON) → Azure Deploymentがapply</li>
-    <li><strong>宣言的</strong>: 公式: "Bicep is a declarative language, which means the elements can appear in any order. Unlike imperative languages, the order of elements doesn't affect how deployment is processed." (Bicep file structure章)</li>
-    <li>副作用なし、評価はARM template生成時 (compile/author time) とdeploy時の2段に分かれる</li>
+    <li><strong>宣言的</strong>:公式: "Bicep is a declarative language, which means the elements can appear in any order. Unlike imperative languages, the order of elements doesn't affect how deployment is processed." (Bicep file structure章)</li>
+    <li>副作用なし、評価はARM template生成時(compile/author time)とdeploy時の2段に分かれる</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -660,7 +660,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
         <tr><td><strong>Bicep file</strong></td><td><code>.bicep</code> ファイル</td><td>デプロイ単位 / module単位</td></tr>
         <tr><td><strong>resource</strong></td><td><code>resource &lt;name&gt; '&lt;type&gt;@&lt;version&gt;' = { ... }</code></td><td>個別リソース層</td></tr>
         <tr><td><strong>module</strong></td><td><code>module &lt;name&gt; '&lt;path&gt;' = { ... }</code></td><td>複数リソース束ね層</td></tr>
-        <tr><td><strong>type</strong></td><td><code>type &lt;name&gt; = &lt;type-expression&gt;</code></td><td>ユーザ定義型 (union, object)</td></tr>
+        <tr><td><strong>type</strong></td><td><code>type &lt;name&gt; = &lt;type-expression&gt;</code></td><td>ユーザ定義型(union, object)</td></tr>
         <tr><td><strong>func</strong></td><td><code>func &lt;name&gt; (...) &lt;type&gt; =&gt; &lt;expr&gt;</code></td><td>ユーザ定義関数</td></tr>
         <tr><td><strong>var</strong></td><td><code>var &lt;name&gt; = &lt;expr&gt;</code></td><td>ローカル変数</td></tr>
         <tr><td><strong>param</strong></td><td><code>param &lt;name&gt; &lt;type&gt; = &lt;default&gt;</code></td><td>デプロイ時パラメータ</td></tr>
@@ -668,7 +668,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
     </table>
   </div>
 
-  <p>module構文 (公式modules節より):</p>
+  <p>module構文(公式modules節より):</p>
 
 <pre><code>module &lt;symbolic-name&gt; '&lt;path-to-file&gt;' = {
   name: '&lt;linked-deployment-name&gt;'
@@ -677,23 +677,23 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   }
 }</code></pre>
 
-  <p>pathは<strong>リテラル文字列のみ</strong> (シンタックス図で <code>'&lt;path-to-file&gt;'</code> は単引用符のリテラル文字列)。registry path (<code>br/public:...:tag</code>) やtemplate spec path (<code>ts:...</code>) も同じく文字列リテラル。</p>
+  <p>pathは<strong>リテラル文字列のみ</strong> (シンタックス図で <code>'&lt;path-to-file&gt;'</code> は単引用符のリテラル文字列)。registry path (<code>br/public:...:tag</code>)やtemplate spec path (<code>ts:...</code>)も同じく文字列リテラル。</p>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>言語が決める寄り</strong>、ただし <code>func</code> で関数定義は可能:</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>言語が決める寄り</strong>、ただし <code>func</code> で関数定義は可能:</p>
 
   <ul>
-    <li>ユーザ定義関数 <code>func</code> あり (公式: User-defined functions in Bicep)</li>
+    <li>ユーザ定義関数 <code>func</code> あり(公式: User-defined functions in Bicep)</li>
     <li>構文: <code>func buildUrl(https bool, hostname string, path string) string =&gt; '${https ? 'https' : 'http'}://...'</code></li>
-    <li><strong>高階関数なし</strong>: 関数を引数に取る、関数を返す、関数を変数に入れる等は仕様にない (関数値が一級ではない)</li>
-    <li>ユーザ定義型 <code>type</code> あり (union型、object型)</li>
+    <li><strong>高階関数なし</strong>:関数を引数に取る、関数を返す、関数を変数に入れる等は仕様にない(関数値が一級ではない)</li>
+    <li>ユーザ定義型 <code>type</code> あり(union型、object型)</li>
     <li>「ヘルパー関数で値計算を抽象化」までは可能だが、「クラス継承」「モジュールを引数に取る関数」のような構造的抽象化は<strong>言語にない</strong></li>
   </ul>
 
-  <p>公式file章の "Known limitations" にもかつては "User-defined functions aren't supported at this time" とあったが、現在は <code>func</code> キーワードで実装済み。それでも高階関数は仕様にない。</p>
+  <p>公式file章の "Known limitations"にもかつては "User-defined functions aren't supported at this time"とあったが、現在は <code>func</code> キーワードで実装済み。それでも高階関数は仕様にない。</p>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>言語が決める</strong> (専用構文 <code>for</code>):</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>言語が決める</strong> (専用構文 <code>for</code>):</p>
 
   <blockquote>
     <p>Add iterative loops to your Bicep file to define multiple copies of: A resource, A module, A variable, A property, An output. Use the <code>for</code> expression to define a loop.</p>
@@ -708,13 +708,13 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <p>つまりTerraformの <code>for_each</code> / <code>count</code> / <code>dynamic</code> と同じく、量を動かす自由度は<strong>専用構文に閉じている</strong>。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>言語が決める</strong> (pathリテラルのみ):</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>言語が決める</strong> (pathリテラルのみ):</p>
 
   <ul>
     <li>module pathは文字列リテラル: <code>module stgModule '../storageAccount.bicep' = { ... }</code> または <code>module storage 'br/public:avm/res/storage/storage-account:0.18.0' = { ... }</code></li>
     <li>公式のsyntaxは <code>module &lt;symbolic-name&gt; '&lt;path-to-file&gt;' = { ... }</code> で、<strong>pathはstring interpolationや変数参照を持たない位置に設計</strong></li>
     <li>つまり「実行時にpathを変えて別moduleを読み込む」ことは不可能。compile時に決まる</li>
-    <li>ただし <code>if</code> で<strong>moduleを出すかどうか</strong>は条件分岐できる (<code>module mod 'a.bicep' = if (cond) { ... }</code>)</li>
+    <li>ただし <code>if</code> で<strong>moduleを出すかどうか</strong>は条件分岐できる(<code>module mod 'a.bicep' = if (cond) { ... }</code>)</li>
   </ul>
 
   <p>「どのmoduleを呼ぶか」は静的、「呼ぶか呼ばないか」は動的、という分離。Terraformの <code>source</code> リテラル制約と同じ性質。</p>
@@ -735,36 +735,36 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <p>3自由度すべてが言語側で制限される、章1 §1-3-4の「外部DSL × 言語が決める」象限の典型例。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
-  <p>Bicepは<strong>ARM template (JSON) の手書きを置き換えるauthoring layer</strong> として設計された。設計上の制約:</p>
+  <p>Bicepは<strong>ARM template (JSON)の手書きを置き換えるauthoring layer</strong> として設計された。設計上の制約:</p>
 
   <ul>
     <li><strong>コンパイル先がJSON</strong>: ARM templateの表現力が天井になる。たとえば「実行時に別templateを読み込む」のはARM templateの世界に存在しないので、Bicepでも実装できない</li>
     <li><strong>decorator中心の制約表現</strong>: <code>@minLength</code>, <code>@maxLength</code>, <code>@allowed</code> 等で値制約を文法的に表現</li>
-    <li><strong><code>for</code> / <code>if</code> の限定的な専用構文</strong>: 任意の制御フローではなく、<strong>resource/module宣言の右辺にのみ書ける形</strong>で量と条件を扱う</li>
+    <li><strong><code>for</code> / <code>if</code> の限定的な専用構文</strong>:任意の制御フローではなく、<strong>resource/module宣言の右辺にのみ書ける形</strong>で量と条件を扱う</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>ARM templateへの1:1対応の予測性 (コンパイル後のJSONが静的に想像できる)、エディタ/lint/IntelliSenseの効きやすさ、Azure専用に特化した型システム (resource typeが強く型付けされる)。</p>
+      <p>ARM templateへの1:1対応の予測性(コンパイル後のJSONが静的に想像できる)、エディタ/lint/IntelliSenseの効きやすさ、Azure専用に特化した型システム(resource typeが強く型付けされる)。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>任意のヘルパー抽象化 (高階関数なし、クラスなし)、cross-cloudの汎用性 (Azure専用)、動的なmodule選択。</p>
+      <p>任意のヘルパー抽象化(高階関数なし、クラスなし)、cross-cloudの汎用性(Azure専用)、動的なmodule選択。</p>
     </div>
   </div>
 
-  <p>Bicepは<strong>Terraform寄りの位置取り</strong> (外部DSL × 言語が決める) を、Azure専用にチューニングした形。Terraformの <code>for_each</code> / <code>count</code> / <code>dynamic</code> に相当する自由度として <code>for</code> / <code>if</code> を持つが、いずれもresource/module宣言の右辺に閉じた専用構文で、汎用言語の制御フローではない。</p>
+  <p>Bicepは<strong>Terraform寄りの位置取り</strong> (外部DSL × 言語が決める)を、Azure専用にチューニングした形。Terraformの <code>for_each</code> / <code>count</code> / <code>dynamic</code> に相当する自由度として <code>for</code> / <code>if</code> を持つが、いずれもresource/module宣言の右辺に閉じた専用構文で、汎用言語の制御フローではない。</p>
 
-  <p class="src">引用元: Bicep file structure and syntax, "Loops" 節, "Conditional deployment" 節, "Functions" 節 — <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/file">learn.microsoft.com</a> / Bicep modules, "Define modules" 節 — <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/modules">learn.microsoft.com</a></p>
+  <p class="src">引用元: Bicep file structure and syntax, "Loops"節, "Conditional deployment"節, "Functions"節 — <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/file">learn.microsoft.com</a> / Bicep modules, "Define modules"節 — <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/modules">learn.microsoft.com</a></p>
 
   <h3>KCL (CNCF)<span class="tier-badge">TIER 1</span></h3>
 
   <p class="src">公式: <a href="https://www.kcl-lang.io/docs/reference/lang/tour">kcl-lang.io/docs/reference/lang/tour</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>外部DSL</strong>。Kubernetes / Cloud Native寄りの構成記述言語、Pythonに似た見た目。CNCF Sandboxプロジェクト。</p>
 
@@ -778,10 +778,10 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   <ul>
     <li><strong>純粋関数</strong>: "KCL functions cannot modify external variables, but can only reference external variables."</li>
     <li><strong>immutability優先</strong>: "KCL prefers immutability and recommend to add up incremental updates through the union."</li>
-    <li><strong>schemaは順序非依存</strong>: 計算は依存ベース (DAGトポロジカルソート相当)</li>
+    <li><strong>schemaは順序非依存</strong>:計算は依存ベース(DAGトポロジカルソート相当)</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -791,7 +791,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
       <tbody>
         <tr><td><strong>module</strong></td><td>ファイル / ディレクトリ</td><td>名前空間、importの単位</td></tr>
         <tr><td><strong>schema</strong></td><td><code>schema Foo: ...</code></td><td>型 + 制約 + デフォルト値の定義</td></tr>
-        <tr><td><strong>lambda</strong></td><td><code>lambda x: int, y: int -&gt; int { x + y }</code></td><td>関数値 (一級)</td></tr>
+        <tr><td><strong>lambda</strong></td><td><code>lambda x: int, y: int -&gt; int { x + y }</code></td><td>関数値(一級)</td></tr>
         <tr><td><strong>rule</strong></td><td>ランタイム制約検証</td><td>バリデーション</td></tr>
         <tr><td><strong>mixin / protocol</strong></td><td>schema合成 / 制約</td><td>多重継承的な再利用</td></tr>
       </tbody>
@@ -809,10 +809,10 @@ schema Employee(Person):
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong>:</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong>:</p>
 
   <ul>
-    <li>ユーザ定義関数 (lambda式): <code>func = lambda x: int, y: int -&gt; int { x + y }</code></li>
+    <li>ユーザ定義関数(lambda式): <code>func = lambda x: int, y: int -&gt; int { x + y }</code></li>
     <li><strong>高階関数あり</strong> (公式より): "Functions can capture external variables and be passed as arguments":</li>
   </ul>
 
@@ -823,12 +823,12 @@ r0 = funcOther(func, 1)  # func を引数として渡す</code></pre>
 
   <ul>
     <li>schemaの単一継承 + mixin合成で構造的抽象化も可</li>
-    <li>ただし副作用は禁止 (純粋関数のみ)、これは「規約に委ねる」中でも安全側に倒した設計</li>
+    <li>ただし副作用は禁止(純粋関数のみ)、これは「規約に委ねる」中でも安全側に倒した設計</li>
   </ul>
 
-  <p>「抽象化の追加」は汎用言語並みの自由度を許している。Pklと類似だが、KCLの方がより明示的に<strong>関数値を一級</strong>として扱う (Pklはラムダはあるが「関数値を変数に入れて使い回す」より「メソッドの引数に直接渡す」用途が中心)。</p>
+  <p>「抽象化の追加」は汎用言語並みの自由度を許している。Pklと類似だが、KCLの方がより明示的に<strong>関数値を一級</strong>として扱う(Pklはラムダはあるが「関数値を変数に入れて使い回す」より「メソッドの引数に直接渡す」用途が中心)。</p>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>言語が決める</strong> (専用構文 = list/dict comprehension):</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>言語が決める</strong> (専用構文 = list/dict comprehension):</p>
 
   <ul>
     <li>list comprehension: <code>[_x for _x in range(20) if _x % 2 == 0]</code></li>
@@ -839,7 +839,7 @@ r0 = funcOther(func, 1)  # func を引数として渡す</code></pre>
 
   <p>つまり「量を動かす」は<strong>式レベルで完結する設計</strong>。Python風の構文だが、Pythonのように手続き的な <code>for</code> 文は持たない。これは副作用禁止と整合した設計。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラルのみ):</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラルのみ):</p>
 
 <pre><code>import .model1              # 相対
 import service              # 絶対 (kcl.mod から)
@@ -848,7 +848,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
   <ul>
     <li>import pathは<strong>リテラルのみ</strong>、変数や式での動的指定は不可</li>
     <li>「実行時にどのmoduleを読むか」を切り替える機構はない</li>
-    <li>ただしschemaレベルでの動的選択は可能 (ある型の値を別のschemaの値で置き換える、union型による分岐等)</li>
+    <li>ただしschemaレベルでの動的選択は可能(ある型の値を別のschemaの値で置き換える、union型による分岐等)</li>
   </ul>
 
   <h4>4. 2×2配置</h4>
@@ -868,13 +868,13 @@ import ..model as model     # 親ディレクトリ</code></pre>
   <p>Pklと同じくハイブリッド型。Pklとの違いは:</p>
 
   <ul>
-    <li>Pkl: ループ構文なし、標準ライブラリ <code>map</code>/<code>filter</code> のみ</li>
+    <li>Pkl:ループ構文なし、標準ライブラリ <code>map</code>/<code>filter</code> のみ</li>
     <li>KCL: list/dict comprehensionあり、ステートメント <code>for</code> なし</li>
   </ul>
 
   <p>両者とも「副作用禁止」「量は式で表現」「import静的」という共通設計。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>KCLの位置取りは<strong>「Pythonの見た目を借りつつ、副作用と動的読み込みを禁止する」</strong>:</p>
 
@@ -887,15 +887,15 @@ import ..model as model     # 親ディレクトリ</code></pre>
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>Python経験者の学習コストの低さ、構成データ計算の表現力 (高階関数で命名規則ヘルパーや変換ロジックを再利用可能)、schemaの型安全と制約検証。</p>
+      <p>Python経験者の学習コストの低さ、構成データ計算の表現力(高階関数で命名規則ヘルパーや変換ロジックを再利用可能)、schemaの型安全と制約検証。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>副作用ベースの抽象化 (ファイル書き出し / 外部呼び出しは禁止)、動的module選択。</p>
+      <p>副作用ベースの抽象化(ファイル書き出し / 外部呼び出しは禁止)、動的module選択。</p>
     </div>
   </div>
 
-  <p>KCLは<strong>Pklと同じハイブリッド象限</strong>に位置する。両者は独立に「外部DSLを選びつつ抽象化追加だけ汎用言語並みに開放する」という設計判断に至った。これは章1 §1-3-4の4象限が<strong>3自由度を一律に分類するのは粗い</strong>ことの示唆 (各自由度ごとに別象限に落ちうる)。</p>
+  <p>KCLは<strong>Pklと同じハイブリッド象限</strong>に位置する。両者は独立に「外部DSLを選びつつ抽象化追加だけ汎用言語並みに開放する」という設計判断に至った。これは章1 §1-3-4の4象限が<strong>3自由度を一律に分類するのは粗い</strong>ことの示唆(各自由度ごとに別象限に落ちうる)。</p>
 
   <p class="src">引用元: KCL Language Tour — <a href="https://www.kcl-lang.io/docs/reference/lang/tour">kcl-lang.io</a></p>
 
@@ -903,7 +903,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://cuelang.org/docs/reference/spec/">cuelang.org/docs/reference/spec/</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>外部DSL</strong>。data validation / configuration / code generationの特化言語。Goから派生したが言語仕様は独立。</p>
 
@@ -915,7 +915,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     <li><strong>constraint = type = value</strong>: typesとvaluesを単一概念で扱うgraph unification model</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -924,7 +924,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
       </thead>
       <tbody>
         <tr><td><strong>package</strong></td><td>ディレクトリ単位</td><td>名前空間</td></tr>
-        <tr><td><strong>definition</strong></td><td><code>#Foo: { ... }</code></td><td>型 (closed struct)</td></tr>
+        <tr><td><strong>definition</strong></td><td><code>#Foo: { ... }</code></td><td>型(closed struct)</td></tr>
         <tr><td><strong>regular field</strong></td><td><code>foo: ...</code></td><td>値</td></tr>
         <tr><td><strong>comprehension</strong></td><td><code>[for x in a if cond { x+1 }]</code></td><td>集合計算</td></tr>
       </tbody>
@@ -935,10 +935,10 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>言語が決める</strong> (関数なし、unificationとcomprehensionのみ):</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>言語が決める</strong> (関数なし、unificationとcomprehensionのみ):</p>
 
   <ul>
-    <li><strong>ユーザ定義関数なし</strong>: 仕様には関数呼び出し <code>f(a1, a2, ..., an)</code> の構文はあるが、これは<strong>builtinsの呼び出し限定</strong></li>
+    <li><strong>ユーザ定義関数なし</strong>:仕様には関数呼び出し <code>f(a1, a2, ..., an)</code> の構文はあるが、これは<strong>builtinsの呼び出し限定</strong></li>
     <li><strong>高階関数なし</strong></li>
     <li><strong>lambdaなし</strong></li>
     <li>抽象化は<strong>definition (<code>#Foo</code>)</strong> で型 + 制約を切り出す形のみ。値レベルでの再利用ヘルパーは書けない</li>
@@ -946,16 +946,16 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>つまり「値を計算するロジックを再利用したい」場合、CUEでは<strong>definitionで制約を書いて、unificationで値を流し込む</strong>という発想に変換する必要がある。命令的な「関数で計算する」アプローチは取れない。</p>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>言語が決める</strong> (comprehension限定):</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>言語が決める</strong> (comprehension限定):</p>
 
   <ul>
     <li>仕様: "Comprehensions define a clause sequence that consists of a sequence of for, if, and let clauses, nesting from left to right."</li>
     <li>構文: <code>[for x in a if x &gt; 1 { x+1 }]</code></li>
     <li><strong>使用箇所</strong>: listとstructの値構築に限定。トップレベルの <code>for</code> 文や手続き的ループはない</li>
-    <li>リソース束ね (Kubernetes manifest配列の生成等) はcomprehensionで表現</li>
+    <li>リソース束ね(Kubernetes manifest配列の生成等)はcomprehensionで表現</li>
   </ul>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラル):</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラル):</p>
 
   <ul>
     <li>仕様: <code>ImportPath = `"` ImportLocation [ ":" identifier ] `"`</code> (文字列リテラル)</li>
@@ -977,26 +977,26 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p><strong>マッピング</strong>: <strong>外部DSL × 言語が決める</strong> (3自由度すべてが言語側で制限)。</p>
 
-  <p>Pkl / KCLのハイブリッド性 (抽象化追加だけ規約寄り) と異なり、CUEは<strong>3自由度すべてを言語で制限する純粋な「外部DSL × 言語が決める」象限</strong>。Terraform / Carina / Bicepと同じ象限の中でも、抽象化機構が<strong>unificationという独自の数学的基礎</strong>に乗っている点で特殊。</p>
+  <p>Pkl / KCLのハイブリッド性(抽象化追加だけ規約寄り)と異なり、CUEは<strong>3自由度すべてを言語で制限する純粋な「外部DSL × 言語が決める」象限</strong>。Terraform / Carina / Bicepと同じ象限の中でも、抽象化機構が<strong>unificationという独自の数学的基礎</strong>に乗っている点で特殊。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>CUEの位置取りは「<strong>unificationに賭けた純粋関数型DSL</strong>」:</p>
 
   <ul>
-    <li><strong>「抽象化 = 関数」ではなく「抽象化 = constraintのunification」</strong>: 関数で値を計算する代わりに、definitionで制約を書き、unifyで値を組み合わせる</li>
-    <li><strong>順序非依存 / 結合則 / 交換則 / 冪等</strong>: これにより部分評価・統合・検証が可能 (例: complete configuration = sum of partial configurations)</li>
-    <li><strong>Turing不完全 (有限性保証)</strong>: 仕様レベルで停止性を保つために、関数定義や再帰を許さない設計判断</li>
+    <li><strong>「抽象化 = 関数」ではなく「抽象化 = constraintのunification」</strong>:関数で値を計算する代わりに、definitionで制約を書き、unifyで値を組み合わせる</li>
+    <li><strong>順序非依存 / 結合則 / 交換則 / 冪等</strong>:これにより部分評価・統合・検証が可能(例: complete configuration = sum of partial configurations)</li>
+    <li><strong>Turing不完全(有限性保証)</strong>:仕様レベルで停止性を保つために、関数定義や再帰を許さない設計判断</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>構成データの数学的取り扱い (constraintの自動検証、mergeの再現性、closed/open structでの型安全性)、Turing不完全による停止性保証、validation/policyとしての強さ。</p>
+      <p>構成データの数学的取り扱い(constraintの自動検証、mergeの再現性、closed/open structでの型安全性)、Turing不完全による停止性保証、validation/policyとしての強さ。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>命令的な計算ロジックの抽象化 (ヘルパー関数で名前生成 / 環境別ポート計算 / 文字列処理を書き直すのが難しい)、命令型プログラマの直感とのズレ。</p>
+      <p>命令的な計算ロジックの抽象化(ヘルパー関数で名前生成 / 環境別ポート計算 / 文字列処理を書き直すのが難しい)、命令型プログラマの直感とのズレ。</p>
     </div>
   </div>
 
@@ -1004,7 +1004,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>これは章1が想定していた「IaC的なresource graphを出力するDSL」の枠組みを大きく逸脱する。CUEはgraph出力ツールではなく<strong>constraint validator + value composer</strong>。3自由度の比較軸がCUEでは「graphの形」ではなく「最終valueの形」を変える自由度として読み替えが必要。</p>
 
-  <p class="src">引用元: CUE Language Specification, "Comprehensions" 節, "Import declarations" 節 — <a href="https://cuelang.org/docs/reference/spec/">cuelang.org</a> / CUE Introduction — <a href="https://cuelang.org/docs/introduction/">cuelang.org</a></p>
+  <p class="src">引用元: CUE Language Specification, "Comprehensions"節, "Import declarations"節 — <a href="https://cuelang.org/docs/reference/spec/">cuelang.org</a> / CUE Introduction — <a href="https://cuelang.org/docs/introduction/">cuelang.org</a></p>
 
   <h2 id="tier2">Tier 2 — 構成記述DSLの代表例</h2>
 
@@ -1012,20 +1012,20 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://dhall-lang.org/">dhall-lang.org</a> / <a href="https://github.com/dhall-lang/dhall-lang">github.com/dhall-lang/dhall-lang</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
-  <p><strong>外部DSL</strong>。"JSON + functions + types + imports" を標榜する純粋関数型 + 全域 (total) な構成記述言語。</p>
+  <p><strong>外部DSL</strong>。"JSON + functions + types + imports"を標榜する純粋関数型 + 全域(total)な構成記述言語。</p>
 
   <p>評価モデル:</p>
 
   <ul>
     <li><strong>Turing不完全</strong>: "Dhall is not Turing-complete. Evaluation always terminates, no exceptions"</li>
-    <li><strong>全域関数型 (total)</strong>: System F-ω + α 拡張、Haskellに近い表現力で再帰は禁止 (代わりに <code>Natural/fold</code> 等の組込み再帰子のみ)</li>
-    <li><strong>純粋</strong>: 副作用なし、評価結果は<strong>normal formにreduce</strong>される</li>
+    <li><strong>全域関数型(total)</strong>: System F-ω + α 拡張、Haskellに近い表現力で再帰は禁止(代わりに <code>Natural/fold</code> 等の組込み再帰子のみ)</li>
+    <li><strong>純粋</strong>:副作用なし、評価結果は<strong>normal formにreduce</strong>される</li>
     <li><strong>強い静的型付け</strong></li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -1033,7 +1033,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
         <tr><th>単位</th><th>構文</th><th>役割</th></tr>
       </thead>
       <tbody>
-        <tr><td><strong>lambda</strong></td><td><code>λ(x: T) → expr</code></td><td>関数値 (一級)</td></tr>
+        <tr><td><strong>lambda</strong></td><td><code>λ(x: T) → expr</code></td><td>関数値(一級)</td></tr>
         <tr><td><strong>let</strong></td><td><code>let x = ... in ...</code></td><td>局所束縛</td></tr>
         <tr><td><strong>record</strong></td><td><code>{ name = "alice", age = 30 }</code></td><td>値の集約</td></tr>
         <tr><td><strong>union</strong></td><td><code>&lt; Some : Text | None &gt;</code></td><td>直和型</td></tr>
@@ -1044,18 +1044,18 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong> (ただし全域性で制限):</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong> (ただし全域性で制限):</p>
 
   <ul>
     <li>ラムダで関数定義可</li>
-    <li><strong>高階関数あり</strong>: 関数を引数にも戻り値にもできる (Haskell系の表現力)</li>
+    <li><strong>高階関数あり</strong>:関数を引数にも戻り値にもできる(Haskell系の表現力)</li>
     <li>record / union型でデータ抽象化可</li>
     <li>ただし<strong>再帰禁止</strong> (Turing不完全のため)、ループは組込み <code>List/fold</code>, <code>Natural/fold</code> 等の再帰子経由</li>
   </ul>
 
-  <p>「抽象化を作る」自由度は汎用言語並みだが、停止性のために<strong>再帰の自由度は制限</strong>されている (再帰子という間接表現を使う必要)。</p>
+  <p>「抽象化を作る」自由度は汎用言語並みだが、停止性のために<strong>再帰の自由度は制限</strong>されている(再帰子という間接表現を使う必要)。</p>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>言語が決める</strong> (<code>List/build</code> / <code>Natural/fold</code> 等の組込み再帰子):</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>言語が決める</strong> (<code>List/build</code> / <code>Natural/fold</code> 等の組込み再帰子):</p>
 
   <ul>
     <li>専用ループ構文なし</li>
@@ -1063,14 +1063,14 @@ import ..model as model     # 親ディレクトリ</code></pre>
     <li>例: <code>List/map Natural Text Natural/show [1, 2, 3]</code></li>
   </ul>
 
-  <p>CUEとKCLの中間: comprehensionのような専用構文ではなく、組込み関数 (高階関数) で表現。</p>
+  <p>CUEとKCLの中間: comprehensionのような専用構文ではなく、組込み関数(高階関数)で表現。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>言語が決める</strong> (import path静的解決):</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>言語が決める</strong> (import path静的解決):</p>
 
   <ul>
     <li>import: <code>./foo.dhall</code>, <code>https://example.com/foo.dhall</code>, <code>env:HOME</code></li>
     <li>importは<strong>compile-timeに静的解決</strong>、hashによるintegrity check可</li>
-    <li>動的なimport (実行時にURLを組み立てる) は不可</li>
+    <li>動的なimport (実行時にURLを組み立てる)は不可</li>
     <li>"Every configuration file can be reduced to a normal form which eliminates all abstraction and indirection"</li>
   </ul>
 
@@ -1080,7 +1080,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span> (lambda / 高階関数 / record / unionが自由、ただし再帰禁止)</td></tr>
-        <tr><td>複数量の制御</td><td><span class="lang">言語が決める</span> + 組込み再帰子経由 (専用構文なし)</td></tr>
+        <tr><td>複数量の制御</td><td><span class="lang">言語が決める</span> + 組込み再帰子経由(専用構文なし)</td></tr>
         <tr><td>実装の切替</td><td><span class="lang">言語が決める</span> (import静的)</td></tr>
       </tbody>
     </table>
@@ -1098,20 +1098,20 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>という同一ハイブリッドパターン。これは「<strong>外部DSL × 関数値が一級な言語</strong>」の典型形である可能性が高い。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>Dhallの位置取りは「<strong>Turing不完全 + 純粋関数型 + 静的import + 暗号学的hash</strong>」:</p>
 
   <ul>
-    <li><strong>再帰禁止 / Turing不完全</strong>: 停止性保証、normal formへのreduce可能性、安全性</li>
+    <li><strong>再帰禁止 / Turing不完全</strong>:停止性保証、normal formへのreduce可能性、安全性</li>
     <li><strong>importのhash integrity</strong>: <code>let pkg = https://example.com/pkg.dhall sha256:abc...</code> でURL経由のimportにhashを付けて改竄検出可</li>
-    <li><strong>normal form</strong>: どんなに抽象化を重ねても、最終的に評価するとnormal form (関数もimportも解決した形) に到達する</li>
+    <li><strong>normal form</strong>:どんなに抽象化を重ねても、最終的に評価するとnormal form (関数もimportも解決した形)に到達する</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>停止性、再現性 (hash付きimportで同じ結果を保証)、構成データの数学的厳格さ。</p>
+      <p>停止性、再現性(hash付きimportで同じ結果を保証)、構成データの数学的厳格さ。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
@@ -1121,7 +1121,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>DhallはCUEと並ぶ<strong>「外部DSL × 言語が決める範囲が広い」象限の純粋実装</strong>だが、CUEがunification中心なのに対しDhallは<strong>lambda calculus + import</strong> というHaskell的な系譜。</p>
 
-  <p>3自由度のうち「抽象化追加」だけはPkl / KCLと同じく規約寄りに開放されているのは、<strong>設定値の計算ロジック (環境別パラメタ計算 / 型変換 / 命名規則) を再利用するために関数抽象化が実用上必要</strong>だから。CUEのように関数を捨てると、定型的な計算の再利用がどうしても辛くなる。</p>
+  <p>3自由度のうち「抽象化追加」だけはPkl / KCLと同じく規約寄りに開放されているのは、<strong>設定値の計算ロジック(環境別パラメタ計算 / 型変換 / 命名規則)を再利用するために関数抽象化が実用上必要</strong>だから。CUEのように関数を捨てると、定型的な計算の再利用がどうしても辛くなる。</p>
 
   <p class="src">引用元: Dhall README and language overview — <a href="https://github.com/dhall-lang/dhall-lang">github.com/dhall-lang/dhall-lang</a> / Dhall language website — <a href="https://dhall-lang.org/">dhall-lang.org</a></p>
 
@@ -1129,7 +1129,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://jsonnet.org/">jsonnet.org</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>外部DSL</strong> (JSON拡張)。Google由来のdata templating language。"Any JSON document is a valid Jsonnet program" — JSONの上位互換。</p>
 
@@ -1138,10 +1138,10 @@ import ..model as model     # 親ディレクトリ</code></pre>
   <ul>
     <li><strong>lazy</strong>: "Jsonnet is a lazy language, so variable initializers are not evaluated until the variable is used"</li>
     <li><strong>純粋関数型</strong> (副作用なし)</li>
-    <li><strong><code>error</code> 文で停止可能</strong>: 部分的にnon-total</li>
+    <li><strong><code>error</code> 文で停止可能</strong>:部分的にnon-total</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -1169,7 +1169,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong>:</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong>:</p>
 
   <ul>
     <li>ユーザ定義関数 / ラムダあり</li>
@@ -1177,7 +1177,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     <li>mixin合成によるオブジェクト拡張・継承的な再利用</li>
   </ul>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>言語が決める</strong> (comprehension中心):</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>言語が決める</strong> (comprehension中心):</p>
 
   <ul>
     <li>list comprehension: <code>[x + 3 for x in arr]</code> / <code>[x for x in arr if x % 2 == 0]</code></li>
@@ -1186,7 +1186,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     <li>ステートメントレベルのループはない</li>
   </ul>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラル):</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラル):</p>
 
   <ul>
     <li><code>local martinis = import 'martinis.libsonnet';</code> のpathは文字列リテラル</li>
@@ -1207,30 +1207,30 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p><strong>マッピング</strong>: <strong>外部DSL × ハイブリッド</strong> (Pkl / KCL / Dhallと同じパターン)。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>Jsonnetの位置取りは「<strong>JSON互換 + lazy + 純粋関数型 + mixin合成</strong>」:</p>
 
   <ul>
-    <li><strong>JSON互換</strong>: 既存JSONツールチェーンとの相互運用が容易、学習コストが低い</li>
-    <li><strong>lazy</strong>: 大きな構成データの一部だけ使う場合の効率、<code>self</code> 後期束縛で柔軟な拡張</li>
-    <li><strong>mixin合成</strong>: クラス継承ではなく <code>+</code> 演算子による合成、CUEのunificationに似て可換 (ただし <code>+</code> は非可換、右辺が勝つ)</li>
+    <li><strong>JSON互換</strong>:既存JSONツールチェーンとの相互運用が容易、学習コストが低い</li>
+    <li><strong>lazy</strong>:大きな構成データの一部だけ使う場合の効率、<code>self</code> 後期束縛で柔軟な拡張</li>
+    <li><strong>mixin合成</strong>:クラス継承ではなく <code>+</code> 演算子による合成、CUEのunificationに似て可換(ただし <code>+</code> は非可換、右辺が勝つ)</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>既存JSON設定の拡張パスとして自然 (既存JSONファイルがそのままJsonnetとして動く)、lazy評価による柔軟な参照解決、シンプルなmixin。</p>
+      <p>既存JSON設定の拡張パスとして自然(既存JSONファイルがそのままJsonnetとして動く)、lazy評価による柔軟な参照解決、シンプルなmixin。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>静的型 (型システムなし、CUE / Pkl / KCLと比べるとruntime errorが多い)、停止性保証 (<code>error</code> で止まりうる)。</p>
+      <p>静的型(型システムなし、CUE / Pkl / KCLと比べるとruntime errorが多い)、停止性保証(<code>error</code> で止まりうる)。</p>
     </div>
   </div>
 
-  <p><strong>CUEとの対比</strong>: CUEはunification (可換・結合・冪等) で値を組み合わせる、Jsonnetは <code>+</code> (右辺優先) で組み合わせる。両者ともgraph的な「ノードを並べる」というより「<strong>最終JSON valueを組み立てる</strong>」のが目的。</p>
+  <p><strong>CUEとの対比</strong>: CUEはunification (可換・結合・冪等)で値を組み合わせる、Jsonnetは <code>+</code> (右辺優先)で組み合わせる。両者ともgraph的な「ノードを並べる」というより「<strong>最終JSON valueを組み立てる</strong>」のが目的。</p>
 
-  <p><strong>Pkl / KCL / Dhallと並んで「外部DSL × ハイブリッド (3自由度のうち抽象化追加だけ規約寄り)」象限の代表例</strong>。型システムはPkl / KCL / Dhallより弱いが、JSON互換とlazy評価の組み合わせがKubernetes manifest生成等で人気を得た。</p>
+  <p><strong>Pkl / KCL / Dhallと並んで「外部DSL × ハイブリッド(3自由度のうち抽象化追加だけ規約寄り)」象限の代表例</strong>。型システムはPkl / KCL / Dhallより弱いが、JSON互換とlazy評価の組み合わせがKubernetes manifest生成等で人気を得た。</p>
 
   <p class="src">引用元: Jsonnet Tutorial — <a href="https://jsonnet.org/learning/tutorial.html">jsonnet.org/learning/tutorial.html</a></p>
 
@@ -1238,7 +1238,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://nickel-lang.org/">nickel-lang.org</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>外部DSL</strong>。Tweagが開発した、構成記述向けの汎用関数型言語。Nix / Dhall / CUEの系譜。</p>
 
@@ -1247,11 +1247,11 @@ import ..model as model     # 親ディレクトリ</code></pre>
   <ul>
     <li><strong>lazy</strong> (Nix的)</li>
     <li><strong>純粋関数型</strong></li>
-    <li><strong>opt-in静的型 + ランタイムcontracts</strong>: 型は付けても付けなくても良い。contractsは値検証 (runtime validation)</li>
+    <li><strong>opt-in静的型 + ランタイムcontracts</strong>:型は付けても付けなくても良い。contractsは値検証(runtime validation)</li>
     <li><strong>merge演算子 <code>&amp;</code></strong>: CUE的な構成データ合成</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -1259,7 +1259,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
         <tr><th>単位</th><th>構文</th><th>役割</th></tr>
       </thead>
       <tbody>
-        <tr><td><strong>function</strong></td><td><code>fun a b =&gt; a + b</code> (curried)</td><td>関数値 (一級)</td></tr>
+        <tr><td><strong>function</strong></td><td><code>fun a b =&gt; a + b</code> (curried)</td><td>関数値(一級)</td></tr>
         <tr><td><strong>let</strong></td><td><code>let add1 = add 1 in add1 2</code></td><td>局所束縛、部分適用</td></tr>
         <tr><td><strong>record</strong></td><td><code>{a = 1, b.c = 2}</code></td><td>レコード値</td></tr>
         <tr><td><strong>enum / match</strong></td><td><code>match { 'Some x =&gt; x, 'None =&gt; 0 }</code></td><td>直和型</td></tr>
@@ -1270,20 +1270,20 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </table>
   </div>
 
-  <p>mergeにはpriority annotation (<code>default</code>, <code>force</code>, <code>priority N</code>) があり、衝突解消ルールを明示できる。</p>
+  <p>mergeにはpriority annotation (<code>default</code>, <code>force</code>, <code>priority N</code>)があり、衝突解消ルールを明示できる。</p>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong>:</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>規約に委ねる範囲が広い</strong>:</p>
 
   <ul>
     <li><code>fun</code> で関数定義、curried syntax</li>
-    <li><strong>高階関数あり</strong>: 部分適用 (<code>let add1 = add 1</code>) が自然に動く</li>
+    <li><strong>高階関数あり</strong>:部分適用(<code>let add1 = add 1</code>)が自然に動く</li>
     <li>record / enumで構造的データ</li>
     <li>contractsで「値が満たすべき制約」をユーザ定義可</li>
   </ul>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>規約に委ねる</strong> (関数 + array操作):</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>規約に委ねる</strong> (関数 + array操作):</p>
 
   <ul>
     <li>専用ループ構文なし</li>
@@ -1293,7 +1293,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>CUE / Dhall / Jsonnetと同様、専用構文ではなく<strong>関数値の操作</strong>で量を動かす。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラル):</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>言語が決める</strong> (import pathリテラル):</p>
 
   <ul>
     <li><code>import "file.ncl"</code> のpathは文字列リテラル</li>
@@ -1315,16 +1315,16 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p><strong>マッピング</strong>: <strong>外部DSL × ハイブリッド</strong> (Pkl / KCL / Dhall / Jsonnetと同じパターン)。</p>
 
-  <p>ただし複数量制御も「規約に委ねる」寄り (専用comprehension構文を持たない、関数で扱う) で、PklとDhallに似て<strong>より「規約寄り」の傾き</strong>。</p>
+  <p>ただし複数量制御も「規約に委ねる」寄り(専用comprehension構文を持たない、関数で扱う)で、PklとDhallに似て<strong>より「規約寄り」の傾き</strong>。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>Nickelの位置取りは「<strong>lazy + opt-in型 + contracts + merge</strong>」:</p>
 
   <ul>
-    <li><strong>opt-in型</strong>: 型は強制しない、必要な箇所に付けるgradual typing的設計</li>
-    <li><strong>contracts</strong>: 静的型では表現しづらい制約 (range, 正規表現マッチ等) をruntime validationで表現。型 + contractsのレイヤ設計は本格的</li>
-    <li><strong>mergeとpriority</strong>: CUEのunificationに近いが、衝突時の解決ルール (<code>default</code> / <code>force</code> / <code>priority N</code>) を明示</li>
+    <li><strong>opt-in型</strong>:型は強制しない、必要な箇所に付けるgradual typing的設計</li>
+    <li><strong>contracts</strong>:静的型では表現しづらい制約(range,正規表現マッチ等)をruntime validationで表現。型 + contractsのレイヤ設計は本格的</li>
+    <li><strong>mergeとpriority</strong>: CUEのunificationに近いが、衝突時の解決ルール(<code>default</code> / <code>force</code> / <code>priority N</code>)を明示</li>
   </ul>
 
   <div class="contrast">
@@ -1334,7 +1334,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>静的型強制 (型を付けないとruntimeまで気付かない)、停止性保証 (Turing完全と思われる)。</p>
+      <p>静的型強制(型を付けないとruntimeまで気付かない)、停止性保証(Turing完全と思われる)。</p>
     </div>
   </div>
 
@@ -1352,7 +1352,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </table>
   </div>
 
-  <p>Nickelは<strong>「型を強制せず、contractsで補完する」</strong>アプローチで、他のハイブリッド系DSLと差別化される。3自由度の所在は同じパターン (外部DSL × ハイブリッド) だが、その中での型/制約の置き方が独特。</p>
+  <p>Nickelは<strong>「型を強制せず、contractsで補完する」</strong>アプローチで、他のハイブリッド系DSLと差別化される。3自由度の所在は同じパターン(外部DSL × ハイブリッド)だが、その中での型/制約の置き方が独特。</p>
 
   <p class="src">引用元: Nickel User Manual: Syntax — <a href="https://nickel-lang.org/user-manual/syntax">nickel-lang.org/user-manual/syntax</a> / Nickel website — <a href="https://nickel-lang.org/">nickel-lang.org</a></p>
 
@@ -1362,7 +1362,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://developer.hashicorp.com/terraform/cdktf">developer.hashicorp.com/terraform/cdktf</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>汎用言語</strong>。TypeScript / Python / Java / C# / Go (CDKと同じくjsiiベース)。コードを実行すると<strong>Terraform JSON</strong>をsynthする。</p>
 
@@ -1370,11 +1370,11 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <ul>
     <li><strong>synth先</strong>: CDK = CloudFormation template、cdktf = Terraform JSON</li>
-    <li><strong>対象provider</strong>: CDK = Azure以外のAWS専用 (実質)、cdktf = Terraform Registry全部 (AWS / Azure / GCP / SaaS)</li>
-    <li><strong>Constructライブラリ</strong>: AWS L2/L3のような厚い抽象は提供されない (providerはそのまま、ユーザが自分でConstructを作る)</li>
+    <li><strong>対象provider</strong>: CDK = Azure以外のAWS専用(実質)、cdktf = Terraform Registry全部(AWS / Azure / GCP / SaaS)</li>
+    <li><strong>Constructライブラリ</strong>: AWS L2/L3のような厚い抽象は提供されない(providerはそのまま、ユーザが自分でConstructを作る)</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -1383,7 +1383,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
       </thead>
       <tbody>
         <tr><td><strong>App</strong></td><td><code>new App()</code></td><td>複数Stackの最上位</td></tr>
-        <tr><td><strong>TerraformStack</strong></td><td><code>class MyStack extends TerraformStack</code></td><td>デプロイ単位 (state単位)</td></tr>
+        <tr><td><strong>TerraformStack</strong></td><td><code>class MyStack extends TerraformStack</code></td><td>デプロイ単位(state単位)</td></tr>
         <tr><td><strong>Construct</strong></td><td><code>class MyComponent extends Construct</code></td><td>再利用単位</td></tr>
         <tr><td><strong>Resource</strong></td><td><code>new aws.s3.S3Bucket(this, 'b', {...})</code></td><td>個別リソース</td></tr>
         <tr><td><strong>TerraformModule</strong></td><td><code>new TerraformHclModule(this, ...)</code></td><td>既存Terraform moduleの埋め込み</td></tr>
@@ -1391,19 +1391,19 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </table>
   </div>
 
-  <p>constructsライブラリはCDKと共有 (AWSが公開している <code>constructs</code> パッケージ)。ツリー構造、<code>node.path</code> でidentityを持つ。</p>
+  <p>constructsライブラリはCDKと共有(AWSが公開している <code>constructs</code> パッケージ)。ツリー構造、<code>node.path</code> でidentityを持つ。</p>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加 (ユーザヘルパー)</strong> — <strong>規約に委ねる</strong>: ホスト言語の関数 / クラス / 継承で自由。CDKと全く同じ。</p>
+  <p><strong>3-1.抽象化の追加(ユーザヘルパー)</strong> — <strong>規約に委ねる</strong>:ホスト言語の関数 / クラス / 継承で自由。CDKと全く同じ。</p>
 
-  <p><strong>3-2. 複数量の制御 (graphの個数を動かす)</strong> — <strong>規約に委ねる</strong>: ホスト言語の <code>for</code>, <code>map</code>, <code>filter</code> で自由。</p>
+  <p><strong>3-2.複数量の制御(graphの個数を動かす)</strong> — <strong>規約に委ねる</strong>:ホスト言語の <code>for</code>, <code>map</code>, <code>filter</code> で自由。</p>
 
   <p>ただし<strong>Terraformプリミティブの <code>for_each</code> / <code>count</code> も使える</strong>: cdktfはTerraform JSONを生成するので、リソースに <code>forEach</code> / <code>count</code> プロパティを設定するとTerraformがruntimeで展開する形にも書ける。これは「ホスト言語側で展開」と「Terraform側で展開」の<strong>2経路</strong>が選べることを意味する。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>規約に委ねる</strong>: ホスト言語のクラス選択 / <code>if</code> 分岐で自由。</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>規約に委ねる</strong>:ホスト言語のクラス選択 / <code>if</code> 分岐で自由。</p>
 
-  <p>ただし<strong>既存Terraform moduleを取り込む <code>TerraformHclModule</code> の場合</strong>: source指定は文字列だが、ホスト言語側で動的に組み立てた文字列を渡せる (synth時にはTerraform JSONの <code>module.source</code> に書き込まれるが、その値はホスト言語実行時に決まる)。</p>
+  <p>ただし<strong>既存Terraform moduleを取り込む <code>TerraformHclModule</code> の場合</strong>: source指定は文字列だが、ホスト言語側で動的に組み立てた文字列を渡せる(synth時にはTerraform JSONの <code>module.source</code> に書き込まれるが、その値はホスト言語実行時に決まる)。</p>
 
   <p>つまり<strong>synth時 = ホスト言語実行時 = 動的に決まってよい</strong>、<strong>Terraform apply時 = もう静的</strong>、という2段階。Terraformの <code>source</code> リテラル制約は「Terraform側から見ると」リテラルだが、cdktfは<strong>synth時にその文字列を任意に組み立てられる</strong>ので、実質ホスト言語による動的選択が可能。</p>
 
@@ -1413,40 +1413,40 @@ import ..model as model     # 親ディレクトリ</code></pre>
     <table class="compare">
       <tbody>
         <tr><td>抽象化の追加</td><td><span class="conv">規約に委ねる</span></td></tr>
-        <tr><td>複数量の制御</td><td><span class="conv">規約に委ねる</span> (ホスト言語経路) + <span class="lang">言語が決める</span> (Terraform <code>for_each</code> 経路) のハイブリッド</td></tr>
+        <tr><td>複数量の制御</td><td><span class="conv">規約に委ねる</span> (ホスト言語経路) + <span class="lang">言語が決める</span> (Terraform <code>for_each</code> 経路)のハイブリッド</td></tr>
         <tr><td>実装の切替</td><td><span class="conv">規約に委ねる</span> (synth時に任意の文字列を生成可)</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p><strong>マッピング</strong>: <strong>汎用言語 (ベタ書き) × 規約に委ねる</strong>。CDKと同じ象限。</p>
+  <p><strong>マッピング</strong>: <strong>汎用言語(ベタ書き) × 規約に委ねる</strong>。CDKと同じ象限。</p>
 
   <p>ただし「複数量の制御」だけはTerraform側のプリミティブも併用可能で、<strong>2経路を選べる</strong>。これは章1 §1-3-4の単純マッピングからは外れる特徴。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>cdktfの位置取りは「<strong>CDKと同じ汎用言語ベース、synth先だけTerraform</strong>」:</p>
 
   <ul>
-    <li><strong>CDKと完全に同じ象限</strong>に落ちる (汎用言語 × 規約に委ねる)</li>
-    <li>違いはsynth先 (CFN vs Terraform JSON) とproviderのカバレッジ (AWS専用vs Terraform Registry全部)</li>
+    <li><strong>CDKと完全に同じ象限</strong>に落ちる(汎用言語 × 規約に委ねる)</li>
+    <li>違いはsynth先(CFN vs Terraform JSON)とproviderのカバレッジ(AWS専用vs Terraform Registry全部)</li>
     <li>ホスト言語の <code>for</code>/<code>if</code> とTerraformの <code>for_each</code>/<code>count</code> を<strong>両方使える</strong>ことで、ユーザは2経路を選択できる</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>Terraformエコシステム (provider / state backend / 既存module) を享受しつつ、汎用言語で書ける、CDK経験者の移行。</p>
+      <p>Terraformエコシステム(provider / state backend / 既存module)を享受しつつ、汎用言語で書ける、CDK経験者の移行。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>「CDKのAWS L2/L3のような厚い抽象」はcdktfにはない (providerをそのまま使う形)、Terraform JSONという中間表現の存在によるdebugの二重化 (synth結果とplan結果を両方見る必要)。</p>
+      <p>「CDKのAWS L2/L3のような厚い抽象」はcdktfにはない(providerをそのまま使う形)、Terraform JSONという中間表現の存在によるdebugの二重化(synth結果とplan結果を両方見る必要)。</p>
     </div>
   </div>
 
-  <p><strong>章1で除外された理由</strong>: 章1は「<code>本ドキュメントの「CDK」は AWS CDK を指す</code>: cdktf (Terraform JSONにsynth) やcdk8s (Kubernetes manifestにsynth) は別engineに対してsynthするCDK系の派生で、本ドキュメントでは扱わない」と明記。本分析では章1の射程外を補完する位置で扱う。</p>
+  <p><strong>章1で除外された理由</strong>:章1は「<code>本ドキュメントの「CDK」は AWS CDK を指す</code>: cdktf (Terraform JSONにsynth)やcdk8s (Kubernetes manifestにsynth)は別engineに対してsynthするCDK系の派生で、本ドキュメントでは扱わない」と明記。本分析では章1の射程外を補完する位置で扱う。</p>
 
-  <p>cdktfは「<strong>汎用言語 × 規約に委ねる</strong>」象限の代表例としてCDKと区別する必要は薄い (3自由度の所在が完全に同じ)。ただし「複数量の制御で2経路 (ホスト言語 / Terraform) を選べる」点は章1の単純化に対する反例で、現実のツールは<strong>複数の制御層を併存させる</strong>ケースがあることを示している。</p>
+  <p>cdktfは「<strong>汎用言語 × 規約に委ねる</strong>」象限の代表例としてCDKと区別する必要は薄い(3自由度の所在が完全に同じ)。ただし「複数量の制御で2経路(ホスト言語 / Terraform)を選べる」点は章1の単純化に対する反例で、現実のツールは<strong>複数の制御層を併存させる</strong>ケースがあることを示している。</p>
 
   <p class="src">引用元: cdktf overview — <a href="https://developer.hashicorp.com/terraform/cdktf">developer.hashicorp.com/terraform/cdktf</a></p>
 
@@ -1454,7 +1454,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://cdk8s.io/">cdk8s.io</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>汎用言語</strong>。TypeScript / Python / Java / Go (jsiiベース)。コードを実行すると<strong>Kubernetes YAML manifests</strong>をsynthする。</p>
 
@@ -1463,10 +1463,10 @@ import ..model as model     # 親ディレクトリ</code></pre>
   <ul>
     <li><strong>synth先</strong>: CDK = CFN、cdktf = Terraform JSON、cdk8s = Kubernetes manifests</li>
     <li><strong>対象</strong>: Kubernetes API</li>
-    <li><strong>stateなし</strong>: cdk8s自体はstateを持たない (synth結果のYAMLを <code>kubectl apply</code> するだけ、stateはKubernetes API serverが持つ)</li>
+    <li><strong>stateなし</strong>: cdk8s自体はstateを持たない(synth結果のYAMLを <code>kubectl apply</code> するだけ、stateはKubernetes API serverが持つ)</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -1477,20 +1477,20 @@ import ..model as model     # 親ディレクトリ</code></pre>
         <tr><td><strong>App</strong></td><td><code>new App()</code></td><td>複数Chartの最上位</td></tr>
         <tr><td><strong>Chart</strong></td><td><code>class MyChart extends Chart</code></td><td>YAML manifestの出力単位</td></tr>
         <tr><td><strong>Construct</strong></td><td><code>class MyComponent extends Construct</code></td><td>再利用単位</td></tr>
-        <tr><td><strong>ApiObject</strong></td><td>Kubernetesリソース (<code>new k.KubeDeployment(this, ...)</code>)</td><td>個別リソース</td></tr>
+        <tr><td><strong>ApiObject</strong></td><td>Kubernetesリソース(<code>new k.KubeDeployment(this, ...)</code>)</td><td>個別リソース</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p>cdk8s-plusライブラリでDeployment / Service / ConfigMap / Pod / RBAC / Ingress等の高レベル抽象を提供 (CDKのL2相当)。</p>
+  <p>cdk8s-plusライブラリでDeployment / Service / ConfigMap / Pod / RBAC / Ingress等の高レベル抽象を提供(CDKのL2相当)。</p>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加</strong> — <strong>規約に委ねる</strong>: ホスト言語の関数 / クラス / 継承で自由。CDK / cdktfと同じ。</p>
+  <p><strong>3-1.抽象化の追加</strong> — <strong>規約に委ねる</strong>:ホスト言語の関数 / クラス / 継承で自由。CDK / cdktfと同じ。</p>
 
-  <p><strong>3-2. 複数量の制御</strong> — <strong>規約に委ねる</strong>: ホスト言語の <code>for</code> / <code>map</code> で自由。Kubernetes側にTerraform <code>for_each</code> のような展開機構はない (Helmの <code>range</code> は別レイヤ) ので、cdktfのような「2経路」もない。</p>
+  <p><strong>3-2.複数量の制御</strong> — <strong>規約に委ねる</strong>:ホスト言語の <code>for</code> / <code>map</code> で自由。Kubernetes側にTerraform <code>for_each</code> のような展開機構はない(Helmの <code>range</code> は別レイヤ)ので、cdktfのような「2経路」もない。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>規約に委ねる</strong>: ホスト言語のクラス選択で自由。</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>規約に委ねる</strong>:ホスト言語のクラス選択で自由。</p>
 
   <h4>4. 2×2配置</h4>
 
@@ -1504,16 +1504,16 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </table>
   </div>
 
-  <p><strong>マッピング</strong>: <strong>汎用言語 (ベタ書き) × 規約に委ねる</strong>。CDKと同じ象限の純粋形。</p>
+  <p><strong>マッピング</strong>: <strong>汎用言語(ベタ書き) × 規約に委ねる</strong>。CDKと同じ象限の純粋形。</p>
 
   <p>cdktfのような「Terraform側の制御層」がないので、<strong>ホスト言語1経路</strong>で全部扱う。これは章1 §1-3-4の「汎用言語 × 規約に委ねる」象限の典型形。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>cdk8sの位置取りは「<strong>CDKと同じ設計をKubernetesに転用</strong>」:</p>
 
   <ul>
-    <li><strong>stateなし</strong>: synthしたYAMLを <code>kubectl apply</code> する形なので、cdk8sはstate管理を持たない (Kubernetes API serverに委ねる)</li>
+    <li><strong>stateなし</strong>: synthしたYAMLを <code>kubectl apply</code> する形なので、cdk8sはstate管理を持たない(Kubernetes API serverに委ねる)</li>
     <li><strong>既存K8s manifestとの互換</strong>: Helm chartや生YAMLから段階的に移行できる</li>
     <li><strong>L2相当の抽象</strong>: cdk8s-plusがCDKのL2のような「ベストプラクティス込みの高レベル抽象」を提供</li>
   </ul>
@@ -1525,7 +1525,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>Helmのようなtemplate配布のエコシステムは別経路 (cdk8s chartはnpm/PyPI経由)、Kubernetesコミュニティの主流から少し外れる。</p>
+      <p>Helmのようなtemplate配布のエコシステムは別経路(cdk8s chartはnpm/PyPI経由)、Kubernetesコミュニティの主流から少し外れる。</p>
     </div>
   </div>
 
@@ -1537,15 +1537,15 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://docs.crossplane.io/v2.2/composition/compositions/">docs.crossplane.io/v2.2/composition/compositions/</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>外部DSL</strong> (YAML) + <strong>functionsレイヤ</strong> (Go / KCL / Python等で書ける)。</p>
 
-  <p>CompositionそのものはKubernetes CRD (<code>apiVersion: apiextensions.crossplane.io/v1</code>, <code>kind: Composition</code>) として<strong>YAMLで定義</strong>される。だがCompositionの中で<strong>Pipeline modeのfunctions</strong>が呼べて、そのfunctionsは<strong>任意の言語で実装</strong>可能 (function-patch-and-transform / function-kcl / function-python等)。</p>
+  <p>CompositionそのものはKubernetes CRD (<code>apiVersion: apiextensions.crossplane.io/v1</code>, <code>kind: Composition</code>)として<strong>YAMLで定義</strong>される。だがCompositionの中で<strong>Pipeline modeのfunctions</strong>が呼べて、そのfunctionsは<strong>任意の言語で実装</strong>可能(function-patch-and-transform / function-kcl / function-python等)。</p>
 
-  <p>つまり<strong>「YAML (外部DSL) でパイプラインを宣言、各ステップは任意言語の関数」</strong>という二層構造。</p>
+  <p>つまり<strong>「YAML (外部DSL)でパイプラインを宣言、各ステップは任意言語の関数」</strong>という二層構造。</p>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -1556,8 +1556,8 @@ import ..model as model     # 親ディレクトリ</code></pre>
         <tr><td><strong>CompositeResourceDefinition (XRD)</strong></td><td>YAML CRD</td><td>ユーザ向けAPIの型定義</td></tr>
         <tr><td><strong>Composite Resource (XR)</strong></td><td>YAML</td><td>XRDを実体化したインスタンス</td></tr>
         <tr><td><strong>Composition</strong></td><td>YAML</td><td>XRから実リソース群を生成するrecipe</td></tr>
-        <tr><td><strong>Function</strong></td><td>コード (Go/KCL/Python/...)</td><td>パイプラインのステップ</td></tr>
-        <tr><td><strong>Composed Resource</strong></td><td>YAML (関数出力)</td><td>実際に作られるリソース (S3 Bucket等)</td></tr>
+        <tr><td><strong>Function</strong></td><td>コード(Go/KCL/Python/...)</td><td>パイプラインのステップ</td></tr>
+        <tr><td><strong>Composed Resource</strong></td><td>YAML (関数出力)</td><td>実際に作られるリソース(S3 Bucket等)</td></tr>
       </tbody>
     </table>
   </div>
@@ -1576,38 +1576,38 @@ import ..model as model     # 親ディレクトリ</code></pre>
       name: function-kcl
     input: ...</code></pre>
 
-  <p>各functionは前段の出力 (composed resourcesの集合) を受け取り、変換して次段に渡す。</p>
+  <p>各functionは前段の出力(composed resourcesの集合)を受け取り、変換して次段に渡す。</p>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加</strong> — <strong>ハイブリッド</strong> (二層):</p>
+  <p><strong>3-1.抽象化の追加</strong> — <strong>ハイブリッド</strong> (二層):</p>
 
   <ul>
-    <li>YAML層: 抽象化機構なし (関数定義もクラスもない、宣言のみ)</li>
-    <li>function層: 任意言語で関数を書ける。<strong>function-kcl</strong> を使えばKCLの高階関数とschemaが使える。<strong>function-go-templating</strong> を使えばGo templateが使える。<strong>function-python</strong> を使えばPythonが使える</li>
+    <li>YAML層:抽象化機構なし(関数定義もクラスもない、宣言のみ)</li>
+    <li>function層:任意言語で関数を書ける。<strong>function-kcl</strong> を使えばKCLの高階関数とschemaが使える。<strong>function-go-templating</strong> を使えばGo templateが使える。<strong>function-python</strong> を使えばPythonが使える</li>
   </ul>
 
-  <p>つまりCompositionのYAML自体は外部DSL × 言語が決める範囲が広い (関数なし) が、<strong>functionを書く側は使う言語次第</strong>で「言語が決める」「規約に委ねる」が変わる。</p>
+  <p>つまりCompositionのYAML自体は外部DSL × 言語が決める範囲が広い(関数なし)が、<strong>functionを書く側は使う言語次第</strong>で「言語が決める」「規約に委ねる」が変わる。</p>
 
-  <p><strong>3-2. 複数量の制御</strong> — <strong>function経由</strong>:</p>
+  <p><strong>3-2.複数量の制御</strong> — <strong>function経由</strong>:</p>
 
   <ul>
-    <li>YAML層: 直接の <code>for</code> / <code>range</code> 構文はない</li>
+    <li>YAML層:直接の <code>for</code> / <code>range</code> 構文はない</li>
     <li>function-kclでKCLのcomprehensionが使える、function-go-templatingでGo templateの <code>{{range}}</code> が使える</li>
     <li>ドキュメント引用: "Crossplane calls them all. It calls them in the order they appear in the pipeline." — pipeline自体は静的な配列</li>
   </ul>
 
   <p>つまり「複数量の制御」は<strong>function内部の関心事</strong>で、Composition YAML層には現れない。</p>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>ハイブリッド</strong>:</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>ハイブリッド</strong>:</p>
 
   <ul>
-    <li>Compositionの選択は <code>compositeTypeRef</code> で型 (XRD) と紐付けるか、Composition Selector (label match) で動的に選ばれる</li>
-    <li>functionの選択は <code>functionRef.name</code> でname参照、これはリテラル文字列 (動的に変えられない)</li>
+    <li>Compositionの選択は <code>compositeTypeRef</code> で型(XRD)と紐付けるか、Composition Selector (label match)で動的に選ばれる</li>
+    <li>functionの選択は <code>functionRef.name</code> でname参照、これはリテラル文字列(動的に変えられない)</li>
     <li>ただしXR側でlabelを動的に付けることで「どのCompositionが選ばれるか」を実行時に変えられる</li>
   </ul>
 
-  <p>つまり「どのCompositionを使うか」は<strong>XRのlabel</strong>で実行時に動的選択可能 (Terraformの <code>source</code> リテラル制約より柔軟)。</p>
+  <p>つまり「どのCompositionを使うか」は<strong>XRのlabel</strong>で実行時に動的選択可能(Terraformの <code>source</code> リテラル制約より柔軟)。</p>
 
   <h4>4. 2×2配置</h4>
 
@@ -1616,7 +1616,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
       <tbody>
         <tr><td>抽象化の追加</td><td><strong>YAML層 = <span class="lang">言語が決める</span></strong> (関数なし) / <strong>function層 = <span class="conv">規約に委ねる</span></strong> (任意言語)</td></tr>
         <tr><td>複数量の制御</td><td><strong>function経由</strong> (使う言語次第)</td></tr>
-        <tr><td>実装の切替</td><td><strong>XRのlabelによる動的選択 (Composition Selector)</strong> + functionは静的</td></tr>
+        <tr><td>実装の切替</td><td><strong>XRのlabelによる動的選択(Composition Selector)</strong> + functionは静的</td></tr>
       </tbody>
     </table>
   </div>
@@ -1625,30 +1625,30 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>最も近いのは「<strong>外部DSL × 言語が決める</strong> (YAML層) + <strong>任意言語 × 規約に委ねる</strong> (function層)」のハイブリッド。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>Crossplane Compositionsの位置取りは「<strong>Kubernetes API上に構築された二層IaC</strong>」:</p>
 
   <ul>
     <li><strong>YAML層は宣言的に閉じている</strong>: KubernetesリソースとしてCRUD可能、kubectlで操作、kustomizeやHelmと組み合わせ可能</li>
-    <li><strong>function層に拡張性を全部押し付ける</strong>: パッチ変換・命名規則・複雑なロジックはfunction側で書く。functionはOCIイメージとして配布、複数言語で書ける</li>
-    <li><strong>Composition Selector</strong>: XRのlabelに応じて適用Compositionを動的に選択 → 環境別 (dev/staging/prod) で別Compositionを使い分け可能、これはTerraform / Bicep / Carinaにはない動的選択軸</li>
+    <li><strong>function層に拡張性を全部押し付ける</strong>:パッチ変換・命名規則・複雑なロジックはfunction側で書く。functionはOCIイメージとして配布、複数言語で書ける</li>
+    <li><strong>Composition Selector</strong>: XRのlabelに応じて適用Compositionを動的に選択 → 環境別(dev/staging/prod)で別Compositionを使い分け可能、これはTerraform / Bicep / Carinaにはない動的選択軸</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>Kubernetes API上の宣言性 (<code>kubectl get composition</code>)、functionによる任意言語拡張、Composition Selectorによる環境切替。</p>
+      <p>Kubernetes API上の宣言性(<code>kubectl get composition</code>)、functionによる任意言語拡張、Composition Selectorによる環境切替。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>全体像の見通し (YAML + functionコード + XRDの三者を読む必要)、デバッグ複雑化 (function chainのどこで何が起きたか)、type safetyの弱さ (YAMLレイヤの型は動的)。</p>
+      <p>全体像の見通し(YAML + functionコード + XRDの三者を読む必要)、デバッグ複雑化(function chainのどこで何が起きたか)、type safetyの弱さ(YAMLレイヤの型は動的)。</p>
     </div>
   </div>
 
-  <p><strong>章1 §1-3-4の枠組みからの逸脱</strong>: Crossplaneは<strong>「外部DSL × 言語が決める」象限と「汎用言語 × 規約に委ねる」象限の両方に同時に足を置く</strong>設計。これは章1が想定していた「<strong>1ツール = 1象限</strong>」という単純化が成り立たない例。「<strong>functionを組み込めば任意のDSL/汎用言語の特性を取り込める</strong>」という拡張ポイントは、Bicepの <code>func</code> やCarinaの <code>fn</code> (両方とも内蔵) と異なり、<strong>ツールチェーン全体で多言語を許容する</strong>という設計判断。</p>
+  <p><strong>章1 §1-3-4の枠組みからの逸脱</strong>: Crossplaneは<strong>「外部DSL × 言語が決める」象限と「汎用言語 × 規約に委ねる」象限の両方に同時に足を置く</strong>設計。これは章1が想定していた「<strong>1ツール = 1象限</strong>」という単純化が成り立たない例。「<strong>functionを組み込めば任意のDSL/汎用言語の特性を取り込める</strong>」という拡張ポイントは、Bicepの <code>func</code> やCarinaの <code>fn</code> (両方とも内蔵)と異なり、<strong>ツールチェーン全体で多言語を許容する</strong>という設計判断。</p>
 
-  <p>これはIaCツール設計のトレードオフとして章1で触れられていない論点 (本ドキュメント全体の射程外、章1 §1-4末尾参照) を浮上させる: <strong>「拡張ポイントを言語境界で開ける」という第三の選択肢</strong>。PulumiのMLC (multi-language components) も類似の発想。</p>
+  <p>これはIaCツール設計のトレードオフとして章1で触れられていない論点(本ドキュメント全体の射程外、章1 §1-4末尾参照)を浮上させる: <strong>「拡張ポイントを言語境界で開ける」という第三の選択肢</strong>。PulumiのMLC (multi-language components)も類似の発想。</p>
 
   <p class="src">引用元: Crossplane Compositions — <a href="https://docs.crossplane.io/v2.2/composition/compositions/">docs.crossplane.io</a></p>
 
@@ -1656,7 +1656,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p class="src">公式: <a href="https://helm.sh/docs/chart_template_guide/">helm.sh/docs/chart_template_guide/</a><br>調査日: 2026-04-26</p>
 
-  <h4>1. 記述言語の位置づけ</h4>
+  <h4>1.記述言語の位置づけ</h4>
 
   <p><strong>外部DSL</strong> (Go templateにSprig関数ライブラリを足したもの)。Kubernetes manifestをtemplate化する。</p>
 
@@ -1668,7 +1668,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     <li><strong>values.yamlで値を注入</strong>: chart利用者は <code>values.yaml</code> でtemplateを埋める</li>
   </ul>
 
-  <h4>2. 抽象化機構</h4>
+  <h4>2.抽象化機構</h4>
 
   <div class="scroll">
     <table>
@@ -1687,7 +1687,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h4>3. 3自由度の評価</h4>
 
-  <p><strong>3-1. 抽象化の追加</strong> — <strong>言語が決める寄り</strong> (Go templateの制限):</p>
+  <p><strong>3-1.抽象化の追加</strong> — <strong>言語が決める寄り</strong> (Go templateの制限):</p>
 
   <ul>
     <li><code>define</code> でnamed templateを定義可。<code>template</code> / <code>include</code> で呼び出し</li>
@@ -1697,15 +1697,15 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>ただし「ヘルパーtemplate」自体は定義できるので、構造的な再利用は可能。</p>
 
-  <p><strong>3-2. 複数量の制御</strong> — <strong>言語が決める</strong> (Go templateの <code>range</code>):</p>
+  <p><strong>3-2.複数量の制御</strong> — <strong>言語が決める</strong> (Go templateの <code>range</code>):</p>
 
   <ul>
     <li><code>{{ range .Values.pizzaToppings }} ... {{ end }}</code> でリスト/マップをイテレート</li>
-    <li>if/else、with (scope) と組み合わせ可能</li>
+    <li>if/else、with (scope)と組み合わせ可能</li>
     <li>専用構文として閉じている</li>
   </ul>
 
-  <p><strong>3-3. 実装の切替</strong> — <strong>ハイブリッド</strong>:</p>
+  <p><strong>3-3.実装の切替</strong> — <strong>ハイブリッド</strong>:</p>
 
   <p>subchartは <code>Chart.yaml</code> の <code>dependencies</code> で<strong>静的に名前指定</strong>:</p>
 
@@ -1716,7 +1716,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <ul>
     <li>name / version / repositoryはリテラル文字列、動的に変えられない</li>
-    <li>ただしvalues.yamlで<strong>subchartの有効/無効を切り替え</strong>たり、subchart間で値を渡したりは可能 (<code>condition</code>, <code>tags</code>)</li>
+    <li>ただしvalues.yamlで<strong>subchartの有効/無効を切り替え</strong>たり、subchart間で値を渡したりは可能(<code>condition</code>, <code>tags</code>)</li>
   </ul>
 
   <p>つまり「どのchartを使うか」は静的、「使うかどうか」は動的。Bicepのmoduleの <code>if</code> 条件と同質。</p>
@@ -1735,49 +1735,49 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p><strong>マッピング</strong>: <strong>外部DSL × 言語が決める</strong>。Terraform / Carina / Bicep / CUEと同じ象限。</p>
 
-  <h4>5. 設計判断の議論</h4>
+  <h4>5.設計判断の議論</h4>
 
   <p>Helmの位置取りは「<strong>Go template + YAML mix-in</strong>」:</p>
 
   <ul>
     <li><strong>templateベース</strong>: YAMLをそのまま書きつつ、変数置換やループで動的化する</li>
-    <li><strong>values.yamlの分離</strong>: chart開発者と利用者の責任分界 (chartは機能、valuesは設定)</li>
+    <li><strong>values.yamlの分離</strong>: chart開発者と利用者の責任分界(chartは機能、valuesは設定)</li>
     <li><strong>subchartの静的依存</strong>: Helm chartは<strong>artifactとして配布</strong>されるので、依存はparse時に決定的でないと不便</li>
   </ul>
 
   <div class="contrast">
     <div class="yes">
       <h3>得たもの</h3>
-      <p>Kubernetes設定のwidely-adopted標準、エコシステム (Helm Hub, Artifact Hub) の充実、values.yamlによる設定/機能の分離。</p>
+      <p>Kubernetes設定のwidely-adopted標準、エコシステム(Helm Hub, Artifact Hub)の充実、values.yamlによる設定/機能の分離。</p>
     </div>
     <div>
       <h3>失ったもの</h3>
-      <p>静的型 (template内の式は型なし、runtime errorが多い)、関数の自由度 (高階関数なし、変数scopeの扱いが特殊)、デバッグ難 (templateが展開されないと結果が見えない)。</p>
+      <p>静的型(template内の式は型なし、runtime errorが多い)、関数の自由度(高階関数なし、変数scopeの扱いが特殊)、デバッグ難(templateが展開されないと結果が見えない)。</p>
     </div>
   </div>
 
   <p><strong>章1 §1-3-4への当てはめ</strong>: Helmは「<strong>外部DSL × 言語が決める</strong>」象限の典型例。Terraform / Bicep / Carinaと並ぶが、<strong>typedじゃない</strong>点で特殊。</p>
 
-  <p>template engine系DSL (Go template, Jinja2等) は<strong>「文字列置換 + 限定的な制御フロー」</strong>を共通骨格とし、抽象化機構が薄い。Helmはその上にKubernetes用の便利関数 (Sprig + <code>lookup</code> / <code>tpl</code> 等) を載せた形。</p>
+  <p>template engine系DSL (Go template, Jinja2等)は<strong>「文字列置換 + 限定的な制御フロー」</strong>を共通骨格とし、抽象化機構が薄い。Helmはその上にKubernetes用の便利関数(Sprig + <code>lookup</code> / <code>tpl</code> 等)を載せた形。</p>
 
-  <p><strong>Crossplaneとの対比</strong>: 両者ともYAMLベースだが、Helm = template engine、Crossplane = Composition pipelineで別アプローチ。Helmはconfiguration <strong>の生成</strong>、Crossplaneはconfiguration <strong>のreconciliation</strong> が主眼。</p>
+  <p><strong>Crossplaneとの対比</strong>:両者ともYAMLベースだが、Helm = template engine、Crossplane = Composition pipelineで別アプローチ。Helmはconfiguration <strong>の生成</strong>、Crossplaneはconfiguration <strong>のreconciliation</strong> が主眼。</p>
 
   <p class="src">引用元: Helm Chart Template Guide: Control Structures — <a href="https://helm.sh/docs/chart_template_guide/control_structures/">helm.sh</a> / Helm Chart Template Guide: Getting Started — <a href="https://helm.sh/docs/chart_template_guide/getting_started/">helm.sh</a></p>
 
   <h2 id="carina">Carinaの立ち位置</h2>
 
-  <p class="src">ステータス: 初稿 (2026-04-27)。cross-DSL分析 (11DSL) と章1 (CDK / Pulumi / Terraform / Carina比較) を踏まえたCarinaの立ち位置整理。</p>
+  <p class="src">ステータス:初稿(2026-04-27)。cross-DSL分析(11DSL)と章1 (CDK / Pulumi / Terraform / Carina比較)を踏まえたCarinaの立ち位置整理。</p>
 
-  <h3>1. 出発点: 章1の4ツール比較での立ち位置</h3>
+  <h3>1.出発点:章1の4ツール比較での立ち位置</h3>
 
   <p>章1 §1-3-4でCarinaは<strong>「外部DSL × 言語が決める」</strong>象限に位置づけられた:</p>
 
   <div class="scroll narrow">
     <table class="compare">
       <tbody>
-        <tr><td>抽象化の追加</td><td>言語が決める (<code>fn</code> / <code>&gt;&gt;</code> / <code>|&gt;</code> / closure実装済み、高階関数未実装)</td></tr>
-        <tr><td>複数量の制御</td><td>言語が決める (<code>for</code> 式 / <code>if</code> 式の専用構文のみ)</td></tr>
-        <tr><td>実装の切替</td><td>言語が決める (<code>source</code> リテラル + <code>use</code> 式は <code>let</code> 束縛RHSのみ、二段で制限)</td></tr>
+        <tr><td>抽象化の追加</td><td>言語が決める(<code>fn</code> / <code>&gt;&gt;</code> / <code>|&gt;</code> / closure実装済み、高階関数未実装)</td></tr>
+        <tr><td>複数量の制御</td><td>言語が決める(<code>for</code> 式 / <code>if</code> 式の専用構文のみ)</td></tr>
+        <tr><td>実装の切替</td><td>言語が決める(<code>source</code> リテラル + <code>use</code> 式は <code>let</code> 束縛RHSのみ、二段で制限)</td></tr>
       </tbody>
     </table>
   </div>
@@ -1786,11 +1786,11 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <h3>2. cross-DSL分析で見えた発見</h3>
 
-  <p>構成記述系11DSL (Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helm) を3自由度で点検した結果、章1の4象限に<strong>第5象限</strong>が浮上した。</p>
+  <p>構成記述系11DSL (Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helm)を3自由度で点検した結果、章1の4象限に<strong>第5象限</strong>が浮上した。</p>
 
-  <h4>「外部DSL × ハイブリッド (抽象化追加だけ規約寄り)」象限</h4>
+  <h4>「外部DSL × ハイブリッド(抽象化追加だけ規約寄り)」象限</h4>
 
-  <p>5DSL (Pkl / KCL / Dhall / Jsonnet / Nickel) が独立に同じパターンに収束:</p>
+  <p>5DSL (Pkl / KCL / Dhall / Jsonnet / Nickel)が独立に同じパターンに収束:</p>
 
   <div class="scroll narrow">
     <table class="compare">
@@ -1802,7 +1802,7 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </table>
   </div>
 
-  <p>これは「<strong>外部DSLを選びつつ、計算ロジックの再利用 (関数) だけは汎用言語並みに開放、graph/value形状を変える2自由度だけ言語で縛る</strong>」という共通設計判断。実用上の必要性 (環境別パラメタ計算 / 命名規則ヘルパー等を関数で再利用したい) からの自然な収束と読める。</p>
+  <p>これは「<strong>外部DSLを選びつつ、計算ロジックの再利用(関数)だけは汎用言語並みに開放、graph/value形状を変える2自由度だけ言語で縛る</strong>」という共通設計判断。実用上の必要性(環境別パラメタ計算 / 命名規則ヘルパー等を関数で再利用したい)からの自然な収束と読める。</p>
 
   <h4>graph出力DSLという別軸</h4>
 
@@ -1817,13 +1817,13 @@ import ..model as model     # 親ディレクトリ</code></pre>
     </table>
   </div>
 
-  <p>graph出力DSLのコードは<strong>(a) ノード + (b) edge</strong> を出す。state管理 / 差分計算 / CRUD実行は<strong>DSLのレイヤではなくツール (engine / CLI) のレイヤ</strong>の話で、本分析 (DSLの比較) では扱わない。</p>
+  <p>graph出力DSLのコードは<strong>(a)ノード + (b) edge</strong> を出す。state管理 / 差分計算 / CRUD実行は<strong>DSLのレイヤではなくツール(engine / CLI)のレイヤ</strong>の話で、本分析(DSLの比較)では扱わない。</p>
 
   <aside class="note-aside">
-    <p>なお「コードからresource graphに至る経路」(直接出力 / ツリーsynth / RPCストリーム) の差は本分析の主題から外れる別軸。CDK / Pulumiもresource graph自体はedge込みで表現できるので「graph出力DSL」としてはTerraform / Carinaと同列。Terraform / Carinaとの差別化要因は<strong>graph形状の静的予測可能性 (章1 §1-3の3自由度議論)</strong> と<strong>評価副作用なし (章1 §1-3-6で他章送り、章2実行モデルで扱う)</strong> の組み合わせで説明できるので、ここでは独立軸として立てない。</p>
+    <p>なお「コードからresource graphに至る経路」(直接出力 / ツリーsynth / RPCストリーム)の差は本分析の主題から外れる別軸。CDK / Pulumiもresource graph自体はedge込みで表現できるので「graph出力DSL」としてはTerraform / Carinaと同列。Terraform / Carinaとの差別化要因は<strong>graph形状の静的予測可能性(章1 §1-3の3自由度議論)</strong> と<strong>評価副作用なし(章1 §1-3-6で他章送り、章2実行モデルで扱う)</strong> の組み合わせで説明できるので、ここでは独立軸として立てない。</p>
   </aside>
 
-  <h3>3. Carinaが目指す位置取り: 空席の象限</h3>
+  <h3>3. Carinaが目指す位置取り:空席の象限</h3>
 
   <p>「graph出力DSL × ハイブリッド象限」の組み合わせを11DSLに当てはめると<strong>空席</strong> (前掲のマトリクス参照)。</p>
 
@@ -1831,59 +1831,59 @@ import ..model as model     # 親ディレクトリ</code></pre>
 
   <p>ただし5DSLに先行例がないため、graph出力DSLでハイブリッド象限を実装することは<strong>新しい設計象限の実証</strong>になる。</p>
 
-  <h3>4. 「IaC向きの言語」観点での評価</h3>
+  <h3>4.「IaC向きの言語」観点での評価</h3>
 
-  <p>各DSLを「IaC (resource graphを出力する) に向くか」で評価すると、上位は:</p>
+  <p>各DSLを「IaC (resource graphを出力する)に向くか」で評価すると、上位は:</p>
 
   <ol>
-    <li><strong>KCL</strong> (現実的解): 5DSLの中で唯一IaC領域の実例 (Konfig / KusionStack) とエコシステムを持つ</li>
-    <li><strong>Pkl</strong> (理論的解): 設計の整合性は高いが公開エコシステムが薄い</li>
+    <li><strong>KCL</strong> (現実的解): 5DSLの中で唯一IaC領域の実例(Konfig / KusionStack)とエコシステムを持つ</li>
+    <li><strong>Pkl</strong> (理論的解):設計の整合性は高いが公開エコシステムが薄い</li>
     <li><strong>Carina (高階関数追加後)</strong>: graph出力を主目的とする点で5DSLと差別化できる、IaC専用に特化したハイブリッド象限DSLになる</li>
-    <li><strong>Crossplane</strong> (番外): 「functionに任意言語を許す」設計でハイブリッド象限の問題を言語境界で逃がす第三の解</li>
+    <li><strong>Crossplane</strong> (番外):「functionに任意言語を許す」設計でハイブリッド象限の問題を言語境界で逃がす第三の解</li>
   </ol>
 
-  <p>Carinaの独自性は<strong>「graph出力を最初から主目的とする」</strong>点。Pkl / KCLは構成データ出力が主目的で、IaCとして使うには別レイヤ (ツール側) の追加が要る。Carinaはgraph出力をDSLレベルで前提にしている。</p>
+  <p>Carinaの独自性は<strong>「graph出力を最初から主目的とする」</strong>点。Pkl / KCLは構成データ出力が主目的で、IaCとして使うには別レイヤ(ツール側)の追加が要る。Carinaはgraph出力をDSLレベルで前提にしている。</p>
 
-  <h3>5. 高階関数を入れた場合のシミュレーション</h3>
+  <h3>5.高階関数を入れた場合のシミュレーション</h3>
 
-  <p>Carinaに高階関数を導入すると、3自由度の対応が次のように変わる (章1 §1-3がgraph形状と属性値の両方を含む形に拡張されたことを踏まえた整理):</p>
+  <p>Carinaに高階関数を導入すると、3自由度の対応が次のように変わる(章1 §1-3がgraph形状と属性値の両方を含む形に拡張されたことを踏まえた整理):</p>
 
   <ul>
-    <li><strong>抽象化の追加</strong>: 言語が決める → <strong>規約に委ねる</strong> (graph形状側 / 属性値側とも、関数値経由で抽象化を増やせる)</li>
-    <li><strong>複数量の制御</strong>: 言語が決める (<code>for</code> 式) のまま (graph形状側 / 属性値側とも)</li>
-    <li><strong>実装の切替</strong>: 言語が決める (<code>source</code> リテラル + <code>use</code> の位置制限) のまま (graph形状側)。<strong>属性値側は「計算ロジックの動的差し替え」が高階関数で可能になる</strong></li>
+    <li><strong>抽象化の追加</strong>:言語が決める → <strong>規約に委ねる</strong> (graph形状側 / 属性値側とも、関数値経由で抽象化を増やせる)</li>
+    <li><strong>複数量の制御</strong>:言語が決める(<code>for</code> 式)のまま(graph形状側 / 属性値側とも)</li>
+    <li><strong>実装の切替</strong>:言語が決める(<code>source</code> リテラル + <code>use</code> の位置制限)のまま(graph形状側)。<strong>属性値側は「計算ロジックの動的差し替え」が高階関数で可能になる</strong></li>
   </ul>
 
-  <p>これはPkl / KCL / Dhall / Jsonnet / Nickelと同じハイブリッド象限への合流を意味する。<strong>5DSLの収束パターンと整合する自然な進化方向</strong>。ただし5DSLはgraph出力DSLではないので、構造的な類似 (analogy) であって直接の先例 (precedent) ではない。</p>
+  <p>これはPkl / KCL / Dhall / Jsonnet / Nickelと同じハイブリッド象限への合流を意味する。<strong>5DSLの収束パターンと整合する自然な進化方向</strong>。ただし5DSLはgraph出力DSLではないので、構造的な類似(analogy)であって直接の先例(precedent)ではない。</p>
 
-  <h4>境界設計: 属性値計算の自由度をgraph形状に染み出させない</h4>
+  <h4>境界設計:属性値計算の自由度をgraph形状に染み出させない</h4>
 
-  <p>高階関数を導入する核心は<strong>属性値計算の自由度を上げる</strong>ことだが、これがgraph形状側 (resource生成位置 / module選択位置 / identity決定位置) に染み出すと、<strong>章1 §1-3の「実装の切替」自由度を言語側で縛る不変条件</strong>が壊れる。AI時代の文脈 (§7参照) ではplan予測精度・AI検証性の悪化として現れる。</p>
+  <p>高階関数を導入する核心は<strong>属性値計算の自由度を上げる</strong>ことだが、これがgraph形状側(resource生成位置 / module選択位置 / identity決定位置)に染み出すと、<strong>章1 §1-3の「実装の切替」自由度を言語側で縛る不変条件</strong>が壊れる。AI時代の文脈(§7参照)ではplan予測精度・AI検証性の悪化として現れる。</p>
 
   <p>例えば次のパターンを禁じる必要がある:</p>
 
 <pre><code>fn pick_module(env: string) -&gt; Module { ... }
 let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を module call の起点に</code></pre>
 
-  <p>これを許すと、現状の不変条件 (<code>source</code> リテラル限定 / <code>use</code> 式の位置制限) が骨抜きになる。<strong>「実装の切替」のgraph形状側だけを厳格分離する</strong>だけでは十分条件にならない: 属性値レベルの関数値が、参照やbooleanを介して後段の <code>for</code> / <code>if</code> / module選択に流れれば結局graph形状を変えうる。境界設計の必要条件は<strong>「関数値がresource生成位置・module選択位置・identity決定位置に到達しない」</strong>という型/文法境界。</p>
+  <p>これを許すと、現状の不変条件(<code>source</code> リテラル限定 / <code>use</code> 式の位置制限)が骨抜きになる。<strong>「実装の切替」のgraph形状側だけを厳格分離する</strong>だけでは十分条件にならない:属性値レベルの関数値が、参照やbooleanを介して後段の <code>for</code> / <code>if</code> / module選択に流れれば結局graph形状を変えうる。境界設計の必要条件は<strong>「関数値がresource生成位置・module選択位置・identity決定位置に到達しない」</strong>という型/文法境界。</p>
 
   <p>選択肢:</p>
 
   <ol class="steps">
     <li><strong>型レベル制約</strong><code>Module</code> 型を関数の戻り値型 / 引数型に置けないようにする。さらにresource typeも関数値で扱えないようにする</li>
-    <li><strong>文法レベル制約</strong>module call (<code>name { ... }</code>) の起点に式を許さず、識別子のみ許す。同様にresource declarationの起点も識別子のみ</li>
+    <li><strong>文法レベル制約</strong>module call (<code>name { ... }</code>)の起点に式を許さず、識別子のみ許す。同様にresource declarationの起点も識別子のみ</li>
     <li><strong>評価レベル制約</strong>関数値がmodule call / resource生成位置に評価された場合はparse/evaluatorで弾く</li>
   </ol>
 
   <p>詳細は <a href="https://github.com/carina-rs/carina/issues/2238">carina#2238</a> で議論。</p>
 
-  <h4>抽象化境界の透明性との関係 (仮説)</h4>
+  <h4>抽象化境界の透明性との関係(仮説)</h4>
 
-  <p>章1 §1-3-4で「予測可能性議論の射程を限定する前提」として記録された<strong>抽象化境界の透明性</strong>は、Carina固有のmodule機構と関わる仮説的観察がある: <strong><code>use</code> 式とインスタンス化の分離 (<code>let network = use { source = ... }; let net = network { ... }</code>)、同一templateから複数インスタンス化、<code>use</code> 式の <code>let</code> RHS限定</strong>といった現状の設計は、moduleの境界を構文レベルで明示する性質を持つ。これは<strong>境界管理を明示しやすい</strong>という意味で、CDKの <code>new SomeConstruct(scope, 'id', props)</code> のような汎用言語の <code>new</code> 慣習よりも透明性に優位を持つ可能性がある。</p>
+  <p>章1 §1-3-4で「予測可能性議論の射程を限定する前提」として記録された<strong>抽象化境界の透明性</strong>は、Carina固有のmodule機構と関わる仮説的観察がある: <strong><code>use</code> 式とインスタンス化の分離(<code>let network = use { source = ... }; let net = network { ... }</code>)、同一templateから複数インスタンス化、<code>use</code> 式の <code>let</code> RHS限定</strong>といった現状の設計は、moduleの境界を構文レベルで明示する性質を持つ。これは<strong>境界管理を明示しやすい</strong>という意味で、CDKの <code>new SomeConstruct(scope, 'id', props)</code> のような汎用言語の <code>new</code> 慣習よりも透明性に優位を持つ可能性がある。</p>
 
   <p>ただし<strong>構文レベルでの明示性は、呼び出し側透明性そのものを自動では保証しない</strong>: module中身を読まずに呼び出し側だけでgraph形状 / 属性値を予測できるかは、依然としてmodule設計者のドキュメント文化・テスト文化・型情報の充実度に依存する。Carinaの構文設計は透明性を<strong>促す方向に効きうる</strong>が、それだけでAI検証性 / plan精度 / 静的監査が成立する保証にはならない。これは経験的検証が必要な仮説で、ここでは深追いしない。</p>
 
-  <h3>6. 「IaCで高階関数は本当に必要か」への懐疑</h3>
+  <h3>6.「IaCで高階関数は本当に必要か」への懐疑</h3>
 
   <p>ハイブリッド象限への合流は構造的整合性の議論で、<strong>ユーザの実需要</strong>とは別の問題。実需要観点では:</p>
 
@@ -1893,13 +1893,13 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
       <ul>
         <li><strong>Bicepが意図的に入れていない</strong>: Microsoft設計、<code>func</code> のみで高階関数は仕様にない。それでもAzure IaCとして広く使われている</li>
         <li><strong>Terraformが14年高階関数なしで運用</strong>: <code>for_each</code> / <code>dynamic</code> で大半の用途を満たしている</li>
-        <li><strong>CDK / Pulumiの高階関数活用は実は限定的</strong>: 命名関数や <code>map</code> でループ程度、Constructを関数で渡す/返すパターンは現場では稀</li>
+        <li><strong>CDK / Pulumiの高階関数活用は実は限定的</strong>:命名関数や <code>map</code> でループ程度、Constructを関数で渡す/返すパターンは現場では稀</li>
       </ul>
     </div>
     <div>
       <h3>IaCで実際に必要な抽象化</h3>
       <ul>
-        <li><strong>値計算の再利用</strong>: 命名規則 / 環境別パラメタ → <code>fn</code> で十分</li>
+        <li><strong>値計算の再利用</strong>:命名規則 / 環境別パラメタ → <code>fn</code> で十分</li>
         <li><strong>構成のテンプレート化</strong>: VPC + Subnet × N + IGWのセット → moduleで十分</li>
         <li><strong>多数生成</strong>: multi-region展開 / リスト要素ごと → <code>for</code> 式で十分</li>
       </ul>
@@ -1913,24 +1913,24 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   <div class="scroll narrow">
     <table class="compare">
       <tbody>
-        <tr><td>A. 入れない (Bicep路線)</td><td>「IaCでは値計算と構成テンプレート化で十分」と割り切る。Bicep成功の経験的裏付けあり</td></tr>
-        <tr><td>B. 入れる (KCL路線)</td><td>構造的に5DSLと整合、長期的拡張余地。ただし大改修コスト</td></tr>
-        <tr><td>C. 保留</td><td>現状の <code>fn</code> + 関数合成で実需要を観察、ユーザから具体ユースケースが出てきたら検討</td></tr>
+        <tr><td>A.入れない(Bicep路線)</td><td>「IaCでは値計算と構成テンプレート化で十分」と割り切る。Bicep成功の経験的裏付けあり</td></tr>
+        <tr><td>B.入れる(KCL路線)</td><td>構造的に5DSLと整合、長期的拡張余地。ただし大改修コスト</td></tr>
+        <tr><td>C.保留</td><td>現状の <code>fn</code> + 関数合成で実需要を観察、ユーザから具体ユースケースが出てきたら検討</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p><strong>Carinaの選択</strong>: <strong>実験的プロジェクト</strong>という位置づけから、A / CよりB (積極導入) の方が学びが多い。境界設計 (graph出力DSLでの高階関数) は5DSLに先行例がない領域なので、<strong>新しい設計象限の実証</strong>として価値が高い。「IaCで本当に必要か」の答えは入れてみないと分からない。</p>
+  <p><strong>Carinaの選択</strong>: <strong>実験的プロジェクト</strong>という位置づけから、A / CよりB (積極導入)の方が学びが多い。境界設計(graph出力DSLでの高階関数)は5DSLに先行例がない領域なので、<strong>新しい設計象限の実証</strong>として価値が高い。「IaCで本当に必要か」の答えは入れてみないと分からない。</p>
 
-  <h3>7. 生成AI利用前提での予測可能性の意味</h3>
+  <h3>7.生成AI利用前提での予測可能性の意味</h3>
 
-  <p>章1 §1-3が立てた予測可能性の基準は (本版で) <strong>「実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れるか」</strong>で、暗黙に<strong>読む主体は人間</strong>が前提だった。生成AIによるIaCコード生成・読解・修正が普及しつつある現在、この前提を再検討する必要がある。</p>
+  <p>章1 §1-3が立てた予測可能性の基準は(本版で) <strong>「実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れるか」</strong>で、暗黙に<strong>読む主体は人間</strong>が前提だった。生成AIによるIaCコード生成・読解・修正が普及しつつある現在、この前提を再検討する必要がある。</p>
 
-  <p>予測可能性はgraph形状と属性値の両方に効く。実運用では「このリソースは具体的にどう設定されているか」をコードから知りたい場面 (インシデント対応 / コンプライアンス監査 / セキュリティレビュー / IAMポリシー検査 / 暗号化設定確認) が頻出し、graph形状だけ見えても属性値が動的計算だらけだと運用上の予測可能性は半減する。</p>
+  <p>予測可能性はgraph形状と属性値の両方に効く。実運用では「このリソースは具体的にどう設定されているか」をコードから知りたい場面(インシデント対応 / コンプライアンス監査 / セキュリティレビュー / IAMポリシー検査 / 暗号化設定確認)が頻出し、graph形状だけ見えても属性値が動的計算だらけだと運用上の予測可能性は半減する。</p>
 
   <h4>「人が直接読まない」前提だと予測可能性は何のため?</h4>
 
-  <p>人が読まなくなったときに予測可能性が指す対象は次のどれか (graph形状側 / 属性値側の両方が論点になる):</p>
+  <p>人が読まなくなったときに予測可能性が指す対象は次のどれか(graph形状側 / 属性値側の両方が論点になる):</p>
 
   <div class="scroll">
     <table>
@@ -1941,49 +1941,49 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
         <tr>
           <td>AIによるgraph + 属性値理解の精度</td>
           <td>LLMが動的構造を持つコードからgraph形状と属性値を正しく推論できるか</td>
-          <td>高 (AIも完璧ではなく、動的module選択 / 深い高階関数チェーン / 複雑な属性値計算で誤読する)</td>
+          <td>高(AIも完璧ではなく、動的module選択 / 深い高階関数チェーン / 複雑な属性値計算で誤読する)</td>
         </tr>
         <tr>
           <td>AI修正の安全性</td>
           <td>「このリソースの暗号化を有効にして」「タグを追加して」とAIに頼んだとき、副作用範囲と既存属性値の整合性を正しく見積もれるか</td>
-          <td>高 (属性値が動的計算で決まっているとAIも整合的な修正を出しにくい)</td>
+          <td>高(属性値が動的計算で決まっているとAIも整合的な修正を出しにくい)</td>
         </tr>
         <tr>
           <td>静的解析の効きやすさ</td>
-          <td>lint / 型検査 / policy engine (例: 「全S3 Bucketは暗号化必須」) が動的属性値で破綻しないか</td>
-          <td>変わらず重要 (AIが読むかと独立)</td>
+          <td>lint / 型検査 / policy engine (例:「全S3 Bucketは暗号化必須」)が動的属性値で破綻しないか</td>
+          <td>変わらず重要(AIが読むかと独立)</td>
         </tr>
         <tr>
           <td>plan/previewの正確性</td>
           <td>ツール側のgraph抽出と差分計算が正しく動くか、属性値のunknownが増えすぎないか</td>
-          <td>高 (静的予測可能性が低いとplanでunknown値だらけになり、人にもAIにも何が起きるか見えなくなる)</td>
+          <td>高(静的予測可能性が低いとplanでunknown値だらけになり、人にもAIにも何が起きるか見えなくなる)</td>
         </tr>
         <tr>
           <td>AIのコンテキスト窓</td>
           <td>巨大IaCリポジトリでAIが全コードを一度に見られないとき、局所読みで判断できるか</td>
-          <td>高 (コンテキスト制約は人と同質、局所読みでgraph形状と属性値が分かる性質が効く)</td>
+          <td>高(コンテキスト制約は人と同質、局所読みでgraph形状と属性値が分かる性質が効く)</td>
         </tr>
         <tr>
           <td>fail-safeガードレール</td>
           <td>AIが自律的にapplyする前提で、予期せぬ副作用を防げるか</td>
-          <td>高 (「動的に何が起きるか分からない」をAIに丸投げできない)</td>
+          <td>高(「動的に何が起きるか分からない」をAIに丸投げできない)</td>
         </tr>
         <tr>
           <td>コンプライアンス・セキュリティレビュー</td>
           <td>「全IAM Roleの <code>assume_role_policy</code> を機械的に確認」「全RDSの <code>storage_encrypted</code> を検証」のような属性値レベルの監査ができるか</td>
-          <td>高 (動的計算で属性値が決まると静的監査が破綻)</td>
+          <td>高(動的計算で属性値が決まると静的監査が破綻)</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <h4>結論: 予測可能性は依然重要、ただし根拠が組み替わる</h4>
+  <h4>結論:予測可能性は依然重要、ただし根拠が組み替わる</h4>
 
   <p>章1 §1-3の予測可能性議論は人前提に縛られていない。静的解析・plan精度・AI解釈・コンプライアンス監査もすべて予測可能性の恩恵を受ける。むしろ生成AIの時代では:</p>
 
   <div class="findings">
     <div>
-      <span class="q">静的に決定的なコード (graph形状も属性値も) はAIにも好都合</span>
+      <span class="q">静的に決定的なコード(graph形状も属性値も)はAIにも好都合</span>
       <span class="a">「人が読めればAIも読める」</span>
     </div>
     <div>
@@ -1991,7 +1991,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
       <span class="a">「人が読めないがAIなら読める」は限定的</span>
     </div>
     <div>
-      <span class="q">plan予測が崩れるとIaCの根本価値 (apply前に結果を見せる) が毀損する</span>
+      <span class="q">plan予測が崩れるとIaCの根本価値(apply前に結果を見せる)が毀損する</span>
       <span class="a">「人もAIも読めないがapplyはできる」は危険</span>
     </div>
   </div>
@@ -2003,28 +2003,28 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   <p>§5の高階関数境界設計は、AI時代の文脈ではより重要度が上がる:</p>
 
   <ul>
-    <li><strong>高階関数を入れた境界設計が緩いとplanがunknownだらけ</strong>: 人にもAIにも判別不能になる</li>
-    <li><strong>AI自律applyの安全性</strong>: 動的module選択や属性値の動的計算を許すとAIが事故を起こす範囲が広がる</li>
-    <li><strong>「AIが書くから人が読めなくていい」は破綻</strong>: AIが動的構造を多用したコードを生成すると、それを検証する人 (またはレビューAI) のコストが跳ね上がる</li>
+    <li><strong>高階関数を入れた境界設計が緩いとplanがunknownだらけ</strong>:人にもAIにも判別不能になる</li>
+    <li><strong>AI自律applyの安全性</strong>:動的module選択や属性値の動的計算を許すとAIが事故を起こす範囲が広がる</li>
+    <li><strong>「AIが書くから人が読めなくていい」は破綻</strong>: AIが動的構造を多用したコードを生成すると、それを検証する人(またはレビューAI)のコストが跳ね上がる</li>
     <li><strong>属性値レベルでも同じ問題</strong>: <code>tags = compose(f, g, h)(env)</code> のような複雑な合成は、graph形状を変えずとも属性監査を破綻させうる</li>
   </ul>
 
   <p>§6の「IaCで高階関数は本当に必要か」議論についても、AI時代の観点から見直しの余地がある:</p>
 
   <ul>
-    <li><strong>値計算の再利用はAIが肩代わりできる</strong>: 「環境別ポート計算ヘルパー」を関数で書く代わりにAIが一括展開した値を生成できる。<strong>高階関数の実需要はむしろ下がる</strong>可能性</li>
+    <li><strong>値計算の再利用はAIが肩代わりできる</strong>:「環境別ポート計算ヘルパー」を関数で書く代わりにAIが一括展開した値を生成できる。<strong>高階関数の実需要はむしろ下がる</strong>可能性</li>
     <li><strong>構成のテンプレート化もmoduleで十分</strong>: AIがmoduleを組み合わせる形で構成を生成できる</li>
     <li><strong>多数生成も <code>for</code> 専用構文で十分</strong>: AIが <code>for</code> の専用構文を生成するのは難しくない</li>
   </ul>
 
-  <p><strong>Bicepが高階関数を入れていない設計判断は、AI時代でむしろ正当化されやすい</strong>: 表現力を絞ったDSLの方がAIにとっても扱いやすい (生成・読解・修正のすべてで)。Carinaの高階関数導入は<strong>構造的整合性 (5DSLのハイブリッド象限合流) とAI時代の機械可読性 (絞り込みを保つ) の間でトレードオフを取る</strong>設計判断になる。</p>
+  <p><strong>Bicepが高階関数を入れていない設計判断は、AI時代でむしろ正当化されやすい</strong>:表現力を絞ったDSLの方がAIにとっても扱いやすい(生成・読解・修正のすべてで)。Carinaの高階関数導入は<strong>構造的整合性(5DSLのハイブリッド象限合流)とAI時代の機械可読性(絞り込みを保つ)の間でトレードオフを取る</strong>設計判断になる。</p>
 
   <p>実験的プロジェクトとしてのCarinaの位置づけは、このトレードオフを<strong>実証実験する</strong>余地を提供する。「高階関数を入れたDSLはAIにとっても扱いやすいか」「属性値計算の自由度を上げても静的監査は成立するか」は入れて使ってみないと分からない。</p>
 
-  <h3>8. Carinaの現状機能点検 (DSL + ツール一体での評価)</h3>
+  <h3>8. Carinaの現状機能点検(DSL + ツール一体での評価)</h3>
 
   <aside class="note-aside">
-    <p>注: 本節はCarinaプロジェクト全体 (DSL + ツール) を一体として評価する。state管理 / CRUD実行はDSL仕様ではなくツール側の機能だが、Carinaプロジェクトとしての成熟度を測るために含める。</p>
+    <p>注:本節はCarinaプロジェクト全体(DSL + ツール)を一体として評価する。state管理 / CRUD実行はDSL仕様ではなくツール側の機能だが、Carinaプロジェクトとしての成熟度を測るために含める。</p>
   </aside>
 
   <p><a href="https://github.com/carina-rs/carina">carina-rs/carina</a> repoを20項目で点検した結果:</p>
@@ -2041,7 +2041,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
         <tr><td>edgeの表現</td><td>✅ ResourceRefによる参照、string interpolation対応</td></tr>
         <tr><td>plan/apply</td><td>✅ Differ + plan generation + validate→plan→apply CLI</td></tr>
         <tr><td>identity</td><td>✅ ResourceId (provider + type + name)、apply間でstable</td></tr>
-        <tr><td>unknown値</td><td>✅ deferred退避 (現状はplan時fully resolved制約あり、issue #2209で改善検討)</td></tr>
+        <tr><td>unknown値</td><td>✅ deferred退避(現状はplan時fully resolved制約あり、issue #2209で改善検討)</td></tr>
         <tr><td>依存解決と実行順序</td><td>✅ deps.rsでgraph抽出、topological order</td></tr>
         <tr><td>state管理</td><td>✅ Local backend + S3 backend + DynamoDB lock</td></tr>
       </tbody>
@@ -2053,8 +2053,8 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   <p>不足:</p>
 
   <ul>
-    <li>❌ <code>count</code> 相当 (<code>for</code> で代替可能)</li>
-    <li>❌ 明示的依存 (<code>depends_on</code> 相当) → <a href="https://github.com/carina-rs/carina/issues/2239">carina#2239</a> を立てた</li>
+    <li>❌ <code>count</code> 相当(<code>for</code> で代替可能)</li>
+    <li>❌ 明示的依存(<code>depends_on</code> 相当) → <a href="https://github.com/carina-rs/carina/issues/2239">carina#2239</a> を立てた</li>
   </ul>
 
   <p>実装済みで注目すべきもの:</p>
@@ -2062,8 +2062,8 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   <ul>
     <li>✅ <strong>import (既存リソース取り込み)</strong>: DSL構文 <code>import { to = ..., id = ... }</code> 実装済み</li>
     <li>✅ <strong>moved block (state migration)</strong>: Terraform <code>moved</code> 相当、<code>removed</code> blockも対応</li>
-    <li>✅ <strong>provider拡張</strong>: WASM plugin systemで言語横断対応 (carina-plugin-sdk / carina-plugin-host)</li>
-    <li>✅ <strong>lifecycle制御 (部分)</strong>: <code>create_before_destroy</code> / <code>prevent_destroy</code> / <code>force_delete</code> 実装済み (<code>replace_on_changes</code> / <code>ignore_changes</code> は未実装)</li>
+    <li>✅ <strong>provider拡張</strong>: WASM plugin systemで言語横断対応(carina-plugin-sdk / carina-plugin-host)</li>
+    <li>✅ <strong>lifecycle制御(部分)</strong>: <code>create_before_destroy</code> / <code>prevent_destroy</code> / <code>force_delete</code> 実装済み(<code>replace_on_changes</code> / <code>ignore_changes</code> は未実装)</li>
   </ul>
 
   <h4>あると便利4項目: 3/4</h4>
@@ -2072,7 +2072,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <ul>
     <li>❌ partial apply / <code>--target</code> → <a href="https://github.com/carina-rs/carina/issues/2240">carina#2240</a> を立てた</li>
-    <li>🚧 drift detection: ロジックは実装済みだがCLI公開なし → <a href="https://github.com/carina-rs/carina/issues/2241">carina#2241</a> を立てた</li>
+    <li>🚧 drift detection:ロジックは実装済みだがCLI公開なし → <a href="https://github.com/carina-rs/carina/issues/2241">carina#2241</a> を立てた</li>
   </ul>
 
   <p>実装済み:</p>
@@ -2082,9 +2082,9 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
     <li>✅ plan可視化: TUI (<code>carina-tui</code>、ratatui) + tree-like表示</li>
   </ul>
 
-  <h3>9. 総合的な立ち位置</h3>
+  <h3>9.総合的な立ち位置</h3>
 
-  <p>章1 + cross-DSL分析 + 機能点検をまとめると、Carina (DSL + ツール) は<strong>想定以上に成熟している</strong>:</p>
+  <p>章1 + cross-DSL分析 + 機能点検をまとめると、Carina (DSL + ツール)は<strong>想定以上に成熟している</strong>:</p>
 
   <ul>
     <li>必須7項目 + import + moved + WASM providerまで揃っており、IaCツールとしての骨格は完成</li>
@@ -2095,7 +2095,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
 
   <div class="contrast">
     <div>
-      <h3>軸1: 運用補助機能の充実 (実需要先行)</h3>
+      <h3>軸1:運用補助機能の充実(実需要先行)</h3>
       <p>短期的に実用度を上げる方向。3つの未実装項目をカバー:</p>
       <ul>
         <li><a href="https://github.com/carina-rs/carina/issues/2239">carina#2239</a> <code>depends_on</code> 相当</li>
@@ -2105,11 +2105,11 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
       <p>これらはgraph出力DSLの根本構造ではなく、実運用で使うための補助機能。Terraformに追従する漸進的改善。</p>
     </div>
     <div class="yes">
-      <h3>軸2: 新しい設計象限の実証 (構造先行)</h3>
+      <h3>軸2:新しい設計象限の実証(構造先行)</h3>
       <p>長期的に独自性を確立する方向。高階関数を導入してハイブリッド象限に踏み込む:</p>
       <ul>
         <li><a href="https://github.com/carina-rs/carina/issues/2238">carina#2238</a> 高階関数サポート</li>
-        <li>境界設計で <strong>graph形状の静的予測可能性 (章1 §1-3の「実装の切替」を言語が決める) を維持</strong>する: 関数値が <code>use</code> / <code>source</code> 位置に染み出さないことが核心</li>
+        <li>境界設計で <strong>graph形状の静的予測可能性(章1 §1-3の「実装の切替」を言語が決める)を維持</strong>する:関数値が <code>use</code> / <code>source</code> 位置に染み出さないことが核心</li>
         <li>5DSLに先行例がない「graph出力 + 外部DSL × ハイブリッド象限」の実証</li>
       </ul>
     </div>
@@ -2118,23 +2118,23 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
   <h4>Carinaの独自性</h4>
 
   <ul>
-    <li><strong>graph出力 + 外部DSL + (将来的に) ハイブリッド</strong>: この3つの組み合わせを取るツールは現状存在しない</li>
-    <li><strong>実験的プロジェクト</strong>としての位置づけが、軸2 (新象限の実証) を取る合理性を支える</li>
+    <li><strong>graph出力 + 外部DSL + (将来的に)ハイブリッド</strong>:この3つの組み合わせを取るツールは現状存在しない</li>
+    <li><strong>実験的プロジェクト</strong>としての位置づけが、軸2 (新象限の実証)を取る合理性を支える</li>
     <li>現状の機能点検結果から、<strong>軸1で実用性を保ちつつ軸2を実験できる</strong>状態にある</li>
   </ul>
 
-  <h3>10. 残された論点</h3>
+  <h3>10.残された論点</h3>
 
   <ul>
-    <li><strong>境界設計の技術的成立性</strong>: 高階関数を入れたとき関数値がresource生成位置・module選択位置・identity決定位置に到達しない型/文法/評価制約が実装可能か (graph形状の静的予測可能性を保つ条件)</li>
-    <li><strong>属性値レベルの動的計算が静的監査に与える影響の経験的検証</strong>: 高階関数経由で属性値計算が複雑化したとき、コンプライアンス監査 / セキュリティスキャン (例: tfsec, checkov相当) がどこまで成立するか</li>
-    <li><strong>unknown値と高階関数の相互作用</strong>: 関数引数/戻り値を流れるdeferred値の扱い</li>
-    <li><strong>identityの安定性</strong>: 高階関数経由で生成されるanonymous resourceの自動命名の安定性</li>
-    <li><strong>plan表示</strong>: 高階関数を経由した展開を予測可能な形で見せるUI設計 (graph形状側 / 属性値側とも)</li>
-    <li><strong>「IaCで高階関数は実需要があるか」の経験的検証</strong>: 入れた後でユーザがどう使うかの観察</li>
-    <li><strong>生成AIが動的構造を持つIaCコードでどの程度誤読・誤修正するか</strong>: AI時代の予測可能性議論を支える経験的根拠の収集 (LLMベンチマーク、実運用事故の事例分析)。属性値レベルの動的計算とgraph形状レベルの動的計算でAI誤読率が異なるかも論点</li>
-    <li><strong>「人前提」と「AI自律apply前提」の予測可能性要件の差</strong>: §7では同方向と整理したが、AI自律でapplyまで完結する場合に追加で要件 (より強い不変条件、例えばapply前のrollback可能性) が要るか</li>
-    <li><strong>11DSLの属性値計算自由度の再評価</strong>: cross-DSL分析の3自由度評価はgraph形状側に偏っている。Pkl / KCL / Dhall / Jsonnet / Nickelなど構成データ出力DSLは属性値計算が主用途なので、属性値自由度で見ると評価が変わる可能性がある。ここでは深追いしない (別issue)</li>
+    <li><strong>境界設計の技術的成立性</strong>:高階関数を入れたとき関数値がresource生成位置・module選択位置・identity決定位置に到達しない型/文法/評価制約が実装可能か(graph形状の静的予測可能性を保つ条件)</li>
+    <li><strong>属性値レベルの動的計算が静的監査に与える影響の経験的検証</strong>:高階関数経由で属性値計算が複雑化したとき、コンプライアンス監査 / セキュリティスキャン(例: tfsec, checkov相当)がどこまで成立するか</li>
+    <li><strong>unknown値と高階関数の相互作用</strong>:関数引数/戻り値を流れるdeferred値の扱い</li>
+    <li><strong>identityの安定性</strong>:高階関数経由で生成されるanonymous resourceの自動命名の安定性</li>
+    <li><strong>plan表示</strong>:高階関数を経由した展開を予測可能な形で見せるUI設計(graph形状側 / 属性値側とも)</li>
+    <li><strong>「IaCで高階関数は実需要があるか」の経験的検証</strong>:入れた後でユーザがどう使うかの観察</li>
+    <li><strong>生成AIが動的構造を持つIaCコードでどの程度誤読・誤修正するか</strong>: AI時代の予測可能性議論を支える経験的根拠の収集(LLMベンチマーク、実運用事故の事例分析)。属性値レベルの動的計算とgraph形状レベルの動的計算でAI誤読率が異なるかも論点</li>
+    <li><strong>「人前提」と「AI自律apply前提」の予測可能性要件の差</strong>: §7では同方向と整理したが、AI自律でapplyまで完結する場合に追加で要件(より強い不変条件、例えばapply前のrollback可能性)が要るか</li>
+    <li><strong>11DSLの属性値計算自由度の再評価</strong>: cross-DSL分析の3自由度評価はgraph形状側に偏っている。Pkl / KCL / Dhall / Jsonnet / Nickelなど構成データ出力DSLは属性値計算が主用途なので、属性値自由度で見ると評価が変わる可能性がある。ここでは深追いしない(別issue)</li>
     <li><strong>抽象化境界の透明性とCarinaの構文設計の関係</strong>: §5末尾で仮説として置いた「<code>use</code> + インスタンス化分離は境界管理を明示しやすいが、呼び出し側透明性そのものは保証しない」の経験的検証。実Carinaプロジェクトでのmodule設計プラクティス・ドキュメント文化・型情報充実度との相互作用を観察する必要がある</li>
   </ul>
 
@@ -2146,7 +2146,7 @@ let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果を 
       <li><a href="https://github.com/carina-rs/carina/issues/2239">carina-rs/carina#2239</a> — 明示的依存指定</li>
       <li><a href="https://github.com/carina-rs/carina/issues/2240">carina-rs/carina#2240</a> — <code>--target</code> フラグ</li>
       <li><a href="https://github.com/carina-rs/carina/issues/2241">carina-rs/carina#2241</a> — <code>carina drift</code> コマンド公開</li>
-      <li class="unwritten">記述言語と抽象化 — CDK / Pulumi / Terraform / Carinaの比較 (章1)</li>
+      <li class="unwritten">記述言語と抽象化 — CDK / Pulumi / Terraform / Carinaの比較(章1)</li>
     </ul>
   </nav>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>plan(source, world) の world を速くする - notes</title>
+<title>plan(source, world)のworldを速くする - notes</title>
 <meta name="description" content="IaCのworld取得が遅いのは「信頼性 = 全リソースの同期GET」という等式のせい。これをほどくと攻め口は三つに分かれる。">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
@@ -44,20 +44,20 @@
 </header>
 
 <article class="note">
-  <h1>plan(source, world) の world を速くする — 異分野の知見の適用可能性</h1>
+  <h1>plan(source, world)のworldを速くする — 異分野の知見の適用可能性</h1>
   <p class="meta"><time datetime="2026-06-11">2026-06-11</time> ・ 生成AI(Claude)との対話による探索 ・ 設計アイデアの整理。実装・実測はしていない。</p>
   <p class="lineage">派生元: <a href="/notes/carina-type-system-type-theory.html">Carinaの型システムと型理論</a>（plan-as-compilation）。そこで整理した「IaCのコンパイルは二引数 <code>plan(source, world)</code> である」という見方を出発点にしている。</p>
 
   <div class="accuracy">
     <h2>⚠️ 精度ノート</h2>
     <ul>
-      <li>Carina側の事実(planが (source, world) の純関数であること、planがロックを取らずapplyがロック下で再計算するという契約、TOCTOUドリフト検出の存在)はcarinaのソース・ドキュメントで確認済み。</li>
+      <li>Carina側の事実(planが(source, world)の純関数であること、planがロックを取らずapplyがロック下で再計算するという契約、TOCTOUドリフト検出の存在)はcarinaのソース・ドキュメントで確認済み。</li>
       <li>異分野の研究・技術への言及(リース、OCC、DBSP / differential dataflow、Build systems à la carte、Salsa、self-adjusting computation、MESI、Dynamoの反エントロピー、CloudTrail / EventBridge / AWS Configの挙動と配信遅延)はAIの学習データ由来であり、一次ソースとの突き合わせはしていない。方向の参考として読み、設計に採用する前に各文献・各サービスの公式ドキュメントで確認すること。</li>
       <li>本ノートはアイデアの列挙であり、どの案も実測による裏づけを持たない。例外として、CloudTrailを変更フィードに使う案の二つの壁(リソースの一意な同定が難しい、ログが膨大)は、Terraformとの組み合わせで実際に試みた経験(筆者)に基づく確認済みの問題である。§2のConfig / Cloud Controlへの方針転換はこの経験を受けたもの。</li>
     </ul>
   </div>
 
-  <h2>1. 問題の構造</h2>
+  <h2>1.問題の構造</h2>
 
   <p>plan = コンパイルの分析で、IaCのコンパイルは二引数 <code>plan(source, world)</code> であると整理した。このうちworldの取得が遅い。信頼できるworldを作ろうとすると、全リソースをクラウドAPIへの同期GETで読む(refresh)ことになり、所要時間はリソース総数に比例し、レート制限にも当たる。</p>
 
@@ -123,7 +123,7 @@
 
   <p>以下、一見IaCと無関係な分野から、この三つに対応する知見を拾う。</p>
 
-  <h2>2. ハードウェア / OS — dirty bitと無効化通知</h2>
+  <h2>2.ハードウェア / OS — dirty bitと無効化通知</h2>
 
   <p>CPUはメモリの全走査をしない。ページテーブルのdirty bitが「変わったページ」だけを教え、キャッシュ一貫性プロトコル(MESI系)は無効化通知を受けたキャッシュ行だけを再取得する。「全部読む」を「変わったと通知されたものだけ読む」に変える構造である。</p>
 
@@ -145,13 +145,13 @@
 
   <p>この経験はdirty bitの供給源の選定を変える。API呼び出しログ(CloudTrail)ではなく、リソース指向の変更フィード(AWS Configのconfiguration item、またはEventBridgeで書き込み系・対象リソース型に絞ったルール)を一次チャネルにすべきである。Configは「リソース型 + リソースID」をキーに構成変更だけを配信するので、量の壁は構造的に小さく、同定の壁もリソースの語彙に最初から揃っている。さらにCarina固有の追い風として、awsccプロバイダはCloud Control APIの上にあり、すべてのリソースが「リソース型(<code>AWS::EC2::VPC</code>)+ primary identifier」という一様な同定子を持つ。stateが保持する識別子とConfigイベントの語彙がほぼ一致するため、Terraform + CloudTrailで問題になった対応づけが、構造的に易しくなる可能性がある(未検証だが、検証する価値が高い)。それでも残る不一致(識別子の表記揺れ、複合識別子)に対しては、購読対象をstateに存在するリソース型・識別子の集合へ事前に絞り込み、対応づけられないイベントは「不明な変更 → 反エントロピー同期の対象」へ落とす、という保守的な設計で吸収する。</p>
 
-  <h2>3. データベース — 増分ビュー維持と差分計算</h2>
+  <h2>3.データベース — 増分ビュー維持と差分計算</h2>
 
   <p>§2の構図はデータベースの増分ビュー維持(incremental view maintenance)そのものである。さらに、DBSP / differential dataflowの系統は「入力の差分から出力の差分を直接計算する」一般理論を与える。これを当てるとplan自体を常駐クエリにできる。desiredとworldの差分(= plan)をworldの変更イベントが届くたびに増分更新し続け、<code>carina plan</code> は「計算する」コマンドから「維持されている差分を表示する」コマンドになる。</p>
 
-  <p>ここで言語側の性質が効く。増分化が安全なのは参照透明な計算だけであり、planが (source, world) の純関数であること — 静的段階の全域性と純粋性 — は、この最適化の前提条件をちょうど満たしている。汎用言語埋め込み型のツール(synthが外界を読みうる)では、この変換は同じ安全性では成立しない。</p>
+  <p>ここで言語側の性質が効く。増分化が安全なのは参照透明な計算だけであり、planが(source, world)の純関数であること — 静的段階の全域性と純粋性 — は、この最適化の前提条件をちょうど満たしている。汎用言語埋め込み型のツール(synthが外界を読みうる)では、この変換は同じ安全性では成立しない。</p>
 
-  <h2>4. 分散システム — リース、楽観的並行性制御、反エントロピー</h2>
+  <h2>4.分散システム — リース、楽観的並行性制御、反エントロピー</h2>
 
   <p>リース(Gray &amp; Cheriton)は「期限付きの所有権があるあいだは、再確認なしで自分のキャッシュを信じてよい」という古典である。IaCでは「このstateの所有者だけがこのリソース群を書く」という運用前提がリースに当たり、前提が成り立つ間はrefresh自体が不要になる(攻め口3)。</p>
 
@@ -159,11 +159,11 @@
 
   <p>イベント配信は遅延も欠落もあるので、それだけに頼ると静かにずれる。Dynamo系の反エントロピー — 低頻度のバックグラウンド全同期で補正する — を併用する。Merkle木的なダイジェスト比較で「どの部分木がずれたか」だけを特定して同期する発想も借りられる。</p>
 
-  <h2>5. コンパイラ / ビルドシステム — 依存追跡つき増分計算</h2>
+  <h2>5.コンパイラ / ビルドシステム — 依存追跡つき増分計算</h2>
 
   <p>Build systems à la carte、Salsa(rustcのクエリ基盤)、self-adjusting computation(Acar)の核は「入力が変わっていなければ再計算しない、変わっても依存の影響範囲だけ再計算する」依存追跡である。world側の変更イベントと組み合わせると、「VPCの1属性が変わった → それに依存する差分計算ノードだけ無効化 → planの大半はキャッシュヒット」という増分planが組める。§3の常駐クエリ案の、よりエンジニアリング寄りの実現形である。</p>
 
-  <h2>6. 型システム — 所有権で「読まなくてよい」を証明する</h2>
+  <h2>6.型システム — 所有権で「読まなくてよい」を証明する</h2>
 
   <p>この探索の文脈に最も合うのはこの角度である。Rustの所有権が「排他なら同期不要」をコンパイル時に証明するのと同じ形で、リソースごとに「書き手は誰か」を宣言のレベルで持たせる。自分(このstate)が排他所有するリソースはrefresh不要(自分の記録が真)とし、共有(コンソール操作や他パイプラインがありうる)と宣言されたリソースだけをイベント購読や同期GETの対象にする。</p>
 
@@ -183,31 +183,31 @@
       </thead>
       <tbody>
         <tr>
-          <td>§2 ハードウェア/OS</td>
+          <td>§2ハードウェア/OS</td>
           <td>dirty bit、MESIの無効化通知</td>
           <td>①読む量を減らす<br>②読む時刻をずらす</td>
           <td>Config / EventBridgeの変更イベントを購読し、worldを実体化ビューとして維持。refreshは「イベント再生 + dirtyなリソースだけのGET」</td>
         </tr>
         <tr>
-          <td>§3 データベース</td>
+          <td>§3データベース</td>
           <td>増分ビュー維持、DBSP / differential dataflow</td>
           <td>①読む量を減らす<br>②読む時刻をずらす</td>
           <td>plan自体を常駐クエリにする。<code>carina plan</code> は「計算する」から「維持されている差分を表示する」へ</td>
         </tr>
         <tr>
-          <td>§4 分散システム</td>
+          <td>§4分散システム</td>
           <td>リース、OCC、反エントロピー / Merkle同期</td>
           <td>③読まなくてよい条件<br>(OCCは錨、反エントロピーは補正)</td>
           <td>所有者が明確な間はrefresh不要。planはロックなし・applyがロック下で検証。低頻度の全同期でずれを補正</td>
         </tr>
         <tr>
-          <td>§5 ビルドシステム</td>
+          <td>§5ビルドシステム</td>
           <td>Build systems à la carte、Salsa、self-adjusting computation</td>
           <td>①読む量を減らす</td>
           <td>依存追跡つき増分plan。変わった属性に依存する差分計算ノードだけ無効化し、大半はキャッシュヒット</td>
         </tr>
         <tr>
-          <td>§6 型システム</td>
+          <td>§6型システム</td>
           <td>Rustの所有権、rely-guarantee推論</td>
           <td>③読まなくてよい条件</td>
           <td>リソースごとに書き手を宣言。排他所有はstateを真とし、共有と宣言されたものだけ購読・GETの対象に。IAM / SCPで宣言を裏づける</td>
@@ -216,7 +216,7 @@
     </table>
   </div>
 
-  <h2>7. 合成案 — 三層構造</h2>
+  <h2>7.合成案 — 三層構造</h2>
 
   <p>Carinaに落とすなら三層になる。</p>
 
@@ -289,11 +289,11 @@
     <li><strong>正しさの錨</strong>apply直前のロック下でのリソース単位の再読・検証(OCCのコミット検証)。planの鮮度はここで最終担保されるため、1と2はすべて「速さとUXのための近似」と位置づけられる。</li>
   </ol>
 
-  <h2>8. 限界</h2>
+  <h2>8.限界</h2>
 
   <p>クラウドのイベント配信は遅延(分オーダー)と欠落があり、トランザクショナルでもない。したがって「plan時点の完全な鮮度」は原理的に買えない。買えるのは「有界の古さ + 変更量比例のコスト + applyでの最終検証」である。これはCarinaが既に持つ「planは予測であり、真実はapplyが確立する」という契約の延長線上にあり、契約を変えずに体感だけを変える種類の最適化だと言える。</p>
 
-  <h2>9. 研究ポインタ(未検証)</h2>
+  <h2>9.研究ポインタ(未検証)</h2>
 
   <div class="scroll narrow">
     <table class="compare">
@@ -334,7 +334,7 @@
     <h2>関連</h2>
     <ul>
       <li><a href="/notes/carina-type-system-type-theory.html">Carinaの型システムと型理論</a> — この探索の派生元</li>
-      <li><a href="/notes/cdk-pulumi-terraform-carina-comparison.html">CDK / Pulumi / Terraform / Carina の設計比較</a></li>
+      <li><a href="/notes/cdk-pulumi-terraform-carina-comparison.html">CDK / Pulumi / Terraform / Carinaの設計比較</a></li>
     </ul>
   </nav>
 

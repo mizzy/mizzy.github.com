@@ -90,7 +90,7 @@
     <table class="compare">
       <tbody>
         <tr><td>日付</td><td>2026-04-26</td></tr>
-        <tr><td>形式</td><td>生成AI (Claude / Codex) との対話による探索 (進行中)</td></tr>
+        <tr><td>形式</td><td>生成AI (Claude / Codex)との対話による探索(進行中)</td></tr>
         <tr><td>性質</td><td>結論の確定ではなく、論点の整理と根拠確認。複数回の訂正を経る前提の作業ノート。</td></tr>
         <tr><td>先行ドキュメント</td><td><a href="https://github.com/carina-rs/carina/blob/main/docs/explorations/2026-04-24-terraform-carina-hcl-limits.md">carina-rs/carinaのdocs/explorations/2026-04-24-terraform-carina-hcl-limits.md</a></td></tr>
       </tbody>
@@ -112,7 +112,7 @@
 
   <h2 id="background">背景と問い</h2>
 
-  <p>先行ドキュメントは「Terraformの限界はどこから来たか」を4層 (HCL/言語起因、Terraformアーキテクチャ起因、組織的優先順位起因、本質的制約) に分けて整理した。Terraform主語の問いに最適化された分類であり、CDK/Pulumi/Carinaを対等に並べる問いには適合しない。</p>
+  <p>先行ドキュメントは「Terraformの限界はどこから来たか」を4層(HCL/言語起因、Terraformアーキテクチャ起因、組織的優先順位起因、本質的制約)に分けて整理した。Terraform主語の問いに最適化された分類であり、CDK/Pulumi/Carinaを対等に並べる問いには適合しない。</p>
 
   <p>このドキュメントは問いを変える。</p>
 
@@ -120,29 +120,29 @@
     <p><strong>インフラ管理ツールの設計判断は、何を選び何を捨てているか</strong></p>
   </blockquote>
 
-  <p>4ツール (Terraform / CDK / Pulumi / Carina) を対等に並べ、設計判断の軸ごとに横断比較する。</p>
+  <p>4ツール(Terraform / CDK / Pulumi / Carina)を対等に並べ、設計判断の軸ごとに横断比較する。</p>
 
   <h2 id="toc">章立て</h2>
 
   <div class="toc">
     <a href="#ch1">
       <span class="st"><span class="status done">第一稿完成</span></span>
-      <span class="t">章1. 表記と抽象化</span>
+      <span class="t">章1.表記と抽象化</span>
       <span class="d">記述言語、抽象化機構、結果予測性に効く記述自由度の所在</span>
     </a>
     <a href="#ch2">
       <span class="st"><span class="status">探索メモ・本文未着手</span></span>
-      <span class="t">章2. 評価モデルと実行境界</span>
+      <span class="t">章2.評価モデルと実行境界</span>
       <span class="d">synthの有無、いつgraphが確定するか、依存解決、コード評価副作用</span>
     </a>
     <a href="#ch3">
       <span class="st"><span class="status">探索メモ・本文未着手</span></span>
-      <span class="t">章3. 型・schema・未知値</span>
-      <span class="d">schema表現、unknown値の扱い (Token / Output&lt;T&gt; / 式木 / refinements)</span>
+      <span class="t">章3.型・schema・未知値</span>
+      <span class="d">schema表現、unknown値の扱い(Token / Output&lt;T&gt; / 式木 / refinements)</span>
     </a>
     <a href="#ch4">
       <span class="st"><span class="status">探索メモ・本文未着手</span></span>
-      <span class="t">章4. 状態の所有と運用責任</span>
+      <span class="t">章4.状態の所有と運用責任</span>
       <span class="d">state所有者、refresh/drift/lock/暗号化、委譲先</span>
     </a>
     <a href="#ch5">
@@ -163,32 +163,32 @@
   <ul class="corrections">
     <li>
       <span class="when">2026-04-26</span>
-      Carinaの <code>use</code> 式について「構造上は値、評価モデル上は値ではない」とした初期主張は、carina#2233 (grammar tighten) で文法上も <code>let</code> 束縛RHS限定に整理された。先行ドキュメント §2-3の訂正としてcarina#2237にもフィードバック済み
+      Carinaの <code>use</code> 式について「構造上は値、評価モデル上は値ではない」とした初期主張は、carina#2233 (grammar tighten)で文法上も <code>let</code> 束縛RHS限定に整理された。先行ドキュメント §2-3の訂正としてcarina#2237にもフィードバック済み
     </li>
     <li>
       <span class="when">2026-04-26</span>
-      Carinaの「ユーザ定義関数未実装」は誤りで、実際は <code>fn</code> (型注釈・再帰検出)、関数合成 <code>&gt;&gt;</code>、パイプ <code>|&gt;</code>、部分適用 (closure) が実装済み。高階関数のみ未実装。先行ドキュメント §5の「関数合成は現時点で重視していない」と齟齬があり、本ドキュメント §1-3-2で訂正
+      Carinaの「ユーザ定義関数未実装」は誤りで、実際は <code>fn</code> (型注釈・再帰検出)、関数合成 <code>&gt;&gt;</code>、パイプ <code>|&gt;</code>、部分適用(closure)が実装済み。高階関数のみ未実装。先行ドキュメント §5の「関数合成は現時点で重視していない」と齟齬があり、本ドキュメント §1-3-2で訂正
     </li>
     <li>
       <span class="when">2026-04-26</span>
-      Pulumiの「中間IRなし」(初期断定) は不正確で、PCL (Pulumi Configuration Language、<code>pulumi convert</code> の中間表現) やUpdate Plans (<code>--save-plan</code> で生成する静的planファイル) が存在する。本ドキュメント §1-1で「ランタイム経路には静的中間テンプレートを持たない」と限定表現に修正
+      Pulumiの「中間IRなし」(初期断定)は不正確で、PCL (Pulumi Configuration Language、<code>pulumi convert</code> の中間表現)やUpdate Plans (<code>--save-plan</code> で生成する静的planファイル)が存在する。本ドキュメント §1-1で「ランタイム経路には静的中間テンプレートを持たない」と限定表現に修正
     </li>
   </ul>
 
-  <h2 id="ch1">章1: 表記と抽象化 <span class="status done">第一稿完成</span></h2>
+  <h2 id="ch1">章1:表記と抽象化 <span class="status done">第一稿完成</span></h2>
 
   <blockquote>
-    <p>ステータス: 第一稿完成 (2026-04-26)。主要論点はCDK / Pulumi / Carina / Terraformのソースおよび公式ドキュメントで確認済みだが、未確認領域あり (Pulumi公式docsの一部記述、CDK L2の網羅的な束ね性質、等)。</p>
+    <p>ステータス:第一稿完成(2026-04-26)。主要論点はCDK / Pulumi / Carina / Terraformのソースおよび公式ドキュメントで確認済みだが、未確認領域あり(Pulumi公式docsの一部記述、CDK L2の網羅的な束ね性質、等)。</p>
   </blockquote>
 
   <p>設計判断としての問い: <strong>インフラ記述の設計判断として、どの言語を選び、どの抽象化機構を一級市民にし、ユーザの記述自由度をどこに置くか。とくに記述言語の選択と記述自由度の所在は、コードからの結果予測性をどう規定するか</strong>。</p>
 
-  <h3 id="s1-1">1-1. 記述言語</h3>
+  <h3 id="s1-1">1-1.記述言語</h3>
 
   <div class="scroll">
     <table>
       <thead>
-        <tr><th>ツール</th><th>記述言語</th><th>ユーザワークフロー</th><th>内部実行モデル (詳細は章2)</th></tr>
+        <tr><th>ツール</th><th>記述言語</th><th>ユーザワークフロー</th><th>内部実行モデル(詳細は章2)</th></tr>
       </thead>
       <tbody>
         <tr>
@@ -201,13 +201,13 @@
           <td>CDK</td>
           <td>TS / Python / Java / C# / Go (汎用言語経由)</td>
           <td>synth → diff → deploy</td>
-          <td>コード実行でCFNテンプレート生成 (synth) → CFN engineがapply</td>
+          <td>コード実行でCFNテンプレート生成(synth) → CFN engineがapply</td>
         </tr>
         <tr>
           <td>Pulumi</td>
           <td>TS / Python / Go / .NET / Java (各言語ネイティブSDK)</td>
           <td>preview → up</td>
-          <td>コード実行中にengineへgRPCストリーミングで <code>RegisterResource</code> を逐次送信 → engineが随時差分判断・実行 (ランタイム経路に静的中間テンプレートなし)<a href="#fn1-1">*</a></td>
+          <td>コード実行中にengineへgRPCストリーミングで <code>RegisterResource</code> を逐次送信 → engineが随時差分判断・実行(ランタイム経路に静的中間テンプレートなし)<a href="#fn1-1">*</a></td>
         </tr>
         <tr>
           <td>Carina</td>
@@ -220,60 +220,60 @@
   </div>
 
   <aside class="note-aside" id="fn1-1">
-    <p>* Pulumiは <strong>ランタイム実行経路には静的中間テンプレートを持たない</strong> が、エコシステム全体には中間表現的なものがいくつか存在する: (a) <code>pulumi convert</code> でTF/CFN/BicepをPulumiコードに変換する際の<strong>PCL (Pulumi Configuration Language)</strong> は公式に「intermediate representation」と呼ばれる、(b) <code>pulumi preview --save-plan</code> で <strong>静的planファイル</strong> (Update Plans) を生成して後で <code>pulumi up --plan</code> で適用可能 (Terraform <code>plan -out</code> 相当)。「中間IRが一切ない」とは言えない。</p>
+    <p>* Pulumiは <strong>ランタイム実行経路には静的中間テンプレートを持たない</strong> が、エコシステム全体には中間表現的なものがいくつか存在する: (a) <code>pulumi convert</code> でTF/CFN/BicepをPulumiコードに変換する際の<strong>PCL (Pulumi Configuration Language)</strong> は公式に「intermediate representation」と呼ばれる、(b) <code>pulumi preview --save-plan</code> で <strong>静的planファイル</strong> (Update Plans)を生成して後で <code>pulumi up --plan</code> で適用可能(Terraform <code>plan -out</code> 相当)。「中間IRが一切ない」とは言えない。</p>
   </aside>
 
   <p>いくつかの注記:</p>
 
   <ul>
-    <li><strong>本ドキュメントの「CDK」はAWS CDKを指す</strong>: cdktf (Terraform JSONにsynth) やcdk8s (Kubernetes manifestにsynth) は別engineに対してsynthするCDK系の派生で、本ドキュメントでは扱わない</li>
-    <li><strong>CDKはjsii</strong>: 実装はTypeScriptで、jsii (<a href="https://github.com/aws/jsii">https://github.com/aws/jsii</a>) がそれをPython/Java/C#/Goにbridgingする。ユーザは好きな言語を選べるが、APIのセマンティクスはTSが原本。</li>
-    <li><strong>Pulumiは各言語ネイティブ</strong>: <code>sdk/nodejs</code>, <code>sdk/python</code>, <code>sdk/go</code> 等がそれぞれnative実装 (gRPCでengineと通信)。jsiiのような単一原本からの自動bridgingではない。多言語Component (MLC) は別建てのschema-driven codegenで実現 (詳細は §1-2)。</li>
-    <li><strong>「外部DSL」「内部DSL」「汎用言語ベタ書き」の三分類</strong>: 一般にDSLには2種類ある。<strong>外部DSL</strong>はホスト言語と独立した専用文法を持ち独自パーサが必要 (HCL, Carina DSL)。<strong>内部DSL</strong> (embedded DSL) はホスト言語の文法上で動き、関数・メソッドチェーン・型システムを駆使してDSL風のAPIを作る (CDK/PulumiのConstruct/Component APIはTypeScriptの内部DSLとも捉えられる)。CDK/Pulumiは厳密には「<strong>内部DSL + 汎用言語のベタ書き</strong>」のハイブリッドで、ユーザはAPIを呼ぶだけのコードも書けるし、ホスト言語の <code>for</code>/<code>if</code>/関数定義をフルに使ったコードも書ける</li>
-    <li><strong>DSLと汎用言語のトレードオフ概観</strong>: 汎用言語を取ると言語そのものの抽象化機構 (関数 / クラス / ジェネリクス / 型システム) をそのまま流用できる。Pulumiの <code>Output&lt;T&gt;</code> のようにSDK側で「依存追跡や未知値伝播を表現する型」を提供することはあるが、これは <strong>ホスト言語の型システムの機能をSDKが活用しているだけで、ツール側が言語を拡張しているわけではない</strong>。静的型言語 (TypeScript / Java / C# / Go) で型を書けば誤った代入は静的に弾かれるが、Python / JavaScriptで型ヒントを書かなければruntimeまで分からない。一方外部DSLを取ると言語側の抽象化機構を自前で設計しなければならない代わりに、<strong>文法レベルで「望ましくない書き方」を禁止できる</strong> (ユーザの記述意思に依存しない)。<strong>抽象化機構の詳細は §1-2、それぞれの設計判断が「結果の予測性」とどうトレードオフするかは §1-3で扱う</strong>。</li>
+    <li><strong>本ドキュメントの「CDK」はAWS CDKを指す</strong>: cdktf (Terraform JSONにsynth)やcdk8s (Kubernetes manifestにsynth)は別engineに対してsynthするCDK系の派生で、本ドキュメントでは扱わない</li>
+    <li><strong>CDKはjsii</strong>:実装はTypeScriptで、jsii (<a href="https://github.com/aws/jsii">https://github.com/aws/jsii</a>)がそれをPython/Java/C#/Goにbridgingする。ユーザは好きな言語を選べるが、APIのセマンティクスはTSが原本。</li>
+    <li><strong>Pulumiは各言語ネイティブ</strong>: <code>sdk/nodejs</code>, <code>sdk/python</code>, <code>sdk/go</code> 等がそれぞれnative実装(gRPCでengineと通信)。jsiiのような単一原本からの自動bridgingではない。多言語Component (MLC)は別建てのschema-driven codegenで実現(詳細は §1-2)。</li>
+    <li><strong>「外部DSL」「内部DSL」「汎用言語ベタ書き」の三分類</strong>:一般にDSLには2種類ある。<strong>外部DSL</strong>はホスト言語と独立した専用文法を持ち独自パーサが必要(HCL, Carina DSL)。<strong>内部DSL</strong> (embedded DSL)はホスト言語の文法上で動き、関数・メソッドチェーン・型システムを駆使してDSL風のAPIを作る(CDK/PulumiのConstruct/Component APIはTypeScriptの内部DSLとも捉えられる)。CDK/Pulumiは厳密には「<strong>内部DSL + 汎用言語のベタ書き</strong>」のハイブリッドで、ユーザはAPIを呼ぶだけのコードも書けるし、ホスト言語の <code>for</code>/<code>if</code>/関数定義をフルに使ったコードも書ける</li>
+    <li><strong>DSLと汎用言語のトレードオフ概観</strong>:汎用言語を取ると言語そのものの抽象化機構(関数 / クラス / ジェネリクス / 型システム)をそのまま流用できる。Pulumiの <code>Output&lt;T&gt;</code> のようにSDK側で「依存追跡や未知値伝播を表現する型」を提供することはあるが、これは <strong>ホスト言語の型システムの機能をSDKが活用しているだけで、ツール側が言語を拡張しているわけではない</strong>。静的型言語(TypeScript / Java / C# / Go)で型を書けば誤った代入は静的に弾かれるが、Python / JavaScriptで型ヒントを書かなければruntimeまで分からない。一方外部DSLを取ると言語側の抽象化機構を自前で設計しなければならない代わりに、<strong>文法レベルで「望ましくない書き方」を禁止できる</strong> (ユーザの記述意思に依存しない)。<strong>抽象化機構の詳細は §1-2、それぞれの設計判断が「結果の予測性」とどうトレードオフするかは §1-3で扱う</strong>。</li>
   </ul>
 
-  <h3 id="s1-2">1-2. 抽象化機構</h3>
+  <h3 id="s1-2">1-2.抽象化機構</h3>
 
   <div class="scroll">
     <table>
       <thead>
-        <tr><th>ツール</th><th>単位 (複数リソースを束ねる抽象化)</th><th>読み込み + インスタンス化の構文</th><th>実体</th></tr>
+        <tr><th>ツール</th><th>単位(複数リソースを束ねる抽象化)</th><th>読み込み + インスタンス化の構文</th><th>実体</th></tr>
       </thead>
       <tbody>
         <tr>
           <td>Terraform</td>
           <td>module (子moduleは再利用、root moduleはデプロイ単位)</td>
           <td><code>module "network" { source = "./modules/network"; ... }</code> (DSLレベルで読み込みとインスタンス化が一体)</td>
-          <td>ディレクトリ (HCLファイル群)</td>
+          <td>ディレクトリ(HCLファイル群)</td>
         </tr>
         <tr>
           <td>CDK</td>
           <td>Stack (デプロイ単位) / ユーザ定義Construct (再利用単位) / L3 Construct (既製パターン)<a href="#fn1-2">**</a></td>
-          <td>ホスト言語の <code>import</code> で読み込み、<code>new MyStack(app, 'main')</code> / <code>new NetworkComponent(scope, 'network', props)</code> でインスタンス化 (DSLレベルでは読み込み構文を持たず、ホスト言語に委譲)</td>
-          <td>TypeScriptクラス (jsiiで多言語化)</td>
+          <td>ホスト言語の <code>import</code> で読み込み、<code>new MyStack(app, 'main')</code> / <code>new NetworkComponent(scope, 'network', props)</code> でインスタンス化(DSLレベルでは読み込み構文を持たず、ホスト言語に委譲)</td>
+          <td>TypeScriptクラス(jsiiで多言語化)</td>
         </tr>
         <tr>
           <td>Pulumi</td>
           <td>Stack (デプロイ単位、設定単位) / ユーザ定義ComponentResource (再利用単位) / 既製Component (Crosswalk等)</td>
-          <td>ホスト言語の <code>import</code> で読み込み、<code>new NetworkComponent('network', args, opts)</code> でインスタンス化 (CDKと同様にDSLレベルでは読み込み構文を持たない)</td>
-          <td>各言語ネイティブのクラス (TS/Python/Go)</td>
+          <td>ホスト言語の <code>import</code> で読み込み、<code>new NetworkComponent('network', args, opts)</code> でインスタンス化(CDKと同様にDSLレベルでは読み込み構文を持たない)</td>
+          <td>各言語ネイティブのクラス(TS/Python/Go)</td>
         </tr>
         <tr>
           <td>Carina</td>
           <td>module (子moduleは再利用、root moduleはデプロイ単位)</td>
           <td>読み込み: <code>let network = use { source = './modules/network' }</code>、インスタンス化: <code>network { ... }</code> (DSLレベルで分離)</td>
-          <td>ディレクトリ (<code>.crn</code> ファイル群)</td>
+          <td>ディレクトリ(<code>.crn</code> ファイル群)</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <aside class="note-aside" id="fn1-2">
-    <p>** CDKの<strong>L2 Construct</strong> (例: <code>s3.Bucket</code>、<code>ec2.Vpc</code>、<code>rds.DatabaseCluster</code>) は中間層で、サービスにより性格が大きく異なる: <code>s3.Bucket</code> のような単一リソース寄りのL2もあれば、<code>ec2.Vpc</code> (VPC + サブネット6個 + IGW + NAT Gatewayを暗黙生成) や <code>rds.DatabaseCluster</code> (Cluster + Instance + SubnetGroup + SG) のように複数リソース束ね寄りのL2もある。表では同列化を避けてL2を独立行に立てていない。</p>
+    <p>** CDKの<strong>L2 Construct</strong> (例: <code>s3.Bucket</code>、<code>ec2.Vpc</code>、<code>rds.DatabaseCluster</code>)は中間層で、サービスにより性格が大きく異なる: <code>s3.Bucket</code> のような単一リソース寄りのL2もあれば、<code>ec2.Vpc</code> (VPC + サブネット6個 + IGW + NAT Gatewayを暗黙生成)や <code>rds.DatabaseCluster</code> (Cluster + Instance + SubnetGroup + SG)のように複数リソース束ね寄りのL2もある。表では同列化を避けてL2を独立行に立てていない。</p>
   </aside>
 
-  <p>注: CDK/Pulumiでは個別リソース (L1 Construct、<code>CustomResource</code>) も同じ <code>new</code> 構文で扱うため、単位の階層が複数ある。本節の主眼は「<strong>複数リソースを束ねる層</strong>」だが、graph上のノードを構成する <strong>個別リソース層</strong> も同じ抽象化機構の軸上にあり、§1-3では両層を含めて自由度を比較する。両層の対応:</p>
+  <p>注: CDK/Pulumiでは個別リソース(L1 Construct、<code>CustomResource</code>)も同じ <code>new</code> 構文で扱うため、単位の階層が複数ある。本節の主眼は「<strong>複数リソースを束ねる層</strong>」だが、graph上のノードを構成する <strong>個別リソース層</strong> も同じ抽象化機構の軸上にあり、§1-3では両層を含めて自由度を比較する。両層の対応:</p>
 
   <div class="scroll">
     <table>
@@ -282,7 +282,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>複数リソース束ね層 (本節の主眼)</td>
+          <td>複数リソース束ね層(本節の主眼)</td>
           <td><code>module "..." { ... }</code></td>
           <td>Stack / ユーザ定義Construct / L3</td>
           <td>Stack / ユーザ定義ComponentResource / 既製Component</td>
@@ -291,7 +291,7 @@
         <tr>
           <td>個別リソース層</td>
           <td><code>resource "aws_s3_bucket" "foo" { ... }</code></td>
-          <td>L1 (<code>new CfnBucket(...)</code>)、L2 (<code>new s3.Bucket(...)</code> 等) は中間層</td>
+          <td>L1 (<code>new CfnBucket(...)</code>)、L2 (<code>new s3.Bucket(...)</code> 等)は中間層</td>
           <td><code>new aws.s3.Bucket(...)</code> (<code>CustomResource</code>)</td>
           <td><code>aws.s3.Bucket { ... }</code></td>
         </tr>
@@ -301,31 +301,31 @@
 
   <p><strong>§1-2は「抽象化機構の分類」、§1-3は「その機構をユーザがどこまで動的に扱えるかの比較」</strong> という役割分担。</p>
 
-  <p>Stack/root moduleはそれ自体も「複数リソースを束ねる抽象化」だが、同時に「<code>apply</code>/<code>up</code>/<code>deploy</code> の対象となるデプロイ単位」という別の役割も持つ (詳細は章5)。</p>
+  <p>Stack/root moduleはそれ自体も「複数リソースを束ねる抽象化」だが、同時に「<code>apply</code>/<code>up</code>/<code>deploy</code> の対象となるデプロイ単位」という別の役割も持つ(詳細は章5)。</p>
 
   <h4>各単位の構造</h4>
 
   <p><strong>Terraform module</strong></p>
   <ul>
-    <li>公式: 「<code>module.&lt;MODULE NAME&gt;</code> is a value representing the results of a <code>module</code> block」 (公式ドキュメント <a href="https://developer.hashicorp.com/terraform/language/expressions/references"><code>expressions/references</code></a>)</li>
+    <li>公式:「<code>module.&lt;MODULE NAME&gt;</code> is a value representing the results of a <code>module</code> block」(公式ドキュメント <a href="https://developer.hashicorp.com/terraform/language/expressions/references"><code>expressions/references</code></a>)</li>
     <li><code>for_each</code> なし → object、<code>for_each</code> 付き → map of objects、<code>count</code> 付き → list of objects</li>
     <li><code>locals { my_mod = module.network }</code> のような代入は可能</li>
-    <li>ただし <code>source</code> はリテラル文字列のみ (公式ドキュメント <a href="https://developer.hashicorp.com/terraform/language/block/module"><code>block/module</code></a>)。OpenTofu 1.8+のearly evaluationでもstaticにしか解決できない (tfvars/env/リテラル変数のみ)</li>
-    <li>言い換えると<strong>moduleは値だが、moduleのidentity (どのsourceをinstantiateするか) は静的にしか決められない</strong></li>
+    <li>ただし <code>source</code> はリテラル文字列のみ(公式ドキュメント <a href="https://developer.hashicorp.com/terraform/language/block/module"><code>block/module</code></a>)。OpenTofu 1.8+のearly evaluationでもstaticにしか解決できない(tfvars/env/リテラル変数のみ)</li>
+    <li>言い換えると<strong>moduleは値だが、moduleのidentity (どのsourceをinstantiateするか)は静的にしか決められない</strong></li>
   </ul>
 
   <p><strong>CDK Construct</strong></p>
   <ul>
-    <li><code>Construct</code> クラスはAWS非依存の汎用ツリー構造として <code>aws/constructs</code> リポジトリで実装されており、aws-cdk-lib (CDK) を含むCDK系 (cdktf / cdk8s等) で共有されている</li>
-    <li>各Constructは親 (scope) と子 (children) を持ち、<code>node.path</code> (scope列を <code>/</code> で連結) で識別子が決まる (詳細は章5)</li>
+    <li><code>Construct</code> クラスはAWS非依存の汎用ツリー構造として <code>aws/constructs</code> リポジトリで実装されており、aws-cdk-lib (CDK)を含むCDK系(cdktf / cdk8s等)で共有されている</li>
+    <li>各Constructは親(scope)と子(children)を持ち、<code>node.path</code> (scope列を <code>/</code> で連結)で識別子が決まる(詳細は章5)</li>
     <li>主要な階層:
       <ul>
-        <li><strong>App</strong> (<code>extends Construct</code>): 複数Stackを束ねる最上位ノード。デプロイの起点</li>
+        <li><strong>App</strong> (<code>extends Construct</code>):複数Stackを束ねる最上位ノード。デプロイの起点</li>
         <li><strong>Stack</strong> (<code>extends Construct</code>): 1 CFNスタックに対応するデプロイ単位。<strong>Terraformのroot module相当</strong> (apply/deployの対象)</li>
-        <li><strong>L1 Construct</strong> (<code>Cfn*</code>): CloudFormationリソースの1:1ラッパ。<strong>Terraformの <code>resource</code> ブロック相当 (個別リソース層)</strong></li>
-        <li><strong>L2 Construct</strong>: ベストプラクティス込みの高レベル抽象だが、サービスにより性格が異なる <strong>中間層</strong>。AWS公式の説明では <strong>通常は単一CloudFormationリソースに対応</strong> とされるが、<code>ec2.Vpc</code> (VPC + サブネット6個 + IGW + NAT Gatewayを暗黙生成)、<code>rds.DatabaseCluster</code> (Cluster + Instance + SubnetGroup + SG)、<code>lambda.Function</code> (Function + IAM Role + Log Group) のように複数リソースを束ねる例外も多い (<code>s3.Bucket</code> のような単一リソース寄りもある)</li>
-        <li><strong>L3 Construct</strong> (既製パターン): 複数リソースを組み合わせたベンダ提供パターン (例: <code>ApplicationLoadBalancedFargateService</code> はECS Cluster / TaskDef / Service / ALB / Listener / TargetGroup / SG / LogGroup / IAM Roleなど10+リソースを束ねる)。<strong>Terraform Registryのmodule相当</strong></li>
-        <li><strong>ユーザ定義Construct</strong>: ユーザが再利用可能な抽象として自分で定義するクラス。<strong>Terraformの子module相当</strong></li>
+        <li><strong>L1 Construct</strong> (<code>Cfn*</code>): CloudFormationリソースの1:1ラッパ。<strong>Terraformの <code>resource</code> ブロック相当(個別リソース層)</strong></li>
+        <li><strong>L2 Construct</strong>:ベストプラクティス込みの高レベル抽象だが、サービスにより性格が異なる <strong>中間層</strong>。AWS公式の説明では <strong>通常は単一CloudFormationリソースに対応</strong> とされるが、<code>ec2.Vpc</code> (VPC + サブネット6個 + IGW + NAT Gatewayを暗黙生成)、<code>rds.DatabaseCluster</code> (Cluster + Instance + SubnetGroup + SG)、<code>lambda.Function</code> (Function + IAM Role + Log Group)のように複数リソースを束ねる例外も多い(<code>s3.Bucket</code> のような単一リソース寄りもある)</li>
+        <li><strong>L3 Construct</strong> (既製パターン):複数リソースを組み合わせたベンダ提供パターン(例: <code>ApplicationLoadBalancedFargateService</code> はECS Cluster / TaskDef / Service / ALB / Listener / TargetGroup / SG / LogGroup / IAM Roleなど10+リソースを束ねる)。<strong>Terraform Registryのmodule相当</strong></li>
+        <li><strong>ユーザ定義Construct</strong>:ユーザが再利用可能な抽象として自分で定義するクラス。<strong>Terraformの子module相当</strong></li>
       </ul>
     </li>
     <li>通常のTSクラスなので、関数引数/戻り値/コレクション格納/動的選択は構造的に可能</li>
@@ -336,59 +336,59 @@
     <li>TS / Python / GoそれぞれのSDKでネイティブにクラスとして提供される</li>
     <li>主要な階層:
       <ul>
-        <li><strong>Stack (Pulumi)</strong>: <code>pulumi up</code> する単位。CDKのStackのような「class」ではなく、設定とデプロイの単位 (1 stack = 1デプロイ環境)。<strong>Terraformのroot module相当</strong></li>
-        <li><strong><code>CustomResource</code></strong>: 個別リソース層、providerがCRUDを持つ。<strong>Terraformの <code>resource</code> ブロック相当</strong></li>
-        <li><strong>ユーザ定義ComponentResource</strong>: ユーザが再利用可能な抽象として自分で定義するクラス。「providerのCRUDを持たない論理リソース」で、<strong>複数の <code>CustomResource</code> や他のComponentを束ねるTerraformの子module相当</strong></li>
-        <li><strong>既製Component</strong>: ベンダ提供の高レベルComponent (例: <code>@pulumi/awsx</code> のCrosswalk for AWS)。<strong>Terraform Registryのmodule相当</strong></li>
+        <li><strong>Stack (Pulumi)</strong>: <code>pulumi up</code> する単位。CDKのStackのような「class」ではなく、設定とデプロイの単位(1 stack = 1デプロイ環境)。<strong>Terraformのroot module相当</strong></li>
+        <li><strong><code>CustomResource</code></strong>:個別リソース層、providerがCRUDを持つ。<strong>Terraformの <code>resource</code> ブロック相当</strong></li>
+        <li><strong>ユーザ定義ComponentResource</strong>:ユーザが再利用可能な抽象として自分で定義するクラス。「providerのCRUDを持たない論理リソース」で、<strong>複数の <code>CustomResource</code> や他のComponentを束ねるTerraformの子module相当</strong></li>
+        <li><strong>既製Component</strong>:ベンダ提供の高レベルComponent (例: <code>@pulumi/awsx</code> のCrosswalk for AWS)。<strong>Terraform Registryのmodule相当</strong></li>
       </ul>
     </li>
-    <li><strong><code>opts.parent</code></strong>: Componentの入れ子関係をURNに反映 (親typeが連結される、詳細は章5)。同名子リソースの別親下での共存や、親子の削除/作成順序の自動推論を可能にする</li>
-    <li><strong>MLC (Multi-Language Components)</strong>: TSで書いたComponentをPulumi schema化して各言語 (Python / Go / Java / .NET) のSDKを自動生成する仕組み。ベンダーが1言語で書いたComponentを全言語ユーザに提供できる (CDKのjsiiと類似のゴール、jsiiが言語橋渡しなのに対しMLCはschema-drivenなRPC)</li>
+    <li><strong><code>opts.parent</code></strong>: Componentの入れ子関係をURNに反映(親typeが連結される、詳細は章5)。同名子リソースの別親下での共存や、親子の削除/作成順序の自動推論を可能にする</li>
+    <li><strong>MLC (Multi-Language Components)</strong>: TSで書いたComponentをPulumi schema化して各言語(Python / Go / Java / .NET)のSDKを自動生成する仕組み。ベンダーが1言語で書いたComponentを全言語ユーザに提供できる(CDKのjsiiと類似のゴール、jsiiが言語橋渡しなのに対しMLCはschema-drivenなRPC)</li>
   </ul>
 
   <p><strong>Carina module (<code>use</code> 式で読み込み + 別構文でインスタンス化)</strong></p>
   <ul>
-    <li>単位はmodule = ディレクトリ (<code>.crn</code> ファイル群)。これはTerraform moduleと同じ位置づけ</li>
+    <li>単位はmodule = ディレクトリ(<code>.crn</code> ファイル群)。これはTerraform moduleと同じ位置づけ</li>
     <li><strong>読み込みとインスタンス化がDSLレベルで分離されている</strong>:
       <ul>
         <li><code>let network = use { source = './modules/network' }</code> でmoduleを <strong>読み込み</strong> (内部では <code>UseStatement</code> メタデータとしてpath/aliasを登録、<code>network</code> という名前に束縛)。<code>use</code> 式自体はリソースを生成しない</li>
         <li><code>let net = network { cidr_block = '10.0.0.0/16' }</code> で <strong>インスタンス化</strong> (binding名 <code>network</code> を呼び出して引数を渡す。これがリソース生成の起点)</li>
         <li>同一templateから <strong>複数インスタンス化が可能</strong>: <code>thing { name = 'alpha' }; thing { name = 'beta' }</code> のように同じbindingを複数回呼べる</li>
-        <li>読み込みとインスタンス化の分離自体はCDK / Pulumiも実現している (ホスト言語の <code>import</code> + <code>new</code>) が、それらは<strong>ホスト言語の機能</strong>であってDSLの構文ではない。Carinaは<strong>DSLレベルの構文</strong>として<code>use</code> 式を持つ点が違い。Terraformは <code>module {}</code> ブロック1個に両者を一体化している</li>
+        <li>読み込みとインスタンス化の分離自体はCDK / Pulumiも実現している(ホスト言語の <code>import</code> + <code>new</code>)が、それらは<strong>ホスト言語の機能</strong>であってDSLの構文ではない。Carinaは<strong>DSLレベルの構文</strong>として<code>use</code> 式を持つ点が違い。Terraformは <code>module {}</code> ブロック1個に両者を一体化している</li>
       </ul>
     </li>
-    <li><code>use</code> 式は <strong><code>let</code> 束縛RHSにしか書けない</strong>。関数引数 / list/map / if/for / exportsに書くと文法エラー。当初は文法上primary位置に含まれるが評価器が <code>let</code> RHSだけを処理する「構造と評価のドリフト」状態だったが、<a href="https://github.com/carina-rs/carina/issues/2233">carina#2233</a> (2026-04-26 close) で <strong>grammarの方をtightenする方向で解決</strong>: <code>use_expr</code> の文法的位置自体が <code>let</code> 束縛RHSに制限された</li>
-    <li><strong><code>source</code> フィールドはリテラル文字列のみ</strong>: parserで <code>Value::String</code> 以外を弾く (<code>carina-core/src/parser/mod.rs:1664-1669</code>)。変数参照 (<code>use { source = path }</code>) や条件分岐 (<code>use { source = if cond { './a' } else { './b' } }</code>) はparse error。Terraformの <code>source</code> リテラル制約と同等。Carinaはこれに加えて <code>use</code> 式の位置自体も <code>let</code> RHSに制限する二段構えで動的選択を遮断している</li>
-    <li>インスタンス化の <code>name { ... }</code> 構文 (<code>ModuleCall</code>) は、同じbindingを複数のnamed binding (<code>let a = thing { ... }</code>) やanonymous (<code>thing { ... }</code>) で呼び分け可能</li>
+    <li><code>use</code> 式は <strong><code>let</code> 束縛RHSにしか書けない</strong>。関数引数 / list/map / if/for / exportsに書くと文法エラー。当初は文法上primary位置に含まれるが評価器が <code>let</code> RHSだけを処理する「構造と評価のドリフト」状態だったが、<a href="https://github.com/carina-rs/carina/issues/2233">carina#2233</a> (2026-04-26 close)で <strong>grammarの方をtightenする方向で解決</strong>: <code>use_expr</code> の文法的位置自体が <code>let</code> 束縛RHSに制限された</li>
+    <li><strong><code>source</code> フィールドはリテラル文字列のみ</strong>: parserで <code>Value::String</code> 以外を弾く(<code>carina-core/src/parser/mod.rs:1664-1669</code>)。変数参照(<code>use { source = path }</code>)や条件分岐(<code>use { source = if cond { './a' } else { './b' } }</code>)はparse error。Terraformの <code>source</code> リテラル制約と同等。Carinaはこれに加えて <code>use</code> 式の位置自体も <code>let</code> RHSに制限する二段構えで動的選択を遮断している</li>
+    <li>インスタンス化の <code>name { ... }</code> 構文(<code>ModuleCall</code>)は、同じbindingを複数のnamed binding (<code>let a = thing { ... }</code>)やanonymous (<code>thing { ... }</code>)で呼び分け可能</li>
   </ul>
 
-  <h3 id="s1-3">1-3. 結果予測性に効く記述自由度の所在</h3>
+  <h3 id="s1-3">1-3.結果予測性に効く記述自由度の所在</h3>
 
-  <p>§1-2で各ツールの抽象化機構を見た。ここでは「<strong>ユーザがそれをどこまで動的に扱えるか</strong>」を比較する。<strong>§1-2で見た複数リソース束ね層に加え、graph形状に直結する個別リソース層も含めて比較する</strong> (例: <code>for_each</code>/<code>count</code> は個別リソース層にも束ね層にも適用される)。基準は <strong>「実行前にコードを読んだ時点で、resource graphの形 (どんなリソースがいくつ、どう繋がって作られるか) と各ノードの属性値が具体的にどう決まるかを読み取れるか」</strong> に直接効く範囲。</p>
+  <p>§1-2で各ツールの抽象化機構を見た。ここでは「<strong>ユーザがそれをどこまで動的に扱えるか</strong>」を比較する。<strong>§1-2で見た複数リソース束ね層に加え、graph形状に直結する個別リソース層も含めて比較する</strong> (例: <code>for_each</code>/<code>count</code> は個別リソース層にも束ね層にも適用される)。基準は <strong>「実行前にコードを読んだ時点で、resource graphの形(どんなリソースがいくつ、どう繋がって作られるか)と各ノードの属性値が具体的にどう決まるかを読み取れるか」</strong> に直接効く範囲。</p>
 
   <p><strong>選定基準</strong>:</p>
   <ul>
-    <li>(i) <strong>resource graphの形</strong> (ノード数とedge) または <strong>各ノードの属性値</strong> を変える自由度に直接効くこと</li>
-    <li>(ii) <strong>表記/抽象化の層</strong> で説明できること (実行モデル / 型 / state / identityは章2〜5で扱うので除外)</li>
+    <li>(i) <strong>resource graphの形</strong> (ノード数とedge)または <strong>各ノードの属性値</strong> を変える自由度に直接効くこと</li>
+    <li>(ii) <strong>表記/抽象化の層</strong> で説明できること(実行モデル / 型 / state / identityは章2〜5で扱うので除外)</li>
   </ul>
 
-  <p>なお本章は言語選択の全評価ではなく、<strong>結果予測性に直接効く軸へ限定</strong> している。学習コスト・テスト容易性・IDE統合・運用責任分界・ガバナンス容易性等の主観/状況依存の論点は本ドキュメントの範囲外 (詳細は §1-4末尾参照)。</p>
+  <p>なお本章は言語選択の全評価ではなく、<strong>結果予測性に直接効く軸へ限定</strong> している。学習コスト・テスト容易性・IDE統合・運用責任分界・ガバナンス容易性等の主観/状況依存の論点は本ドキュメントの範囲外(詳細は §1-4末尾参照)。</p>
 
   <p><strong>この基準で選ばれた3つの自由度</strong> (各自由度はgraph形状にも属性値にも適用される):</p>
 
   <ol class="steps">
-    <li><strong>抽象化の追加</strong>ユーザが新しい抽象 (任意ヘルパー関数 / クラス / 薄いwrapper) を足せるか。<strong>graph形状側</strong>ではmodule / Construct / Componentの切り出し、<strong>属性値側</strong>では値計算ヘルパー (命名規則 / 環境別パラメタ計算 / 文字列処理) や型抽象が該当</li>
+    <li><strong>抽象化の追加</strong>ユーザが新しい抽象(任意ヘルパー関数 / クラス / 薄いwrapper)を足せるか。<strong>graph形状側</strong>ではmodule / Construct / Componentの切り出し、<strong>属性値側</strong>では値計算ヘルパー(命名規則 / 環境別パラメタ計算 / 文字列処理)や型抽象が該当</li>
     <li><strong>複数量の制御</strong>同じ抽象や要素を何個展開するかを動的に決められるか。<strong>graph形状側</strong>では <code>for_each</code>/<code>count</code> でresourceノード数を動かす、<strong>属性値側</strong>では <code>tags = { for k in keys: ... }</code> のようなmap / list comprehensionで属性内コレクションの要素数を動かす</li>
-    <li><strong>実装の切替</strong>どの実装を選ぶかを動的に決められるか。<strong>graph形状側</strong>では <code>source</code> ディレクトリやクラスの動的選択、<strong>属性値側</strong>では計算ロジックの動的選択 (ストラテジ的な分岐)</li>
+    <li><strong>実装の切替</strong>どの実装を選ぶかを動的に決められるか。<strong>graph形状側</strong>では <code>source</code> ディレクトリやクラスの動的選択、<strong>属性値側</strong>では計算ロジックの動的選択(ストラテジ的な分岐)</li>
   </ol>
 
-  <p>属性値の予測可能性は、運用上「このリソースは具体的にどう設定されているか」をコードから知りたい場面 (インシデント対応 / コンプライアンス監査 / セキュリティレビュー) でgraph形状と並ぶ重要性を持つ。生成AIがIaCコードを読解・修正する文脈でも、属性値計算の動的構造はAIの誤読・誤修正の主因になる (詳細はcross-DSL分析 <code>carina-position.md</code> §7)。先行版の本章は属性値を「4ツールとも差が出にくい」として対象外としたが、属性値計算の抽象化自由度にはTerraform (組込み関数のみ) &lt; Bicep (<code>func</code> あり) &lt; Carina (関数合成 + closure) &lt; CDK / Pulumi (高階関数 + クラス継承) で明確な差があり、本版では予測可能性軸に統合する。</p>
+  <p>属性値の予測可能性は、運用上「このリソースは具体的にどう設定されているか」をコードから知りたい場面(インシデント対応 / コンプライアンス監査 / セキュリティレビュー)でgraph形状と並ぶ重要性を持つ。生成AIがIaCコードを読解・修正する文脈でも、属性値計算の動的構造はAIの誤読・誤修正の主因になる(詳細はcross-DSL分析 <code>carina-position.md</code> §7)。先行版の本章は属性値を「4ツールとも差が出にくい」として対象外としたが、属性値計算の抽象化自由度にはTerraform (組込み関数のみ) &lt; Bicep (<code>func</code> あり) &lt; Carina (関数合成 + closure) &lt; CDK / Pulumi (高階関数 + クラス継承)で明確な差があり、本版では予測可能性軸に統合する。</p>
 
-  <p>ただし「複数量の制御」だけはgraph形状と属性値の境界が曖昧で、同じ <code>for</code> 構文でも <code>for_each</code> でresource生成に流れればgraph形状側、<code>tags</code> map内に閉じれば属性値側、と用法で分かれる。両者はengineが「別ノード/別identityとして扱うか」で区別する (詳細は §1-3-3末尾)。</p>
+  <p>ただし「複数量の制御」だけはgraph形状と属性値の境界が曖昧で、同じ <code>for</code> 構文でも <code>for_each</code> でresource生成に流れればgraph形状側、<code>tags</code> map内に閉じれば属性値側、と用法で分かれる。両者はengineが「別ノード/別identityとして扱うか」で区別する(詳細は §1-3-3末尾)。</p>
 
   <p>識別子・unknown値・依存解決・state操作のような <strong>実行時挙動の所在</strong> も別軸で、章5/3/4で深掘りする。</p>
 
-  <h4 id="s1-3-1">1-3-1. 「記述自由度の所在」の二層</h4>
+  <h4 id="s1-3-1">1-3-1.「記述自由度の所在」の二層</h4>
 
   <p>ユーザの上記3つの自由度は、<strong>誰が制限するか</strong> で2つに分かれる:</p>
 
@@ -401,7 +401,7 @@
         <tr>
           <td><strong>言語が決める</strong></td>
           <td>文法・評価器・型検査でユーザの選択肢が制限される</td>
-          <td>書けない (文法エラー / 型エラー / 評価エラー)</td>
+          <td>書けない(文法エラー / 型エラー / 評価エラー)</td>
         </tr>
         <tr>
           <td><strong>規約に委ねる</strong></td>
@@ -425,24 +425,24 @@
       </thead>
       <tbody>
         <tr>
-          <td><strong>抽象化の追加</strong><br>(graph側: module/Construct/Component。属性値側: ヘルパー関数 / クラス / wrapper)</td>
+          <td><strong>抽象化の追加</strong><br>(graph側: module/Construct/Component。属性値側:ヘルパー関数 / クラス / wrapper)</td>
           <td><strong>言語</strong>: graph側はmodule切り出しのみ、<strong>属性値側もユーザ定義関数不可</strong> (組込み関数 + provider functionのみ)<a href="#fn1-3-2">*</a></td>
           <td><strong>規約</strong>: graph側はConstructクラス、<strong>属性値側はTSの関数 / クラス / 高階関数 / 外部libで自由</strong>、組織が縛る</td>
-          <td><strong>規約</strong>: 同左 (ComponentとTS/Python/Goの関数機構)</td>
-          <td><strong>言語</strong>: graph側はmodule、<strong>属性値側は <code>fn</code> (型注釈・再帰検出) + 関数合成 <code>&gt;&gt;</code> + パイプ <code>|&gt;</code> + closure</strong>。ただし高階関数 (関数を引数/戻り値に取る) と一級関数値は未実装</td>
+          <td><strong>規約</strong>:同左(ComponentとTS/Python/Goの関数機構)</td>
+          <td><strong>言語</strong>: graph側はmodule、<strong>属性値側は <code>fn</code> (型注釈・再帰検出) + 関数合成 <code>&gt;&gt;</code> + パイプ <code>|&gt;</code> + closure</strong>。ただし高階関数(関数を引数/戻り値に取る)と一級関数値は未実装</td>
         </tr>
         <tr>
-          <td><strong>複数量の制御</strong><br>(graph側: ノード数を動かす。属性値側: 属性内コレクション要素数を動かす)</td>
+          <td><strong>複数量の制御</strong><br>(graph側:ノード数を動かす。属性値側:属性内コレクション要素数を動かす)</td>
           <td><strong>言語</strong>: graph側は <code>for_each</code> / <code>count</code> / <code>dynamic</code> の専用構文、属性値側は <code>for</code> 式 / <code>[for ...]</code> の専用構文のみ</td>
           <td><strong>規約</strong>: graph側 / 属性値側ともTSの <code>for</code> / <code>map</code> / <code>filter</code> 等で自由</td>
-          <td><strong>規約</strong>: 同左</td>
-          <td><strong>言語</strong>: graph側 / 属性値側とも <code>for</code> 式 / <code>if</code> 式の専用構文のみ (<code>count</code> 相当は未実装)</td>
+          <td><strong>規約</strong>:同左</td>
+          <td><strong>言語</strong>: graph側 / 属性値側とも <code>for</code> 式 / <code>if</code> 式の専用構文のみ(<code>count</code> 相当は未実装)</td>
         </tr>
         <tr>
-          <td><strong>実装の切替</strong><br>(graph側: どのmodule/componentを使うか動的選択。属性値側: 計算ロジックを動的に切替)</td>
+          <td><strong>実装の切替</strong><br>(graph側:どのmodule/componentを使うか動的選択。属性値側:計算ロジックを動的に切替)</td>
           <td><strong>言語</strong>: graph側は <code>source</code> リテラルのみ、属性値側も組込み関数のみで動的計算ロジック差し替え不可</td>
           <td><strong>規約</strong>: graph側は普通のクラス選択で自由、属性値側もホスト言語の関数選択で自由</td>
-          <td><strong>規約</strong>: 同左</td>
+          <td><strong>規約</strong>:同左</td>
           <td><strong>言語</strong>: graph側は <code>source</code> リテラルのみ + <code>use</code> 式は <code>let</code> 束縛RHSのみ、属性値側も <code>fn</code> 値が一級でないので動的差し替え不可</td>
         </tr>
       </tbody>
@@ -450,21 +450,21 @@
   </div>
 
   <aside class="note-aside" id="fn1-3-2">
-    <p>* Terraformはprovider function (1.8+) をprovider開発者が定義できるが、ユーザのconfig内で任意のヘルパー関数を定義する構文はない。Carinaは <code>fn</code> 構文でユーザ定義関数 (型注釈・デフォルト引数・再帰検出含む)、<code>&gt;&gt;</code> で関数合成、<code>|&gt;</code> でパイプを実装済み。先行ドキュメント §5の「関数合成は現時点で重視していない」は実装と齟齬があり、現状は基本的な関数合成機構までは実装されている (高階関数は未実装、将来選択肢)。</p>
+    <p>* Terraformはprovider function (1.8+)をprovider開発者が定義できるが、ユーザのconfig内で任意のヘルパー関数を定義する構文はない。Carinaは <code>fn</code> 構文でユーザ定義関数(型注釈・デフォルト引数・再帰検出含む)、<code>&gt;&gt;</code> で関数合成、<code>|&gt;</code> でパイプを実装済み。先行ドキュメント §5の「関数合成は現時点で重視していない」は実装と齟齬があり、現状は基本的な関数合成機構までは実装されている(高階関数は未実装、将来選択肢)。</p>
   </aside>
 
   <p><strong>全体像</strong>:</p>
 
   <ul>
     <li><strong>Terraform / Carina = 言語が決める</strong>: graph形状の3自由度と属性値計算の3自由度すべてを文法で制限。抽象化の追加はTerraform = ユーザ定義関数不可で属性値計算ヘルパーも書けない、Carina = <code>fn</code> で属性値計算は書けるが高階関数なし、と度合いに差がある</li>
-    <li><strong>Bicep (cross-DSL分析参照) = 言語が決める</strong>: Carinaと類似の中間 (<code>func</code> あり、高階関数なし)</li>
-    <li><strong>CDK / Pulumi = 規約に委ねる</strong>: graph形状 (Construct/Component) も属性値計算 (関数 / 高階関数 / 外部lib) もホスト言語の機能をフルに使える、組織がlint・レビューで縛る</li>
+    <li><strong>Bicep (cross-DSL分析参照) = 言語が決める</strong>: Carinaと類似の中間(<code>func</code> あり、高階関数なし)</li>
+    <li><strong>CDK / Pulumi = 規約に委ねる</strong>: graph形状(Construct/Component)も属性値計算(関数 / 高階関数 / 外部lib)もホスト言語の機能をフルに使える、組織がlint・レビューで縛る</li>
   </ul>
 
-  <p>属性値計算の自由度差はTerraform &lt; Bicep &lt; Carina &lt; CDK / Pulumiの順で表現力が上がる。これはgraph形状側では同列に「言語が決める」と評価される3ツール (Terraform / Bicep / Carina) でも、<strong>属性値側では明確な差</strong> が出ることを示している。</p>
+  <p>属性値計算の自由度差はTerraform &lt; Bicep &lt; Carina &lt; CDK / Pulumiの順で表現力が上がる。これはgraph形状側では同列に「言語が決める」と評価される3ツール(Terraform / Bicep / Carina)でも、<strong>属性値側では明確な差</strong> が出ることを示している。</p>
 
   <figure>
-    <svg class="ladder" viewBox="0 0 640 210" role="img" aria-label="属性値計算の抽象化自由度が Terraform、Bicep、Carina、CDK/Pulumi の順に上がることを示す帯グラフ">
+    <svg class="ladder" viewBox="0 0 640 210" role="img" aria-label="属性値計算の抽象化自由度がTerraform、Bicep、Carina、CDK/Pulumiの順に上がることを示す帯グラフ">
       <text class="axis" x="0" y="12">属性値計算の抽象化自由度</text>
 
       <rect class="bar tf" x="0" y="26" width="150" height="34" rx="4"/>
@@ -489,11 +489,11 @@
     <figcaption>graph形状側では同列に「言語が決める」と評価されるTerraform / Bicep / Carinaも、属性値計算の自由度では差が出る。帯の長さは順序のみを表し、量的な尺度ではない。</figcaption>
   </figure>
 
-  <p>これは記述言語選択 (外部DSL vs 汎用言語) と強い相関を持つ自然な帰結 (詳細は §1-3-4で議論)。</p>
+  <p>これは記述言語選択(外部DSL vs汎用言語)と強い相関を持つ自然な帰結(詳細は §1-3-4で議論)。</p>
 
-  <h4 id="s1-3-3">1-3-3. 二層のトレードオフ</h4>
+  <h4 id="s1-3-3">1-3-3.二層のトレードオフ</h4>
 
-  <p><strong>言語が決める (Terraform / Carina)</strong></p>
+  <p><strong>言語が決める(Terraform / Carina)</strong></p>
 
   <div class="contrast">
     <div class="yes">
@@ -502,40 +502,40 @@
         <li>「読めない書き方」を構造的に書けない → ベテランも新人も同じ表現力に揃う</li>
         <li>静的解析・LSP・自動修正ツールが効きやすい</li>
         <li>レビュアーが「文法が通っているなら最低ラインは満たす」と判断できる</li>
-        <li>組織コストが低い (規約を作って教育する手間が要らない)</li>
+        <li>組織コストが低い(規約を作って教育する手間が要らない)</li>
       </ul>
     </div>
     <div>
       <h3>失うもの</h3>
       <ul>
-        <li><strong>逃げ道がない</strong>: 複雑な構成を表現したい時、文法の表現力を超えると別アプローチに逃げる必要がある
+        <li><strong>逃げ道がない</strong>:複雑な構成を表現したい時、文法の表現力を超えると別アプローチに逃げる必要がある
           <ul>
             <li>Terraform: <code>dynamic</code> ブロックはlimited、<code>for_each</code> の制約に苦しむ、結局module切ったり外部スクリプトで生成したり</li>
-            <li>Carina: <code>fn</code> と関数合成 (<code>&gt;&gt;</code>) で値計算の抽象化はできるが、高階関数や一級関数値がないため、関数を引数で渡したりmoduleを引数で受け取って加工する設計は書けない</li>
+            <li>Carina: <code>fn</code> と関数合成(<code>&gt;&gt;</code>)で値計算の抽象化はできるが、高階関数や一級関数値がないため、関数を引数で渡したりmoduleを引数で受け取って加工する設計は書けない</li>
           </ul>
         </li>
-        <li><strong>言語拡張のコストが高い</strong>: 新しい構文を追加するにはparser/evaluator/LSPすべて触る必要がある</li>
+        <li><strong>言語拡張のコストが高い</strong>:新しい構文を追加するにはparser/evaluator/LSPすべて触る必要がある</li>
         <li><strong>「言語の表現力」がツールの上限を決める</strong>: HCL / Carina DSLの表現力以上のことはできない</li>
       </ul>
     </div>
   </div>
 
-  <p><strong>規約に委ねる (CDK / Pulumi)</strong></p>
+  <p><strong>規約に委ねる(CDK / Pulumi)</strong></p>
 
   <div class="contrast">
     <div class="yes">
       <h3>得るもの</h3>
       <ul>
-        <li><strong>逃げ道がある</strong>: 何でも書けるので、複雑な構成も表現可能。社内のベテランがutilを作れば全員が使える</li>
-        <li>言語のエコシステム (npm, PyPI等) と統合される</li>
+        <li><strong>逃げ道がある</strong>:何でも書けるので、複雑な構成も表現可能。社内のベテランがutilを作れば全員が使える</li>
+        <li>言語のエコシステム(npm, PyPI等)と統合される</li>
         <li>IDE/デバッガ/テストフレームワークが普通に使える</li>
-        <li>ツール側の実装コストが低い (ホスト言語に乗っかる)</li>
+        <li>ツール側の実装コストが低い(ホスト言語に乗っかる)</li>
       </ul>
     </div>
     <div>
       <h3>失うもの</h3>
       <ul>
-        <li><strong>「読めない書き方」を防げない</strong>: ループ・条件・継承を駆使したコードがチームに混入する</li>
+        <li><strong>「読めない書き方」を防げない</strong>:ループ・条件・継承を駆使したコードがチームに混入する</li>
         <li><strong>規約の維持コスト</strong>: lintルール、コードレビュー、オンボーディング教育、すべて組織が負担する</li>
         <li>「ベテランしか保守できないコード」が生まれやすい</li>
         <li>表現力の差がチーム内のスキル差として顕在化する</li>
@@ -543,12 +543,12 @@
     </div>
   </div>
 
-  <p><strong>「複数量の制御」の境界: graph形状 vs 属性値</strong></p>
+  <p><strong>「複数量の制御」の境界: graph形状vs属性値</strong></p>
 
   <p>3自由度のうち「複数量の制御」だけは、同じ構文でも適用位置でgraph形状と属性値のどちらに効くかが分かれる。区別の基準は <strong>「engineが別ノード/別identityとして扱うか」</strong>:</p>
 
   <ul>
-    <li><strong>graph形状側に効く</strong>: <code>for_each = var.subnet_cidrs</code> のようにresourceブロックやmodule呼び出しで使われると、要素ごとに別resourceノード (別identity) が生成される。要素数の動的化はそのままノード数の動的化</li>
+    <li><strong>graph形状側に効く</strong>: <code>for_each = var.subnet_cidrs</code> のようにresourceブロックやmodule呼び出しで使われると、要素ごとに別resourceノード(別identity)が生成される。要素数の動的化はそのままノード数の動的化</li>
     <li><strong>属性値側に閉じる</strong>: <code>tags = { for k in keys: k =&gt; format(...) }</code> や <code>policy_statements = [for s in stmts: { ... }]</code> のように属性内のコレクション生成で使われると、ノード数もidentityも変わらず属性値の中身だけが動く</li>
   </ul>
 
@@ -556,20 +556,20 @@
 
   <p>§1-3-2表の「複数量の制御」セルは両者を一括で評価しているが、評価対象を分解するときはこの境界を意識する必要がある。</p>
 
-  <h4 id="s1-3-4">1-3-4. 「記述自由度の所在」と「コードからの結果予測性」の因果</h4>
+  <h4 id="s1-3-4">1-3-4.「記述自由度の所在」と「コードからの結果予測性」の因果</h4>
 
-  <p>ここまで見た二層は、4ツールの「コードからの結果予測性」の差を説明する (記述自由度に起因する範囲で)。</p>
+  <p>ここまで見た二層は、4ツールの「コードからの結果予測性」の差を説明する(記述自由度に起因する範囲で)。</p>
 
   <div class="scroll narrow">
     <table class="compare">
       <thead>
-        <tr><th>ツール</th><th>コードからの結果予測性 (記述自由度に起因する範囲)</th></tr>
+        <tr><th>ツール</th><th>コードからの結果予測性(記述自由度に起因する範囲)</th></tr>
       </thead>
       <tbody>
-        <tr><td>Terraform</td><td>高い (graph形状・属性値とも <code>for_each</code> / <code>dynamic</code> 使用時、およびmodule経由で低下)</td></tr>
+        <tr><td>Terraform</td><td>高い(graph形状・属性値とも <code>for_each</code> / <code>dynamic</code> 使用時、およびmodule経由で低下)</td></tr>
         <tr><td>CDK</td><td><strong>書き方依存</strong> (graph形状・属性値ともL1ベタ書きなら高、ループ/条件/継承/高階関数を駆使すると低)</td></tr>
         <tr><td>Pulumi</td><td><strong>書き方依存</strong> (同様)</td></tr>
-        <tr><td>Carina</td><td>高い (graph形状: <code>for</code> のdeferredはplan表示で確認可能。属性値: <code>fn</code> で値計算が抽象化されるが高階関数なしのため動的差し替えは不可。いずれもmodule経由で低下)</td></tr>
+        <tr><td>Carina</td><td>高い(graph形状: <code>for</code> のdeferredはplan表示で確認可能。属性値: <code>fn</code> で値計算が抽象化されるが高階関数なしのため動的差し替えは不可。いずれもmodule経由で低下)</td></tr>
       </tbody>
     </table>
   </div>
@@ -580,26 +580,26 @@
     <li>規約に委ねると、ベタ書きで予測性を保てるが、抽象化を使った瞬間に予測性が落ちる</li>
   </ul>
 
-  <p>つまり <strong>「DSLだから読みやすい」のではなく、「『言語が決める』範囲が広いから (= 規約に委ねる範囲が狭いから) 読みやすい」</strong>。記述言語の選択と記述自由度の所在は <strong>完全に独立とは言えないが、概念的に区別できる別軸</strong>: 実際は強い相関がある (外部DSLは言語が決める範囲を広く取りやすい / 汎用言語は規約に頼りやすい)。汎用言語でもSDKが <code>Output&lt;T&gt;</code> のような型を提供してunknown値伝播を表現するパターン (Pulumi、CDKのToken等、詳細は章3) はあるが、これは <strong>ホスト言語の型システムをSDK側で活用しているだけ</strong> で、(a) 静的型言語かつ (b) ユーザが型を書く慣習を採用したときにのみ効く。Pulumiが言語を拡張して制約を課しているわけではないので、これを「言語が決める」と評価するのは過大評価になる。汎用言語で言語レベルの制約を全面的に入れたIaCツールの実装例は本ドキュメントでは確認できていない。</p>
+  <p>つまり <strong>「DSLだから読みやすい」のではなく、「『言語が決める』範囲が広いから(= 規約に委ねる範囲が狭いから)読みやすい」</strong>。記述言語の選択と記述自由度の所在は <strong>完全に独立とは言えないが、概念的に区別できる別軸</strong>:実際は強い相関がある(外部DSLは言語が決める範囲を広く取りやすい / 汎用言語は規約に頼りやすい)。汎用言語でもSDKが <code>Output&lt;T&gt;</code> のような型を提供してunknown値伝播を表現するパターン(Pulumi、CDKのToken等、詳細は章3)はあるが、これは <strong>ホスト言語の型システムをSDK側で活用しているだけ</strong> で、(a)静的型言語かつ(b)ユーザが型を書く慣習を採用したときにのみ効く。Pulumiが言語を拡張して制約を課しているわけではないので、これを「言語が決める」と評価するのは過大評価になる。汎用言語で言語レベルの制約を全面的に入れたIaCツールの実装例は本ドキュメントでは確認できていない。</p>
 
-  <p>なおこの予測性の議論はすべて <strong>「抽象化を経由していない範囲」</strong> に限定される。Terraform / Carinaのmodule、CDK Construct、Pulumi Componentのいずれかを呼び出した瞬間、呼び出し側からは中身が見えなくなる (リソース数・identity・依存関係、<strong>および本版で予測可能性軸に統合した各ノードの属性値</strong>)。<strong>抽象化境界の透明性</strong>は記述言語や記述自由度の所在ではなく「呼び出し側がどれだけ中身を読みに行く必要があるか」で決まる独立した軸で、各ツールのドキュメント文化・テスト文化・preview UIが補う部分。</p>
+  <p>なおこの予測性の議論はすべて <strong>「抽象化を経由していない範囲」</strong> に限定される。Terraform / Carinaのmodule、CDK Construct、Pulumi Componentのいずれかを呼び出した瞬間、呼び出し側からは中身が見えなくなる(リソース数・identity・依存関係、<strong>および本版で予測可能性軸に統合した各ノードの属性値</strong>)。<strong>抽象化境界の透明性</strong>は記述言語や記述自由度の所在ではなく「呼び出し側がどれだけ中身を読みに行く必要があるか」で決まる独立した軸で、各ツールのドキュメント文化・テスト文化・preview UIが補う部分。</p>
 
   <p>抽象化境界の透明性は本ドキュメントで深追いしないが、次の3点で本章の議論と接続する:</p>
 
   <ul>
-    <li><strong>属性値統合の含意</strong>: §1-3で予測可能性軸をgraph形状 + 属性値に拡張したことで、module経由で隠される対象もgraph形状 (リソース数 / identity / 依存関係) だけでなく <strong>各リソースの属性値</strong> に広がった。「全S3 Bucketの暗号化設定をコードから機械的に確認」のような属性値レベルの監査は、抽象化境界を越えた先まで読みに行く必要がある</li>
+    <li><strong>属性値統合の含意</strong>: §1-3で予測可能性軸をgraph形状 + 属性値に拡張したことで、module経由で隠される対象もgraph形状(リソース数 / identity / 依存関係)だけでなく <strong>各リソースの属性値</strong> に広がった。「全S3 Bucketの暗号化設定をコードから機械的に確認」のような属性値レベルの監査は、抽象化境界を越えた先まで読みに行く必要がある</li>
     <li><strong>AI時代の含意</strong> (cross-DSL分析 <code>carina-position.md</code> §7参照): AIの <strong>コンテキスト窓</strong> と <strong>局所読解性</strong> は抽象化境界の透明性と深く関わる。AIがmodule中身までコンテキストに入れないと修正できない場合、透明性が低い抽象化はAI検証性・plan精度・静的監査の <strong>前提条件を毀損する</strong>。透明性は予測可能性の内実ではなく、§7のAI時代議論を成立させる <strong>射程条件</strong></li>
-    <li><strong>他章との接続</strong>: 抽象化境界を越えた先のidentity安定性 / unknown値伝播は <strong>章3 (型と未知値)</strong> と <strong>章5 (identityと安定性)</strong> で扱う</li>
+    <li><strong>他章との接続</strong>:抽象化境界を越えた先のidentity安定性 / unknown値伝播は <strong>章3 (型と未知値)</strong> と <strong>章5 (identityと安定性)</strong> で扱う</li>
   </ul>
 
   <p>上記予測性議論の射程を限定する重要な前提として記録しておく。</p>
 
   <h4 id="s1-3-4-quad">仮想的な組み合わせ</h4>
 
-  <p>「ユーザの記述自由度をどこに委ねるか」(言語が決める / 規約に委ねる) と「記述言語の選択」(外部DSL / 汎用言語) の組み合わせ:</p>
+  <p>「ユーザの記述自由度をどこに委ねるか」(言語が決める / 規約に委ねる)と「記述言語の選択」(外部DSL / 汎用言語)の組み合わせ:</p>
 
   <figure>
-    <svg class="quad" viewBox="0 0 640 400" role="img" aria-label="記述言語 (外部DSL / 汎用言語) と記述自由度の所在 (言語が決める / 規約に委ねる) の2×2。外部DSL×言語が決めるがTerraform/Carina、汎用言語×規約に委ねるがCDK/Pulumi、残る2象限は該当ツールなし">
+    <svg class="quad" viewBox="0 0 640 400" role="img" aria-label="記述言語(外部DSL / 汎用言語)と記述自由度の所在(言語が決める / 規約に委ねる)の2×2。外部DSL×言語が決めるがTerraform/Carina、汎用言語×規約に委ねるがCDK/Pulumi、残る2象限は該当ツールなし">
       <!-- 軸ラベル -->
       <text class="axhead" x="150" y="18">記述自由度の所在</text>
       <text class="axis" x="150" y="40">言語が決める</text>
@@ -645,7 +645,7 @@
 
       <text class="axhead" x="60" y="390">実線 = 実装例あり / 破線 = 空席</text>
     </svg>
-    <figcaption>§1-3-4の2×2。「読みやすさ」は記述言語 (縦軸) ではなく記述自由度の所在 (横軸) で決まる、というのがこの図の主張。2軸は強い相関を持つが概念的に区別できる別軸で、対角の2象限が空席であることがその相関の強さを示している。</figcaption>
+    <figcaption>§1-3-4の2×2。「読みやすさ」は記述言語(縦軸)ではなく記述自由度の所在(横軸)で決まる、というのがこの図の主張。2軸は強い相関を持つが概念的に区別できる別軸で、対角の2象限が空席であることがその相関の強さを示している。</figcaption>
   </figure>
 
   <div class="scroll">
@@ -662,47 +662,47 @@
     </table>
   </div>
 
-  <p>「外部DSL × 規約に委ねる」が空席なのは <strong>淘汰圧の結果</strong>: 専用文法を作っておきながら任意の動的選択を許すなら、汎用言語を使う方が経済的で、外部DSLを作る意味が薄い。</p>
+  <p>「外部DSL × 規約に委ねる」が空席なのは <strong>淘汰圧の結果</strong>:専用文法を作っておきながら任意の動的選択を許すなら、汎用言語を使う方が経済的で、外部DSLを作る意味が薄い。</p>
 
-  <p>「汎用言語 × 言語が決める」もIaCツールでは事実上の空席。Pulumiの <code>Output&lt;T&gt;</code> やCDKの <code>BucketProps</code> のように<strong>SDK側で型を提供してホスト言語の型システムを活用するパターン</strong>はあるが、これらは (a) 静的型言語かつ (b) ユーザが型を書いたときにのみ効く慣習で、ツール側が言語を拡張して制約を課しているわけではない。Pkl (Apple) のように汎用言語風だが評価モデルを制限するDSLは近いが、PklはIaCツールではなく構成データ出力DSL (詳細はcross-DSL分析参照)。この象限に <strong>言語レベルで</strong> 全面的に寄ったIaCツールの実装例は本ドキュメント執筆時点で確認できておらず、設計の余地として残っている。</p>
+  <p>「汎用言語 × 言語が決める」もIaCツールでは事実上の空席。Pulumiの <code>Output&lt;T&gt;</code> やCDKの <code>BucketProps</code> のように<strong>SDK側で型を提供してホスト言語の型システムを活用するパターン</strong>はあるが、これらは(a)静的型言語かつ(b)ユーザが型を書いたときにのみ効く慣習で、ツール側が言語を拡張して制約を課しているわけではない。Pkl (Apple)のように汎用言語風だが評価モデルを制限するDSLは近いが、PklはIaCツールではなく構成データ出力DSL (詳細はcross-DSL分析参照)。この象限に <strong>言語レベルで</strong> 全面的に寄ったIaCツールの実装例は本ドキュメント執筆時点で確認できておらず、設計の余地として残っている。</p>
 
-  <p>この組み合わせ分析が妥当かどうかは、より多くのツール (Pkl, Bicep, KCL, Cue等) との比較で検証する必要がある。本ドキュメントでは深追いしない。</p>
+  <p>この組み合わせ分析が妥当かどうかは、より多くのツール(Pkl, Bicep, KCL, Cue等)との比較で検証する必要がある。本ドキュメントでは深追いしない。</p>
 
   <h4 id="s1-3-5">1-3-5. Carinaの現在地</h4>
 
-  <p>Carinaは「<strong>外部DSL × 言語が決める</strong>」位置取り。複数量の制御 (graph形状・属性値とも) と実装の切替は文法レベルで制限。抽象化の追加は中間的: ユーザ定義関数 <code>fn</code> (型注釈・再帰検出含む)・関数合成 <code>&gt;&gt;</code>・パイプ <code>|&gt;</code>・部分適用 (closure) は実装済みで、<strong>属性値計算の抽象化</strong> はTerraformより自由 (組込み関数依存ではなくユーザ関数で書ける) だが、<strong>高階関数 (関数を引数/戻り値に取る) と一級関数値は未実装</strong> のため、属性値計算ロジックの動的差し替え (実装の切替 / 属性値側) は文法レベルで遮断されている。先行ドキュメント §5の「関数合成は現時点で重視していない」「宣言性を捨てない」は、合成自体は実装済みなので <strong>「合成までは実装、高階関数化はしない方向」</strong> と読み替えるのが正確。module一級値化 (issue #2233でgrammar tighten解決済み、<code>use</code> 式は <code>let</code> 束縛RHS限定) や高階関数の追加は将来選択肢として開いているが、本ドキュメントは現状比較が主題なので深追いしない。</p>
+  <p>Carinaは「<strong>外部DSL × 言語が決める</strong>」位置取り。複数量の制御(graph形状・属性値とも)と実装の切替は文法レベルで制限。抽象化の追加は中間的:ユーザ定義関数 <code>fn</code> (型注釈・再帰検出含む)・関数合成 <code>&gt;&gt;</code>・パイプ <code>|&gt;</code>・部分適用(closure)は実装済みで、<strong>属性値計算の抽象化</strong> はTerraformより自由(組込み関数依存ではなくユーザ関数で書ける)だが、<strong>高階関数(関数を引数/戻り値に取る)と一級関数値は未実装</strong> のため、属性値計算ロジックの動的差し替え(実装の切替 / 属性値側)は文法レベルで遮断されている。先行ドキュメント §5の「関数合成は現時点で重視していない」「宣言性を捨てない」は、合成自体は実装済みなので <strong>「合成までは実装、高階関数化はしない方向」</strong> と読み替えるのが正確。module一級値化(issue #2233でgrammar tighten解決済み、<code>use</code> 式は <code>let</code> 束縛RHS限定)や高階関数の追加は将来選択肢として開いているが、本ドキュメントは現状比較が主題なので深追いしない。</p>
 
-  <h4 id="s1-3-6">1-3-6. 本節で扱わなかったこと (他章送り)</h4>
+  <h4 id="s1-3-6">1-3-6.本節で扱わなかったこと(他章送り)</h4>
 
   <ul>
-    <li><strong>リソース識別子の所在</strong>: ユーザが書くか / ツールが自動生成するか。Terraform/Carina (named) はユーザ制御、CDK/Pulumi/Carina (anonymous) はツール側のランタイム自動加工。詳細は <a href="#ch5"><strong>章5 (identityと安定性)</strong></a> で扱う</li>
+    <li><strong>リソース識別子の所在</strong>:ユーザが書くか / ツールが自動生成するか。Terraform/Carina (named)はユーザ制御、CDK/Pulumi/Carina (anonymous)はツール側のランタイム自動加工。詳細は <a href="#ch5"><strong>章5 (identityと安定性)</strong></a> で扱う</li>
     <li><strong>unknown値の扱い</strong>: CDK Token / Pulumi <code>Output&lt;T&gt;</code> / Terraformの <code>count</code>/<code>for_each</code> エラー / Carinaのdeferred退避。詳細は <a href="#ch3"><strong>章3 (型と未知値)</strong></a> で扱う</li>
     <li><strong>依存解決と実行順序</strong>: 4ツール共通でランタイム自動推論。詳細は <a href="#ch2">章2 (中間表現と実行モデル)</a> で扱う</li>
-    <li><strong>構文と評価副作用のずれ</strong>: CDK/Pulumiの <code>new</code> は通常の言語慣習 (オブジェクト生成のみ、副作用なし) に見えるが、実際にはconstruct treeへの追加 (CDK) やengineへの <code>RegisterResource</code> RPC通知 (Pulumi) を伴う。Terraform/Carinaの宣言的構文 (<code>resource</code> ブロック / <code>let foo = type { ... }</code>) には対応する副作用がない。この論点は表記の見た目より評価時に何が起きるかが本体で、実行モデルの差として <a href="#ch2"><strong>章2 (中間表現と実行モデル)</strong></a> で扱う</li>
-    <li><strong>state操作</strong>: ユーザが手動編集できるか / 規約で縛るか。詳細は <a href="#ch4"><strong>章4 (stateの所有)</strong></a> で扱う</li>
+    <li><strong>構文と評価副作用のずれ</strong>: CDK/Pulumiの <code>new</code> は通常の言語慣習(オブジェクト生成のみ、副作用なし)に見えるが、実際にはconstruct treeへの追加(CDK)やengineへの <code>RegisterResource</code> RPC通知(Pulumi)を伴う。Terraform/Carinaの宣言的構文(<code>resource</code> ブロック / <code>let foo = type { ... }</code>)には対応する副作用がない。この論点は表記の見た目より評価時に何が起きるかが本体で、実行モデルの差として <a href="#ch2"><strong>章2 (中間表現と実行モデル)</strong></a> で扱う</li>
+    <li><strong>state操作</strong>:ユーザが手動編集できるか / 規約で縛るか。詳細は <a href="#ch4"><strong>章4 (stateの所有)</strong></a> で扱う</li>
     <li><strong>型システムの詳細</strong>: refinement / sum type / phantom type等は章3で扱う</li>
-    <li><strong>評価モデルによる制約</strong>: 純粋関数性 / 副作用の隔離 / 評価順保証 (Pklのlazy evaluation等) は本ドキュメントの範囲外</li>
+    <li><strong>評価モデルによる制約</strong>:純粋関数性 / 副作用の隔離 / 評価順保証(Pklのlazy evaluation等)は本ドキュメントの範囲外</li>
   </ul>
 
-  <h3 id="s1-4">1-4. この章の小結</h3>
+  <h3 id="s1-4">1-4.この章の小結</h3>
 
   <ul>
-    <li><strong>記述言語</strong> (§1-1): 外部DSL (Terraform/Carina) と汎用言語 (CDK/Pulumi、内部DSL + ベタ書きのハイブリッド) の選択は、抽象化機構と制御の所在の設計余地を規定する</li>
-    <li><strong>抽象化機構</strong> (§1-2): 「複数リソースを束ねる抽象化」には<strong>デプロイ単位</strong> (Terraform/Carinaのroot module / CDKのStack / PulumiのStack) と<strong>再利用単位</strong> (Terraform/Carinaの子module / CDKのユーザ定義ConstructとL3 / Pulumiのユーザ定義ComponentResourceと既製Component) の2種がある。L1/L2や <code>CustomResource</code> は個別リソース層でTerraformの <code>resource</code> 相当
+    <li><strong>記述言語</strong> (§1-1):外部DSL (Terraform/Carina)と汎用言語(CDK/Pulumi、内部DSL + ベタ書きのハイブリッド)の選択は、抽象化機構と制御の所在の設計余地を規定する</li>
+    <li><strong>抽象化機構</strong> (§1-2):「複数リソースを束ねる抽象化」には<strong>デプロイ単位</strong> (Terraform/Carinaのroot module / CDKのStack / PulumiのStack)と<strong>再利用単位</strong> (Terraform/Carinaの子module / CDKのユーザ定義ConstructとL3 / Pulumiのユーザ定義ComponentResourceと既製Component)の2種がある。L1/L2や <code>CustomResource</code> は個別リソース層でTerraformの <code>resource</code> 相当
       <ul>
-        <li>Terraform module: ディレクトリ単位、<code>module</code> ブロックで参照。<code>source</code> はリテラル文字列のみ (実装選択は静的)</li>
+        <li>Terraform module:ディレクトリ単位、<code>module</code> ブロックで参照。<code>source</code> はリテラル文字列のみ(実装選択は静的)</li>
         <li>CDK Stack / ユーザ定義Construct / L3 Construct: TypeScriptクラス + <code>new</code> 式。jsiiで多言語化</li>
-        <li>Pulumi Stack (設定単位) / ユーザ定義ComponentResource / 既製Component: 各言語ネイティブのクラス + <code>new</code> 式。MLCで多言語提供</li>
-        <li>Carina module: ディレクトリ単位。<strong>読み込み (<code>let name = use { source = ... }</code>) とインスタンス化 (<code>name { ... }</code>) が分離</strong>。<code>use</code> 式は <code>let</code> 束縛RHSにしか書けない (issue #2233でgrammar tighten解決済み)。同一templateから複数インスタンス化が可能。moduleを一級値として扱う設計余地は将来選択肢として残る</li>
+        <li>Pulumi Stack (設定単位) / ユーザ定義ComponentResource / 既製Component:各言語ネイティブのクラス + <code>new</code> 式。MLCで多言語提供</li>
+        <li>Carina module:ディレクトリ単位。<strong>読み込み(<code>let name = use { source = ... }</code>)とインスタンス化(<code>name { ... }</code>)が分離</strong>。<code>use</code> 式は <code>let</code> 束縛RHSにしか書けない(issue #2233でgrammar tighten解決済み)。同一templateから複数インスタンス化が可能。moduleを一級値として扱う設計余地は将来選択肢として残る</li>
       </ul>
     </li>
-    <li><strong>結果予測性に効く記述自由度の所在</strong> (§1-3): <strong>resource graphの形と各ノードの属性値</strong> を変える3つの自由度 (抽象化の追加 / 複数量の制御 / 実装の切替) を「言語が決める」か「規約に委ねる」かは、二層に分けられる。3自由度はgraph形状側と属性値側の両方に適用される
+    <li><strong>結果予測性に効く記述自由度の所在</strong> (§1-3): <strong>resource graphの形と各ノードの属性値</strong> を変える3つの自由度(抽象化の追加 / 複数量の制御 / 実装の切替)を「言語が決める」か「規約に委ねる」かは、二層に分けられる。3自由度はgraph形状側と属性値側の両方に適用される
       <ul>
-        <li><strong>「読みやすさ」は記述言語ではなく記述自由度の所在で決まる</strong>: 「DSLだから読みやすい」ではなく「言語が決める範囲が広いから読みやすい」。記述言語と記述自由度の所在は強い相関を持つが概念的に区別できる別軸</li>
-        <li>「言語が決める」(Terraform/Carina) は読みやすさを構造的に保つ代わりに表現力に上限がある (逃げ道がない)</li>
-        <li>「規約に委ねる」(CDK/Pulumi) は逃げ道がある代わりに組織の維持コストを生む</li>
-        <li><strong>graph形状側で同列の3ツール (Terraform/Bicep/Carina) も属性値計算の自由度では差がある</strong>: Terraform (組込み関数のみ) &lt; Bicep (<code>func</code> あり) &lt; Carina (<code>fn</code> + 関数合成 + closure) &lt; CDK/Pulumi (高階関数 + クラス継承 + 外部lib)</li>
-        <li>「複数量の制御」はgraph形状側 (<code>for_each</code> でresourceノード生成) と属性値側 (<code>tags</code> map内 <code>for</code>) で効く先が違う。区別の基準はengineが別ノード/別identityとして扱うか</li>
+        <li><strong>「読みやすさ」は記述言語ではなく記述自由度の所在で決まる</strong>:「DSLだから読みやすい」ではなく「言語が決める範囲が広いから読みやすい」。記述言語と記述自由度の所在は強い相関を持つが概念的に区別できる別軸</li>
+        <li>「言語が決める」(Terraform/Carina)は読みやすさを構造的に保つ代わりに表現力に上限がある(逃げ道がない)</li>
+        <li>「規約に委ねる」(CDK/Pulumi)は逃げ道がある代わりに組織の維持コストを生む</li>
+        <li><strong>graph形状側で同列の3ツール(Terraform/Bicep/Carina)も属性値計算の自由度では差がある</strong>: Terraform (組込み関数のみ) &lt; Bicep (<code>func</code> あり) &lt; Carina (<code>fn</code> + 関数合成 + closure) &lt; CDK/Pulumi (高階関数 + クラス継承 + 外部lib)</li>
+        <li>「複数量の制御」はgraph形状側(<code>for_each</code> でresourceノード生成)と属性値側(<code>tags</code> map内 <code>for</code>)で効く先が違う。区別の基準はengineが別ノード/別identityとして扱うか</li>
         <li>抽象化境界の透明性は別軸で、記述言語/記述自由度の所在に依存しない</li>
         <li>識別子・unknown値・依存解決・state操作のような実行時挙動の所在は §1-3では扱わず、章5/3/2/4で深掘り</li>
       </ul>
@@ -711,22 +711,22 @@
 
   <h4>結果予測性に絞った理由</h4>
 
-  <p>本章は「言語選択の全評価」ではなく、<strong>結果予測性に直接効く軸</strong> に絞っている。言語選択で重要な軸は他にも多数ある: 学習コスト、既存人材との適合、エコシステム / ライブラリ流通、型安全、テスト容易性、リファクタリング耐性、レビュー容易性、IDE / LSP統合、CI/CD統合、デバッグ性、セキュアデフォルト、移植性、実行性能、運用責任分界、チーム規模適性、ガバナンス容易性、等。</p>
+  <p>本章は「言語選択の全評価」ではなく、<strong>結果予測性に直接効く軸</strong> に絞っている。言語選択で重要な軸は他にも多数ある:学習コスト、既存人材との適合、エコシステム / ライブラリ流通、型安全、テスト容易性、リファクタリング耐性、レビュー容易性、IDE / LSP統合、CI/CD統合、デバッグ性、セキュアデフォルト、移植性、実行性能、運用責任分界、チーム規模適性、ガバナンス容易性、等。</p>
 
   <p>これらを本ドキュメントで主軸にしない理由:</p>
 
   <ul>
-    <li><strong>章2-5に分散する論点</strong> (型 / state / identity等) は各章で扱う</li>
-    <li><strong>組織論・運用論寄りの論点</strong> (学習コスト、人材適合、ガバナンス等) は主観・状況依存で構造的比較が難しい</li>
+    <li><strong>章2-5に分散する論点</strong> (型 / state / identity等)は各章で扱う</li>
+    <li><strong>組織論・運用論寄りの論点</strong> (学習コスト、人材適合、ガバナンス等)は主観・状況依存で構造的比較が難しい</li>
     <li><strong>4ツール間で比較粒度が揃いにくい</strong> (エコシステム流通量、IDE統合度等)</li>
-    <li><strong>章1で立てる軸として結果予測性が最適</strong>: 記述言語の選択と記述自由度の所在を1つの因果で束ねられ、4ツールで構造的に差を立てられる。型安全 / identity安定性 / state委譲等の他の構造的比較軸は章2-5で扱う</li>
+    <li><strong>章1で立てる軸として結果予測性が最適</strong>:記述言語の選択と記述自由度の所在を1つの因果で束ねられ、4ツールで構造的に差を立てられる。型安全 / identity安定性 / state委譲等の他の構造的比較軸は章2-5で扱う</li>
   </ul>
 
   <p>結果予測性以外も実務上は重要だが、本ドキュメントは「設計判断の構造的整理」を主題とするため、構造的比較に適した軸に絞った。</p>
 
-  <p>なお <strong>ファイル/ディレクトリ構成の規約</strong> (どこに何を置くか、moduleをどの粒度で切るか等) は、ユーザの認知負荷や設計判断の安定性には効くが、resource graphの形 (ノード数・edge) や各ノードの属性値には直接効かないため §1-3の選定基準 (i) を満たさず、本章では扱わない (Terraform/Carinaの「module = ディレクトリ単位」という抽象化機構そのものは §1-2で既出)。配置規約と設計判断の安定性は独立した論点として、本ドキュメントの主章構成 (章2-5) には含めず、必要に応じて付録/別章で扱う余地がある。</p>
+  <p>なお <strong>ファイル/ディレクトリ構成の規約</strong> (どこに何を置くか、moduleをどの粒度で切るか等)は、ユーザの認知負荷や設計判断の安定性には効くが、resource graphの形(ノード数・edge)や各ノードの属性値には直接効かないため §1-3の選定基準(i)を満たさず、本章では扱わない(Terraform/Carinaの「module = ディレクトリ単位」という抽象化機構そのものは §1-2で既出)。配置規約と設計判断の安定性は独立した論点として、本ドキュメントの主章構成(章2-5)には含めず、必要に応じて付録/別章で扱う余地がある。</p>
 
-  <h4>この章で扱わないこと (他章送り)</h4>
+  <h4>この章で扱わないこと(他章送り)</h4>
 
   <ul>
     <li>synthの有無そのもの → <a href="#ch2">章2</a></li>
@@ -735,47 +735,47 @@
     <li>identity (CDKの論理IDハッシュ、Pulumi URN等) → <a href="#ch5">章5</a></li>
   </ul>
 
-  <h4>本章で確認できなかったこと (推測領域)</h4>
+  <h4>本章で確認できなかったこと(推測領域)</h4>
 
   <ul>
-    <li><del>CDKで「Constructを配列/Mapに入れて動的選択」することへの明示的な公式禁止/制約記述 (構造上は可能だが、明文確認は未了)</del> → <strong>2026-04-27確認済み</strong>: 明示的禁止はない。AWS CDK公式 <a href="https://docs.aws.amazon.com/cdk/v2/guide/best-practices.html">Best practices</a> は「<strong>Make decisions at synthesis time</strong>」として <code>environments.forEach(env =&gt; new MyStack(...))</code> のようなホスト言語ループでConstructを生成するパターンを <strong>推奨</strong>。配列/Map格納も推奨例として挙がっている。ただし「statefulリソースの論理IDを変更すると置き換えが発生する」「単体テストで論理IDの固定性を検証すべき」と注意喚起あり。動的選択のメカニズム自体は許容されているが、identity安定性の責任はユーザに委ねられる</li>
-    <li><del>Pulumiで「Componentを引数/戻り値/コレクションに使う」ことへの公式禁止記述 (同上、<code>Output&lt;T&gt;</code> 絡みの実行時制約は別問題で章3)</del> → <strong>2026-04-27確認済み</strong>: 明示的禁止はない。Pulumi公式 <a href="https://www.pulumi.com/docs/concepts/resources/names/">Names and URNs</a> は <strong>resourceオブジェクト参照を変数で渡すパターンを推奨</strong> (<code>depends_on=[bucket]</code> のように、URN文字列ではなくresourceオブジェクト)。これは事実上Componentを変数・引数として扱えることを示している。ただしURNはproject + stack + resource name + resource type + parent階層から構成され、<strong>名前やparentの階層変更でURNが変わると別リソース扱い (削除 → 新規作成)</strong> という警告あり。動的選択のメカニズム自体は許容されているが、URN安定性の責任はユーザに委ねられる</li>
+    <li><del>CDKで「Constructを配列/Mapに入れて動的選択」することへの明示的な公式禁止/制約記述(構造上は可能だが、明文確認は未了)</del> → <strong>2026-04-27確認済み</strong>:明示的禁止はない。AWS CDK公式 <a href="https://docs.aws.amazon.com/cdk/v2/guide/best-practices.html">Best practices</a> は「<strong>Make decisions at synthesis time</strong>」として <code>environments.forEach(env =&gt; new MyStack(...))</code> のようなホスト言語ループでConstructを生成するパターンを <strong>推奨</strong>。配列/Map格納も推奨例として挙がっている。ただし「statefulリソースの論理IDを変更すると置き換えが発生する」「単体テストで論理IDの固定性を検証すべき」と注意喚起あり。動的選択のメカニズム自体は許容されているが、identity安定性の責任はユーザに委ねられる</li>
+    <li><del>Pulumiで「Componentを引数/戻り値/コレクションに使う」ことへの公式禁止記述(同上、<code>Output&lt;T&gt;</code> 絡みの実行時制約は別問題で章3)</del> → <strong>2026-04-27確認済み</strong>:明示的禁止はない。Pulumi公式 <a href="https://www.pulumi.com/docs/concepts/resources/names/">Names and URNs</a> は <strong>resourceオブジェクト参照を変数で渡すパターンを推奨</strong> (<code>depends_on=[bucket]</code> のように、URN文字列ではなくresourceオブジェクト)。これは事実上Componentを変数・引数として扱えることを示している。ただしURNはproject + stack + resource name + resource type + parent階層から構成され、<strong>名前やparentの階層変更でURNが変わると別リソース扱い(削除 → 新規作成)</strong> という警告あり。動的選択のメカニズム自体は許容されているが、URN安定性の責任はユーザに委ねられる</li>
   </ul>
 
-  <p>両ツールとも <strong>構造的・公式推奨的にも動的選択は可能で、明示的禁止はない</strong>。代わりにidentity安定性 (CDKの論理ID / PulumiのURN) への注意がユーザ責任として強調される。これは §1-3の「規約に委ねる」象限の典型挙動と整合: 言語側で動的選択を遮断せず、規約 (best practices / lint / レビュー) でidentity安定性を担保する設計判断。</p>
+  <p>両ツールとも <strong>構造的・公式推奨的にも動的選択は可能で、明示的禁止はない</strong>。代わりにidentity安定性(CDKの論理ID / PulumiのURN)への注意がユーザ責任として強調される。これは §1-3の「規約に委ねる」象限の典型挙動と整合:言語側で動的選択を遮断せず、規約(best practices / lint / レビュー)でidentity安定性を担保する設計判断。</p>
 
-  <h2 id="ch2">章2: 評価モデルと実行境界 <span class="status">探索メモ・本文未着手</span></h2>
+  <h2 id="ch2">章2:評価モデルと実行境界 <span class="status">探索メモ・本文未着手</span></h2>
 
   <div class="draft">
-    <p><strong>ステータス: 探索メモ (本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
+    <p><strong>ステータス:探索メモ(本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
   </div>
 
   <h3>主題</h3>
 
-  <p>ユーザコードからresource graph (とその差分) が確定するまで、何段階の評価/通信を経るか。各ツールの実行モデルを比較する。</p>
+  <p>ユーザコードからresource graph (とその差分)が確定するまで、何段階の評価/通信を経るか。各ツールの実行モデルを比較する。</p>
 
   <h3>取り上げる論点</h3>
 
   <h4>章1 §1-3-6から送られた論点</h4>
 
   <ul>
-    <li><strong>構文と評価副作用のずれ</strong> (CDK/Pulumiの <code>new</code> の副作用): CDK/Pulumiの <code>new</code> は通常の言語慣習 (オブジェクト生成のみ、副作用なし) に見えるが、実際にはconstruct treeへの追加 (CDK) やengineへの <code>RegisterResource</code> RPC通知 (Pulumi) を伴う。Terraform/Carinaの宣言的構文 (<code>resource</code> ブロック / <code>let foo = type { ... }</code>) には対応する副作用がない</li>
+    <li><strong>構文と評価副作用のずれ</strong> (CDK/Pulumiの <code>new</code> の副作用): CDK/Pulumiの <code>new</code> は通常の言語慣習(オブジェクト生成のみ、副作用なし)に見えるが、実際にはconstruct treeへの追加(CDK)やengineへの <code>RegisterResource</code> RPC通知(Pulumi)を伴う。Terraform/Carinaの宣言的構文(<code>resource</code> ブロック / <code>let foo = type { ... }</code>)には対応する副作用がない</li>
     <li><strong>依存解決と実行順序</strong> (4ツール共通でランタイム自動推論)</li>
   </ul>
 
-  <h4>章1 §1-1で言及した論点 (詳細はここで)</h4>
+  <h4>章1 §1-1で言及した論点(詳細はここで)</h4>
 
   <ul>
-    <li><strong>synthの有無</strong>: CDKはcloud assembly (CFNテンプレート + assets) を生成、Pulumiは中間テンプレートなし</li>
+    <li><strong>synthの有無</strong>: CDKはcloud assembly (CFNテンプレート + assets)を生成、Pulumiは中間テンプレートなし</li>
     <li><strong>planの地位</strong>:
       <ul>
         <li>Terraform: tfplan binary (不可侵)</li>
-        <li>Carina: <code>Plan&lt;Effect&gt;</code> 同一プロセス内型付き値、内部加工可能 (<code>add_state_block_effects</code>)</li>
+        <li>Carina: <code>Plan&lt;Effect&gt;</code> 同一プロセス内型付き値、内部加工可能(<code>add_state_block_effects</code>)</li>
         <li>CDK: cloud assemblyが中間IR、<code>cdk diff</code> / <code>cdk deploy</code> で扱う</li>
-        <li>Pulumi: ランタイム経路に静的中間テンプレートなし、ただし <code>--save-plan</code> でUpdate Plans (静的planファイル) を生成可</li>
+        <li>Pulumi:ランタイム経路に静的中間テンプレートなし、ただし <code>--save-plan</code> でUpdate Plans (静的planファイル)を生成可</li>
       </ul>
     </li>
-    <li><strong>ユーザワークフロー vs 内部実行モデルのずれ</strong>: Pulumiの <code>preview → up</code> ワークフローはTerraform似だが、内部はストリーミング <code>RegisterResource</code></li>
+    <li><strong>ユーザワークフローvs内部実行モデルのずれ</strong>: Pulumiの <code>preview → up</code> ワークフローはTerraform似だが、内部はストリーミング <code>RegisterResource</code></li>
   </ul>
 
   <h4>4ツールの実行モデル概観</h4>
@@ -794,19 +794,19 @@
         </tr>
         <tr>
           <td>CDK</td>
-          <td>TS code実行 → cloud assembly (CFNテンプレート + assets) 生成 → CFN deploy</td>
-          <td>CFNテンプレート (静的、JSON/YAML)</td>
+          <td>TS code実行 → cloud assembly (CFNテンプレート + assets)生成 → CFN deploy</td>
+          <td>CFNテンプレート(静的、JSON/YAML)</td>
           <td>CFNサービスへのChangeSet経由deploy</td>
         </tr>
         <tr>
           <td>Pulumi</td>
           <td>コード実行中にengineへgRPC streaming <code>RegisterResource</code> → engine随時差分判断・実行</td>
-          <td>ランタイム経路に中間テンプレートなし。ただしPCL (<code>pulumi convert</code> 用IR)、Update Plans (<code>--save-plan</code>) は存在</td>
+          <td>ランタイム経路に中間テンプレートなし。ただしPCL (<code>pulumi convert</code> 用IR)、Update Plans (<code>--save-plan</code>)は存在</td>
           <td>engine ↔ language host gRPC、provider gRPC</td>
         </tr>
         <tr>
           <td>Carina</td>
-          <td>DSL → resource graph → 全体差分一括計算 → 順次実行 (Terraformと同じ宣言型)</td>
+          <td>DSL → resource graph → 全体差分一括計算 → 順次実行(Terraformと同じ宣言型)</td>
           <td><code>Plan&lt;Effect&gt;</code> 型付きRust値、同一プロセス内加工可</td>
           <td>provider plugin (WASM等)、state backend</td>
         </tr>
@@ -820,7 +820,7 @@
   <ul>
     <li>公式: <a href="https://docs.aws.amazon.com/cdk/v2/guide/configure-synth.html">Configure synth</a>, <a href="https://docs.aws.amazon.com/cdk/v2/guide/deploy.html">Deploy applications</a>, <a href="https://docs.aws.amazon.com/cdk/v2/guide/ref-cli-cmd-deploy.html">cdk deploy CLI ref</a></li>
     <li>出力: cloud assembly (<code>cdk.out/</code> 配下、CFNテンプレート + assets + metadata)</li>
-    <li>deployment method: デフォルトChangeSet経由 (<code>--method change-set</code>)、<code>--method direct</code> でスキップ可、<code>hotswap</code> モードあり</li>
+    <li>deployment method:デフォルトChangeSet経由(<code>--method change-set</code>)、<code>--method direct</code> でスキップ可、<code>hotswap</code> モードあり</li>
   </ul>
 
   <h4>Pulumi</h4>
@@ -850,28 +850,28 @@
 
   <h3>既調査の補足素材</h3>
 
-  <h4>Pulumi <code>RegisterResource</code> 流れ (確認済み)</h4>
+  <h4>Pulumi <code>RegisterResource</code> 流れ(確認済み)</h4>
 
   <ol class="steps">
     <li><strong>コンストラクタ起動</strong>ユーザコード <code>new aws.s3.Bucket("mybucket")</code> でCustomResourceコンストラクタ起動</li>
     <li><strong>registerResource()</strong><code>runtime/resource.ts</code> の <code>registerResource()</code> 関数が呼ばれる</li>
-    <li><strong>inputs解決</strong><code>prepareResource()</code> でinputsを解決 (Output&lt;T&gt;の解決待ち含む)</li>
+    <li><strong>inputs解決</strong><code>prepareResource()</code> でinputsを解決(Output&lt;T&gt;の解決待ち含む)</li>
     <li><strong>gRPC送信</strong>gRPC clientで <code>monitor.registerResource(req, ...)</code> をengineに送信</li>
-    <li><strong>step生成</strong>engineが現在stateと比較してstep (Create/Update/Delete) を生成</li>
+    <li><strong>step生成</strong>engineが現在stateと比較してstep (Create/Update/Delete)を生成</li>
     <li><strong>判断または実行</strong>previewなら判断のみ、upならproviderを呼んで実行</li>
-    <li><strong>応答</strong>response (URN / id / outputs) がlanguage hostに返る</li>
+    <li><strong>応答</strong>response (URN / id / outputs)がlanguage hostに返る</li>
     <li><strong>反映</strong>ユーザコード側のResourceインスタンスに反映</li>
   </ol>
 
-  <h4>CDK synthフロー (確認済み)</h4>
+  <h4>CDK synthフロー(確認済み)</h4>
 
   <ol class="steps">
     <li><strong>コード実行</strong><code>cdk synth</code> でユーザコード実行</li>
-    <li><strong>construct tree構築</strong>construct treeが組み上がる (各 <code>new s3.Bucket(...)</code> でtreeにノード追加)</li>
-    <li><strong>テンプレート生成</strong>treeからCFNテンプレート (JSON/YAML) を生成</li>
-    <li><strong>cloud assembly書き出し</strong>cloud assembly (<code>cdk.out/</code>) として書き出し (テンプレート + assets + metadata)</li>
+    <li><strong>construct tree構築</strong>construct treeが組み上がる(各 <code>new s3.Bucket(...)</code> でtreeにノード追加)</li>
+    <li><strong>テンプレート生成</strong>treeからCFNテンプレート(JSON/YAML)を生成</li>
+    <li><strong>cloud assembly書き出し</strong>cloud assembly (<code>cdk.out/</code>)として書き出し(テンプレート + assets + metadata)</li>
     <li><strong>submit</strong><code>cdk deploy</code> でcloud assemblyをCFNサービスにsubmit</li>
-    <li><strong>ChangeSet</strong>デフォルトはChangeSet経由 (previewしてからapply)</li>
+    <li><strong>ChangeSet</strong>デフォルトはChangeSet経由(previewしてからapply)</li>
   </ol>
 
   <h4>CDK Token / Pulumi Output&lt;T&gt; / Carina式木 / Terraform refinements</h4>
@@ -879,41 +879,41 @@
   <p>unknown値の扱いは章3が本論だが、章2でも「実行モデルとの協調」として触れる:</p>
 
   <ul>
-    <li>CDK Token: 実行時 (synth時) に <code>Fn::GetAtt</code> 等に解決されるplaceholder文字列</li>
-    <li>Pulumi Output&lt;T&gt;: ストリーミング実行中に依存追跡しながら解決</li>
+    <li>CDK Token:実行時(synth時)に <code>Fn::GetAtt</code> 等に解決されるplaceholder文字列</li>
+    <li>Pulumi Output&lt;T&gt;:ストリーミング実行中に依存追跡しながら解決</li>
     <li>Terraform: cty.Value + unknownフラグ、graph構築時点で <code>count</code>/<code>for_each</code> がunknownだとエラー</li>
-    <li>Carina: 式木保持 (<code>ResourceRef</code> / <code>Interpolation</code> / <code>FunctionCall</code>)、<code>for</code> のiterableにunknownが来たら <code>deferred_for_expressions</code> に退避</li>
+    <li>Carina:式木保持(<code>ResourceRef</code> / <code>Interpolation</code> / <code>FunctionCall</code>)、<code>for</code> のiterableにunknownが来たら <code>deferred_for_expressions</code> に退避</li>
   </ul>
 
-  <h3>起こりうるサブ節 (案)</h3>
+  <h3>起こりうるサブ節(案)</h3>
 
   <ul>
-    <li>2-1. ワークフローと内部実行モデルの対応</li>
-    <li>2-2. 中間表現の有無とその性質 (synth / Plan / RPC streaming)</li>
-    <li>2-3. 評価副作用の局所性 (<code>new</code> の副作用、宣言の純粋性)</li>
-    <li>2-4. 依存解決の所在 (graph構築時 vs streaming中)</li>
-    <li>2-5. planの加工性 (Terraform = 不可、Carina = 可、Pulumi = <code>--save-plan</code>)</li>
-    <li>2-6. 章1との接続 (記述言語選択がどう実行モデルを規定するか)</li>
+    <li>2-1.ワークフローと内部実行モデルの対応</li>
+    <li>2-2.中間表現の有無とその性質(synth / Plan / RPC streaming)</li>
+    <li>2-3.評価副作用の局所性(<code>new</code> の副作用、宣言の純粋性)</li>
+    <li>2-4.依存解決の所在(graph構築時vs streaming中)</li>
+    <li>2-5. planの加工性(Terraform = 不可、Carina = 可、Pulumi = <code>--save-plan</code>)</li>
+    <li>2-6.章1との接続(記述言語選択がどう実行モデルを規定するか)</li>
   </ul>
 
-  <h3>Codexレビューでの指摘 (反映済み)</h3>
+  <h3>Codexレビューでの指摘(反映済み)</h3>
 
   <ul>
     <li>Pulumiの「中間IRなし」は <strong>断定すると誤り寄り</strong> (PCL、Update Plansが存在)。「ランタイム実行経路には静的中間テンプレートを持たない」と限定するのが正確。章2で本格展開する際にこの精度を保つ</li>
   </ul>
 
-  <h2 id="ch3">章3: 型・schema・未知値 <span class="status">探索メモ・本文未着手</span></h2>
+  <h2 id="ch3">章3:型・schema・未知値 <span class="status">探索メモ・本文未着手</span></h2>
 
   <div class="draft">
-    <p><strong>ステータス: 探索メモ (本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
+    <p><strong>ステータス:探索メモ(本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
   </div>
 
   <h3>主題</h3>
 
   <ul>
-    <li>4ツールのschema表現 (providerが公開する型の語彙、ユーザ側の型システム)</li>
-    <li>unknown値 (実行時まで決まらない値) の扱い</li>
-    <li>型システムがunknown値の扱いをどう強制 (または放置) するか</li>
+    <li>4ツールのschema表現(providerが公開する型の語彙、ユーザ側の型システム)</li>
+    <li>unknown値(実行時まで決まらない値)の扱い</li>
+    <li>型システムがunknown値の扱いをどう強制(または放置)するか</li>
   </ul>
 
   <h3>取り上げる論点</h3>
@@ -925,11 +925,11 @@
     <li><strong>型システムの詳細</strong>: refinement / sum type / phantom type等</li>
   </ul>
 
-  <h4>章1 §1-1で言及した論点 (詳細はここで)</h4>
+  <h4>章1 §1-1で言及した論点(詳細はここで)</h4>
 
   <ul>
-    <li><strong>Pulumi <code>Output&lt;T&gt;</code> の型レベル制約性</strong>: ホスト言語 (TypeScript) の型システムを使って <code>string</code> と区別された独立型を作り、<code>then</code> を持たないことで <code>await</code> を不可能にし、<code>toString</code> で例外を投げる (<code>sdk/nodejs/output.ts:300-305</code>)。「内部DSLの型レベル制約」の典型例</li>
-    <li><strong>CDK Tokenはstringに偽装する別アプローチ</strong>: 型システムを使わないplaceholder設計</li>
+    <li><strong>Pulumi <code>Output&lt;T&gt;</code> の型レベル制約性</strong>:ホスト言語(TypeScript)の型システムを使って <code>string</code> と区別された独立型を作り、<code>then</code> を持たないことで <code>await</code> を不可能にし、<code>toString</code> で例外を投げる(<code>sdk/nodejs/output.ts:300-305</code>)。「内部DSLの型レベル制約」の典型例</li>
+    <li><strong>CDK Tokenはstringに偽装する別アプローチ</strong>:型システムを使わないplaceholder設計</li>
   </ul>
 
   <h4>4ツールのschema/型概観</h4>
@@ -944,13 +944,13 @@
           <td>Terraform</td>
           <td>cty (string/number/list/map/object/tuple)</td>
           <td>variable type system (limited)</td>
-          <td>cty.Value + unknownフラグ、refinements (1.6+) で部分情報保持</td>
+          <td>cty.Value + unknownフラグ、refinements (1.6+)で部分情報保持</td>
           <td>provider pluginから <code>GetSchema</code> RPCで取得</td>
         </tr>
         <tr>
           <td>CDK</td>
           <td>CFN schema (CloudFormationの型情報、TSの型に変換)</td>
-          <td>TSの型 (<code>BucketProps</code> 等のinterface)</td>
+          <td>TSの型(<code>BucketProps</code> 等のinterface)</td>
           <td>Token (stringに偽装、synth時に <code>Fn::GetAtt</code> 等に解決)</td>
           <td>型システムはunknown値を区別しない</td>
         </tr>
@@ -964,8 +964,8 @@
         <tr>
           <td>Carina</td>
           <td><code>AttributeType</code> (Union/StringEnum/Custom (refinement)/Struct)</td>
-          <td>DSLの型 (namespaced enum含む)</td>
-          <td>式木保持 (<code>ResourceRef</code> / <code>Interpolation</code> / <code>FunctionCall</code>)、<code>for</code> でdeferred退避</td>
+          <td>DSLの型(namespaced enum含む)</td>
+          <td>式木保持(<code>ResourceRef</code> / <code>Interpolation</code> / <code>FunctionCall</code>)、<code>for</code> でdeferred退避</td>
           <td>partial evaluation / symbolic executionに近い</td>
         </tr>
       </tbody>
@@ -992,8 +992,8 @@
     <li>Input&lt;T&gt;: <code>export type Input&lt;T&gt; = T | Promise&lt;T&gt; | OutputInstance&lt;T&gt;</code> (L935)</li>
     <li>連鎖メソッド: <code>apply()</code> (L369), <code>pulumi.all()</code> (L771-792), <code>pulumi.interpolate</code> (L1248), <code>concat</code> (L1232)</li>
     <li>preview時の挙動: <code>applyHelperAsync</code> で <code>if (!doApply) return { value: undefined, isKnown: false, ... }</code> (L499-507) — <code>func</code> を実行せず未知Outputを返す</li>
-    <li><code>toString</code> / <code>toJSON</code>: <code>OutputToStringError</code> を投げる (L22-53, L167, L190)</li>
-    <li>secret伝播: <code>applyHelperAsync</code> の戻り <code>liftInnerOutput(allResources, transformed, true, isSecret)</code> (L520) — apply後もsecretを保持。<code>all</code> では <code>some(isSecret)</code> でOR集約 (L854)</li>
+    <li><code>toString</code> / <code>toJSON</code>: <code>OutputToStringError</code> を投げる(L22-53, L167, L190)</li>
+    <li>secret伝播: <code>applyHelperAsync</code> の戻り <code>liftInnerOutput(allResources, transformed, true, isSecret)</code> (L520) — apply後もsecretを保持。<code>all</code> では <code>some(isSecret)</code> でOR集約(L854)</li>
     <li>公式docs: <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/">inputs-outputs</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/all/">allページ</a></li>
   </ul>
 
@@ -1002,7 +1002,7 @@
   <ul>
     <li>AWS CDK公式 <a href="https://docs.aws.amazon.com/cdk/v2/guide/tokens.html">Tokens</a></li>
     <li><code>Token.asString()</code> / <code>Token.asNumber()</code> / <code>Token.asList()</code> で生成</li>
-    <li>型はstring (or number / list) に偽装、内部にplaceholder文字列 <code>${Token[Bucket.Arn.0]}</code> を持つ</li>
+    <li>型はstring (or number / list)に偽装、内部にplaceholder文字列 <code>${Token[Bucket.Arn.0]}</code> を持つ</li>
     <li>synth時にCFNテンプレートの <code>Fn::GetAtt</code>, <code>Fn::Join</code> 等に変換される</li>
     <li>型システムは助けない: <code>bucket.bucketArn.split(':')[5]</code> のようなstring操作は呼べてしまうが意図通り動かないことが多い</li>
   </ul>
@@ -1020,32 +1020,32 @@
   <ul>
     <li><code>Value</code> enum: <code>String, Int, Float, Bool, List, Map, ResourceRef { path }, Interpolation(parts), FunctionCall { name, args }, Secret, Closure</code> (<code>carina-core/src/resource.rs:173-216</code>)</li>
     <li><code>Value::Unknown</code> バリアントは存在しない</li>
-    <li>resolver (<code>carina-core/src/resolver.rs</code>) の挙動:
+    <li>resolver (<code>carina-core/src/resolver.rs</code>)の挙動:
       <ul>
         <li><strong><code>ResourceRef</code></strong>: stateから解決できれば具体値に置換、できなければRefのまま</li>
-        <li><strong><code>Interpolation</code></strong>: 全パーツが解決できればStringに連結、未解決パーツが残れば <code>Interpolation</code> のまま</li>
-        <li><strong><code>FunctionCall</code></strong>: 全引数が解決できれば即評価、未解決引数が残れば <code>FunctionCall</code> のまま (部分評価)</li>
+        <li><strong><code>Interpolation</code></strong>:全パーツが解決できればStringに連結、未解決パーツが残れば <code>Interpolation</code> のまま</li>
+        <li><strong><code>FunctionCall</code></strong>:全引数が解決できれば即評価、未解決引数が残れば <code>FunctionCall</code> のまま(部分評価)</li>
       </ul>
     </li>
-    <li><code>for</code> 式が未解決なiterableを持つ場合: <code>DeferredForExpression</code> として <code>deferred_for_expressions</code> に退避 (<code>carina-core/src/parser/mod.rs:531</code>)</li>
-    <li><code>expand_deferred_for_expressions()</code> でupstream_state (他プロジェクトのstate) から解決できれば展開、できなければdeferredのままplan表示に回される (<code>carina-cli/src/display.rs:248-251</code>)</li>
+    <li><code>for</code> 式が未解決なiterableを持つ場合: <code>DeferredForExpression</code> として <code>deferred_for_expressions</code> に退避(<code>carina-core/src/parser/mod.rs:531</code>)</li>
+    <li><code>expand_deferred_for_expressions()</code> でupstream_state (他プロジェクトのstate)から解決できれば展開、できなければdeferredのままplan表示に回される(<code>carina-cli/src/display.rs:248-251</code>)</li>
   </ul>
 
-  <h4>型システムの拡張 (refinement / sum type / phantom type)</h4>
+  <h4>型システムの拡張(refinement / sum type / phantom type)</h4>
 
   <p>Carinaの <code>AttributeType</code>:</p>
   <ul>
     <li><code>Union { members }</code>: sum type</li>
     <li><code>StringEnum { values, namespace }</code>: enum</li>
     <li><code>Custom { base, validate, pattern, length, semantic_name, namespace }</code>: nominal refinement type (base + 実行時述語 + 名前)</li>
-    <li><code>Struct { name, fields: Vec&lt;StructField&gt; }</code>: 構造体型</li>
+    <li><code>Struct { name, fields: Vec&lt;StructField&gt; }</code>:構造体型</li>
   </ul>
 
   <p>cty (Terraform):</p>
   <ul>
     <li>string/number/list/map/object/tuple</li>
     <li>sum type / refinement typeは構築子としてない</li>
-    <li>enumはstring + OneOf validatorで表現 (型としてはstringのまま)</li>
+    <li>enumはstring + OneOf validatorで表現(型としてはstringのまま)</li>
   </ul>
 
   <p>Pulumi schema:</p>
@@ -1060,7 +1060,7 @@
     <li><code>Bucket | undefined</code> のようなunionは書けるが、CFN schemaの表現力には制約あり</li>
   </ul>
 
-  <h4>CDK Token vs Pulumi Output&lt;T&gt; 対比 (章3の核心の1つ)</h4>
+  <h4>CDK Token vs Pulumi Output&lt;T&gt;対比(章3の核心の1つ)</h4>
 
   <div class="scroll">
     <table>
@@ -1069,75 +1069,75 @@
       </thead>
       <tbody>
         <tr><td>型</td><td><code>string</code> (普通の文字列に偽装)</td><td><code>Output&lt;string&gt;</code> (独立した型)</td></tr>
-        <tr><td>文字列補間</td><td><code>${bucket.arn}</code> がそのまま書ける (普通のstring補間)</td><td><code>pulumi.interpolate`${bucket.arn}`</code> を経由する必要あり</td></tr>
+        <tr><td>文字列補間</td><td><code>${bucket.arn}</code> がそのまま書ける(普通のstring補間)</td><td><code>pulumi.interpolate`${bucket.arn}`</code> を経由する必要あり</td></tr>
         <tr><td>stringメソッド</td><td>呼べてしまうが意図通り動かないことがある</td><td>型エラーで呼べない</td></tr>
-        <tr><td>条件分岐</td><td>synth時のToken値で分岐になる (実値で分岐できない)</td><td><code>apply()</code> で実値が確定してから分岐できる</td></tr>
-        <tr><td>「うっかり間違い」</td><td>起きる (型システムが助けない)</td><td>防げる (型システムが強制)</td></tr>
-        <tr><td>書く時の負担</td><td>軽い (普通の文字列として書ける)</td><td>重い (<code>apply</code> / <code>interpolate</code> を経由)</td></tr>
+        <tr><td>条件分岐</td><td>synth時のToken値で分岐になる(実値で分岐できない)</td><td><code>apply()</code> で実値が確定してから分岐できる</td></tr>
+        <tr><td>「うっかり間違い」</td><td>起きる(型システムが助けない)</td><td>防げる(型システムが強制)</td></tr>
+        <tr><td>書く時の負担</td><td>軽い(普通の文字列として書ける)</td><td>重い(<code>apply</code> / <code>interpolate</code> を経由)</td></tr>
       </tbody>
     </table>
   </div>
 
   <h3>先行ドキュメントとの接続</h3>
 
-  <p>先行ドキュメント (<code>carina-rs/carina</code> の <a href="https://github.com/carina-rs/carina/blob/main/docs/explorations/2026-04-24-terraform-carina-hcl-limits.md"><code>docs/explorations/2026-04-24-terraform-carina-hcl-limits.md</code></a>) §2-4で:</p>
+  <p>先行ドキュメント(<code>carina-rs/carina</code> の <a href="https://github.com/carina-rs/carina/blob/main/docs/explorations/2026-04-24-terraform-carina-hcl-limits.md"><code>docs/explorations/2026-04-24-terraform-carina-hcl-limits.md</code></a>) §2-4で:</p>
 
   <ul>
-    <li>Terraformのcty.Value + unknownフラグ、msgpack ext typeシリアライゼーション、refinements (1.6+) を整理済み</li>
-    <li>Carinaの式木保持 (ResourceRef / Interpolation / FunctionCall)、deferred for-expressionを整理済み</li>
-    <li>「値 + フラグ」(Terraform) vs 「式木そのまま」(Carina) の構造的差を整理済み</li>
+    <li>Terraformのcty.Value + unknownフラグ、msgpack ext typeシリアライゼーション、refinements (1.6+)を整理済み</li>
+    <li>Carinaの式木保持(ResourceRef / Interpolation / FunctionCall)、deferred for-expressionを整理済み</li>
+    <li>「値 + フラグ」(Terraform) vs「式木そのまま」(Carina)の構造的差を整理済み</li>
   </ul>
 
   <p>これらを章3の素材として活用する。CDK Token / Pulumi Output&lt;T&gt;の対比が先行ドキュメントの未確認箇所だったので、本章で補完する。</p>
 
-  <h3>起こりうるサブ節 (案)</h3>
+  <h3>起こりうるサブ節(案)</h3>
 
   <ul>
-    <li>3-1. schema表現の語彙 (cty / CFN schema / Pulumi schema / Carina AttributeType)</li>
-    <li>3-2. ユーザ側の型システム (DSLのtype / TSの型 / 型レベル制約)</li>
-    <li>3-3. unknown値の表現と伝播 (Token / Output&lt;T&gt; / 式木 / refinements)</li>
-    <li>3-4. 型システムによる強制 vs 規約による回避</li>
-    <li>3-5. 章1との接続 (<code>Output&lt;T&gt;</code> は「内部DSLの型レベル制約」の典型例)</li>
+    <li>3-1. schema表現の語彙(cty / CFN schema / Pulumi schema / Carina AttributeType)</li>
+    <li>3-2.ユーザ側の型システム(DSLのtype / TSの型 / 型レベル制約)</li>
+    <li>3-3. unknown値の表現と伝播(Token / Output&lt;T&gt; / 式木 / refinements)</li>
+    <li>3-4.型システムによる強制vs規約による回避</li>
+    <li>3-5.章1との接続(<code>Output&lt;T&gt;</code> は「内部DSLの型レベル制約」の典型例)</li>
   </ul>
 
   <h3>未確認の論点</h3>
 
   <ul>
-    <li>Pulumi schemaの表現力 (enum / oneOf / refinementの扱い、provider間の差)</li>
-    <li>CDKのjsiiでTS型をPython/Java/Goにbridgingする時の精度 (型情報の損失があるか)</li>
-    <li>Pkl / Bicep / KCL / Cue等の比較 (本ドキュメントでは深追いしない方針)</li>
+    <li>Pulumi schemaの表現力(enum / oneOf / refinementの扱い、provider間の差)</li>
+    <li>CDKのjsiiでTS型をPython/Java/Goにbridgingする時の精度(型情報の損失があるか)</li>
+    <li>Pkl / Bicep / KCL / Cue等の比較(本ドキュメントでは深追いしない方針)</li>
   </ul>
 
-  <h2 id="ch4">章4: 状態の所有と運用責任 <span class="status">探索メモ・本文未着手</span></h2>
+  <h2 id="ch4">章4:状態の所有と運用責任 <span class="status">探索メモ・本文未着手</span></h2>
 
   <div class="draft">
-    <p><strong>ステータス: 探索メモ (本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
+    <p><strong>ステータス:探索メモ(本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
   </div>
 
   <h3>主題</h3>
 
-  <p>state (apply後の現状記録) を誰が保持し、refresh/drift detection/lock/暗号化等の運用責任を誰が担うか。設計判断としては「自前stateを持つか、他のシステムに委譲するか」が中心。</p>
+  <p>state (apply後の現状記録)を誰が保持し、refresh/drift detection/lock/暗号化等の運用責任を誰が担うか。設計判断としては「自前stateを持つか、他のシステムに委譲するか」が中心。</p>
 
   <h3>取り上げる論点</h3>
 
   <h4>章1 §1-3-6から送られた論点</h4>
 
   <ul>
-    <li><strong>state操作</strong>: ユーザが手動編集できるか / 規約で縛るか</li>
+    <li><strong>state操作</strong>:ユーザが手動編集できるか / 規約で縛るか</li>
   </ul>
 
-  <h4>章1 §1-2 / §1-3-2で言及した論点 (詳細はここで)</h4>
+  <h4>章1 §1-2 / §1-3-2で言及した論点(詳細はここで)</h4>
 
   <ul>
-    <li><strong>CDK Stack</strong> = root module相当。CDKはstateを持たずCFNサービスに委譲 (<code>apply</code>/<code>up</code>/<code>deploy</code> の対象となるデプロイ単位)</li>
-    <li><strong>Pulumi Stack</strong> = 設定単位。Pulumi service / S3 / local backendにstate (checkpoint) 保存</li>
-    <li><strong>Terraform / Carina</strong> = 自前state (<code>tfstate</code> / <code>carina.state.json</code>) をS3 / local等のbackendに保存</li>
+    <li><strong>CDK Stack</strong> = root module相当。CDKはstateを持たずCFNサービスに委譲(<code>apply</code>/<code>up</code>/<code>deploy</code> の対象となるデプロイ単位)</li>
+    <li><strong>Pulumi Stack</strong> = 設定単位。Pulumi service / S3 / local backendにstate (checkpoint)保存</li>
+    <li><strong>Terraform / Carina</strong> = 自前state (<code>tfstate</code> / <code>carina.state.json</code>)をS3 / local等のbackendに保存</li>
     <li>ユーザがstateを手動編集できるか:
       <ul>
-        <li>Terraform: 規約 (<code>terraform state</code> CLIはある)</li>
-        <li>CDK: 該当なし (stateを持たない、CFN側)</li>
-        <li>Pulumi: 規約 (<code>pulumi state</code> CLIで操作可)</li>
-        <li>Carina: 規約</li>
+        <li>Terraform:規約(<code>terraform state</code> CLIはある)</li>
+        <li>CDK:該当なし(stateを持たない、CFN側)</li>
+        <li>Pulumi:規約(<code>pulumi state</code> CLIで操作可)</li>
+        <li>Carina:規約</li>
       </ul>
     </li>
   </ul>
@@ -1156,7 +1156,7 @@
           <td>tfstate (JSON)</td>
           <td><code>terraform refresh</code> (applyに統合)</td>
           <td><code>terraform plan</code> で検出</td>
-          <td>backendが提供 (S3 + DynamoDB等)</td>
+          <td>backendが提供(S3 + DynamoDB等)</td>
           <td>backend依存</td>
         </tr>
         <tr>
@@ -1170,7 +1170,7 @@
         </tr>
         <tr>
           <td>Pulumi</td>
-          <td>自前 (Pulumi service / S3 / local)</td>
+          <td>自前(Pulumi service / S3 / local)</td>
           <td>checkpoint (JSON)</td>
           <td><code>pulumi refresh</code></td>
           <td><code>pulumi preview</code> で検出</td>
@@ -1195,15 +1195,15 @@
   <ul>
     <li><strong>state所有の選択</strong>:
       <ul>
-        <li>自前 (Terraform / Pulumi / Carina): backend設計の自由度、運用責任を負う</li>
-        <li>委譲 (CDK → CFN): 運用がCFN側に委ねられ、ロック/drift/暗号化を任せられる代わりにCFNにロックインされる</li>
+        <li>自前(Terraform / Pulumi / Carina): backend設計の自由度、運用責任を負う</li>
+        <li>委譲(CDK → CFN):運用がCFN側に委ねられ、ロック/drift/暗号化を任せられる代わりにCFNにロックインされる</li>
       </ul>
     </li>
     <li><strong>state操作の手段</strong>:
       <ul>
-        <li>Terraform: <code>state mv</code> / <code>state rm</code> / <code>import</code> / 手動JSON編集 (非推奨)</li>
+        <li>Terraform: <code>state mv</code> / <code>state rm</code> / <code>import</code> / 手動JSON編集(非推奨)</li>
         <li>Pulumi: <code>pulumi state delete</code> / <code>pulumi stack export</code> / <code>pulumi stack import</code></li>
-        <li>CDK: 該当なし (CFNコンソール / CLI経由)</li>
+        <li>CDK:該当なし(CFNコンソール / CLI経由)</li>
         <li>Carina: <span class="todo">(要確認)</span></li>
       </ul>
     </li>
@@ -1241,20 +1241,20 @@
   <h4>Carina</h4>
   <ul>
     <li>state v3: <code>carina-state</code> crate</li>
-    <li>binding/dependency_bindings: 章5のidentity議論にも関係</li>
+    <li>binding/dependency_bindings:章5のidentity議論にも関係</li>
     <li>state CLI / 手動編集機構: <span class="todo">要確認</span></li>
   </ul>
 
   <h3>既調査の補足素材</h3>
 
-  <h4>Carina特有: Plan&lt;Effect&gt; 同一プロセス内加工</h4>
+  <h4>Carina特有: Plan&lt;Effect&gt;同一プロセス内加工</h4>
 
   <p>先行ドキュメント <code>2026-04-24-terraform-carina-hcl-limits.md</code> §3-3で触れた:</p>
 
   <ul>
-    <li>Terraform: state blocks (<code>moved</code>/<code>removed</code>/<code>import</code>) の処理が分散 (pre-planでmoved、graph内でremoved/import)</li>
+    <li>Terraform: state blocks (<code>moved</code>/<code>removed</code>/<code>import</code>)の処理が分散(pre-planでmoved、graph内でremoved/import)</li>
     <li>Carina: <code>Plan&lt;Effect&gt;</code> 生成後に <code>add_state_block_effects()</code> でstate blocksを統一的に反映</li>
-    <li>「plan完成前/中にstate/graphに吸収する」(Terraform) vs 「plan完成後に統一加工」(Carina) の設計思想差</li>
+    <li>「plan完成前/中にstate/graphに吸収する」(Terraform) vs「plan完成後に統一加工」(Carina)の設計思想差</li>
   </ul>
 
   <p>これは章4の主要論点として展開可能。</p>
@@ -1262,62 +1262,62 @@
   <h4>stateの「所有」と「運用責任」の対比</h4>
 
   <ul>
-    <li>所有 = どこにデータがあるか (Terraform/Pulumi/Carina = 自前、CDK = CFN)</li>
-    <li>運用責任 = lock/暗号化/migrationを誰が担うか (Terraform/Pulumi = ユーザがbackendを設定、CDK = CFNに委ねる)</li>
+    <li>所有 = どこにデータがあるか(Terraform/Pulumi/Carina = 自前、CDK = CFN)</li>
+    <li>運用責任 = lock/暗号化/migrationを誰が担うか(Terraform/Pulumi = ユーザがbackendを設定、CDK = CFNに委ねる)</li>
   </ul>
 
-  <p>この2軸は同じツールでも分離できる (例: Pulumi serviceを使うと所有は自前だが運用責任の多くはPulumi社に委ねる)。</p>
+  <p>この2軸は同じツールでも分離できる(例: Pulumi serviceを使うと所有は自前だが運用責任の多くはPulumi社に委ねる)。</p>
 
-  <h3>起こりうるサブ節 (案)</h3>
+  <h3>起こりうるサブ節(案)</h3>
 
   <ul>
-    <li>4-1. stateの所有 (自前 vs 委譲)</li>
-    <li>4-2. 運用責任の所在 (lock / drift / 暗号化 / migration)</li>
-    <li>4-3. state操作の機構 (<code>terraform state</code> / <code>pulumi state</code> / CFNコンソール / Carina)</li>
-    <li>4-4. state加工の自由度 (Terraformの分散 vs Carinaの <code>add_state_block_effects</code> 統一)</li>
-    <li>4-5. 章1 / 5との接続 (Stack/root module = stateの単位、identity = state内の参照)</li>
+    <li>4-1. stateの所有(自前vs委譲)</li>
+    <li>4-2.運用責任の所在(lock / drift / 暗号化 / migration)</li>
+    <li>4-3. state操作の機構(<code>terraform state</code> / <code>pulumi state</code> / CFNコンソール / Carina)</li>
+    <li>4-4. state加工の自由度(Terraformの分散vs Carinaの <code>add_state_block_effects</code> 統一)</li>
+    <li>4-5.章1 / 5との接続(Stack/root module = stateの単位、identity = state内の参照)</li>
   </ul>
 
   <h3>未確認の論点</h3>
 
   <ul>
-    <li>Carinaのstate v3の詳細 (binding/dependency_bindingsの意味、state CLI、手動編集機構、refresh機構の有無)</li>
-    <li>Pulumi serviceの運用責任範囲 (具体的に何をPulumi社が担うか)</li>
+    <li>Carinaのstate v3の詳細(binding/dependency_bindingsの意味、state CLI、手動編集機構、refresh機構の有無)</li>
+    <li>Pulumi serviceの運用責任範囲(具体的に何をPulumi社が担うか)</li>
     <li>CFN drift detectionの精度と限界</li>
     <li><code>terraform state rm</code> 後のresource復元方法、<code>pulumi state delete</code> 後の復元方法</li>
-    <li>multi-region / multi-account state設計 (本ドキュメントでは深追いしない方針か?)</li>
-    <li>secret値がstateにどう保存されるか (Pulumi secret機構との接続、章3との関係)</li>
+    <li>multi-region / multi-account state設計(本ドキュメントでは深追いしない方針か?)</li>
+    <li>secret値がstateにどう保存されるか(Pulumi secret機構との接続、章3との関係)</li>
   </ul>
 
   <h2 id="ch5">章5: identityとrefactoring安定性 <span class="status">探索メモ・本文未着手</span></h2>
 
   <div class="draft">
-    <p><strong>ステータス: 探索メモ (本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。章1の議論で <strong>最も具体例が出揃っている章</strong> で、本文化の準備が比較的進んでいる。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
+    <p><strong>ステータス:探索メモ(本文未着手)。</strong> 章1執筆中に「他章送り」として整理した論点と既調査の素材を集約したもの。章1の議論で <strong>最も具体例が出揃っている章</strong> で、本文化の準備が比較的進んでいる。以下は本文ではなく、論点リスト・ソース調査ポインタ・節構成案である。</p>
   </div>
 
   <h3>主題</h3>
 
-  <p>「何を同一資源と見なすか」(identity) の規則と、コード構造を変えた時 (rename / move / refactor) にどこまで耐えるかの設計判断。stateの話 (章4) とは別の独立軸。</p>
+  <p>「何を同一資源と見なすか」(identity)の規則と、コード構造を変えた時(rename / move / refactor)にどこまで耐えるかの設計判断。stateの話(章4)とは別の独立軸。</p>
 
   <h3>取り上げる論点</h3>
 
   <h4>章1 §1-3-6から送られた論点</h4>
 
   <ul>
-    <li><strong>リソース識別子の所在</strong>: ユーザが書くか / ツールが自動生成するか
+    <li><strong>リソース識別子の所在</strong>:ユーザが書くか / ツールが自動生成するか
       <ul>
-        <li>Terraform/Carina (named) はユーザ制御</li>
-        <li>CDK/Pulumi/Carina (anonymous) はツール側のランタイム自動加工</li>
+        <li>Terraform/Carina (named)はユーザ制御</li>
+        <li>CDK/Pulumi/Carina (anonymous)はツール側のランタイム自動加工</li>
       </ul>
     </li>
   </ul>
 
-  <h4>章1 §1-2で言及した論点 (詳細はここで)</h4>
+  <h4>章1 §1-2で言及した論点(詳細はここで)</h4>
 
   <ul>
     <li><strong>CDK Construct <code>node.path</code></strong>: scope列を <code>/</code> 区切りで連結する仕様</li>
     <li><strong>Pulumi <code>opts.parent</code></strong>: URNのtype部に親typeが連結される</li>
-    <li><strong>Stack/root module</strong>: デプロイ単位かつ「複数リソースを束ねる抽象化」、章5で深掘り</li>
+    <li><strong>Stack/root module</strong>:デプロイ単位かつ「複数リソースを束ねる抽象化」、章5で深掘り</li>
   </ul>
 
   <h4>章1 §1-3-2表の「リソース識別子」行から送られた論点</h4>
@@ -1326,15 +1326,15 @@
     <li>Terraform: resource addressは <code>&lt;type&gt;.&lt;ラベル&gt;</code> で、ユーザが書いたラベルがそのまま使われる、ハッシュ化なし</li>
     <li>CDK: CFN論理IDはconstruct path → MD5ハッシュで自動生成、<code>overrideLogicalId()</code> で明示制御可</li>
     <li>Pulumi: URNはlogical name + parent type等をengineが組み立て、<code>aliases</code> で歴史的同一性を保てる</li>
-    <li>Carina: named bindingはbinding名そのまま (ハッシュなし)、anonymousはcontent-based hashで自動生成</li>
+    <li>Carina: named bindingはbinding名そのまま(ハッシュなし)、anonymousはcontent-based hashで自動生成</li>
   </ul>
 
   <h4>章1 §1-3-2表後の段落で送られた論点</h4>
 
   <p><strong>リソース識別子をユーザが日常的に意識する頻度</strong>:</p>
   <ul>
-    <li>Terraform/Carina: 別リソースから参照するためにコードに直接書く → 常時意識</li>
-    <li>CDK/Pulumi: ホスト言語の変数 (<code>const bucket = new s3.Bucket(...)</code> の <code>bucket</code>) 経由で参照、識別子は運用時 (cdk diff・コンソール・state操作・cross-stack reference・override・import) に表面化</li>
+    <li>Terraform/Carina:別リソースから参照するためにコードに直接書く → 常時意識</li>
+    <li>CDK/Pulumi:ホスト言語の変数(<code>const bucket = new s3.Bucket(...)</code> の <code>bucket</code>)経由で参照、識別子は運用時(cdk diff・コンソール・state操作・cross-stack reference・override・import)に表面化</li>
   </ul>
 
   <h4>4ツールのidentity概観</h4>
@@ -1348,13 +1348,13 @@
         <tr>
           <td>Terraform</td>
           <td>resource address (<code>aws_s3_bucket.foo</code>)</td>
-          <td>ユーザ制御 (<code>&lt;type&gt;.&lt;ラベル&gt;</code>)</td>
+          <td>ユーザ制御(<code>&lt;type&gt;.&lt;ラベル&gt;</code>)</td>
           <td><code>moved</code> ブロックでリネーム/移動を吸収</td>
         </tr>
         <tr>
           <td>CDK</td>
           <td>CFN論理ID (例: <code>MyBucketF68F3FF0</code>)</td>
-          <td>construct pathのMD5ハッシュ先頭8桁 (大文字16進)。L2は内部でid <code>Resource</code> のCfnBucketを生成するためpath長2で必ずハッシュが付く。stack直下のL1のみ例外的にハッシュなし</td>
+          <td>construct pathのMD5ハッシュ先頭8桁(大文字16進)。L2は内部でid <code>Resource</code> のCfnBucketを生成するためpath長2で必ずハッシュが付く。stack直下のL1のみ例外的にハッシュなし</td>
           <td><code>overrideLogicalId()</code> で明示制御可、<code>cdk refactor</code> <span class="todo">(新機能?)</span></td>
         </tr>
         <tr>
@@ -1365,7 +1365,7 @@
         </tr>
         <tr>
           <td>Carina</td>
-          <td>named: binding名 (ラベルそのまま) / anonymous: content-based hash (SimHash 16 hex、create-only attrsからstandard hash 8 hexも)</td>
+          <td>named: binding名(ラベルそのまま) / anonymous: content-based hash (SimHash 16 hex、create-only attrsからstandard hash 8 hexも)</td>
           <td>namedはユーザ制御、anonymousは <code>compute_anonymous_identifiers</code> でcontent-based自動生成</td>
           <td><span class="todo">(要確認: rename機構、<code>moved</code> 相当の有無)</span></td>
         </tr>
@@ -1373,16 +1373,16 @@
     </table>
   </div>
 
-  <h3>物理リソース名との関係 (重要な区別)</h3>
+  <h3>物理リソース名との関係(重要な区別)</h3>
 
-  <p>論理ID/URN/binding名は<strong>state/IR内部の識別子</strong>で、AWS上の物理リソース名 (S3 bucket名、IAM Role名等) とは別物。ただし関係はある:</p>
+  <p>論理ID/URN/binding名は<strong>state/IR内部の識別子</strong>で、AWS上の物理リソース名(S3 bucket名、IAM Role名等)とは別物。ただし関係はある:</p>
 
   <ul>
-    <li><strong>リソース名を明示指定</strong> (CDKの <code>bucketName</code>、Carinaの <code>name</code> 属性等) すれば、物理名は完全に制御できる。論理ID/URNとは独立</li>
-    <li><strong>リソース名を省略</strong> すると、CFNは <code>&lt;stack&gt;-&lt;logicalId&gt;-&lt;random&gt;</code> 形式 (例: <code>mystack-mybucketf68f3ff0-abc123xyz</code>) で自動生成。<strong>論理IDが物理名にサフィックスとして埋め込まれる</strong></li>
+    <li><strong>リソース名を明示指定</strong> (CDKの <code>bucketName</code>、Carinaの <code>name</code> 属性等)すれば、物理名は完全に制御できる。論理ID/URNとは独立</li>
+    <li><strong>リソース名を省略</strong> すると、CFNは <code>&lt;stack&gt;-&lt;logicalId&gt;-&lt;random&gt;</code> 形式(例: <code>mystack-mybucketf68f3ff0-abc123xyz</code>)で自動生成。<strong>論理IDが物理名にサフィックスとして埋め込まれる</strong></li>
   </ul>
 
-  <p>CDK/Pulumi命名の比較 (確認済み):</p>
+  <p>CDK/Pulumi命名の比較(確認済み):</p>
 
   <div class="scroll">
     <table>
@@ -1391,29 +1391,29 @@
       </thead>
       <tbody>
         <tr><td>形式</td><td><code>&lt;stack&gt;-&lt;logicalId&gt;-&lt;random&gt;</code></td><td><code>&lt;logicalName&gt;-&lt;7hex&gt;</code> (terraform-bridgeベース)</td></tr>
-        <tr><td>例 (<code>new ... ("mybucket")</code>)</td><td><code>mystack-mybucketf68f3ff0-abc123xyz</code></td><td><code>mybucket-d7c2fa0</code></td></tr>
+        <tr><td>例(<code>new ... ("mybucket")</code>)</td><td><code>mystack-mybucketf68f3ff0-abc123xyz</code></td><td><code>mybucket-d7c2fa0</code></td></tr>
         <tr><td>stack名を含む</td><td>はい</td><td>いいえ</td></tr>
-        <tr><td>論理IDのhashを含む</td><td>はい (<code>MyBucketF68F3FF0</code>)</td><td>いいえ (logical nameそのまま)</td></tr>
+        <tr><td>論理IDのhashを含む</td><td>はい(<code>MyBucketF68F3FF0</code>)</td><td>いいえ(logical nameそのまま)</td></tr>
       </tbody>
     </table>
   </div>
 
   <p>→ Pulumiの方がCDKよりユーザフレンドリー。</p>
 
-  <p>物理名長の問題 (CDK特有):</p>
+  <p>物理名長の問題(CDK特有):</p>
   <ul>
-    <li>AWSリソース名の長さ制限 (S3 63文字、IAM Role 64文字、Lambda Function 64文字、ALB Target Group <strong>32文字</strong> 等) で切り詰められる</li>
+    <li>AWSリソース名の長さ制限(S3 63文字、IAM Role 64文字、Lambda Function 64文字、ALB Target Group <strong>32文字</strong> 等)で切り詰められる</li>
     <li>例: <code>MyAppProductionStack-MyServiceTargetGroupF68F3FF0</code> 51文字がALB TGの32文字制限で <code>MyAppProductionStaMyServ-XXXXXXXX</code> のように真ん中削り</li>
     <li>元の意味のある部分が削られて識別がより困難になる</li>
   </ul>
 
   <p>物理名問題の運用面の弊害:</p>
   <ul>
-    <li>認知負荷 (一覧で何のbucketか分からない)</li>
-    <li>コミュニケーション摩擦 (ハッシュ付き名前を口頭/Issueで共有しにくい)</li>
-    <li>ドキュメント乖離 (設計時の名前と運用時の名前のズレ)</li>
-    <li>クロスサービス連携の不便 (IAMポリシーで正確な名前が必要)</li>
-    <li>URL/ドメインの見栄え (S3 website / CloudFront originでURLに直接出る)</li>
+    <li>認知負荷(一覧で何のbucketか分からない)</li>
+    <li>コミュニケーション摩擦(ハッシュ付き名前を口頭/Issueで共有しにくい)</li>
+    <li>ドキュメント乖離(設計時の名前と運用時の名前のズレ)</li>
+    <li>クロスサービス連携の不便(IAMポリシーで正確な名前が必要)</li>
+    <li>URL/ドメインの見栄え(S3 website / CloudFront originでURLに直接出る)</li>
   </ul>
 
   <h3>ソース調査ポインタ</h3>
@@ -1421,17 +1421,17 @@
   <h4>CDK論理ID</h4>
   <ul>
     <li><code>aws/constructs</code> リポジトリの <code>src/construct.ts:503</code> (<code>Construct</code> クラス)</li>
-    <li><code>node.path</code>: scope列を <code>/</code> 区切りで連結 (<code>construct.ts:92-100</code>)</li>
+    <li><code>node.path</code>: scope列を <code>/</code> 区切りで連結(<code>construct.ts:92-100</code>)</li>
     <li><code>Stack.allocateLogicalId</code> (<code>packages/aws-cdk-lib/core/lib/stack.ts:1393-1398</code>)</li>
     <li><code>makeUniqueId()</code> (<code>packages/aws-cdk-lib/core/lib/private/uniqueid.ts:21-23, 65-83</code>)
       <ul>
-        <li>MD5(path.join('/')) の先頭8文字を大文字16進</li>
-        <li>removeNonAlphanumeric(各component).join('') を最大240文字に切ったもの + 8文字ハッシュ (合計 ≤ 255)</li>
-        <li>親stack名はpathに含まれない (stack単位でローカル)</li>
+        <li>MD5(path.join('/'))の先頭8文字を大文字16進</li>
+        <li>removeNonAlphanumeric(各component).join('')を最大240文字に切ったもの + 8文字ハッシュ(合計 ≤ 255)</li>
+        <li>親stack名はpathに含まれない(stack単位でローカル)</li>
         <li><code>Default</code> は完全除外、<code>Resource</code> はhuman portionからは除かれるがハッシュには含まれる</li>
       </ul>
     </li>
-    <li>ハッシュなし条件 (<code>uniqueid.ts:34-63</code>): components.length === 1かつ非英数字除去後が255文字以内、stack直下のL1のみ</li>
+    <li>ハッシュなし条件(<code>uniqueid.ts:34-63</code>): components.length === 1かつ非英数字除去後が255文字以内、stack直下のL1のみ</li>
     <li>Escape hatches (CDK refactor関連): <a href="https://docs.aws.amazon.com/cdk/v2/guide/cfn-layer.html">Customize constructs</a>
       <ul>
         <li><code>node.defaultChild</code> でL1取得</li>
@@ -1445,22 +1445,22 @@
   <ul>
     <li>フォーマット: <code>urn:pulumi:&lt;Stack&gt;::&lt;Project&gt;::&lt;Qualified$Type$Name&gt;::&lt;Name&gt;</code> (<code>sdk/go/common/resource/urn/urn.go:38</code>)</li>
     <li>区切り文字: <code>NameDelimiter = "::"</code>, <code>TypeDelimiter = "$"</code> (L54-55)</li>
-    <li>親type連結ロジック (L80-93):
+    <li>親type連結ロジック(L80-93):
 <pre><code>if parentType != "" &amp;&amp; parentType != tokens.RootStackType {
     typ = string(parentType) + TypeDelimiter + typ
 }</code></pre>
     </li>
     <li><code>aliases</code> で旧URNを保持: <span class="todo">docsを要確認</span></li>
-    <li>physical name生成 (<code>pulumi-terraform-bridge/pkg/tfbridge/names.go:181-185</code>): "8 character random suffix ('-' + 7 random chars)"</li>
+    <li>physical name生成(<code>pulumi-terraform-bridge/pkg/tfbridge/names.go:181-185</code>): "8 character random suffix ('-' + 7 random chars)"</li>
   </ul>
 
   <h4>Terraform resource address</h4>
   <ul>
-    <li><code>&lt;type&gt;.&lt;label&gt;</code> 形式 (例: <code>aws_s3_bucket.foo</code>)</li>
+    <li><code>&lt;type&gt;.&lt;label&gt;</code> 形式(例: <code>aws_s3_bucket.foo</code>)</li>
     <li>module内: <code>module.network.aws_s3_bucket.foo</code></li>
     <li><code>for_each</code> 付き: <code>aws_s3_bucket.foo["key"]</code></li>
     <li><code>count</code> 付き: <code>aws_s3_bucket.foo[0]</code></li>
-    <li><code>moved</code> ブロック (Terraform 1.1+): リネーム/移動を吸収
+    <li><code>moved</code> ブロック(Terraform 1.1+):リネーム/移動を吸収
 <pre><code>moved {
   from = aws_s3_bucket.old
   to   = aws_s3_bucket.new
@@ -1482,26 +1482,26 @@
     <li>anonymous module call: <code>thing { name = 'alpha' }</code>
       <ul>
         <li><code>instance_prefix = thing_&lt;16hex SimHash&gt;</code></li>
-        <li>SimHashはmodule_name + flattened argumentsから決定 (content-based)</li>
+        <li>SimHashはmodule_name + flattened argumentsから決定(content-based)</li>
         <li>Hamming distance対応で小さい引数変更時もstate内のリソースを追跡可能</li>
         <li>出典: <code>carina-core/src/module_resolver/mod.rs:577-591</code></li>
       </ul>
     </li>
-    <li>リネーム自動検知: carina#2194でissue起票済み (Delete+CreateをMoveと認識、または <code>moved</code> ブロックをサジェスト)</li>
+    <li>リネーム自動検知: carina#2194でissue起票済み(Delete+CreateをMoveと認識、または <code>moved</code> ブロックをサジェスト)</li>
     <li><code>name</code> 属性とstate identifierは <strong>独立</strong> (CDK/Pulumiの自動名生成とは異なる、carina-core/src/parser/mod.rs:5395-5404)</li>
   </ul>
 
-  <h3>起こりうるサブ節 (案)</h3>
+  <h3>起こりうるサブ節(案)</h3>
 
   <ul>
-    <li>5-1. identityの生成方式 (ユーザ制御 vs ツール自動)</li>
-    <li>5-2. 物理リソース名との関係 (内部IDと物理IDの混同に注意)</li>
-    <li>5-3. 命名長と切り詰め問題 (CDK特有)</li>
-    <li>5-4. 運用面の弊害 (認知負荷・コミュニケーション・URL見栄え)</li>
-    <li>5-5. リファクタ耐性の機構 (<code>moved</code> / <code>aliases</code> / <code>overrideLogicalId</code> / Carinaの現状)</li>
-    <li>5-6. anonymous caseのcontent-based hash (Carina) の設計判断</li>
-    <li>5-7. 章4 (state) との接続 (identity = state内の参照、変わるとstate上の別リソース扱い)</li>
-    <li>5-8. 章1 (抽象化機構) との接続 (Stack/Componentの入れ子がidentityを規定)</li>
+    <li>5-1. identityの生成方式(ユーザ制御vsツール自動)</li>
+    <li>5-2.物理リソース名との関係(内部IDと物理IDの混同に注意)</li>
+    <li>5-3.命名長と切り詰め問題(CDK特有)</li>
+    <li>5-4.運用面の弊害(認知負荷・コミュニケーション・URL見栄え)</li>
+    <li>5-5.リファクタ耐性の機構(<code>moved</code> / <code>aliases</code> / <code>overrideLogicalId</code> / Carinaの現状)</li>
+    <li>5-6. anonymous caseのcontent-based hash (Carina)の設計判断</li>
+    <li>5-7.章4 (state)との接続(identity = state内の参照、変わるとstate上の別リソース扱い)</li>
+    <li>5-8.章1 (抽象化機構)との接続(Stack/Componentの入れ子がidentityを規定)</li>
   </ul>
 
   <h3>未確認の論点</h3>
@@ -1509,7 +1509,7 @@
   <ul>
     <li>CDKの <code>cdk refactor</code> の存在と機能範囲</li>
     <li>Pulumiの <code>aliases</code> の使い方詳細</li>
-    <li>Carinaの <code>moved</code> 相当機構の有無 (carina#2194の進捗)</li>
+    <li>Carinaの <code>moved</code> 相当機構の有無(carina#2194の進捗)</li>
     <li>CDKで「Construct構造を変えると論理IDが変わる」の具体例とその回避策</li>
     <li>multi-stack/multi-environmentでのidentity設計</li>
   </ul>
@@ -1525,7 +1525,7 @@
   <nav class="links">
     <h2>関連</h2>
     <ul>
-      <li><a href="https://github.com/carina-rs/carina/blob/main/docs/explorations/2026-04-24-terraform-carina-hcl-limits.md">先行ドキュメント: Terraformの限界はどこから来たか (carina-rs/carina)</a></li>
+      <li><a href="https://github.com/carina-rs/carina/blob/main/docs/explorations/2026-04-24-terraform-carina-hcl-limits.md">先行ドキュメント: Terraformの限界はどこから来たか(carina-rs/carina)</a></li>
       <li class="unwritten">宣言的とは何か</li>
     </ul>
   </nav>
