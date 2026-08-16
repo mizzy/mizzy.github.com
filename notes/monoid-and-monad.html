@@ -40,7 +40,7 @@
 
   <p><strong>モノイド</strong>は「くっつけられる」構造である。要素の集合と、二つを繋ぐ演算と、何も足さない単位元があり、繋ぎ方の順序が結果を変えない(結合律)。リストの連結が典型で、<code>[a] ++ [b] ++ [c]</code> をどう括っても <code>[a,b,c]</code> になる。</p>
 
-  <p><strong>モナド</strong>は「値を受けて次の計算を返す関数を繋げられる」構造である。<code>bind</code>(Promiseの<code>then</code>、<code>Output.apply</code>)が中心で、渡すのは値ではなく<strong>関数</strong>である。</p>
+  <p><strong>モナド</strong>は「値を受けて次の計算を返す関数を繋げられる」構造である。<code>bind</code>(Promiseの<code>then</code>、<code>Output.apply</code>)が中心で、渡すのは値ではなく<strong>関数</strong>である。定義そのものは<a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a>に書いた。</p>
 
   <figure>
     <svg viewBox="0 0 620 200" role="img" aria-label="モノイドは値を並べた列なので全要素を数えられるが、モナドはbindの右側が関数なので、その先に何が来るかを適用前には列挙できないことを示す図">
@@ -137,6 +137,7 @@
   <nav class="links">
     <h2>関連</h2>
     <ul>
+      <li><a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a></li>
       <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
       <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
       <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>

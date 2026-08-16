@@ -152,7 +152,7 @@
     <p>三つのモナド則は <a href="https://www.haskell.org/onlinereport/haskell2010/haskellch6.html#x13-1330006.3.6">Haskell 2010 Language Report §6.3.6</a> に等式として載っている。ただし<strong>左単位元 / 右単位元 / 結合律という呼び名はReportには無い</strong> — Reportは三本の等式を名前なしで並べているだけで、この名前は <a href="https://wiki.haskell.org/Typeclassopedia#Monad">Typeclassopedia</a> 以降の慣用である。</p>
     <p><code>Maybe</code> のbindは <code>GHC.Internal.Base</code> の定義そのまま。<code>List</code> は実際にはリスト内包表記 <code>xs &gt;&gt;= f = [y | x &lt;- xs, y &lt;- f x]</code> で定義されている(内包表記が <code>&gt;&gt;=</code> に脱糖されると無限ループになるため、と実装にコメントがある)。本文に書いた <code>concat (map f xs)</code> は外延的に等しい説明用の形で、baseの字面ではない。</p>
     <p>なお本文の <code>M</code> はGHCの現在の <code>Monad</code> を念頭に置いている。Haskell 2010の <code>Monad</code> クラスは <code>fail</code> を持ち <code>Applicative</code> を上位クラスに持たないので、Reportはあくまで法則の出典として引いている。</p>
-    <p>Promiseがモナド則を満たさないことは、resolveがthenableを再帰的に同化することから従う既知の議論。仕様上の該当箇所は <a href="https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-createresolvingfunctions">ECMA-262 CreateResolvingFunctions</a> で、<code>Get(resolution, "then")</code> が callable なら値として履行せず <code>NewPromiseResolveThenableJob</code> に回す。かつて "Promise Resolve Functions" と呼ばれていた節で、その名前でのアンカーは現在は別名として残っているだけである。</p>
+    <p>Promiseがモナド則を満たさないことは、resolveがthenableを再帰的に同化することから従う既知の議論。仕様上の該当箇所は <a href="https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-createresolvingfunctions">ECMA-262 CreateResolvingFunctions</a> で、<code>Get(resolution, "then")</code> がcallableなら値として履行せず <code>NewPromiseResolveThenableJob</code> に回す。かつて "Promise Resolve Functions" と呼ばれていた節で、その名前でのアンカーは現在は別名として残っているだけである。</p>
     <p><code>Output&lt;T&gt;</code> が <code>then</code> を持たないことは、Pulumiの実装位置(Proxyで <code>then</code> を <code>undefined</code> に潰す)を参照ノートに記録してある。</p>
     <p>「箱ではなく合成戦略」という言い方は説明のための整理であって、圏論側の定式化(自己関手の圏のモノイド対象)とは別の切り口である。関数モナド <code>(-&gt;) r</code> を「中に何も入っていない」と書いたのも同じく口語で、正確には値を蓄えるのではなく<strong>環境への依存</strong>が文脈になっている、という意味である(<code>instance Monad ((-&gt;) r) where f &gt;&gt;= k = \r -&gt; k (f r) r</code>)。</p>
   </div>
@@ -166,6 +166,16 @@
       <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
     </ul>
   </nav>
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    </ul>
+  </div>
+
   <p class="tags"><a href="/notes/#tag-モナド">#モナド</a> <a href="/notes/#tag-構造">#構造</a> <a href="/notes/#tag-型システム">#型システム</a></p>
 </article>
 </body>
