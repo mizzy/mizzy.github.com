@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>import / removed / moved は現実を動かさずに帳簿だけを書き換える - notes</title>
+<meta name="description" content="コードの整理が本番の作り直しになると、誰も整理しなくなる。stateだけを書き換える3つのブロックが、その結びつきを切っている。">
+<meta property="og:title" content="import / removed / moved は現実を動かさずに帳簿だけを書き換える">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/state-blocks-decouple-code-from-reality.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/state-blocks-decouple-code-from-reality.png">
+<meta property="og:description" content="コードの整理が本番の作り直しになると、誰も整理しなくなる。stateだけを書き換える3つのブロックが、その結びつきを切っている。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="import / removed / moved は現実を動かさずに帳簿だけを書き換える">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/state-blocks-decouple-code-from-reality.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>import / removed / moved は現実を動かさずに帳簿だけを書き換える</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-…/chapter-4</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p>IaCの差分エンジンは「コードとstateがずれていたら現実を動かして揃える」機械である。リソースの名前を変えればstateに無い名前が現れ、Createが出る。旧い名前はdesiredから消えるのでDeleteが出る。<strong>つまり素朴に作ると、コードの整理がそのまま本番の作り直しになる。</strong></p>
+
+  <p><code>import</code> / <code>removed</code> / <code>moved</code> はこの結びつきを切る。3つとも<strong>stateだけを書き換えて、クラウド側のAPIを一切叩かない</strong>。</p>
+
+  <figure>
+    <svg viewBox="0 0 620 200" role="img" aria-label="コードを変えると差分エンジンはCreateとDeleteを出して現実を作り直すが、state blocksはstateの登録だけを書き換えてクラウドのAPIを叩かないことを示す図">
+      <style>
+        .sb text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .sb .box  { fill: var(--surface); stroke: var(--rule); }
+        .sb .lbl  { fill: var(--faint); font-size: 11.5px; }
+        .sb .m    { font-family: var(--mono); font-size: 11.5px; fill: var(--text); }
+        .sb .arw  { stroke: var(--faint); fill: none; }
+        .sb .bad  { stroke: var(--accent-2); fill: none; }
+        .sb .badt { fill: var(--accent-2); font-size: 11.5px; }
+        .sb .okt  { fill: var(--accent); font-size: 11.5px; }
+        .sb .dim  { fill: var(--faint); font-size: 11px; }
+      </style>
+      <g class="sb">
+        <!-- 素朴な場合 -->
+        <text class="lbl" x="0" y="12">素朴に名前を変えると</text>
+
+        <rect class="box" x="0" y="24" width="104" height="34" rx="3"/>
+        <text class="m" x="52" y="45" text-anchor="middle">コード</text>
+
+        <path class="arw" d="M108 41 L154 41" marker-end="url(#a1)"/>
+        <rect class="box" x="158" y="24" width="104" height="34" rx="3"/>
+        <text class="m" x="210" y="45" text-anchor="middle">state</text>
+
+        <path class="bad" d="M266 41 L312 41" marker-end="url(#a2)"/>
+        <rect class="bad" x="316" y="24" width="150" height="34" rx="3"/>
+        <text class="badt" x="391" y="45" text-anchor="middle">Create + Delete</text>
+
+        <text class="badt" x="476" y="45">本番が作り直る</text>
+
+        <!-- state blocks の場合 -->
+        <text class="lbl" x="0" y="112">state blocks を書くと</text>
+
+        <rect class="box" x="0" y="124" width="104" height="34" rx="3"/>
+        <text class="m" x="52" y="145" text-anchor="middle">コード</text>
+
+        <path class="arw" d="M108 141 L154 141" marker-end="url(#a1)"/>
+        <rect class="box" x="158" y="124" width="104" height="34" rx="3"/>
+        <text class="m" x="210" y="145" text-anchor="middle">state</text>
+
+        <text class="dim" x="272" y="138">Create / Delete は</text>
+        <text class="dim" x="272" y="153">撤回される</text>
+
+        <text class="okt" x="410" y="145">現実は動かない</text>
+      </g>
+      <defs>
+        <marker id="a1" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" fill="var(--faint)"/>
+        </marker>
+        <marker id="a2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2)"/>
+        </marker>
+      </defs>
+    </svg>
+  </figure>
+
+  <div class="scroll narrow">
+    <table>
+      <thead>
+        <tr><th>ブロック</th><th>stateに対して</th><th>現実に対して</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>import</code></td><td>既存リソースをstateに登録する</td><td>何もしない(既にある)</td></tr>
+        <tr><td><code>removed</code></td><td>stateから登録を外す</td><td>何もしない(残り続ける)</td></tr>
+        <tr><td><code>moved</code></td><td>登録のアドレスを付け替える</td><td>何もしない(同じ物)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>なぜこれが重要か</h2>
+
+  <p>コードの構造と、動いている実体の寿命が<strong>分離できる</strong>からである。</p>
+
+  <p>この分離が無いと、リファクタリングの費用が「エディタ上の手間」ではなく「本番の停止時間」になる。名前が気に入らないだけでDBが作り直されるなら、誰も名前を直さない。モジュールを切り直すとVPCが消えるなら、構造は腐ったまま凍結される。<strong>コードの整理にリスクが乗った瞬間、整理されなくなる。</strong></p>
+
+  <p>裏返せば、この3つは「あとで直せる」を保証する機構である。IaCは一度書いたら長く生きるコードなので、最初の設計が最適であることより、<strong>後から作り替えられることのほうが効いてくる</strong>。</p>
+
+  <p><code>import</code> はさらにもう一方向を開く。<strong>IaCの外で生まれた実体を、後から管理下に入れられる。</strong> これが無いと「最初からIaCで作ったものしか管理できない」ことになり、手で作った既存環境は永久に手作業のままになる。移行の経路がある。</p>
+
+  <h2>効果としての位置づけ</h2>
+
+  <p>Carinaではこの3つも <code>Effect</code> の一種として、他の7種と同じ列に並ぶ。ただし出自が違う。差分エンジンが選ぶのは Read / Create / Update / Delete / Wait の5種で、<strong>Import / Remove / Move は差分エンジンが一切出さない</strong>。ユーザーが書いたブロックから、plan生成後の後処理(<code>add_state_block_effects</code>)が付け足す。</p>
+
+  <p>この後処理は付け足すだけでなく、差分エンジンが出した命令を<strong>撤回する</strong>。<code>removed</code> の対象に対応するDeleteを消し、<code>import</code> の対象に対応するCreateを消す。撤回こそがこの機構の本体である — 放っておけば差分エンジンが出してしまう「現実を動かす命令」を、ユーザーの宣言で取り下げている。</p>
+
+  <p>そして撤回された結果もまたplanに載る。planは効果の列という平らな値なので、「stateだけが動いて現実は動かない」ことが<strong>applyの前に目で確認できる</strong>。帳簿の書き換えが黙って起きるのではなく、命令として明示される。</p>
+
+  <h2>危うさも同じ場所から来る</h2>
+
+  <p>現実を動かさないということは、<strong>stateと現実がずれる方向にも動かせる</strong>ということでもある。<code>removed</code> を書けばリソースは残ったまま管理から外れ、誰も面倒を見ない実体になる。<code>import</code> のidを間違えれば、別の実体を掴んだまま以後のplanが嘘をつく。</p>
+
+  <p>差分エンジンの出す命令は「stateを現実に近づける」方向にしか動かないので間違えても収束するが、state blocksは<strong>その保証の外側にある</strong>。ユーザーが直接命令を書いている以上、正しさの根拠はユーザーの意図だけである。planに出ることが唯一の防波堤になる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</a></li>
+      <li><a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityとはエンジンが「同じリソース」と見なす規則である</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRがユーザーインターフェイスである</a></li>
+    </ul>
+  </nav>
+  <p class="tags">
+    <a href="/notes/#tag-state">#state</a>
+    <a href="/notes/#tag-リファクタリング">#リファクタリング</a>
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-iac">#iac</a>
+  </p>
+</article>
+</body>
+</html>
