@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>notes</title>
-<meta name="description" content="Gosuke Miyashitaのノート。IaCツールとDSLの設計についての探索記録。">
+<meta name="description" content="Gosuke Miyashita のノート。IaCツールとDSLの設計についての探索記録。">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
 </head>
@@ -22,412 +22,723 @@
   <p>考えたことを概念ごとに1枚ずつ書いて、互いにリンクしている場所。書きかけのまま置いてあるものも多い。</p>
   <p>いまのところ中身はIaCツールとDSLの設計についての、生成AIとの対話による探索記録。結論の確定ではなく論点の整理で、
   どこまで確認済みでどこからが推測かは<a href="/notes/about-these-notes-accuracy.html">これらのノートの精度について</a>にまとめてある。</p>
-  <div class="filters">
-    <button type="button" data-tag="" class="on">すべて</button>
-    <button type="button" data-tag="型システム">#型システム</button> <button type="button" data-tag="dsl">#dsl</button> <button type="button" data-tag="iac">#iac</button> <button type="button" data-tag="plan">#plan</button> <button type="button" data-tag="設計原則">#設計原則</button> <button type="button" data-tag="設計判断">#設計判断</button> <button type="button" data-tag="コンパイラ">#コンパイラ</button> <button type="button" data-tag="設計空間">#設計空間</button> <button type="button" data-tag="参照">#参照</button> <button type="button" data-tag="差分">#差分</button> <button type="button" data-tag="全域性">#全域性</button> <button type="button" data-tag="予測可能性">#予測可能性</button> <button type="button" data-tag="unknown">#unknown</button>
-  </div>
+</div>
+
+<div class="paths">
+  <h2>ここから読む</h2>
+  <p class="lead">80枚をどこから読むかは、それ自体が問題である。実際に張ってあるリンクを辿って四つの道筋を引いた。途中でどこへでも逸れてよい。</p>
+  <section class="path">
+    <h3><span class="n">1</span>予測可能性はどこから来るのか</h3>
+    <p class="lead">「実行前に結果が読める」がなぜ根本価値なのか。そこから記述自由度の話へ降りていく。</p>
+    <ol>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/ai-context-window-is-a-locality-constraint.html">AIのコンテキスト窓は人の局所読解と同質の制約である</a></li>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+    </ol>
+  </section>
+  <section class="path">
+    <h3><span class="n">2</span>planをコンパイラとして読む</h3>
+    <p class="lead">planは中間表現で、applyはリンカである。この読み替えが実バグを予言するところまで。</p>
+    <ol>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+    </ol>
+  </section>
+  <section class="path">
+    <h3><span class="n">3</span>型はどこまで守れるのか</h3>
+    <p class="lead">値ベースの全数検査という強い性質から出発して、その検査が届かない場所を特定する。</p>
+    <ol>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+    </ol>
+  </section>
+  <section class="path">
+    <h3><span class="n">4</span>何を言語に入れないか</h3>
+    <p class="lead">意味的本体はグラフだけ、という立場から、高階関数を入れないという判断まで。</p>
+    <ol>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+    </ol>
+  </section>
+</div>
+
+<div class="index-head">
+  <h2 class="all">すべてのノート <span class="count">80本</span></h2>
+</div>
+
+<div class="legend">
+  <span><i class="verified"></i>確認済み 29</span>
+  <span><i class="interpretation"></i>解釈 41</span>
+  <span><i class="normative"></i>規範 8</span>
+  <span><i class="ai-sourced"></i>AI由来 2</span>
+</div>
+
+<div class="filters">
+  <button type="button" data-tag="" class="on">すべて</button>
+  <button type="button" data-tag="型システム">#型システム</button> <button type="button" data-tag="dsl">#dsl</button> <button type="button" data-tag="iac">#iac</button> <button type="button" data-tag="plan">#plan</button> <button type="button" data-tag="設計原則">#設計原則</button> <button type="button" data-tag="設計判断">#設計判断</button> <button type="button" data-tag="コンパイラ">#コンパイラ</button> <button type="button" data-tag="設計空間">#設計空間</button> <button type="button" data-tag="参照">#参照</button> <button type="button" data-tag="差分">#差分</button> <button type="button" data-tag="全域性">#全域性</button> <button type="button" data-tag="予測可能性">#予測可能性</button> <button type="button" data-tag="unknown">#unknown</button>
 </div>
 
 <div class="cards">
-  <a class="card" href="/notes/two-by-two-is-per-freedom.html" data-tags="設計空間 比較軸 方法論" data-kind="concept">
-    <h2>ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</h2>
-    <p>「記述言語(外部DSL / 汎用言語)× 記述自由度の所在(言語が決める / 規約に委ねる)」の2×2は、暗黙に「ツール = 1象限」を前提していた。構成記述系DSL 11個を同じ枠組みで点検すると、この前提は部分的に破綻する。</p>
-    <span class="tags"><span>#設計空間</span> <span>#比較軸</span> <span>#方法論</span></span>
-  </a>
-  <a class="card" href="/notes/predictability-is-the-core-value.html" data-tags="予測可能性 iac 設計原則" data-kind="concept">
-    <h2>実行前に結果が読めることがIaCの根本価値である</h2>
-    <p>IaCの根本価値は「apply前に結果を見せる」ことにある。だから予測可能性 — 実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れること — は、他の設計軸と並ぶ一つの軸ではなく、他の判断の…</p>
-    <span class="tags"><span>#予測可能性</span> <span>#iac</span> <span>#設計原則</span></span>
-  </a>
-  <a class="card" href="/notes/plan-is-compilation.html" data-tags="iac コンパイラ plan" data-kind="concept">
-    <h2>planはコンパイルである</h2>
-    <p>carina planは、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。applyはその中間言語の実行系である。</p>
-    <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#plan</span></span>
-  </a>
-  <a class="card" href="/notes/semantic-typing.html" data-tags="型システム 型理論 cue" data-kind="concept">
-    <h2>型は値の分類器である(意味論的型付け)</h2>
-    <p>Carinaの型付けの様式は、型を「項に付く構文的な札」ではなく「値の集合(値の分類器)」とみなし、型付けを所属判定として与える意味論的型付け(semantic typing)の系譜である。</p>
-    <span class="tags"><span>#型システム</span> <span>#型理論</span> <span>#cue</span></span>
-  </a>
-  <a class="card" href="/notes/hybrid-quadrant-convergence.html" data-tags="設計空間 dsl 収束" data-kind="concept">
-    <h2>5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</h2>
-    <p>構成記述系DSL 11個を3自由度で点検すると、当初の4象限には現れていなかった第5象限が浮上する。Pkl / KCL / Dhall / Jsonnet / Nickelの5つが、独立に同じパターンへ収束している。</p>
-    <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#収束</span></span>
-  </a>
-  <a class="card" href="/notes/higher-order-functions-unnecessary.html" data-tags="高階関数 dsl 懐疑" data-kind="concept">
-    <h2>IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</h2>
-    <p>ハイブリッド象限への合流は構造的整合性の議論であって、ユーザの実需要とは別の問題である。実需要の観点から見ると、IaCで高階関数は「あれば嬉しいが必須ではない」機能かもしれない。</p>
-    <span class="tags"><span>#高階関数</span> <span>#dsl</span> <span>#懐疑</span></span>
-  </a>
-  <a class="card" href="/notes/graph-is-the-semantic-core.html" data-tags="設計原則 iac グラフ" data-kind="concept">
-    <h2>IaC言語の意味的本体はリソース定義と依存グラフだけである</h2>
-    <p>IaC言語の意味的本体は、リソースの定義と、その依存関係グラフである。それ以外のすべての言語機能は、あれば便利という程度のものにすぎない。</p>
-    <span class="tags"><span>#設計原則</span> <span>#iac</span> <span>#グラフ</span></span>
-  </a>
-  <a class="card" href="/notes/two-stage-language.html" data-tags="iac 型システム 段階分離" data-kind="concept">
-    <h2>IaC言語は二段階の言語である</h2>
-    <p>Carinaのようなインフラ記述言語は「実行時に型を検査する動的型付き言語」ではないし、古典的な静的型付き言語でもない。静的段階と動的段階という二つの段階を持つ言語として読むのが正確である。</p>
-    <span class="tags"><span>#iac</span> <span>#型システム</span> <span>#段階分離</span></span>
-  </a>
-  <a class="card" href="/notes/world-acquisition-is-the-bottleneck.html" data-tags="plan 性能 設計" data-kind="concept">
-    <h2>「信頼できるworld = 全リソースの同期GET」という等式をほどく</h2>
-    <p>IaCのコンパイルは二引数plan(source, world)である。このうちworldの取得が遅い。</p>
-    <span class="tags"><span>#plan</span> <span>#性能</span> <span>#設計</span></span>
-  </a>
-  <a class="card" href="/notes/relocation-without-verification.html" data-tags="バグクラス 型システム apply" data-kind="concept">
-    <h2>再配置後に検証がないのは型検査済みIRの不変条件の破壊である</h2>
-    <p>「well-typedなIRだけがバックエンドに渡る」というのがコンパイラの標準的な契約である。しかしapplyの再配置はIRに新しい値を書き込む。</p>
-    <span class="tags"><span>#バグクラス</span> <span>#型システム</span> <span>#apply</span></span>
-  </a>
-  <a class="card" href="/notes/compilation-takes-source-and-world.html" data-tags="iac コンパイラ 増分計算" data-kind="concept">
-    <h2>IaCのコンパイルは二引数である</h2>
-    <p>通常のコンパイラはソースだけの関数である: compile(source) = binary。IaCのコンパイルは二引数である: plan(source, state) = patch。</p>
-    <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#増分計算</span></span>
-  </a>
-  <a class="card" href="/notes/plan-is-prediction-apply-is-truth.html" data-tags="plan apply occ" data-kind="concept">
-    <h2>planは予測であり、真実はapplyが確立する</h2>
-    <p>planはロックを取らず、applyがロック下で差分を再計算する。この契約を意識的に推すと、plan時のworldの鮮度は正しさの問題ではなくUXの問題だと正当化できる。</p>
-    <span class="tags"><span>#plan</span> <span>#apply</span> <span>#occ</span></span>
-  </a>
-  <a class="card" href="/notes/make-the-broken-state-unrepresentable.html" data-tags="typestate 型安全 設計原則" data-kind="concept">
-    <h2>typestateで壊れた状態を書けなくする</h2>
-    <p>Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは一貫していて、静的段階の内部不変条件を、実装言語の型でコンパイル時に固定することである。</p>
-    <span class="tags"><span>#typestate</span> <span>#型安全</span> <span>#設計原則</span></span>
-  </a>
-  <a class="card" href="/notes/graph-shape-vs-attribute-value.html" data-tags="予測可能性 比較軸 差分" data-kind="concept">
-    <h2>予測可能性はgraph形状と属性値の二側面を持つ</h2>
-    <p>コードから読み取りたいものは二つある。graph形状(どんなリソースがいくつ、どう繋がって作られるか)と、各ノードの属性値(そのリソースが具体的にどう設定されるか)である。三つの記述自由度はどちらの側にも適用される。</p>
-    <span class="tags"><span>#予測可能性</span> <span>#比較軸</span> <span>#差分</span></span>
-  </a>
-  <a class="card" href="/notes/three-freedoms-of-description.html" data-tags="比較軸 dsl 設計判断" data-kind="concept">
-    <h2>結果予測性に効く記述自由度は三つに絞れる</h2>
-    <p>記述自由度は無数に立てられるが、「実行前にコードを読んだ時点で、resource graphの形と各ノードの属性値がどう決まるかを読み取れるか」に直接効く軸に絞ると、三つになる。</p>
-    <span class="tags"><span>#比較軸</span> <span>#dsl</span> <span>#設計判断</span></span>
-  </a>
-  <a class="card" href="/notes/locus-of-descriptive-freedom.html" data-tags="設計判断 dsl 組織" data-kind="concept">
-    <h2>記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</h2>
-    <p>ユーザーの記述自由度をどこまで許すかという設計判断は、誰が制限するかで二層に分かれる。</p>
-    <span class="tags"><span>#設計判断</span> <span>#dsl</span> <span>#組織</span></span>
-  </a>
-  <a class="card" href="/notes/static-stage-totality.html" data-tags="全域性 dsl 型システム" data-kind="concept">
-    <h2>静的段階の全域性は構文制限だけでは得られない</h2>
-    <p>「静的段階の評価が必ず停止する」という性質は、一般再帰を禁じてループを有限に限るだけでは出てこない。構文制限と参照グラフの非循環性強制という二本の柱で初めて成り立つ。</p>
-    <span class="tags"><span>#全域性</span> <span>#dsl</span> <span>#型システム</span></span>
-  </a>
-  <a class="card" href="/notes/bounded-composition-is-enough.html" data-tags="設計原則 再利用 dsl" data-kind="concept">
-    <h2>IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</h2>
-    <p>IaCが本当に必要とする再利用は、検証済みパターンのパラメータ付き合成であって、任意計算ではない。それはモジュール・for・exportsという有界な合成手段 — すべて蒸発条件を満たす — で足りる。</p>
-    <span class="tags"><span>#設計原則</span> <span>#再利用</span> <span>#dsl</span></span>
-  </a>
-  <a class="card" href="/notes/boring-verbatim-beats-clever-abstraction.html" data-tags="設計原則 可読性 iac" data-kind="concept">
-    <h2>IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</h2>
-    <p>インフラ記述の主要な読者はレビューアと将来の運用者である。彼らが問うのは「このコードは何を計算するか」ではなく「この記述から実際に何が作られるか」の判読性である。</p>
-    <span class="tags"><span>#設計原則</span> <span>#可読性</span> <span>#iac</span></span>
-  </a>
-  <a class="card" href="/notes/identity-is-what-the-engine-considers-the-same-resource.html" data-tags="identity iac リファクタリング" data-kind="concept">
-    <h2>identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</h2>
-    <p>identityとは「何を同一資源と見なすか」の規則である。stateをどこに置き誰が運用責任を負うかという問い(章4の主題)とは別の独立軸であり、同じツールでも別々に設計できる。</p>
-    <span class="tags"><span>#identity</span> <span>#iac</span> <span>#リファクタリング</span></span>
-  </a>
-  <a class="card" href="/notes/plan-as-ir-properties.html" data-tags="plan ir コンパイラ" data-kind="concept">
-    <h2>planはSSA的で直列化可能なIRである</h2>
-    <p>中間表現としてのplanは、コンパイラのIRが持つ古典的な性質をいくつも備えている。単一定義性、直列化可能性、そして「検査済みであること」の三つである。</p>
-    <span class="tags"><span>#plan</span> <span>#ir</span> <span>#コンパイラ</span></span>
-  </a>
-  <a class="card" href="/notes/monoid-artifact-vs-monad-artifact.html" data-tags="モナド 構造 plan" data-kind="concept">
-    <h2>デプロイ計画がモノイドかモナドかで見通しが決まる</h2>
-    <p>未知値をめぐる三すくみは、構造の言葉で言い直せる。鍵になる区別は、デプロイ計画が「平らな宣言の集まり」か「継続のつながり」かである。</p>
-    <span class="tags"><span>#モナド</span> <span>#構造</span> <span>#plan</span></span>
-  </a>
-  <a class="card" href="/notes/type-erasure-at-plugin-boundary.html" data-tags="型消去 プラグイン バグクラス" data-kind="concept">
-    <h2>プラグイン境界の型消去は事故クラスを予測する</h2>
-    <p>WASMプラグイン境界(WITプロトコル)では、型情報の一部が不可逆に消える。</p>
-    <span class="tags"><span>#型消去</span> <span>#プラグイン</span> <span>#バグクラス</span></span>
-  </a>
-  <a class="card" href="/notes/nominal-axis-subtyping.html" data-tags="型システム 部分型 公称型" data-kind="concept">
-    <h2>公称軸ごとの幅部分型付けが再利用と混同防止を両立する</h2>
-    <p>列挙やカスタム文字列型にはTypeIdentity { provider, segments, kind }という公称的な識別が付く(providerは省略可能)。</p>
-    <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#公称型</span></span>
-  </a>
-  <a class="card" href="/notes/effects-as-free-monoid.html" data-tags="効果 代数 plan" data-kind="concept">
-    <h2>効果の具体化 — planは効果の自由モノイドである</h2>
-    <p>静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種のEffect値の列である。</p>
-    <span class="tags"><span>#効果</span> <span>#代数</span> <span>#plan</span></span>
-  </a>
-  <a class="card" href="/notes/the-window-is-narrower-than-it-looks.html" data-tags="unknown 型システム 検査" data-kind="concept">
-    <h2>未知値の周りは無検査ではない</h2>
-    <p>Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。値が無くても宣言型どうしを照合する別経路の検査が走るため、静的近似が本当に確定できない窓は見かけより狭い。</p>
-    <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#検査</span></span>
-  </a>
-  <a class="card" href="/notes/type-directed-equality.html" data-tags="差分 等価性 型システム" data-kind="concept">
-    <h2>等価判定は正規形へ簡約してから型ごとに行う</h2>
-    <p>差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality)という原則である。同じ値の組でも、期待される型によって判定が変わる。</p>
-    <span class="tags"><span>#差分</span> <span>#等価性</span> <span>#型システム</span></span>
-  </a>
-  <a class="card" href="/notes/evaporation-condition.html" data-tags="設計原則 蒸発条件 dsl" data-kind="concept">
-    <h2>言語機能はグラフへ消える糖衣である限りで許される</h2>
-    <p>IaC言語に機能を足してよいかどうかには、はっきりした判定条件がある。言語機能は、静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される。以後これを蒸発条件と呼ぶ。</p>
-    <span class="tags"><span>#設計原則</span> <span>#蒸発条件</span> <span>#dsl</span></span>
-  </a>
-  <a class="card" href="/notes/predictability-rationale-shifts-under-ai.html" data-tags="ai 予測可能性 設計判断" data-kind="concept">
-    <h2>AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</h2>
-    <p>予測可能性の基準を「実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れるか」と置くとき、暗黙に読む主体は人間が前提されていた。</p>
-    <span class="tags"><span>#ai</span> <span>#予測可能性</span> <span>#設計判断</span></span>
-  </a>
-  <a class="card" href="/notes/ir-is-the-user-interface.html" data-tags="plan ux ir" data-kind="concept">
-    <h2>IaCではIRダンプが一級の製品機能である</h2>
-    <p>planを中間表現として読んだときの最も特徴的な性質はこれである。このIRはユーザーインターフェースである。</p>
-    <span class="tags"><span>#plan</span> <span>#ux</span> <span>#ir</span></span>
-  </a>
-  <a class="card" href="/notes/unknown-is-the-window-between-stages.html" data-tags="unknown 型システム 段階分離" data-kind="concept">
-    <h2>Unknownは二段階の間に開いた窓である</h2>
-    <p>静的段階では値が決まらないものがある。上流スタックのapply結果への参照、まだ作られていないリソースの属性、for展開の変数などで、Terraformの「(known after apply)」に相当する。</p>
-    <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#段階分離</span></span>
-  </a>
-  <a class="card" href="/notes/apply-is-linker-and-loader.html" data-tags="apply コンパイラ リンカ" data-kind="concept">
-    <h2>applyはリンカ兼ローダである</h2>
-    <p>applyの仕事をコンパイラの言葉で言うと、リンクとロードである。plan中の穴を実値で埋めながら、依存順に実行していく操作だからである。</p>
-    <span class="tags"><span>#apply</span> <span>#コンパイラ</span> <span>#リンカ</span></span>
-  </a>
-  <a class="card" href="/notes/empty-quadrant-embedded-total.html" data-tags="設計空間 dsl 全域性" data-kind="concept">
-    <h2>「汎用言語 × 言語が決める」の空席は偶然ではない</h2>
-    <p>「汎用言語 × 言語が決める」象限に該当するIaCツールは、確認できる範囲で存在しない。これは偶然ではなく、ホスト言語をサブセット化しない限り埋まらないという構造から来る。</p>
-    <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#全域性</span></span>
-  </a>
-  <a class="card" href="/notes/refinement-types-as-constrained-base.html" data-tags="型システム 篩型 型理論" data-kind="concept">
-    <h2>カスタム型は独立の構成子ではなく篩型である</h2>
-    <p>Carinaに「カスタム型」という独立した型構成子はない。代わりにString / Int / Floatの各変種が制約を持ち運ぶ。つまりカスタム型の正体は基底型を述語で絞り込んだ篩型(refinement types)である。</p>
-    <span class="tags"><span>#型システム</span> <span>#篩型</span> <span>#型理論</span></span>
-  </a>
-  <a class="card" href="/notes/verify-at-the-trust-boundary.html" data-tags="型システム 信頼境界 設計原則" data-kind="concept">
-    <h2>信頼境界を越えるデータは境界で再検証する</h2>
-    <p>「一度検査したのだから、あとは信用してよい」は、データが同じ信頼領域に留まっている間だけ成り立つ。別の場所・別の時刻・別のバージョンに対して作られたデータが入ってくる点では、検査済みという前提そのものを疑い直す必要がある。</p>
-    <span class="tags"><span>#型システム</span> <span>#信頼境界</span> <span>#設計原則</span></span>
-  </a>
-  <a class="card" href="/notes/value-based-checking-needs-totality.html" data-tags="型システム 全域性 契約検査" data-kind="concept">
-    <h2>値ベースの全数検査は停止性の配当である</h2>
-    <p>Carinaの型検査は、項(構文)にラベルを付ける体系ではなく、評価済みの値がその型に属するかを判定する様式を取る。これができるのは静的段階が全域的だからで、値ベースの検査様式は停止性の配当として読める。</p>
-    <span class="tags"><span>#型システム</span> <span>#全域性</span> <span>#契約検査</span></span>
-  </a>
-  <a class="card" href="/notes/totality-cannot-be-retrofitted.html" data-tags="全域性 言語設計 iac" data-kind="concept">
-    <h2>全域性は後付けできない</h2>
-    <p>静的段階の全域性は、実装を頑張れば手に入る種類の性質ではない。言語設計の選択そのものに由来するため、汎用言語に埋め込む方式を選んだ時点で原理的に取れなくなる。</p>
-    <span class="tags"><span>#全域性</span> <span>#言語設計</span> <span>#iac</span></span>
-  </a>
-  <a class="card" href="/notes/abstraction-boundary-opacity.html" data-tags="抽象化 透明性 仮説" data-kind="concept">
-    <h2>抽象化境界の透明性は記述自由度とは独立した軸である</h2>
-    <p>記述自由度から導かれる予測可能性の議論は、すべて「抽象化を経由していない範囲」に限定される。</p>
-    <span class="tags"><span>#抽象化</span> <span>#透明性</span> <span>#仮説</span></span>
-  </a>
-  <a class="card" href="/notes/unknown-token-output-trilemma.html" data-tags="unknown 比較 iac" data-kind="concept">
-    <h2>未知値の規律と段階分離は三すくみである</h2>
-    <p>段階を跨ぐ値(applyまで決まらない値)の扱いに、IaCツールの設計差が最も鮮明に現れる。</p>
-    <span class="tags"><span>#unknown</span> <span>#比較</span> <span>#iac</span></span>
-  </a>
-  <a class="card" href="/notes/general-purpose-embedding-tradeoff.html" data-tags="トレードオフ 設計判断 比較" data-kind="concept">
-    <h2>汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</h2>
-    <p>汎用言語埋め込みと専用全域言語の取引は、構造としてはきれいに相補的である。</p>
-    <span class="tags"><span>#トレードオフ</span> <span>#設計判断</span> <span>#比較</span></span>
-  </a>
-  <a class="card" href="/notes/analogy-that-predicts-bugs.html" data-tags="方法論 類比 設計" data-kind="concept">
-    <h2>良い類比は実バグを予言する</h2>
-    <p>類比の価値は、記述が整うことにあるのではない。対応から実装上の予言が導け、その予言が実際のバグや改善方向を当てることにある。当たらない類比は装飾であり、当たる類比は分析の道具である。</p>
-    <span class="tags"><span>#方法論</span> <span>#類比</span> <span>#設計</span></span>
-  </a>
-  <a class="card" href="/notes/function-values-must-not-reach-graph-shape.html" data-tags="型システム 境界設計 高階関数" data-kind="concept">
-    <h2>高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</h2>
-    <p>graph出力DSLに高階関数を入れる核心は属性値計算の自由度を上げることにあるが、その自由度がgraph形状側(resource生成位置 / module選択位置 / identity決定位置)に染み出すと、「実装の切替」自由度…</p>
-    <span class="tags"><span>#型システム</span> <span>#境界設計</span> <span>#高階関数</span></span>
-  </a>
-  <a class="card" href="/notes/state-ownership-vs-operational-responsibility.html" data-tags="state 運用 設計判断" data-kind="concept">
-    <h2>stateの「所有」と「運用責任」は分離できる二軸である</h2>
-    <p>stateをめぐる設計判断は一つの軸ではなく二つある。</p>
-    <span class="tags"><span>#state</span> <span>#運用</span> <span>#設計判断</span></span>
-  </a>
-  <a class="card" href="/notes/readability-comes-from-the-locus-not-the-language.html" data-tags="dsl 可読性 設計判断" data-kind="concept">
-    <h2>「DSLだから読みやすい」のではない</h2>
-    <p>「DSLだから読みやすい」のではなく、「『言語が決める』範囲が広いから(= 規約に委ねる範囲が狭いから)読みやすい」。読みやすさの原因は記述言語の選択ではなく、記述自由度の所在にある。</p>
-    <span class="tags"><span>#dsl</span> <span>#可読性</span> <span>#設計判断</span></span>
-  </a>
-  <a class="card" href="/notes/checking-completeness-is-time-indexed.html" data-tags="型システム 検査 バグクラス" data-kind="concept">
-    <h2>「全数検査」は検証ステップの時点で確定している値に限られる</h2>
-    <p>値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。検査されるのは、検証ステップの時点で値が確定しているものだけである。</p>
-    <span class="tags"><span>#型システム</span> <span>#検査</span> <span>#バグクラス</span></span>
-  </a>
-  <a class="card" href="/notes/dirty-bit-for-the-cloud.html" data-tags="増分計算 aws 確認済み経験" data-kind="concept">
-    <h2>クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</h2>
-    <p>CPUはメモリの全走査をしない。ページテーブルのdirty bitが「変わったページ」だけを教え、キャッシュ一貫性プロトコル(MESI系)は無効化通知を受けたキャッシュ行だけを再取得する。</p>
-    <span class="tags"><span>#増分計算</span> <span>#aws</span> <span>#確認済み経験</span></span>
-  </a>
-  <a class="card" href="/notes/single-definition-checker.html" data-tags="設計負債 lsp コンパイラ" data-kind="concept">
-    <h2>検査器が二系統あるのは設計負債である</h2>
-    <p>静的検査器が二系統ある — plan/validate経路とLSP経路 — というのは、機能の重複ではなく理論的な負債である。同じ検査の二重実装であり、意味論の一致(パリティ)を規約と試験で維持している。</p>
-    <span class="tags"><span>#設計負債</span> <span>#lsp</span> <span>#コンパイラ</span></span>
-  </a>
-  <a class="card" href="/notes/graph-output-vs-config-data-output.html" data-tags="dsl 分類 設計空間" data-kind="concept">
-    <h2>構成データ出力DSLとgraph出力DSLはレイヤが違う</h2>
-    <p>構成記述系DSLを「何を出力するか」で分けると、3自由度では捉えきれない別レイヤの差が浮上する。</p>
-    <span class="tags"><span>#dsl</span> <span>#分類</span> <span>#設計空間</span></span>
-  </a>
-  <a class="card" href="/notes/bounded-staleness-is-what-you-can-buy.html" data-tags="限界 plan 分散システム" data-kind="concept">
-    <h2>買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</h2>
-    <p>world取得を速くする三つの攻め口を一つの設計に落とすと、三層になる。</p>
-    <span class="tags"><span>#限界</span> <span>#plan</span> <span>#分散システム</span></span>
-  </a>
-  <a class="card" href="/notes/ai-context-window-is-a-locality-constraint.html" data-tags="ai 透明性 局所性" data-kind="concept">
-    <h2>AIのコンテキスト窓は人の局所読解と同質の制約である</h2>
-    <p>巨大なIaCリポジトリでは、AIが全コードを一度にコンテキストへ入れられない。このとき効くのは「局所読みでgraph形状と属性値が分かる」という性質であり、これは人の局所読解性と同質の制約である。</p>
-    <span class="tags"><span>#ai</span> <span>#透明性</span> <span>#局所性</span></span>
-  </a>
-  <a class="card" href="/notes/ai-lowers-demand-for-abstraction.html" data-tags="ai 高階関数 dsl" data-kind="concept">
-    <h2>AIは抽象化の実需要をむしろ下げる</h2>
-    <p>「IaCで高階関数は本当に必要か」という問いは、AI時代の観点から見直すと必要性が上がるのではなく下がる方向に傾く。IaCで実際に必要とされる三つの抽象化のいずれも、AIが肩代わりできるからである。</p>
-    <span class="tags"><span>#ai</span> <span>#高階関数</span> <span>#dsl</span></span>
-  </a>
-  <a class="card" href="/notes/sdk-types-are-not-language-constraints.html" data-tags="型システム dsl 評価" data-kind="concept">
-    <h2>SDKが型を提供することは言語が制約を課すことではない</h2>
-    <p>PulumiのOutput&lt;T&gt;やCDKのToken / BucketPropsのように、SDK側が型を提供して依存追跡や未知値伝播を表現するパターンがある。これを「言語が決める」象限の実例と数えるのは過大評価である。</p>
-    <span class="tags"><span>#型システム</span> <span>#dsl</span> <span>#評価</span></span>
-  </a>
-  <a class="card" href="/notes/two-axis-config-language-genealogy.html" data-tags="dsl 系譜 設計空間" data-kind="concept">
-    <h2>「専用言語か」と「全域か」は独立した二軸である</h2>
-    <p>設定記述言語の系譜は「汎用言語に埋め込むか、専用言語を作るか」の一本の線ではない。「専用言語かどうか」と「全域的かどうか」は独立した選択であり、その二軸が張る空間として見た方が正確である。</p>
-    <span class="tags"><span>#dsl</span> <span>#系譜</span> <span>#設計空間</span></span>
-  </a>
-  <a class="card" href="/notes/refactoring-stability-mechanisms.html" data-tags="identity リファクタリング state" data-kind="concept">
-    <h2>リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</h2>
-    <p>コード構造を変えたとき(rename / move / refactor)に既存リソースが破壊されないかどうかは、identityの生成規則そのものではなく、旧identityと新identityを歴史的に繋ぐ機構があるかどうかで…</p>
-    <span class="tags"><span>#identity</span> <span>#リファクタリング</span> <span>#state</span></span>
-  </a>
-  <a class="card" href="/notes/two-type-languages-asymmetry.html" data-tags="型システム 設計負債 非対称" data-kind="concept">
-    <h2>型注釈の言語とスキーマ型は別の言語である</h2>
-    <p>Carinaには型を表す言語が二つある。ユーザーが書く型注釈の言語(TypeExpr)と、プロバイダのスキーマが表すスキーマ型(AttributeType)である。</p>
-    <span class="tags"><span>#型システム</span> <span>#設計負債</span> <span>#非対称</span></span>
-  </a>
-  <a class="card" href="/notes/attribute-audit-needs-static-values.html" data-tags="監査 セキュリティ 予測可能性" data-kind="concept">
-    <h2>属性値が動的計算だと静的監査が破綻する</h2>
-    <p>予測可能性はgraph形状と属性値の両方に効く。運用の現場では「このリソースは具体的にどう設定されているか」をコードから知りたい場面 — インシデント対応、コンプライアンス監査、セキュリティレビュー、IAMポリシー検査、暗号化設定…</p>
-    <span class="tags"><span>#監査</span> <span>#セキュリティ</span> <span>#予測可能性</span></span>
-  </a>
-  <a class="card" href="/notes/named-mu-types-iso-recursive.html" data-tags="型システム 再帰型 型理論" data-kind="concept">
-    <h2>循環スキーマは名前付きμ型で明示展開する</h2>
-    <p>CloudFormationのWAFv2 Statement → AndStatement → List&lt;Statement&gt;のような循環スキーマを表すため、スキーマは</p>
-    <span class="tags"><span>#型システム</span> <span>#再帰型</span> <span>#型理論</span></span>
-  </a>
-  <a class="card" href="/notes/layered-extension-point.html" data-tags="設計空間 拡張性 crossplane" data-kind="concept">
-    <h2>拡張ポイントを言語境界で開けるのは第三の選択肢である</h2>
-    <p>「言語が決める」か「規約に委ねる」かという二択の外側に、拡張ポイントを言語境界で開けるという第三の選択肢がある。</p>
-    <span class="tags"><span>#設計空間</span> <span>#拡張性</span> <span>#crossplane</span></span>
-  </a>
-  <a class="card" href="/notes/ownership-proves-you-need-not-read.html" data-tags="所有権 型システム 分散システム" data-kind="concept">
-    <h2>排他所有が証明できれば読まなくてよい</h2>
-    <p>worldを速くする三つの攻め口のうち、最も踏み込んだものは「読まなくてよい条件を作る」である。自分しか書かないリソースについては、自分の記録が真であり、クラウドAPIを叩く必要がない。</p>
-    <span class="tags"><span>#所有権</span> <span>#型システム</span> <span>#分散システム</span></span>
-  </a>
-  <a class="card" href="/notes/optimistic-check-conservative-equality.html" data-tags="unknown 健全性 差分" data-kind="concept">
-    <h2>検査は素通し、等価性は不成立 — Unknownの一貫した保守性</h2>
-    <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、どちらも「インフラを壊さない側」に倒すという一つの原則の現れである。</p>
-    <span class="tags"><span>#unknown</span> <span>#健全性</span> <span>#差分</span></span>
-  </a>
-  <a class="card" href="/notes/logical-id-vs-physical-name.html" data-tags="identity 命名 運用" data-kind="concept">
-    <h2>論理IDと物理リソース名は別物だが漏れる</h2>
-    <p>論理ID / URN / binding名はstate/IR内部の識別子であり、AWS上の物理リソース名(S3 bucket名、IAM Role名等)とは別物である。</p>
-    <span class="tags"><span>#identity</span> <span>#命名</span> <span>#運用</span></span>
-  </a>
-  <a class="card" href="/notes/where-the-analogy-breaks.html" data-tags="iac コンパイラ 限界" data-kind="concept">
-    <h2>類比が切れるのはターゲットが生きている場所である</h2>
-    <p>「planはコンパイルである」という類比が切れる場所は散らばっていない。すべて一つの原因に帰着する — ターゲットが受動的なメモリではなく、生きた外部世界であること。切れ目は三つある。</p>
-    <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#限界</span></span>
-  </a>
-  <a class="card" href="/notes/empty-quadrant-selection-pressure.html" data-tags="設計空間 dsl 淘汰圧" data-kind="concept">
-    <h2>「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</h2>
-    <p>記述言語と記述自由度の所在の2×2で、「外部DSL × 規約に委ねる」— 動的なsourceと任意関数を持つ専用DSL — に該当するツールがない。これは偶然の空白ではなく淘汰圧の結果である。</p>
-    <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#淘汰圧</span></span>
-  </a>
-  <a class="card" href="/notes/untagged-union-discrimination.html" data-tags="型システム 合併型 設計負債" data-kind="concept">
-    <h2>タグなし合併の判別はヒューリスティックに頼るしかない</h2>
-    <p>CarinaのUnion(Vec&lt;AttributeType&gt;)はタグなし合併(untagged union)である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
-    <span class="tags"><span>#型システム</span> <span>#合併型</span> <span>#設計負債</span></span>
-  </a>
-  <a class="card" href="/notes/totality-value-depends-on-what-it-gates.html" data-tags="全域性 pkl 設計判断" data-kind="concept">
-    <h2>全域性の価値は「何をゲートするか」で決まる</h2>
-    <p>全域性は、それ自体が普遍的に望ましい性質なのではない。静的段階が何の門番をしているかによって、その価値が変わる。</p>
-    <span class="tags"><span>#全域性</span> <span>#pkl</span> <span>#設計判断</span></span>
-  </a>
-  <a class="card" href="/notes/dynamic-stage-effect-closure.html" data-tags="効果 比較 安全性" data-kind="concept">
-    <h2>動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</h2>
-    <p>「動的段階では、コードに書いたこと以外の副作用が発生しない」という性質を動的段階の効果の閉包性と呼ぶと、これは二つの独立した命題に分解できる。</p>
-    <span class="tags"><span>#効果</span> <span>#比較</span> <span>#安全性</span></span>
-  </a>
-  <a class="card" href="/notes/provenance-should-be-a-type.html" data-tags="型システム 差分 設計方向" data-kind="concept">
-    <h2>属性の出所は型に昇格させるべきモダリティである</h2>
-    <p>「この属性は誰が書くのか」— ユーザー指定か、プロバイダ算出か、サーバ既定か — という区別が、Carinaでは型に乗っていない。フラグと投影で表現されている。これが理論的な負債になっている。</p>
-    <span class="tags"><span>#型システム</span> <span>#差分</span> <span>#設計方向</span></span>
-  </a>
-  <a class="card" href="/notes/diffing-is-instruction-selection.html" data-tags="plan コンパイラ 差分" data-kind="concept">
-    <h2>差分計算は命令選択である</h2>
-    <p>IaCの差分エンジンがやっていることは、コンパイラの命令選択(instruction selection)の変種として読める。</p>
-    <span class="tags"><span>#plan</span> <span>#コンパイラ</span> <span>#差分</span></span>
-  </a>
-  <a class="card" href="/notes/type-checking-reduces-to-nodes-and-edges.html" data-tags="型システム 設計原則 グラフ" data-kind="concept">
-    <h2>検査対象はノード上の値とエッジ両端の型の二種に還元できる</h2>
-    <p>IaC言語の型検査が項ベースの型体系をほぼ必要としないのは、実装上の手抜きではなく、意味的本体がグラフだけであることの帰結である。型を付けるべき「プログラム」が実質存在しないので、検査対象はグラフそのものになる。</p>
-    <span class="tags"><span>#型システム</span> <span>#設計原則</span> <span>#グラフ</span></span>
-  </a>
-  <a class="card" href="/notes/plan-as-a-standing-query.html" data-tags="増分計算 純粋性 plan" data-kind="concept">
-    <h2>純粋性はplanを常駐クエリに変える前提条件である</h2>
-    <p>worldを変更イベントで維持される実体化ビューにするという構図は、データベースの増分ビュー維持(incremental view maintenance)そのものである。</p>
-    <span class="tags"><span>#増分計算</span> <span>#純粋性</span> <span>#plan</span></span>
-  </a>
-  <a class="card" href="/notes/credentials-adjacent-code-is-attack-surface.html" data-tags="セキュリティ 供給網 設計判断" data-kind="concept">
-    <h2>資格情報の傍で任意パッケージが動くこと自体が攻撃面である</h2>
-    <p>汎用言語埋め込み型のIaCツールが得るパッケージエコシステムには、他のドメインでは生じない種類のコストがある。世界を変更する資格情報の傍でnpm / PyPIの任意パッケージが動くことは、それ自体が供給網攻撃の攻撃面である。</p>
-    <span class="tags"><span>#セキュリティ</span> <span>#供給網</span> <span>#設計判断</span></span>
-  </a>
-  <a class="card" href="/notes/escape-hatch-tradeoff.html" data-tags="トレードオフ 組織 dsl" data-kind="concept">
-    <h2>逃げ道の有無が表現力の上限と組織コストを交換する</h2>
-    <p>記述自由度の二層は、逃げ道の有無という一点でトレードオフを作る。</p>
-    <span class="tags"><span>#トレードオフ</span> <span>#組織</span> <span>#dsl</span></span>
-  </a>
-  <a class="card" href="/notes/ref-four-tool-comparison-matrices.html" data-tags="参照 比較表 iac" data-kind="ref">
-    <h2>Terraform / CDK / Pulumi / Carina比較マトリクス</h2>
-    <p>4ツール(Terraform / CDK / Pulumi / Carina)を軸ごとに横断比較した概観表を集約したもの。(要確認)と書かれたセルは埋まっていないまま残してある — 何が確認できていないかも情報である。</p>
-    <span class="tags"><span>#参照</span> <span>#比較表</span> <span>#iac</span></span>
-  </a>
-  <a class="card" href="/notes/ref-three-freedoms-matrix.html" data-tags="参照 比較表 dsl" data-kind="ref">
-    <h2>3自由度サマリ表</h2>
-    <p>IaC 4ツールと構成記述系DSL 11本を、3自由度 — 抽象化の追加 / 複数量の制御 / 実装の切替 — で横断評価した一覧表。</p>
-    <span class="tags"><span>#参照</span> <span>#比較表</span> <span>#dsl</span></span>
-  </a>
-  <a class="card" href="/notes/ref-carina-feature-inventory.html" data-tags="参照 carina スナップショット" data-kind="ref">
-    <h2>Carina機能点検(2026-04-27時点)</h2>
-    <p>2026-04-27時点のスナップショット。 carina-rs/carina(https://github.com/carina-rs/carina) repoをIaCツールとして必要な20項目で点検した結果である。</p>
-    <span class="tags"><span>#参照</span> <span>#carina</span> <span>#スナップショット</span></span>
-  </a>
-  <a class="card" href="/notes/ref-source-pointers.html" data-tags="参照 ポインタ" data-kind="ref">
-    <h2>ソース調査ポインタ集</h2>
-    <p>このノートは腐る。 行番号は当時のリポジトリのスナップショットであり、対象リポジトリが更新されれば合わなくなる。ここにあるのは結論ではなく再調査の足がかり — 「どのファイルのどのあたりを見れば確認できるか」の記録である。</p>
-    <span class="tags"><span>#参照</span> <span>#ポインタ</span></span>
-  </a>
-  <a class="card" href="/notes/ref-carina-issue-index.html" data-tags="参照 issue carina" data-kind="ref">
-    <h2>探索から出たissue索引</h2>
-    <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
-    <span class="tags"><span>#参照</span> <span>#issue</span> <span>#carina</span></span>
-  </a>
-  <a class="card" href="/notes/ref-config-dsl-survey.html" data-tags="参照 dsl 調査" data-kind="ref">
-    <h2>構成記述DSL 11本の調査</h2>
-    <p>構成記述系DSL 11本(Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helm)を、同じ枠組み — 記述言語の…</p>
-    <span class="tags"><span>#参照</span> <span>#dsl</span> <span>#調査</span></span>
-  </a>
-  <a class="card" href="/notes/open-questions.html" data-tags="未解決 todo" data-kind="meta">
-    <h2>未解決の問い</h2>
-    <p>これらの探索で答えが出なかった問いの一覧。概念ノートではなく、次に調べるべきことのリストである。既に解決したものは各概念ノートに事実として書かれているのでここには含まない。</p>
-    <span class="tags"><span>#未解決</span> <span>#todo</span></span>
-  </a>
-  <a class="card" href="/notes/about-these-notes-accuracy.html" data-tags="メタ 精度" data-kind="meta">
-    <h2>これらのノートの精度について</h2>
-    <p>これらのノートは確定した結論ではない。 すべて生成AI(Claude / Codex)との対話による設計探索の記録を分解したもので、結論の確定ではなく論点の整理と根拠確認を目的として書かれた作業ノートが元になっている。</p>
-    <span class="tags"><span>#メタ</span> <span>#精度</span></span>
+  <a class="card verified" href="/notes/two-by-two-is-per-freedom.html" data-tags="設計空間 比較軸 方法論">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</h2>
+      <p>「記述言語(外部DSL / 汎用言語)× 記述自由度の所在(言語が決める / 規約に委ねる)」の2×2は、暗黙に「ツール = 1象限」を前提していた。</p>
+      <span class="tags"><span>#設計空間</span> <span>#比較軸</span> <span>#方法論</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/predictability-is-the-core-value.html" data-tags="予測可能性 iac 設計原則">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>実行前に結果が読めることがIaCの根本価値である</h2>
+      <p>IaCの根本価値は「apply前に結果を見せる」ことにある。だから予測可能性 — 実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れること — は、他の設計軸と並ぶ一つの軸ではなく、…</p>
+      <span class="tags"><span>#予測可能性</span> <span>#iac</span> <span>#設計原則</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/plan-is-compilation.html" data-tags="iac コンパイラ plan">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>planはコンパイルである</h2>
+      <p>carina plan は、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。applyはその中間言語の実行系である。</p>
+      <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#plan</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/semantic-typing.html" data-tags="型システム 型理論 cue">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>型は値の分類器である(意味論的型付け)</h2>
+      <p>Carinaの型付けの様式は、型を「項に付く構文的な札」ではなく「値の集合(値の分類器)」とみなし、型付けを所属判定として与える意味論的型付け(semantic typing)の系譜である。</p>
+      <span class="tags"><span>#型システム</span> <span>#型理論</span> <span>#cue</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/hybrid-quadrant-convergence.html" data-tags="設計空間 dsl 収束">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</h2>
+      <p>構成記述系DSL 11個を3自由度で点検すると、当初の4象限には現れていなかった第5象限が浮上する。Pkl / KCL / Dhall / Jsonnet / Nickelの5つが、独立に同じパターンへ収束している。</p>
+      <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#収束</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/higher-order-functions-unnecessary.html" data-tags="高階関数 dsl 懐疑">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</h2>
+      <p>ハイブリッド象限への合流は構造的整合性の議論であって、ユーザの実需要とは別の問題である。実需要の観点から見ると、IaCで高階関数は「あれば嬉しいが必須ではない」機能かもしれない。</p>
+      <span class="tags"><span>#高階関数</span> <span>#dsl</span> <span>#懐疑</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/graph-is-the-semantic-core.html" data-tags="設計原則 iac グラフ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>IaC言語の意味的本体はリソース定義と依存グラフだけである</h2>
+      <p>IaC言語の意味的本体は、リソースの定義と、その依存関係グラフである。それ以外のすべての言語機能は、あれば便利という程度のものにすぎない。</p>
+      <span class="tags"><span>#設計原則</span> <span>#iac</span> <span>#グラフ</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/two-stage-language.html" data-tags="iac 型システム 段階分離">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>IaC言語は二段階の言語である</h2>
+      <p>Carinaのようなインフラ記述言語は「実行時に型を検査する動的型付き言語」ではないし、古典的な静的型付き言語でもない。静的段階と動的段階という二つの段階を持つ言語として読むのが正確である。</p>
+      <span class="tags"><span>#iac</span> <span>#型システム</span> <span>#段階分離</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/world-acquisition-is-the-bottleneck.html" data-tags="plan 性能 設計">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「信頼できるworld = 全リソースの同期GET」という等式をほどく</h2>
+      <p>IaCのコンパイルは二引数plan(source, world)である。このうちworldの取得が遅い。</p>
+      <span class="tags"><span>#plan</span> <span>#性能</span> <span>#設計</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/relocation-without-verification.html" data-tags="バグクラス 型システム apply">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>再配置後に検証がないのは型検査済みIRの不変条件の破壊である</h2>
+      <p>「well-typedなIRだけがバックエンドに渡る」というのがコンパイラの標準的な契約である。しかしapplyの再配置はIRに新しい値を書き込む。</p>
+      <span class="tags"><span>#バグクラス</span> <span>#型システム</span> <span>#apply</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/compilation-takes-source-and-world.html" data-tags="iac コンパイラ 増分計算">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>IaCのコンパイルは二引数である</h2>
+      <p>通常のコンパイラはソースだけの関数である: compile(source) = binary。IaCのコンパイルは二引数である: plan(source, state) = patch。</p>
+      <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#増分計算</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/plan-is-prediction-apply-is-truth.html" data-tags="plan apply occ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>planは予測であり、真実はapplyが確立する</h2>
+      <p>planはロックを取らず、applyがロック下で差分を再計算する。この契約を意識的に推すと、plan時のworldの鮮度は正しさの問題ではなくUXの問題だと正当化できる。</p>
+      <span class="tags"><span>#plan</span> <span>#apply</span> <span>#occ</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/make-the-broken-state-unrepresentable.html" data-tags="typestate 型安全 設計原則">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>typestateで壊れた状態を書けなくする</h2>
+      <p>Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは一貫していて、静的段階の内部不変条件を、実装言語の型でコンパイル時に固定することである。</p>
+      <span class="tags"><span>#typestate</span> <span>#型安全</span> <span>#設計原則</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/graph-shape-vs-attribute-value.html" data-tags="予測可能性 比較軸 差分">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>予測可能性はgraph形状と属性値の二側面を持つ</h2>
+      <p>コードから読み取りたいものは二つある。graph形状(どんなリソースがいくつ、どう繋がって作られるか)と、各ノードの属性値(そのリソースが具体的にどう設定されるか)である。三つの記述自由度はどちらの側にも適用される。</p>
+      <span class="tags"><span>#予測可能性</span> <span>#比較軸</span> <span>#差分</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/three-freedoms-of-description.html" data-tags="比較軸 dsl 設計判断">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>結果予測性に効く記述自由度は三つに絞れる</h2>
+      <p>記述自由度は無数に立てられるが、「実行前にコードを読んだ時点で、resource graphの形と各ノードの属性値がどう決まるかを読み取れるか」に直接効く軸に絞ると、三つになる。</p>
+      <span class="tags"><span>#比較軸</span> <span>#dsl</span> <span>#設計判断</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/locus-of-descriptive-freedom.html" data-tags="設計判断 dsl 組織">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</h2>
+      <p>ユーザーの記述自由度をどこまで許すかという設計判断は、誰が制限するかで二層に分かれる。</p>
+      <span class="tags"><span>#設計判断</span> <span>#dsl</span> <span>#組織</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/static-stage-totality.html" data-tags="全域性 dsl 型システム">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>静的段階の全域性は構文制限だけでは得られない</h2>
+      <p>「静的段階の評価が必ず停止する」という性質は、一般再帰を禁じてループを有限に限るだけでは出てこない。構文制限と参照グラフの非循環性強制という二本の柱で初めて成り立つ。</p>
+      <span class="tags"><span>#全域性</span> <span>#dsl</span> <span>#型システム</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/bounded-composition-is-enough.html" data-tags="設計原則 再利用 dsl">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</h2>
+      <p>IaCが本当に必要とする再利用は、検証済みパターンのパラメータ付き合成であって、任意計算ではない。それはモジュール・for・exportsという有界な合成手段 — すべて蒸発条件を満たす — で足りる。</p>
+      <span class="tags"><span>#設計原則</span> <span>#再利用</span> <span>#dsl</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/boring-verbatim-beats-clever-abstraction.html" data-tags="設計原則 可読性 iac">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</h2>
+      <p>インフラ記述の主要な読者はレビューアと将来の運用者である。彼らが問うのは「このコードは何を計算するか」ではなく「この記述から実際に何が作られるか」の判読性である。</p>
+      <span class="tags"><span>#設計原則</span> <span>#可読性</span> <span>#iac</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/identity-is-what-the-engine-considers-the-same-resource.html" data-tags="identity iac リファクタリング">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</h2>
+      <p>identityとは「何を同一資源と見なすか」の規則である。stateをどこに置き誰が運用責任を負うかという問い(章4の主題)とは別の独立軸であり、同じツールでも別々に設計できる。</p>
+      <span class="tags"><span>#identity</span> <span>#iac</span> <span>#リファクタリング</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/plan-as-ir-properties.html" data-tags="plan ir コンパイラ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>planはSSA的で直列化可能なIRである</h2>
+      <p>中間表現としてのplanは、コンパイラのIRが持つ古典的な性質をいくつも備えている。単一定義性、直列化可能性、そして「検査済みであること」の三つである。</p>
+      <span class="tags"><span>#plan</span> <span>#ir</span> <span>#コンパイラ</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/monoid-artifact-vs-monad-artifact.html" data-tags="モナド 構造 plan">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>デプロイ計画がモノイドかモナドかで見通しが決まる</h2>
+      <p>未知値をめぐる三すくみは、構造の言葉で言い直せる。鍵になる区別は、デプロイ計画が「平らな宣言の集まり」か「継続のつながり」かである。</p>
+      <span class="tags"><span>#モナド</span> <span>#構造</span> <span>#plan</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/type-erasure-at-plugin-boundary.html" data-tags="型消去 プラグイン バグクラス">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>プラグイン境界の型消去は事故クラスを予測する</h2>
+      <p>WASMプラグイン境界(WITプロトコル)では、型情報の一部が不可逆に消える。</p>
+      <span class="tags"><span>#型消去</span> <span>#プラグイン</span> <span>#バグクラス</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/nominal-axis-subtyping.html" data-tags="型システム 部分型 公称型">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>公称軸ごとの幅部分型付けが再利用と混同防止を両立する</h2>
+      <p>列挙やカスタム文字列型にはTypeIdentity { provider, segments, kind }という公称的な識別が付く(providerは省略可能)。</p>
+      <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#公称型</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/effects-as-free-monoid.html" data-tags="効果 代数 plan">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>効果の具体化 — planは効果の自由モノイドである</h2>
+      <p>静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種のEffect値の列である。</p>
+      <span class="tags"><span>#効果</span> <span>#代数</span> <span>#plan</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/the-window-is-narrower-than-it-looks.html" data-tags="unknown 型システム 検査">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>未知値の周りは無検査ではない</h2>
+      <p>Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。値が無くても宣言型どうしを照合する別経路の検査が走るため、静的近似が本当に確定できない窓は見かけより狭い。</p>
+      <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#検査</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/type-directed-equality.html" data-tags="差分 等価性 型システム">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>等価判定は正規形へ簡約してから型ごとに行う</h2>
+      <p>差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality) という原則である。同じ値の組でも、期待される型によって判定が変わる。</p>
+      <span class="tags"><span>#差分</span> <span>#等価性</span> <span>#型システム</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/evaporation-condition.html" data-tags="設計原則 蒸発条件 dsl">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>言語機能はグラフへ消える糖衣である限りで許される</h2>
+      <p>IaC言語に機能を足してよいかどうかには、はっきりした判定条件がある。言語機能は、静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される。以後これを蒸発条件と呼ぶ。</p>
+      <span class="tags"><span>#設計原則</span> <span>#蒸発条件</span> <span>#dsl</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/predictability-rationale-shifts-under-ai.html" data-tags="ai 予測可能性 設計判断">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</h2>
+      <p>予測可能性の基準を「実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れるか」と置くとき、暗黙に読む主体は人間が前提されていた。</p>
+      <span class="tags"><span>#ai</span> <span>#予測可能性</span> <span>#設計判断</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/ir-is-the-user-interface.html" data-tags="plan ux ir">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>IaCではIRダンプが一級の製品機能である</h2>
+      <p>planを中間表現として読んだときの最も特徴的な性質はこれである。このIRはユーザーインターフェースである。</p>
+      <span class="tags"><span>#plan</span> <span>#ux</span> <span>#ir</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/unknown-is-the-window-between-stages.html" data-tags="unknown 型システム 段階分離">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>Unknownは二段階の間に開いた窓である</h2>
+      <p>静的段階では値が決まらないものがある。上流スタックのapply結果への参照、まだ作られていないリソースの属性、for展開の変数などで、Terraformの「(known after apply)」に相当する。</p>
+      <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#段階分離</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/apply-is-linker-and-loader.html" data-tags="apply コンパイラ リンカ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>applyはリンカ兼ローダである</h2>
+      <p>applyの仕事をコンパイラの言葉で言うと、リンクとロードである。plan中の穴を実値で埋めながら、依存順に実行していく操作だからである。</p>
+      <span class="tags"><span>#apply</span> <span>#コンパイラ</span> <span>#リンカ</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/empty-quadrant-embedded-total.html" data-tags="設計空間 dsl 全域性">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「汎用言語 × 言語が決める」の空席は偶然ではない</h2>
+      <p>「汎用言語 × 言語が決める」象限に該当するIaCツールは、確認できる範囲で存在しない。これは偶然ではなく、ホスト言語をサブセット化しない限り埋まらないという構造から来る。</p>
+      <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#全域性</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/refinement-types-as-constrained-base.html" data-tags="型システム 篩型 型理論">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>カスタム型は独立の構成子ではなく篩型である</h2>
+      <p>Carinaに「カスタム型」という独立した型構成子はない。代わりにString / Int / Floatの各変種が制約を持ち運ぶ。</p>
+      <span class="tags"><span>#型システム</span> <span>#篩型</span> <span>#型理論</span></span>
+    </span>
+  </a>
+  <a class="card ai-sourced" href="/notes/verify-at-the-trust-boundary.html" data-tags="型システム 信頼境界 設計原則">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>信頼境界を越えるデータは境界で再検証する</h2>
+      <p>「一度検査したのだから、あとは信用してよい」は、データが同じ信頼領域に留まっている間だけ成り立つ。</p>
+      <span class="tags"><span>#型システム</span> <span>#信頼境界</span> <span>#設計原則</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/value-based-checking-needs-totality.html" data-tags="型システム 全域性 契約検査">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>値ベースの全数検査は停止性の配当である</h2>
+      <p>Carinaの型検査は、項(構文)にラベルを付ける体系ではなく、評価済みの値がその型に属するかを判定する様式を取る。これができるのは静的段階が全域的だからで、値ベースの検査様式は停止性の配当として読める。</p>
+      <span class="tags"><span>#型システム</span> <span>#全域性</span> <span>#契約検査</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/totality-cannot-be-retrofitted.html" data-tags="全域性 言語設計 iac">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>全域性は後付けできない</h2>
+      <p>静的段階の全域性は、実装を頑張れば手に入る種類の性質ではない。言語設計の選択そのものに由来するため、汎用言語に埋め込む方式を選んだ時点で原理的に取れなくなる。</p>
+      <span class="tags"><span>#全域性</span> <span>#言語設計</span> <span>#iac</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/abstraction-boundary-opacity.html" data-tags="抽象化 透明性 仮説">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>抽象化境界の透明性は記述自由度とは独立した軸である</h2>
+      <p>記述自由度から導かれる予測可能性の議論は、すべて「抽象化を経由していない範囲」に限定される。</p>
+      <span class="tags"><span>#抽象化</span> <span>#透明性</span> <span>#仮説</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/unknown-token-output-trilemma.html" data-tags="unknown 比較 iac">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>未知値の規律と段階分離は三すくみである</h2>
+      <p>段階を跨ぐ値(applyまで決まらない値)の扱いに、IaCツールの設計差が最も鮮明に現れる。</p>
+      <span class="tags"><span>#unknown</span> <span>#比較</span> <span>#iac</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/general-purpose-embedding-tradeoff.html" data-tags="トレードオフ 設計判断 比較">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</h2>
+      <p>汎用言語埋め込みと専用全域言語の取引は、構造としてはきれいに相補的である。</p>
+      <span class="tags"><span>#トレードオフ</span> <span>#設計判断</span> <span>#比較</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/analogy-that-predicts-bugs.html" data-tags="方法論 類比 設計">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>良い類比は実バグを予言する</h2>
+      <p>類比の価値は、記述が整うことにあるのではない。対応から実装上の予言が導け、その予言が実際のバグや改善方向を当てることにある。当たらない類比は装飾であり、当たる類比は分析の道具である。</p>
+      <span class="tags"><span>#方法論</span> <span>#類比</span> <span>#設計</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/function-values-must-not-reach-graph-shape.html" data-tags="型システム 境界設計 高階関数">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</h2>
+      <p>graph出力DSLに高階関数を入れる核心は属性値計算の自由度を上げることにあるが、その自由度がgraph形状側(resource生成位置 / module選択位置 / identity決定位置)に染み出すと、「実装の切…</p>
+      <span class="tags"><span>#型システム</span> <span>#境界設計</span> <span>#高階関数</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/state-ownership-vs-operational-responsibility.html" data-tags="state 運用 設計判断">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>stateの「所有」と「運用責任」は分離できる二軸である</h2>
+      <p>stateをめぐる設計判断は一つの軸ではなく二つある。</p>
+      <span class="tags"><span>#state</span> <span>#運用</span> <span>#設計判断</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/readability-comes-from-the-locus-not-the-language.html" data-tags="dsl 可読性 設計判断">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「DSLだから読みやすい」のではない</h2>
+      <p>「DSLだから読みやすい」のではなく、「『言語が決める』範囲が広いから(= 規約に委ねる範囲が狭いから)読みやすい」。読みやすさの原因は記述言語の選択ではなく、記述自由度の所在にある。</p>
+      <span class="tags"><span>#dsl</span> <span>#可読性</span> <span>#設計判断</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/checking-completeness-is-time-indexed.html" data-tags="型システム 検査 バグクラス">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「全数検査」は検証ステップの時点で確定している値に限られる</h2>
+      <p>値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。検査されるのは、検証ステップの時点で値が確定しているものだけである。</p>
+      <span class="tags"><span>#型システム</span> <span>#検査</span> <span>#バグクラス</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/dirty-bit-for-the-cloud.html" data-tags="増分計算 aws 確認済み経験">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</h2>
+      <p>CPUはメモリの全走査をしない。ページテーブルのdirty bitが「変わったページ」だけを教え、キャッシュ一貫性プロトコル(MESI系)は無効化通知を受けたキャッシュ行だけを再取得する。</p>
+      <span class="tags"><span>#増分計算</span> <span>#aws</span> <span>#確認済み経験</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/single-definition-checker.html" data-tags="設計負債 lsp コンパイラ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>検査器が二系統あるのは設計負債である</h2>
+      <p>静的検査器が二系統ある — plan/validate経路とLSP経路 — というのは、機能の重複ではなく理論的な負債である。同じ検査の二重実装であり、意味論の一致(パリティ)を規約と試験で維持している。</p>
+      <span class="tags"><span>#設計負債</span> <span>#lsp</span> <span>#コンパイラ</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/graph-output-vs-config-data-output.html" data-tags="dsl 分類 設計空間">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>構成データ出力DSLとgraph出力DSLはレイヤが違う</h2>
+      <p>構成記述系DSLを「何を出力するか」で分けると、3自由度では捉えきれない別レイヤの差が浮上する。</p>
+      <span class="tags"><span>#dsl</span> <span>#分類</span> <span>#設計空間</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/bounded-staleness-is-what-you-can-buy.html" data-tags="限界 plan 分散システム">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</h2>
+      <p>world取得を速くする三つの攻め口を一つの設計に落とすと、三層になる。</p>
+      <span class="tags"><span>#限界</span> <span>#plan</span> <span>#分散システム</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/ai-context-window-is-a-locality-constraint.html" data-tags="ai 透明性 局所性">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>AIのコンテキスト窓は人の局所読解と同質の制約である</h2>
+      <p>巨大なIaCリポジトリでは、AIが全コードを一度にコンテキストへ入れられない。このとき効くのは「局所読みでgraph形状と属性値が分かる」という性質であり、これは人の局所読解性と同質の制約である。</p>
+      <span class="tags"><span>#ai</span> <span>#透明性</span> <span>#局所性</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/ai-lowers-demand-for-abstraction.html" data-tags="ai 高階関数 dsl">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>AIは抽象化の実需要をむしろ下げる</h2>
+      <p>「IaCで高階関数は本当に必要か」という問いは、AI時代の観点から見直すと必要性が上がるのではなく下がる方向に傾く。IaCで実際に必要とされる三つの抽象化のいずれも、AIが肩代わりできるからである。</p>
+      <span class="tags"><span>#ai</span> <span>#高階関数</span> <span>#dsl</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/sdk-types-are-not-language-constraints.html" data-tags="型システム dsl 評価">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>SDKが型を提供することは言語が制約を課すことではない</h2>
+      <p>PulumiのOutput&lt;T&gt;やCDKのToken / BucketPropsのように、SDK側が型を提供して依存追跡や未知値伝播を表現するパターンがある。これを「言語が決める」象限の実例と数えるのは過大評価である。</p>
+      <span class="tags"><span>#型システム</span> <span>#dsl</span> <span>#評価</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/two-axis-config-language-genealogy.html" data-tags="dsl 系譜 設計空間">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「専用言語か」と「全域か」は独立した二軸である</h2>
+      <p>設定記述言語の系譜は「汎用言語に埋め込むか、専用言語を作るか」の一本の線ではない。「専用言語かどうか」と「全域的かどうか」は独立した選択であり、その二軸が張る空間として見た方が正確である。</p>
+      <span class="tags"><span>#dsl</span> <span>#系譜</span> <span>#設計空間</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/refactoring-stability-mechanisms.html" data-tags="identity リファクタリング state">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</h2>
+      <p>コード構造を変えたとき(rename / move / refactor)に既存リソースが破壊されないかどうかは、identityの生成規則そのものではなく、旧identityと新identityを歴史的に繋ぐ機構がある…</p>
+      <span class="tags"><span>#identity</span> <span>#リファクタリング</span> <span>#state</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/two-type-languages-asymmetry.html" data-tags="型システム 設計負債 非対称">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>型注釈の言語とスキーマ型は別の言語である</h2>
+      <p>Carinaには型を表す言語が二つある。ユーザーが書く型注釈の言語(TypeExpr)と、プロバイダのスキーマが表すスキーマ型(AttributeType)である。</p>
+      <span class="tags"><span>#型システム</span> <span>#設計負債</span> <span>#非対称</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/attribute-audit-needs-static-values.html" data-tags="監査 セキュリティ 予測可能性">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>属性値が動的計算だと静的監査が破綻する</h2>
+      <p>予測可能性はgraph形状と属性値の両方に効く。運用の現場では「このリソースは具体的にどう設定されているか」をコードから知りたい場面 — インシデント対応、コンプライアンス監査、セキュリティレビュー、IAMポリシー検査、…</p>
+      <span class="tags"><span>#監査</span> <span>#セキュリティ</span> <span>#予測可能性</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/named-mu-types-iso-recursive.html" data-tags="型システム 再帰型 型理論">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>循環スキーマは名前付きμ型で明示展開する</h2>
+      <p>CloudFormationのWAFv2 Statement → AndStatement → List&lt;Statement&gt; のような循環スキーマを表すため、スキーマは</p>
+      <span class="tags"><span>#型システム</span> <span>#再帰型</span> <span>#型理論</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/layered-extension-point.html" data-tags="設計空間 拡張性 crossplane">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>拡張ポイントを言語境界で開けるのは第三の選択肢である</h2>
+      <p>「言語が決める」か「規約に委ねる」かという二択の外側に、拡張ポイントを言語境界で開けるという第三の選択肢がある。</p>
+      <span class="tags"><span>#設計空間</span> <span>#拡張性</span> <span>#crossplane</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/ownership-proves-you-need-not-read.html" data-tags="所有権 型システム 分散システム">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>排他所有が証明できれば読まなくてよい</h2>
+      <p>worldを速くする三つの攻め口のうち、最も踏み込んだものは「読まなくてよい条件を作る」である。自分しか書かないリソースについては、自分の記録が真であり、クラウドAPIを叩く必要がない。</p>
+      <span class="tags"><span>#所有権</span> <span>#型システム</span> <span>#分散システム</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/optimistic-check-conservative-equality.html" data-tags="unknown 健全性 差分">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>検査は素通し、等価性は不成立 — Unknownの一貫した保守性</h2>
+      <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、どちらも「インフラを壊さない側」に倒すという一つの原則の現れである。</p>
+      <span class="tags"><span>#unknown</span> <span>#健全性</span> <span>#差分</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/logical-id-vs-physical-name.html" data-tags="identity 命名 運用">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>論理IDと物理リソース名は別物だが漏れる</h2>
+      <p>論理ID / URN / binding名はstate/IR内部の識別子であり、AWS上の物理リソース名(S3 bucket名、IAM Role名等)とは別物である。</p>
+      <span class="tags"><span>#identity</span> <span>#命名</span> <span>#運用</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/where-the-analogy-breaks.html" data-tags="iac コンパイラ 限界">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>類比が切れるのはターゲットが生きている場所である</h2>
+      <p>「planはコンパイルである」という類比が切れる場所は散らばっていない。すべて一つの原因に帰着する — ターゲットが受動的なメモリではなく、生きた外部世界であること。切れ目は三つある。</p>
+      <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#限界</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/empty-quadrant-selection-pressure.html" data-tags="設計空間 dsl 淘汰圧">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</h2>
+      <p>記述言語と記述自由度の所在の2×2で、「外部DSL × 規約に委ねる」— 動的なsourceと任意関数を持つ専用DSL — に該当するツールがない。これは偶然の空白ではなく淘汰圧の結果である。</p>
+      <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#淘汰圧</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/untagged-union-discrimination.html" data-tags="型システム 合併型 設計負債">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>タグなし合併の判別はヒューリスティックに頼るしかない</h2>
+      <p>CarinaのUnion(Vec&lt;AttributeType&gt;)はタグなし合併(untagged union) である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
+      <span class="tags"><span>#型システム</span> <span>#合併型</span> <span>#設計負債</span></span>
+    </span>
+  </a>
+  <a class="card ai-sourced" href="/notes/totality-value-depends-on-what-it-gates.html" data-tags="全域性 pkl 設計判断">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>全域性の価値は「何をゲートするか」で決まる</h2>
+      <p>全域性は、それ自体が普遍的に望ましい性質なのではない。静的段階が何の門番をしているかによって、その価値が変わる。</p>
+      <span class="tags"><span>#全域性</span> <span>#pkl</span> <span>#設計判断</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/dynamic-stage-effect-closure.html" data-tags="効果 比較 安全性">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</h2>
+      <p>「動的段階では、コードに書いたこと以外の副作用が発生しない」という性質を動的段階の効果の閉包性と呼ぶと、これは二つの独立した命題に分解できる。</p>
+      <span class="tags"><span>#効果</span> <span>#比較</span> <span>#安全性</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/provenance-should-be-a-type.html" data-tags="型システム 差分 設計方向">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>属性の出所は型に昇格させるべきモダリティである</h2>
+      <p>「この属性は誰が書くのか」— ユーザー指定か、プロバイダ算出か、サーバ既定か — という区別が、Carinaでは型に乗っていない。フラグと投影で表現されている。これが理論的な負債になっている。</p>
+      <span class="tags"><span>#型システム</span> <span>#差分</span> <span>#設計方向</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/diffing-is-instruction-selection.html" data-tags="plan コンパイラ 差分">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>差分計算は命令選択である</h2>
+      <p>IaCの差分エンジンがやっていることは、コンパイラの命令選択(instruction selection)の変種として読める。</p>
+      <span class="tags"><span>#plan</span> <span>#コンパイラ</span> <span>#差分</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/type-checking-reduces-to-nodes-and-edges.html" data-tags="型システム 設計原則 グラフ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>検査対象はノード上の値とエッジ両端の型の二種に還元できる</h2>
+      <p>IaC言語の型検査が項ベースの型体系をほぼ必要としないのは、実装上の手抜きではなく、意味的本体がグラフだけであることの帰結である。型を付けるべき「プログラム」が実質存在しないので、検査対象はグラフそのものになる。</p>
+      <span class="tags"><span>#型システム</span> <span>#設計原則</span> <span>#グラフ</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/plan-as-a-standing-query.html" data-tags="増分計算 純粋性 plan">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>純粋性はplanを常駐クエリに変える前提条件である</h2>
+      <p>worldを変更イベントで維持される実体化ビューにするという構図は、データベースの増分ビュー維持 (incremental view maintenance)そのものである。</p>
+      <span class="tags"><span>#増分計算</span> <span>#純粋性</span> <span>#plan</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/credentials-adjacent-code-is-attack-surface.html" data-tags="セキュリティ 供給網 設計判断">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>資格情報の傍で任意パッケージが動くこと自体が攻撃面である</h2>
+      <p>汎用言語埋め込み型のIaCツールが得るパッケージエコシステムには、他のドメインでは生じない種類のコストがある。</p>
+      <span class="tags"><span>#セキュリティ</span> <span>#供給網</span> <span>#設計判断</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/escape-hatch-tradeoff.html" data-tags="トレードオフ 組織 dsl">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>逃げ道の有無が表現力の上限と組織コストを交換する</h2>
+      <p>記述自由度の二層は、逃げ道の有無という一点でトレードオフを作る。</p>
+      <span class="tags"><span>#トレードオフ</span> <span>#組織</span> <span>#dsl</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/ref-four-tool-comparison-matrices.html" data-tags="参照 比較表 iac">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>Terraform / CDK / Pulumi / Carina比較マトリクス</h2>
+      <p>4ツール(Terraform / CDK / Pulumi / Carina)を軸ごとに横断比較した概観表を集約したもの。(要確認)と書かれたセルは埋まっていないまま残してある — 何が確認できていないかも情報である。</p>
+      <span class="tags"><span>#参照</span> <span>#比較表</span> <span>#iac</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/ref-three-freedoms-matrix.html" data-tags="参照 比較表 dsl">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>3自由度サマリ表</h2>
+      <p>IaC 4ツールと構成記述系DSL 11本を、3自由度 — 抽象化の追加 / 複数量の制御 / 実装の切替 — で横断評価した一覧表。</p>
+      <span class="tags"><span>#参照</span> <span>#比較表</span> <span>#dsl</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/ref-carina-feature-inventory.html" data-tags="参照 carina スナップショット">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>Carina機能点検(2026-04-27時点)</h2>
+      <p>2026-04-27時点のスナップショット。 carina-rs/carina(https://github.com/carina-rs/carina) repoをIaCツールとして必要な20項目で点検した結果である。</p>
+      <span class="tags"><span>#参照</span> <span>#carina</span> <span>#スナップショット</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/ref-source-pointers.html" data-tags="参照 ポインタ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>ソース調査ポインタ集</h2>
+      <p>このノートは腐る。 行番号は当時のリポジトリのスナップショットであり、対象リポジトリが更新されれば合わなくなる。</p>
+      <span class="tags"><span>#参照</span> <span>#ポインタ</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/ref-carina-issue-index.html" data-tags="参照 issue carina">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>探索から出たissue索引</h2>
+      <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
+      <span class="tags"><span>#参照</span> <span>#issue</span> <span>#carina</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/ref-config-dsl-survey.html" data-tags="参照 dsl 調査">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>構成記述DSL 11本の調査</h2>
+      <p>構成記述系DSL 11本(Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helm)を、同じ枠組み —…</p>
+      <span class="tags"><span>#参照</span> <span>#dsl</span> <span>#調査</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/open-questions.html" data-tags="未解決 todo">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>未解決の問い</h2>
+      <p>これらの探索で答えが出なかった問いの一覧。概念ノートではなく、次に調べるべきことのリストである。既に解決したものは各概念ノートに事実として書かれているのでここには含まない。</p>
+      <span class="tags"><span>#未解決</span> <span>#todo</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/about-these-notes-accuracy.html" data-tags="メタ 精度">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>これらのノートの精度について</h2>
+      <p>これらのノートは確定した結論ではない。 すべて生成AI(Claude / Codex)との対話による設計探索の記録を分解したもので、結論の確定ではなく論点の整理と根拠確認を目的として書かれた作業ノートが元になっている。</p>
+      <span class="tags"><span>#メタ</span> <span>#精度</span></span>
+    </span>
   </a>
 </div>
 
