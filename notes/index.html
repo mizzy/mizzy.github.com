@@ -85,7 +85,7 @@
 </div>
 
 <div class="index-head">
-  <h2 class="all">すべてのノート <span class="count">90本</span> <span class="order">更新が新しい順</span></h2>
+  <h2 class="all">すべてのノート <span class="count">91本</span> <span class="order">更新が新しい順</span></h2>
 </div>
 
 <div class="search">
@@ -109,6 +109,14 @@
 </div>
 
 <div class="cards">
+  <a class="card interpretation" href="/notes/state-blocks-decouple-code-from-reality.html" data-tags="state リファクタリング plan iac">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>import / removed / moved は現実を動かさずに帳簿だけを書き換える</h2>
+      <p>コードの整理が本番の作り直しになると、誰も整理しなくなる。stateだけを書き換える3つのブロックが、その結びつきを切っている。</p>
+      <span class="tags"><span>#state</span> <span>#リファクタリング</span> <span>#plan</span> <span>#iac</span></span>
+    </span>
+  </a>
   <a class="card interpretation" href="/notes/monoid-and-monad.html" data-tags="モナド 構造 plan">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -941,11 +949,36 @@
 
   bs.forEach(function(b){
     b.addEventListener('click', function(){
-      tag=b.dataset.tag;
-      bs.forEach(function(x){ x.classList.toggle('on', x===b); });
-      render();
+      setTag(b.dataset.tag);
+      // ボタンで選び直したらURLのタグも合わせる。戻るで前の絞り込みに帰れる
+      var h=b.dataset.tag ? '#tag-'+encodeURIComponent(b.dataset.tag) : '#';
+      if(location.hash!==h) history.pushState(null, '', h);
     });
   });
+
+  // タグの絞り込みはURLからも掛かる。各ノートのページ末尾にある
+  // /notes/#tag-iac のようなリンクがこれを使う。
+  //
+  // ボタンは出現数の多いタグにしか無い(17個)が、実際に使われているタグは
+  // 100種を超える。render() は tag 文字列だけを見ていて、それがボタンとして
+  // 存在するかは問わないので、ハッシュから直接 tag を立てれば全部のタグが引ける。
+  // ボタンが無いタグのときは「すべて」の見た目を解除しておかないと、
+  // 絞り込み中なのに絞り込んでいないように見える。
+  function setTag(t){
+    tag=t;
+    bs.forEach(function(x){ x.classList.toggle('on', x.dataset.tag===t); });
+    render();
+  }
+
+  function fromHash(){
+    var m=/^#tag-(.+)$/.exec(location.hash);
+    var t=m ? decodeURIComponent(m[1]) : '';
+    if(t!==tag) setTag(t);
+  }
+
+  window.addEventListener('hashchange', fromHash);
+  window.addEventListener('popstate', fromHash);
+  fromHash();
 
   // 日本語の変換中は input が確定前の文字で何度も飛ぶ。
   // そのまま引くと「かたけんさ」のような未確定文字で一旦0本になり、
