@@ -120,7 +120,47 @@
 
   <p><strong>引数については反変、戻り値については共変</strong>になる。日常的な言い方をすれば、「より広い引数を受け取り、より狭い値を返す関数」は、いつでも代わりに使える。より多くを受け付けて、より確かなものを返すのだから、置き換えて困る場面がない。</p>
 
-  <p>これは型理論の標準的な規則(<code>S-Arrow</code>)で、Pierceらの記述がそのまま「関数構成子は第一引数について反変、第二引数について共変である」と言っている(<a href="https://softwarefoundations.cis.upenn.edu/plf-current/Sub.html">Software Foundations, <em>Sub: Subtyping</em></a>)。Scalaの<code>Function1</code>はこの規則を型定義そのものに書いていて、<code>trait Function1[-T1, +R]</code>と、引数に反変(<code>-</code>)、戻り値に共変(<code>+</code>)の印が付く(<a href="https://github.com/scala/scala/blob/2.13.x/src/library/scala/Function1.scala">scala/scala</a>)。</p>
+  <h3>具体例で確かめる</h3>
+
+  <p>規則だけ見ても腑に落ちないので、<code>犬 &lt;: 動物</code>で実際に代入してみる。<strong><code>犬 -&gt; 動物</code>という関数がほしい</strong>場面を考える。呼ぶ側は犬を渡すつもりで、返ってきたものを動物として扱うつもりでいる。代わりに何を渡せるか。</p>
+
+  <div class="scroll narrow">
+  <table>
+    <thead><tr><th>渡す関数</th><th>通るか</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td><code>動物 -&gt; 動物</code></td><td><strong>通る</strong></td><td>犬を渡す→動物なので受け取れる。返りは動物で期待どおり</td></tr>
+      <tr><td><code>チワワ -&gt; 動物</code></td><td><strong>壊れる</strong></td><td>柴犬を渡した瞬間に困る。チワワしか扱えない</td></tr>
+      <tr><td><code>犬 -&gt; 犬</code></td><td><strong>通る</strong></td><td>返りが犬。犬は動物なので、動物として扱って問題ない</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>一行目と二行目が引数側の話で、<strong>引数の型は広げる分には通り、狭めると壊れる</strong>。中身の向き(<code>チワワ &lt;: 犬 &lt;: 動物</code>)と、関数全体の向きが逆になっている。</p>
+
+  <pre><code>チワワ    &lt;:  犬     &lt;:  動物        ← 引数の型の向き
+動物-&gt;X   &lt;:  犬-&gt;X  &lt;:  チワワ-&gt;X   ← 関数全体の向き(反転)</code></pre>
+
+  <p>三行目が戻り値側で、こちらは<strong>狭める分には通る</strong>。向きはそのままである。</p>
+
+  <h3>「第一引数」は関数の引数のことではない</h3>
+
+  <p>これは型理論の標準的な規則(<code>S-Arrow</code>)で、Pierceらの記述がそのまま「関数構成子は第一引数について反変、第二引数について共変である」と言っている(<a href="https://softwarefoundations.cis.upenn.edu/plf-current/Sub.html">Software Foundations, <em>Sub: Subtyping</em></a>)。</p>
+
+  <p><strong>この言い回しは引っかかりやすい。</strong> ここでの「第一引数/第二引数」は<strong>型構成子<code>-&gt;</code>から見た引数</strong>であって、関数から見た引数ではない。<code>A -&gt; B</code>を<code>Arrow&lt;A, B&gt;</code>と書き直すと対応が見える。</p>
+
+  <div class="scroll narrow">
+  <table>
+    <thead><tr><th>原文の言い方</th><th>実体</th><th>関数として見ると</th></tr></thead>
+    <tbody>
+      <tr><td><code>-&gt;</code>の<strong>第一引数</strong></td><td><code>A</code></td><td>関数の<strong>引数</strong>の型</td></tr>
+      <tr><td><code>-&gt;</code>の<strong>第二引数</strong></td><td><code>B</code></td><td>関数の<strong>戻り値</strong>の型</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>同じ「引数」という語が二つの階層で使われていて、しかも片方がもう片方と一致してしまうので紛らわしい。わざわざこの言い方をするのは、<strong><code>List&lt;T&gt;</code>の変性と<code>A -&gt; B</code>の変性を同じ土俵で語るため</strong>である。「型構成子は各引数について共変か反変か不変かを持つ」という一般則があり、<code>List</code>は引数を一つ取って共変、<code>-&gt;</code>は引数を二つ取って第一が反変・第二が共変、と揃えて言える。<code>-&gt;</code>に限って読むなら「引数について反変、戻り値について共変」と読み替えてよい。</p>
+
+  <p>Scalaの<code>Function1</code>はこの規則を型定義そのものに書いていて、<code>trait Function1[-T1, +R]</code>と、引数に反変(<code>-</code>)、戻り値に共変(<code>+</code>)の印が付く(<a href="https://github.com/scala/scala/blob/2.13.x/src/library/scala/Function1.scala">scala/scala</a>)。<code>-T1</code>が第一引数、<code>+R</code>が第二引数で、上の表そのものである。</p>
 
   <p>この規則は関数型言語に限った話ではない。メソッドのオーバーライドで戻り値を狭められる(共変戻り値)のに引数は狭められない、というよくある制約は、同じ規則の別の顔である。</p>
 
