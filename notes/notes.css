@@ -64,8 +64,9 @@
   --radius-md: 2px;
   --radius-lg: 4px;
 
-  --measure: 46rem;   /* 本文の幅 */
-  --wide: 58rem;      /* 図・表がはみ出せる幅。本文から左右に約3rmずつ */
+  /* コラムの幅。見出し・本文・表・図がすべてこの1本に揃う。
+     表と図がこの中に収まる必要があるので、本文だけの場合より広く取る。 */
+  --measure: 62rem;
 
   /* ---- 図（インラインSVG）用の別名 ----
    * 各ノートのページ固有CSSはこの短い名前でBroadsheetのトークンを参照する。
@@ -185,7 +186,9 @@ h4 {
   margin: var(--space-4) 0 var(--space-2);
 }
 
-p { margin: 0 0 var(--space-4); text-wrap: pretty; }
+/* 本文の段落だけは行長を抑える。コラム幅いっぱいだと日本語では1行が長すぎ、
+   行を追うのが難しくなる。表・図はコラム幅いっぱいを使う。 */
+p { margin: 0 0 var(--space-4); text-wrap: pretty; max-width: 46rem; }
 
 p.meta {
   margin: 0 0 var(--space-6);
@@ -194,8 +197,10 @@ p.meta {
   line-height: 1.7;
 }
 
-ul, ol { padding-left: 1.4em; margin: 0 0 var(--space-4); }
+ul, ol { padding-left: 1.4em; margin: 0 0 var(--space-4); max-width: 46rem; }
 li { margin-bottom: var(--space-1); }
+/* 表の中のリストは幅を制限しない */
+td ul, td ol, th ul, th ol { max-width: none; }
 
 strong { font-weight: 600; }
 em, i, cite { font-style: italic; }
@@ -556,22 +561,14 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   color: color-mix(in srgb, var(--color-text) 50%, transparent);
 }
 
-/* ---- はみ出し ----
- * 図・比較・表は本文(--measure)より広く、--wide まで取れる。
- * margin ショートハンドで打ち消されないよう、このブロックは必ず末尾に置く。
+/* ---- 幅を揃える ----
+ * 見出し・本文・表・図の左右端を、すべて同じ1本のコラムに揃える。
+ * 紙面のコラムは1本で、そこから飛び出すものを作らない（Broadsheetの原則）。
+ * `width: 100%` は article の内容ボックス（--measure から padding を引いた幅）。
+ * このブロックは、後続の margin ショートハンドで打ち消されないよう末尾に置く。
  */
 
 figure, .contrast, .scroll, .bleed {
-  width: min(var(--wide), 100vw - var(--space-8));
-  margin-left: 50%;
-  translate: -50% 0;
-}
-
-/* 2列だけの表（日付/形式/性質のようなキー・値）は広げない。
-   広げると左右の列が離れすぎて読みにくいので、本文と同じ幅・同じ左右端に揃える。
-   `width: 100%` は article の内容ボックス（--measure から padding を引いた幅）
-   なので、見出しや本文と左右がぴったり揃う。 */
-.scroll.narrow {
   width: 100%;
   margin-left: 0;
   translate: none;
