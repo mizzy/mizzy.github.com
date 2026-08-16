@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>効果の具体化 — planは効果の自由モノイドである - notes</title>
-<meta name="description" content="静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種のEffect値の列である。">
+<meta name="description" content="静的段階の出力であるplanは、Read / Create / Update / Delete / Import / Remove / Move / Wait / DeferredCreate / DeferredReplaceの10種のEffect値の列である。">
 <meta property="og:title" content="効果の具体化 — planは効果の自由モノイドである">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://mizzy.org/notes/effects-as-free-monoid.html">
 <meta property="og:image" content="https://mizzy.org/notes/ogp/effects-as-free-monoid.png">
-<meta property="og:description" content="静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種のEffect値の列である。">
+<meta property="og:description" content="静的段階の出力であるplanは、Read / Create / Update / Delete / Import / Remove / Move / Wait / DeferredCreate / DeferredReplaceの10種のEffect値の列である。">
 <meta property="og:site_name" content="notes — mizzy.org">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="効果の具体化 — planは効果の自由モノイドである">
@@ -33,13 +33,15 @@
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §7</code>
   </p>
 
-  <p>静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種の<code>Effect</code>値の列である。<strong>効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。</strong></p>
+  <p>静的段階の出力であるplanは、Read / Create / Update / Delete / Import / Remove / Move / Wait / DeferredCreate / DeferredReplaceの10種の<code>Effect</code>値の列である。<strong>効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。</strong><code>Plan</code>は<code>effects: Vec&lt;Effect&gt;</code>を持つserde直列化可能な構造体で、<code>dyn Fn</code>の類を一切抱えていない。</p>
+
+  <p>置換(Replace)がこの列に無いことは、この読みにとって偶然ではない。置換は命令ではなく、差分エンジンがCreateとDeleteの対に展開する複合命令である。<a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></p>
 
   <p>これは副作用の具体化(reification)であり、構造としては「プログラム = 効果の自由構造、意味 = 解釈器」というfree monad / algebraic effectsの発想の初等形に当たる。</p>
 
   <h2>free monadではなく自由モノイド</h2>
 
-  <p>正確にはfree monadではない。<strong>継続を持たない</strong>からである。効果の結果に依存して次の効果を構成する部分は、静的段階で済ませてある。したがって構造は<strong>効果の自由モノイド(列)+ 複数解釈器</strong>(実プロバイダ、mock、表示)である。</p>
+  <p>正確にはfree monadではない。<strong>ほとんどの効果が継続を持たない</strong>からである。効果の結果に依存して次の効果を構成する部分は、大半が静的段階で済ませてある。したがって構造は<strong>効果の自由モノイド(列)+ 複数解釈器</strong>(実プロバイダ、mock、表示)である — ただしこの呼び方には後述の留保が要る。</p>
 
   <figure>
     <svg viewBox="0 0 640 210" role="img" aria-label="効果の列(自由モノイド)に対して、実プロバイダ・mock・表示器という三つの解釈器を差し替えられることを示す図">
@@ -52,7 +54,7 @@
         .fm .arw { stroke: var(--faint); fill: none; }
       </style>
       <g class="fm">
-        <text class="ttl" x="8" y="20">効果の列(自由モノイド) — 継続を持たない平らな並び</text>
+        <text class="ttl" x="8" y="20">効果の並び — Deferred系を除けば継続を持たない</text>
         <rect class="hi" x="8" y="32" width="86" height="34" rx="4"/>
         <text x="51" y="54" text-anchor="middle">Create</text>
         <rect class="hi" x="102" y="32" width="86" height="34" rx="4"/>
@@ -61,7 +63,7 @@
         <text x="239" y="54" text-anchor="middle">Delete</text>
         <rect class="hi" x="290" y="32" width="86" height="34" rx="4"/>
         <text x="333" y="54" text-anchor="middle">Move</text>
-        <text class="dim" x="390" y="54">… 全8種のEffect値</text>
+        <text class="dim" x="390" y="54">… 全10種のEffect値</text>
         <text class="dim" x="8" y="86">全要素を列挙・検査・表示・保存できる</text>
 
         <path class="arw" d="M192 96 V 122"/>
@@ -84,10 +86,18 @@
         <text class="dim" x="8" y="200">効果が値であって手続きでないから、意味を後から与えられる</text>
       </g>
     </svg>
-    <figcaption>継続がないからこそ、効果の列は全要素を並べて読める。同じ列に対して解釈器を差し替えられることも、この構造の配当である。</figcaption>
+    <figcaption>継続がないからこそ、効果の並びは全要素を並べて読める。同じ並びに対して解釈器を差し替えられることも、この構造の配当である。</figcaption>
   </figure>
 
   <p>この区別は装飾ではない。継続がないからこそplanは全要素を列挙・検査・表示・保存できる。free monadなら「次に何をするか」が関数の中に隠れ、実行するまで中身を見られない。「planは検査可能・表示可能・保存可能であり、applyだけが世界に触る」というCarinaの中心的性質は、自由モノイドであることに直接由来している。</p>
+
+  <h2>自由モノイドと呼ぶには二点の留保が要る</h2>
+
+  <p><strong>順序に意味がない。</strong><code>Plan</code>は<code>Vec&lt;Effect&gt;</code>だが、この<code>Vec</code>の順序は実行順ではない。実行順はapply時に<code>apply_edges</code> / <code>destroy_edges</code>からDAGとして導出される。モノイドの積は連接だが、連接の順序が意味を持たないなら、構造としてはむしろ<strong>多重集合 + 導出可能な辺</strong>である。「列」と呼ぶのは実装の格納形式に引きずられた言い方になっている。</p>
+
+  <p><strong>Deferred系は脱関数化された継続である。</strong>DeferredCreateは<code>template</code>としてAST片を抱えており、apply後の上流stateに対して再展開されて新しいCreateを生む。関数ではないので「純粋な値」は保てるが、「効果の結果に依存して次の効果を構成する部分は静的段階で済ませてある」は、この2変種については成り立たない。実装は<code>is_scheduler_meta()</code>という述語でこれらを他と区別している。</p>
+
+  <p>したがって正確には、<strong>Deferred系を除いた部分について、順序を捨てた自由構造</strong>である。その上でなら、planが検査可能・表示可能・保存可能であることの説明としては今も効く。</p>
 
   <h2>複数解釈器という帰結</h2>
 
@@ -96,6 +106,12 @@
   <h2>型システムから見た意味</h2>
 
   <p>型システムの観点では、静的段階の成果物が<strong>「型検査済みの効果プログラム」という明確な中間言語</strong>になっていることが重要である。検査と実行の境界がplanという具体的なデータに一致している。抽象的な「検査は実行前に終わる」という主張が、ファイルに書き出して持ち運べる具体物として存在する、ということでもある。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p><code>Effect</code>が10変種であること、Replaceが変種として存在しないこと、<code>Plan</code>が<code>Vec&lt;Effect&gt;</code>を持つserde直列化可能な構造体で<code>dyn Fn</code>を含まないこと、実行順が<code>apply_edges</code> / <code>destroy_edges</code>から導出されること、<code>DeferredCreate</code>が<code>template</code>にAST片を持ち<code>is_scheduler_meta()</code>で区別されることは、2026-08-16時点のソースで確認済み(<code>carina-core/src/effect.rs</code>、<code>plan.rs</code>)。自由モノイド / free monadとの対応づけは解釈である。</p>
+    <p>初稿は8種としてReadとDeferredCreate / DeferredReplaceを落とし、実装に無いReplaceを含めていた。落としていたDeferred系がまさに継続に当たるものだったので、「継続を持たない」という初稿の主張は、抜けていた変種を入れると弱まる。留保付きで残した。</p>
+  </div>
 
   <nav class="links">
     <h2>関連</h2>

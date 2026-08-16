@@ -61,7 +61,7 @@
       <g class="ir">
         <rect class="hi" x="150" y="30" width="400" height="150" rx="4"/>
         <text class="ttl" x="166" y="52">plan — 中間表現</text>
-        <text class="dim" x="534" y="52" text-anchor="end">Effect 8種の列と依存DAG</text>
+        <text class="dim" x="534" y="52" text-anchor="end">Effect 10種と依存DAG</text>
 
         <rect class="node" x="176" y="76" width="96" height="30" rx="3"/>
         <text class="mono" x="224" y="95" text-anchor="middle">Create vpc</text>
@@ -102,11 +102,13 @@
     <figcaption>三つの性質は別々の話ではない。単一定義性がDAGを成立させ、継続が残らないことが直列化を可能にし、保存されたlineageとserialの照合がリンク時の整合性検査に対応する。</figcaption>
   </figure>
 
-  <p>IRの中身は、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種の<code>Effect</code>値の列と依存DAGである。効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。IRに継続が残らない — 効果の結果に依存して次の効果を構成する部分は静的段階で済ませてある — ことが、planが検査可能・表示可能・保存可能であることを支えている。</p>
+  <p>IRの中身は、Read / Create / Update / Delete / Import / Remove / Move / Wait / DeferredCreate / DeferredReplaceの10種の<code>Effect</code>値と依存DAGである(置換は命令ではなくCreate/Deleteの対に展開される — <a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a>)。効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。IRに継続が残らない — 効果の結果に依存して次の効果を構成する部分は静的段階で済ませてある — ことが、planが検査可能・表示可能・保存可能であることを支えている。</p>
+
+  <p>ただし格納形式の<code>Vec&lt;Effect&gt;</code>の順序は実行順ではなく、実行順はapply時にDAGとして導出される。DeferredCreate / DeferredReplaceの2変種は例外で、AST片を抱えてapply後に再展開される脱関数化された継続に当たる。「継続が残らない」が素直に成り立つのはこの2つを除いた部分である。</p>
 
   <div class="accuracy">
     <h2>根拠の確度</h2>
-    <p>Effectが8種であること、<code>plan --out</code>のlineage / serial照合の挙動はソースで確認済み。SSA・オブジェクトファイルとの対応づけは解釈である。</p>
+    <p>Effectが10種であること、<code>plan --out</code>のlineage / serial照合の挙動はソースで確認済み(前者は2026-08-16に再確認)。SSA・オブジェクトファイルとの対応づけは解釈である。初稿は8種と書き、ReadとDeferredCreate / DeferredReplaceを落として実装に無いReplaceを含めていた。</p>
   </div>
 
   <nav class="links">

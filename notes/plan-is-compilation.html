@@ -42,7 +42,7 @@
         <tr><td>字句・構文解析</td><td>pest文法による.crnのパース</td></tr>
         <tr><td>マクロ展開・脱糖</td><td>letのfixed-point解決、for展開、補間、モジュール展開</td></tr>
         <tr><td>意味解析・型検査</td><td>スキーマ検証(値の所属)+ 参照の代入可能性(エッジの型)</td></tr>
-        <tr><td>命令選択(lowering)</td><td>差分計算 — desiredとstateの差を8種の命令(Effect)に落とす</td></tr>
+        <tr><td>命令選択(lowering)</td><td>差分計算 — desiredとstateの差を10種の命令(Effect)に落とす</td></tr>
         <tr><td>中間表現(IR)</td><td>plan = Effectのリスト + 依存DAG</td></tr>
         <tr><td>オブジェクトファイル</td><td><code>plan --out</code>の保存形式</td></tr>
         <tr><td>未解決シンボル・再配置情報</td><td>deferred参照とUnknown</td></tr>
@@ -61,7 +61,7 @@
 
   <div class="accuracy">
     <h2>根拠の確度</h2>
-    <p>コンパイラ各段への対応づけ全体は解釈であり、実装の自己記述ではない。類比は分析の道具として置かれている。個々の事実(Effectが8種であること、<code>plan --out</code>の保存形式、検証と代入の順序)はソースで確認済み。</p>
+    <p>コンパイラ各段への対応づけ全体は解釈であり、実装の自己記述ではない。類比は分析の道具として置かれている。個々の事実(Effectが10種であること、<code>plan --out</code>の保存形式、検証と代入の順序)はソースで確認済み(Effectの種類は2026-08-16に再確認。初稿は8種と書き、ReadとDeferredCreate / DeferredReplaceを落として実装に無いReplaceを含めていた)。</p>
   </div>
 
   <nav class="links">
