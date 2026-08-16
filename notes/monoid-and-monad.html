@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>モノイドとモナドを分けるのは継続を持てるかどうかである - notes</title>
+<meta name="description" content="繋ぐものが値か関数か。この一点が、planを表示してレビューできるかどうかを決めている。">
+<meta property="og:title" content="モノイドとモナドを分けるのは継続を持てるかどうかである">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/monoid-and-monad.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/monoid-and-monad.png">
+<meta property="og:description" content="繋ぐものが値か関数か。この一点が、planを表示してレビューできるかどうかを決めている。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="モノイドとモナドを分けるのは継続を持てるかどうかである">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/monoid-and-monad.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>モノイドとモナドを分けるのは継続を持てるかどうかである</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>既存ノート群の前提を独立させたもの</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p>IaCの成果物を語るときにモノイドとモナドという言葉を使っているが、ここで効いているのは圏論の一般論ではなく、<strong>片方は「次に何をするか」を関数の中に隠せて、もう片方は隠せない</strong>という一点だけである。この一点が、planをレビューできるかどうかを決めている。</p>
+
+  <h2>二つの構造</h2>
+
+  <p><strong>モノイド</strong>は「くっつけられる」構造である。要素の集合と、二つを繋ぐ演算と、何も足さない単位元があり、繋ぎ方の順序が結果を変えない(結合律)。リストの連結が典型で、<code>[a] ++ [b] ++ [c]</code> をどう括っても <code>[a,b,c]</code> になる。</p>
+
+  <p><strong>モナド</strong>は「値を受けて次の計算を返す関数を繋げられる」構造である。<code>bind</code>(Promiseの<code>then</code>、<code>Output.apply</code>)が中心で、渡すのは値ではなく<strong>関数</strong>である。</p>
+
+  <figure>
+    <svg viewBox="0 0 620 200" role="img" aria-label="モノイドは値を並べた列なので全要素を数えられるが、モナドはbindの右側が関数なので、その先に何が来るかを適用前には列挙できないことを示す図">
+      <style>
+        .mm text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .mm .box { fill: var(--surface); stroke: var(--rule); }
+        .mm .lbl { fill: var(--faint); font-size: 11.5px; }
+        .mm .m   { font-family: var(--mono); font-size: 12px; fill: var(--text); }
+        .mm .op  { font-family: var(--mono); font-size: 12px; fill: var(--faint); }
+        .mm .ok  { fill: var(--accent); font-size: 11.5px; }
+        .mm .hid { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+        .mm .hidt { fill: var(--accent-2); font-family: var(--mono); font-size: 11.5px; }
+        .mm .dim { fill: var(--faint); font-size: 11px; }
+      </style>
+
+      <g class="mm">
+      <!-- モノイド側 -->
+      <text class="lbl" x="0" y="12">モノイド — 繋ぐのは値</text>
+
+      <rect class="box" x="0"   y="26" width="78" height="38" rx="3"/>
+      <rect class="box" x="98"  y="26" width="78" height="38" rx="3"/>
+      <rect class="box" x="196" y="26" width="78" height="38" rx="3"/>
+      <rect class="box" x="294" y="26" width="78" height="38" rx="3"/>
+
+      <text class="m" x="39"  y="50" text-anchor="middle">Create</text>
+      <text class="m" x="137" y="50" text-anchor="middle">Update</text>
+      <text class="m" x="235" y="50" text-anchor="middle">Delete</text>
+      <text class="m" x="333" y="50" text-anchor="middle">Wait</text>
+
+      <text class="op" x="88"  y="50" text-anchor="middle">&lt;&gt;</text>
+      <text class="op" x="186" y="50" text-anchor="middle">&lt;&gt;</text>
+      <text class="op" x="284" y="50" text-anchor="middle">&lt;&gt;</text>
+
+      <text class="ok" x="390" y="50">4つ。全部見えている</text>
+
+      <!-- モナド側 -->
+      <text class="lbl" x="0" y="112">モナド — 繋ぐのは関数</text>
+
+      <rect class="box" x="0" y="126" width="78" height="38" rx="3"/>
+      <text class="m" x="39" y="150" text-anchor="middle">Create</text>
+
+      <text class="op" x="88" y="150" text-anchor="middle">&gt;&gt;=</text>
+
+      <!-- 不透明な箱: 破線で「中が見えない」ことを表す -->
+      <rect class="hid" x="106" y="122" width="200" height="46" rx="3"/>
+      <text class="hidt" x="206" y="143" text-anchor="middle">\arn -&gt; ???</text>
+      <text class="dim"  x="206" y="159" text-anchor="middle">arnが来るまで開けない</text>
+
+      <text class="dim" x="322" y="150">何個になるか数えられない</text>
+      </g>
+    </svg>
+    <figcaption>上は要素を数えられる。下は<code>&gt;&gt;=</code>の右が関数なので、適用してみるまで何が出るか分からない。</figcaption>
+  </figure>
+
+  <h2>見えるかどうかの差はここから出る</h2>
+
+  <p>繋ぐものが値なら、繋いだ結果を開いて全要素を数えられる。繋ぐものが関数なら、<strong>関数を適用してみるまで中身が分からない</strong>。関数の本体を覗く手段は一般には無い(それができるならホスト言語の静的解析器を書いたことになる)。</p>
+
+  <p>だから「planを表示してユーザーが承認する」というワークフローは、成果物がモノイドであることに依存している。モナドだと、表示できるのは「ここまで分かっている部分と、これから走る関数」でしかなく、<strong>表示されたものが実行されるものの全部だと言えない</strong>。</p>
+
+  <h2>モナドは弱いのではなく強すぎる</h2>
+
+  <p>順序を間違えやすいので書いておく。モナドはモノイドの上位互換ではないし、劣った構造でもない。<strong>表現力が高いことがそのまま検査可能性の喪失になっている</strong>、という取引である。</p>
+
+  <div class="contrast">
+    <div>
+      <h3>得るもの</h3>
+      <p><code>Output.apply</code>が書けるからこそ「デプロイ中に判明したARNを見て分岐する」が書ける。実行時にしか分からない値に応じて構造を変えられる。</p>
+    </div>
+    <div class="yes">
+      <h3>失うもの</h3>
+      <p>書けるからこそpreviewが原理的に近似になる。同じ性質の裏表であって、実装を頑張れば両方取れるという種類の話ではない。</p>
+    </div>
+  </div>
+
+  <p>Pulumiのドキュメントが「applyの中でリソースを作るのは避けよ」と<strong>禁止ではなく非推奨</strong>で書いているのは、この構造の帰結である — 禁止できるなら言語が禁止している。</p>
+
+  <h2>「モノイドだから安全」ではない</h2>
+
+  <p>モノイド性が保証するのは「成果物に継続が残らない」ことだけで、その成果物が正しいとも、成果物を作る過程が行儀よいとも言っていない。</p>
+
+  <ul>
+    <li>CDKの成果物(CFNテンプレート)はモノイドだが、それを組み立てるのはチューリング完全な任意プログラムであり、生成の停止性も再現性も言語の保証にならない</li>
+    <li>モノイドの1要素として不透明な箱を埋め込むことはできる。Lambda-backedカスタムリソースがそれで、列としては平らなまま、その要素の中で任意コードが走る</li>
+    <li>実行時に成果物の外から効果が足されることも防げない。CFNの自動ロールバックがそれに当たる</li>
+  </ul>
+
+  <p>つまりモノイド性は<strong>静的側の必要条件</strong>であって、十分条件ではない。「成果物が全情報を含む」ためには、モノイド性に加えて、生成が全域的であること、実行が成果物に閉じていることが要る。三つは別々の軸である。</p>
+
+  <h2>自由構造という言い方</h2>
+
+  <p><code>Plan</code>が<code>Vec&lt;Effect&gt;</code>であるように、効果を値として並べて意味を後から与える設計を<strong>自由モノイド + 解釈器</strong>と呼んでいる。同じ発想を継続込みでやるとfree monadになる。Carinaのplanが前者に留まるのは、効果の結果に依存して次を決める部分を静的段階で済ませてあるからで、これは制約ではなく選択である。詳細と留保は<a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a>。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+      <li><a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRがユーザーインターフェイスである</a></li>
+      <li><a href="/notes/evaporation-condition.html">蒸発条件</a></li>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+    </ul>
+  </nav>
+  <p class="tags"><a href="/notes/#tag-モナド">#モナド</a> <a href="/notes/#tag-構造">#構造</a> <a href="/notes/#tag-plan">#plan</a></p>
+</article>
+</body>
+</html>
