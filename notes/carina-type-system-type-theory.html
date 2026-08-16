@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carina型システムの型理論的分析 - notes</title>
+<meta name="description" content="CarinaのDSLを二段階の言語(静的段階 = validate/plan、動的段階 = apply)として読み、型構成子・篩型・名前付きμ型・Unknownの意味論を型理論の語彙で分析した探索記録。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* このページ固有の図解 */
+  .dia text { font-family: var(--sans); font-size: 11px; fill: var(--text); }
+  .dia .box     { fill: var(--surface); stroke: var(--rule); }
+  .dia .stage   { fill: var(--sunken);  stroke: var(--rule); }
+  .dia .hot     { fill: var(--accent-bg); stroke: var(--accent); }
+  .dia .arrow   { stroke: var(--faint); fill: none; }
+  .dia .flow    { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+  .dia .tip     { fill: var(--accent); stroke: none; }
+  .dia .dim     { fill: var(--faint); font-size: 10px; }
+  .dia .cap     { fill: var(--muted); font-size: 10px; letter-spacing: 0.05em; }
+  .dia .sep     { stroke: var(--rule); stroke-dasharray: 4 4; }
+  .dia .mono    { font-family: var(--mono); font-size: 10px; }
+
+  /* 派生関係のDAG */
+  .dag .node    { fill: var(--surface); stroke: var(--rule); }
+  .dag .root    { fill: var(--accent-bg); stroke: var(--accent); }
+  .dag .edge    { stroke: var(--faint); fill: none; }
+  .dag text     { font-family: var(--sans); font-size: 11px; fill: var(--text); }
+  .dag .sub     { fill: var(--faint); font-size: 9.5px; }
+
+  /* 精度ノートを節の中に入れるとき、h3見出しにも .accuracy > h2と同じ体裁を与える */
+  .accuracy > h3 {
+    margin: 0 0 0.6rem;
+    padding: 0;
+    border: 0;
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+  .accuracy h4 {
+    margin: 1rem 0 0.3rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Carina型システムの型理論的分析</h1>
+  <p class="meta"><time datetime="2026-06-10">2026-06-10</time> 〜 <time datetime="2026-06-11">2026-06-11</time></p>
+
+  <div class="scroll">
+    <table class="compare">
+      <tbody>
+        <tr><td>日付</td><td>2026-06-10〜2026-06-11</td></tr>
+        <tr><td>形式</td><td>生成AI (Claude) との対話による探索</td></tr>
+        <tr><td>性質</td><td>結論の確定ではなく、論点の整理と根拠確認。対話の過程で複数回の訂正を経た作業ノート(訂正内容は各節の精度ノートに記載)。</td></tr>
+        <tr><td>対象コミット</td><td>carina-rs/carina main <code>ad91ed00</code></td></tr>
+        <tr><td>経緯</td><td><a href="https://github.com/carina-rs/carina/issues/3445">carina-rs/carina#3445</a> として作成後、explorationsリポジトリへ移動。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="accuracy">
+    <h2>⚠️ この記録の精度について</h2>
+    <p>各節の冒頭に置いた精度ノートを参照。共通の前提:</p>
+    <ul>
+      <li>ソース・実行で確認済みの論点、解釈・類比、AIの学習データ由来の主張を区別する</li>
+      <li>実行再現を伴う発見は issue 化済み(下記)</li>
+      <li>探索の途中で誤った主張を二度以上訂正している。引用前に精度ノートの訂正履歴を確認すること</li>
+    </ul>
+  </div>
+
+  <h2 id="docs">この探索の構成</h2>
+
+  <p>もとは5本のドキュメントからなる探索記録で、1本の本体から3本が派生している。本体である型システム分析から、全域性の比較とplanのコンパイラ読みがそれぞれ枝分かれし、比較ノートからさらに設計上の立場が導かれる、という系譜になっている。</p>
+
+  <figure>
+    <svg class="dag" viewBox="0 0 640 250" role="img" aria-label="4つのドキュメントの派生関係を示す有向非巡回グラフ。型システム分析を根として、全域性の比較とplanのコンパイラ読みが派生し、全域性の比較からさらに設計上の立場が派生する">
+      <!-- root -->
+      <rect class="root" x="20" y="94" width="176" height="52" rx="5"/>
+      <text x="108" y="117" text-anchor="middle">1. 型システムの分析</text>
+      <text class="sub" x="108" y="134" text-anchor="middle">本体 — 二段階の言語として読む</text>
+
+      <!-- branch 1 -->
+      <rect class="node" x="270" y="20" width="176" height="52" rx="5"/>
+      <text x="358" y="43" text-anchor="middle">2. 静的段階の全域性</text>
+      <text class="sub" x="358" y="60" text-anchor="middle">Pulumi / CDKとの比較</text>
+
+      <!-- branch 2 -->
+      <rect class="node" x="270" y="176" width="176" height="52" rx="5"/>
+      <text x="358" y="199" text-anchor="middle">4. planはコンパイルである</text>
+      <text class="sub" x="358" y="216" text-anchor="middle">中間言語としてのplan</text>
+
+      <!-- leaf -->
+      <rect class="node" x="452" y="98" width="168" height="52" rx="5"/>
+      <text x="536" y="121" text-anchor="middle">3. IaC言語に必要なもの</text>
+      <text class="sub" x="536" y="138" text-anchor="middle">規範的な立場 — 蒸発条件</text>
+
+      <!-- edges -->
+      <path class="edge" d="M196 110 C 234 110, 234 46, 266 46"/>
+      <path class="edge" d="M196 130 C 234 130, 234 202, 266 202"/>
+      <path class="edge" d="M446 60 C 470 60, 458 96, 480 96"/>
+      <path class="edge" d="M258 40 l 8 6 l -8 6" fill="none"/>
+      <path class="edge" d="M258 196 l 8 6 l -8 6" fill="none"/>
+      <path class="edge" d="M474 88 l 8 6 l -8 6" fill="none"/>
+    </svg>
+    <figcaption>派生の系譜。1が本体で、2と4がそこから枝分かれし、3は2から導かれる。</figcaption>
+  </figure>
+
+  <div class="toc">
+    <a href="#analysis">
+      <span class="t">1. Carina型システムの型理論的分析(本体)</span>
+      <span class="d">CarinaのDSLを二段階の言語(静的段階 = validate/plan、動的段階 = apply)として読み、型構成子・篩型・名前付きμ型・公称軸の部分型付け・Unknownの意味論・型主導の等価性を型理論の語彙で分析する。実装 (Rust) のtypestateとWIT境界の型消去は付録として分離。</span>
+    </a>
+    <a href="#totality">
+      <span class="t">2. 静的段階の全域性 — Pulumi / AWS CDKとの比較</span>
+      <span class="d">静的段階の全域性を軸にした比較。段階分離の度合い、未知値の意味論 (Unknown / Token / Output)、モナド/モノイドによる三すくみの言い直し、Pklを含む系譜の二軸整理。</span>
+    </a>
+    <a href="#position">
+      <span class="t">3. IaC言語に必要なもの — Carinaの設計上の立場</span>
+      <span class="d">規範的な立場の表明。IaC言語の意味的本体はリソース定義と依存関係グラフであり、他の機能は静的段階の終わりまでにグラフへ蒸発する糖衣である限りで許容される(蒸発条件)。汎用言語の抽象化とエコシステムは不要、という設計上の賭けの論拠。</span>
+    </a>
+    <a href="#compilation">
+      <span class="t">4. planはコンパイルである — 中間言語としてのplanの分析</span>
+      <span class="d">「plan = 型検査しながらの中間表現へのコンパイル」を主題化した分析。脱糖・二引数の命令選択plan(source, world)・IRとしてのplan(SSA的・直列化可能・人間がレビューするIR)・リンカ兼ローダとしてのapply。類比からcarina#3448と検査器単一定義化が独立に導出されること、類比が切れる場所(ターゲットが生きている)まで。</span>
+    </a>
+  </div>
+
+  <h3>この探索から出た issue</h3>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a> — 代入で解決された値がスキーマで再検証されない(上流値はplan時、リソース出力はapply時)</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3449">carina#3449</a> — 再export連鎖で上流exportの型推論が無音で型なしに落ちる</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a> — パース時置換が参照型検査をバイパスする</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2786">carina#2786</a>(既存)— 入れ子参照の型未検査。実行再現をコメントで追記</li>
+  </ul>
+
+  <h3>関連する先行探索</h3>
+
+  <ul>
+    <li>2026-04-26-cdk-pulumi-terraform-carina-comparison — 同じツール群を記述言語・抽象化・記述自由度の軸で比較した先行探索。本探索の比較ノートは全域性・段階分離・モナド/モノイドの軸に絞った別角度</li>
+    <li>2026-04-26-cross-dsl-design-position — Pklほか構成記述系DSLの横断分析。本探索の系譜整理(全域的 × 専用言語の二軸)と相補</li>
+  </ul>
+
+  <!-- ============================================================ -->
+
+  <h2 id="analysis">1. Carina型システムの型理論的分析</h2>
+
+  <p class="meta">2026-06-10 / 対象コミット: main <code>ad91ed00</code></p>
+
+  <div class="accuracy">
+    <h3>⚠️ 精度ノート</h3>
+    <dl>
+      <dt>ソース・実行で確認済み</dt>
+      <dd>型構成子とShape / RawShapeの構造、<code>is_assignable_to</code> の規則(公称識別の包摂・区間包含・匿名→識別の拒否)、Unknownの素通しが葉単位であること(検証器を直接駆動するデモで実行確認)、循環letの静的拒否と依存循環検出(実行確認)、参照型検査がトップレベル限定であること(<a href="https://github.com/carina-rs/carina/issues/2786">carina#2786</a>、実行再現)、パース時置換による検査バイパス(<a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>、実行再現)、planの「検証 → 上流state読込 → 代入」順序、実行器と各代入点に再検証経路がないこと(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)、上流export型検査の存在と型の供給源が上流設定ディレクトリであること、export型推論の失敗系。</dd>
+
+      <dt>解釈・枠組み(検証の対象ではない)</dt>
+      <dd>二段階言語という読み、意味論的型付け・篩型・iso-recursive・幅部分型付け・gradual typingへの対応づけ、効果の自由モノイド読み。型理論の概念への対応付けは分析上の主張であり、実装がそう自称しているわけではない。</dd>
+
+      <dt>AIの学習データ由来(一次ソース未確認)</dt>
+      <dd>CUE / JSON Schemaとの同族性の記述。</dd>
+
+      <dt>訂正履歴</dt>
+      <dd>初稿の「型検査は実行時」を段階の語彙(静的段階 = validate/plan、動的段階 = apply)へ全面修正。「Unknownの窓」の範囲を二度訂正(未解決参照への宣言型検査の存在 → 上流参照の型供給源がstateではなく設定ディレクトリであること)。「全数」性の限定を「静的段階で確定する値」から「検証ステップの時点で確定している値」へ精密化。</dd>
+    </dl>
+  </div>
+
+  <p>このレポートは、CarinaのDSL(.crnで書かれる対象言語)の型システムを型理論の語彙で分析したものである。実装の詳細仕様書ではなく、「Carinaという言語が型理論上のどの概念をどう使っているか、どこに理論的な強みと弱みがあるか」を整理することを目的とする。処理系がRustで実装されていることに由来する話題は言語の型システムそのものではないため本体からは除外し、付録で実装上の特徴として短く触れるにとどめる。</p>
+
+  <h3 id="a1">1.1 分析の立場 — 何を「実行」と呼ぶか</h3>
+
+  <p>Carinaプログラムの実行とは、apply段階でEffectが実際のインフラに作用することである。validateとplanはそれに先立つ段階であり、そこで行われるのは式の評価(let束縛、補間、for展開)、スキーマ型に対する検査、そして実行すべき操作(Create / Update / DeleteなどのEffect)のリスト、つまりplanの生成である。型エラーはどの操作も実行される前に報告される。</p>
+
+  <p>したがってCarinaは二段階の言語として読むのが正確である。</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>段階</th><th>行われること</th><th>型理論上の対応</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>静的段階(validate / plan)</td><td>評価・型検査・plan(実行する操作のリスト)の生成</td><td>型検査しながらの中間表現へのコンパイル</td></tr>
+        <tr><td>動的段階(apply)</td><td>効果の実行(外界への作用)</td><td>実行</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <svg class="dia" viewBox="0 0 700 290" role="img" aria-label="Carinaの二段階構成を示す図。静的段階ではソースの評価・型検査・plan生成が行われ、planという境界を挟んで動的段階のapplyが効果を外界へ適用する">
+      <!-- 静的段階の箱 -->
+      <rect class="stage" x="8" y="34" width="426" height="186" rx="6"/>
+      <text class="cap" x="20" y="26">静的段階 &mdash; validate / plan</text>
+
+      <!-- 動的段階の箱 -->
+      <rect class="stage" x="478" y="34" width="214" height="186" rx="6"/>
+      <text class="cap" x="490" y="26">動的段階 &mdash; apply</text>
+
+      <!-- 境界線 -->
+      <path class="sep" d="M456 20 V 244"/>
+      <text class="cap" x="456" y="262" text-anchor="middle">検査と実行の境界</text>
+
+      <!-- 静的段階の中身: 入力2つ → 評価 → 型検査 → plan -->
+      <rect class="box" x="26" y="52" width="128" height="40" rx="4"/>
+      <text x="90" y="70" text-anchor="middle">ソース</text>
+      <text class="mono" x="90" y="84" text-anchor="middle">.crn</text>
+
+      <rect class="box" x="26" y="176" width="128" height="40" rx="4"/>
+      <text x="90" y="194" text-anchor="middle">state</text>
+      <text class="dim" x="90" y="208" text-anchor="middle">現状のスナップショット</text>
+
+      <rect class="box" x="196" y="52" width="128" height="40" rx="4"/>
+      <text x="260" y="70" text-anchor="middle">評価</text>
+      <text class="dim" x="260" y="84" text-anchor="middle">let / 補間 / for展開</text>
+
+      <rect class="box" x="196" y="112" width="128" height="40" rx="4"/>
+      <text x="260" y="130" text-anchor="middle">型検査</text>
+      <text class="dim" x="260" y="144" text-anchor="middle">値の所属 + 参照の適合</text>
+
+      <!-- plan -->
+      <rect class="hot" x="342" y="98" width="80" height="72" rx="5"/>
+      <text x="382" y="126" text-anchor="middle">plan</text>
+      <text class="dim" x="382" y="142" text-anchor="middle">Effectの列</text>
+      <text class="dim" x="382" y="156" text-anchor="middle">+ 依存DAG</text>
+
+      <!-- 動的段階の中身 -->
+      <rect class="box" x="494" y="114" width="84" height="40" rx="4"/>
+      <text x="536" y="138" text-anchor="middle">apply</text>
+
+      <rect class="box" x="604" y="114" width="76" height="40" rx="4"/>
+      <text x="642" y="132" text-anchor="middle">外界</text>
+      <text class="dim" x="642" y="146" text-anchor="middle">実インフラ</text>
+
+      <text class="dim" x="586" y="182" text-anchor="middle">位相順に再配置しながら実行</text>
+      <text class="dim" x="586" y="198" text-anchor="middle">applyは型を見ない</text>
+
+      <!-- 矢印 -->
+      <path class="arrow" d="M154 72 H 190"/>
+      <path class="tip" d="M184 66 l 8 6 l -8 6 z"/>
+      <path class="arrow" d="M260 92 V 108"/>
+      <path class="tip" d="M254 102 l 6 8 l 6 -8 z"/>
+      <path class="arrow" d="M154 196 C 176 196, 176 132, 190 132"/>
+      <path class="tip" d="M184 126 l 8 6 l -8 6 z"/>
+      <path class="flow" d="M324 132 H 338"/>
+      <path class="tip" d="M332 126 l 8 6 l -8 6 z"/>
+      <path class="flow" d="M422 134 H 490"/>
+      <path class="tip" d="M483 128 l 8 6 l -8 6 z"/>
+      <path class="flow" d="M578 134 H 600"/>
+      <path class="tip" d="M594 128 l 8 6 l -8 6 z"/>
+
+      <text class="dim" x="216" y="240" text-anchor="middle">型エラーはここまでに全部出る</text>
+    </svg>
+    <figcaption>二段階の言語としてのCarina。静的段階が全域的なので、プログラムを完全評価してから値を全数検査できる。planは検査と実行の境界そのものであり、動的段階に渡るのは「型検査済みの効果プログラム」だけである。</figcaption>
+  </figure>
+
+  <p>つまりCarinaは「実行時に型を検査する動的型付き言語」ではない。検査は実行に先立って完結する。ただし古典的な静的型付き言語とも違いがあり、検査の対象は原則として項(構文)ではなく評価済みの値である。これが可能なのは静的段階が全域的であるためで、その全域性は二本の柱で成り立っている。一本目は構文制限で、一般再帰はなく、forは有限コレクション上の展開しかできない。ただし構文制限だけでは停止は出ない。値の流れの循環(相互に参照し合う束縛やリソース)というもう一つの発散源があり、これは参照グラフの非循環性強制という二本目の柱で塞がれている。循環するlet束縛はfixed-point評価の前に静的に拒否され(<code>Cyclic let binding detected</code>)、letのfixed-point自体にも束縛数 + 1の反復上限がある(<code>config_loader.rs</code>)。リソース間の参照については、評価器がそもそも式を収束まで反復しない — 静的段階で解決できない参照はdeferredのまま残り、動的段階が依存グラフの位相順で解決する — 上で、そのグラフの循環は明示エラーで拒否される(<code>deps.rs</code>、<code>Circular dependency detected: a -&gt; b -&gt; a</code>)。「自分の出力に依存するリソースへの参照」は、このDAG強制が遮断する形になっている。プログラムを完全評価してから値をスキーマ型と照合する、という構成が成り立つのはこの二本柱の停止性による。型推論を持つ項ベースの型システムというより、plan生成というコンパイルの最中に全数実行される契約検査(contract checking)に近い、と性格づけるのが正確である。</p>
+
+  <p>型理論の分類でいえば、これは型を「項に付く構文的な札」ではなく「値の集合(値の分類器)」とみなし、型付けを所属判定として与える意味論的型付け(semantic typing)の系譜である。型と値を一つの束に統合したCUEや、スキーマを値の分類器とするJSON Schemaが同族に当たる。Γ ⊢ e : T形式の構文的な判断体系はほぼ持たないが、完全に値ベースというわけでもない。静的段階の時点で値が手に入らない参照(他リソースの属性への参照など)に対しては、宣言型どうしの代入可能性を照合する項レベルの検査が補完的に走る(§1.6)。つまり実態は「値がある所では所属判定、ない所では宣言型の判定」というハイブリッドである。</p>
+
+  <p>なおLSP診断は、この静的段階の検査をエディタ上で前倒しに実行するもう一つの実装であり、検査の意味論としてはvalidateと同一であること(パリティ)が要求されている。</p>
+
+  <h3 id="a2">1.2 型の言語 — 代数的構成子</h3>
+
+  <p>スキーマ型(<code>AttributeType</code>、<code>carina-core/src/schema/mod.rs</code>)は、型理論の標準的な型構成子をほぼ一通り備えている。</p>
+
+  <ul>
+    <li>基底型: <code>String</code> / <code>Int</code> / <code>Float</code> / <code>Bool</code> / <code>Duration</code></li>
+    <li>直積型: <code>Struct { name, fields }</code> — 名前付きフィールドのレコード型。各フィールドの <code>required</code> フラグが <code>T</code> か <code>Option&lt;T&gt;</code> 相当かを表す</li>
+    <li>列・写像: <code>List { element_type, ordered }</code> / <code>Map { key, value }</code> — <code>ordered</code> フラグは「列(sequence)」と「多重集合(multiset)」を同じ構成子で表し分けており、等価性の意味論(§1.7)に効く</li>
+    <li>合併型: <code>Union(Vec&lt;AttributeType&gt;)</code> — タグなし合併(untagged union)。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ</li>
+    <li>列挙型: <code>Enum { identity, base, values, … }</code> — 基底型 + 値の有限集合 + 公称的なidentity。閉じた列挙(valuesあり)と開いた列挙(valuesなし、検証関数で判定)の両方を表せる</li>
+  </ul>
+
+  <p>ユーザーが書く型注釈の言語(<code>TypeExpr</code>、<code>parser/ast.rs</code>)はこれに加えて <code>StringLiteral</code> を持つ。これは値ひとつだけを持つシングルトン型で、<code>Union</code> と組み合わせると <code>'dev' | 'prod'</code> のようなリテラル合併型が書ける。TypeScriptのリテラル型と同じ構図であり、ユーザー定義の列挙を公称的な <code>Enum</code> を経由せず構造的に表現する手段になっている。</p>
+
+  <p>タグなし合併である点には理論的な代償がある。直和型(tagged sum)と違い、値がどのメンバに属するかを判別子なしに構造照合で推定する必要があり、実装は「最良スコアのメンバを選ぶ」ヒューリスティックに頼る。メンバ同士が重なる場合(例: <code>Int | Float</code>)は数値の包摂(Int→Float昇格)で吸収しているが、重なりの大きい合併を定義すると正規化先が曖昧になる余地は残る。</p>
+
+  <p>また、型注釈の言語とスキーマ型は別の言語であり、前者から後者への対応付け(解決)を静的段階の一部として行う。リテラル型・構造的合併は注釈側にしかなく、篩の制約(§1.3)はスキーマ側にしかない、という非対称がある。</p>
+
+  <h3 id="a3">1.3 篩型 (refinement types) としての制約付き基底型</h3>
+
+  <p>Carinaに「カスタム型」という独立した型構成子はない。代わりに <code>String</code> / <code>Int</code> / <code>Float</code> の各変種が</p>
+
+  <ul>
+    <li>正規表現パターン(<code>pattern</code>)</li>
+    <li>長さ・値域の区間(<code>length</code> / <code>range</code>、両端の省略で開区間を表現)</li>
+    <li>任意の検証関数</li>
+  </ul>
+
+  <p>を持ち運ぶ。これは型理論でいう篩型 — <code>{ x: String | P(x) }</code> のように基底型を述語で絞り込んだ型 — に相当する。検査はすべて静的段階で評価済みの値に対して行われるため、篩の述語は決定可能性の心配なしに任意の計算を含められる(完全評価できる言語の利点である)。一方で述語のうち構造的な表現を持つのは区間とパターンだけで、それを超える部分は不透明な関数に逃がしている。述語が一階の表現を持つか否かは、型を直列化してプラグイン境界を越えられるか(付録参照)を分ける線でもある。</p>
+
+  <h3 id="a4">1.4 再帰型 — 名前付きμ型</h3>
+
+  <p>CloudFormationのWAFv2 <code>Statement → AndStatement → List&lt;Statement&gt;</code> のような循環スキーマを表すため、スキーマは</p>
+
+  <pre><code>Schema = { root: 型, defs: 名前 → 型 }</code></pre>
+
+  <p>という形を取り、型の中に <code>Ref(名前)</code>(defsへの参照)が現れる。これは μ 型を名前付き定義の組で表す、iso-recursive(展開を明示的な操作として扱う)流儀に相当する。型の意味を消費する操作(検証・差分・補完)は参照をdefsに対して一段展開(unfold)してから進み、展開にはホップ数の上限があるため、壊れた定義に対しても停止する。equi-recursive的に「参照と展開後を暗黙に同一視する」扱いを避けたのは意図的な設計で、過去には暗黙展開に相当する処理が循環スキーマ上で無限再帰した事故があり(carina#3340系)、その根治として展開を明示操作に一本化した経緯がある。</p>
+
+  <h3 id="a5">1.5 公称性と構造性 — TypeIdentityの部分的部分型付け</h3>
+
+  <p>列挙やカスタム文字列型には <code>TypeIdentity { provider, segments, kind }</code> という公称的な識別が付く(providerは省略可能)。注目すべきはその等価性・代入可能性の定義で、単純な全フィールド一致ではない。</p>
+
+  <ul>
+    <li>等価性(<code>same_type</code>)は「両者が値を持っている軸だけ」を比較する。provider無指定の型はprovider軸について「より広い型」として振る舞う。</li>
+    <li>代入可能性(<code>assignable_to</code>)は方向付きで、受け側が特定している軸は送り側も一致しなければならないが、受け側が特定していない軸は問わない。</li>
+  </ul>
+
+  <p>これは公称型に幅部分型付け(width subtyping)を一軸ずつ載せた構造で、<code>aws.iam.Role.Arn &lt;: Arn</code>(provider非依存のArn)のような包摂が成り立つ。provider無指定のbare identityは実質的にそのkindの上限(top)として機能する。一方で <code>aws.Region</code> と <code>gcp.Region</code> のように両軸が特定されていれば別型であり、provider越しの混同は型として弾かれる。「公称的な核(kind)+ 省略可能な公称軸による包摂」というこの設計は、完全公称型と完全構造型の中間にあり、マルチプロバイダ環境での型再利用(共通のArn型)とプロバイダ間の混同防止を一つの機構で両立させている。</p>
+
+  <p>DSL上の列挙値の表記(<code>aws.s3.Bucket.VersioningStatus.enabled</code> のような名前空間付き識別子)は、この公称識別への構文的な参照であり、静的段階で「identity + プロバイダAPI値」という正規形へ解決される。比較・直列化は解決済みの形でのみ行われる(§1.7)。</p>
+
+  <h3 id="a6">1.6 段階を跨ぐ値 — Unknown</h3>
+
+  <p>静的段階では値が決まらないものがある。上流スタックのapply結果への参照、まだ作られていないリソースの属性、for展開の変数などで、Terraformの「(known after apply)」に相当する。Carinaはこれを <code>Value::Unknown(理由)</code> として値の一級表現にしている。</p>
+
+  <p>型理論的に見ると、これは二つの段階の間に開いた窓の扱いの問題である。plan(静的段階の出力)は動的段階の挙動の静的近似であり、Unknownはその近似で確定できなかった箇所を明示する装置と言える。扱いの特徴は二点ある。</p>
+
+  <ol class="steps">
+    <li><strong>値の所属検査はUnknownを素通しする。</strong>「動的段階で解決されるはずの値」に偽の型エラーを出さない楽観的な扱いで、漸進的型付け(gradual typing)における動的型 <code>?</code> と既知型の整合(consistency)関係と同型の判断である。ただしCarinaの場合これは検査を実行時へ先送りするのではなく、静的近似の精度限界を受け入れるという意味を持つ。また素通しはUnknownが現れた葉の位置単位であり、リストは具体値と未解決値の混在が許されて要素ごとに個別に判定されるため、兄弟要素の所属検査やコンテナの形状・必須フィールドの検査は通常どおり走る(検証器の最上位で値を具体軸へ射影し、射影できない値だけを受理する一点に、この素通しの判断が集約されている)。</li>
+    <li><strong>等価性においてUnknownは何とも等しくない。</strong>差分計算は「不明な値は変化したとみなす」方向に倒れるため、健全(変化の見逃しを出さない)だが完全ではない(実際には変化しない差分を表示しうる)。三値論理の「不明」を二値の判定に埋め込む際の保守的な選択である。</li>
+  </ol>
+
+  <p>ただし素通しは「未解決の値の周りは無検査」という意味ではない。値が未解決の参照に対しては、参照元属性のスキーマ型をアクセスパス(<code>.field</code> / <code>[idx]</code>)に沿って絞り込み、代入先の型へ方向付きの代入可能性(§1.5)で照合する、宣言型ベースの項レベル検査が別経路で走る(<code>carina-core/src/validation/mod.rs</code> の参照型検査)。この判定は公称識別の包摂に加えて長さ・値域の区間の包含まで見るため、篩型のうち決定可能な断片については宣言レベルで含意(部分型)検査が成立しており、<code>role_arn = role.role_name</code> のような型違いの参照は値なしで弾ける。ただしこの検査の被覆には実装上の欠落が確認されている。検査対象は属性のトップレベルに現れた参照だけで、リストや構造体の要素に埋まった同じ型違いの参照は素通りする(<a href="https://github.com/carina-rs/carina/issues/2786">carina#2786</a>、実行再現済み)。また、パース時に値が解決できた参照は具体値へ置換されて出自が消えるため、この検査自体に到達しない(<a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>)。いずれも設計上の窓ではなく修正可能な欠落である。スタックを跨ぐ <code>upstream_state</code> 参照にも同種の検査がある(<code>carina-core/src/upstream_exports.rs</code>)。型の供給源はstateファイルではなく上流の設定ディレクトリで、そのexports宣言を静的にパースし、export名の存在・宣言型と参照位置の期待型の照合・for / フィールドアクセス / 添字の形状、をそれぞれ値なしで検査する。stateのexports自体は型なしのJSON値だが、スタック境界の型付けは設定側の宣言が担う、という構図である。</p>
+
+  <p>したがって静的近似が本当に確定できない窓は、見かけより狭い。残るのは二つで、(a) 値依存の篩所属 — 参照元の宣言型が代入先の篩より粗い場合(例: 宣言上はただのStringを、長さ・パターン付きの型が期待される場所へ補間して渡す場合)、最終値が篩を満たすかは宣言型から決定できない。そして値が確定して代入された後も、Carina自身はどの経路でも再検査しない。代入の時刻は二通りあり、上流stateの値はplan時(ただし検証ステップの後)、リソース出力はapply時だが、どちらの代入点にも検証経路がなく、最終判定はプロバイダAPIのエラーに委ねられる。(b) 宣言型のない上流exportへの参照 — 上流のexports宣言に型注釈がなく推論でも型が取れない場合、比較対象が存在せず型検査はスキップされる。型を書いた境界は検査され、書かなかった所だけ穴が開く(上流ディレクトリ自体が読めない場合は検査不能だが、それは独立した診断として報告される)。一方、for変数由来のUnknownなどは型が構文から決まるので窓の外である。</p>
+
+  <p>Unknownが単なる ⊥ ではなく理由(上流参照、for変数、編集途中の補間など7種)を持ち運ぶ点は実務的に優れており、近似が確定できなかった箇所の診断品質を支えている。</p>
+
+  <h3 id="a7">1.7 効果の具体化と、型主導の等価性</h3>
+
+  <h4>効果の具体化</h4>
+
+  <p>静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種の <code>Effect</code> 値の列である。効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。これは副作用の具体化(reification)であり、構造としては「プログラム = 効果の自由構造、意味 = 解釈器」というfree monad / algebraic effectsの発想の初等形に当たる。継続を持たない(効果の結果に依存して次の効果を構成する部分は静的段階で済ませてある)ため、正確には効果の自由モノイド(列)+ 複数解釈器(実プロバイダ、mock、表示)である。この分離が「planは検査可能・表示可能・保存可能であり、applyだけが世界に触る」というCarinaの中心的性質を支えている。型システムの観点では、静的段階の成果物が「型検査済みの効果プログラム」という明確な中間言語になっており、検査と実行の境界がplanという具体的なデータに一致していることが重要である。</p>
+
+  <h4>型主導の等価性</h4>
+
+  <p>差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality)という原則である。同じ値の組でも、期待される型によって判定が変わる:</p>
+
+  <ul>
+    <li>順序付きリストは列として位置比較、順序なしリストは多重集合として比較</li>
+    <li>列挙はプロバイダAPI値の正規形で比較し、公称識別が両側にあればidentityも厳密に比較</li>
+    <li>合併型はメンバを順に試す(合併の等価性はメンバ等価性の存在量化)</li>
+    <li>秘匿値はハッシュ経由で比較し、平文を状態に残さない</li>
+  </ul>
+
+  <p>比較の前には正規化が入る。<code>Union[String, List&lt;String&gt;]</code> の標準形化、DSL綴りの列挙値からAPI正規形への解決などを型に導かれて行い、正規形(canonical form)同士でのみ等価性を判定する。型理論の言葉では、値の同値関係を型ごとの定義的等価(definitional equality)として与え、判定は正規形への簡約を経てから行う、という型付き等価性の標準的な構成である。過去の不具合(state中の列挙値が永遠に変更扱いされ続ける現象)は正規化を経ない比較経路が残っていたことが原因で、「正規形を経ない等価判定は不健全」という理論側の予言どおりの事故だった。</p>
+
+  <h3 id="a8">1.8 評価</h3>
+
+  <h4>強み</h4>
+
+  <ol>
+    <li>段階設計が明確である。型検査は効果の実行に完全に先行し、静的段階の成果物(plan)が検査と実行の境界そのものになっている。エラーは外界に一切触れる前に報告される。</li>
+    <li>全域的な静的段階を活かした検査構成。言語が停止性を持つため完全評価してから値を検査でき、篩の述語に任意の計算を許しながら決定可能性の問題を回避している。</li>
+    <li>等価性・正規化が型主導で一元化されている。差分という中心機能が「正規形に簡約してから型ごとの同値関係で比較」という原則に載っている。</li>
+    <li>Unknownの意味論が一貫して保守的。検査は素通し、等価性は不成立、という組み合わせは「偽の型エラーを出さず、怪しい差分は出す」方向に揃っており、インフラツールとして健全側に倒れている。</li>
+    <li>公称軸の部分的部分型付けが、共通型の再利用とプロバイダ間混同防止を一つの機構で両立している。</li>
+  </ol>
+
+  <h4>弱み・理論的な負債</h4>
+
+  <ol>
+    <li>静的検査器が二系統ある。plan/validate経路とLSP経路は同じ検査の二重実装であり、意味論の一致(パリティ)を規約と試験で維持している。検査器を一つの定義から導出できていないことのコストである。</li>
+    <li>タグなし合併の判別はヒューリスティック。スコアリングによるメンバ選択は重なりの大きい合併で原理的に曖昧であり、判別子付き合併を言語に持たない限り根本解消はしない。</li>
+    <li>属性の出所が型に乗っていない。「この属性は誰が書くのか(ユーザー / プロバイダ / サーバ既定)」という区別が型でなくフラグと投影で表現されており、差分の「見かけの削除」問題のような症状が出るたびに個別対処になりやすい。</li>
+    <li>型注釈の言語とスキーマ型の非対称。リテラル型・構造的合併は注釈側にしかなく、篩の制約はスキーマ側にしかない。二つの型言語の対応付けが部分写像であることは、表現できる型の集合が経路によって違うことを意味する。</li>
+    <li>篩の不透明部分(検証関数)は合成も直列化も比較もできない。構造的な制約(パターン・区間)への寄せが進むほどこの問題は縮むが、現状は二系統の併存で、どちらで検証されるかが型から読めない。</li>
+    <li>段階を跨ぐ値の篩所属は最終的に誰も検査しない。参照の宣言型検査(§1.6)が粗い型を通した場合、代入で解決された値が篩を満たすかを確かめる経路がない。検証はplanの早い段階で一度だけ走り、上流stateの値はその後ろで(plan時に)、リソース出力はapply時に代入されるため、どちらも検査器の視界に入らない。値ベース検査の「全数」性は検証ステップの時点で値が確定しているものに限られる、ということの帰結である。</li>
+  </ol>
+
+  <h4>型理論的に見た発展方向(参考)</h4>
+
+  <ul>
+    <li>合併への判別子導入(またはDSL構文でのtagged union)。</li>
+    <li>属性の出所(ユーザー指定 / プロバイダ算出 / サーバ既定)を型上のモダリティとして昇格させると、現在フラグと投影で行っている差分の補正が型主導の操作になる。</li>
+    <li>検査器の単一定義化。validateとLSPが同じ検査定義を共有すれば、パリティは規約でなく構成から従う。</li>
+  </ul>
+
+  <h3 id="a9">1.9 まとめ</h3>
+
+  <p>Carinaの型システムは、「全域的な静的段階で完全評価と型検査を済ませ、型検査済みの効果プログラム(plan)だけを動的段階に渡す、二段階の言語」として読むのが正確である。型付けの様式は意味論的型付け(型 = 値の分類器)を基本に、値が未確定の参照には宣言型の代入可能性判定を補うハイブリッドである。型の言語は代数的構成子・篩型・名前付きμ型・公称軸の部分型付けを備え、段階の間に開く窓(applyまで決まらない値)はUnknownの楽観的検査と保守的等価性という一貫した意味論で扱われ、窓として残るのは値依存の篩所属と宣言型のない上流exportへの参照に限られる。理論的な負債は、検査器の二重実装、タグなし合併の曖昧さ、属性出所の型外表現、二つの型言語の非対称、段階を跨ぐ値の篩所属の未検査に集中しており、いずれも「定義を一つにし、区別を型に昇格させる」方向に解があることが読み取れる。</p>
+
+  <h3 id="a-appendix">付録 — 処理系実装における型(参考)</h3>
+
+  <p>以下はCarinaという言語の型システムではなく、それを実装するRustコードが自分自身の不変条件を守るために使っている型の話である。言語の分析とは層が違うため本体から分けたが、実装の特徴として記録しておく。</p>
+
+  <p>処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。未解決の列挙識別子と解決済み正規形は別の型で、後者はリゾルバしか生成できない(carina#3438)。μ 型の参照を展開した後の型ビューには参照変種が存在せず、未展開のまま照合する状態がそもそも書けない(carina#3349)。効果の部分集合しか受理しない実行器には絞り込み済みの型を渡す(carina#3164)。パーサの段階(パース直後 / 推論後)は型パラメータで区別される。いずれも本文 §1.1で述べた静的段階の内部不変条件を、実装言語の型でコンパイル時に固定するものである。</p>
+
+  <p>また、WASMプラグイン境界(WITプロトコル)では型情報の一部が不可逆に消える。列挙値はタグと公称識別を失って文字列になり、再帰的なコレクションはJSON文字列として運ばれ、往復後に一部の構造区別は復元されない。これは静的型付き言語のコンパイルにおける型消去と同型の現象で、境界の向こうは実質的に単型(uni-typed)の世界である。消去された情報に依存する処理が境界の先にあると静かに壊れるという事故クラス(篩のパターンが境界で脱落したcarina#3364など)はこの構図から予測可能で、プロトコルへの版数付与はこの消去境界に契約を置く標準的な緩和策である。</p>
+
+  <!-- ============================================================ -->
+
+  <h2 id="totality">2. 静的段階の全域性 — CarinaとPulumi / AWS CDKの比較</h2>
+
+  <p class="meta">2026-06-10 / <a href="#analysis">1. 型システムの分析</a>から派生</p>
+
+  <div class="accuracy">
+    <h3>⚠️ 精度ノート</h3>
+    <dl>
+      <dt>ソース・実行で確認済み</dt>
+      <dd>Carina側の記述(全域性の二本柱、planの構造、Unknownの意味論)はソース・実行で確認済み(詳細は<a href="#analysis">型システム分析</a>の精度ノート)。</dd>
+
+      <dt>公式ドキュメント・二次記事で確認済み</dt>
+      <dd>CDKのTokenが文字列操作で無音に壊れることは、公式ドキュメントと複数の日本語記事(replaceが無視される例、splitがプレースホルダ断片を返す例)で確認済み。</dd>
+
+      <dt>AIの学習データ由来(一次ソース未確認)</dt>
+      <dd>Pulumiの <code>Output.apply</code> がデプロイ中に実行されることとpreviewの近似性の詳細、Pulumi dynamic provider、Pklのチューリング完全性と評価タイムアウトオプション、CDK context lookupの挙動詳細、CloudFormationの自動ロールバック挙動、CDK constructによる補助リソース注入の具体例。方向は確からしいが、引用前に公式ドキュメントでの確認を推奨。</dd>
+
+      <dt>関連</dt>
+      <dd>2026-04-26-cdk-pulumi-terraform-carina-comparisonと対象ツールが重なる。本ノートは全域性・段階分離・モナド/モノイドの軸に絞った別角度の分析。</dd>
+    </dl>
+  </div>
+
+  <p>このノートは、型システム分析レポートで土台として置いた「静的段階が全域的である」というCarinaの性質を、PulumiとAWS CDKという汎用言語埋め込み型のインフラ記述ツールと比較して整理したものである。結論を先に言うと、この性質はPulumi / CDKでは基本的に実現できない。実装の頑張りの問題ではなく、言語設計の選択そのものに由来する。</p>
+
+  <h3 id="t1">2.1 「静的段階が全域的」とは何か</h3>
+
+  <p>Carinaは二段階の言語として読める。静的段階(validate / plan)で式の評価・型検査・plan(実行する操作のリスト)の生成を済ませ、動的段階(apply)でその操作だけを実行する。このとき「評価が必ず停止する」(全域性)と「評価結果がソースとstateだけの関数である」(純粋性)が言語の性質として成り立っているため、「プログラムを完全評価してから、出てきた値を全数検査する」が完全な決定手続きになる。型システム分析レポートで述べた値ベースの検査様式(plan生成の最中に全数実行される契約検査)は、すべてこの土台の上に載っている。</p>
+
+  <p>全域性は言語を制限することでしか得られない。CarinaのDSLに一般再帰はなく、forは有限コレクション上の展開しかできない。ただし構文制限は片方の柱にすぎない。相互参照(循環する値の流れ)というもう一つの発散源があり、こちらは構文では塞げないため、参照グラフの非循環性強制で塞ぐ。Carinaでは循環するlet束縛が評価前に静的拒否され、リソース間の依存循環は明示エラーになる(評価器は資源間の式を収束まで反復せず、未解決参照は動的段階が依存グラフの位相順で解決する)。つまり全域性は「構文制限 + 参照グラフの非循環性強制」の合わせ技であり、いずれにせよ後付けできる種類の性質ではない。</p>
+
+  <h3 id="t2">2.2 汎用言語埋め込みが構造的に失うもの</h3>
+
+  <p>PulumiとCDKは逆の取引をしている。リソースグラフを構築する段階(Pulumiのプログラム実行、CDKのsynth)は、TypeScript / Python / Goといったチューリング完全な汎用言語の任意のプログラム実行である。無限ループも、ネットワークI/Oも、環境変数や現在時刻への依存も書ける。したがって「グラフ構築は必ず停止する」「同じソースから必ず同じグラフが出る」は言語の定理としては成立せず、プログラマとライブラリの行儀に依存する経験則になる。</p>
+
+  <p>失われるのは停止性だけではない点に注意したい。Carinaのplanがソースとstateの純関数であるのに対し、synthの出力は外界に依存しうる(CDKのcontext lookupのように、synth中にAWSへ問い合わせる仕組みは公式機能ですらある)。これを言語保証に戻すには汎用言語をサブセット化するしかなく、それはもう別言語を作ることと同じである。</p>
+
+  <h3 id="t3">2.3 二段階の分離の度合い</h3>
+
+  <p>ただしPulumiとCDKを一括りにすると見落としが出る。二段階の分離がどこまで保たれているかは両者で違う。</p>
+
+  <p>CDKは構造的にはCarinaに近い。synth(任意プログラム)→ CloudFormationテンプレート(閉じた宣言的成果物)→ deployという流れで、動的段階への入力は全域的な成果物になっている。壊れているのは「静的段階の停止性・純粋性」だけで、検査と実行の境界が具体的な成果物(テンプレート)に一致するという性質は保たれている。</p>
+
+  <p>Pulumiは分離自体が崩れている。<code>Output.apply()</code> のコールバックは依存リソースが実体化した後、つまりdeployの最中に実行される。プログラムの一部が動的段階で走るので、<code>pulumi preview</code> は構造的に近似でしかなく、コールバック内の分岐でリソースを作るようなコードはpreviewに現れないことがある。Carinaの「planは動的段階の静的近似であり、近似誤差はUnknownとして明示される」という性質に対して、Pulumiは近似誤差の所在がプログラム中の任意のクロージャに分散する。</p>
+
+  <h3 id="t4">2.4 未知値の意味論 — Unknown / Token / Output</h3>
+
+  <p>段階を跨ぐ値(applyまで決まらない値)の扱いに、この設計差が最も鮮明に現れる。</p>
+
+  <p>CarinaのUnknownは定義された意味論を持つ一級の値である。値の所属検査は葉の位置で素通し(周囲の構造検査は続く)、等価性は何とも成立しない、未解決参照には宣言型ベースの代入可能性検査が別経路で走る。未知値をどう扱うかが言語の意味論として固定されている。</p>
+
+  <p>CDKのTokenは未解決値のプレースホルダだが、型上はただの <code>string</code> である。<code>if (vpcId === "...")</code> のような分岐や比較に使ってもコンパイルも実行も通り、プレースホルダ文字列への操作として黙って間違った結果を返す。CDKの有名な落とし穴であり、汎用言語に埋め込むと未知値の意味論をホスト言語の制御フローに守らせる手段がない、ということの帰結である。</p>
+
+  <p>Pulumiの <code>Output&lt;T&gt;</code> はCDKより規律が強い。型付きのコンテナなので、TypeScript上で <code>Output&lt;string&gt;</code> を素の <code>string</code> として使えば型エラーになり、値に触るには <code>apply()</code> を経由するしかない。未知値の型レベルの規律という一点ではPulumiが三者で最も明示的とも言える。ただしその <code>apply()</code> こそが §2.3で述べた「動的段階で走るコールバック」であり、規律の代価として段階の分離を失っている。</p>
+
+  <p>整理すると、CDKは段階の分離を保って未知値の規律を失い、Pulumiは未知値の規律を強めて段階の分離を失い、Carinaは言語を小さくすることで両方を同時に手にしている、という三すくみになる。</p>
+
+  <p>この三すくみは構造の言葉で言い直せる。鍵になる区別は、デプロイ計画が「平らな宣言の集まり」か「継続(前の結果を受けて次を決める関数)のつながり」か、である。前者はリストの連結だけでできた構造(モノイド)で、実行前に全要素を列挙・検査できる。後者はPromiseの <code>then</code> と同じ構造(モナド)で、後続の処理が関数の中に隠れているため、実行するまで中身を見られない。リトマス試験は「デプロイ時に決まる値を受けて、次に何を作るかを決めるコールバックを書けるか」である。Pulumiは書ける(<code>Output.apply</code> がそれで、コールバックはデプロイ中に走る)— だからPulumiのプログラムはモナド的で、previewが原理的に近似になる。CDKは書けない — synthが吐くテンプレートには継続が残らず、デプロイ時の値への依存は <code>Ref</code> / <code>Fn::GetAtt</code> というプレースホルダの穴として埋まり、実行順はCloudFormationがDAGとして組む。つまりCDKの成果物はCarinaのplanと同じモノイド的な形をしている(Lambda-backedカスタムリソースはデプロイ中に任意コードを走らせる脱出口だが、CloudFormationから見ても不透明な箱であり、言語構造というより「モノイドの1要素として埋め込まれた別プログラム」である)。</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th></th><th>成果物の構造</th><th>穴(未知値)の扱い</th><th>成果物を作る言語</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Carina</td><td>モノイド(plan + DAG)</td><td>一級のUnknown(意味論が定義済み)</td><td>全域的なDSL</td></tr>
+        <tr><td>CDK</td><td>モノイド(テンプレート + DAG)</td><td>Token = ただのstring(誤用が無音)</td><td>チューリング完全な汎用言語</td></tr>
+        <tr><td>Pulumi</td><td>モナド(継続がデプロイ中に走る)</td><td><code>Output&lt;T&gt;</code>(型で守られた継続)</td><td>チューリング完全な汎用言語</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <svg class="dia" viewBox="0 0 700 360" role="img" aria-label="Carina・CDK・Pulumiの三すくみを示す図。CDKは段階の分離を保つが未知値の規律を失い、Pulumiは未知値の規律を持つが段階の分離を失い、Carinaは言語を小さくすることで両方を得る">
+      <!-- Carina 行 -->
+      <text class="cap" x="8" y="26">Carina &mdash; モノイド、全域的なDSL</text>
+      <rect class="hot" x="8" y="36" width="300" height="46" rx="5"/>
+      <text x="158" y="56" text-anchor="middle">静的段階: 評価 → 型検査 → plan</text>
+      <text class="dim" x="158" y="72" text-anchor="middle">停止する / ソースとstateの純関数</text>
+      <rect class="box" x="392" y="36" width="300" height="46" rx="5"/>
+      <text x="542" y="56" text-anchor="middle">動的段階: planのEffectを実行</text>
+      <text class="dim" x="542" y="72" text-anchor="middle">ユーザーコードは走らない</text>
+      <path class="flow" d="M308 59 H 386"/>
+      <path class="tip" d="M379 53 l 8 6 l -8 6 z"/>
+      <text class="dim" x="347" y="94" text-anchor="middle">Unknown = 一級の値</text>
+
+      <!-- CDK 行 -->
+      <text class="cap" x="8" y="140">CDK &mdash; モノイド、しかし生成器が任意プログラム</text>
+      <rect class="box" x="8" y="150" width="300" height="46" rx="5"/>
+      <text x="158" y="170" text-anchor="middle">synth: 任意のTypeScript / Python</text>
+      <text class="dim" x="158" y="186" text-anchor="middle">停止しうる保証なし / 外界に問い合わせうる</text>
+      <rect class="box" x="392" y="150" width="300" height="46" rx="5"/>
+      <text x="542" y="170" text-anchor="middle">deploy: テンプレートをCFnが実行</text>
+      <text class="dim" x="542" y="186" text-anchor="middle">自動ロールバック / カスタムリソース</text>
+      <path class="flow" d="M308 173 H 386"/>
+      <path class="tip" d="M379 167 l 8 6 l -8 6 z"/>
+      <text class="dim" x="347" y="208" text-anchor="middle">Token = ただのstring</text>
+
+      <!-- Pulumi 行 -->
+      <text class="cap" x="8" y="254">Pulumi &mdash; モナド、境界が破れている</text>
+      <rect class="box" x="8" y="264" width="240" height="46" rx="5"/>
+      <text x="128" y="284" text-anchor="middle">プログラム実行</text>
+      <text class="dim" x="128" y="300" text-anchor="middle">Output&lt;T&gt; は型で守られる</text>
+      <rect class="box" x="392" y="264" width="300" height="46" rx="5"/>
+      <text x="542" y="284" text-anchor="middle">deploy</text>
+      <text class="dim" x="542" y="300" text-anchor="middle">Output.applyのコールバックがここで走る</text>
+      <!-- はみ出す継続 -->
+      <rect class="hot" x="262" y="264" width="112" height="46" rx="5"/>
+      <text x="318" y="284" text-anchor="middle">継続</text>
+      <text class="dim" x="318" y="300" text-anchor="middle">境界を跨ぐ</text>
+      <path class="flow" d="M248 287 H 258"/>
+      <path class="flow" d="M374 287 H 386"/>
+      <path class="tip" d="M379 281 l 8 6 l -8 6 z"/>
+      <text class="dim" x="318" y="330" text-anchor="middle">previewは原理的に近似</text>
+
+      <!-- 段階境界 -->
+      <path class="sep" d="M350 16 V 108"/>
+      <path class="sep" d="M350 130 V 222"/>
+      <path class="sep" d="M350 244 V 340"/>
+    </svg>
+    <figcaption>三すくみ。CarinaとCDKでは成果物が境界で閉じる(モノイド)。Pulumiでは継続が境界を跨いで動的段階まで生き残る(モナド)ため、previewから中身が見えない。CDKが破っているのは境界ではなく、生成器側の停止性・純粋性である。</figcaption>
+  </figure>
+
+  <p>CDKとPulumiの違いはモナド/モノイドの軸にある。CDKは成果物をモノイドに保った代わりに穴を <code>string</code> 型のまま放置し(Tokenの誤用が無音で壊れる)、Pulumiは穴を <code>Output&lt;T&gt;</code> という型付きの容器で守った代わりに、その容器がモナドなので継続の中身がpreviewから見えない。「穴を型で守ること」と「成果物を平らに保つこと」を、両者は片方ずつしか取れていない。CDKとCarinaの違いは §2.1〜§2.2の全域性の軸にある。成果物は同じモノイドでも、CDKのそれはチューリング完全な任意プログラムが組み立てるので、生成の停止と再現性が言語の保証にならない。三つの性質 — モノイドの成果物・型と意味論で守られた穴・全域的な生成器 — を同時に持つのがCarinaの位置である。</p>
+
+  <p>この対比は実行時の側からも言い直せる。「動的段階では、コードに書いたこと以外の副作用が発生しない」という性質 — 動的段階の効果の閉包性 — を立てると、これは二つに分解できる。P1(完全性): 動的段階で起きる効果はすべて実行前の成果物に列挙されている(エンジンが勝手に足さず、ユーザーコードが途中で混ざらない)。P2(帰属性): 成果物の各効果はユーザーが書いたコードに遡れる(ライブラリが黙って注入しない)。モノイド性が「成果物に継続が残らない」という静的側の性質だとすれば、閉包性はその実行時側の対偶である。</p>
+
+  <p>Carinaは両方を構造的に満たす。applyが実行するのはplanに列挙されたEffectだけで、apply中にユーザーコードが走る仕組み(フック、プロビジョナ、コールバック)はなく、失敗時の自動ロールバックもない(途中失敗は中途状態で止まるだけで、誰も書いていない削除をエンジンが自律的に実行することはない)。モジュールやforは展開結果がそのままplanに見える糖衣で、書いていないリソースを注入する層がない。条件は二つで、性質が成り立つのはEffectの粒度であり(1効果の実装としてプロバイダは複数のAPI呼び出しを行い、クラウド側が付随リソースを暗黙に作ることもある)、プロバイダは効果を忠実に実装すると信頼されたコードである(ただしWASMサンドボックス内で動きI/Oがホスト経由なので、この信頼を機構で縛る余地が構造的にある)。</p>
+
+  <p>CDKはP1にもP2にも破れがある。CloudFormationは失敗時に自動ロールバックする — 作ったものを勝手に消すという、誰も書いていない効果をエンジンが自律的に実行する。カスタムリソース(Lambda-backed)はデプロイ中に任意コードを走らせ、その副作用はテンプレートから不透明である。そしてP2の破れは日常的で、constructライブラリは利用者が書いていないリソース(補助Lambda、IAMロール)をスタックに注入する。成果物には載るので「テンプレートに対する完全性」は保たれるが、「コードに書いたこと」への帰属は薄れる。</p>
+
+  <p>PulumiはP1が言語構造として成立しない。<code>Output.apply</code> のコールバックとdynamic providerはデプロイ中に任意のユーザーコードを実行し、そのコードはリソースとして表現されない副作用を自由に持てて、previewには現れない。行儀よく書けば満たせるが、言語は保証しない — モナド的(継続がデプロイ中に走る)という構造の帰結である。</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th></th><th>P1: 効果は成果物に閉じる</th><th>P2: 効果はユーザーコードに遡れる</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Carina</td><td>成り立つ(Effect粒度、プロバイダを信頼の根として)</td><td>成り立つ</td></tr>
+        <tr><td>CDK</td><td>破れ(自動ロールバック、カスタムリソース)</td><td>破れ(constructの暗黙注入)</td></tr>
+        <tr><td>Pulumi</td><td>構造的に不成立(デプロイ中の任意コード)</td><td>CDKと同様の注入あり</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="t5">2.5 トレードオフは相補的</h3>
+
+  <p>公平のために、汎用言語埋め込みの見返りも明記しておく。TypeScriptの型検査は、グラフを組み立てるメタプログラムに対する本物の項ベース静的型付けであり、関数・クラス・パッケージエコシステム(npm / PyPI)による抽象化もそのまま使える。型システム分析レポートの言葉で言えば、構図は綺麗に相補的である。</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th></th><th>メタプログラムの項ベース型付け</th><th>静的段階の全域性・値の全数検査</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Pulumi / CDK</td><td>強い(ホスト言語の型システム)</td><td>持てない</td></tr>
+        <tr><td>Carina</td><td>ほぼ持たない</td><td>持つ</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>構造として失うものは言語が小さいこと自体である。全域的なDSLには汎用言語の抽象化手段(高階関数、再帰的なデータ変換、外部ライブラリ)がなく、表現力の上限は言語設計者が用意した構成子で決まる。この損失をどう価値づけるかは設計上の立場の問題であり、本ノートの範囲(設計空間の客観的な整理)を超えるため、別ノート <a href="#position">IaC言語に必要なもの — Carinaの設計上の立場</a> に切り出した。要旨だけ述べれば、IaC言語の意味的本体はリソース定義と依存関係グラフであり、左列(メタプログラムの項ベース型付けとエコシステム)は「持てない」ではなく「要らない」、というのがCarinaの立場である。</p>
+
+  <h3 id="t6">2.6 系譜</h3>
+
+  <p>Carinaの選択は孤立したものではない。TerraformのHCL、BazelのStarlark、Dhall、CUEはいずれも「全域的な設定記述言語」の系譜にあり、評価の停止を言語で保証した上で、評価結果に対する検査や合成を組み立てている。逆にNixはチューリング完全であり、この系譜には入らない(Nixの評価は停止しないことがある)。</p>
+
+  <p>Pkl (Apple) を加えると、この系譜は一本の線ではなく二軸の空間として見えてくる。Pklは専用の設定記述言語で、型注釈に任意の述語を付けられる(<code>port: Int(this &gt; 0 &amp;&amp; this &lt; 65536)</code>)。検査はその述語を評価済みの値へ適用する方式で、意味論的型付け + 値ベースの契約検査という検査様式だけ見れば、この系譜の中でCarinaに最も近い。ところが停止性の軸では反対側にいる。Pklは再帰関数を書けるチューリング完全な言語で、評価は停止しないことがあり得る(CLIに評価タイムアウトのオプションがあるのはその裏返しである)。純粋性はモジュール・外部リソースへのアクセス許可制というサンドボックスで運用的に確保するが、全域性は言語の定理としては持たない。</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th></th><th>全域的</th><th>チューリング完全</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>専用言語</td><td>HCL / Starlark / Dhall / CUE / Carina</td><td>Nix / Pkl</td></tr>
+        <tr><td>汎用言語埋め込み</td><td>(構造的に不可能)</td><td>Pulumi / CDK</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>「専用言語かどうか」と「全域的かどうか」は独立の選択であり、埋め込み+全域の象限が空なのは偶然ではない(ホスト言語をサブセット化しない限り埋まらない)。そしてPklの位置は、全域性の価値が「評価結果が何をゲートするか」に依存することを照らす。Pklの評価結果はJSON/YAMLという成果物で、評価が止まらなければビルドが失敗するだけ — 世界は何も変わらない。一方CarinaやTerraformの静的段階は、実インフラを変更する動的段階の門番であり、門番が停止しないことは成果物生成の失敗より重い。Pklが全域性を捨てて値ベースの篩検査だけを取れたのは、守るべきapply段階(と、それに伴うunknown値の問題)をそもそも持たないからだ、と読める。</p>
+
+  <p>つまり「静的段階の全域性」は、インフラ記述ツールの設計空間における一つの明確な分岐点である。汎用言語に埋め込んでエコシステムと項ベース型付けを取るか、専用言語を作って全域性と値の全数検査を取るか。Carinaは後者を選び、型システム分析レポートで述べた検査様式の全体(意味論的型付け、篩の任意述語、型主導の等価性、Unknownの一貫した意味論)は、その選択の配当として読める。</p>
+
+  <!-- ============================================================ -->
+
+  <h2 id="position">3. IaC言語に必要なもの — Carinaの設計上の立場</h2>
+
+  <p class="meta">2026-06-11 / <a href="#totality">2. 静的段階の全域性</a>から派生</p>
+
+  <div class="accuracy">
+    <h3>⚠️ 精度ノート</h3>
+    <p>規範的な立場の表明であり、検証対象となる事実主張はほぼ含まない。「Terraformが高階関数なしで長年成立している」は一般知識ベース。供給網リスクの論点は一般論であり、具体的な事故事例の調査はしていない。</p>
+  </div>
+
+  <p>このノートは規範的な立場の表明である。型システム分析レポートが「Carinaはどういう構造か」を記述し、全域性の比較ノートが設計空間の客観的なトレードオフを整理するのに対し、ここでは「なぜその構造を選ぶのか」という設計原理を述べる。</p>
+
+  <h3 id="p1">3.1 立場の要約</h3>
+
+  <p>IaC言語の意味的本体は、リソースの定義と、その依存関係グラフである。それ以外のすべての言語機能は、あれば便利という程度のものにすぎない。</p>
+
+  <p>「あれば便利」の限界も定められる。言語機能は、静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される。let、for、補間、モジュール、exportsはこの条件を満たす — planの時点ではすべて展開・置換され、残るのは型付きノード(リソース定義)とエッジ(依存)だけである。以後この条件を蒸発条件と呼ぶ。</p>
+
+  <figure>
+    <svg class="dia" viewBox="0 0 660 220" role="img" aria-label="蒸発条件を示す図。let・for・補間・モジュール・exportsという糖衣が静的段階の終わりまでに正規化され、残るのはリソース定義のノードと依存のエッジだけになる">
+      <!-- 左: 糖衣 -->
+      <text class="cap" x="8" y="22">ソースに書ける機能</text>
+      <rect class="box" x="8" y="34" width="150" height="26" rx="4"/>
+      <text x="83" y="51" text-anchor="middle">let</text>
+      <rect class="box" x="8" y="66" width="150" height="26" rx="4"/>
+      <text x="83" y="83" text-anchor="middle">for</text>
+      <rect class="box" x="8" y="98" width="150" height="26" rx="4"/>
+      <text x="83" y="115" text-anchor="middle">補間</text>
+      <rect class="box" x="8" y="130" width="150" height="26" rx="4"/>
+      <text x="83" y="147" text-anchor="middle">モジュール</text>
+      <rect class="box" x="8" y="162" width="150" height="26" rx="4"/>
+      <text x="83" y="179" text-anchor="middle">exports</text>
+
+      <!-- 中: 蒸発 -->
+      <text class="cap" x="230" y="22">静的段階</text>
+      <rect class="stage" x="212" y="34" width="140" height="154" rx="5"/>
+      <text x="282" y="102" text-anchor="middle">正規化 (蒸発)</text>
+      <text class="dim" x="282" y="120" text-anchor="middle">展開・置換</text>
+
+      <!-- 右: グラフだけ残る -->
+      <text class="cap" x="408" y="22">planに残るもの</text>
+      <circle class="hot" cx="452" cy="70" r="20"/>
+      <text x="452" y="74" text-anchor="middle">vpc</text>
+      <circle class="hot" cx="562" cy="60" r="20"/>
+      <text x="562" y="64" text-anchor="middle">subnet</text>
+      <circle class="hot" cx="540" cy="150" r="20"/>
+      <text x="540" y="154" text-anchor="middle">sg</text>
+      <circle class="hot" cx="632" cy="126" r="20"/>
+      <text x="632" y="130" text-anchor="middle">ec2</text>
+      <path class="arrow" d="M472 66 H 540"/>
+      <path class="arrow" d="M462 88 L 528 140"/>
+      <path class="arrow" d="M578 74 L 618 110"/>
+      <path class="arrow" d="M558 143 L 612 132"/>
+      <text class="dim" x="540" y="196" text-anchor="middle">型付きノード + 依存エッジだけ</text>
+
+      <!-- 矢印 -->
+      <path class="flow" d="M158 110 H 206"/>
+      <path class="tip" d="M199 104 l 8 6 l -8 6 z"/>
+      <path class="flow" d="M352 110 H 402"/>
+      <path class="tip" d="M395 104 l 8 6 l -8 6 z"/>
+    </svg>
+    <figcaption>蒸発条件。言語機能は静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される。全域性とは「糖衣が必ず蒸発しきることの保証」にほかならない。</figcaption>
+  </figure>
+
+  <p>なお「依存関係グラフの記述」には精密化が要る。エッジの大半はユーザーが明示するのではなく、値の参照(<code>vpc.vpc_id</code>)から推論される。つまり言語が記述させるのは「グラフそのもの」ではなく「グラフが一意に定まるだけの情報」である。</p>
+
+  <h3 id="p2">3.2 蒸発条件は判定基準として働く</h3>
+
+  <p>この条件を採ると、比較ノートで整理した設計空間の各点に評価が下せる。</p>
+
+  <ul>
+    <li>全域性(評価の停止保証)とは、糖衣が必ず蒸発しきることの保証である。評価が止まらない・循環するとは、グラフに正規化しきれない記述が残るということにほかならない。</li>
+    <li>planがモノイド(平らな宣言の集まり)であるのは、蒸発後にグラフ以外の何も残らないからである。</li>
+    <li>Pulumiの <code>Output.apply</code> コールバックが問題なのは、蒸発しない糖衣 — デプロイ段階まで生き残るプログラム片 — だからである。「言語に必要なのはグラフの記述だけ」という立場からは、あれはグラフの外にはみ出た異物である。</li>
+    <li>型検査が項ベースの体系をほぼ必要としないことも同じ理由で説明がつく。型を付けるべき「プログラム」が実質存在せず、検査対象はグラフそのもの — ノード上の値の所属(スキーマ検証)と、エッジ両端の型の適合(参照の代入可能性)— である。型システム分析レポートで記述した検査機構は、すべてこの二種に還元できる。</li>
+  </ul>
+
+  <h3 id="p3">3.3 汎用言語の抽象化手段とエコシステムは不要である</h3>
+
+  <p>CDK / Pulumiが提供する汎用言語の抽象化(高階関数、クラス、任意計算)とパッケージエコシステムを、本立場は「失ったもの」と数えない。IaCというドメインでは必要がないからである。理由は三つ。</p>
+
+  <p>第一に、インフラ記述の主要な読者はレビューアと将来の運用者であり、問われるのは「この記述から実際に何が作られるか」の判読性である。抽象の層が厚くなるほど記述と成果物の距離が開き、plan / diffの判読コストが上がる。IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い。</p>
+
+  <p>第二に、IaCが本当に必要とする再利用は、検証済みパターンのパラメータ付き合成であって、任意計算ではない。それはモジュール・for・exportsという有界な合成手段 — すべて蒸発条件を満たす — で足りる。Terraformが高階関数なしで長年成立していることがその実証である。汎用言語に人が求める「表現力」の実態の多くは繰り返しの除去であり、チューリング完全性はそれに対して過剰である。</p>
+
+  <p>第三に、世界を変更する資格情報の傍でnpm / PyPIの任意パッケージが動くことは、それ自体が供給網攻撃の攻撃面である。被害半径が「ビルドの汚染」から「本番インフラの改変」へ広がる。</p>
+
+  <h3 id="p4">3.4 帰結</h3>
+
+  <p>比較ノートのトレードオフ表(メタプログラムの項ベース型付け × 全域性・値の全数検査)は、構造としては対称な取引である。しかしドメインに照らした価値づけは対称ではない。左列は「持てない」ではなく「要らない」— これがCarinaの設計上の賭けであり、型システム分析レポートで記述した検査様式の全体(意味論的型付け、篩の任意述語、型主導の等価性、Unknownの一貫した意味論)は、この賭けの配当として読める。</p>
+
+  <!-- ============================================================ -->
+
+  <h2 id="compilation">4. planはコンパイルである — 中間言語としてのplanの分析</h2>
+
+  <p class="meta">2026-06-11 / <a href="#analysis">1. 型システムの分析</a>から派生</p>
+
+  <div class="accuracy">
+    <h3>⚠️ 精度ノート</h3>
+    <dl>
+      <dt>ソースで確認済み</dt>
+      <dd>Effectが8種であること、<code>plan --out</code> とlineage / serial照合、TOCTOUドリフト検出、検証と代入の順序、再配置(代入)後に検証経路がないこと(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)。</dd>
+
+      <dt>解釈(検証の対象ではない)</dt>
+      <dd>コンパイラ各段への対応付け全体。類比は分析の道具であり、実装の自己記述ではない。</dd>
+
+      <dt>AIの学習データ由来</dt>
+      <dd>rustc / Roslynのクエリ型アーキテクチャ、JVMバイトコード検証器・WebAssembly検証・proof-carrying code・Typed Assembly Language・名前マングリング・SVHへの言及、リンカ・ローダ・SSAの一般論。いずれも一次ソース未確認。</dd>
+    </dl>
+  </div>
+
+  <p>型システム分析レポートで、Carinaの静的段階を「型検査しながらの中間表現へのコンパイル」と性格づけた。このノートはその一句を主題に昇格させ、<code>carina plan</code> をコンパイラとして、planを中間言語(IR)として読み切る。類比は装飾ではなく、各対応から実装上の予言(そのうち一つは確認済みの実バグ)が導けることを示す。</p>
+
+  <h3 id="c1">4.1 主張と対応表</h3>
+
+  <p><code>carina plan</code> は、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。applyはその中間言語の実行系である。対応は段ごとに取れる。</p>
+
+  <div class="scroll">
+    <table class="compare">
+      <thead>
+        <tr><th>コンパイラの段</th><th>Carinaでの対応物</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>字句・構文解析</td><td>pest文法による .crnのパース</td></tr>
+        <tr><td>マクロ展開・脱糖</td><td>letのfixed-point解決、for展開、補間、モジュール展開</td></tr>
+        <tr><td>意味解析・型検査</td><td>スキーマ検証(値の所属)+ 参照の代入可能性(エッジの型)</td></tr>
+        <tr><td>命令選択 (lowering)</td><td>差分計算 — desiredとstateの差を8種の命令(Effect)に落とす</td></tr>
+        <tr><td>中間表現 (IR)</td><td>plan = Effectのリスト + 依存DAG</td></tr>
+        <tr><td>オブジェクトファイル</td><td><code>plan --out</code> の保存形式</td></tr>
+        <tr><td>未解決シンボル・再配置情報</td><td>deferred参照とUnknown</td></tr>
+        <tr><td>リンク・ロード</td><td>apply — DAGの位相順に再配置(値の代入)しながら実行</td></tr>
+        <tr><td>ターゲットアーキテクチャ</td><td>プロバイダ(aws / awscc / mock)</td></tr>
+        <tr><td>IRダンプ</td><td>plan表示・carina-tui</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>以下、各段を検分する。</p>
+
+  <h3 id="c2">4.2 フロントエンド — 糖衣はIR生成までに消える</h3>
+
+  <p>コンパイラのフロントエンドは、人間向けの構文(糖衣)を中間表現が知らなくてよい形に展開する。Carinaのlet・for・補間・モジュールがこれに当たり、planの時点ではすべて消えて、残るのは型付きノード(リソース定義)とエッジ(依存)だけである。設計上の立場ノートで蒸発条件と呼んだもの — 言語機能は静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される — は、コンパイラの言葉では「すべての言語機能はフロントエンドでlowering可能でなければならない」というIR中心の言語設計原則そのものである。</p>
+
+  <p>この観点で型検査の位置も定まる。Carinaの検査は完全評価された値に対する所属判定(<a href="#a1">§1.1</a>)であり、コンパイラの語彙では「脱糖後の正規形に対して意味解析を行う」ことに当たる。検査対象が項ではなく値であるという特異性は、フロントエンドが全域的(評価が必ず停止し、脱糖が必ず完了する)だから許される贅沢である。</p>
+
+  <h3 id="c3">4.3 ミドルエンド — 差分による命令選択、(ソース, 世界) の関数としてのコンパイル</h3>
+
+  <p>通常のコンパイラはソースだけの関数である: compile(source) = binary。Carinaのコンパイルは二引数である: plan(source, state) = patch。ソースが記述するのは「あるべき状態」であり、出力されるのは「現状との差分を埋める命令列」だからだ。</p>
+
+  <p>これは命令選択(instruction selection)の変種として読める。ターゲットの命令セットはCreate / Update / Replace / Delete / Import / Remove / Move / Waitの8命令で、ユーザーはどれも書かない。差分エンジンが、desiredのノードとstateのノードを突き合わせ、各ノードに対して適切な命令を選択する。Replaceがcascading updateや一時名を伴うのは、単一の論理的変更が複数命令の定型列に展開される、複合命令のloweringに相当する。</p>
+
+  <p>二引数であることの帰結は大きい。第一に、コンパイルは本質的に増分(incremental)である。同じソースでも世界が違えば違うpatchが出るし、世界がすでにソースの意味と一致していれば空のplanが出る — 不動点に達した増分ビルドがno-opになるのと同じである。第二に、コンパイル結果の正しさが世界のスナップショットに依存する。planが読んだstateが古くなればpatchは陳腐化する — これがTOCTOUドリフト検出(planの前後でstateの指紋を比べ、動いていれば警告)の存在理由であり、通常のコンパイラには無い段である。ビルドシステムの用語でいえば、Carinaは「ソース → 成果物」のビルドではなく「世界を宣言へ収束させる」自己調整計算(self-adjusting computation)を、毎回のplanで一段ずつ実行している。</p>
+
+  <h3 id="c4">4.4 IRとしてのplanの性質</h3>
+
+  <p>中間表現としてのplanは、いくつかの古典的な性質を持つ。</p>
+
+  <p><strong>単一定義性。</strong>各リソースはplan内でちょうど一つのノードとして定義され、他のノードはその属性を参照するだけである。SSA(静的単一代入)形式が変数の再代入を許さないのと同じ規律で、これが依存解析(DAG構築)を自明にしている。</p>
+
+  <p><strong>直列化可能性。</strong><code>plan --out</code> はIRをファイルに書き出す。これはオブジェクトファイルに相当し、リンク前の成果物を持ち運べる。保存されたplanには生成時のstateの系譜(lineage)と版(serial)が記録され、apply側はロック下でそれを照合し、系譜不一致なら拒否、版のずれなら警告する — オブジェクトファイルのABI整合性検査に正確に対応する。</p>
+
+  <p><strong>検査済みであること。</strong>型検査はIR生成の最中に完了しており、applyは型を見ない。「well-typedなIRだけがバックエンドに渡る」というコンパイラの標準的な契約である(この契約の破れが <a href="#c6">§4.6</a> の主題になる)。</p>
+
+  <p>そして最も特徴的な性質: <strong>このIRはユーザーインターフェースである。</strong>通常のコンパイラでIRダンプは開発者のデバッグ手段だが、IaCでは「IRを人間がレビューして承認する」ことがワークフローの中核である(planを見てからapplyする)。plan表示・detail level・TUIといった表示系への投資は、IRのpretty printerが一級の製品機能であることの帰結であり、IRに継続が残らないこと(比較ノートのモノイド性)はこの読みでは「IRダンプが全情報を含むこと」の保証である。</p>
+
+  <h3 id="c5">4.5 バックエンド — applyはリンカ兼ローダである</h3>
+
+  <p>applyの仕事をコンパイラの言葉で言うと、リンクとロードである。</p>
+
+  <p>planの中のdeferred参照(<code>vpc.vpc_id</code> の穴)は未解決シンボルであり、Unknownはその表示名である。applyは依存DAGの位相順 — リンク順 — にノードを実行し、各ノードの実行が完了するたびに、その出力(プロバイダが採番した実値)で後続ノードの穴を埋める。これは再配置(relocation)— オブジェクトファイル中の「あとで実アドレスを入れる」印に、ロード時に実値を書き込む操作 — の正確な対応物である。シンボルが解決できない構成(相互依存)はリンク不能としてエラーになる(循環依存検出)。</p>
+
+  <p>プロバイダはターゲットアーキテクチャである。同じIRがaws / awscc / mockという異なるバックエンドで「実行」でき、mockはエミュレータに当たる。プロバイダがWASMプラグインであることは、バックエンドがプラグイン化されたコンパイラ基盤(LLVMのターゲット追加)に似た構造で、WITプロトコルはそのABIである。型システム分析レポートの付録で述べた境界での型消去は、ABIが表現できる型がソース言語の型より粗いという、コンパイラでは見慣れた現象(名前マングリングで失われる情報、C ABIに落ちるときに消えるジェネリクス)に対応し、protocol_versionの照合はABIバージョニングである。</p>
+
+  <h3 id="c6">4.6 類比は予言する — 再配置後の検証の欠如</h3>
+
+  <p>この読みの価値は、対応から実装上の予言が導けることにある。</p>
+
+  <p><a href="#c4">§4.4</a> で「well-typedなIRだけがバックエンドに渡る」と書いた。しかし <a href="#c5">§4.5</a> の再配置はIRに新しい値を書き込む。すると問いが立つ: 再配置で書き込まれた値は、IRが持っていた型(篩)に対して検証されるのか? リンカの類比で言えば、「再配置後のオブジェクトを誰かベリファイするのか」である。</p>
+
+  <p>答えは否で、これは確認済みの実バグである(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)。検証はplanの早い段階で一度だけ走り、上流stateの値はその後ろで(plan時に)、リソース出力はapply時に代入されるが、どちらの代入点にも検証経路がない。違反値はplanの表示に現れてさえ検査されず、プロバイダAPIのエラーとしてapplyの途中で初めて顕在化する。コンパイラの言葉で言えば「型検査済み」というIRの不変条件が再配置で破壊可能であり、修正の縫い目も類比から直ちに出る: 各再配置点の直後に、書き込んだ値をその穴の型で検証する。</p>
+
+  <figure>
+    <svg class="dia" viewBox="0 0 700 250" role="img" aria-label="検証と代入のタイミングを示す図。検証はplanの早い段階で一度だけ走り、上流stateの代入とリソース出力の代入はどちらもその後ろで起きるため、代入された値は検査されない">
+      <!-- 時間軸 -->
+      <path class="arrow" d="M20 118 H 676"/>
+      <path class="tip" d="M668 112 l 8 6 l -8 6 z"/>
+      <text class="cap" x="20" y="146">時間 &rarr;</text>
+
+      <!-- 段階の区切り -->
+      <path class="sep" d="M400 40 V 200"/>
+      <text class="cap" x="200" y="30" text-anchor="middle">plan</text>
+      <text class="cap" x="540" y="30" text-anchor="middle">apply</text>
+
+      <!-- 検証 -->
+      <rect class="hot" x="60" y="52" width="122" height="34" rx="4"/>
+      <text x="121" y="74" text-anchor="middle">スキーマ検証</text>
+      <path class="flow" d="M121 88 V 112"/>
+      <circle class="tip" cx="121" cy="118" r="4"/>
+      <text class="dim" x="121" y="166" text-anchor="middle">ここで一度だけ走る</text>
+
+      <!-- 上流stateの代入 -->
+      <rect class="box" x="242" y="52" width="130" height="34" rx="4"/>
+      <text x="307" y="74" text-anchor="middle">上流stateの代入</text>
+      <path class="arrow" d="M307 88 V 112"/>
+      <circle class="tip" cx="307" cy="118" r="4"/>
+      <text class="dim" x="307" y="166" text-anchor="middle">検証済み</text>
+      <text class="dim" x="307" y="182" text-anchor="middle">の後ろ &mdash; 未検査</text>
+
+      <!-- リソース出力の代入 -->
+      <rect class="box" x="460" y="52" width="150" height="34" rx="4"/>
+      <text x="535" y="74" text-anchor="middle">リソース出力の代入</text>
+      <path class="arrow" d="M535 88 V 112"/>
+      <circle class="tip" cx="535" cy="118" r="4"/>
+      <text class="dim" x="535" y="166" text-anchor="middle">再配置 &mdash; 未検査</text>
+      <text class="dim" x="535" y="182" text-anchor="middle">プロバイダAPIのエラー待ち</text>
+
+      <text class="dim" x="350" y="222" text-anchor="middle">carina#3448 &mdash; 「型検査済み」というIRの不変条件が、再配置で破壊できる</text>
+    </svg>
+    <figcaption>検証はplanの早い段階で一度だけ走る。上流stateの値もリソース出力も、その後ろの代入点でIRに書き込まれるが、どちらの代入点にも検証経路がない。修正の縫い目は類比から直ちに出る — 各再配置点の直後に、書き込んだ値をその穴の型で検証する。</figcaption>
+  </figure>
+
+  <p>この問題へのコンパイラの世界の対応史は、修正方針の裏書きとして読める。戦略は四段階に整理できる。</p>
+
+  <ol class="steps">
+    <li><strong>(a) 検査しない</strong>古典的なC/ELFリンカの再配置は型なしの操作で、翻訳単位間で宣言が食い違っても黙ってリンクが成功し、実行時に静かに壊れる(Cの有名な未定義動作の一族)。Carinaの現状はここにいる。</li>
+    <li><strong>(b) 識別子に型を運ばせる</strong>C++ の名前マングリングはシンボル名に型を焼き込み、不一致を「無音の破壊」から「リンクエラー」に変換する。RustのSVHも同系で、Carinaの保存planのlineage / serial照合はこの戦略の粗粒度版である。</li>
+    <li><strong>(c) 境界で再検証する</strong>JVMのバイトコード検証器が代表で、クラスロード(動的リンクに相当)のたびに「コンパイル時に検査済みだったはず」を信用せず型整合を再検査する。理由は信頼境界(クラスファイルは別の場所・別の時刻・別のバージョンに対して作られたかもしれない)であり、WebAssemblyのインスタンス化時検証、proof-carrying codeも同じ形。JVMが示した経験則は「検証は付いている型の整合確認なのでコンパイルよりずっと安く、毎回やって割に合う」。</li>
+    <li><strong>(d) 最後まで型を持ち続ける</strong>Typed Assembly Languageや型付きIRリンク(LTO)のように、最下層の表現にも型を運び、あらゆる変換の後で再検査可能にする。</li>
+  </ol>
+
+  <p>carina#3448の修正は戦略 (c) に当たる。代入される値の出所は上流stateとプロバイダ応答 — このplanの検査器が自分で検査していない、外から来るデータ — であり、JVMがクラスローダに検証器を置いたのと同じ理由で、代入点が検証を置く正しい場所になる。コストの経験則も同じ方向に倒れる(所属検査は既にある述語の適用だけで、クラウドAPI呼び出しに比べれば誤差)。なお戦略 (d) を「実行時検査なし」の意味で取ることは原理的にできない — 篩の述語は値依存で、値は動的段階に初めて生まれるため、値が到着した時点で述語を走らせる以外にない。(d) から取り込めるのは構造の方であり、deferredの穴に期待型を持たせ、穴を埋める唯一のAPIが「その型の検証器だけが生成できる検証済み値」を要求するようにすれば、検査を飛ばした代入が実装言語の型レベルで書けなくなる。つまり (c) が検査を置き、(d) の精神が検査を外せなくする、という併用が修正の完成形である。</p>
+
+  <p>同型の予言は他にも立つ。検査器が二系統ある問題(validateとLSPのパリティ維持)は、コンパイラ工学ではフロントエンドの二重実装として知られ、標準解はクエリ型(インクリメンタル)コンパイラ基盤 — 一つの検査定義をバッチとエディタの両方が問い合わせる構造 — である(rustc / Roslynが辿った道)。<a href="#a8">§1.8</a> の「検査器の単一定義化」はこの標準解と一致する。また、IRを持つコンパイラには最適化パスの置き場が自然に生まれる。効果の併合(同一プロバイダへのバッチ発行)、無効果の削除、並列スケジューリングの強化などは、planというIRが既にあるからこそ「パスを足す」形で議論できる将来余地である。</p>
+
+  <h3 id="c7">4.7 類比の限界 — ターゲットが生きている</h3>
+
+  <p>対応が切れる場所も明示しておく。すべて「ターゲットが受動的なメモリではなく、生きた外部世界である」ことに由来する。</p>
+
+  <p>第一に、書き込みが失敗する。通常のローダでstore命令は失敗しないが、applyの1命令はAPIエラーで失敗しうる。途中失敗は「半分だけ書かれたバイナリ」を残す — トランザクションも自動ロールバックもなく、回復は次回の差分コンパイル(再plan)に委ねられる。</p>
+
+  <p>第二に、ターゲットは共有可変である。コンパイル(plan)と実行(apply)の間に他の書き手が世界を変えうる。planがロックを取らない設計(TOCTOU窓 + ドリフト警告 + apply側での再計算)は、「IRは予測にすぎず、真の整合性は実行直前に再確立する」という、共有可変ターゲットに対する妥当な妥協である。</p>
+
+  <p>第三に、コンパイラ自身がターゲットを読む。refreshは世界の現状を観測してから差分を取る。ソースしか読まない通常のコンパイルと違い、コンパイルの入力に世界が含まれる — これは <a href="#c3">§4.3</a> の二引数性の言い換えであり、限界というより、IaCのコンパイルを定義づける本質的な差である。</p>
+
+  <h3 id="c8">4.8 まとめ</h3>
+
+  <p>planを中間言語と見ると、Carinaの構成要素は一つのコンパイラパイプラインとして整列する。蒸発条件はフロントエンドの設計原則、値ベース検査は脱糖後の意味解析、差分計算は (ソース, 世界) を引数とする命令選択、planはSSA的で直列化可能で人間がレビューするIR、applyは再配置しながら実行するリンカ兼ローダ、プロバイダはプラグイン化されたターゲット、WITはABIである。類比は記述に留まらず、「再配置後に検証が無い」という実バグ(carina#3448)と「検査器の単一定義化」という改善方向を独立に導出する程度には予言力を持つ。切れるのはターゲットが生きている場所 — 書き込みの失敗・共有可変性・世界を読むコンパイル — であり、そこがIaCをコンパイラ工学の単純な転写から分かつ固有の領域である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/world-acquisition-incremental-plan.html">plan(source, world) の world を速くする</a> — plan-as-compilationからの派生</li>
+      <li><a href="/notes/cdk-pulumi-terraform-carina-comparison.html">CDK / Pulumi / Terraform / Carina の設計比較</a></li>
+      <li><a href="/notes/cross-dsl-design-position.html">Cross-DSL 設計位置取り分析</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/index.html">#infra</a>
+    <a href="/notes/index.html">#carina</a>
+    <a href="/notes/index.html">#type-theory</a>
+    <a href="/notes/index.html">#iac</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,44 +1,90 @@
-/* notes.css — mizzy.org/notes の共通土台
+/* notes.css — mizzy.org/notes
  *
- * 各ノートのHTMLはこれを読み込み、ページ固有の図解CSSだけを <style> で足す。
- * 色は必ずここのCSS変数を経由すること（ダークモード追従のため）。
+ * Broadsheetデザインシステム（新聞紙面）を日本語の長文向けに適用したもの。
+ * 色・間隔・角丸はすべてBroadsheetのトークンから取る。値の直書きをしない。
+ *
+ * Broadsheetからの逸脱は2点、どちらも日本語のため:
+ *   1. 和文は明朝体。Source Serif 4に日本語字形が無いので、
+ *      欧文=Source Serif 4 / 和文=ヒラギノ明朝ほかで組む。
+ *   2. 本文は15px/1.55ではなく17px/1.9。日本語は字面が大きく、
+ *      同じ設定だと詰まって読めない。
+ *
+ * 紙のみ。ダークモードは持たない（Broadsheetはダーク面を持たないシステム）。
  */
 
-/* ---- トークン ---- */
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap');
+
+/* ---- トークン（Broadsheet） ---- */
 
 :root {
-  --bg:        #fdfcfa;
-  --surface:   #ffffff;
-  --sunken:    #f4f2ee;
-  --text:      #1c1b19;
-  --muted:     #6b6862;
-  --faint:     #94908a;
-  --rule:      #e2ded7;
-  --accent:    #9a4a1f;
-  --accent-bg: #f7ede6;
-  --link:      #8a3f18;
+  --color-bg:      #f3f2f2;
+  --color-surface: #eae9e9;
+  --color-text:    #201e1d;
+  --color-accent:  #0088b0;
+  --color-accent-2:#d6006c;
+  --color-divider: color-mix(in srgb, #201e1d 16%, transparent);
 
-  --sans: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-neutral-100: #f8f4f4;
+  --color-neutral-200: #eae7e7;
+  --color-neutral-300: #d7d3d3;
+  --color-neutral-400: #bab6b6;
+  --color-neutral-500: #9b9797;
+  --color-neutral-600: #7d7979;
+  --color-neutral-700: #605d5d;
+  --color-neutral-800: #444141;
+  --color-neutral-900: #2d2b2b;
 
-  --measure: 52rem;   /* 本文の幅 */
-  --wide: 68rem;      /* 図・表・比較カードがはみ出せる幅 */
-  --radius: 6px;
-}
+  --color-accent-100: #e9f8ff;
+  --color-accent-200: #cbeeff;
+  --color-accent-600: #1186ac;
+  --color-accent-700: #006786;
+  --color-accent-800: #004961;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:        #161513;
-    --surface:   #1e1d1a;
-    --sunken:    #252320;
-    --text:      #e8e5df;
-    --muted:     #a09b93;
-    --faint:     #757068;
-    --rule:      #33302b;
-    --accent:    #e0895a;
-    --accent-bg: #2a211b;
-    --link:      #e59a70;
-  }
+  --color-accent-2-100: #fff1f4;
+  --color-accent-2-200: #ffdee6;
+  --color-accent-2-700: #aa0b56;
+
+  /* 欧文はSource Serif 4、和文は明朝体。
+     日本語のフォールバックを欧文より後ろに置くことで、
+     ラテン文字だけがSource Serif 4で組まれる。 */
+  --font-body: "Source Serif 4", "Hiragino Mincho ProN", "Yu Mincho",
+               YuMincho, "Noto Serif JP", "Songti SC", serif;
+  --font-heading: var(--font-body);
+  --font-heading-weight: 600;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --space-1: 5px;
+  --space-2: 10px;
+  --space-3: 15px;
+  --space-4: 20px;
+  --space-6: 30px;
+  --space-8: 40px;
+
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+
+  --measure: 40rem;   /* 本文の幅 */
+  --wide: 58rem;      /* 図・表がはみ出せる幅 */
+
+  /* ---- 図（インラインSVG）用の別名 ----
+   * 各ノートのページ固有CSSはこの短い名前でBroadsheetのトークンを参照する。
+   * 図の中で色を直書きしないための唯一の入口。新しい図もこの名前を使う。
+   */
+  --bg:        var(--color-bg);
+  --surface:   var(--color-neutral-100);
+  --sunken:    var(--color-surface);
+  --text:      var(--color-text);
+  --muted:     color-mix(in srgb, var(--color-text) 62%, transparent);
+  --faint:     color-mix(in srgb, var(--color-text) 45%, transparent);
+  --rule:      var(--color-neutral-300);
+  --accent:    var(--color-accent);
+  --accent-bg: var(--color-accent-100);
+  --accent-2:  var(--color-accent-2);
+  --link:      var(--color-accent-700);
+  --sans:      var(--font-body);
+  --mono:      var(--font-mono);
+  --radius:    var(--radius-md);
 }
 
 /* ---- ベース ---- */
@@ -47,383 +93,444 @@
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.85;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.9;
+  font-weight: 400;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--link); text-underline-offset: 2px; }
-a:hover { text-decoration-thickness: 2px; }
+a { color: var(--color-accent-700); text-underline-offset: 3px; }
+a:hover { color: var(--color-accent-2-700); }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
 
 /* ---- ヘッダ ---- */
+/* 新聞の題字。太い罫と細い罫で日付欄を挟む、紙面のフルニチュア。
+   Broadsheetで罫が許されるのはここだけ。 */
 
 header.site {
-  display: flex;
-  align-items: baseline;
-  gap: 1.25rem;
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 1.75rem 1.5rem 0;
-  font-size: 0.875rem;
+  padding: var(--space-6) var(--space-4) 0;
+}
+
+header.site .rule {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-bottom: var(--space-1);
+  border-top: 3px solid var(--color-text);
+  border-bottom: 1px solid var(--color-text);
+  padding-top: var(--space-2);
+  font-size: 13px;
 }
 
 header.site .home {
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--text);
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
   text-decoration: none;
 }
 
-header.site a:not(.home) { color: var(--muted); text-decoration: none; }
-header.site a:not(.home):hover { color: var(--link); }
-header.site .home::after {
-  content: "";
-  display: inline-block;
-  width: 1px; height: 0.9em;
-  margin-left: 1.25rem;
-  vertical-align: -0.1em;
-  background: var(--rule);
+header.site a:not(.home) {
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  text-decoration: none;
 }
+header.site a:not(.home):hover { color: var(--color-accent-700); }
+header.site .spacer { margin-left: auto; }
 
 /* ---- 記事 ---- */
 
 article.note {
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 6rem;
+  padding: var(--space-8) var(--space-4) 6rem;
 }
 
-article.note > * { max-width: 100%; }
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  letter-spacing: -0.01em;
+}
 
 h1 {
-  font-size: 1.9rem;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
-  margin: 0 0 0.75rem;
+  font-size: 40px;
+  line-height: 1.3;
+  margin: 0 0 var(--space-3);
 }
 
+/* 見出しは罫でも箱でもなく、余白と級数で区切る（Broadsheetの原則） */
 h2 {
-  font-size: 1.2rem;
-  line-height: 1.5;
-  margin: 3rem 0 1rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--rule);
+  font-size: 27px;
+  line-height: 1.4;
+  margin: var(--space-8) 0 var(--space-3);
 }
 
 h3 {
-  font-size: 1rem;
-  margin: 2rem 0 0.5rem;
+  font-size: 21px;
+  line-height: 1.5;
+  margin: var(--space-6) 0 var(--space-2);
 }
 
-p { margin: 0 0 1.25rem; }
+h4 {
+  font-size: 18px;
+  line-height: 1.6;
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+p { margin: 0 0 var(--space-4); text-wrap: pretty; }
 
 p.meta {
-  margin: 0 0 2.5rem;
-  color: var(--faint);
-  font-size: 0.8125rem;
-  font-variant-numeric: tabular-nums;
+  margin: 0 0 var(--space-6);
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  font-size: 14px;
+  line-height: 1.7;
 }
 
-ul, ol { padding-left: 1.4em; margin: 0 0 1.25rem; }
-li { margin-bottom: 0.4rem; }
+ul, ol { padding-left: 1.4em; margin: 0 0 var(--space-4); }
+li { margin-bottom: var(--space-1); }
 
-strong { font-weight: 700; }
+strong { font-weight: 600; }
+em, i, cite { font-style: italic; }
 
 blockquote {
-  margin: 1.5rem 0;
-  padding: 0.25rem 0 0.25rem 1.25rem;
-  border-left: 2px solid var(--accent);
-  color: var(--muted);
+  margin: var(--space-6) 0;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-accent);
+  font-style: italic;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
 }
 blockquote p:last-child { margin-bottom: 0; }
-blockquote cite { display: block; font-size: 0.8125rem; font-style: normal; }
+blockquote cite { display: block; font-size: 14px; font-style: normal; }
 
-hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
+hr, .hr {
+  height: 1px; border: 0;
+  margin: var(--space-8) 0;
+  background: var(--color-divider);
+}
+
+del { color: color-mix(in srgb, var(--color-text) 50%, transparent); }
 
 /* ---- コード ---- */
 
 code {
-  font-family: var(--mono);
-  font-size: 0.875em;
-  background: var(--sunken);
-  padding: 0.15em 0.35em;
-  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  background: var(--color-surface);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
 }
 
 pre {
-  background: var(--sunken);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   overflow-x: auto;
-  font-size: 0.8125rem;
+  font-size: 13px;
   line-height: 1.7;
-  margin: 0 0 1.5rem;
+  margin: 0 0 var(--space-4);
 }
 pre code { background: none; padding: 0; font-size: inherit; }
 
 /* ---- 表 ---- */
+/* 見出し行の下だけ罫を引く。セルを箱で囲わない。 */
 
-.scroll { overflow-x: auto; margin-bottom: 1.5rem; }
+.scroll { overflow-x: auto; margin-bottom: var(--space-6); }
 
 table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.7;
 }
 th, td {
   text-align: left;
   vertical-align: top;
-  padding: 0.6rem 0.9rem;
-  border-bottom: 1px solid var(--rule);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-divider);
 }
 th {
-  font-size: 0.8125rem;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-  font-weight: 600;
-  border-bottom-width: 2px;
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 14px;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  border-bottom: 1px solid var(--color-text);
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: 0; }
+
+table.compare td:first-child {
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  width: 28%;
 }
 
-/* 対比用。2列目以降が「選択肢」になる比較表 */
-table.compare td:first-child { color: var(--muted); width: 30%; }
+/* ---- 精度ノート ---- */
+/* AIとの対話による探索記録の但し書き。読者への前提条件なので、
+   紙面では「囲み記事」として本文と区別する。 */
 
-/* ---- 図解パーツ ---- */
-
-/* 誤解 / 実際は の2カラム */
-.contrast {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-.contrast > div {
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem;
-  font-size: 0.9375rem;
-  line-height: 1.7;
-}
-.contrast > div > h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.8125rem;
-  letter-spacing: 0.03em;
-  color: var(--muted);
-}
-.contrast > .yes { border-color: var(--accent); background: var(--accent-bg); }
-.contrast p:last-child { margin-bottom: 0; }
-
-/* 番号付きステップ */
-ol.steps { list-style: none; padding: 0; margin: 1.5rem 0; counter-reset: step; }
-ol.steps > li {
-  counter-increment: step;
-  position: relative;
-  padding: 0 0 1.25rem 2.75rem;
-  margin: 0;
-  border-left: 1px solid var(--rule);
-  margin-left: 0.85rem;
-}
-ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
-ol.steps > li::before {
-  content: counter(step);
-  position: absolute;
-  left: -0.85rem;
-  top: 0.15rem;
-  width: 1.7rem; height: 1.7rem;
-  border-radius: 50%;
-  background: var(--accent);
-  color: var(--bg);
-  font-size: 0.75rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-ol.steps > li > strong { display: block; }
-
-/* 精度ノート。AI との対話による探索記録の、確度の但し書き */
 .accuracy {
-  background: var(--sunken);
-  border: 1px solid var(--rule);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 1.1rem 1.3rem;
-  margin: 2rem 0;
-  font-size: 0.9375rem;
-  line-height: 1.75;
+  margin: var(--space-6) 0;
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--color-accent-2);
+  font-size: 15px;
+  line-height: 1.8;
 }
-.accuracy > h2 {
-  margin: 0 0 0.6rem;
-  padding: 0;
-  border: 0;
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-  color: var(--accent);
+.accuracy > h2, .accuracy > h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  font-weight: var(--font-heading-weight);
+  color: var(--color-accent-2-700);
 }
 .accuracy dl { margin: 0; }
 .accuracy dt {
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  font-weight: 600;
-  margin-top: 0.8rem;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  font-weight: var(--font-heading-weight);
+  color: color-mix(in srgb, var(--color-text) 62%, transparent);
+  margin-top: var(--space-3);
 }
 .accuracy dt:first-child { margin-top: 0; }
-.accuracy dd { margin: 0.15rem 0 0; }
+.accuracy dd { margin: 0 0 0; }
+.accuracy ul { margin-bottom: 0; padding-left: 1.2em; }
 .accuracy p:last-child, .accuracy ul:last-child { margin-bottom: 0; }
 
-/* ドキュメントの状態 */
+/* ---- ステータス ---- */
+/* 書きかけを完成品に見せないための表示。スポットカラーで刷る。 */
+
 .status {
   display: inline-block;
-  font-size: 0.75rem;
-  letter-spacing: 0.03em;
-  padding: 0.1rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid var(--rule);
-  color: var(--muted);
-  background: var(--surface);
+  font-family: var(--font-heading);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  font-weight: var(--font-heading-weight);
+  padding: 0.1em 0.6em;
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-700);
+  vertical-align: 0.22em;
+  margin-left: var(--space-2);
 }
-.status.done { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+.status.done {
+  background: var(--color-accent-100);
+  color: var(--color-accent-800);
+}
 
-/* 章・サブドキュメントの一覧 */
-.toc { margin: 2rem 0; display: grid; gap: 0.5rem; }
+/* 未着手の章に置く但し書き */
+.draft {
+  margin: var(--space-3) 0 var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-neutral-300);
+  font-size: 15px;
+  color: color-mix(in srgb, var(--color-text) 62%, transparent);
+}
+.draft p:last-child { margin-bottom: 0; }
+
+/* 訂正履歴 */
+ul.corrections {
+  font-size: 15px;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+}
+
+/* 本文中の未解決マーカー (要確認: …) */
+.todo {
+  color: var(--color-accent-2-700);
+  font-size: 0.92em;
+}
+
+/* ---- 目次 ---- */
+/* 箱で囲わず、番号と余白で並べる */
+
+.toc { margin: var(--space-6) 0 var(--space-8); }
 .toc a {
   display: block;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 0.8rem 1rem;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-divider);
   text-decoration: none;
   color: inherit;
-  background: var(--surface);
 }
-.toc a:hover { border-color: var(--accent); }
-.toc .t { color: var(--link); font-weight: 600; font-size: 0.9375rem; }
-.toc .d { display: block; color: var(--muted); font-size: 0.875rem; line-height: 1.6; margin-top: 0.2rem; }
+.toc a:first-child { border-top: 1px solid var(--color-divider); }
+.toc a:hover .t { color: var(--color-accent-2-700); }
+.toc .t {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 17px;
+  color: var(--color-accent-700);
+}
+.toc .d {
+  display: block;
+  font-size: 14px;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  margin-top: 2px;
+}
 
-/* 補足・余談 */
+/* ---- 対比 ---- */
+
+.contrast {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin: var(--space-6) 0;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.contrast > div > h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+}
+/* 「実際は」の側だけシアンで刷る */
+.contrast > .yes { border-left: 2px solid var(--color-accent); padding-left: var(--space-3); }
+.contrast p:last-child { margin-bottom: 0; }
+
+/* ---- 番号付きステップ ---- */
+
+ol.steps { list-style: none; padding: 0; margin: var(--space-6) 0; counter-reset: step; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 var(--space-4) var(--space-6);
+  margin: 0;
+}
+ol.steps > li:last-child { padding-bottom: 0; }
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 19px;
+  color: var(--color-accent);
+  line-height: 1.6;
+}
+ol.steps > li > strong { display: block; }
+
+/* ---- 補足 ---- */
+
 aside.note-aside {
-  background: var(--sunken);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem;
-  margin: 1.5rem 0;
-  font-size: 0.9375rem;
-  line-height: 1.75;
-  color: var(--muted);
+  margin: var(--space-6) 0;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-neutral-300);
+  font-size: 15px;
+  line-height: 1.8;
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
 }
 aside.note-aside p:last-child { margin-bottom: 0; }
 
-/* 図。SVGは fill/stroke に var(--...) を使うこと */
-figure { margin-top: 2.5rem; margin-bottom: 2.5rem; }
+/* ---- 図 ---- */
+
+figure { margin: var(--space-8) 0; }
 figure svg { display: block; width: 100%; height: auto; }
 figcaption {
   max-width: var(--measure);
-  margin: 0.75rem auto 0;
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  color: var(--faint);
+  margin: var(--space-3) auto 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
 }
 
-/* ---- 関連リンク / タグ ---- */
+/* ---- 関連・タグ ---- */
 
 nav.links {
-  margin-top: 3.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--rule);
+  margin-top: 4rem;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-text);
 }
 nav.links h2 {
-  margin: 0 0 0.6rem;
-  padding: 0;
-  border: 0;
-  font-size: 0.8125rem;
-  letter-spacing: 0.02em;
-  color: var(--muted);
+  margin: 0 0 var(--space-2);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
 }
 nav.links ul { list-style: none; padding: 0; margin: 0; }
-nav.links li { margin-bottom: 0.3rem; font-size: 0.9375rem; }
+nav.links li { margin-bottom: var(--space-1); font-size: 16px; }
 
-/* まだ書いていないノートへの参照。「いつか書く」の印 */
-nav.links li.unwritten { color: var(--faint); }
+nav.links li.unwritten { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
 nav.links li.unwritten::after {
   content: "未執筆";
-  margin-left: 0.5rem;
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 0.05rem 0.45rem;
-  vertical-align: 0.1em;
+  margin-left: var(--space-2);
+  font-size: 12px;
+  color: var(--color-neutral-600);
 }
 
-p.tags { margin-top: 1.5rem; font-size: 0.8125rem; }
+p.tags {
+  margin-top: var(--space-4);
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
 p.tags a {
-  display: inline-block;
-  margin-right: 0.4rem;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
   text-decoration: none;
 }
-p.tags a:hover { border-color: var(--accent); color: var(--link); }
+p.tags a:hover { color: var(--color-accent-2-700); }
 
 /* ---- index ---- */
 
-.index-head { max-width: var(--measure); margin: 0 auto; padding: 2.5rem 1.5rem 0; }
-.index-head h1 { margin-bottom: 0.5rem; }
-.index-head p { color: var(--muted); }
+.index-head {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4) 0;
+}
+.index-head h1 { margin-bottom: var(--space-3); }
+.index-head p {
+  color: color-mix(in srgb, var(--color-text) 65%, transparent);
+  font-size: 16px;
+}
 
+/* 一覧は箱で並べず、罫で区切った紙面の記事一覧にする */
 .cards {
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 1rem 1.5rem 6rem;
-  display: grid;
-  gap: 0.75rem;
+  padding: var(--space-6) var(--space-4) 6rem;
 }
 .cards a.card {
   display: block;
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 1rem 1.15rem;
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-divider);
   text-decoration: none;
   color: inherit;
 }
-.cards a.card:hover { border-color: var(--accent); }
+.cards a.card:first-child { border-top: 1px solid var(--color-text); }
+.cards a.card:last-child { border-bottom: 1px solid var(--color-divider); }
 .cards .card h2 {
-  margin: 0 0 0.3rem;
-  padding: 0;
-  border: 0;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: var(--link);
+  margin: 0 0 var(--space-2);
+  font-size: 23px;
+  line-height: 1.45;
+  color: var(--color-accent-700);
 }
+.cards a.card:hover h2 { color: var(--color-accent-2-700); }
 .cards .card p {
   margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.65;
-  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
 }
 .cards .card .tags {
-  margin-top: 0.6rem;
-  font-size: 0.75rem;
-  color: var(--faint);
+  display: block;
+  margin-top: var(--space-2);
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
 }
 
 /* ---- はみ出し ----
- * 図・比較カード・表は本文(--measure)より広く、--wide まで取れる。
- * margin-inline を使うのは、後続ルールの margin ショートハンドで
- * 打ち消されないようにするため。このブロックは必ずファイル末尾に置く。
+ * 図・比較・表は本文(--measure)より広く、--wide まで取れる。
+ * margin ショートハンドで打ち消されないよう、このブロックは必ず末尾に置く。
  */
 
 figure, .contrast, .scroll, .bleed {
-  width: min(var(--wide), 100vw - 3rem);
+  width: min(var(--wide), 100vw - var(--space-8));
   margin-left: 50%;
   translate: -50% 0;
 }
@@ -431,10 +538,11 @@ figure, .contrast, .scroll, .bleed {
 /* ---- 狭い画面 ---- */
 
 @media (max-width: 44rem) {
-  body { font-size: 15.5px; line-height: 1.8; }
-  h1 { font-size: 1.55rem; }
-  .contrast { grid-template-columns: 1fr; }
-  /* 狭い画面でははみ出さず本文幅に揃える */
+  body { font-size: 16px; line-height: 1.85; }
+  h1 { font-size: 30px; }
+  h2 { font-size: 23px; }
+  h3 { font-size: 19px; }
+  .contrast { grid-template-columns: 1fr; gap: var(--space-4); }
   figure, .contrast, .scroll, .bleed {
     width: auto;
     margin-left: 0;
