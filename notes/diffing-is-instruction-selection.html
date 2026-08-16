@@ -16,6 +16,40 @@
 <meta name="twitter:image" content="https://mizzy.org/notes/ogp/diffing-is-instruction-selection.png">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* 命令セットの一覧。差分エンジンが選ぶものとそうでないものを刷り分ける */
+  .iset {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-2);
+  }
+  .iset span {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 2px var(--space-2);
+    border: 1px solid var(--color-neutral-300);
+    color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  }
+  .iset span.sel {
+    border-color: var(--color-accent);
+    background: var(--color-accent-100);
+    color: var(--color-text);
+  }
+  .isetkey {
+    font-size: 13px;
+    color: color-mix(in srgb, var(--color-text) 55%, transparent);
+    margin: 0 0 var(--space-6);
+  }
+  .isetkey .swatch {
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-right: var(--space-2);
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent-100);
+  }
+</style>
 </head>
 <body>
 <header class="site">
@@ -35,13 +69,125 @@
 
   <p>IaCの差分エンジンがやっていることは、コンパイラの<strong>命令選択(instruction selection)の変種</strong>として読める。ターゲットの命令セットが固定されていて、ユーザーはその命令をどれも書かず、エンジンが自動的に選ぶ、という構造が同じだからである。</p>
 
-  <p>Carinaのターゲット命令セットはCreate / Update / Replace / Delete / Import / Remove / Move / Waitの8命令である。ユーザーはこのどれも書かない。差分エンジンが、desiredのノードとstateのノードを突き合わせ、各ノードに対して適切な命令を選択する。</p>
+  <p>Carinaのターゲット命令セットは <code>Effect</code> の10種である。ただし命令選択の読みが素直に当てはまるのは、このうち差分エンジンが実際に選ぶ5種だけである。</p>
 
-  <p>命令選択として読むと、複合的な変更の扱いも位置づけがつく。Replaceがcascading updateや一時名を伴うのは、<strong>単一の論理的変更が複数命令の定型列に展開される、複合命令のlowering</strong>に相当する。コンパイラで一つの高水準演算が複数のマシン命令の定型パターンに落ちるのと同じ構図である。</p>
+  <p class="iset">
+    <span class="sel">Read</span><span class="sel">Create</span><span class="sel">Update</span><span class="sel">Delete</span><span class="sel">Wait</span><span>Import</span><span>Remove</span><span>Move</span><span>DeferredCreate</span><span>DeferredReplace</span>
+  </p>
+  <p class="isetkey"><span class="swatch"></span>差分エンジンが選ぶ &nbsp;/&nbsp; 残りはplan生成後の後処理が付け足す</p>
+
+  <p>ユーザーはこの5種をどれも書かない。差分エンジンがdesiredのノードとstateのノードを突き合わせ、各ノードに対して適切な命令を選択する。</p>
+
+  <p>残りは出自が違う。Import / Remove / Moveは差分エンジンが一切出さず、ユーザーが書いた <code>import</code> / <code>removed</code> / <code>moved</code> ブロックからplan生成後の後処理(<code>add_state_block_effects</code>)が付け足す。この後処理は差分エンジンが出した命令を撤回もする — <code>removed</code> の対象に対応するDeleteや、<code>import</code> の対象に対応するCreateを消す。つまりこの3種については「ユーザーは命令を書かない」が成り立たず、むしろユーザーが命令を直接指定している。命令選択という比喩が効く範囲はここで切れる。</p>
+
+  <p>命令選択として読むと、複合的な変更の扱いも位置づけがつく。ここで効くのが<strong>Replaceは命令ではない</strong>という事実である。<code>Effect</code> にReplaceという変種は無い。置換は差分エンジンが <code>ReplacementGroup</code> として組み立て、CreateとDeleteの対に展開される — <strong>単一の論理的変更が複数命令の定型列に展開される、複合命令のlowering</strong>そのものである。コンパイラで一つの高水準演算が複数のマシン命令の定型パターンに落ちるのと同じ構図である。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 358" role="img" aria-label="ユーザーが書いた一つの論理的変更である置換が、delete-before-createでは削除してから作る2命令の列に、create-before-destroyでは一時名での作成・消費者へのcascading update・旧リソースの削除という3命令の列に展開される様子を示す図。展開先の命令はCreateとDeleteとUpdateだけで、Replaceという命令はどこにも現れない">
+      <style>
+        .lw text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .lw .box { fill: var(--surface); stroke: var(--rule); }
+        .lw .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .lw .ttl { font-size: 12.5px; font-weight: 600; }
+        .lw .dim { fill: var(--faint); font-size: 11px; }
+        .lw .m   { font-family: var(--mono); font-size: 10.5px; fill: var(--text); }
+        .lw .mu  { font-family: var(--mono); font-size: 10.5px; fill: var(--accent-2); }
+        .lw .edge { stroke: var(--faint); fill: none; }
+        .lw .drop { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .lw .ghost { fill: none; stroke: var(--accent-2); stroke-width: 1; stroke-dasharray: 3 2; }
+        .lw .a2t { fill: var(--accent-2); font-size: 11px; }
+        .lw .step { fill: var(--muted); font-size: 11px; }
+        .lw .sep { stroke: var(--rule); fill: none; }
+        .lw .lbl { fill: var(--muted); font-size: 11px; }
+      </style>
+      <g class="lw">
+        <text class="ttl" x="12" y="20">ユーザーが書いた変更</text>
+
+        <rect class="box" x="12" y="32" width="230" height="46" rx="4"/>
+        <text class="m" x="24" y="52">name = "web"</text>
+        <text class="mu" x="24" y="68">instance_type 変更 → 再作成必要</text>
+
+        <rect class="ghost" x="266" y="32" width="120" height="46" rx="4"/>
+        <text class="a2t" x="278" y="52">Replace</text>
+        <text class="a2t" x="278" y="68">— 命令は無い</text>
+
+        <path class="edge" d="M242 55 H 262"/>
+        <text class="dim" x="400" y="52">差分エンジンが ReplacementGroup を組み、</text>
+        <text class="dim" x="400" y="68">下の命令列へ展開する</text>
+
+        <path class="sep" d="M12 98 H 688"/>
+
+        <text class="ttl" x="12" y="124">delete-before-create — 共存できない場合</text>
+        <text class="step" x="12" y="160">1</text>
+        <rect class="box" x="30" y="144" width="150" height="38" rx="4"/>
+        <text class="ttl" x="42" y="168">Delete</text>
+        <path class="drop" d="M180 163 H 214"/>
+        <text class="step" x="222" y="160">2</text>
+        <rect class="box" x="240" y="144" width="150" height="38" rx="4"/>
+        <text class="ttl" x="252" y="168">Create</text>
+        <text class="dim" x="410" y="168">停止時間が出るが、名前の衝突は起きない</text>
+
+        <path class="sep" d="M12 202 H 688"/>
+
+        <text class="ttl" x="12" y="228">create-before-destroy — 先に作る場合</text>
+        <text class="step" x="12" y="264">1</text>
+        <rect class="hi" x="30" y="248" width="182" height="46" rx="4"/>
+        <text class="ttl" x="42" y="268">Create</text>
+        <text class="mu" x="42" y="284">name = "web-tmp…" (一時名)</text>
+
+        <path class="drop" d="M212 271 H 246"/>
+        <text class="step" x="254" y="264">2</text>
+        <rect class="hi" x="272" y="248" width="182" height="46" rx="4"/>
+        <text class="ttl" x="284" y="268">Update × 消費者</text>
+        <text class="dim" x="284" y="284">参照を新しい方へ向け替え</text>
+
+        <path class="drop" d="M454 271 H 488"/>
+        <text class="step" x="496" y="264">3</text>
+        <rect class="box" x="514" y="248" width="150" height="46" rx="4"/>
+        <text class="ttl" x="526" y="268">Delete</text>
+        <text class="dim" x="526" y="284">旧リソース</text>
+
+        <path class="sep" d="M12 322 H 688"/>
+        <text class="dim" x="12" y="346">展開先に現れるのはCreate / Update / Deleteだけ。「Replaceを実行する」機構はどこにも無い。</text>
+      </g>
+    </svg>
+    <figcaption>置換のlowering。一時名が要るかはスキーマの <code>unique_name</code> が決める — 名前属性で一意なら要り、<code>Coexisting</code> なら要らず、<code>Conflicting</code> ならCBD自体がplan時エラーになる。</figcaption>
+  </figure>
+
+  <p>展開の形は2通りある。delete-before-create(DBC)は削除してから作る単純な列。create-before-destroy(CBD)は先に作るため、名前が衝突するなら<strong>一時名</strong>を与えて作り、参照している消費者をcascading updateで新しい方へ向け替え、最後に旧リソースを削除する。一時名が要るかはスキーマの <code>unique_name</code> が決める — 名前属性で一意なら要り、共存可能(<code>Coexisting</code>)なら要らず、そもそも共存不能(<code>Conflicting</code>)ならCBD自体がplan時エラーになる。「Replaceを実行する」機構はどこにも無く、あるのは展開結果の命令列だけである。</p>
+
+  <p>命令セットが型で狭められている例もある。基本実行器が扱えるのはCreate / Update / Deleteの3種だけで、これは <code>BasicEffect</code> という別の型で表現されている。以前は <code>Effect</code> を受けて非対応の変種を <code>unreachable!()</code> で弾いており、呼び出し側のフィルタ漏れが実行時パニックを招いた。narrowingを型に移したことで、新しい変種を足すと「基本か否か」を決めるまでコンパイルが通らない。<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>の実例になっている。</p>
 
   <p>普通の命令選択との違いは入力にある。コンパイラの命令選択はIRだけを見て命令を選ぶが、差分計算はdesired(ソース由来)とstate(世界由来)の二つを突き合わせて選ぶ。命令選択が二引数であることは、IaCのコンパイルが本質的に増分であることの現れである。</p>
 
-  <p>出力側の性質も命令選択に対応する。選ばれた命令の列は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。つまり命令選択の成果物は「効果の自由モノイド(列)」であって、その先に継続が隠れていない。</p>
+  <p>ただし「二引数」は概念の粒度での話である。実装の <code>diff()</code> は5引数を取り、desiredとcurrentのほかに <code>saved</code>(前回保存した属性)、<code>prev_explicit</code>(ユーザーが実際に書いた属性の木)、<code>schema</code> を受ける。後ろの3つは第三の入力というより、<strong>二つを比べる前にどちらを正規化するかの指定</strong>である — サーバ側が勝手に返す既定値や、ユーザーが一度も書いていないフィールドを差分に出さないために要る。二引数という読みは、この正規化を込みで「世界の側」を整えていると見るなら保てる。</p>
+
+  <p>粒度の違いはもう一つある。<code>diff()</code> が返すのはリソース単位の <code>Diff</code>(Create / Update / NoChange / Delete の4種)で、plan全体の命令である <code>Effect</code> とは別の型である。NoChangeがあることからも分かるように、こちらは「このリソースはどうなったか」の判定であって、実行すべき命令ではない。命令選択と呼んでいるのは、この判定を含みつつ、置換の展開・state操作・待機までを <code>Effect</code> の列に落とす工程全体である。</p>
+
+  <p>plan全体の入口 <code>create_plan()</code> は10引数を取る。「世界の側」も一枚岩ではない — <code>current_states</code> はrefresh済みのリモート状態であって、state fileそのものではない。state fileは <code>saved_attrs</code> / <code>prev_explicit</code> / <code>directives_map</code> という別々の引数として効く。desired対stateという二項対立は、実装では4つの役割に分かれている。</p>
+
+  <p>そしてProviderが <code>create_plan()</code> の引数に入っている。待機述語の順序ヒントを取るために、planの段階でProviderに問い合わせる。Providerを「動的段階の解釈器」とだけ見る読みは、ここで少し崩れる。命令を選ぶ側にもProviderが顔を出している。</p>
+
+  <p>出力側の性質も命令選択に対応する。選ばれた命令の列は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。<code>Plan</code> は <code>effects: Vec&lt;Effect&gt;</code> を持つserde直列化可能な構造体で、<code>dyn Fn</code> の類を一切抱えていない。</p>
+
+  <p>この「純粋な値」を自由モノイド(列)と呼ぶのは、ただし二点で言い過ぎである。第一に、<code>Vec</code> の順序は実行順ではない。実行順はapply時に <code>apply_edges</code> / <code>destroy_edges</code> からDAGとして導出される。順序が意味を持たない以上、モノイドの積(連接)に中身がない。第二に、DeferredCreateは <code>template</code> としてAST片を抱えており、apply後の上流stateに対して再展開される。関数ではないので値であることは保てるが、<strong>脱関数化された継続</strong>ではある。実装自身がこれを <code>is_scheduler_meta()</code> という述語で他と区別している。</p>
+
+  <p>「継続が隠れていない」が素直に成り立つのは、この2つのDeferred系を除いた部分である。除いた上でなら、planが検査可能・表示可能・保存可能であることの説明としては今も効く。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>以下は2026-08-16時点のソースで確認済み(<code>carina-core/src/effect.rs</code>、<code>differ/mod.rs</code>、<code>differ/plan.rs</code>、<code>plan.rs</code>、<code>carina-cli/src/wiring/mod.rs</code>)。</p>
+    <ul>
+      <li><code>Effect</code> の10変種と、Replaceが変種として存在しないこと。実装には変種を数える <code>assert_eq!(effects.len(), 10, …)</code> があり、変種を足すと落ちる</li>
+      <li>差分エンジンが出すのはRead / Create / Update / Delete / Waitの5種で、Import / Remove / Moveは <code>add_state_block_effects</code> が後から付け足すこと。この後処理が既存の命令を撤回もすること</li>
+      <li><code>ReplacementGroup</code> によるCBD/DBCの展開順、一時名の生成条件と <code>unique_name</code> の分岐</li>
+      <li><code>BasicEffect</code> による3変種への絞り込みと、それが <code>unreachable!()</code> を置き換えた経緯</li>
+      <li><code>diff()</code> の5引数、<code>create_plan()</code> の10引数、<code>Diff</code> の4変種、<code>current_states</code> がrefresh済みリモート状態であること、Providerが <code>create_plan()</code> の引数であること</li>
+      <li><code>Plan</code> が <code>Vec&lt;Effect&gt;</code> を持ちserde直列化可能で <code>dyn Fn</code> を含まないこと。実行順が <code>apply_edges</code> / <code>destroy_edges</code> から導出されること</li>
+    </ul>
+    <p>命令選択という対応づけ自体は解釈である。</p>
+    <p>初稿は命令セットを「Create / Update / Replace / Delete / Import / Remove / Move / Waitの8命令」と書いていた。Readと後から入ったDeferredCreate / DeferredReplaceが抜け、実装に無いReplaceが入っていた。加えて「ユーザーはこのどれも書かない」が全10種に掛かるように読めたが、Import / Remove / Moveはユーザーが書いたブロックが直接の出処である。Replaceを命令から外したことで、上のloweringの読みはむしろ強くなっている。</p>
+  </div>
 
   <nav class="links">
     <h2>関連</h2>
@@ -49,6 +195,7 @@
       <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
       <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
       <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
     </ul>
   </nav>
 
