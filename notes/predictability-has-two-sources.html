@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>予測可能性には二つの源がある - notes</title>
+<meta name="description" content="コードを読めば分かることと、そのmoduleを使い慣れているから分かっていること。体感上は区別がつかないが、宿る場所が成果物か個人かで経済的性質がまるで違う。">
+<meta property="og:title" content="予測可能性には二つの源がある — コードから読めることと、既に知っていること">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/predictability-has-two-sources.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/predictability-has-two-sources.png">
+<meta property="og:description" content="コードを読めば分かることと、そのmoduleを使い慣れているから分かっていること。体感上は区別がつかないが、宿る場所が成果物か個人かで経済的性質がまるで違う。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="予測可能性には二つの源がある — コードから読めることと、既に知っていること">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/predictability-has-two-sources.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* 二つの源を並べる表: 「個人に宿る」側を第二スポットカラーで刷る */
+  .sources td:last-child { color: var(--color-accent-2-700); }
+  .sources td:first-child { font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>予測可能性には二つの源がある — コードから読めることと、既に知っていること</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>predictability-is-the-core-value / abstraction-boundary-opacity からの派生</code>
+    <span class="dates"><time datetime="2026-08-17">2026-08-17</time> 作成</span>
+  </p>
+
+  <p>「実行前に結果が読める」(<a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a>)と言うとき、その「読める」の中身は一つではない。二つ混ざっている。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="同じ「予測できる」という状態に二つの経路がある。一方はコードを読んで属性値とgraph形状が決まる経路、もう一方はmoduleの利用経験を重ねて中を読まずに分かっている経路。前者はコードに宿り、後者は読み手に宿る">
+      <style>
+        .src text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .src .box  { fill: var(--surface); stroke: var(--rule); }
+        .src .b1   { fill: var(--accent-bg); stroke: var(--accent); }
+        .src .b2   { fill: var(--bg); stroke: var(--accent-2); stroke-dasharray: 4 3; }
+        .src .ttl  { font-size: 13px; font-weight: 600; }
+        .src .dim  { fill: var(--muted); font-size: 11px; }
+        .src .arw  { stroke: var(--faint); fill: none; }
+        .src .goal { fill: var(--sunken); stroke: var(--rule); }
+      </style>
+      <g class="src">
+        <rect class="b1" x="8" y="18" width="252" height="70" rx="4"/>
+        <text class="ttl" x="26" y="42">1. 静的予測可能性</text>
+        <text x="26" y="62">目の前のコードを読めば決まる</text>
+        <text class="dim" x="26" y="79">宿る場所: コード(成果物)</text>
+
+        <rect class="b2" x="8" y="112" width="252" height="70" rx="4"/>
+        <text class="ttl" x="26" y="136">2. 習熟による予測可能性</text>
+        <text x="26" y="156">何度も使ったので読まずに分かる</text>
+        <text class="dim" x="26" y="173">宿る場所: 読み手(個人)</text>
+
+        <path class="arw" d="M260 53 H 340 Q 356 53 356 72 V 96"/>
+        <path class="arw" d="M260 147 H 340 Q 356 147 356 128 V 104"/>
+
+        <rect class="goal" x="392" y="66" width="232" height="68" rx="4"/>
+        <text class="ttl" x="410" y="92">「予測できる」</text>
+        <text class="dim" x="410" y="112">体感上は区別がつかない</text>
+
+        <text class="dim" x="8" y="202">経路が違えば、新規参加者に効くか・転用できるか・陳腐化するかがすべて違う。</text>
+      </g>
+    </svg>
+    <figcaption>同じ状態に見えるが、根拠がコードにあるか読み手の頭の中にあるかで、その後の性質が分かれる。</figcaption>
+  </figure>
+
+  <ol>
+    <li><strong>静的予測可能性</strong> — 目の前のコードを読めば、graph形状と属性値が決まる</li>
+    <li><strong>習熟による予測可能性</strong> — そのmoduleを何度も使ったので、中を読まなくても何が出てくるか分かっている</li>
+  </ol>
+
+  <p>同じ「予測できる」という状態でも、<strong>どこに根拠が置かれているかが違う</strong>。1はコードという成果物の性質で、2は読み手の頭の中にある。</p>
+
+  <h2>二つが同じに見える場面</h2>
+
+  <p>実務では両者が混ざる。よく使うmoduleを呼ぶとき、人は中を読んでいない。それでも「これを呼べばVPCとサブネットとNATが出る」と予測できて、planを見れば想定どおりだと確認できる。この状態は静的予測可能性が高いのと<strong>体感上は区別がつかない</strong>。</p>
+
+  <p><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a>は「呼び出し側がどれだけ中身を読みに行く必要があるか」を独立した軸として立て、それをドキュメント文化・テスト文化が補うとした。習熟はその補いの実態の一つである。ただし補い方が違う — ドキュメントは成果物に残るが、習熟は<strong>個人の中にしか残らない</strong>。</p>
+
+  <h2>経済的性質がまるで違う</h2>
+
+  <div class="scroll">
+    <table class="sources">
+      <thead>
+        <tr><th></th><th>静的予測可能性</th><th>習熟による予測可能性</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>どこに宿るか</td><td>コード(成果物)</td><td>読み手(個人)</td></tr>
+        <tr><td>新規参加者</td><td>すぐ効く</td><td>効かない。積み直しが要る</td></tr>
+        <tr><td>転用</td><td>リポジトリを移っても効く</td><td>そのmodule群を離れると消える</td></tr>
+        <tr><td>陳腐化</td><td>コードを直せば追随する</td><td><strong>moduleが変わっても頭は古いまま</strong></td></tr>
+        <tr><td>検証</td><td>静的解析・型検査が代行できる</td><td>代行できない</td></tr>
+        <tr><td>獲得コスト</td><td>書くときに一度払う</td><td>使うたびに少しずつ、人数分払う</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>最後の行が効く。習熟は<strong>人数に比例して払い直される</strong>。10人のチームなら10回、入れ替わればまた払う。静的予測可能性はコードに一度書けば全員が使える。組織が大きくなるほど、また人の出入りが多いほど、2に頼る設計は割高になる。</p>
+
+  <h2>危険なのは陳腐化のほう</h2>
+
+  <p>もっと悪いのは、習熟が<strong>間違ったまま自信を保てる</strong>ことである。静的予測可能性は、コードが変われば読んだ結果も変わるので、勘違いはコードを読み直せば直る。習熟は違う。moduleの中身が変わっても、「知っている」という感覚は自動では更新されない。<strong>読まないことを正当化した状態のまま、前提だけが古くなる。</strong></p>
+
+  <p>しかも習熟が高いほどplanを注意深く見なくなる。「いつもどおりのはず」で差分を流し読みする。予測可能性が高い状態が、逆に検証を省く理由になる。これが<a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a>と同じ構図 — 気付けないことが被害を大きくする — に落ちる経路である。</p>
+
+  <h2>設計判断としての含意</h2>
+
+  <p>この区別は、抽象化を評価するときの見え方を変える。「このmoduleは分かりやすい」という評価が、コードの性質を指しているのか、評価者が慣れているだけなのかで、下すべき判断が違う。後者なら、その分かりやすさはチームの外へ持ち出せない。</p>
+
+  <p><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a>が退屈な逐語的記述を推すのは、1に寄せる主張として読める。抽象を厚くすると1が下がり、その埋め合わせを2に頼ることになる。埋め合わせは効くが、上の表の性質を引き受けることになる。</p>
+
+  <p>AIの側から見ると差はもっとはっきりする。<a href="/notes/ai-context-window-is-a-locality-constraint.html">AIのコンテキスト窓は人の局所読解と同質の制約である</a>で書いたとおり、AIはコンテキストに入っていないものを知らない。<strong>AIには2が無い</strong> — 正確には、学習データに含まれる著名なmoduleについては疑似的に2を持つが、その組織固有のmoduleについては持たないし、持ったつもりで誤ることがある。人間の習熟は経験の反復で更新されるが、AIの「知っているつもり」は学習時点で凍っている。1に寄せておくことの価値は、この非対称のぶんだけ大きい。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>二つの源を分ける枠組み自体が、既存ノートからの派生として立てた解釈である。経済的性質の表は論理的な整理であって、実測や事例調査に基づかない。「習熟が高いほどplanを流し読みする」という観察は筆者の経験則で、定量的な裏づけを取っていない。AIが組織固有のmoduleについて「持ったつもりで誤る」という記述も、機序としてはもっともらしいが未検証である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+      <li><a href="/notes/ai-context-window-is-a-locality-constraint.html">AIのコンテキスト窓は人の局所読解と同質の制約である</a></li>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-予測可能性">#予測可能性</a>
+    <a href="/notes/#tag-抽象化">#抽象化</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+  </p>
+</article>
+</body>
+</html>
