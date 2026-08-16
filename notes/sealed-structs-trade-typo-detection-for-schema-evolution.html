@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる - notes</title>
+<meta name="description" content="構造体の値検証は必須フィールドの存在を確かめ、未知のフィールドを拒否する。つまり幅部分型付けを負の方向にしか許さない。">
+<meta property="og:title" content="構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/sealed-structs-trade-typo-detection-for-schema-evolution.png">
+<meta property="og:description" content="構造体の値検証は必須フィールドの存在を確かめ、未知のフィールドを拒否する。つまり幅部分型付けを負の方向にしか許さない。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/sealed-structs-trade-typo-detection-for-schema-evolution.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §2.3, §3.2 (g), §6</code>
+  </p>
+
+  <p>構造体の値検証は、必須フィールドの存在を確かめ、<strong>未知のフィールドを拒否する</strong>(似た名前があれば候補として提示する)。つまり幅部分型付け(width subtyping)を<strong>負の方向にしか許さない</strong>。フィールドを減らすことはできず、増やすこともできない、封印された(sealed)構造体である。Flowの完全型<code>{| ... |}</code>やRustの構造体リテラルに近い扱いになる。</p>
+
+  <p>これは意図した設計である。IaCでは打ち間違いが最も多い誤りで、未知フィールドを黙って捨てる言語では「書いたのに効いていない」という最悪の失敗モードが生まれる。封印はこれを構文の位置で捕まえる。</p>
+
+  <h2>代償はスキーマの進化速度</h2>
+
+  <p>代償ははっきりしている。<strong>プロバイダのスキーマが新しいフィールドを増やしたとき、コード生成が追いつくまでそのフィールドは書けない</strong>。クラウドAPIは絶えず属性を足すので、この追従は継続的なコストになる。実際、コード生成で都度追従する運用になっている。</p>
+
+  <p>つまり交換されているのは<strong>打ち間違いの検出</strong>と<strong>スキーマ進化への耐性</strong>であり、封印はこの二つのうち前者に全振りした選択である。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 190" role="img" aria-label="封印された構造体と開いた構造体を対比し、打ち間違い検出とスキーマ進化耐性のどちらを取るかの交換を示す図。開閉を型の属性にすれば既定値を保ったまま個別に緩められる">
+      <style>
+        .seal text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .seal .box { fill: var(--surface); stroke: var(--rule); }
+        .seal .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .seal .ttl { font-size: 13px; font-weight: 600; }
+        .seal .dim { fill: var(--faint); font-size: 11px; }
+        .seal .ok  { fill: var(--accent); font-size: 11px; }
+        .seal .ng  { fill: var(--accent-2); font-size: 11px; }
+        .seal .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="seal">
+        <rect class="box" x="8" y="18" width="230" height="96" rx="4"/>
+        <text class="ttl" x="24" y="40">封印 (sealed) — 現状の既定</text>
+        <text class="ok" x="24" y="64">打ち間違いを構文の位置で捕まえる</text>
+        <text class="ng" x="24" y="84">新フィールドは生成が追いつくまで書けない</text>
+        <text class="dim" x="24" y="104">規則がコードに埋まっている</text>
+
+        <rect class="box" x="258" y="18" width="230" height="96" rx="4"/>
+        <text class="ttl" x="274" y="40">開いた (open) 様式</text>
+        <text class="ok" x="274" y="64">進化の速いスキーマに追従できる</text>
+        <text class="ng" x="274" y="84">打ち間違いが素通りしうる</text>
+        <text class="dim" x="274" y="104">今は選択肢として存在しない</text>
+
+        <rect class="hi" x="8" y="130" width="480" height="46" rx="4"/>
+        <text class="ttl" x="24" y="152">開閉を型の属性にする</text>
+        <text class="dim" x="24" y="170">既定値は封印のまま、緩めたい型だけ型の側で宣言する</text>
+
+        <path class="arw" d="M123 114 V 128"/>
+        <path class="arw" d="M373 114 V 128"/>
+
+        <text class="dim" x="504" y="146">例外が検証器の</text>
+        <text class="dim" x="504" y="164">分岐ではなく型の値になる</text>
+      </g>
+    </svg>
+    <figcaption>二者択一に見えるのは、開閉が型ではなく検証器のコードに埋まっているからである。型の属性に上げれば、既定値を動かさずに例外を作れる。</figcaption>
+  </figure>
+
+  <h2>中間はありうる</h2>
+
+  <p>この交換は二者択一ではない。構造体に「開いた(open)」様式を導入し、<strong>どの構造体が未知フィールドを受けるかを型の側で宣言できる</strong>ようにすれば、封印の既定値を保ったまま進化の速いスキーマだけ緩められる。判定が「どこでも同じ規則」から「型に書かれた規則」に移るだけで、検査の一貫性は保たれる。</p>
+
+  <p>これは「区別を型に昇格させる」という解の形の、もう一つの適用先である。現状は「全ての構造体は封印されている」という規則がコードに埋まっており、例外を作ろうとすれば検証器を分岐させるしかない。開閉を型の属性にすれば、例外は分岐ではなく型の値になる。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>「コード生成で都度追従している」という運用上の観察は評価メモの記述に依拠しており、追従の遅れが実際にどの程度の負担になっているかの計測はない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+    <a href="/notes/#tag-トレードオフ">#トレードオフ</a>
+  </p>
+</article>
+</body>
+</html>

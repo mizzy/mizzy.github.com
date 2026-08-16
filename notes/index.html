@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>notes</title>
 <meta name="description" content="Gosuke Miyashita のノート。IaCツールとDSLの設計についての探索記録。">
+<meta property="og:title" content="notes">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mizzy.org/notes/">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/index.png">
+<meta property="og:description" content="Gosuke Miyashita のノート。IaCツールとDSLの設計についての探索記録。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="notes">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/index.png">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
 </head>
@@ -112,7 +121,7 @@
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
       <h2>planはコンパイルである</h2>
-      <p>carina plan は、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。applyはその中間言語の実行系である。</p>
+      <p>carina planは、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。applyはその中間言語の実行系である。</p>
       <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#plan</span></span>
     </span>
   </a>
@@ -304,7 +313,7 @@
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
       <h2>等価判定は正規形へ簡約してから型ごとに行う</h2>
-      <p>差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality) という原則である。同じ値の組でも、期待される型によって判定が変わる。</p>
+      <p>差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality)という原則である。同じ値の組でも、期待される型によって判定が変わる。</p>
       <span class="tags"><span>#差分</span> <span>#等価性</span> <span>#型システム</span></span>
     </span>
   </a>
@@ -600,7 +609,7 @@
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
       <h2>タグなし合併の判別はヒューリスティックに頼るしかない</h2>
-      <p>CarinaのUnion(Vec&lt;AttributeType&gt;)はタグなし合併(untagged union) である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
+      <p>CarinaのUnion(Vec&lt;AttributeType&gt;)はタグなし合併(untagged union)である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
       <span class="tags"><span>#型システム</span> <span>#合併型</span> <span>#設計負債</span></span>
     </span>
   </a>
@@ -648,7 +657,7 @@
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
       <h2>純粋性はplanを常駐クエリに変える前提条件である</h2>
-      <p>worldを変更イベントで維持される実体化ビューにするという構図は、データベースの増分ビュー維持 (incremental view maintenance)そのものである。</p>
+      <p>worldを変更イベントで維持される実体化ビューにするという構図は、データベースの増分ビュー維持(incremental view maintenance)そのものである。</p>
       <span class="tags"><span>#増分計算</span> <span>#純粋性</span> <span>#plan</span></span>
     </span>
   </a>

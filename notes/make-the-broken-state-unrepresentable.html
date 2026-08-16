@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>typestateで壊れた状態を書けなくする - notes</title>
 <meta name="description" content="Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは静的段階の内部不変条件を実装言語の型でコンパイル時に固定することである。">
+<meta property="og:title" content="typestateで壊れた状態を書けなくする">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/make-the-broken-state-unrepresentable.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/make-the-broken-state-unrepresentable.png">
+<meta property="og:description" content="Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは静的段階の内部不変条件を実装言語の型でコンパイル時に固定することである。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="typestateで壊れた状態を書けなくする">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/make-the-broken-state-unrepresentable.png">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
 </head>
@@ -118,16 +127,22 @@
       <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
       <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
       <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
     </ul>
   </nav>
 
   <div class="backlinks">
     <h2>ここへリンクしているノート</h2>
     <ul>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
       <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
       <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
       <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+      <li><a href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</a></li>
       <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
       <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
       <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
     </ul>

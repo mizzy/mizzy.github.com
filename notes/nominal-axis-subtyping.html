@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>公称軸ごとの幅部分型付けが再利用と混同防止を両立する - notes</title>
 <meta name="description" content="列挙やカスタム文字列型にはTypeIdentityという公称的な識別が付く。注目すべきはその等価性・代入可能性の定義で、単純な全フィールド一致ではない。">
+<meta property="og:title" content="公称軸ごとの幅部分型付けが再利用と混同防止を両立する">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/nominal-axis-subtyping.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/nominal-axis-subtyping.png">
+<meta property="og:description" content="列挙やカスタム文字列型にはTypeIdentityという公称的な識別が付く。注目すべきはその等価性・代入可能性の定義で、単純な全フィールド一致ではない。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="公称軸ごとの幅部分型付けが再利用と混同防止を両立する">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/nominal-axis-subtyping.png">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
 </head>
@@ -103,6 +112,7 @@
   <nav class="links">
     <h2>関連</h2>
     <ul>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
       <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
       <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
       <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
@@ -112,7 +122,12 @@
   <div class="backlinks">
     <h2>ここへリンクしているノート</h2>
     <ul>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
       <li><a href="/notes/ownership-proves-you-need-not-read.html">排他所有が証明できれば読まなくてよい</a></li>
+      <li><a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></li>
+      <li><a href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
       <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
       <li><a href="/notes/type-checking-reduces-to-nodes-and-edges.html">検査対象はノード上の値とエッジ両端の型の二種に還元できる</a></li>
       <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である - notes</title>
+<meta name="description" content="Carinaの型システムには「まだ確定していない」を表す表現が四つ独立に存在する。">
+<meta property="og:title" content="「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/four-kinds-of-undetermined.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/four-kinds-of-undetermined.png">
+<meta property="og:description" content="Carinaの型システムには「まだ確定していない」を表す表現が四つ独立に存在する。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/four-kinds-of-undetermined.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.2 (h), §6</code>
+  </p>
+
+  <p>Carinaの型システムには「まだ確定していない」を表す表現が<strong>四つ独立に存在する</strong>。</p>
+
+  <ul>
+    <li><strong>deferredな値</strong> — 静的段階で展開できず次のフェーズへ送られた式</li>
+    <li><strong>識別を持たないカスタム型</strong> — 篩型でありながら公称識別が空のもの</li>
+    <li><strong>Unknown値</strong> — 段階を跨ぐために解決できない値</li>
+    <li><strong>注釈側の未知型</strong> — ユーザーが書く型注釈の言語に現れる未確定</li>
+  </ul>
+
+  <p>四つはそれぞれ違う種類の未確定を表しており、どれも必要な区別ではある。しかし<strong>四つあること自体が、この型システムの漸進性(gradual typing)の境界がどこにあるかを見えにくくしている</strong>。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 220" role="img" aria-label="四つの未確定表現が値の側と型の側に分かれて散らばっている状態と、標準的な漸進的型付けでDynamic型一つに集約されている状態を対比した図">
+      <style>
+        .und text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .und .box { fill: var(--surface); stroke: var(--rule); }
+        .und .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .und .ttl { font-size: 13px; font-weight: 600; }
+        .und .dim { fill: var(--faint); font-size: 11px; }
+        .und .hdr { fill: var(--muted); font-size: 11px; }
+        .und .sep { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="und">
+        <text class="ttl" x="8" y="18">Carinaの現状 — 四つが層をまたいで散らばる</text>
+
+        <text class="hdr" x="8" y="46">値の側</text>
+        <rect class="box" x="8" y="54" width="150" height="34" rx="4"/>
+        <text x="20" y="76">deferredな値</text>
+        <rect class="box" x="8" y="94" width="150" height="34" rx="4"/>
+        <text x="20" y="116">Unknown値</text>
+
+        <text class="hdr" x="176" y="46">型の側</text>
+        <rect class="box" x="176" y="54" width="180" height="34" rx="4"/>
+        <text x="188" y="76">識別なしのカスタム型</text>
+        <rect class="box" x="176" y="94" width="180" height="34" rx="4"/>
+        <text x="188" y="116">注釈側の未知型</text>
+
+        <text class="dim" x="8" y="152">解消の時点も担い手もそれぞれ違う。</text>
+        <text class="dim" x="8" y="170">「今どういう意味で未確定か」は四つを特定しないと答えられない。</text>
+
+        <path class="sep" d="M392 14 V 196"/>
+
+        <text class="ttl" x="420" y="18">標準的な漸進的型付け</text>
+        <rect class="hi" x="420" y="66" width="140" height="46" rx="4"/>
+        <text class="ttl" x="490" y="94" text-anchor="middle">Dynamic (?)</text>
+        <text class="dim" x="420" y="140">未確定は一つの型に集約され、</text>
+        <text class="dim" x="420" y="158">既知型との関係は整合性という</text>
+        <text class="dim" x="420" y="176">単一の関係で与えられる。</text>
+      </g>
+    </svg>
+    <figcaption>散らばりそのものが問題なのではなく、散らばったまま四つの意味論が並べて書かれていないことが、境界を読めなくしている。</figcaption>
+  </figure>
+
+  <h2>一本化した体系との差</h2>
+
+  <p>漸進的型付けの標準的な構成では、未確定は<code>Dynamic</code>型(<code>?</code>)という<strong>一つの型</strong>に集約され、既知型との関係は整合性(consistency)という単一の関係で与えられる。どこが動的でどこが静的かが型の上で一目で読める。</p>
+
+  <p>Carinaはそうなっていない。四つの表現は層も違う — 値の側にあるもの(deferred、Unknown)と型の側にあるもの(識別なしのカスタム型、注釈の未知型)が混在し、静的段階のどの時点で解消されるかもそれぞれ違う。結果として「この値は今どういう意味で未確定なのか」を答えるには、四つのうちどれかを特定する必要がある。</p>
+
+  <h2>整理が先、統合は後</h2>
+
+  <p>解の方向は二段階になる。まず<strong>四つの意味論を一枚にまとめる</strong> — それぞれが何を表し、いつ・誰によって解消され、検査と等価性でどう扱われるかを並べて書く。この整理だけでも、どの二つが実は同じものかが見える。その上で、統合できる組があれば一本化する。</p>
+
+  <p>整理が先に来るのは、四つのうちどれが本質的な区別でどれが実装の都合かが、現状では書き出されていないからである。Unknownが理由を持ち運ぶ設計であることや、識別なしのカスタム型が明示キャストなしでは識別付きの受け側に流せないことは、いずれも意図された意味論である。一方でdeferredと注釈側の未知型の関係は説明されていない。<strong>区別が意図的なのか偶然なのかを分けることが、統合の可否を決める</strong>。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-漸進的型付け">#漸進的型付け</a>
+    <a href="/notes/#tag-設計負債">#設計負債</a>
+  </p>
+</article>
+</body>
+</html>

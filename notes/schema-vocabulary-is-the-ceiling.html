@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある - notes</title>
+<meta name="description" content="「プロバイダのプロトコルで型が潰れるから型を強くできない」というのは、差の所在を取り違えた説明である。">
+<meta property="og:title" content="プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/schema-vocabulary-is-the-ceiling.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/schema-vocabulary-is-the-ceiling.png">
+<meta property="og:description" content="「プロバイダのプロトコルで型が潰れるから型を強くできない」というのは、差の所在を取り違えた説明である。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/schema-vocabulary-is-the-ceiling.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-24-terraform-carina-hcl-limits.md §3-4, §5</code>
+  </p>
+
+  <p>「プロバイダのプロトコルで型が潰れるから型を強くできない」というのは、差の所在を取り違えた説明である。TerraformとCarinaを並べると、<strong>値を運ぶ層はどちらも型タグなしで送っている</strong>。</p>
+
+  <ul>
+    <li>値の層は型タグなしで送られる(msgpackでもJSONでも)</li>
+    <li>schemaは別のRPCで事前に共有される</li>
+    <li>受け側はschemaの辞書と値を突き合わせて型を復元する</li>
+  </ul>
+
+  <p>復元の仕組み自体が同じである以上、「プロトコルで潰れる」は差ではない。<strong>本当の差は、schemaが運べる型の語彙にある</strong>。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>Terraform</th><th>Carina</th></tr></thead>
+      <tbody>
+        <tr><td>schemaの型語彙</td><td>string / number / list / map / object / tuple</td><td>左に加えて合併・列挙・篩型・構造体</td></tr>
+        <tr><td>合併型をschemaで表せるか</td><td>×</td><td>✓</td></tr>
+        <tr><td>篩をschemaで表せるか</td><td>検証述語のみ</td><td>パターン・区間・検証関数</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Terraform側で列挙相当を表そうとすると<code>string</code>に検証述語を足す形になり、<strong>型としては<code>string</code>のまま</strong>である。検証の段階で誤りを捕まえられるかどうかで言えば両者とも捕まえられる — <code>terraform validate</code>はプロバイダプラグインに検証RPCを呼び、選択肢の検証まで実行するので、書き間違いはplanを待たずに落ちる。差は<strong>検出できるかではなく仕組み</strong>にあり、実行時述語で弾くのか型で弾くのかが、推論への反映と言語仕様への組み込みの差になる。</p>
+
+  <h2>語彙が広いことの配当は供給側の弱さを吸収できること</h2>
+
+  <p>型語彙の差が最も効くのは、<strong>プロバイダごとに型の供給源の質が違う</strong>場面である。</p>
+
+  <p>供給源がリッチなAPIモデル(合併型や列挙をネイティブに持つもの)であれば、schemaの型語彙をそのまま埋められる。一方、供給源が貧しい場合 — CloudFormationのスペックは<code>SubnetId</code>も<code>Name</code>もどちらも単なる<code>string</code>としか言わない — 生成されるschemaは弱くなる。</p>
+
+  <p>ここでコード生成側のヒューリスティックが効く。属性名から専用型を推論し(<code>kms_key_arn</code>、<code>iam_role_arn</code>のような命名から)、既知の型への上書き辞書を持って補強する。漏れはあるが、主要な誤用パターンは捕捉できる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="供給源の型情報が弱くても、schemaの型語彙が広ければ命名からの推論と上書き辞書で補強できるが、語彙がstringしかなければ補強の書き込み先が無いことを示す図">
+      <style>
+        .ceil text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ceil .box { fill: var(--surface); stroke: var(--rule); }
+        .ceil .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .ceil .ttl { font-size: 13px; font-weight: 600; }
+        .ceil .dim { fill: var(--faint); font-size: 11px; }
+        .ceil .arw { stroke: var(--faint); fill: none; }
+        .ceil .cap { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .ceil .cap2 { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .ceil .lbl2 { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="ceil">
+        <rect class="box" x="8" y="60" width="140" height="60" rx="4"/>
+        <text class="ttl" x="24" y="84">貧しい供給源</text>
+        <text class="dim" x="24" y="104">すべてstringとしか言わない</text>
+
+        <rect class="box" x="188" y="60" width="150" height="60" rx="4"/>
+        <text class="ttl" x="204" y="84">補強</text>
+        <text class="dim" x="204" y="104">命名からの推論・上書き辞書</text>
+
+        <path class="arw" d="M148 90 H 184"/>
+        <path class="arw" d="M338 90 H 374"/>
+
+        <rect class="hi" x="378" y="24" width="254" height="60" rx="4"/>
+        <text class="ttl" x="394" y="48">広い型語彙 — 書き込み先がある</text>
+        <text class="dim" x="394" y="68">合併・列挙・篩型・構造体</text>
+
+        <rect class="box" x="378" y="100" width="254" height="60" rx="4"/>
+        <text class="ttl" x="394" y="124">stringしか無い器</text>
+        <text class="dim" x="394" y="144">推論できても書き込む先が無い</text>
+
+        <path class="cap" d="M368 20 H 636"/>
+        <path class="cap2" d="M368 168 H 636"/>
+        <text class="lbl2" x="378" y="188">語彙が上限を決める — 補強の余地は器の広さに従属する</text>
+      </g>
+    </svg>
+    <figcaption>型語彙は将来の補強の天井である。器が狭ければ、供給源が良くなっても補強が良くなっても、書き込む先が無い。</figcaption>
+  </figure>
+
+  <p>要点はその<strong>改善余地がどこから来るか</strong>である。<strong>器が広いからこそ、供給側が弱くても補強で近づけられる</strong>。schemaが<code>string</code>しか表せない器なら、名前から型を推論できたところで書き込む先がない。型語彙を広げる投資は、その時点でプロバイダから取れる型情報の量とは独立に、将来の補強の上限を引き上げている。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>コード生成のヒューリスティック補強については上書き辞書の実例までは確認されているが、補強の網羅度は未検証である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/constraint-origin-has-four-layers.html">ツールの限界は出自を四層に分けないと解消手段を取り違える</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+      <li><a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/constraint-origin-has-four-layers.html">ツールの限界は出自を四層に分けないと解消手段を取り違える</a></li>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-schema">#schema</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-プロバイダ">#プロバイダ</a>
+  </p>
+</article>
+</body>
+</html>

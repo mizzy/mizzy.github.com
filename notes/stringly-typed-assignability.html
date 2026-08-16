@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>型名の文字列比較で代入可能性を決めるのは構造を捨てている - notes</title>
+<meta name="description" content="代入可能性判定の最終アームは、二つの型の表示用の名前を文字列として比較するものになっている。">
+<meta property="og:title" content="型名の文字列比較で代入可能性を決めるのは構造を捨てている">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/stringly-typed-assignability.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/stringly-typed-assignability.png">
+<meta property="og:description" content="代入可能性判定の最終アームは、二つの型の表示用の名前を文字列として比較するものになっている。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="型名の文字列比較で代入可能性を決めるのは構造を捨てている">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/stringly-typed-assignability.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>型名の文字列比較で代入可能性を決めるのは構造を捨てている</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §2.1, §3.3 (j)(m), §6</code>
+  </p>
+
+  <p>代入可能性判定の最終アームは、二つの型の<strong>表示用の名前を文字列として比較する</strong>ものになっている。</p>
+
+  <pre><code>(a, b) =&gt; a.type_name() == b.type_name()</code></pre>
+
+  <p>構造体の<code>type_name()</code>は<code>"Struct(名前)"</code>であり、フィールド集合の比較ではなく名前の一致である。<code>List&lt;T&gt;</code>の<code>type_name()</code>は<code>"List&lt;" + T.type_name() + "&gt;"</code>という文字列連結で、一見構造を見ているようだが、実態は入れ子の公称名を文字列に潰したものでしかない。値の検証側にも、分岐が型名の文字列を経由する箇所がある。</p>
+
+  <p>構造体の代入可能性が公称であること自体は<strong>意図した設計判断</strong>である(プロバイダを跨いだ同名構造体の取り違えを防ぐ)。問題はその公称性を<strong>文字列化で実現している</strong>ことにある。</p>
+
+  <h2>なぜ文字列が問題なのか</h2>
+
+  <p>三つの理由がある。</p>
+
+  <p>第一に、<strong>網羅性検査が効かない</strong>。実装言語の代数的データ型に対する分岐なら、構成子を足したときに未処理の枝がコンパイルエラーになる。文字列に潰した時点でその保護は消え、新しいプリミティブや構成子を足しても静かに素通りする。</p>
+
+  <p>第二に、<strong>型引数を持つ構成子を足した瞬間に破綻する</strong>。ジェネリクスや高階の型構成子を導入すれば、名前の文字列一致では表せない関係(変性、束縛変数の名前替え)が必要になる。文字列連結は構造を保存しない符号化なので、そこで作り直しになる。</p>
+
+  <p>第三に、<strong>文字列化は本来ハッシュと表示のための機能</strong>である。判定に流用したことで、表示名を変えると型の意味が変わるという結合が生まれている。表示の都合で名前を整えたら代入可能性が変わる、という事故の可能性が構造として残る。</p>
+
+  <h2>直す方向</h2>
+
+  <p>修正は素直で、最終アームを<strong>構成子ごとの構造再帰</strong>に置き換えることである。公称性を捨てる必要はない — 構造体は名前で比較し、<code>List&lt;T&gt;</code>は構成子が一致することを確かめてから要素型を再帰する、という形に書き直せば、公称の意味論は保ったまま網羅性が実装言語の型に戻る。</p>
+
+  <p>これは「区別を型に昇格させる」という、この型システムの負債群に共通する解の形の一例である。文字列は最も情報の少ない表現であり、そこへ潰した時点で実装言語の型システムが持っていた保護をすべて手放している。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+      <li><a href="/notes/type-checking-reduces-to-nodes-and-edges.html">検査対象はノード上の値とエッジ両端の型の二種に還元できる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-設計負債">#設計負債</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+  </p>
+</article>
+</body>
+</html>

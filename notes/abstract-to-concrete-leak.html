@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる - notes</title>
+<meta name="description" content="公称識別の軸ごとの包摂は設計としては方向付きであるのに、その判定に使われている関数は対称な同値関係として書かれている。">
+<meta property="og:title" content="同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/abstract-to-concrete-leak.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/abstract-to-concrete-leak.png">
+<meta property="og:description" content="公称識別の軸ごとの包摂は設計としては方向付きであるのに、その判定に使われている関数は対称な同値関係として書かれている。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/abstract-to-concrete-leak.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.3 (n), §5</code>
+  </p>
+
+  <p>公称識別の軸ごとの包摂は、設計としては方向付きである。受け側が特定している軸は送り側も一致していなければならず、受け側が特定していない軸は問わない。ところが<strong>その判定に使われている関数は対称な同値関係として書かれている</strong>。</p>
+
+  <p><code>TypeIdentity::same_type</code>の規則は「各軸について、両方が値を持っているときだけ一致を要求し、片方が空なら通す」である。この規則は左右を入れ替えても成り立つ。にもかかわらず代入可能性判定のカスタム型どうしのアームは、これを送り側から受け側への片方向の包摂判定として呼んでいる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="対称な同値関係を片方向の包摂判定に流用した結果、具体から抽象への代入だけでなく抽象から具体への代入も通ってしまう漏れの図">
+      <style>
+        .leak text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .leak .box { fill: var(--surface); stroke: var(--rule); }
+        .leak .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .leak .ttl { font-size: 13px; font-weight: 600; }
+        .leak .dim { fill: var(--faint); font-size: 11px; }
+        .leak .ok  { stroke: var(--accent); fill: none; }
+        .leak .bad { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+        .leak .lbl-ok  { fill: var(--muted); font-size: 11px; }
+        .leak .lbl-bad { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="leak">
+        <rect class="box" x="8" y="66" width="200" height="66" rx="4"/>
+        <text class="ttl" x="24" y="90">抽象 — aws.Arn</text>
+        <text class="dim" x="24" y="112">segments未指定</text>
+
+        <rect class="hi" x="432" y="66" width="200" height="66" rx="4"/>
+        <text class="ttl" x="448" y="90">具体 — aws.iam.Role.Arn</text>
+        <text class="dim" x="448" y="112">segments指定</text>
+
+        <path class="ok" d="M432 112 H 212" marker-end="none"/>
+        <path class="ok" d="M220 106 L 208 112 L 220 118"/>
+        <text class="lbl-ok" x="240" y="132">具体→抽象: 通る（正しい）</text>
+
+        <path class="bad" d="M208 86 H 428"/>
+        <path class="bad" d="M420 80 L 432 86 L 420 92"/>
+        <text class="lbl-bad" x="240" y="60">抽象→具体: 通ってしまう（漏れ）</text>
+
+        <text class="dim" x="24" y="180">対称なsame_typeを片方向の判定位置に置いたため、</text>
+        <text class="dim" x="24" y="196">出元不明の汎用ARNが具体型だけを受けるべき属性に流れる。</text>
+      </g>
+    </svg>
+    <figcaption>同値関係は左右対称なので、片方向の包摂判定の位置に置くと逆向きの矢も同時に通る。設計として通したいのは片方だけである。</figcaption>
+  </figure>
+
+  <h2>何が漏れるか</h2>
+
+  <p>結果として、<strong>本来拒否すべき抽象から具体への代入が通る</strong>。</p>
+
+  <pre><code>generic  = aws.Arn                 // segments 未指定
+role_arn = aws.iam.Role.Arn        // segments 指定
+
+generic.is_assignable_to(&amp;role_arn)   // 通ってしまう ✗
+role_arn.is_assignable_to(&amp;generic)   // 通る (これは正しい)</code></pre>
+
+  <p>出元不明の汎用ARN — 実体は<code>aws.acm.Certificate.Arn</code>かもしれない値 — を、<code>aws.iam.Role.Arn</code>だけを受けるべき属性に渡せてしまう。プロバイダ軸ではクラウド跨ぎの混同を型で弾けているのに、<strong>セグメント軸では同じ設計目標が達成されていない</strong>(<a href="https://github.com/carina-rs/carina/issues/3218">carina#3218</a>)。</p>
+
+  <h2>同じアームの中に正しい形がある</h2>
+
+  <p>この漏れが際立つのは、<strong>同じ判定アームの中で他の制約は方向付きに書かれている</strong>からである。パターンは受け側が持っていて送り側が持たなければ拒否し、区間は送り側が受け側に包含されることを要求する。方向を持つのが当然という前提で書かれた規則の列に、identityだけが対称な関係として混じっている。</p>
+
+  <p>さらに同じ判定関数の中には「識別を持たない送り側から識別を持つ受け側への代入は拒否する」という規則があり、コメントに「送り側は識別の証明を持たない」と明記されている。<strong>その精神を<code>TypeIdentity</code>内部の軸にも適用すれば直る</strong> — 対称な<code>same_type</code>と方向付きの<code>assignable_to</code>を別の関数に分離し、具体から抽象は通し、抽象から具体は拒否する。</p>
+
+  <h2>バグクラスとしての形</h2>
+
+  <p>これは単発の実装ミスではなく、名前の付くバグクラスである。<strong>同値関係と半順序は別物であり、前者を後者の位置に置いても型検査は通ってしまう</strong>。どちらも二引数の真偽値関数で、シグネチャが同じだからである。区別は名前と使われ方にしかなく、実装言語の型は何も守ってくれない。</p>
+
+  <p>だから検出は性質側からしか来ない。反対称性の性質試験があれば、<code>a ≤ b</code> かつ <code>b ≤ a</code> なのに <code>a ≠ b</code> という組を機械的に見つけられた。設計意図と実装挙動のずれが試験の欠落によって見えていなかった、という構図そのものである。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-バグクラス">#バグクラス</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ツールの限界は出自を四層に分けないと解消手段を取り違える - notes</title>
+<meta name="description" content="「Terraformの限界はHCLに起因する」という仮説は部分的に正しいが不十分である。限界は単一原因ではなく、出自の違う四つの層が重なっている。">
+<meta property="og:title" content="ツールの限界は出自を四層に分けないと解消手段を取り違える">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/constraint-origin-has-four-layers.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/constraint-origin-has-four-layers.png">
+<meta property="og:description" content="「Terraformの限界はHCLに起因する」という仮説は部分的に正しいが不十分である。限界は単一原因ではなく、出自の違う四つの層が重なっている。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ツールの限界は出自を四層に分けないと解消手段を取り違える">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/constraint-origin-has-four-layers.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>ツールの限界は出自を四層に分けないと解消手段を取り違える</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-24-terraform-carina-hcl-limits.md §1, §8</code>
+  </p>
+
+  <p>「Terraformの限界はHCLに起因する」という仮説は部分的に正しいが不十分である。限界は単一原因ではなく、<strong>出自の違う四つの層が重なっている</strong>。層を分けないと、解消手段の見積もりを丸ごと間違える。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>層</th><th>内容</th><th>解消手段</th></tr></thead>
+      <tbody>
+        <tr><td><strong>言語起因</strong></td><td>型の表現力、参照モデル、モジュール境界</td><td>DSLを作り直す</td></tr>
+        <tr><td><strong>アーキテクチャ起因</strong></td><td>planの扱い方、state操作、schema語彙</td><td>別実装で設計思想ごと変える</td></tr>
+        <tr><td><strong>組織的優先順位起因</strong></td><td>開発元が触らなかった制約</td><td>Forkで解禁できる</td></tr>
+        <tr><td><strong>本質的制約</strong></td><td>リソース作成後にしか決まらない値、ブートストラップ</td><td>どの設計でも残る</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 640 250" role="img" aria-label="四層の制約と各アプローチの到達範囲を示す図。Forkは組織的優先順位起因の層までしか届かず、新実装は言語起因とアーキテクチャ起因まで届き、本質的制約はどの手段でも残る">
+      <style>
+        .lyr text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .lyr .box { fill: var(--surface); stroke: var(--rule); }
+        .lyr .fix { fill: var(--accent-bg); stroke: var(--accent); }
+        .lyr .ttl { font-size: 13px; font-weight: 600; }
+        .lyr .dim { fill: var(--faint); font-size: 11px; }
+        .lyr .rng { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .lyr .rng2 { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .lyr .cap { fill: var(--muted); font-size: 11px; }
+        .lyr .cap2 { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="lyr">
+        <rect class="box" x="8" y="14" width="360" height="46" rx="4"/>
+        <text class="ttl" x="24" y="34">言語起因</text>
+        <text class="dim" x="24" y="52">型の表現力・参照モデル・モジュール境界</text>
+
+        <rect class="box" x="8" y="66" width="360" height="46" rx="4"/>
+        <text class="ttl" x="24" y="86">アーキテクチャ起因</text>
+        <text class="dim" x="24" y="104">planの扱い方・state操作・schema語彙</text>
+
+        <rect class="box" x="8" y="118" width="360" height="46" rx="4"/>
+        <text class="ttl" x="24" y="138">組織的優先順位起因</text>
+        <text class="dim" x="24" y="156">開発元が触らなかった制約</text>
+
+        <rect class="fix" x="8" y="170" width="360" height="46" rx="4"/>
+        <text class="ttl" x="24" y="190">本質的制約</text>
+        <text class="dim" x="24" y="208">作成後にしか決まらない値・ブートストラップ</text>
+
+        <path class="rng" d="M392 122 V 160"/>
+        <path class="rng" d="M388 122 H 396"/>
+        <path class="rng" d="M388 160 H 396"/>
+        <text class="cap" x="404" y="136">Forkが届く範囲</text>
+        <text class="dim" x="404" y="154">OpenTofuが実証した</text>
+
+        <path class="rng" d="M392 18 V 108"/>
+        <path class="rng" d="M388 18 H 396"/>
+        <path class="rng" d="M388 108 H 396"/>
+        <text class="cap" x="404" y="52">新実装でしか届かない範囲</text>
+        <text class="dim" x="404" y="70">DSLと実行モデルの作り直し</text>
+
+        <path class="rng2" d="M392 174 V 212"/>
+        <path class="rng2" d="M388 174 H 396"/>
+        <path class="rng2" d="M388 212 H 396"/>
+        <text class="cap2" x="404" y="196">どの設計でも残る</text>
+      </g>
+    </svg>
+    <figcaption>解消手段は層ごとに決まっている。層の帰属を間違えると、Forkで済むものに新実装を当て、消えないものに「作り直せば解決する」という期待を立てることになる。</figcaption>
+  </figure>
+
+  <h2>分けると何が言えるようになるか</h2>
+
+  <p>四層に分けると、各ツールがどこまで届くかが構造的に決まる。</p>
+
+  <p><strong>OpenTofuはForkの到達範囲を実証した事例として読める。</strong>変数の早期評価(backendやmoduleのsourceで変数を使える)、state暗号化の言語組み込み、provider iterationはいずれも組織的優先順位起因の制約であり、Forkで解禁できた。一方でHCLとプロトコルの根本は動いていない。<strong>Fork元互換が進化の上限を決める</strong>、というのが四層で見たときの読みである。</p>
+
+  <p>逆に、言語起因とアーキテクチャ起因の両方を同時に外そうとすれば、DSLも実行モデルも作り直すしかない。Carinaの位置取りはそこにある — schemaの型語彙を豊かにし、planを型付き値として同一プロセス内で加工し、state操作を単一の加工関数に統一する、というのは二層をまたいだ設計変更である。<strong>OpenTofuでは到達できない領域</strong>というのは、対抗心の表明ではなく層の話である。</p>
+
+  <p>そして最下層は誰も外せない。リソースを作る前には決まらない値があり、最初の一つを作るためのブートストラップが要る。段階を跨ぐ未知値の扱いが設計の焦点になり続けるのは、それが本質的制約の層にあるからで、どの設計を選んでも消えない。</p>
+
+  <h2>帰属を間違えたときの症状</h2>
+
+  <p>層の帰属は実際に間違えられる。この四層自体、当初は「商業・政治起因」という層を含んでいた。開発元が意図的に制約を課したという証拠は公開されていないため、根拠のある言い方は「組織的優先順位起因」に留まる。<strong>意図の帰属は検証できないが、優先順位の帰属は行動から読める</strong>という差である。</p>
+
+  <p>帰属を間違えると、解消手段の見積もりが狂う。本質的制約を言語起因と読めば「作り直せば解決する」という誤った期待が立ち、逆に組織的優先順位起因を本質的制約と読めば、Forkで済むものを新実装で解こうとすることになる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/about-these-notes-accuracy.html">これらのノートの精度について</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-比較軸">#比較軸</a>
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+  </p>
+</article>
+</body>
+</html>

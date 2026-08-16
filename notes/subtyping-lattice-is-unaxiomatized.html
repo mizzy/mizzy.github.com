@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>部分型関係が公理化されていないと性質の破れを検出できない - notes</title>
+<meta name="description" content="代入可能性の判定は手書きの分岐の集合として書かれており、それらが全体として部分型関係の性質を満たすかはコードでも試験でも保証されていない。">
+<meta property="og:title" content="部分型関係が公理化されていないと性質の破れを検出できない">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/subtyping-lattice-is-unaxiomatized.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/subtyping-lattice-is-unaxiomatized.png">
+<meta property="og:description" content="代入可能性の判定は手書きの分岐の集合として書かれており、それらが全体として部分型関係の性質を満たすかはコードでも試験でも保証されていない。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="部分型関係が公理化されていないと性質の破れを検出できない">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/subtyping-lattice-is-unaxiomatized.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>部分型関係が公理化されていないと性質の破れを検出できない</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>audits/2026-05-23-type-system-evaluation.md §3.3 (i)(k), §6</code>
+  </p>
+
+  <p>代入可能性の判定は、手書きの分岐の集合として書かれている。個々のアームは妥当だが、それらが全体として部分型関係の性質を満たすかは<strong>コードでも試験でも保証されていない</strong>。反射性・推移性・反対称性のいずれもである。</p>
+
+  <p>これは学術的な体系との差がそのまま出ている箇所である。System F&lt;: やDOT calculusでは部分型は判断規則(judgement rules)として記述され、推移性は公理か導出可能な定理として最初から手に入る。手書きの分岐の集合では、規則を一つ足すたびに全体の性質が保たれているかを人間が確かめ直すしかない。</p>
+
+  <h2>破れは実際に起きている</h2>
+
+  <p>性質の欠落は抽象的なリスクではない。公称識別の軸で<strong>反対称性が破れている実例</strong>が既に見つかっている(抽象型から具体型への代入が通る)。反対称性の性質試験があれば機械的に検出できた種類の破れである。</p>
+
+  <p>同型の未形式化はもう一箇所ある。<strong>変性(共変・反変)がコード上に明示されていない</strong>。<code>List&lt;T&gt;</code>や<code>Map&lt;K,V&gt;</code>の変性がどうなっているかは実装を読んで推測するしかなく、現状はおそらく全て共変で動いている。IaCの値は基本的に読み出し専用なので実害は出ていないが、これはJava配列の共変性と同じ不健全性の罠が置かれている状態である。読むだけなら共変で安全、書き戻しがあれば危険、という境界がどこにも書かれていない。</p>
+
+  <h2>公理化が回帰ネットになる</h2>
+
+  <p>だから改善の順序が決まる。<strong>個々の破れを直すことと、性質を試験で担保することは別の作業であり、後者は前者の再発を防ぐネットになる。</strong>反射性・推移性・反対称性を性質試験(property test)として書けば、既知の破れを検出するだけでなく、将来アームを足したときの破れも自動的に捕まる。</p>
+
+  <p>これは他の負債と同じ形の解でもある。「一箇所の破れを直す」のは症状への対処で、「性質を機械的に検査する仕組みを置く」のが根の側にある。呼び出し側が覚えていることに依存する不変条件を型の形に作り直すのと同様、<strong>規則の集合が満たすべき性質は、人間の注意ではなく試験の形に置き直すまで守られていない</strong>。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+    <a href="/notes/#tag-設計負債">#設計負債</a>
+  </p>
+</article>
+</body>
+</html>
