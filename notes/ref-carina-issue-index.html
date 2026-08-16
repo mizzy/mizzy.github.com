@@ -31,7 +31,7 @@
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/README.md, type-system-analysis.md / explorations/2026-04-26-cross-dsl-design-position/carina-position.md / explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/README.md, chapter-5</code>
-    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成</span>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
   </p>
 
   <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
@@ -57,6 +57,18 @@
     <li><a href="https://github.com/carina-rs/carina/issues/3438">carina#3438</a> — 未解決の列挙識別子と解決済み正規形を別の型にし、後者はリゾルバしか生成できないようにするtypestate。→ <a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
     <li><a href="https://github.com/carina-rs/carina/issues/3349">carina#3349</a> — μ型の参照を展開した後の型ビューには参照変種が存在せず、未展開のまま照合する状態がそもそも書けないようにするtypestate。→ <a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
     <li><a href="https://github.com/carina-rs/carina/issues/3164">carina#3164</a> — 効果の部分集合しか受理しない実行器には絞り込み済みの型を渡すtypestate。→ <a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+  </ul>
+
+  <h2>型システム評価から起票(2026-05-23)</h2>
+
+  <p>PL・型理論の観点で実装を読んだ評価から出たもの。</p>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/carina/issues/3218">carina#3218</a> — <code>TypeIdentity::same_type</code>(対称な同値関係)を<code>assignable_to</code>(片方向)の判定に流用しているため、抽象型から具体型への代入が通る健全性バグ。<strong>2026-05-23にclosed</strong>。→ <a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3208">carina#3208</a> — 部分型関係の性質試験。#3218とセットで対応すれば回帰ネットになる。#3218は2026-05-23にclosedだが、こちらは<strong>open</strong>のまま。→ <a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2219">carina#2219</a> — 合併型の検証失敗時に、構造的に最も近いメンバのエラーを返すスコアリング。→ <a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3210">carina#3210</a> — <code>List&lt;T&gt;</code> / <code>Map&lt;K,V&gt;</code>の変性の文書化と強制。位置ごとに共変/反変/不変を分類し、性質試験を置く。<strong>open</strong>。→ <a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3209">carina#3209</a> — 型名の文字列比較を構成子ごとの構造比較に置き換える。コンテナ部分は<code>d15d8ce8</code>(2026-08-15)で構造再帰になったが、最終アームの文字列比較は残っており<strong>open</strong>。→ <a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
   </ul>
 
   <h2>機能点検から起票(2026-04-27)</h2>
@@ -103,6 +115,7 @@
     <h2>ここへリンクしているノート</h2>
     <ul>
       <li><a href="/notes/about-these-notes-accuracy.html">これらのノートの精度について</a></li>
+          <li><a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
     </ul>
   </div>
 

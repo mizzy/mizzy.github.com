@@ -65,6 +65,15 @@
     <li><strong>Pulumi MLCとの比較</strong>: MLC (multi-language components)はcross-DSL分析で扱わなかった(CDKのjsiiと同じ「単一原本からの自動bridging」軸)</li>
   </ul>
 
+  <h2>型システムの形式化</h2>
+
+  <ul>
+    <li><strong>変性(共変・反変)の明示</strong>: <code>List&lt;T&gt;</code> / <code>Map&lt;K,V&gt;</code>の変性がコード上に書かれていない。「実装が何を選んでいるか」は<a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a>で確認した(全て共変。<code>Map</code>はキーも共変)ので、残る問いは<strong>書き戻しが入る場面があるか</strong>の点検と、変性を型の側に書く方法である</li>
+    <li><strong>「未確定」四表現の統合可否</strong>: deferred / 識別なしカスタム型 / Unknown / 注釈側の未知型の意味論を一枚に整理したとき、どれとどれが同じものか。<a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a></li>
+    <li><strong>構造体の「開いた」様式の設計</strong>: プロバイダのスキーマ進化に耐えるため、どの構造体が未知フィールドを受けるかを型で宣言できるようにするか。<a href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</a></li>
+    <li><strong><code>is_assignable_to</code>と注釈側の互換判定の統合方法</strong>: 一方を他方の薄いラッパーにするか、共通の正規化型を挟むか</li>
+  </ul>
+
   <h2>型・schema・unknown (章3)</h2>
 
   <ul>
@@ -118,6 +127,7 @@
     <h2>ここへリンクしているノート</h2>
     <ul>
       <li><a href="/notes/about-these-notes-accuracy.html">これらのノートの精度について</a></li>
+          <li><a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
     </ul>
   </div>
 
