@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>構成記述DSL 11本の調査 - notes</title>
+<title>構成記述系DSL 11本の調査 - notes</title>
 <meta name="description" content="構成記述系DSL 11本を、記述言語の位置づけ / 抽象化機構 / 3自由度の評価 / 2×2配置 / 設計判断という同じ枠組みで観察した調査データ。">
-<meta property="og:title" content="構成記述DSL 11本の調査">
+<meta property="og:title" content="構成記述系DSL 11本の調査">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://mizzy.org/notes/ref-config-dsl-survey.html">
 <meta property="og:image" content="https://mizzy.org/notes/ogp/ref-config-dsl-survey.png">
 <meta property="og:description" content="構成記述系DSL 11本を、記述言語の位置づけ / 抽象化機構 / 3自由度の評価 / 2×2配置 / 設計判断という同じ枠組みで観察した調査データ。">
 <meta property="og:site_name" content="notes — mizzy.org">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="構成記述DSL 11本の調査">
+<meta name="twitter:title" content="構成記述系DSL 11本の調査">
 <meta name="twitter:image" content="https://mizzy.org/notes/ogp/ref-config-dsl-survey.png">
 <link rel="stylesheet" href="/notes/notes.css">
 <link rel="icon" href="/favicon.png" type="image/png">
@@ -27,7 +27,7 @@
 </header>
 
 <article class="note">
-  <h1>構成記述DSL 11本の調査</h1>
+  <h1>構成記述系DSL 11本の調査</h1>
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
     出典: <code>explorations/2026-04-26-cross-dsl-design-position/tier-1〜3各ファイル</code>
@@ -37,6 +37,12 @@
   <p>構成記述系DSL 11本(Pkl / Bicep / KCL / CUE / Dhall / Jsonnet / Nickel / cdktf / cdk8s / Crossplane / Helm)を、同じ枠組み — 記述言語の位置づけ / 抽象化機構 / 3自由度の評価 / 2×2配置 / 設計判断 — で観察した調査データ。<strong>調査日は全DSL共通で2026-04-26</strong>、公式ドキュメントの当時の記述に基づく。</p>
 
   <p>3自由度は「抽象化の追加」「複数量の制御」「実装の切替」で、各自由度を「言語が決める」か「規約に委ねる」かで判定する。</p>
+
+  <aside class="term">
+    <h2>「構成記述系DSL」という呼び方について</h2>
+    <p>これはこのノート群での呼び方で、一般的な用語ではない。英語圏では<strong>configuration language</strong> / <strong>config DSL</strong> と呼ばれる分類を指す。Nickelは自らを "configuration language" と名乗っており(<a href="https://github.com/nickel-lang/nickel">nickel-lang/nickel</a>)、Brian Grantも <a href="https://itnext.io/can-configuration-languages-dsls-solve-configuration-complexity-eee8f124e13a">"Configuration Languages (config DSLs)"</a> と並記している。</p>
+    <p>日本語では「構成管理(configuration management)」は定着しているが、そちらはChef / Puppet的な構成管理を指してしまうので採らない。ここで扱うのはKubernetesマニフェストやアプリ設定を生成する言語の方である。</p>
+  </aside>
 
   <nav class="toc">
     <a href="#pkl"><span class="t">Pkl (Apple)</span><span class="d">外部DSL × 言語が決める、抽象化の追加だけ規約寄り</span></a>

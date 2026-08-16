@@ -372,6 +372,27 @@ table.compare td:first-child {
 .accuracy ul { margin-bottom: 0; padding-left: 1.2em; }
 .accuracy p:last-child, .accuracy ul:last-child { margin-bottom: 0; }
 
+/* ---- 用語の断り ---- */
+/* このノート群だけの造語であることを初出で断る囲み。警告ではないので
+   シアン(対話的な要素と同じ第一のスポットカラー)で刷り、マゼンタは
+   精度ノートに取っておく。 */
+
+.term {
+  margin: var(--space-6) 0;
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--color-accent);
+  font-size: 15px;
+  line-height: 1.8;
+}
+.term > h2, .term > h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  font-weight: var(--font-heading-weight);
+  color: var(--color-accent-700);
+}
+.term p:last-child { margin-bottom: 0; }
+
 /* ---- ステータス ---- */
 /* 書きかけを完成品に見せないための表示。スポットカラーで刷る。 */
 
