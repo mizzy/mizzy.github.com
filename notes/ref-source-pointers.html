@@ -140,17 +140,21 @@
 
   <h3>Output&lt;T&gt;</h3>
 
+  <p>行番号は master <code>cd514ac1d</code>(2026-08-14、<code>sdk/nodejs/output.ts</code> 全1341行)で確認したもの。初出時から概ね+1ずれていたので更新した。</p>
+
   <ul>
-    <li>実装: <code>sdk/nodejs/output.ts:64-144</code> (<code>OutputImpl&lt;T&gt;</code> クラス、<code>OutputInstance&lt;T&gt;</code> interface)</li>
+    <li>実装: <code>sdk/nodejs/output.ts:65-391</code> (<code>OutputImpl&lt;T&gt;</code> クラス。旧記載の<code>64-144</code>はフィールド宣言の範囲でクラス全体ではなかった)</li>
     <li>型定義: <code>export type Output&lt;T&gt; = OutputInstance&lt;T&gt; &amp; Lifted&lt;T&gt;</code> (L1137)</li>
-    <li><code>then</code> 不在: Proxyで <code>if (prop === "then") return undefined</code> (L300-305)</li>
+    <li><code>then</code> 不在: Proxyの<code>get</code>トラップで <code>if (prop === "then") return undefined</code> (L301-306)。コメントは「他のシステムがPromiseかどうかの判定に使うので、そうだと示したくない」。プロパティ持ち上げのProxyを入れたPR #2510(2019-03)で同時に入っており、任意のプロパティ名を<code>apply</code>に持ち上げる仕組みの副作用(<code>then</code>まで持ち上がってawaitが壊れる)を塞ぐための処置</li>
     <li>内部状態: <code>isSecret: Promise&lt;boolean&gt;</code> (L84)、<code>isKnown: Promise&lt;boolean&gt;</code> (L96、preview時に未確定ならfalse)、<code>promise: () =&gt; Promise&lt;T&gt;</code> (L110)、<code>resources: () =&gt; Set&lt;Resource&gt;</code> (L124)、<code>allResources?: () =&gt; Promise&lt;Set&lt;Resource&gt;&gt;</code> (L144)</li>
     <li><code>Input&lt;T&gt;</code>: <code>export type Input&lt;T&gt; = T | Promise&lt;T&gt; | OutputInstance&lt;T&gt;</code> (L935)</li>
-    <li>連鎖メソッド: <code>apply()</code> (L369), <code>pulumi.all()</code> (L771-792), <code>pulumi.interpolate</code> (L1248), <code>concat</code> (L1232)</li>
-    <li>preview時の挙動: <code>applyHelperAsync</code> で <code>if (!doApply) return { value: undefined, isKnown: false, ... }</code> (L499-507) — <code>func</code> を実行せず未知Outputを返す。公式docsの記述も一致する: 「<code>apply</code>の中で作られたリソースは、outputの値が既にわかっている場合を除き<code>pulumi preview</code>に現れない」「<code>apply</code>の中でリソースを作ることは可能な限り避けるべき」「preview出力が実際の<code>pulumi up</code>の変更と一致しないことがある」(<a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a>)</li>
-    <li>deploy中実行: 「<code>pulumi up</code>でプログラムが実行されるとき、<code>apply</code>関数はリソースが作られてプロパティが解決するまで待ってから目的の値を出力する」(同上)</li>
-    <li><code>toString</code> / <code>toJSON</code>: <code>OutputToStringError</code> を投げる(L22-53, L167, L190)</li>
-    <li>secret伝播: <code>applyHelperAsync</code> の戻り <code>liftInnerOutput(allResources, transformed, true, isSecret)</code> (L520)。<code>all</code> では <code>some(isSecret)</code> でOR集約(L854)</li>
+    <li>連鎖メソッド: <code>apply()</code> (L370), <code>pulumi.all()</code> (実体L795、doc含めL773-806), <code>pulumi.interpolate</code> (L1248), <code>concat</code> (L1232)</li>
+    <li>preview時の挙動: <code>applyHelperAsync</code> (L490-523)で <code>const doApply = isKnown || runWithUnknowns</code> (L500)、偽なら <code>return { value: undefined, isKnown: false, isSecret }</code> (L502-509) — <code>func</code> を実行せず未知Outputを返す。<code>isKnown</code> はエンジン由来の値をそのまま使わず、コンストラクタ(L246-248)で <code>containsUnknowns(val)</code> をANDして再計算する。<code>runWithUnknowns</code> は公開シグネチャに無い内部の抜け穴(<code>apply&lt;U&gt;(func, runWithUnknowns?)</code> L370、SDK内の唯一の呼び手は持ち上げProxy自身 L356)で、この経路ではコールバックに未知センチネルが渡る。詳細は<a href="/notes/preview-does-not-run-the-callback.html">previewはapplyのコールバックを近似しない、実行しない</a></li>
+    <li>deploy中実行: 「<code>pulumi up</code>でプログラムが実行されるとき、<code>apply</code>関数はリソースが作られてプロパティが解決するまで待ってから目的の値を出力する」(<a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a>)</li>
+    <li><code>toString</code> / <code>toJSON</code>: <code>OutputToStringError</code> (L23-54)、宣言はL168 / L191。<strong>既定では投げない</strong> — <code>utils.errorOutputString</code> が設定されているときだけ投げ、既定ではエラー文言を文字列として返し <code>This function may throw in a future version of @pulumi/pulumi.</code> を付ける。つまり <code>`${output}`</code> は既定でエラーメッセージを埋め込む</li>
+    <li>secret伝播: 実行された場合は <code>liftInnerOutput(allResources, transformed, /*isKnown*/ true, isSecret)</code> (定義L461、呼び出しL523)。コールバックがOutputを返した場合は外側と内側のORを取る(L485)。<strong>スキップされた場合も <code>isSecret</code> はそのまま引き継ぐ</strong>(L508)</li>
+    <li><code>all</code> の集約は非対称: known は <code>every</code>、secret は <code>some</code> (L825-859)。1つでも未知なら全体が未知になり(=previewでコールバックが飛ぶ)、1つでもsecretなら全体がsecretになる</li>
+    <li>stack outputs は <code>apply</code> の中で作ることが<strong>できない</strong>(禁止)。「applyの中でリソースを作るのは避けよ」(非推奨)と併記されているので混同しないこと</li>
     <li>公式docs: <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/">inputs-outputs</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/all/">allページ</a></li>
   </ul>
 

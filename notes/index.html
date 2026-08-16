@@ -85,7 +85,7 @@
 </div>
 
 <div class="index-head">
-  <h2 class="all">すべてのノート <span class="count">92本</span> <span class="order">更新が新しい順</span></h2>
+  <h2 class="all">すべてのノート <span class="count">93本</span> <span class="order">更新が新しい順</span></h2>
 </div>
 
 <div class="search">
@@ -109,6 +109,22 @@
 </div>
 
 <div class="cards">
+  <a class="card interpretation" href="/notes/preview-does-not-run-the-callback.html" data-tags="unknown plan iac">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>previewはapplyのコールバックを近似しない、実行しない</h2>
+      <p>入力が未知のとき、previewはコールバックに一歩も入らない。評価されるのは精度の落ちたプログラムではなく、長さの違うプログラムである。</p>
+      <span class="tags"><span>#unknown</span> <span>#plan</span> <span>#iac</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/unknown-token-output-trilemma.html" data-tags="unknown 比較 iac">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>未知値の規律と段階分離は三すくみである</h2>
+      <p>段階を跨ぐ値(applyまで決まらない値)の扱いに、IaCツールの設計差が最も鮮明に現れる。</p>
+      <span class="tags"><span>#unknown</span> <span>#比較</span> <span>#iac</span></span>
+    </span>
+  </a>
   <a class="card interpretation" href="/notes/monad-is-not-a-box.html" data-tags="モナド 構造 型システム">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -387,14 +403,6 @@
       <h2>タグなし合併の判別はヒューリスティックに頼るしかない</h2>
       <p>CarinaのUnion(Vec&lt;AttributeType&gt;)はタグなし合併(untagged union)である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
       <span class="tags"><span>#型システム</span> <span>#合併型</span> <span>#設計負債</span></span>
-    </span>
-  </a>
-  <a class="card interpretation" href="/notes/unknown-token-output-trilemma.html" data-tags="unknown 比較 iac">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>未知値の規律と段階分離は三すくみである</h2>
-      <p>段階を跨ぐ値(applyまで決まらない値)の扱いに、IaCツールの設計差が最も鮮明に現れる。</p>
-      <span class="tags"><span>#unknown</span> <span>#比較</span> <span>#iac</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/type-erasure-at-plugin-boundary.html" data-tags="型消去 プラグイン バグクラス">
