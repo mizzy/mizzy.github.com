@@ -31,6 +31,7 @@
   <p class="meta">
     <span class="epistemic interpretation">解釈</span>
     出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-5-identity-and-refactoring-stability.md</code>
+    <span class="dates"><time datetime="2026-04-26">2026-04-26</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
   </p>
 
   <p>identityとは「<strong>何を同一資源と見なすか</strong>」の規則である。stateをどこに置き誰が運用責任を負うかという問い(章4の主題)とは<strong>別の独立軸</strong>であり、同じツールでも別々に設計できる。identityが変わればstate上では別リソース扱いになる — つまりidentityはstate内の参照の形を規定するが、state所有の設計判断とは独立している。</p>
@@ -124,6 +125,8 @@
       <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
       <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</a></li>
       <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+    
+      <li><a href="/notes/iac-processor-does-not-end-at-evaluation.html">構成データ出力DSLから貰えるのは評価段階だけである</a></li>
     </ul>
   </div>
 

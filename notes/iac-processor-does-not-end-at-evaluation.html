@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>構成データ出力DSLから貰えるのは評価段階だけである - notes</title>
+<meta name="description" content="構成データ出力DSLをIaCのfront endに採っても、貰えるのは評価段階だけである。identity・差分・state・Unknownは線の向こう側に残り、辺の検査は言語境界で失われる。">
+<meta property="og:title" content="構成データ出力DSLから貰えるのは評価段階だけである">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/iac-processor-does-not-end-at-evaluation.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/iac-processor-does-not-end-at-evaluation.png">
+<meta property="og:description" content="構成データ出力DSLをIaCのfront endに採っても、貰えるのは評価段階だけである。identity・差分・state・Unknownは線の向こう側に残り、辺の検査は言語境界で失われる。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="構成データ出力DSLから貰えるのは評価段階だけである">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/iac-processor-does-not-end-at-evaluation.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>構成データ出力DSLから貰えるのは評価段階だけである</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: 既存ノートからの再構成(探索記録の移植ではない)
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p>構成データ出力DSL(Jsonnet / CUE / Dhall / Nickel / KCL / Pkl)をIaCの front end に使えないか、という問いがある。「IaCはグラフだから使えない」と言い切るのは<strong>言い過ぎ</strong>で、実際 Jsonnet や CUE が Terraform JSON や k8s manifest を吐く構成は広く動いている。resource graph は構造データとして表現できる。</p>
+
+  <p>正確には、<strong>貰えるのは評価段階だけ</strong>である。そして評価段階はIaCで難しいところではない。</p>
+
+  <h2>出力で終わる処理系と、出力から始まる処理系</h2>
+
+  <p>構成データ出力DSLの契約は「評価して値ツリーを出す」で終わる。型検査があっても、検査するのは<strong>出てくるドキュメント</strong>であり、出した後は型を捨てる。処理系の仕事はそこで完結する。</p>
+
+  <p>IaCの処理系は、その出力<strong>から</strong>始まる仕事の方が本体である。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="構成データ出力DSLの処理系は評価して値ツリーを出したところで仕事が終わるのに対し、IaC処理系はその出力から先にrefresh・差分計算・identityの同定・Unknownの扱い・stateの記録という段が続き、front endを流用しても貰えるのは最初の評価段階だけであることを示す図">
+      <style>
+        .pl text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .pl .box { fill: var(--surface); stroke: var(--rule); }
+        .pl .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .pl .ttl { font-size: 12.5px; font-weight: 600; }
+        .pl .dim { fill: var(--faint); font-size: 11px; }
+        .pl .arw { stroke: var(--faint); fill: none; }
+        .pl .own { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .pl .stop { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .pl .a2t { fill: var(--accent-2); font-size: 11px; }
+        .pl .sep { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="pl">
+        <text class="ttl" x="12" y="20">構成データ出力DSLの処理系</text>
+
+        <rect class="hi" x="12" y="32" width="150" height="42" rx="4"/>
+        <text class="ttl" x="87" y="58" text-anchor="middle">評価</text>
+
+        <path class="arw" d="M162 53 H 196"/>
+        <rect class="box" x="204" y="32" width="150" height="42" rx="4"/>
+        <text class="ttl" x="279" y="52" text-anchor="middle">値ツリーを出す</text>
+        <text class="dim" x="279" y="68" text-anchor="middle">型はここで捨てる</text>
+
+        <path class="stop" d="M370 32 V 74"/>
+        <text class="a2t" x="382" y="50">ここで仕事が終わる</text>
+        <text class="a2t" x="382" y="66">— これが契約の全部</text>
+
+        <path class="sep" d="M12 96 H 688"/>
+
+        <text class="ttl" x="12" y="122">IaCの処理系</text>
+
+        <rect class="hi" x="12" y="134" width="150" height="42" rx="4"/>
+        <text class="ttl" x="87" y="160" text-anchor="middle">評価</text>
+        <text class="dim" x="87" y="192" text-anchor="middle">流用できるのはここだけ</text>
+
+        <path class="own" d="M162 155 H 196"/>
+
+        <rect class="box" x="204" y="134" width="112" height="42" rx="4"/>
+        <text class="ttl" x="260" y="152" text-anchor="middle">refresh</text>
+        <text class="dim" x="260" y="168" text-anchor="middle">世界を読む</text>
+
+        <path class="own" d="M316 155 H 340"/>
+
+        <rect class="box" x="348" y="134" width="112" height="42" rx="4"/>
+        <text class="ttl" x="404" y="152" text-anchor="middle">差分計算</text>
+        <text class="dim" x="404" y="168" text-anchor="middle">identity同定</text>
+
+        <path class="own" d="M460 155 H 484"/>
+
+        <rect class="box" x="492" y="134" width="112" height="42" rx="4"/>
+        <text class="ttl" x="548" y="152" text-anchor="middle">apply</text>
+        <text class="dim" x="548" y="168" text-anchor="middle">stateに記録</text>
+
+        <path class="sep" d="M12 218 H 688"/>
+
+        <text class="dim" x="12" y="242">評価の後ろに続く段はどれも自前になる。しかもfront endの型情報は境界で失われているので、</text>
+        <text class="dim" x="12" y="260">辺の検査(参照先が実在し、型が合い、applyまでに値を持つこと)はもう一度やり直すことになる。</text>
+        <text class="dim" x="12" y="286">値ツリーは評価が終われば完成しているので、Unknown — まだ無いが後で値を持つ — を置く場所も無い。</text>
+      </g>
+    </svg>
+    <figcaption>front endを流用して浮くのは左端の一段だけで、IaCで手間がかかるのはその右側である。</figcaption>
+  </figure>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>段階</th><th>構成データ出力DSL</th><th>IaC処理系</th></tr></thead>
+      <tbody>
+        <tr><td>評価</td><td>ある</td><td>ある</td></tr>
+        <tr><td>世界の取得(refresh)</td><td>無い</td><td>要る</td></tr>
+        <tr><td>世界との突き合わせ(差分計算)</td><td>無い</td><td>要る</td></tr>
+        <tr><td>identity の同定</td><td>無い</td><td>要る</td></tr>
+        <tr><td>まだ存在しない値の扱い</td><td>無い</td><td>要る</td></tr>
+        <tr><td>効果の実行と記録(state)</td><td>無い</td><td>要る</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>これは構成データ出力DSLの欠陥ではない。値ツリーを出すことが仕事なのだから、その先が無いのは当然である。<a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a>が「state管理 / 差分計算 / CRUD実行はDSLのレイヤではなくツールのレイヤの話であり、DSL同士を比べるときはこの線を越えない」と書いて引いた線の、<strong>向こう側</strong>がまるごとIaC処理系の担当になる。</p>
+
+  <p><strong>ここでは意図的にその線を越えている。</strong> DSL同士を比較するときは越えるべきでないが、「既存DSLを front end に採用できるか」を問うときは、越えた先の面積こそが判断材料だからである。線の向こう側が自前になるなら、front endの流用で浮くコストはその分だけ小さい。</p>
+
+  <h2>消えるのは辺の検査である</h2>
+
+  <p>値ツリーとして出せることと、出した後も検査が効くことは別である。IaCで効かせたい性質は<strong>辺</strong>にある — <code>subnet.vpc_id</code> の参照先が実在し、型が合っており、apply時には値を持つ、という性質である。</p>
+
+  <p>構成データ出力DSLの中では、この辺は書けても<strong>辺として残らない</strong>。JSONに落ちた時点で参照は文字列か、消費側ツール独自の補間構文を埋めた文字列になる。DSLの型システムはドキュメントを検査し終えて退場しており、辺の正しさを見るのは消費側の仕事として残る。<a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a>が言っているのと同じ損失が、言語境界をまたぐ地点で起きる。</p>
+
+  <p>これは identity についても効く。<a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a>はノードと辺までを扱ってidentityに触れていないが、<a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a>が言う「エンジンが同じリソースとみなすもの」は、値ツリーには現れない。同じJSONを二度出しても、それが同じリソースの二度目なのか別物なのかは、ドキュメントの側からは決まらない。</p>
+
+  <h2>Unknownを表現する語彙が無い</h2>
+
+  <p>もう一つの欠落は既に別ノートが押さえている。<a href="/notes/totality-value-depends-on-what-it-gates.html">全域性の価値は「何をゲートするか」で決まる</a>が「Pklには守るべきapply段階がなく、したがって段階を跨ぐ値(applyまで決まらない値)の問題自体を持たない」と書いている通りで、これはPklに限らず構成データ出力DSL全般に及ぶ。値ツリーは評価が終われば完成しているものだから、<a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a>のUnknown — まだ無いが後で値を持ち、型は分かっている — を置く場所が無い。</p>
+
+  <p>つまりこれは評価器に足せる機能ではなく、<a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a>ことの帰結である。</p>
+
+  <h2>コンパイラの蓄積は使えるが、既存処理系は流用できない</h2>
+
+  <p><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a>は「三点の外側ではコンパイラの蓄積がほぼそのまま使える」と書いている。本ノートはそれと矛盾しない。<strong>理論の蓄積が使えることと、特定言語の処理系がそのまま載ることは別</strong>だからである。</p>
+
+  <p>字句解析・評価・型検査の作り方はコンパイラ工学から借りられる。借りられないのは、refresh・差分・identity・stateという、評価の後ろに続く段の<strong>実装</strong>である。既存DSLの処理系が提供しているのは前者の成果物であって、後者は最初から範囲外にある。</p>
+
+  <h2>帰結</h2>
+
+  <p>構成データ出力DSLを front end に採用しても、手に入るのは「評価してツリーを出す」までである。identity・差分・state・Unknownはどのみち自前で持つことになり、しかも front end の型情報は境界で失われているので、<strong>辺の検査をもう一度やり直す</strong>ことになる。</p>
+
+  <p>これは<a href="/notes/adopting-a-language-means-subtracting-from-it.html">既存言語を採用してもフル機能は使わせられない</a>と対になる論点である。向こうは言語表面の話(採っても使わせられない)、こちらは処理系の話(採っても難しい部分は貰えない)。汎用言語埋め込みと構成データ出力DSLという別々の選択肢に対して、それぞれ別の理由で「既存のものを流用する」が期待ほど効かない。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>構成データ出力DSLとgraph出力DSLのレイヤ差は<a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a>で確認済み。apply段階を持たないことの含意は<a href="/notes/totality-value-depends-on-what-it-gates.html">全域性の価値は「何をゲートするか」で決まる</a>にあるが、そちらはPklについてAI由来の未確認事実を含む。</p>
+    <p>本ノートが足しているのは「front endに採用したとき何が貰えて何が残るか」という読みで、解釈である。未解決の問いに挙がっていた「Pklの構成データ計算 vs IaCのresource graph」への一つの答えでもある。</p>
+    <p>実在の構成(Jsonnet + Terraform JSON、CUE + k8s)で辺の検査がどこまで失われ、どこで補われているかは未確認。表の「無い」は、その言語の仕事の範囲外という意味であって、周辺ツールを含めた運用で代替物が無いという主張ではない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/adopting-a-language-means-subtracting-from-it.html">既存言語を採用してもフル機能は使わせられない</a></li>
+      <li><a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/totality-value-depends-on-what-it-gates.html">全域性の価値は「何をゲートするか」で決まる</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+    <a href="/notes/#tag-段階分離">#段階分離</a>
+  </p>
+</article>
+</body>
+</html>

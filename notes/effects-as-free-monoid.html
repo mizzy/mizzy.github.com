@@ -31,6 +31,7 @@
   <p class="meta">
     <span class="epistemic interpretation">解釈</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §7</code>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
   </p>
 
   <p>静的段階の出力であるplanは、Read / Create / Update / Delete / Import / Remove / Move / Wait / DeferredCreate / DeferredReplaceの10種の<code>Effect</code>値の列である。<strong>効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。</strong><code>Plan</code>は<code>effects: Vec&lt;Effect&gt;</code>を持つserde直列化可能な構造体で、<code>dyn Fn</code>の類を一切抱えていない。</p>

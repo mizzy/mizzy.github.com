@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>既存言語を採用してもフル機能は使わせられない - notes</title>
+<meta name="description" content="既存言語をIaCのfront endに採ると、蒸発しない機能を禁止して回ることになる。別言語を作るのと同じではなく、作った上でホスト言語の面積も抱え続ける。">
+<meta property="og:title" content="既存言語を採用してもフル機能は使わせられない">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/adopting-a-language-means-subtracting-from-it.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/adopting-a-language-means-subtracting-from-it.png">
+<meta property="og:description" content="既存言語をIaCのfront endに採ると、蒸発しない機能を禁止して回ることになる。別言語を作るのと同じではなく、作った上でホスト言語の面積も抱え続ける。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="既存言語を採用してもフル機能は使わせられない">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/adopting-a-language-means-subtracting-from-it.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* 前払い / 後払いの対比。コストの向きが逆であることだけを見せる */
+  .ledger { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin: var(--space-8) 0; }
+  .ledger > div { border-top: 2px solid var(--color-neutral-300); padding-top: var(--space-3); }
+  .ledger > div.pay-later { border-top-color: var(--color-accent); }
+  .ledger h3 { font-size: 14px; margin: 0 0 var(--space-2); font-weight: 600; }
+  .ledger .when { font-size: 13px; color: color-mix(in srgb, var(--color-text) 50%, transparent); margin: 0 0 var(--space-2); }
+  .ledger ul { margin: 0; padding-left: 1.2em; font-size: 15px; }
+  @media (max-width: 40rem) { .ledger { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>既存言語を採用してもフル機能は使わせられない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: 既存ノートからの再構成(探索記録の移植ではない)
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成</span>
+  </p>
+
+  <p>既存言語を採用する利点として挙がるのは、言語そのもの・処理系・エコシステム・学習資産がタダで手に入る、という話である。だがIaCの front end として採用する場合、<strong>手に入れた機能のかなりの部分を、こちらから禁止して回ることになる</strong>。</p>
+
+  <p>禁止する範囲は恣意的に決まるのではない。<a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a>をそのまま他人の言語に当てはめた結果として決まる。グラフ形状の決定位置に到達する高階関数、静的段階での I/O、停止しない再帰、<code>eval</code>、実行順に依存する可変状態。どれもホスト言語では正当な機能だが、蒸発しないので通せない。</p>
+
+  <h2>サブセット化のコストは「別言語を作るのと同じ」では済まない</h2>
+
+  <p>サブセット化が必要であること自体は既に書いた(<a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a>、<a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a>)。そこでの言い方は「ホスト言語をサブセット化するしかなく、それはもう別言語を作ることと同じである」だった。</p>
+
+  <p>これは入口のコストとしては正しいが、<strong>継続的なコストを勘定に入れていない</strong>。別言語を作るのと同じ、ではなく、<strong>別言語を作った上でホスト言語の面積も抱え続ける</strong>のが実際である。</p>
+
+  <ul>
+    <li>利用者が読む言語仕様はホスト言語の全体のままで、こちらが尊重するのは部分集合だけ</li>
+    <li>ホスト言語の型システムは、こちらが拒否したい構文も型検査に通す。禁止は言語の外側の層(lint、実行時チェック、規約)で表明することになる</li>
+    <li>エコシステムはディスクの上にあり続ける。<code>npm install</code> は動くが、入れたパッケージが静的段階で使える保証はない</li>
+    <li>ホスト言語が版を上げるたび、新機能が蒸発条件を満たすかを判定する仕事が増える</li>
+  </ul>
+
+  <p>つまり「既存言語だから学習コストが低い」という利点は、サブセット化した時点で<strong>部分的に反転する</strong>。利用者は言語を知っていることによってむしろ、書けるはずのものが書けない理由を個別に学ぶ必要が出る。知らない言語を知らないまま学ぶより、知っている言語の禁止事項を覚える方が難しいことがある。</p>
+
+  <h2>勘定の向きが逆のノートがある</h2>
+
+  <p><a href="/notes/empty-quadrant-selection-pressure.html">「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</a>は同じ勘定を反対側から立てている。あちらは<strong>外部DSLを作る</strong>コスト(parser、evaluator、LSP、エコシステムの不在)を数え、その見返りが「文法レベルで禁止できること」なのだから、禁止を放棄した外部DSLには存在理由が残らない、と論じた。</p>
+
+  <div class="ledger">
+    <div>
+      <h3>外部DSLを作る</h3>
+      <p class="when">前払い</p>
+      <ul>
+        <li>parser / evaluator / LSPを書く</li>
+        <li>エコシステムが無い</li>
+      </ul>
+    </div>
+    <div class="pay-later">
+      <h3>既存言語を採る</h3>
+      <p class="when">後払い — ホスト言語が生きている限り続く</p>
+      <ul>
+        <li>禁止事項を言語の外側で表明し続ける</li>
+        <li>版が上がるたび新機能を判定する</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>本ノートはその対になる。<strong>既存言語を採る</strong>側にも、禁止を表明し続けるコストがかかる。両方を並べると、「作るか採るか」はコストの有無の対比ではなく、<strong>どちらのコストを払うかの選択</strong>になる。外部DSLは前払いで parser と evaluator を作り、埋め込みは後払いで禁止事項を維持し続ける。前者は一度作れば減っていくが、後者はホスト言語が生きている限り続く。</p>
+
+  <h2>この論点が置き換わるもの</h2>
+
+  <p><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a>は、汎用言語の項ベース型付けを「持てない」ではなく「<strong>要らない</strong>」と評価した。本ノートはそれと別のことを言っている — 仮に要るとしても、<strong>採用したら禁止して回る側に立つ</strong>。「要らない」はドメインについての規範的判断であり、こちらは採用した場合に発生する構造的コストの話である。</p>
+
+  <p>したがって専用言語の選択理由として、「小さい言語で足りる」という積極的な理由(<a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a>)とは別に、「大きい言語を採っても小さくして使うことになる」という消極的な理由が立つ。後者は前者が成り立たない場合でも生き残る。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>サブセット化が必要であることは既存ノートの通り。本ノートが足しているのは「サブセット化後もホスト言語の面積が残る」というコストの読みで、これは解釈である。実在ツールでこのコストがどう現れているか(Pulumi / CDKが実際に何を禁止し、どう表明しているか)は未確認。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/iac-processor-does-not-end-at-evaluation.html">構成データ出力DSLから貰えるのは評価段階だけである</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+      <li><a href="/notes/empty-quadrant-selection-pressure.html">「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</a></li>
+      <li><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a></li>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+    <a href="/notes/#tag-言語設計">#言語設計</a>
+  </p>
+</article>
+</body>
+</html>

@@ -31,6 +31,7 @@
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
     出典: <code>audits/2026-05-23-type-system-evaluation.md §2.3, §3.2 (g), §6</code>
+    <span class="dates"><time datetime="2026-05-23">2026-05-23</time> 作成</span>
   </p>
 
   <p>構造体の値検証は、必須フィールドの存在を確かめ、<strong>未知のフィールドを拒否する</strong>(似た名前があれば候補として提示する)。つまり幅部分型付け(width subtyping)を<strong>負の方向にしか許さない</strong>。フィールドを減らすことはできず、増やすこともできない、封印された(sealed)構造体である。Flowの完全型<code>{| ... |}</code>やRustの構造体リテラルに近い扱いになる。</p>

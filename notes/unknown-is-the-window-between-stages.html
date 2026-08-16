@@ -31,6 +31,7 @@
   <p class="meta">
     <span class="epistemic interpretation">解釈</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §6</code>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
   </p>
 
   <p>静的段階では値が決まらないものがある。上流スタックのapply結果への参照、まだ作られていないリソースの属性、for展開の変数などで、Terraformの「(known after apply)」に相当する。Carinaはこれを<code>Value::Unknown(理由)</code>として<strong>値の一級表現</strong>にしている。</p>
@@ -136,6 +137,8 @@
       <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
       <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
       <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    
+      <li><a href="/notes/iac-processor-does-not-end-at-evaluation.html">構成データ出力DSLから貰えるのは評価段階だけである</a></li>
     </ul>
   </div>
 

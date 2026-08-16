@@ -220,6 +220,16 @@ p.meta {
   line-height: 1.7;
 }
 
+/* 作成日 / 更新日。出典と同じ行の族だが、数字なので級数を一段落とす */
+p.meta .dates {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-text) 45%, transparent);
+}
+p.meta .dates time { font-variant-numeric: tabular-nums; }
+p.meta .dates .sep { margin: 0 0.5em; }
+
 ul, ol { padding-left: 1.4em; margin: 0 0 var(--space-4); }
 li { margin-bottom: var(--space-1); }
 /* 表の中のリストは幅を制限しない */
@@ -658,6 +668,12 @@ p.tags a:hover { color: var(--color-accent-2-700); }
 .index-head h2.all .count {
   font-size: 13px;
   color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+/* 並び順の断り書き。件数より一段弱く */
+.index-head h2.all .order {
+  font-size: 13px;
+  font-weight: 400;
+  color: color-mix(in srgb, var(--color-text) 42%, transparent);
 }
 
 /* タグの絞り込み。ノートが増えると一覧だけでは辿れないため。 */
