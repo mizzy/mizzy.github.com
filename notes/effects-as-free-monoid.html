@@ -94,7 +94,7 @@
 
   <h2>自由モノイドと呼ぶには二点の留保が要る</h2>
 
-  <p><strong>順序に意味がない。</strong><code>Plan</code>は<code>Vec&lt;Effect&gt;</code>だが、この<code>Vec</code>の順序は実行順ではない。実行順はapply時に<code>apply_edges</code> / <code>destroy_edges</code>からDAGとして導出される。モノイドの積は連接だが、連接の順序が意味を持たないなら、構造としてはむしろ<strong>多重集合 + 導出可能な辺</strong>である。「列」と呼ぶのは実装の格納形式に引きずられた言い方になっている。</p>
+  <p><strong>順序に意味がない。</strong><code>Plan</code>は<code>Vec&lt;Effect&gt;</code>だが、この<code>Vec</code>の順序は実行順ではない。実行順はapply時に<code>apply_edges</code> / <code>destroy_edges</code>からDAGとして導出される。モノイドの積は連接だが、連接の順序が意味を持たないなら、構造としてはむしろ<strong>多重集合 + 導出可能なエッジ</strong>である。「列」と呼ぶのは実装の格納形式に引きずられた言い方になっている。</p>
 
   <p><strong>Deferred系は脱関数化された継続である。</strong>DeferredCreateは<code>template</code>としてAST片を抱えており、apply後の上流stateに対して再展開されて新しいCreateを生む。関数ではないので「純粋な値」は保てるが、「効果の結果に依存して次の効果を構成する部分は静的段階で済ませてある」は、この2変種については成り立たない。実装は<code>is_scheduler_meta()</code>という述語でこれらを他と区別している。</p>
 
