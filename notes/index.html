@@ -85,11 +85,11 @@
 </div>
 
 <div class="index-head">
-  <h2 class="all">すべてのノート <span class="count">80本</span></h2>
+  <h2 class="all">すべてのノート <span class="count">87本</span></h2>
 </div>
 
 <div class="legend">
-  <span><i class="verified"></i>確認済み 29</span>
+  <span><i class="verified"></i>確認済み 36</span>
   <span><i class="interpretation"></i>解釈 41</span>
   <span><i class="normative"></i>規範 8</span>
   <span><i class="ai-sourced"></i>AI由来 2</span>
@@ -97,16 +97,24 @@
 
 <div class="filters">
   <button type="button" data-tag="" class="on">すべて</button>
-  <button type="button" data-tag="型システム">#型システム</button> <button type="button" data-tag="dsl">#dsl</button> <button type="button" data-tag="iac">#iac</button> <button type="button" data-tag="plan">#plan</button> <button type="button" data-tag="設計原則">#設計原則</button> <button type="button" data-tag="設計判断">#設計判断</button> <button type="button" data-tag="コンパイラ">#コンパイラ</button> <button type="button" data-tag="設計空間">#設計空間</button> <button type="button" data-tag="参照">#参照</button> <button type="button" data-tag="差分">#差分</button> <button type="button" data-tag="全域性">#全域性</button> <button type="button" data-tag="予測可能性">#予測可能性</button> <button type="button" data-tag="unknown">#unknown</button>
+  <button type="button" data-tag="型システム">#型システム</button> <button type="button" data-tag="dsl">#dsl</button> <button type="button" data-tag="iac">#iac</button> <button type="button" data-tag="plan">#plan</button> <button type="button" data-tag="設計判断">#設計判断</button> <button type="button" data-tag="設計原則">#設計原則</button> <button type="button" data-tag="コンパイラ">#コンパイラ</button> <button type="button" data-tag="設計空間">#設計空間</button> <button type="button" data-tag="設計負債">#設計負債</button> <button type="button" data-tag="参照">#参照</button> <button type="button" data-tag="部分型">#部分型</button> <button type="button" data-tag="差分">#差分</button> <button type="button" data-tag="全域性">#全域性</button> <button type="button" data-tag="バグクラス">#バグクラス</button> <button type="button" data-tag="予測可能性">#予測可能性</button> <button type="button" data-tag="比較軸">#比較軸</button> <button type="button" data-tag="unknown">#unknown</button>
 </div>
 
 <div class="cards">
-  <a class="card verified" href="/notes/two-by-two-is-per-freedom.html" data-tags="設計空間 比較軸 方法論">
+  <a class="card verified" href="/notes/make-the-broken-state-unrepresentable.html" data-tags="typestate 型安全 設計原則">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</h2>
-      <p>「記述言語(外部DSL / 汎用言語)× 記述自由度の所在(言語が決める / 規約に委ねる)」の2×2は、暗黙に「ツール = 1象限」を前提していた。</p>
-      <span class="tags"><span>#設計空間</span> <span>#比較軸</span> <span>#方法論</span></span>
+      <h2>typestateで壊れた状態を書けなくする</h2>
+      <p>Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは一貫していて、静的段階の内部不変条件を、実装言語の型でコンパイル時に固定することである。</p>
+      <span class="tags"><span>#typestate</span> <span>#型安全</span> <span>#設計原則</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/nominal-axis-subtyping.html" data-tags="型システム 部分型 公称型">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>公称軸ごとの幅部分型付けが再利用と混同防止を両立する</h2>
+      <p>列挙やカスタム文字列型にはTypeIdentity { provider, segments, kind }という公称的な識別が付く(providerは省略可能)。</p>
+      <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#公称型</span></span>
     </span>
   </a>
   <a class="card normative" href="/notes/predictability-is-the-core-value.html" data-tags="予測可能性 iac 設計原則">
@@ -117,12 +125,12 @@
       <span class="tags"><span>#予測可能性</span> <span>#iac</span> <span>#設計原則</span></span>
     </span>
   </a>
-  <a class="card interpretation" href="/notes/plan-is-compilation.html" data-tags="iac コンパイラ plan">
+  <a class="card verified" href="/notes/two-by-two-is-per-freedom.html" data-tags="設計空間 比較軸 方法論">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>planはコンパイルである</h2>
-      <p>carina planは、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。applyはその中間言語の実行系である。</p>
-      <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#plan</span></span>
+      <h2>ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</h2>
+      <p>「記述言語(外部DSL / 汎用言語)× 記述自由度の所在(言語が決める / 規約に委ねる)」の2×2は、暗黙に「ツール = 1象限」を前提していた。</p>
+      <span class="tags"><span>#設計空間</span> <span>#比較軸</span> <span>#方法論</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/semantic-typing.html" data-tags="型システム 型理論 cue">
@@ -131,6 +139,14 @@
       <h2>型は値の分類器である(意味論的型付け)</h2>
       <p>Carinaの型付けの様式は、型を「項に付く構文的な札」ではなく「値の集合(値の分類器)」とみなし、型付けを所属判定として与える意味論的型付け(semantic typing)の系譜である。</p>
       <span class="tags"><span>#型システム</span> <span>#型理論</span> <span>#cue</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/plan-is-compilation.html" data-tags="iac コンパイラ plan">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>planはコンパイルである</h2>
+      <p>carina planは、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。applyはその中間言語の実行系である。</p>
+      <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#plan</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/hybrid-quadrant-convergence.html" data-tags="設計空間 dsl 収束">
@@ -189,6 +205,14 @@
       <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#増分計算</span></span>
     </span>
   </a>
+  <a class="card interpretation" href="/notes/unknown-is-the-window-between-stages.html" data-tags="unknown 型システム 段階分離">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>Unknownは二段階の間に開いた窓である</h2>
+      <p>静的段階では値が決まらないものがある。上流スタックのapply結果への参照、まだ作られていないリソースの属性、for展開の変数などで、Terraformの「(known after apply)」に相当する。</p>
+      <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#段階分離</span></span>
+    </span>
+  </a>
   <a class="card verified" href="/notes/plan-is-prediction-apply-is-truth.html" data-tags="plan apply occ">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -197,12 +221,20 @@
       <span class="tags"><span>#plan</span> <span>#apply</span> <span>#occ</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/make-the-broken-state-unrepresentable.html" data-tags="typestate 型安全 設計原則">
+  <a class="card interpretation" href="/notes/refinement-types-as-constrained-base.html" data-tags="型システム 篩型 型理論">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>typestateで壊れた状態を書けなくする</h2>
-      <p>Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは一貫していて、静的段階の内部不変条件を、実装言語の型でコンパイル時に固定することである。</p>
-      <span class="tags"><span>#typestate</span> <span>#型安全</span> <span>#設計原則</span></span>
+      <h2>カスタム型は独立の構成子ではなく篩型である</h2>
+      <p>Carinaに「カスタム型」という独立した型構成子はない。代わりにString / Int / Floatの各変種が制約を持ち運ぶ。</p>
+      <span class="tags"><span>#型システム</span> <span>#篩型</span> <span>#型理論</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/type-erasure-at-plugin-boundary.html" data-tags="型消去 プラグイン バグクラス">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>プラグイン境界の型消去は事故クラスを予測する</h2>
+      <p>WASMプラグイン境界(WITプロトコル)では、型情報の一部が不可逆に消える。</p>
+      <span class="tags"><span>#型消去</span> <span>#プラグイン</span> <span>#バグクラス</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/graph-shape-vs-attribute-value.html" data-tags="予測可能性 比較軸 差分">
@@ -211,6 +243,14 @@
       <h2>予測可能性はgraph形状と属性値の二側面を持つ</h2>
       <p>コードから読み取りたいものは二つある。graph形状(どんなリソースがいくつ、どう繋がって作られるか)と、各ノードの属性値(そのリソースが具体的にどう設定されるか)である。三つの記述自由度はどちらの側にも適用される。</p>
       <span class="tags"><span>#予測可能性</span> <span>#比較軸</span> <span>#差分</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/type-directed-equality.html" data-tags="差分 等価性 型システム">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>等価判定は正規形へ簡約してから型ごとに行う</h2>
+      <p>差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality)という原則である。同じ値の組でも、期待される型によって判定が変わる。</p>
+      <span class="tags"><span>#差分</span> <span>#等価性</span> <span>#型システム</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/three-freedoms-of-description.html" data-tags="比較軸 dsl 設計判断">
@@ -277,20 +317,12 @@
       <span class="tags"><span>#モナド</span> <span>#構造</span> <span>#plan</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/type-erasure-at-plugin-boundary.html" data-tags="型消去 プラグイン バグクラス">
+  <a class="card interpretation" href="/notes/totality-cannot-be-retrofitted.html" data-tags="全域性 言語設計 iac">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>プラグイン境界の型消去は事故クラスを予測する</h2>
-      <p>WASMプラグイン境界(WITプロトコル)では、型情報の一部が不可逆に消える。</p>
-      <span class="tags"><span>#型消去</span> <span>#プラグイン</span> <span>#バグクラス</span></span>
-    </span>
-  </a>
-  <a class="card verified" href="/notes/nominal-axis-subtyping.html" data-tags="型システム 部分型 公称型">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>公称軸ごとの幅部分型付けが再利用と混同防止を両立する</h2>
-      <p>列挙やカスタム文字列型にはTypeIdentity { provider, segments, kind }という公称的な識別が付く(providerは省略可能)。</p>
-      <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#公称型</span></span>
+      <h2>全域性は後付けできない</h2>
+      <p>静的段階の全域性は、実装を頑張れば手に入る種類の性質ではない。言語設計の選択そのものに由来するため、汎用言語に埋め込む方式を選んだ時点で原理的に取れなくなる。</p>
+      <span class="tags"><span>#全域性</span> <span>#言語設計</span> <span>#iac</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/effects-as-free-monoid.html" data-tags="効果 代数 plan">
@@ -301,20 +333,20 @@
       <span class="tags"><span>#効果</span> <span>#代数</span> <span>#plan</span></span>
     </span>
   </a>
+  <a class="card verified" href="/notes/two-type-languages-asymmetry.html" data-tags="型システム 設計負債 非対称">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>型注釈の言語とスキーマ型は別の言語である</h2>
+      <p>Carinaには型を表す言語が二つある。ユーザーが書く型注釈の言語(TypeExpr)と、プロバイダのスキーマが表すスキーマ型(AttributeType)である。</p>
+      <span class="tags"><span>#型システム</span> <span>#設計負債</span> <span>#非対称</span></span>
+    </span>
+  </a>
   <a class="card verified" href="/notes/the-window-is-narrower-than-it-looks.html" data-tags="unknown 型システム 検査">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
       <h2>未知値の周りは無検査ではない</h2>
       <p>Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。値が無くても宣言型どうしを照合する別経路の検査が走るため、静的近似が本当に確定できない窓は見かけより狭い。</p>
       <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#検査</span></span>
-    </span>
-  </a>
-  <a class="card verified" href="/notes/type-directed-equality.html" data-tags="差分 等価性 型システム">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>等価判定は正規形へ簡約してから型ごとに行う</h2>
-      <p>差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality)という原則である。同じ値の組でも、期待される型によって判定が変わる。</p>
-      <span class="tags"><span>#差分</span> <span>#等価性</span> <span>#型システム</span></span>
     </span>
   </a>
   <a class="card normative" href="/notes/evaporation-condition.html" data-tags="設計原則 蒸発条件 dsl">
@@ -341,20 +373,20 @@
       <span class="tags"><span>#plan</span> <span>#ux</span> <span>#ir</span></span>
     </span>
   </a>
-  <a class="card interpretation" href="/notes/unknown-is-the-window-between-stages.html" data-tags="unknown 型システム 段階分離">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>Unknownは二段階の間に開いた窓である</h2>
-      <p>静的段階では値が決まらないものがある。上流スタックのapply結果への参照、まだ作られていないリソースの属性、for展開の変数などで、Terraformの「(known after apply)」に相当する。</p>
-      <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#段階分離</span></span>
-    </span>
-  </a>
   <a class="card interpretation" href="/notes/apply-is-linker-and-loader.html" data-tags="apply コンパイラ リンカ">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
       <h2>applyはリンカ兼ローダである</h2>
       <p>applyの仕事をコンパイラの言葉で言うと、リンクとロードである。plan中の穴を実値で埋めながら、依存順に実行していく操作だからである。</p>
       <span class="tags"><span>#apply</span> <span>#コンパイラ</span> <span>#リンカ</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/checking-completeness-is-time-indexed.html" data-tags="型システム 検査 バグクラス">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「全数検査」は検証ステップの時点で確定している値に限られる</h2>
+      <p>値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。検査されるのは、検証ステップの時点で値が確定しているものだけである。</p>
+      <span class="tags"><span>#型システム</span> <span>#検査</span> <span>#バグクラス</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/empty-quadrant-embedded-total.html" data-tags="設計空間 dsl 全域性">
@@ -365,12 +397,12 @@
       <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#全域性</span></span>
     </span>
   </a>
-  <a class="card interpretation" href="/notes/refinement-types-as-constrained-base.html" data-tags="型システム 篩型 型理論">
+  <a class="card verified" href="/notes/schema-vocabulary-is-the-ceiling.html" data-tags="schema 型システム プロバイダ">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>カスタム型は独立の構成子ではなく篩型である</h2>
-      <p>Carinaに「カスタム型」という独立した型構成子はない。代わりにString / Int / Floatの各変種が制約を持ち運ぶ。</p>
-      <span class="tags"><span>#型システム</span> <span>#篩型</span> <span>#型理論</span></span>
+      <h2>プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</h2>
+      <p>「プロバイダのプロトコルで型が潰れるから型を強くできない」というのは、差の所在を取り違えた説明である。TerraformとCarinaを並べると、値を運ぶ層はどちらも型タグなしで送っている。</p>
+      <span class="tags"><span>#schema</span> <span>#型システム</span> <span>#プロバイダ</span></span>
     </span>
   </a>
   <a class="card ai-sourced" href="/notes/verify-at-the-trust-boundary.html" data-tags="型システム 信頼境界 設計原則">
@@ -389,12 +421,20 @@
       <span class="tags"><span>#型システム</span> <span>#全域性</span> <span>#契約検査</span></span>
     </span>
   </a>
-  <a class="card interpretation" href="/notes/totality-cannot-be-retrofitted.html" data-tags="全域性 言語設計 iac">
+  <a class="card verified" href="/notes/abstract-to-concrete-leak.html" data-tags="型システム バグクラス 部分型">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>全域性は後付けできない</h2>
-      <p>静的段階の全域性は、実装を頑張れば手に入る種類の性質ではない。言語設計の選択そのものに由来するため、汎用言語に埋め込む方式を選んだ時点で原理的に取れなくなる。</p>
-      <span class="tags"><span>#全域性</span> <span>#言語設計</span> <span>#iac</span></span>
+      <h2>同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</h2>
+      <p>公称識別の軸ごとの包摂は、設計としては方向付きである。受け側が特定している軸は送り側も一致していなければならず、受け側が特定していない軸は問わない。ところがその判定に使われている関数は対称な同値関係として書かれている。</p>
+      <span class="tags"><span>#型システム</span> <span>#バグクラス</span> <span>#部分型</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/stringly-typed-assignability.html" data-tags="型システム 設計負債 部分型">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>型名の文字列比較で代入可能性を決めるのは構造を捨てている</h2>
+      <p>代入可能性判定の最終アームは、二つの型の表示用の名前を文字列として比較するものになっている。</p>
+      <span class="tags"><span>#型システム</span> <span>#設計負債</span> <span>#部分型</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/abstraction-boundary-opacity.html" data-tags="抽象化 透明性 仮説">
@@ -413,6 +453,14 @@
       <span class="tags"><span>#unknown</span> <span>#比較</span> <span>#iac</span></span>
     </span>
   </a>
+  <a class="card interpretation" href="/notes/single-definition-checker.html" data-tags="設計負債 lsp コンパイラ">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>検査器が二系統あるのは設計負債である</h2>
+      <p>静的検査器が二系統ある — plan/validate経路とLSP経路 — というのは、機能の重複ではなく理論的な負債である。同じ検査の二重実装であり、意味論の一致(パリティ)を規約と試験で維持している。</p>
+      <span class="tags"><span>#設計負債</span> <span>#lsp</span> <span>#コンパイラ</span></span>
+    </span>
+  </a>
   <a class="card interpretation" href="/notes/general-purpose-embedding-tradeoff.html" data-tags="トレードオフ 設計判断 比較">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -427,6 +475,14 @@
       <h2>良い類比は実バグを予言する</h2>
       <p>類比の価値は、記述が整うことにあるのではない。対応から実装上の予言が導け、その予言が実際のバグや改善方向を当てることにある。当たらない類比は装飾であり、当たる類比は分析の道具である。</p>
       <span class="tags"><span>#方法論</span> <span>#類比</span> <span>#設計</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/subtyping-lattice-is-unaxiomatized.html" data-tags="型システム 部分型 設計負債">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>部分型関係が公理化されていないと性質の破れを検出できない</h2>
+      <p>代入可能性の判定は、手書きの分岐の集合として書かれている。個々のアームは妥当だが、それらが全体として部分型関係の性質を満たすかはコードでも試験でも保証されていない。反射性・推移性・反対称性のいずれもである。</p>
+      <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#設計負債</span></span>
     </span>
   </a>
   <a class="card normative" href="/notes/function-values-must-not-reach-graph-shape.html" data-tags="型システム 境界設計 高階関数">
@@ -453,12 +509,12 @@
       <span class="tags"><span>#dsl</span> <span>#可読性</span> <span>#設計判断</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/checking-completeness-is-time-indexed.html" data-tags="型システム 検査 バグクラス">
+  <a class="card interpretation" href="/notes/two-axis-config-language-genealogy.html" data-tags="dsl 系譜 設計空間">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>「全数検査」は検証ステップの時点で確定している値に限られる</h2>
-      <p>値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。検査されるのは、検証ステップの時点で値が確定しているものだけである。</p>
-      <span class="tags"><span>#型システム</span> <span>#検査</span> <span>#バグクラス</span></span>
+      <h2>「専用言語か」と「全域か」は独立した二軸である</h2>
+      <p>設定記述言語の系譜は「汎用言語に埋め込むか、専用言語を作るか」の一本の線ではない。「専用言語かどうか」と「全域的かどうか」は独立した選択であり、その二軸が張る空間として見た方が正確である。</p>
+      <span class="tags"><span>#dsl</span> <span>#系譜</span> <span>#設計空間</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/dirty-bit-for-the-cloud.html" data-tags="増分計算 aws 確認済み経験">
@@ -469,12 +525,28 @@
       <span class="tags"><span>#増分計算</span> <span>#aws</span> <span>#確認済み経験</span></span>
     </span>
   </a>
-  <a class="card interpretation" href="/notes/single-definition-checker.html" data-tags="設計負債 lsp コンパイラ">
+  <a class="card verified" href="/notes/untagged-union-discrimination.html" data-tags="型システム 合併型 設計負債">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>検査器が二系統あるのは設計負債である</h2>
-      <p>静的検査器が二系統ある — plan/validate経路とLSP経路 — というのは、機能の重複ではなく理論的な負債である。同じ検査の二重実装であり、意味論の一致(パリティ)を規約と試験で維持している。</p>
-      <span class="tags"><span>#設計負債</span> <span>#lsp</span> <span>#コンパイラ</span></span>
+      <h2>タグなし合併の判別はヒューリスティックに頼るしかない</h2>
+      <p>CarinaのUnion(Vec&lt;AttributeType&gt;)はタグなし合併(untagged union)である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
+      <span class="tags"><span>#型システム</span> <span>#合併型</span> <span>#設計負債</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/constraint-origin-has-four-layers.html" data-tags="比較軸 iac 設計判断">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>ツールの限界は出自を四層に分けないと解消手段を取り違える</h2>
+      <p>「Terraformの限界はHCLに起因する」という仮説は部分的に正しいが不十分である。限界は単一原因ではなく、出自の違う四つの層が重なっている。層を分けないと、解消手段の見積もりを丸ごと間違える。</p>
+      <span class="tags"><span>#比較軸</span> <span>#iac</span> <span>#設計判断</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/optimistic-check-conservative-equality.html" data-tags="unknown 健全性 差分">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>検査は素通し、等価性は不成立 — Unknownの一貫した保守性</h2>
+      <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、どちらも「インフラを壊さない側」に倒すという一つの原則の現れである。</p>
+      <span class="tags"><span>#unknown</span> <span>#健全性</span> <span>#差分</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/graph-output-vs-config-data-output.html" data-tags="dsl 分類 設計空間">
@@ -517,12 +589,12 @@
       <span class="tags"><span>#型システム</span> <span>#dsl</span> <span>#評価</span></span>
     </span>
   </a>
-  <a class="card interpretation" href="/notes/two-axis-config-language-genealogy.html" data-tags="dsl 系譜 設計空間">
+  <a class="card verified" href="/notes/four-kinds-of-undetermined.html" data-tags="型システム 漸進的型付け 設計負債">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>「専用言語か」と「全域か」は独立した二軸である</h2>
-      <p>設定記述言語の系譜は「汎用言語に埋め込むか、専用言語を作るか」の一本の線ではない。「専用言語かどうか」と「全域的かどうか」は独立した選択であり、その二軸が張る空間として見た方が正確である。</p>
-      <span class="tags"><span>#dsl</span> <span>#系譜</span> <span>#設計空間</span></span>
+      <h2>「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</h2>
+      <p>Carinaの型システムには「まだ確定していない」を表す表現が四つ独立に存在する。</p>
+      <span class="tags"><span>#型システム</span> <span>#漸進的型付け</span> <span>#設計負債</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/refactoring-stability-mechanisms.html" data-tags="identity リファクタリング state">
@@ -533,12 +605,12 @@
       <span class="tags"><span>#identity</span> <span>#リファクタリング</span> <span>#state</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/two-type-languages-asymmetry.html" data-tags="型システム 設計負債 非対称">
+  <a class="card normative" href="/notes/provenance-should-be-a-type.html" data-tags="型システム 差分 設計方向">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>型注釈の言語とスキーマ型は別の言語である</h2>
-      <p>Carinaには型を表す言語が二つある。ユーザーが書く型注釈の言語(TypeExpr)と、プロバイダのスキーマが表すスキーマ型(AttributeType)である。</p>
-      <span class="tags"><span>#型システム</span> <span>#設計負債</span> <span>#非対称</span></span>
+      <h2>属性の出所は型に昇格させるべきモダリティである</h2>
+      <p>「この属性は誰が書くのか」— ユーザー指定か、プロバイダ算出か、サーバ既定か — という区別が、Carinaでは型に乗っていない。フラグと投影で表現されている。これが理論的な負債になっている。</p>
+      <span class="tags"><span>#型システム</span> <span>#差分</span> <span>#設計方向</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/attribute-audit-needs-static-values.html" data-tags="監査 セキュリティ 予測可能性">
@@ -573,12 +645,12 @@
       <span class="tags"><span>#所有権</span> <span>#型システム</span> <span>#分散システム</span></span>
     </span>
   </a>
-  <a class="card interpretation" href="/notes/optimistic-check-conservative-equality.html" data-tags="unknown 健全性 差分">
+  <a class="card verified" href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html" data-tags="型システム 部分型 トレードオフ">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
-      <h2>検査は素通し、等価性は不成立 — Unknownの一貫した保守性</h2>
-      <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、どちらも「インフラを壊さない側」に倒すという一つの原則の現れである。</p>
-      <span class="tags"><span>#unknown</span> <span>#健全性</span> <span>#差分</span></span>
+      <h2>構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</h2>
+      <p>構造体の値検証は、必須フィールドの存在を確かめ、未知のフィールドを拒否する(似た名前があれば候補として提示する)。つまり幅部分型付け(width subtyping)を負の方向にしか許さない。</p>
+      <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#トレードオフ</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/logical-id-vs-physical-name.html" data-tags="identity 命名 運用">
@@ -605,14 +677,6 @@
       <span class="tags"><span>#設計空間</span> <span>#dsl</span> <span>#淘汰圧</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/untagged-union-discrimination.html" data-tags="型システム 合併型 設計負債">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>タグなし合併の判別はヒューリスティックに頼るしかない</h2>
-      <p>CarinaのUnion(Vec&lt;AttributeType&gt;)はタグなし合併(untagged union)である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
-      <span class="tags"><span>#型システム</span> <span>#合併型</span> <span>#設計負債</span></span>
-    </span>
-  </a>
   <a class="card ai-sourced" href="/notes/totality-value-depends-on-what-it-gates.html" data-tags="全域性 pkl 設計判断">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -627,14 +691,6 @@
       <h2>動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</h2>
       <p>「動的段階では、コードに書いたこと以外の副作用が発生しない」という性質を動的段階の効果の閉包性と呼ぶと、これは二つの独立した命題に分解できる。</p>
       <span class="tags"><span>#効果</span> <span>#比較</span> <span>#安全性</span></span>
-    </span>
-  </a>
-  <a class="card normative" href="/notes/provenance-should-be-a-type.html" data-tags="型システム 差分 設計方向">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>属性の出所は型に昇格させるべきモダリティである</h2>
-      <p>「この属性は誰が書くのか」— ユーザー指定か、プロバイダ算出か、サーバ既定か — という区別が、Carinaでは型に乗っていない。フラグと投影で表現されている。これが理論的な負債になっている。</p>
-      <span class="tags"><span>#型システム</span> <span>#差分</span> <span>#設計方向</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/diffing-is-instruction-selection.html" data-tags="plan コンパイラ 差分">
@@ -725,20 +781,20 @@
       <span class="tags"><span>#参照</span> <span>#dsl</span> <span>#調査</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/open-questions.html" data-tags="未解決 todo">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>未解決の問い</h2>
-      <p>これらの探索で答えが出なかった問いの一覧。概念ノートではなく、次に調べるべきことのリストである。既に解決したものは各概念ノートに事実として書かれているのでここには含まない。</p>
-      <span class="tags"><span>#未解決</span> <span>#todo</span></span>
-    </span>
-  </a>
   <a class="card verified" href="/notes/about-these-notes-accuracy.html" data-tags="メタ 精度">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
       <h2>これらのノートの精度について</h2>
       <p>これらのノートは確定した結論ではない。 すべて生成AI(Claude / Codex)との対話による設計探索の記録を分解したもので、結論の確定ではなく論点の整理と根拠確認を目的として書かれた作業ノートが元になっている。</p>
       <span class="tags"><span>#メタ</span> <span>#精度</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/open-questions.html" data-tags="未解決 todo">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>未解決の問い</h2>
+      <p>これらの探索で答えが出なかった問いの一覧。概念ノートではなく、次に調べるべきことのリストである。既に解決したものは各概念ノートに事実として書かれているのでここには含まない。</p>
+      <span class="tags"><span>#未解決</span> <span>#todo</span></span>
     </span>
   </a>
 </div>
