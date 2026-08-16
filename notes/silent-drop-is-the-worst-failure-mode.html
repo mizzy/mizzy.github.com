@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>黙って捨てるのは、落とすことより悪い - notes</title>
+<meta name="description" content="失敗の悪さは損失の大きさでは決まらず、気付けるかどうかで決まる。ビルドを止める失敗はその場でコストを払い終えるが、黙って捨てる失敗はいつ発覚するか分からない負債として残る。">
+<meta property="og:title" content="黙って捨てるのは、落とすことより悪い">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/silent-drop-is-the-worst-failure-mode.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/silent-drop-is-the-worst-failure-mode.png">
+<meta property="og:description" content="失敗の悪さは損失の大きさでは決まらず、気付けるかどうかで決まる。ビルドを止める失敗はその場でコストを払い終えるが、黙って捨てる失敗はいつ発覚するか分からない負債として残る。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="黙って捨てるのは、落とすことより悪い">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/silent-drop-is-the-worst-failure-mode.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  .checkpass { margin: var(--space-6) 0; }
+  .checkpass ol { list-style: none; padding: 0; margin: 0; counter-reset: cp; }
+  .checkpass li {
+    counter-increment: cp;
+    position: relative;
+    padding: var(--space-2) 0 var(--space-2) var(--space-8);
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.8;
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .checkpass li:last-child { border-bottom: 0; }
+  .checkpass li::before {
+    content: counter(cp);
+    position: absolute;
+    left: 0; top: var(--space-2);
+    width: 1.7em;
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    color: var(--color-neutral-600);
+    background: var(--color-neutral-200);
+    border-radius: var(--radius-md);
+    padding: 0.15em 0;
+  }
+  .checkpass li.key::before { background: var(--color-accent-100); color: var(--color-accent-700); }
+  .checkpass li .side {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 0.2em;
+  }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>黙って捨てるのは、落とすことより悪い</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>peitho/docs/PEITHO_KICKOFF.md §5</code> / <code>peitho/CLAUDE.md 三本柱③</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p>k1LoW/deckはGoogle Slidesのプレースホルダが足りないとき、<strong>溢れた内容を黙って捨てる</strong>。エラーも警告も出ない。出力されたスライドを一枚ずつ見比べるまで、書いたはずの段落が消えていることに気付けない。</p>
+
+  <p>peithoはこれを<strong>ビルドエラーに変えた</strong>。設計文書で「silent dropping is absolutely forbidden」と書かれ、実装規約としてパーサが未知の構造を <code>_ =&gt; {}</code> で飲み込むことを禁じている。</p>
+
+  <pre><code>error: slide 4 needs 2 code slots but layout 'title-body-code' only allows up to 0..1
+  = help: use layout 'code-2col', or split the content across explicit slots</code></pre>
+
+  <h2>なぜ「捨てる」が特に悪いのか</h2>
+
+  <p>失敗の悪さは損失の大きさでは決まらない。<strong>気付けるかどうか</strong>で決まる。</p>
+
+  <div class="contrast">
+    <div class="yes">
+      <h3>ビルドが止まる</h3>
+      <p>損失は「その場で作業が止まる」こと。大きく見えるが、コストは<strong>その場で全部払い終わっている</strong>。</p>
+    </div>
+    <div>
+      <h3>黙って捨てる</h3>
+      <p>損失は段落1つ。小さいのに、いつ発覚するか分からない負債として残る。しかも発覚する場所は最悪の場所 — 聴衆の前だ。</p>
+    </div>
+  </div>
+
+  <p>これは「書いたのに効いていない」という失敗モードで、<a href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">構造体の封印</a>が未知フィールドを拒否する理由と同じものである。あちらは打ち間違いを構文の位置で捕まえ、こちらは溢れをビルドの位置で捕まえる。捕まえる場所は違うが、<strong>避けている失敗モードは同一</strong>である。</p>
+
+  <h2>「余りが無いこと」の検査は独立の段</h2>
+
+  <p>peithoの検査パスは4段あり、最後の1段が要点になっている。</p>
+
+  <div class="checkpass">
+    <ol>
+      <li>内容の断片をスロットへ割り当てる</li>
+      <li>各スロットの中身が <code>accepts</code>(型)を満たすか</li>
+      <li><code>arity</code>(個数)を満たすか</li>
+      <li class="key">割り当てられずに<strong>余った内容が無いか</strong> + 必須スロットが埋まっているか
+        <span class="side">スロット側からは見えない。内容側から見る段としてしか書けない</span></li>
+    </ol>
+  </div>
+
+  <p>1〜3は「スロット側から見た検査」で、これだけでは足りない。どのスロットも型と個数を満たしているのに、行き先の無い段落が余っている状態が通ってしまうからだ。<strong>余りの検査は、内容側から見る4段目としてしか書けない。</strong></p>
+
+  <p>型検査を「宣言された穴が正しく埋まっているか」とだけ捉えると、この段は抜け落ちる。<strong>全域性(totality)を、入力の側からも要求している</strong>と読むのが正しい(<a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a>)。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/the-template-is-the-schema.html">契約を別ファイルに切り出すと必ずずれる</a></li>
+      <li><a href="/notes/content-derived-identity-unsticks-silently.html">内容から導いた識別子は、内容を直した瞬間に静かに外れる</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/the-template-is-the-schema.html">契約を別ファイルに切り出すと必ずずれる</a></li>
+      <li><a href="/notes/content-derived-identity-unsticks-silently.html">内容から導いた識別子は、内容を直した瞬間に静かに外れる</a></li>
+      <li><a href="/notes/order-instead-of-observe.html">競合は観測では閉じない。順序づけでしか閉じない</a></li>
+      <li><a href="/notes/sealed-structs-trade-typo-detection-for-schema-evolution.html">構造体を封印すると打ち間違いは捕まるがスキーマ進化に弱くなる</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-型安全">#型安全</a>
+    <a href="/notes/#tag-peitho">#peitho</a>
+  </p>
+</article>
+</body>
+</html>

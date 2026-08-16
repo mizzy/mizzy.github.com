@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>まとめられる通り道にトグルを流してはいけない - notes</title>
+<meta name="description" content="取りこぼしと合流が起きる通り道にトグル命令を流すと恒久的にずれる。絶対状態を毎回繰り返し送ることで初めて収束する。IaCが宣言的である実務上の理由と同じ形。">
+<meta property="og:title" content="まとめられる通り道にトグルを流してはいけない">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/absolute-state-over-coalescing-channel.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/absolute-state-over-coalescing-channel.png">
+<meta property="og:description" content="取りこぼしと合流が起きる通り道にトグル命令を流すと恒久的にずれる。絶対状態を毎回繰り返し送ることで初めて収束する。IaCが宣言的である実務上の理由と同じ形。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="まとめられる通り道にトグルを流してはいけない">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/absolute-state-over-coalescing-channel.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>まとめられる通り道にトグルを流してはいけない</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>peitho/CLAUDE.md Display swap (Issue #108)</code> / <code>Incremental reveal (Issue #290)</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p>peithoのプレゼンは二画面(発表者用と聴衆用)を同期させる。同期の通り道は長ポーリングのサーバ経由で、<strong>取りこぼしと合流(coalescing)が起きる</strong>。速く連続した更新は、遅い受信側にとっては最後の一つにまとめられて届く。</p>
+
+  <p>ここで画面の入れ替え(swap)を「入れ替えろ」というトグル命令として流すと壊れる。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="トグル命令を流す場合、二回の入れ替え命令が通り道で一つにまとめられると受信側は一回だけ反転し、状態が恒久的にずれる。絶対状態を流す場合、まとめられても最後の値が正しく、取りこぼしても次のポーリングで正しい値が届くので収束する。">
+      <style>
+        .tg text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .tg .box { fill: var(--surface); stroke: var(--rule); }
+        .tg .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .tg .ttl { font-size: 13px; font-weight: 600; }
+        .tg .dim { fill: var(--faint); font-size: 11px; }
+        .tg .ky  { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+        .tg .arw { stroke: var(--faint); fill: none; }
+        .tg .ok  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .tg .bad { stroke: var(--accent-2); fill: none; stroke-width: 1.5; }
+        .tg .a2t { fill: var(--accent-2); font-size: 11px; }
+        .tg .sep { stroke: var(--rule); fill: none; }
+        .tg .pipe { fill: var(--sunken); stroke: var(--rule); }
+      </style>
+      <g class="tg">
+        <text class="ttl" x="12" y="20">トグル命令 — 「反転せよ」</text>
+        <text class="ky" x="12" y="42">送信 ×2</text>
+        <rect class="box" x="90" y="28" width="58" height="22" rx="3"/>
+        <text class="ky" x="119" y="43" text-anchor="middle">toggle</text>
+        <rect class="box" x="154" y="28" width="58" height="22" rx="3"/>
+        <text class="ky" x="183" y="43" text-anchor="middle">toggle</text>
+
+        <rect class="pipe" x="252" y="24" width="150" height="30" rx="4"/>
+        <text class="dim" x="327" y="43" text-anchor="middle">通り道でまとめられる</text>
+
+        <rect class="box" x="442" y="28" width="58" height="22" rx="3"/>
+        <text class="ky" x="471" y="43" text-anchor="middle">toggle</text>
+        <path class="bad" d="M216 39 H 248"/>
+        <path class="bad" d="M406 39 H 438"/>
+        <text class="a2t" x="580" y="43">1回だけ反転 → ずれたまま</text>
+        <text class="a2t" x="12" y="72">取りこぼしても同じ。差分は失うと二度と戻らない。</text>
+
+        <path class="sep" d="M12 96 H 688"/>
+
+        <text class="ttl" x="12" y="124">絶対状態 — 「今こうあるべき」</text>
+        <text class="ky" x="12" y="146">送信 ×2</text>
+        <rect class="box" x="90" y="132" width="76" height="22" rx="3"/>
+        <text class="ky" x="128" y="147" text-anchor="middle">swapped:t</text>
+        <rect class="box" x="172" y="132" width="76" height="22" rx="3"/>
+        <text class="ky" x="210" y="147" text-anchor="middle">swapped:f</text>
+
+        <rect class="pipe" x="288" y="128" width="150" height="30" rx="4"/>
+        <text class="dim" x="363" y="147" text-anchor="middle">まとめられる</text>
+
+        <rect class="hi" x="478" y="132" width="76" height="22" rx="3"/>
+        <text class="ky" x="516" y="147" text-anchor="middle">swapped:f</text>
+        <path class="ok" d="M252 143 H 284"/>
+        <path class="ok" d="M442 143 H 474"/>
+        <text class="dim" x="566" y="147">最後の一つが正しい</text>
+
+        <text class="ttl" x="12" y="190">さらに毎回のポーリング応答が現在状態を載せる</text>
+        <rect class="hi" x="90" y="200" width="130" height="26" rx="4"/>
+        <text class="ky" x="155" y="217" text-anchor="middle">GET /sync → 現在状態</text>
+        <path class="ok" d="M224 213 H 300"/>
+        <rect class="box" x="304" y="200" width="180" height="26" rx="4"/>
+        <text class="dim" x="394" y="217" text-anchor="middle">遅れて気付いた窓が追いつく</text>
+        <text class="dim" x="12" y="242">初回だけ配ると、合流で消えた更新を取り逃がした窓は二度と再ハンドシェイクしない</text>
+      </g>
+    </svg>
+    <figcaption>差分は失うと戻らない。絶対状態は次の1回で追いつける。</figcaption>
+  </figure>
+
+  <p>そこで流すものを <code>{"swapped": true}</code> という<strong>絶対状態</strong>にした。設計記録は「never a toggle command — the channel coalesces」と明記している。絶対状態なら、まとめられても最後の一つが正しく、取りこぼしても次のポーリングで正しくなり、<strong>何度適用しても同じ</strong>(冪等)。</p>
+
+  <p>スライド位置の同期も同じ形で、<code>{"index":N,"step":M}</code> という原子的な絶対値を流す。位置だけの裸のindexは拒否される — 位置と段階が別々に届くと、その間に不整合な中間状態が現れるからである。</p>
+
+  <h2>「毎回全部送る」ことが収束を担っている</h2>
+
+  <p>もう一段の含みがある。ハンドシェイク時だけ現在状態を送るのでは足りない、と記録は言う。</p>
+
+  <blockquote>
+    <p>this per-poll replay is load-bearing for convergence</p>
+    <cite>— <code>peitho/CLAUDE.md</code></cite>
+  </blockquote>
+
+  <p>理由はこうだ。生きている窓が「まとめられて消えた」更新を取り逃がすと、<strong>その窓は二度と再ハンドシェイクしない</strong>。だから初回だけ状態を配っても届かない。<strong>すべてのポーリング応答が現在の絶対状態を載せる</strong>ことで、遅れて気付いた窓が次の応答で自分から追いつく。</p>
+
+  <p>つまり「絶対状態を送る」だけでは足りず、「<strong>絶対状態を繰り返し送る</strong>」ことで初めて収束する。差分ではなく状態を、一度ではなく毎回。</p>
+
+  <h2>IaCの差分エンジンと同じ考え方である</h2>
+
+  <p>これは目新しい発明ではなく、宣言的な仕組みが一様にやっていることと同じである。</p>
+
+  <div class="scroll narrow">
+    <table class="compare">
+      <thead>
+        <tr><th></th><th>流すもの</th><th>取りこぼしたら</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>トグル命令</td><td>「反転せよ」</td><td>恒久的にずれる</td></tr>
+        <tr><td>絶対状態の繰り返し</td><td>「今こうあるべき」</td><td>次の周期で直る</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>IaCが「望ましい状態を毎回まるごと書き、現実と突き合わせて差分を出す」形をとっているのも同じ理由による。命令の列を積み上げる形だと、一つ取りこぼした時点で以降の全部がずれる。<strong>宣言的であることの実務上の利得は、途中の取りこぼしから自力で回復できること</strong>にある。</p>
+
+  <p>peithoで面白いのは、この性質が<strong>理念としてではなく事故の修正として</strong>現れたことである。トグルを流して壊れ、絶対状態に直した。<a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a>が言うように差分エンジンは「望ましい状態」から命令を選び直す機械で、ここでのシェルも受け取った絶対状態から遷移を選び直している。命令を運ぶのではなく、状態を運んで命令はローカルで作る。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></li>
+      <li><a href="/notes/order-instead-of-observe.html">競合は観測では閉じない。順序づけでしか閉じない</a></li>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+      <li><a href="/notes/plan-as-a-standing-query.html">純粋性はplanを常駐クエリに変える前提条件である</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/shell-executes-ui-only-requests.html">遷移を実行する場所を一箇所に閉じ込める</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/order-instead-of-observe.html">競合は観測では閉じない。順序づけでしか閉じない</a></li>
+      <li><a href="/notes/shell-executes-ui-only-requests.html">遷移を実行する場所を一箇所に閉じ込める</a></li>
+      <li><a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></li>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+      <li><a href="/notes/plan-as-a-standing-query.html">純粋性はplanを常駐クエリに変える前提条件である</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-並行性">#並行性</a>
+    <a href="/notes/#tag-宣言的">#宣言的</a>
+    <a href="/notes/#tag-peitho">#peitho</a>
+  </p>
+</article>
+</body>
+</html>

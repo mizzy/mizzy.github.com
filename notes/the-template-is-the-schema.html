@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>契約を別ファイルに切り出すと必ずずれる - notes</title>
+<meta name="description" content="peithoのレイアウトHTMLはスキーマを兼ねている。契約を別ファイルに書き出さないのは、二重管理が必ずずれるからである。同居できない言語境界では、片方を正として生成する。">
+<meta property="og:title" content="契約を別ファイルに切り出すと必ずずれる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/the-template-is-the-schema.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/the-template-is-the-schema.png">
+<meta property="og:description" content="peithoのレイアウトHTMLはスキーマを兼ねている。契約を別ファイルに書き出さないのは、二重管理が必ずずれるからである。同居できない言語境界では、片方を正として生成する。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="契約を別ファイルに切り出すと必ずずれる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/the-template-is-the-schema.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>契約を別ファイルに切り出すと必ずずれる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>peitho/docs/PEITHO_KICKOFF.md §3, §17</code> / <code>peitho/CLAUDE.md 三本柱②</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p>peithoのレイアウトはHTMLテンプレートだが、<strong>テンプレートそのものがスキーマを兼ねている</strong>。契約を別ファイルに書き出すことを明示的に禁じている — 「二重管理は必ずずれる」からである。</p>
+
+  <pre><code>&lt;section class="slide"&gt;
+  &lt;h1&gt;&lt;slot name="title" accepts="inline" arity="1"&gt;&lt;/slot&gt;&lt;/h1&gt;
+  &lt;div class="body"&gt;
+    &lt;slot name="body" accepts="blocks" arity="0..*"&gt;&lt;/slot&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+
+  <p><code>&lt;slot&gt;</code> の属性から契約(名前 / 受け付ける型 / 個数)を抽出する。スキーマファイルは存在しない。<strong>契約が意味の場所に物理的に同居しているので、片方だけ直すことができない。</strong></p>
+
+  <h2>「同居」で守れない境界には別の手を打つ</h2>
+
+  <p>同じ設計判断が、言語をまたぐ境界でも繰り返し出てくる。peithoはビルドがRust、プレゼン実行時がTypeScriptで、両者はmanifestという契約を共有する。ここでは物理的な同居ができない。</p>
+
+  <p>採った手は<strong>片方を正とし、もう片方を生成する</strong>ことである。ドメイン型とmanifestスキーマはRust側の <code>peitho-core</code> が唯一の源で、TS型は <code>ts-rs</code> / <code>schemars</code> 経由で生成される。TS側は契約を手書きしない。Rust側が変われば生成物がずれ、CIの <code>git diff --exit-code bindings/</code> が赤くなる。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="契約の写しを人間が手で同期する地点を無くす三つの方法を比較した図。規約で守る場合は二つの写しの間に人間の同期作業が残り、ずれても気付けない。同居させる場合は契約が本体の中にあるので写しが存在しない。生成する場合は片方が正で、もう片方は生成され、ずれるとCIが赤くなる。">
+      <style>
+        .sc text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .sc .box { fill: var(--surface); stroke: var(--rule); }
+        .sc .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .sc .ttl { font-size: 13px; font-weight: 600; }
+        .sc .dim { fill: var(--faint); font-size: 11px; }
+        .sc .arw { stroke: var(--faint); fill: none; }
+        .sc .ok  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .sc .bad { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .sc .a2t { fill: var(--accent-2); font-size: 11px; }
+        .sc .sep { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="sc">
+        <text class="ttl" x="12" y="20">① 規約で守る</text>
+        <rect class="box" x="12" y="30" width="120" height="40" rx="4"/>
+        <text x="72" y="55" text-anchor="middle">本体</text>
+        <rect class="box" x="232" y="30" width="120" height="40" rx="4"/>
+        <text x="292" y="55" text-anchor="middle">契約ファイル</text>
+        <path class="bad" d="M136 50 H 228"/>
+        <text class="a2t" x="182" y="42" text-anchor="middle">人が同期</text>
+        <text class="dim" x="380" y="54">ずれても誰も気付かない</text>
+
+        <path class="sep" d="M12 88 H 688"/>
+
+        <text class="ttl" x="12" y="112">② 同居させる — peithoのレイアウト</text>
+        <rect class="hi" x="12" y="122" width="200" height="40" rx="4"/>
+        <text x="112" y="140" text-anchor="middle">本体 = 契約</text>
+        <text class="dim" x="112" y="155" text-anchor="middle">&lt;slot accepts arity&gt;</text>
+        <text class="dim" x="240" y="146">写しが存在しないので、ずれようがない</text>
+
+        <path class="sep" d="M12 180 H 688"/>
+
+        <text class="ttl" x="12" y="204">③ 生成する — 言語をまたぐ境界</text>
+        <rect class="hi" x="12" y="214" width="120" height="30" rx="4"/>
+        <text x="72" y="234" text-anchor="middle">Rust(正)</text>
+        <rect class="box" x="232" y="214" width="120" height="30" rx="4"/>
+        <text x="292" y="234" text-anchor="middle">TS(生成物)</text>
+        <path class="ok" d="M136 229 H 228"/>
+        <text class="dim" x="182" y="222" text-anchor="middle">ts-rs</text>
+        <text class="dim" x="380" y="233">ずれるとCIが赤くなる</text>
+      </g>
+    </svg>
+    <figcaption>①だけが「人間が覚えていること」に依存している。②と③は、狙いは同じで手段が違う。</figcaption>
+  </figure>
+
+  <p><strong>同居も生成も、狙いは一つ</strong>である — 契約の写しを人間が手で同期する地点を無くすこと。同居できるなら同居し、できないなら生成する。どちらも取れないなら、それは「規約で守る」ということで、<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>の言う「呼び出し側が覚えていること」に依存した状態に戻っている。</p>
+
+  <h2>表現力の上限を引き受けている</h2>
+
+  <p>テンプレートがスキーマを兼ねるということは、<strong>HTMLの <code>&lt;slot&gt;</code> 要素で書けることが契約の表現力の上限</strong>になるということでもある。契約を別言語で書けば、もっと複雑な条件(「titleがある場合に限りsubtitleを許す」等)を表現できたはずだ。</p>
+
+  <p>peithoはその上限を受け入れている。契約の語彙が貧しいことより、契約が本体からずれることの方が高くつく、という賭けである。これは<a href="/notes/schema-vocabulary-is-the-ceiling.html">schemaの型語彙が上限を決める</a>のと同じ構図を、逆向きの選択として持っている — あちらはschemaの型語彙が上限を決めることを問題として指摘し、こちらは上限が低いことを承知で同居を選んでいる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/content-derived-identity-unsticks-silently.html">内容から導いた識別子は、内容を直した瞬間に静かに外れる</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-契約">#契約</a>
+    <a href="/notes/#tag-peitho">#peitho</a>
+  </p>
+</article>
+</body>
+</html>

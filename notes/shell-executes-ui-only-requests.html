@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>遷移を実行する場所を一箇所に閉じ込める - notes</title>
+<meta name="description" content="UIは要求を投げるだけで、遷移を実行するのはシェルだけ。スライド本体がシェルを知らないのは行儀ではなく、配布物にシェルが入っていないための必要条件である。">
+<meta property="og:title" content="遷移を実行する場所を一箇所に閉じ込める">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/shell-executes-ui-only-requests.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/shell-executes-ui-only-requests.png">
+<meta property="og:description" content="UIは要求を投げるだけで、遷移を実行するのはシェルだけ。スライド本体がシェルを知らないのは行儀ではなく、配布物にシェルが入っていないための必要条件である。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="遷移を実行する場所を一箇所に閉じ込める">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/shell-executes-ui-only-requests.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>遷移を実行する場所を一箇所に閉じ込める</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>peitho/docs/PEITHO_KICKOFF.md §16</code> / <code>peitho/CLAUDE.md §16 event contract</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p>peithoのスライド送りには入力源がいくつもある。キーボード、発表者画面のボタン、スマホのリモコン、クリック。素朴に作れば、それぞれが「次のスライドへ移る」処理を持つ。</p>
+
+  <p>peithoは不変条件を一つ置いてこれを避けている。</p>
+
+  <blockquote>
+    <p>Only the shell ever executes transitions.</p>
+    <cite>— <code>peitho/docs/PEITHO_KICKOFF.md §16</code></cite>
+  </blockquote>
+
+  <p>UIの部品は <code>peitho:navigate {to:"next"}</code> という<strong>要求</strong>を投げるだけで、自分では動かない。実際の遷移はシェルだけが実行し、結果を <code>peitho:slidechange</code> として全員に<strong>通知</strong>する。入力源が増えても、状態が変わる場所は一箇所のままである。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 260" role="img" aria-label="キーボード、発表者ボタン、リモコン、クリックという四つの入力源はいずれも navigate 要求をシェルに投げるだけで、遷移を実行するのはシェルだけである。シェルは実行結果を slidechange としてスライド本体を含む全員に通知する。スライド本体は通知を聞くだけで要求を出さない一方向の依存になっている。">
+      <style>
+        .sh text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .sh .box { fill: var(--surface); stroke: var(--rule); }
+        .sh .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .sh .ttl { font-size: 13px; font-weight: 600; }
+        .sh .dim { fill: var(--faint); font-size: 11px; }
+        .sh .ky  { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+        .sh .req { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .sh .ntf { stroke: var(--faint); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+      </style>
+      <g class="sh">
+        <text class="dim" x="12" y="18">入力源(要求のみ)</text>
+        <rect class="box" x="12" y="28" width="110" height="26" rx="4"/>
+        <text x="67" y="45" text-anchor="middle">キーボード</text>
+        <rect class="box" x="12" y="62" width="110" height="26" rx="4"/>
+        <text x="67" y="79" text-anchor="middle">発表者ボタン</text>
+        <rect class="box" x="12" y="96" width="110" height="26" rx="4"/>
+        <text x="67" y="113" text-anchor="middle">リモコン</text>
+        <rect class="box" x="12" y="130" width="110" height="26" rx="4"/>
+        <text x="67" y="147" text-anchor="middle">クリック</text>
+
+        <path class="req" d="M126 41 C 180 41, 200 80, 248 88"/>
+        <path class="req" d="M126 75 C 180 75, 200 84, 248 90"/>
+        <path class="req" d="M126 109 C 180 109, 200 96, 248 94"/>
+        <path class="req" d="M126 143 C 180 143, 200 104, 248 98"/>
+        <text class="ky" x="186" y="126">peitho:navigate</text>
+
+        <rect class="hi" x="252" y="62" width="150" height="56" rx="4"/>
+        <text class="ttl" x="327" y="86" text-anchor="middle">シェル</text>
+        <text class="dim" x="327" y="104" text-anchor="middle">遷移を実行する唯一の場所</text>
+
+        <path class="ntf" d="M406 78 H 508"/>
+        <text class="ky" x="457" y="70" text-anchor="middle">slidechange</text>
+        <rect class="box" x="512" y="62" width="160" height="26" rx="4"/>
+        <text x="592" y="79" text-anchor="middle">進捗・二窓同期</text>
+
+        <path class="ntf" d="M406 104 C 460 104, 470 150, 508 158"/>
+        <rect class="box" x="512" y="144" width="160" height="40" rx="4"/>
+        <text x="592" y="162" text-anchor="middle">スライド本体</text>
+        <text class="dim" x="592" y="177" text-anchor="middle">聞くだけ・要求は出さない</text>
+
+        <text class="dim" x="12" y="212">配布物にはシェルが入っていない。だから本体がシェルを前提にすると壊れる。</text>
+        <text class="dim" x="12" y="234">実線 = 要求(下から上へのみ)   破線 = 通知(上から下へのみ)</text>
+      </g>
+    </svg>
+    <figcaption>入力源が4つあっても、状態が変わる場所は1つ。依存は下から上への要求と、上から下への通知だけ。</figcaption>
+  </figure>
+
+  <div class="contrast">
+    <div class="yes">
+      <h3>要求(UI → シェル)</h3>
+      <p><code>peitho:navigate</code> / <code>peitho:timercontrol</code>。投げるだけで、自分では状態を変えない。</p>
+    </div>
+    <div class="yes">
+      <h3>通知(シェル → 全員)</h3>
+      <p><code>peitho:slidechange</code> / <code>peitho:presentationstart</code>。実行した結果を配る。</p>
+    </div>
+  </div>
+
+  <p><code>{to: "next"}</code> という書き方も効いている。「3番へ行け」ではなく「次へ」という<strong>意図</strong>を送るので、次がどこかを決めるのはシェルだけになる。飛ばすスライド(<code>skip</code>)や段階表示(reveal)が後から入ったとき、増えた解決規則はシェルの中だけで済んだ。</p>
+
+  <h2>依存の向きが一方向であること</h2>
+
+  <p>もう一つの規則が対になっている。</p>
+
+  <blockquote>
+    <p>The slide body may listen to events, but may not issue requests.</p>
+    <cite>— <code>peitho/docs/PEITHO_KICKOFF.md §16</code></cite>
+  </blockquote>
+
+  <p>スライド本体はイベントを聞いてよいが、要求を出してはいけない。理由が具体的で良い — <strong>配布用の成果物にはシェルが入っていない</strong>。<code>peitho build</code> が出すのはスライド本体だけで、プレゼン実行時のシェルは <code>peitho present</code> が一時領域に生成する。スライド本体がシェルの存在を前提にしていたら、配布物で壊れる。</p>
+
+  <p>つまりこの一方向性は行儀の良さではなく、<strong>同じ本体を二つの入り口(配布用と発表用)から使い回すための必要条件</strong>である。共有されている実体は一つで、入り口が二つ。本体が入り口を知っていたら共有できない。</p>
+
+  <p>「シェルを含めるか否か」はemit時の注入の切り替えにすぎず、再ビルドを要さない。これは<a href="/notes/iac-processor-does-not-end-at-evaluation.html">構成データ出力DSLから貰えるのは評価段階だけである</a>と同じ発想 — 中間表現を一度作り、出力段でだけ分岐させる。入力側で分岐しないから、真実の源が割れない。</p>
+
+  <h2>抽象の境界として</h2>
+
+  <p>UI部品はシェルの内部状態を知らず、シェルはUI部品が何個あるかを知らない。両者を繋いでいるのはイベントの語彙だけである。<a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a>の言う不透明さが、ここでは<strong>要求と通知の非対称</strong>として実現されている — 下から上へは要求しか通らず、上から下へは通知しか通らない。</p>
+
+  <p>窓をまたぐ同期はさらに一段外側にあり、シェルが橋渡しする(<a href="/notes/absolute-state-over-coalescing-channel.html">まとめられる通り道にトグルを流してはいけない</a>)。UI部品は窓の中のイベントだけ知っていればよく、複数窓の存在を知らない。<strong>層を足すたびに全部品が知るべきことが増える、という設計を避けている。</strong></p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/absolute-state-over-coalescing-channel.html">まとめられる通り道にトグルを流してはいけない</a></li>
+      <li><a href="/notes/iac-processor-does-not-end-at-evaluation.html">構成データ出力DSLから貰えるのは評価段階だけである</a></li>
+      <li><a href="/notes/layered-extension-point.html">拡張ポイントを言語境界で開けるのは第三の選択肢である</a></li>
+      <li><a href="/notes/cascade-replaces-accumulated-state.html">出力先に重ねる層があるなら、状態を溜めずに済む</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/absolute-state-over-coalescing-channel.html">まとめられる通り道にトグルを流してはいけない</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/iac-processor-does-not-end-at-evaluation.html">構成データ出力DSLから貰えるのは評価段階だけである</a></li>
+      <li><a href="/notes/layered-extension-point.html">拡張ポイントを言語境界で開けるのは第三の選択肢である</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-アーキテクチャ">#アーキテクチャ</a>
+    <a href="/notes/#tag-peitho">#peitho</a>
+  </p>
+</article>
+</body>
+</html>
