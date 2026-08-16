@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>属性の出所は型に昇格させるべきモダリティである - notes</title>
+<meta name="description" content="「この属性は誰が書くのか」という区別が、Carinaでは型に乗っていない。フラグと投影で表現されている。これが理論的な負債になっている。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>属性の出所は型に昇格させるべきモダリティである</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §8弱み3,発展方向</code>
+  </p>
+
+  <p>「この属性は誰が書くのか」— ユーザー指定か、プロバイダ算出か、サーバ既定か — という区別が、Carinaでは<strong>型に乗っていない</strong>。フラグと投影で表現されている。これが理論的な負債になっている。</p>
+
+  <h2>症状の出方</h2>
+
+  <p>出所が型の外にあると、差分計算のたびに個別対処が要る。代表例が「見かけの削除」問題である。ユーザーが書いていない属性にサーバが既定値を入れた場合、次の差分計算でその属性が「消える」ように見える。実際には誰も消そうとしていないが、比較の両側で出所が違うことを型が知らないため、差分器はそれを検出できない。</p>
+
+  <p>この種の症状はひとつではない。出所の区別が必要になる場面が増えるたびにフラグと投影の処理が足され、<strong>症状が出るたびに個別対処になりやすい</strong>構造ができている。</p>
+
+  <h2>型に昇格させると何が変わるか</h2>
+
+  <p>属性の出所を<strong>型上のモダリティ</strong>として昇格させれば、現在フラグと投影で行っている差分の補正が<strong>型主導の操作</strong>になる。</p>
+
+  <p>差分計算は既に型主導である。等価性は型ごとに定義され、正規化は型に導かれて走る。出所が型に乗れば、出所ごとの比較規則もその枠組みに載る — 「ユーザー指定でない属性はユーザー側の欠落を差分としない」といった規則が、個別の補正処理ではなく型ごとの同値関係の一部になる。</p>
+
+  <p>これは「区別を型に昇格させる」という、この型システムの負債群に共通する解の形でもある。検査器の二重実装、二つの型言語の非対称、タグなし合併の曖昧さも含め、負債はいずれも<strong>「定義を一つにし、区別を型に昇格させる」</strong>方向に解がある。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-差分">#差分</a>
+    <a href="/notes/#tag-設計方向">#設計方向</a>
+  </p>
+</article>
+</body>
+</html>

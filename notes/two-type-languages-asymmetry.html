@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>型注釈の言語とスキーマ型は別の言語である - notes</title>
+<meta name="description" content="Carinaには型を表す言語が二つある。ユーザーが書く型注釈の言語とプロバイダのスキーマが表すスキーマ型であり、両者の対応付けは部分写像である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>型注釈の言語とスキーマ型は別の言語である</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §2末尾, §8弱み4</code>
+  </p>
+
+  <p>Carinaには型を表す言語が二つある。ユーザーが書く<strong>型注釈の言語</strong>(<code>TypeExpr</code>)と、プロバイダのスキーマが表す<strong>スキーマ型</strong>(<code>AttributeType</code>)である。両者は別の言語であり、前者から後者への対応付け(解決)を静的段階の一部として行う。</p>
+
+  <p>問題はこの対応付けが<strong>部分写像</strong>であることにある。両側の表現力が対称ではない。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="型注釈の言語とスキーマ型の表現力が対称でないことを示す図。リテラル型・構造的合併は注釈側にしかなく、パターン・区間・検証関数という篩の制約はスキーマ側にしかない。中央の重なりだけが対応付けの通る範囲である">
+      <style>
+        .asym text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .asym .box { fill: var(--surface); stroke: var(--rule); }
+        .asym .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .asym .ttl { font-size: 13px; font-weight: 600; }
+        .asym .dim { fill: var(--faint); font-size: 11px; }
+        .asym .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="asym">
+        <text class="ttl" x="8" y="20">型注釈の言語(TypeExpr)</text>
+        <rect class="box" x="8" y="32" width="196" height="76" rx="4"/>
+        <text x="24" y="56">リテラル型</text>
+        <text x="24" y="78">構造的合併 'dev' | 'prod'</text>
+        <text class="dim" x="24" y="98">運べない — 注釈側だけの機能</text>
+
+        <rect class="hi" x="228" y="32" width="184" height="76" rx="4"/>
+        <text class="ttl" x="320" y="60" text-anchor="middle">対応付け(解決)</text>
+        <text class="dim" x="320" y="82" text-anchor="middle">部分写像</text>
+        <text class="dim" x="320" y="98" text-anchor="middle">両側が重なる範囲だけ通る</text>
+
+        <text class="ttl" x="436" y="20">スキーマ型(AttributeType)</text>
+        <rect class="box" x="436" y="32" width="196" height="76" rx="4"/>
+        <text x="452" y="56">パターン・区間</text>
+        <text x="452" y="78">検証関数(篩の制約)</text>
+        <text class="dim" x="452" y="98">書けない — スキーマ側だけの機能</text>
+
+        <path class="arw" d="M204 70 H 224"/>
+        <path class="arw" d="M412 70 H 432"/>
+
+        <text class="dim" x="8" y="146">ある制約は書けるが運べない。ある型は運ばれてくるが書けない。</text>
+        <text class="dim" x="8" y="168">一方に機能を足すたび、対応表に穴が増えるか、対応付けの実装が複雑になる。</text>
+      </g>
+    </svg>
+    <figcaption>対応付けが部分写像であるとは、表現できる型の集合が経路によって違うということである。非対称は機能不足ではなく、二つの型言語を別々に育てたことの負債である。</figcaption>
+  </figure>
+
+  <ul>
+    <li><strong>リテラル型・構造的合併は注釈側にしかない。</strong> <code>StringLiteral</code>と<code>Union</code>を組み合わせた<code>'dev' | 'prod'</code>のようなリテラル合併型は注釈側の機能である。</li>
+    <li><strong>篩の制約はスキーマ側にしかない。</strong> パターン・区間・検証関数という篩型の装備はスキーマ型が持つ。</li>
+  </ul>
+
+  <h2>何が帰結するか</h2>
+
+  <p>対応付けが部分写像であることは、<strong>表現できる型の集合が経路によって違う</strong>ことを意味する。ユーザーが注釈で書ける型と、プロバイダのスキーマが表せる型が一致しない。ある制約は書けるが運べない、ある型は運ばれてくるが書けない、という非対称が構造的に残る。</p>
+
+  <p>これは単なる機能不足ではなく、二つの型言語を別々に育てたことの負債である。一方に機能を足すたびに、他方との対応表に穴が増えるか、対応付けの実装が複雑になる。</p>
+
+  <p>同種の負債は検査器にもある。plan/validate経路とLSP経路は同じ検査の二重実装であり、意味論の一致(パリティ)を規約と試験で維持している。検査器を一つの定義から導出できていないことのコストである。型言語が二つあることと検査器が二系統あることは、どちらも<strong>「定義を一つにできていない」</strong>という同じ形の問題であり、解の方向も同じ側にある。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+      <li><a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-設計負債">#設計負債</a>
+    <a href="/notes/#tag-非対称">#非対称</a>
+  </p>
+</article>
+</body>
+</html>

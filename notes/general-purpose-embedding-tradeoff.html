@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称 - notes</title>
+<meta name="description" content="汎用言語埋め込みと専用全域言語の取引は、構造としてはきれいに相補的である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §5, explorations/2026-06-10-carina-type-system-type-theory/design-position.md §4</code>
+  </p>
+
+  <p>汎用言語埋め込みと専用全域言語の取引は、構造としてはきれいに相補的である。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>メタプログラムの項ベース型付け</th><th>静的段階の全域性・値の全数検査</th></tr></thead>
+      <tbody>
+        <tr><td>Pulumi / CDK</td><td>強い(ホスト言語の型システム)</td><td>持てない</td></tr>
+        <tr><td>Carina</td><td>ほぼ持たない</td><td>持つ</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>TypeScriptの型検査は、グラフを組み立てるメタプログラムに対する<strong>本物の項ベース静的型付け</strong>であり、関数・クラス・パッケージエコシステム(npm / PyPI)による抽象化もそのまま使える。専用言語側が構造として失うのは<strong>言語が小さいこと自体</strong>で、高階関数・再帰的なデータ変換・外部ライブラリがなく、表現力の上限は言語設計者が用意した構成子で決まる。</p>
+
+  <p><strong>しかしドメインに照らした価値づけは対称ではない。</strong>表の左列は「持てない」ではなく「<strong>要らない</strong>」というのが設計上の立場である。IaC言語の意味的本体はリソース定義と依存関係グラフだけであり、その本体に対して項ベース型付けとエコシステムは必要な道具ではない。</p>
+
+  <p>この非対称な価値づけこそが設計上の賭けであり、検査様式の全体(意味論的型付け、篩の任意述語、型主導の等価性、Unknownの一貫した意味論)は<strong>この賭けの配当</strong>として読める。構造の整理(どちらを取ればどちらを失うか)は客観的に書けるが、どちらを取るかの判断はドメインの性質についての規範的な主張に依存する。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/credentials-adjacent-code-is-attack-surface.html">資格情報の傍で任意パッケージが動くこと自体が攻撃面である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/credentials-adjacent-code-is-attack-surface.html">資格情報の傍で任意パッケージが動くこと自体が攻撃面である</a></li>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-トレードオフ">#トレードオフ</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+    <a href="/notes/#tag-比較">#比較</a>
+  </p>
+</article>
+</body>
+</html>

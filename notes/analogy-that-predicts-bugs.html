@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>良い類比は実バグを予言する - notes</title>
+<meta name="description" content="類比の価値は、記述が整うことにあるのではない。対応から実装上の予言が導け、その予言が実際のバグや改善方向を当てることにある。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>良い類比は実バグを予言する</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §6冒頭, §8</code>
+  </p>
+
+  <p>類比の価値は、記述が整うことにあるのではない。<strong>対応から実装上の予言が導け、その予言が実際のバグや改善方向を当てる</strong>ことにある。当たらない類比は装飾であり、当たる類比は分析の道具である。</p>
+
+  <p>「planはコンパイルである」という読みは、この基準を満たした。導かれた予言は少なくとも三つある。</p>
+
+  <p><strong>第一の予言 — 再配置後の検証の欠如。</strong>IRの性質として「well-typedなIRだけがバックエンドに渡る」と置き、applyの性質として「再配置はIRに新しい値を書き込む」と置くと、リンカの類比から自動的に問いが出る:「再配置後のオブジェクトを誰かベリファイするのか」。答えは否で、これは確認済みの実バグ(carina#3448)だった。実装を眺めて見つけたのではなく、対応表から演繹して見つかっている。しかも修正の縫い目まで類比が指す — 各再配置点の直後に、書き込んだ値をその穴の型で検証する。</p>
+
+  <p><strong>第二の予言 — 検査器の単一定義化。</strong>検査器が二系統ある問題(validateとLSPのパリティ維持)は、コンパイラ工学ではフロントエンドの二重実装として知られ、標準解はクエリ型(インクリメンタル)コンパイラ基盤 — 一つの検査定義をバッチとエディタの両方が問い合わせる構造 — である。型システム側の分析が独立に出した「検査器の単一定義化」という改善方向と一致する。</p>
+
+  <p><strong>第三の予言 — 最適化パスの置き場。</strong>IRを持つコンパイラには最適化パスの置き場が自然に生まれる。効果の併合(同一プロバイダへのバッチ発行)、無効果の削除、並列スケジューリングの強化などは、planというIRが既にあるからこそ「パスを足す」形で議論できる将来余地である。</p>
+
+  <p>類比が予言力を持つのは、対応が構造レベルで取れているときだけである。だからこそ、類比が<strong>どこで切れるか</strong>も同じ精度で押さえておく必要がある。切れ目を明示しない類比は、当たらない場所でも当てにされてしまう。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-方法論">#方法論</a>
+    <a href="/notes/#tag-類比">#類比</a>
+    <a href="/notes/#tag-設計">#設計</a>
+  </p>
+</article>
+</body>
+</html>

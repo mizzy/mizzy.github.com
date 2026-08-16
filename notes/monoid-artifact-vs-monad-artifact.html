@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>デプロイ計画がモノイドかモナドかで見通しが決まる - notes</title>
+<meta name="description" content="未知値をめぐる三すくみは、構造の言葉で言い直せる。鍵になる区別は、デプロイ計画が「平らな宣言の集まり」か「継続のつながり」かである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>デプロイ計画がモノイドかモナドかで見通しが決まる</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §4後半</code>
+  </p>
+
+  <p>未知値をめぐる三すくみは、構造の言葉で言い直せる。鍵になる区別は、<strong>デプロイ計画が「平らな宣言の集まり」か「継続のつながり」か</strong>である。</p>
+
+  <p>前者はリストの連結だけでできた構造(<strong>モノイド</strong>)で、実行前に全要素を列挙・検査できる。後者はPromiseの<code>then</code>と同じ構造(<strong>モナド</strong>)で、後続の処理が関数の中に隠れているため、実行するまで中身を見られない。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 250" role="img" aria-label="モノイド的な成果物では全要素が並んで実行前に列挙・検査できるのに対し、モナド的な成果物では継続が関数の中に隠れて実行するまで中身が見えないことを対比した図">
+      <style>
+        .mm text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .mm .box  { fill: var(--surface); stroke: var(--rule); }
+        .mm .hi   { fill: var(--accent-bg); stroke: var(--accent); }
+        .mm .opaque { fill: var(--surface); stroke: var(--rule); stroke-dasharray: 4 3; }
+        .mm .ttl  { font-size: 13px; font-weight: 600; }
+        .mm .dim  { fill: var(--faint); font-size: 11px; }
+        .mm .arw  { stroke: var(--faint); fill: none; }
+        .mm .eye  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+      </style>
+      <g class="mm">
+        <text class="ttl" x="8" y="20">モノイド — 平らな宣言の集まり</text>
+        <rect class="hi" x="8"   y="34" width="86" height="34" rx="4"/>
+        <rect class="hi" x="102" y="34" width="86" height="34" rx="4"/>
+        <rect class="hi" x="196" y="34" width="86" height="34" rx="4"/>
+        <rect class="hi" x="290" y="34" width="86" height="34" rx="4"/>
+        <text x="51"  y="56" text-anchor="middle">Effect</text>
+        <text x="145" y="56" text-anchor="middle">Effect</text>
+        <text x="239" y="56" text-anchor="middle">Effect</text>
+        <text x="333" y="56" text-anchor="middle">Effect</text>
+        <text x="392" y="56">…連結だけ</text>
+        <path class="eye" d="M8 82 H 376"/>
+        <text class="dim" x="8" y="102">実行前に全要素を列挙・検査できる — 表示されたものが実行されるものの全部</text>
+
+        <text class="ttl" x="8" y="150">モナド — 継続のつながり</text>
+        <rect class="hi"     x="8"   y="164" width="86" height="34" rx="4"/>
+        <text x="51" y="186" text-anchor="middle">Effect</text>
+        <path class="arw" d="M94 181 H 122"/>
+        <rect class="opaque" x="126" y="164" width="150" height="34" rx="4"/>
+        <text x="201" y="186" text-anchor="middle">λ(値) → 次の計画</text>
+        <path class="arw" d="M276 181 H 304"/>
+        <rect class="opaque" x="308" y="164" width="86" height="34" rx="4"/>
+        <text class="dim" x="351" y="186" text-anchor="middle">?</text>
+        <text class="dim" x="8" y="232">継続が関数の中に隠れる — 実行するまで先が見えず、previewは原理的に近似になる</text>
+      </g>
+    </svg>
+    <figcaption>モノイド性が効くのは、それが「成果物が全情報を含む」ことの保証だからである。継続が残る成果物では、表示されたものが実行されるものの全部だと言えなくなる。</figcaption>
+  </figure>
+
+  <h2>リトマス試験</h2>
+
+  <p>判定は一つの問いで済む。<strong>「デプロイ時に決まる値を受けて、次に何を作るかを決めるコールバックを書けるか」</strong>。</p>
+
+  <ul>
+    <li><strong>Pulumiは書ける。</strong> <code>Output.apply</code>がそれで、コールバックはデプロイ中に走る。だからPulumiのプログラムはモナド的であり、previewが原理的に近似になる。</li>
+    <li><strong>CDKは書けない。</strong> synthが吐くテンプレートには継続が残らない。デプロイ時の値への依存は<code>Ref</code> / <code>Fn::GetAtt</code>というプレースホルダの穴として埋まり、実行順はCloudFormationがDAGとして組む。つまりCDKの成果物はCarinaのplanと同じモノイド的な形をしている。</li>
+  </ul>
+
+  <p>Lambda-backedカスタムリソースはデプロイ中に任意コードを走らせる脱出口だが、CloudFormationから見ても不透明な箱であり、言語構造というより「モノイドの1要素として埋め込まれた別プログラム」である。</p>
+
+  <h2>なぜこの軸が効くか</h2>
+
+  <p>CDKとPulumiの違いはこのモナド/モノイドの軸にある。CDKは成果物をモノイドに保った代わりに穴を<code>string</code>型のまま放置し(Tokenの誤用が無音で壊れる)、Pulumiは穴を<code>Output&lt;T&gt;</code>という型付きの容器で守った代わりに、その容器がモナドなので継続の中身がpreviewから見えない。</p>
+
+  <p>モノイド性が効くのは、それが<strong>「成果物が全情報を含む」ことの保証</strong>だからである。planという中間表現をユーザーがレビューして承認するワークフローが成立するのは、IRに継続が残らないからにほかならない。継続が残る成果物では、表示されたものが実行されるものの全部だと言えなくなる。</p>
+
+  <p>CDKとCarinaの違いは、この軸ではなく全域性の軸にある。成果物は同じモノイドでも、CDKのそれはチューリング完全な任意プログラムが組み立てるので、生成の停止と再現性が言語の保証にならない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-モナド">#モナド</a>
+    <a href="/notes/#tag-構造">#構造</a>
+    <a href="/notes/#tag-plan">#plan</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>カスタム型は独立の構成子ではなく篩型である - notes</title>
+<meta name="description" content="Carinaに「カスタム型」という独立した型構成子はない。カスタム型の正体は基底型を述語で絞り込んだ篩型である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>カスタム型は独立の構成子ではなく篩型である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §3</code>
+  </p>
+
+  <p>Carinaに「カスタム型」という独立した型構成子はない。代わりに<code>String</code> / <code>Int</code> / <code>Float</code>の各変種が制約を持ち運ぶ。つまりカスタム型の正体は<strong>基底型を述語で絞り込んだ篩型(refinement types)</strong>である。</p>
+
+  <p>持ち運ばれる制約は三種類ある。</p>
+
+  <ul>
+    <li>正規表現パターン(<code>pattern</code>)</li>
+    <li>長さ・値域の区間(<code>length</code> / <code>range</code>、両端の省略で開区間を表現)</li>
+    <li>任意の検証関数</li>
+  </ul>
+
+  <p>これは型理論でいう篩型 — <code>{ x: String | P(x) }</code>のように基底型を述語で絞り込んだ型 — に相当する。</p>
+
+  <h2>任意述語を許せる理由</h2>
+
+  <p>検査はすべて静的段階で評価済みの値に対して行われるため、<strong>篩の述語は決定可能性の心配なしに任意の計算を含められる</strong>。項レベルで含意を証明する型システムでは述語の表現力に決定可能性の上限がかかるが、値に適用するだけなら走らせれば済む。完全評価できる言語の利点である。</p>
+
+  <h2>述語の二系統という代償</h2>
+
+  <p>一方で、述語のうち構造的な表現を持つのは区間とパターンだけで、それを超える部分は不透明な関数に逃がしている。この非対称は二つの帰結を生む。</p>
+
+  <p>第一に、<strong>篩の不透明部分(検証関数)は合成も直列化も比較もできない。</strong> 構造的な制約(パターン・区間)への寄せが進むほどこの問題は縮むが、現状は二系統の併存であり、どちらで検証されるかが型から読めない。</p>
+
+  <p>第二に、<strong>述語が一階の表現を持つか否かは、型を直列化してプラグイン境界を越えられるかを分ける線でもある。</strong> 構造的な制約は境界の向こうへ運べるが、関数は運べない。実際、篩のパターンがプラグイン境界で脱落する事故(<a href="https://github.com/carina-rs/carina/issues/3364">carina#3364</a>)が起きている。</p>
+
+  <p>なお値が未解決の参照に対しては、区間の包含までは宣言レベルで照合される。<strong>篩型のうち決定可能な断片については、値なしでも含意(部分型)検査が成立している</strong>ということでもある。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-篩型">#篩型</a>
+    <a href="/notes/#tag-型理論">#型理論</a>
+  </p>
+</article>
+</body>
+</html>

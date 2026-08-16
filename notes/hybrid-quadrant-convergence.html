@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した - notes</title>
+<meta name="description" content="構成記述系DSL 11個を3自由度で点検すると、当初の4象限には現れていなかった第5象限が浮上する。Pkl / KCL / Dhall / Jsonnet / Nickelの5つが、独立に同じパターンへ収束している。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/README.md, explorations/2026-04-26-cross-dsl-design-position/carina-position.md §2</code>
+  </p>
+
+  <p>構成記述系DSL 11個を3自由度で点検すると、当初の4象限には現れていなかった<strong>第5象限</strong>が浮上する。Pkl / KCL / Dhall / Jsonnet / Nickelの5つが、独立に同じパターンへ収束している。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 250" role="img" aria-label="Pkl・KCL・Dhall・Jsonnet・Nickelの5つのDSLが互いに参照せず独立に同じ設計位置へ収束したことと、その収束が構成データ出力DSLに限った観察であることを示す図">
+      <style>
+        .hq text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .hq .box { fill: var(--surface); stroke: var(--rule); }
+        .hq .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .hq .ttl { font-size: 13px; font-weight: 600; }
+        .hq .dim { fill: var(--faint); font-size: 11px; }
+        .hq .arw { stroke: var(--faint); fill: none; }
+        .hq .warn { fill: var(--accent-2); font-size: 11px; }
+        .hq .cut { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+      </style>
+      <g class="hq">
+        <rect class="box" x="8" y="24" width="86" height="26" rx="3"/>
+        <text x="51" y="42" text-anchor="middle">Pkl</text>
+        <rect class="box" x="8" y="58" width="86" height="26" rx="3"/>
+        <text x="51" y="76" text-anchor="middle">KCL</text>
+        <rect class="box" x="8" y="92" width="86" height="26" rx="3"/>
+        <text x="51" y="110" text-anchor="middle">Dhall</text>
+        <rect class="box" x="8" y="126" width="86" height="26" rx="3"/>
+        <text x="51" y="144" text-anchor="middle">Jsonnet</text>
+        <rect class="box" x="8" y="160" width="86" height="26" rx="3"/>
+        <text x="51" y="178" text-anchor="middle">Nickel</text>
+        <text class="dim" x="8" y="200">互いに参照し合っていない</text>
+
+        <path class="arw" d="M94 37 C 150 37, 160 90, 214 96"/>
+        <path class="arw" d="M94 71 C 150 71, 165 92, 214 100"/>
+        <path class="arw" d="M94 105 H 214"/>
+        <path class="arw" d="M94 139 C 150 139, 165 118, 214 110"/>
+        <path class="arw" d="M94 173 C 150 173, 160 120, 214 114"/>
+
+        <rect class="hi" x="218" y="42" width="230" height="128" rx="4"/>
+        <text class="ttl" x="333" y="66" text-anchor="middle">第5象限</text>
+        <text x="234" y="92">抽象化の追加 → 規約に委ねる</text>
+        <text x="234" y="114">複数量の制御 → 言語が決める</text>
+        <text x="234" y="136">実装の切替 → 言語が決める</text>
+        <text class="dim" x="333" y="158" text-anchor="middle">自然な収束</text>
+
+        <path class="cut" d="M470 20 V 210"/>
+        <text class="warn" x="482" y="66">graph出力DSLには</text>
+        <text class="warn" x="482" y="86">先例が存在しない</text>
+        <text class="warn" x="482" y="112">5DSLは構造的な類似</text>
+        <text class="warn" x="482" y="132">であって直接の先例</text>
+        <text class="warn" x="482" y="152">ではない</text>
+
+        <text class="dim" x="8" y="232">5つはいずれもJSON/YAMLを出力するDSLで、graph形状の予測性が論点にならない</text>
+      </g>
+    </svg>
+    <figcaption>収束が起きたのは構成データ出力DSLの側である。この線を越えてgraph出力DSLで同じ位置を取るときには、5DSLが問われなかった論点が新たに要る。</figcaption>
+  </figure>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>自由度</th><th>これら5DSLの対応</th></tr></thead>
+      <tbody>
+        <tr><td>抽象化の追加</td><td><strong>規約に委ねる</strong>(高階関数 / lambda / 継承などが自由)</td></tr>
+        <tr><td>複数量の制御</td><td><strong>言語が決める</strong>(専用comprehension or組込み再帰子)</td></tr>
+        <tr><td>実装の切替</td><td><strong>言語が決める</strong>(import pathリテラル)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>これは「<strong>外部DSLを選びつつ、計算ロジックの再利用(関数)だけは汎用言語並みに開放し、graph/value形状を変える2自由度だけ言語で縛る</strong>」という共通の設計判断である。5つが互いに参照し合った結果ではなく別々に到達しているので、実用上の必要性 — 環境別パラメタ計算や命名規則ヘルパーを関数で再利用したい — からの<strong>自然な収束</strong>と読める。</p>
+
+  <p>重要な限定がある。この収束は<strong>構成データ出力DSLに限った観察</strong>である。5つはいずれもJSON/YAMLを出力するDSLで、graph形状の予測性が論点にならない。graph出力DSLでこの位置取りを実装した先例は存在しない。したがってgraph出力DSLがこの象限に踏み込むとき、5DSLは<strong>構造的な類似(analogy)であって直接の先例(precedent)ではない</strong>。</p>
+
+  <p>graph出力DSLで同じことをやるなら、関数値がgraph形状に染み出さない境界設計が追加で必要になる。これが5DSLでは問われなかった論点である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+      <li><a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-selection-pressure.html">「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+      <li><a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/layered-extension-point.html">拡張ポイントを言語境界で開けるのは第三の選択肢である</a></li>
+      <li><a href="/notes/ref-config-dsl-survey.html">構成記述DSL 11本の調査</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計空間">#設計空間</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-収束">#収束</a>
+  </p>
+</article>
+</body>
+</html>

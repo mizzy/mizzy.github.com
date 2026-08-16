@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>構成データ出力DSLとgraph出力DSLはレイヤが違う - notes</title>
+<meta name="description" content="構成記述系DSLを「何を出力するか」で分けると、3自由度では捉えきれない別レイヤの差が浮上する。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>構成データ出力DSLとgraph出力DSLはレイヤが違う</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/README.md出力の構造軸, explorations/2026-04-26-cross-dsl-design-position/carina-position.md §2</code>
+  </p>
+
+  <p>構成記述系DSLを「<strong>何を出力するか</strong>」で分けると、3自由度では捉えきれない別レイヤの差が浮上する。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>出力形態</th><th>内容</th><th>例</th></tr></thead>
+      <tbody>
+        <tr><td><strong>構成データ出力</strong></td><td>値ツリー(JSON/YAML/設定値)</td><td>Pkl, KCL, CUE, Dhall, Jsonnet, Nickel</td></tr>
+        <tr><td><strong>graph出力</strong></td><td>ノード + edgeの宣言</td><td>Terraform, CDK, Pulumi, Carina, Bicep, cdktf, cdk8s, Crossplane, Helm</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 640 250" role="img" aria-label="構成データ出力DSLは値ツリーを出すだけでノード間の関係を持たないのに対し、graph出力DSLはノード集合とedgeを出す。graphに至る経路はツールごとに異なるがapply時点ではどれもresource graphになることを示す図">
+      <style>
+        .go text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .go .box { fill: var(--surface); stroke: var(--rule); }
+        .go .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .go .ttl { font-size: 13px; font-weight: 600; }
+        .go .dim { fill: var(--faint); font-size: 11px; }
+        .go .arw { stroke: var(--faint); fill: none; }
+        .go .edge { stroke: var(--accent); fill: none; }
+        .go .node { fill: var(--accent-bg); stroke: var(--accent); }
+        .go .leaf { fill: var(--surface); stroke: var(--rule); }
+      </style>
+      <g class="go">
+        <text class="ttl" x="8" y="20">構成データ出力 — 値ツリー</text>
+        <rect class="leaf" x="100" y="34" width="62" height="24" rx="3"/>
+        <path class="arw" d="M118 58 V 76"/>
+        <path class="arw" d="M144 58 V 76"/>
+        <rect class="leaf" x="70" y="76" width="62" height="24" rx="3"/>
+        <rect class="leaf" x="142" y="76" width="62" height="24" rx="3"/>
+        <text class="dim" x="228" y="60">枝は入れ子であって依存ではない</text>
+        <text class="dim" x="228" y="80">ノード間の関係という構造を持たない</text>
+        <text class="dim" x="228" y="100">効くのは「最終valueの集合サイズ」だけ</text>
+
+        <text class="ttl" x="8" y="140">graph出力 — ノード + edge</text>
+        <rect class="node" x="70" y="154" width="62" height="24" rx="3"/>
+        <rect class="node" x="70" y="200" width="62" height="24" rx="3"/>
+        <rect class="node" x="164" y="177" width="62" height="24" rx="3"/>
+        <path class="edge" d="M132 166 C 150 166, 150 187, 162 187"/>
+        <path class="edge" d="M132 212 C 150 212, 150 191, 162 191"/>
+        <text class="dim" x="252" y="170">(a)ノード集合 = type + 属性値</text>
+        <text class="dim" x="252" y="190">(b)edge = 参照 / depends_on / opts.parent</text>
+        <text class="dim" x="252" y="210">自由度がノード数・identity・依存関係に効く</text>
+
+        <text class="dim" x="8" y="242">経路は直接出力 / ツリー→synth / RPCストリーム / YAML pipelineと分かれるが、applyの段階ではどれもresource graphを扱う</text>
+      </g>
+    </svg>
+    <figcaption>値ツリーと依存グラフは同じ「出力」でもレイヤが違う。同じ「複数量の制御」という自由度を当てても、効く先が別物になる。</figcaption>
+  </figure>
+
+  <p>graph出力DSLのコードが出すのは、<strong>(a)ノード集合</strong>(リソース宣言 = type + 属性値)と<strong>(b) edge</strong>(リソース間の依存関係 — 参照、<code>depends_on</code>、<code>opts.parent</code>)である。構成データ出力DSLは値ツリーを出すだけで、ノード間の関係という構造を持たない。</p>
+
+  <p>この区別は、3自由度の評価が「何に効くか」を決める。graph出力DSLでは自由度がノード数・identity・依存関係に効くが、構成データ出力DSLでは「最終valueの集合サイズ」にしか効かない。同じ「複数量の制御」という軸を当てても、意味するものが違う。</p>
+
+  <p>「graph出力」という括りはgraphに至る<strong>経路</strong>を粗く扱っている点に注意が要る。最終的にresource graphになるのは共通だが、経路はツールごとに異なる — 直接出力(Terraform, Carina, Bicep, Helm)、ツリー→synthでgraph変換(CDK, cdktf, cdk8s)、RPCストリーム(Pulumi)、YAML pipeline(Crossplane)。経路は違うが、applyされる段階ではどのツールもresource graphを扱うので、3自由度の比較には経路差は直接効かない。</p>
+
+  <p>なおgraphを出力した後のstate管理 / 差分計算 / CRUD実行は、<strong>DSLのレイヤではなくツール(engine / CLI)のレイヤ</strong>の話である。DSL同士を比べるときはこの線を越えない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/ref-config-dsl-survey.html">構成記述DSL 11本の調査</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-分類">#分類</a>
+    <a href="/notes/#tag-設計空間">#設計空間</a>
+  </p>
+</article>
+</body>
+</html>

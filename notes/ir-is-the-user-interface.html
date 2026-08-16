@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IaCではIRダンプが一級の製品機能である - notes</title>
+<meta name="description" content="planを中間表現として読んだときの最も特徴的な性質はこれである。このIRはユーザーインターフェースである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>IaCではIRダンプが一級の製品機能である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §4</code>
+  </p>
+
+  <p>planを中間表現として読んだときの最も特徴的な性質はこれである。<strong>このIRはユーザーインターフェースである。</strong></p>
+
+  <div class="contrast">
+    <div>
+      <h3>通常のコンパイラ</h3>
+      <p>IRダンプは開発者のデバッグ手段にすぎない。<code>-emit-llvm</code>の出力を毎回人間が読んでから実行を承認する、というワークフローはない。</p>
+    </div>
+    <div class="yes">
+      <h3>IaC</h3>
+      <p>「IRを人間がレビューして承認する」ことがワークフローの中核である — planを見てからapplyする。</p>
+    </div>
+  </div>
+
+  <p>この違いは投資の配分をそのまま説明する。plan表示・detail level・TUIといった表示系への投資は、装飾ではなく<strong>IRのpretty printerが一級の製品機能であることの帰結</strong>である。コンパイラの類比で「IRダンプの見やすさに開発リソースを割く」と言えば奇妙に聞こえるが、IRが承認の対象である以上それは中心機能への投資である。</p>
+
+  <p>そしてこの読みは、IRの構造的性質に別の意味を与える。IRに継続が残らないこと(planがモノイド的な平らな列であること)は、単に解析しやすいという話ではなく「<strong>IRダンプが全情報を含むこと</strong>」の保証である。継続がIRの中に隠れていれば、ダンプを読み切っても実行時に何が起きるかは分からない。人間のレビューが意味を持つのは、成果物が平らだからである。</p>
+
+  <p>逆に言えば、成果物にプログラム片が残る設計 — デプロイ中に走るコールバックを書ける設計 — では、IRダンプを見せてもそれは近似の提示にとどまる。IRを製品機能に昇格させられるかどうかは、IRの構造そのものが決めている。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-ux">#ux</a>
+    <a href="/notes/#tag-ir">#ir</a>
+  </p>
+</article>
+</body>
+</html>

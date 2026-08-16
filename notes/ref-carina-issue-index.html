@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>探索から出たissue索引 - notes</title>
+<meta name="description" content="これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>探索から出たissue索引</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/README.md, type-system-analysis.md / explorations/2026-04-26-cross-dsl-design-position/carina-position.md / explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/README.md, chapter-5</code>
+  </p>
+
+  <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
+
+  <h2>型システム探索から起票(2026-06-10〜11)</h2>
+
+  <p>実行再現を伴う発見として起票されたもの。</p>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a> — 代入で解決された値がスキーマで再検証されない(上流値はplan時、リソース出力はapply時に代入されるが、どちらの代入点にも検証経路がない)。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3449">carina#3449</a> — 再export連鎖で上流exportの型推論が無音で型なしに落ちる。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a> — パース時置換が参照型検査をバイパスする。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2786">carina#2786</a>(既存)— 入れ子参照の型未検査。実行再現をコメントで追記。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+  </ul>
+
+  <h2>型システムの構造に関わる既存issue</h2>
+
+  <p>分析の中で「この設計はこの事故を防ぐためにこうなっている」という文脈で参照されたもの。</p>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/carina/issues/3340">carina#3340</a> — 暗黙展開に相当する処理が循環スキーマ上で無限再帰した事故。根治として展開を明示操作に一本化した経緯を持つ。→ <a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3364">carina#3364</a> — 篩のパターンがWASMプラグイン境界で脱落した事故。境界での型消去に依存する処理が静かに壊れる事故クラスの実例。→ <a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3438">carina#3438</a> — 未解決の列挙識別子と解決済み正規形を別の型にし、後者はリゾルバしか生成できないようにするtypestate。→ <a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3349">carina#3349</a> — μ型の参照を展開した後の型ビューには参照変種が存在せず、未展開のまま照合する状態がそもそも書けないようにするtypestate。→ <a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3164">carina#3164</a> — 効果の部分集合しか受理しない実行器には絞り込み済みの型を渡すtypestate。→ <a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+  </ul>
+
+  <h2>機能点検から起票(2026-04-27)</h2>
+
+  <p>Carinaの20項目点検で不足が確認された項目。</p>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/carina/issues/2238">carina#2238</a> — 高階関数サポート検討。境界設計(関数値がgraph形状決定位置に到達しない条件)の議論もここ</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2239">carina#2239</a> — 明示的依存指定(<code>depends_on</code>相当)</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2240">carina#2240</a> — partial apply / <code>--target</code>フラグ</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2241">carina#2241</a> — <code>carina drift</code>コマンド公開(ロジックは実装済みだがCLI未公開)</li>
+  </ul>
+
+  <h2>4ツール比較探索から参照(2026-04-26)</h2>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/carina/issues/2233">carina#2233</a>(2026-04-26 close)— <code>use</code>式の位置制限。当初は文法上primary位置に含まれるが評価器が<code>let</code> RHSだけを処理する「構造と評価のドリフト」状態だったのを、grammarの方をtightenする方向で解決した</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2237">carina#2237</a> — 先行ドキュメントの記述訂正のフィードバック先(<code>use</code>式についての初期主張の訂正)</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2209">carina#2209</a> — plan時fully resolved制約の改善検討(unknown値のdeferred退避に関わる)</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/2194">carina#2194</a> — リネーム自動検知(Delete+CreateをMoveと認識、または<code>moved</code>ブロックをサジェスト)</li>
+  </ul>
+
+  <h2>探索そのもののissue</h2>
+
+  <ul>
+    <li><a href="https://github.com/carina-rs/explorations/issues/1">carina-rs/explorations#1</a> — cross-DSL分析を独立化。Carinaの20項目機能点検もこの関連調査</li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3445">carina-rs/carina#3445</a> — 型システム探索の作成元issue(後にexplorationsリポジトリへ移動)</li>
+  </ul>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/about-these-notes-accuracy.html">これらのノートの精度について</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-参照">#参照</a>
+    <a href="/notes/#tag-issue">#issue</a>
+    <a href="/notes/#tag-carina">#carina</a>
+  </p>
+</article>
+</body>
+</html>

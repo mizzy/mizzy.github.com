@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>検査器が二系統あるのは設計負債である - notes</title>
+<meta name="description" content="静的検査器がplan/validate経路とLSP経路の二系統あるのは、機能の重複ではなく理論的な負債である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>検査器が二系統あるのは設計負債である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §8弱み1 / plan-as-compilation.md §6末尾</code>
+  </p>
+
+  <p>静的検査器が二系統ある — plan/validate経路とLSP経路 — というのは、機能の重複ではなく<strong>理論的な負債</strong>である。同じ検査の二重実装であり、意味論の一致(パリティ)を規約と試験で維持している。<strong>検査器を一つの定義から導出できていないことのコスト</strong>がそこに現れている。</p>
+
+  <p>LSP診断は静的段階の検査をエディタ上で前倒しに実行するもう一つの実装であり、検査の意味論としてはvalidateと同一であることが要求される。要求されている、というのが問題の核心である。一致が<strong>構成から従う</strong>のではなく、規約と試験という外部の努力で維持されている限り、ずれは常に入りうる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="現状は検査定義がvalidate用とLSP用に二つあり規約と試験でパリティを保つ構造、標準解は一つの検査定義をバッチとエディタの双方が問い合わせる構造であることを対比した図">
+      <style>
+        .dual text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .dual .box { fill: var(--surface); stroke: var(--rule); }
+        .dual .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .dual .ttl { font-size: 13px; font-weight: 600; }
+        .dual .dim { fill: var(--faint); font-size: 11px; }
+        .dual .arw { stroke: var(--faint); fill: none; }
+        .dual .weak { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+      </style>
+      <g class="dual">
+        <text class="ttl" x="8" y="18">現状 — 定義が二つ</text>
+        <rect class="box" x="8" y="30" width="120" height="34" rx="4"/>
+        <text x="24" y="52">検査定義A</text>
+        <rect class="box" x="8" y="98" width="120" height="34" rx="4"/>
+        <text x="24" y="120">検査定義B</text>
+        <text class="dim" x="18" y="86">validate / plan</text>
+        <text class="dim" x="18" y="152">LSP</text>
+        <path class="weak" d="M68 64 V 98"/>
+        <text class="dim" x="76" y="86">パリティは規約と試験で維持</text>
+
+        <path class="arw" d="M290 81 H 330" />
+        <text class="dim" x="292" y="72">単一定義化</text>
+
+        <text class="ttl" x="360" y="18">標準解 — 定義が一つ</text>
+        <rect class="hi" x="360" y="64" width="130" height="34" rx="4"/>
+        <text class="ttl" x="425" y="86" text-anchor="middle">検査定義</text>
+        <rect class="box" x="522" y="30" width="110" height="34" rx="4"/>
+        <text x="538" y="52">validate / plan</text>
+        <rect class="box" x="522" y="98" width="110" height="34" rx="4"/>
+        <text x="538" y="120">LSP</text>
+        <path class="arw" d="M490 78 L 522 52"/>
+        <path class="arw" d="M490 86 L 522 112"/>
+        <text class="dim" x="360" y="152">クエリ型コンパイラ基盤。パリティは構成から従う</text>
+      </g>
+    </svg>
+    <figcaption>二重実装は定義が二つあることの症状である。一つの検査定義をバッチとエディタの両方が問い合わせる構造にすれば、パリティは規約ではなく構成から従う。</figcaption>
+  </figure>
+
+  <p>コンパイラ工学ではこれはフロントエンドの二重実装として知られた問題で、標準解も定まっている。クエリ型(インクリメンタル)コンパイラ基盤 — <strong>一つの検査定義をバッチとエディタの両方が問い合わせる構造</strong> — である。rustcやRoslynが辿った道がこれに当たる。</p>
+
+  <p>型システム側の分析が独立に出した改善方向「検査器の単一定義化」は、このコンパイラ工学の標準解と一致する。validateとLSPが同じ検査定義を共有すれば、パリティは規約でなく構成から従う。</p>
+
+  <p>この負債の性質は、他の理論的負債と共通の形をしている。「定義を一つにし、区別を型に昇格させる」方向に解がある、という形である。二重実装は定義が二つあることの症状であり、個々のずれを試験で潰し続けるのは症状への対処にとどまる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計負債">#設計負債</a>
+    <a href="/notes/#tag-lsp">#lsp</a>
+    <a href="/notes/#tag-コンパイラ">#コンパイラ</a>
+  </p>
+</article>
+</body>
+</html>

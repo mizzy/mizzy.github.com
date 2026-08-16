@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>類比が切れるのはターゲットが生きている場所である - notes</title>
+<meta name="description" content="「planはコンパイルである」という類比が切れる場所は散らばっていない。すべてターゲットが受動的なメモリではなく、生きた外部世界であることに帰着する。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>類比が切れるのはターゲットが生きている場所である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §7</code>
+  </p>
+
+  <p>「planはコンパイルである」という類比が切れる場所は散らばっていない。すべて一つの原因に帰着する — <strong>ターゲットが受動的なメモリではなく、生きた外部世界である</strong>こと。切れ目は三つある。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="類比の三つの切れ目がすべて一つの原因に帰着することを示す図。書き込みが失敗する、ターゲットは共有可変である、コンパイラ自身がターゲットを読む、の三点はいずれもターゲットが生きた外部世界であることから来る">
+      <style>
+        .brk text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .brk .box { fill: var(--surface); stroke: var(--rule); }
+        .brk .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .brk .ttl { font-size: 13px; font-weight: 600; }
+        .brk .dim { fill: var(--faint); font-size: 11px; }
+        .brk .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="brk">
+        <rect class="hi" x="8" y="66" width="150" height="66" rx="4"/>
+        <text class="ttl" x="83" y="92" text-anchor="middle">ターゲットが</text>
+        <text class="ttl" x="83" y="112" text-anchor="middle">生きた外部世界</text>
+
+        <path class="arw" d="M158 99 H 190 V 46 H 218"/>
+        <path class="arw" d="M158 99 H 218"/>
+        <path class="arw" d="M158 99 H 190 V 152 H 218"/>
+
+        <rect class="box" x="222" y="22" width="410" height="48" rx="4"/>
+        <text class="ttl" x="238" y="44">第一に、書き込みが失敗する</text>
+        <text class="dim" x="238" y="62">APIエラーで途中失敗 — 半分だけ書かれたバイナリが残る</text>
+
+        <rect class="box" x="222" y="76" width="410" height="48" rx="4"/>
+        <text class="ttl" x="238" y="98">第二に、ターゲットは共有可変である</text>
+        <text class="dim" x="238" y="116">planとapplyの間に他の書き手が世界を変えうる</text>
+
+        <rect class="box" x="222" y="130" width="410" height="48" rx="4"/>
+        <text class="ttl" x="238" y="152">第三に、コンパイラ自身がターゲットを読む</text>
+        <text class="dim" x="238" y="170">refreshは世界の現状を観測する — 二引数性の言い換え</text>
+      </g>
+    </svg>
+    <figcaption>三つの切れ目は散らばった例外ではなく、一つの原因の三つの現れである。この三点の外側では、コンパイラの蓄積がほぼそのまま使える。</figcaption>
+  </figure>
+
+  <p><strong>第一に、書き込みが失敗する。</strong> 通常のローダでstore命令は失敗しないが、applyの1命令はAPIエラーで失敗しうる。途中失敗は「半分だけ書かれたバイナリ」を残す — トランザクションも自動ロールバックもなく、回復は次回の差分コンパイル(再plan)に委ねられる。コンパイラ・リンカの世界には対応物がない状況である。</p>
+
+  <p><strong>第二に、ターゲットは共有可変である。</strong> コンパイル(plan)と実行(apply)の間に他の書き手が世界を変えうる。planがロックを取らない設計(TOCTOU窓 + ドリフト警告 + apply側での再計算)は、「<strong>IRは予測にすぎず、真の整合性は実行直前に再確立する</strong>」という、共有可変ターゲットに対する妥当な妥協である。</p>
+
+  <p><strong>第三に、コンパイラ自身がターゲットを読む。</strong> refreshは世界の現状を観測してから差分を取る。ソースしか読まない通常のコンパイルと違い、コンパイルの入力に世界が含まれる。これは二引数性の言い換えであり、限界というより、IaCのコンパイルを定義づける本質的な差である。</p>
+
+  <p>この三点が、IaCをコンパイラ工学の単純な転写から分かつ固有の領域である。逆に言えば、この三点の外側ではコンパイラの蓄積がほぼそのまま使える。切れ目を先に押さえておくことが、類比を道具として安全に使う条件になる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-コンパイラ">#コンパイラ</a>
+    <a href="/notes/#tag-限界">#限界</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全域性は後付けできない - notes</title>
+<meta name="description" content="静的段階の全域性は、実装を頑張れば手に入る種類の性質ではない。言語設計の選択そのものに由来するため、汎用言語に埋め込む方式を選んだ時点で原理的に取れなくなる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>全域性は後付けできない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §2</code>
+  </p>
+
+  <p>静的段階の全域性は、実装を頑張れば手に入る種類の性質ではない。<strong>言語設計の選択そのものに由来する</strong>ため、汎用言語に埋め込む方式を選んだ時点で原理的に取れなくなる。</p>
+
+  <p>PulumiとCDKは逆の取引をしている。リソースグラフを構築する段階(Pulumiのプログラム実行、CDKのsynth)は、TypeScript / Python / Goといったチューリング完全な汎用言語の任意のプログラム実行である。無限ループも、ネットワークI/Oも、環境変数や現在時刻への依存も書ける。したがって「グラフ構築は必ず停止する」「同じソースから必ず同じグラフが出る」は言語の定理としては成立せず、プログラマとライブラリの行儀に依存する経験則になる。</p>
+
+  <p>失われるのは停止性だけではない。Carinaのplanがソースとstateの純関数であるのに対し、synthの出力は外界に依存しうる。CDKのcontext lookupのように、synth中にAWSへ問い合わせる仕組みは公式機能ですらある。</p>
+
+  <p>そして後付けの道が塞がっている理由がここにある。これを言語保証に戻すには汎用言語をサブセット化するしかなく、<strong>それはもう別言語を作ることと同じである</strong>。全域性は「構文制限 + 参照グラフの非循環性強制」の合わせ技であり、既存のホスト言語に対して外から課せるものではない。</p>
+
+  <p>この構図は設計空間の象限としても現れる。「汎用言語埋め込みかつ全域的」という象限が空なのは偶然ではなく、ホスト言語をサブセット化しない限り埋まらない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a></li>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+      <li><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-全域性">#全域性</a>
+    <a href="/notes/#tag-言語設計">#言語設計</a>
+    <a href="/notes/#tag-iac">#iac</a>
+  </p>
+</article>
+</body>
+</html>

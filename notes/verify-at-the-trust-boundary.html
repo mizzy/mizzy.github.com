@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>信頼境界を越えるデータは境界で再検証する - notes</title>
+<meta name="description" content="「一度検査したのだから、あとは信用してよい」は、データが同じ信頼領域に留まっている間だけ成り立つ。コンパイラの世界はこの問題に段階的な解を積み上げてきた。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>信頼境界を越えるデータは境界で再検証する</h1>
+  <p class="meta">
+    <span class="epistemic ai-sourced">AI由来</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §6</code>
+  </p>
+
+  <p>「一度検査したのだから、あとは信用してよい」は、データが同じ信頼領域に留まっている間だけ成り立つ。<strong>別の場所・別の時刻・別のバージョンに対して作られたデータ</strong>が入ってくる点では、検査済みという前提そのものを疑い直す必要がある。コンパイラの世界はこの問題に段階的な解を積み上げてきた。</p>
+
+  <p>戦略は四段階に整理できる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="信頼境界に対する四段階の戦略。(a)検査しないと無音の破壊が残り、(b)識別子に型を運ばせるとリンクエラーに変わり、(c)境界で再検証すると型整合が保たれ、(d)最後まで型を持ち続けるとあらゆる変換の後で再検査できる。IaCの再配置点では(c)が正しい解である">
+      <style>
+        .strat text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .strat .box { fill: var(--surface); stroke: var(--rule); }
+        .strat .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .strat .ttl { font-size: 13px; font-weight: 600; }
+        .strat .dim { fill: var(--faint); font-size: 11px; }
+        .strat .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="strat">
+        <text class="dim" x="8" y="18">検査の強さ</text>
+        <path class="arw" d="M8 26 H 632"/>
+
+        <rect class="box" x="8" y="40" width="146" height="96" rx="4"/>
+        <text class="ttl" x="24" y="64">(a)検査しない</text>
+        <text class="dim" x="24" y="86">C / ELFリンカの再配置</text>
+        <text class="dim" x="24" y="104">型なしの操作</text>
+        <text class="dim" x="24" y="124">無音の破壊</text>
+
+        <rect class="box" x="164" y="40" width="146" height="96" rx="4"/>
+        <text class="ttl" x="180" y="64">(b)識別子に型を</text>
+        <text class="dim" x="180" y="86">C++の名前マングリング</text>
+        <text class="dim" x="180" y="104">RustのSVH</text>
+        <text class="dim" x="180" y="124">リンクエラーに変換</text>
+
+        <rect class="hi" x="320" y="40" width="146" height="96" rx="4"/>
+        <text class="ttl" x="336" y="64">(c)境界で再検証</text>
+        <text class="dim" x="336" y="86">JVMバイトコード検証器</text>
+        <text class="dim" x="336" y="104">WASMインスタンス化時検証</text>
+        <text class="dim" x="336" y="124">IaCの正しい解</text>
+
+        <rect class="box" x="476" y="40" width="156" height="96" rx="4"/>
+        <text class="ttl" x="492" y="64">(d)最後まで型を</text>
+        <text class="dim" x="492" y="86">Typed Assembly Language</text>
+        <text class="dim" x="492" y="104">型付きIRリンク(LTO)</text>
+        <text class="dim" x="492" y="124">変換後も再検査可能</text>
+
+        <text class="dim" x="8" y="170">(c)が検査を置き、(d)の精神が検査を外せなくする — 併用が修正の完成形である。</text>
+        <text class="dim" x="8" y="192">篩の述語は値依存なので、値が到着した時点で走らせる以外にない。</text>
+      </g>
+    </svg>
+    <figcaption>四段階は排他ではない。IaCの再配置点では(c)が正しい解であり、(d)から取り込めるのは「検査を飛ばした代入を型レベルで書けなくする」という構造の方である。</figcaption>
+  </figure>
+
+  <p><strong>(a)検査しない。</strong> 古典的なC/ELFリンカの再配置は型なしの操作で、翻訳単位間で宣言が食い違っても黙ってリンクが成功し、実行時に静かに壊れる(Cの有名な未定義動作の一族)。</p>
+
+  <p><strong>(b)識別子に型を運ばせる。</strong> C++の名前マングリングはシンボル名に型を焼き込み、不一致を「無音の破壊」から「リンクエラー」に変換する。RustのSVHも同系で、保存planのlineage / serial照合はこの戦略の粗粒度版に当たる。</p>
+
+  <p><strong>(c)境界で再検証する。</strong> JVMのバイトコード検証器が代表で、クラスロード(動的リンクに相当)のたびに「コンパイル時に検査済みだったはず」を信用せず型整合を再検査する。理由は信頼境界 — クラスファイルは別の場所・別の時刻・別のバージョンに対して作られたかもしれない — であり、WebAssemblyのインスタンス化時検証、proof-carrying codeも同じ形。JVMが示した経験則は「<strong>検証は付いている型の整合確認なのでコンパイルよりずっと安く、毎回やって割に合う</strong>」。</p>
+
+  <p><strong>(d)最後まで型を持ち続ける。</strong> Typed Assembly Languageや型付きIRリンク(LTO)のように、最下層の表現にも型を運び、あらゆる変換の後で再検査可能にする。</p>
+
+  <p>IaCの再配置点に当てはめると(c)が正しい解である。代入される値の出所は上流stateとプロバイダ応答 — このplanの検査器が自分で検査していない、外から来るデータ — であり、JVMがクラスローダに検証器を置いたのと同じ理由で、代入点が検証を置く正しい場所になる。コストの経験則も同じ方向に倒れる(所属検査は既にある述語の適用だけで、クラウドAPI呼び出しに比べれば誤差)。</p>
+
+  <p>なお(d)を「実行時検査なし」の意味で取ることは原理的にできない。篩の述語は値依存で、値は動的段階に初めて生まれるため、値が到着した時点で述語を走らせる以外にない。(d)から取り込めるのは<strong>構造の方</strong>である。deferredの穴に期待型を持たせ、穴を埋める唯一のAPIが「その型の検証器だけが生成できる検証済み値」を要求するようにすれば、検査を飛ばした代入が実装言語の型レベルで書けなくなる。つまり(c)が検査を置き、(d)の精神が<strong>検査を外せなくする</strong>、という併用が修正の完成形である。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>JVM検証器・WebAssembly検証・proof-carrying code・Typed Assembly Language・名前マングリング・SVHへの言及はAIの学習データ由来で、一次ソース未確認。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-信頼境界">#信頼境界</a>
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+  </p>
+</article>
+</body>
+</html>

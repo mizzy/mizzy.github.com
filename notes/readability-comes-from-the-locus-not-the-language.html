@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「DSLだから読みやすい」のではない - notes</title>
+<meta name="description" content="「DSLだから読みやすい」のではなく、「『言語が決める』範囲が広いから読みやすい」。読みやすさの原因は記述言語の選択ではなく、記述自由度の所在にある。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「DSLだから読みやすい」のではない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-4, §1-4</code>
+  </p>
+
+  <p><strong>「DSLだから読みやすい」のではなく、「『言語が決める』範囲が広いから(= 規約に委ねる範囲が狭いから)読みやすい」。</strong>読みやすさの原因は記述言語の選択ではなく、記述自由度の所在にある。</p>
+
+  <p>因果はこう説明できる。言語が決める範囲が広いと、「予測しにくい書き方」が文法で書けないので、結果予測性は<strong>構造的に</strong>高い。規約に委ねると、ベタ書きで予測性を保つことはできるが、抽象化を使った瞬間に予測性が落ちる。だからCDK / Pulumiの結果予測性は「高い/低い」ではなく「<strong>書き方依存</strong>」という別の性質になる — L1ベタ書きなら高く、ループ/条件/継承/高階関数を駆使すると低い。</p>
+
+  <p>この区別が実際に効く場面が二つある。一つは、汎用言語を選んでも記述自由度を言語側で縛る設計余地は原理的には残っている、という認識(実装例は確認されていないが、論理的に閉じてはいない)。もう一つは、外部DSLを選んだからといって自動的に読みやすくなるわけではない、という認識 — 動的なsourceと任意関数を許すDSLを作れば、外部DSLのまま「規約に委ねる」側に落ちる。</p>
+
+  <p>なお汎用言語でもSDKが<code>Output&lt;T&gt;</code>のような型を提供して未知値伝播を表現するパターンはあるが、これを「言語が決める」と評価するのは過大評価になる(<a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a>)。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-可読性">#可読性</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+  </p>
+</article>
+</body>
+</html>

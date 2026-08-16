@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>循環スキーマは名前付きμ型で明示展開する - notes</title>
+<meta name="description" content="CloudFormationのWAFv2のような循環スキーマを表すため、スキーマはrootとdefsの組を取り、型の中にdefsへの参照が現れる。これはμ型を名前付き定義の組で表すiso-recursiveな流儀に相当する。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>循環スキーマは名前付きμ型で明示展開する</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §4</code>
+  </p>
+
+  <p>CloudFormationのWAFv2 <code>Statement → AndStatement → List&lt;Statement&gt;</code>のような循環スキーマを表すため、スキーマは</p>
+
+  <pre><code>Schema = { root: 型, defs: 名前 → 型 }</code></pre>
+
+  <p>という形を取り、型の中に<code>Ref(名前)</code>(defsへの参照)が現れる。これは<strong>μ型を名前付き定義の組で表す、iso-recursiveな流儀</strong>に相当する。展開(unfold)を暗黙の同一視ではなく明示的な操作として扱う、という選択である。</p>
+
+  <h2>展開が明示操作であることの効果</h2>
+
+  <p>型の意味を消費する操作(検証・差分・補完)は、参照をdefsに対して一段展開してから進む。展開にはホップ数の上限があるため、<strong>壊れた定義に対しても停止する</strong>。</p>
+
+  <p>equi-recursive的に「参照と展開後を暗黙に同一視する」扱いを避けたのは意図的な設計である。過去には暗黙展開に相当する処理が循環スキーマ上で無限再帰した事故があり(<a href="https://github.com/carina-rs/carina/issues/3340">carina#3340</a>系)、その根治として展開を明示操作に一本化した経緯がある。</p>
+
+  <h2>型でも固定されている</h2>
+
+  <p>この不変条件は規約ではなく実装言語の型で固定されている。μ型の参照を展開した後の型ビューには参照変種が存在せず、<strong>未展開のまま照合する状態がそもそも書けない</strong>(<a href="https://github.com/carina-rs/carina/issues/3349">carina#3349</a>)。「展開を忘れないこと」を各消費地点が覚えている必要がない形になっている、というのがこの根治の要点である。</p>
+
+  <p>equi-recursiveの暗黙同一視は書き手にとって楽だが、無限再帰の可能性を型システムの外に置く。iso-recursiveは展開を一度書かせる代わりに、停止性を構造として担保する。全域性を土台に置く言語では後者が整合する。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-再帰型">#再帰型</a>
+    <a href="/notes/#tag-型理論">#型理論</a>
+  </p>
+</article>
+</body>
+</html>

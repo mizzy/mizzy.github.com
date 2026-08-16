@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である - notes</title>
+<meta name="description" content="identityとは「何を同一資源と見なすか」の規則である。stateをどこに置き誰が運用責任を負うかという問いとは別の独立軸であり、同じツールでも別々に設計できる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-5-identity-and-refactoring-stability.md</code>
+  </p>
+
+  <p>identityとは「<strong>何を同一資源と見なすか</strong>」の規則である。stateをどこに置き誰が運用責任を負うかという問い(章4の主題)とは<strong>別の独立軸</strong>であり、同じツールでも別々に設計できる。identityが変わればstate上では別リソース扱いになる — つまりidentityはstate内の参照の形を規定するが、state所有の設計判断とは独立している。</p>
+
+  <p>設計判断の中心は<strong>識別子をユーザが書くか、ツールが自動生成するか</strong>である。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>識別子</th><th>生成方式</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>resource address (<code>aws_s3_bucket.foo</code>)</td><td>ユーザ制御(<code>&lt;type&gt;.&lt;ラベル&gt;</code>)、ハッシュ化なし</td></tr>
+        <tr><td>CDK</td><td>CFN論理ID (例: <code>MyBucketF68F3FF0</code>)</td><td>construct pathのMD5ハッシュ先頭8桁(大文字16進)</td></tr>
+        <tr><td>Pulumi</td><td>URN (<code>urn:pulumi:&lt;stack&gt;::&lt;project&gt;::&lt;parent$type&gt;::&lt;name&gt;</code>)</td><td>type/name/parent等をengineが連結</td></tr>
+        <tr><td>Carina</td><td>named: binding名そのまま / anonymous: content-based hash</td><td>namedはユーザ制御、anonymousは自動生成</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>CDKのL2は内部でid <code>Resource</code>のCfnBucketを生成するためpath長2となり必ずハッシュが付く。stack直下のL1のみが例外的にハッシュなしになる。CarinaのanonymousはSimHash 16 hex、create-only attrsからstandard hash 8 hexも用いる。</p>
+
+  <p><strong>日常的に意識する頻度</strong>にも差が出る。Terraform / Carinaでは別リソースから参照するために識別子をコードに直接書くので常時意識する。CDK / Pulumiではホスト言語の変数(<code>const bucket = new s3.Bucket(...)</code>の<code>bucket</code>)経由で参照するため、識別子が表面化するのは運用時 — <code>cdk diff</code>、コンソール、state操作、cross-stack reference、override、import — に限られる。</p>
+
+  <p>入れ子構造がidentityを規定する点も共通する。CDKの<code>node.path</code>はscope列を<code>/</code>区切りで連結し、Pulumiの<code>opts.parent</code>はURNのtype部に親typeを<code>$</code>区切りで連結する。つまり抽象化機構の入れ子がそのままidentityの構造になる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/logical-id-vs-physical-name.html">論理IDと物理リソース名は別物だが漏れる</a></li>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/logical-id-vs-physical-name.html">論理IDと物理リソース名は別物だが漏れる</a></li>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-identity">#identity</a>
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-リファクタリング">#リファクタリング</a>
+  </p>
+</article>
+</body>
+</html>

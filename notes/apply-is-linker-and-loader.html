@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>applyはリンカ兼ローダである - notes</title>
+<meta name="description" content="applyの仕事をコンパイラの言葉で言うと、リンクとロードである。plan中の穴を実値で埋めながら、依存順に実行していく操作だからである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>applyはリンカ兼ローダである</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §5</code>
+  </p>
+
+  <p>applyの仕事をコンパイラの言葉で言うと、<strong>リンクとロード</strong>である。plan中の穴を実値で埋めながら、依存順に実行していく操作だからである。</p>
+
+  <p>plan中のdeferred参照(<code>vpc.vpc_id</code>の穴)は<strong>未解決シンボル</strong>であり、Unknownはその表示名である。applyは依存DAGの位相順 — リンク順 — にノードを実行し、各ノードの実行が完了するたびに、その出力(プロバイダが採番した実値)で後続ノードの穴を埋める。これは<strong>再配置(relocation)</strong> — オブジェクトファイル中の「あとで実アドレスを入れる」印に、ロード時に実値を書き込む操作 — の正確な対応物である。シンボルが解決できない構成(相互依存)はリンク不能としてエラーになる(循環依存検出)。</p>
+
+  <p>プロバイダは<strong>ターゲットアーキテクチャ</strong>である。同じIRがaws / awscc / mockという異なるバックエンドで「実行」でき、mockはエミュレータに当たる。プロバイダがWASMプラグインであることは、バックエンドがプラグイン化されたコンパイラ基盤(LLVMのターゲット追加)に似た構造で、WITプロトコルはその<strong>ABI</strong>である。</p>
+
+  <p>ABIとして読むと、境界での型消去も見慣れた現象になる。プラグイン境界で型情報の一部が不可逆に失われるのは、ABIが表現できる型がソース言語の型より粗いという、コンパイラでは日常的な事態(名前マングリングで失われる情報、C ABIに落ちるときに消えるジェネリクス)に対応する。<code>protocol_version</code>の照合はABIバージョニングである。</p>
+
+  <p>そしてリンカ・ローダとして読むと、すぐに一つの問いが立つ。再配置はIRに新しい値を書き込む操作である以上、「<strong>再配置後のオブジェクトを誰かベリファイするのか</strong>」という問いが避けられない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-apply">#apply</a>
+    <a href="/notes/#tag-コンパイラ">#コンパイラ</a>
+    <a href="/notes/#tag-リンカ">#リンカ</a>
+  </p>
+</article>
+</body>
+</html>

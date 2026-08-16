@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>planは予測であり、真実はapplyが確立する - notes</title>
+<meta name="description" content="planはロックを取らず、applyがロック下で差分を再計算する。この契約を意識的に推すと、plan時のworldの鮮度は正しさの問題ではなくUXの問題だと正当化できる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>planは予測であり、真実はapplyが確立する</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-11-world-acquisition-incremental-plan/README.md §4, §8 / explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §7</code>
+  </p>
+
+  <p>planはロックを取らず、applyがロック下で差分を再計算する。この契約を意識的に推すと、<strong>plan時のworldの鮮度は正しさの問題ではなくUXの問題</strong>だと正当化できる。planは安いキャッシュで即答してよく、正しさの担保はapply側の検証に一本化される。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="planがロックなしで古いworldから予測を作り、その間に他の書き手が世界を変えうるTOCTOU窓があり、applyがロック下で差分を再計算して真実を確立する時系列の図">
+      <style>
+        .occ text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .occ .box { fill: var(--surface); stroke: var(--rule); }
+        .occ .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .occ .ttl { font-size: 13px; font-weight: 600; }
+        .occ .dim { fill: var(--faint); font-size: 11px; }
+        .occ .arw { stroke: var(--faint); fill: none; }
+        .occ .win { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .occ .drift { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="occ">
+        <rect class="box" x="8" y="42" width="200" height="72" rx="4"/>
+        <text class="ttl" x="24" y="64">plan — ロックなし</text>
+        <text x="24" y="86">古いworldでよい</text>
+        <text class="dim" x="24" y="105">安いキャッシュで即答してよい</text>
+
+        <path class="arw" d="M208 78 H 424"/>
+        <path class="win" d="M258 30 V 150"/>
+        <path class="win" d="M374 30 V 150"/>
+        <text class="drift" x="316" y="24" text-anchor="middle">TOCTOU窓</text>
+        <text class="drift" x="316" y="98" text-anchor="middle">他の書き手が</text>
+        <text class="drift" x="316" y="114" text-anchor="middle">世界を変えうる</text>
+
+        <rect class="hi" x="424" y="42" width="208" height="72" rx="4"/>
+        <text class="ttl" x="440" y="64">apply — ロック下</text>
+        <text x="440" y="86">差分を再計算して検証</text>
+        <text class="dim" x="440" y="105">ここで真実が確立する</text>
+
+        <text class="dim" x="8" y="176">planは予測にすぎない。手前のあらゆる近似は「速さとUXのための近似」に位置づけられる。</text>
+      </g>
+    </svg>
+    <figcaption>正しさの担保がapply側に一本化されているため、plan手前の高速化はすべて契約を変えずに体感だけを変える最適化になる。</figcaption>
+  </figure>
+
+  <p>これは楽観的並行性制御(OCC)そのものの形である。OCCは「古いスナップショットで作業を進め、コミット時に検証する」枠組みであり、planが古いworldで動きapplyがロック下で再計算するCarinaの構造はすでにこの形をしている。リソース単位のversion比較(compare-and-swap的なapply)まで細粒度化する余地もある。</p>
+
+  <p>この契約が要請される根本の理由は、<strong>ターゲットが生きている</strong>ことにある。通常のコンパイラのターゲットは受動的なメモリだが、IaCではコンパイル(plan)と実行(apply)の間に他の書き手が世界を変えうる。planがロックを取らない設計 — TOCTOU窓 + ドリフト警告 + apply側での再計算 — は、「IRは予測にすぎず、真の整合性は実行直前に再確立する」という、共有可変ターゲットに対する妥当な妥協である。</p>
+
+  <p>この読みは実務的な帰結を持つ。world取得を速くするためのあらゆる近似 — 排他所有による読み飛ばし、イベント駆動のdirty追跡、有界の古さを許すキャッシュ — は、<strong>契約を変えずに体感だけを変える種類の最適化</strong>として正当化できる。planの鮮度はapply直前の再読・検証で最終担保されるため、その手前はすべて「速さとUXのための近似」と位置づけられるからである。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/ownership-proves-you-need-not-read.html">排他所有が証明できれば読まなくてよい</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-apply">#apply</a>
+    <a href="/notes/#tag-occ">#occ</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>タグなし合併の判別はヒューリスティックに頼るしかない - notes</title>
+<meta name="description" content="CarinaのUnionはタグなし合併である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論には理論的な代償がある。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>タグなし合併の判別はヒューリスティックに頼るしかない</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §2末尾, §8弱み2</code>
+  </p>
+
+  <p>Carinaの<code>Union(Vec&lt;AttributeType&gt;)</code>は<strong>タグなし合併(untagged union)</strong> である。「いずれかのメンバが受理すれば妥当」という集合論的合併の意味論を持つ。これには理論的な代償がある。</p>
+
+  <p>直和型(tagged sum)と違い、<strong>値がどのメンバに属するかを判別子なしに構造照合で推定する必要がある</strong>。実装は「最良スコアのメンバを選ぶ」ヒューリスティックに頼っている。</p>
+
+  <h2>どこまで吸収できるか</h2>
+
+  <p>メンバ同士が重なる場合(例: <code>Int | Float</code>)は、数値の包摂(Int→Float昇格)で吸収している。しかし<strong>重なりの大きい合併を定義すると、正規化先が曖昧になる余地は残る</strong>。スコアリングによるメンバ選択は原理的に曖昧であり、判別子付き合併を言語に持たない限り根本解消はしない。</p>
+
+  <p>この曖昧さは等価性にも波及する。合併型の等価判定はメンバを順に試す(メンバ等価性の存在量化)構成であり、正規化がどのメンバに寄せるかで結果が変わりうる。差分計算が型主導の正規化に載っている以上、正規化先の曖昧さは差分の曖昧さになる。</p>
+
+  <h2>発展方向</h2>
+
+  <p>理論的な解は明快で、<strong>合併への判別子導入(またはDSL構文でのtagged union)</strong> である。値のどこかにメンバを一意に決めるタグがあれば、判別は推定ではなく参照になる。</p>
+
+  <p>なおユーザーが書く型注釈の言語には<code>StringLiteral</code>(値ひとつだけを持つシングルトン型)があり、<code>Union</code>と組み合わせると<code>'dev' | 'prod'</code>のようなリテラル合併型が書ける。TypeScriptのリテラル型と同じ構図であり、ユーザー定義の列挙を公称的な<code>Enum</code>を経由せず構造的に表現する手段になっている。リテラル合併に限れば判別は曖昧にならないが、これは注釈側にしかない機能である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-合併型">#合併型</a>
+    <a href="/notes/#tag-設計負債">#設計負債</a>
+  </p>
+</article>
+</body>
+</html>

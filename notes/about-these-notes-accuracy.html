@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>これらのノートの精度について - notes</title>
+<meta name="description" content="これらのノートは確定した結論ではない。すべて生成AI(Claude / Codex)との対話による設計探索の記録を分解したもので、結論の確定ではなく論点の整理と根拠確認を目的として書かれた作業ノートが元になっている。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>これらのノートの精度について</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/README.md / explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/README.md / explorations/2026-06-10-carina-type-system-type-theory/README.md / explorations/2026-06-11-world-acquisition-incremental-plan/README.md</code>
+  </p>
+
+  <p><strong>これらのノートは確定した結論ではない。</strong>すべて生成AI(Claude / Codex)との対話による設計探索の記録を分解したもので、結論の確定ではなく<strong>論点の整理と根拠確認</strong>を目的として書かれた作業ノートが元になっている。引用・参照する前に、このページと各ノートの<code>## 根拠の確度</code>を確認してほしい。</p>
+
+  <h2>主張の四つの区別</h2>
+
+  <p>元の探索は、主張を次の四つに区別する規約で書かれている。各ノート冒頭の一行(<code>verified</code> / <code>interpretation</code> / <code>ai-sourced</code> / <code>normative</code>)はこの区別を引き継いだものである。</p>
+
+  <ul>
+    <li><strong>verified (確認済み)</strong> — 対象リポジトリのソースを読む、実行して再現する、公式ドキュメントの記述を確認する、のいずれかで裏を取った主張。行番号やAPIの挙動に関する記述はここに入る</li>
+    <li><strong>interpretation (解釈)</strong> — 確認済みの事実に対する読み・類比・構造の整理。コンパイラ理論やデータベース理論との対応づけは分析の道具であって、実装の自己記述ではない</li>
+    <li><strong>ai-sourced (AI由来)</strong> — AIの学習データ由来の主張で、一次ソースとの突き合わせをしていないもの。研究論文への言及、他社製品の内部挙動、クラウドサービスの配信特性などが該当する。方向の参考として読み、採用する前に各文献・各サービスの公式ドキュメントで確認すること</li>
+    <li><strong>normative (規範)</strong> — 「こう設計すべきである」という立場の表明。事実の記述ではなく設計上の賭けであり、反対の立場も同じだけ筋が通りうる</li>
+  </ul>
+
+  <h2>訂正を経ている</h2>
+
+  <p>探索の過程で、<strong>誤った主張を二度以上訂正している</strong>。例えば次のようなものがある。</p>
+
+  <ul>
+    <li>Carinaの「ユーザ定義関数未実装」は誤りで、実際は<code>fn</code>(型注釈・再帰検出)、関数合成<code>&gt;&gt;</code>、パイプ<code>|&gt;</code>、部分適用(closure)が実装済みだった。未実装なのは高階関数のみ</li>
+    <li>Pulumiに「中間IRがない」という初期の断定は不正確で、PCL (<code>pulumi convert</code>の中間表現)やUpdate Plans (<code>--save-plan</code>の静的planファイル)が存在する。正確には「ランタイム実行経路には静的中間テンプレートを持たない」</li>
+    <li>Carinaの<code>use</code>式について「構造上は値、評価モデル上は値ではない」とした初期主張は、grammarをtightenする方向で解決され、文法上も<code>let</code>束縛RHS限定に整理された</li>
+  </ul>
+
+  <p>分解後のノートには、訂正は<strong>履歴としてではなく正しい事実として</strong>書いてある。つまりノート本文には最終的に正しいと判断された内容だけがある。それでも、二度以上訂正が起きた領域だという事実は、<strong>まだ訂正されていない誤りが残っている可能性</strong>を示している。</p>
+
+  <h2>個別ノートの<code>## 根拠の確度</code>を見ること</h2>
+
+  <p>全ノート共通の警告はこのページにあるので、各ノートはそれを繰り返さない。代わりに、そのノート固有の但し書き — 「この部分だけは実際に試した確認済みの経験」「この見立ては未検証」「この数字は当時のスナップショット」— を<code>## 根拠の確度</code>に書いている。引用するなら、そこを読んでからにしてほしい。</p>
+
+  <p><code>ref-</code>で始まる参照ノートは概念ではなく調査データである。特にソースコードの行番号を含むものは腐るので、再調査の足がかりとして扱うこと。</p>
+
+  <h2>出自(分解元の探索)</h2>
+
+  <ul>
+    <li><code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/</code> — CDK / Pulumi / Terraform / Carinaの設計比較(2026-04-26)。記述言語・抽象化・記述自由度・実行モデル・型・state・identityの軸</li>
+    <li><code>explorations/2026-04-26-cross-dsl-design-position/</code> — 構成記述系DSL 11本の横断分析とCarinaの立ち位置整理(2026-04-26〜27)</li>
+    <li><code>explorations/2026-06-10-carina-type-system-type-theory/</code> — Carina型システムの型理論的分析(2026-06-10〜11)。対象コミット<code>ad91ed00</code></li>
+    <li><code>explorations/2026-06-11-world-acquisition-incremental-plan/</code> — plan(source, world)のworldを速くする異分野知見の適用可能性(2026-06-11)。実装・実測はしていない</li>
+  </ul>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-メタ">#メタ</a>
+    <a href="/notes/#tag-精度">#精度</a>
+  </p>
+</article>
+</body>
+</html>

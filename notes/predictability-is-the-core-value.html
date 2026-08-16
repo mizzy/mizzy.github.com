@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>実行前に結果が読めることがIaCの根本価値である - notes</title>
+<meta name="description" content="IaCの根本価値は「apply前に結果を見せる」ことにある。だから予測可能性は、他の設計軸と並ぶ一つの軸ではなく、他の判断の基準になる位置にある。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>実行前に結果が読めることがIaCの根本価値である</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-4, explorations/2026-04-26-cross-dsl-design-position/carina-position.md §7</code>
+  </p>
+
+  <p>IaCの根本価値は「<strong>apply前に結果を見せる</strong>」ことにある。だから予測可能性 — 実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れること — は、他の設計軸と並ぶ一つの軸ではなく、他の判断の基準になる位置にある。</p>
+
+  <p>記述言語の選択と記述自由度の所在を一つの因果で束ねられるのもこの軸である。言語が決める範囲が広ければ「予測しにくい書き方」が文法で書けないので予測性が構造的に高く、規約に委ねると抽象化を使った瞬間に落ちる。ツール間の差を構造的に立てられるのがこの軸なので、比較の主軸に選ばれる。</p>
+
+  <p>「予測可能性が崩れるとどうなるか」を裏側から見ると、根本価値であることがはっきりする。<strong>「人もAIも読めないがapplyはできる」は危険</strong>である。plan予測が崩れると、apply前に結果を見せるというIaCの機能そのものが毀損する。静的予測可能性が低いとplanでunknown値だらけになり、人にもAIにも何が起きるか見えなくなる。</p>
+
+  <p>学習コスト、既存人材との適合、エコシステム流通、テスト容易性、IDE統合、運用責任分界、ガバナンス容易性など、言語選択で重要な軸は他にも多数ある。それらを主軸にしないのは重要でないからではなく、主観・状況依存で構造的比較が難しく、ツール間で比較粒度が揃いにくいからである。予測可能性は構造的比較に適した軸として選ばれている。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/ai-context-window-is-a-locality-constraint.html">AIのコンテキスト窓は人の局所読解と同質の制約である</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+      <li><a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-予測可能性">#予測可能性</a>
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>純粋性はplanを常駐クエリに変える前提条件である - notes</title>
+<meta name="description" content="worldを変更イベントで維持される実体化ビューにするという構図は、データベースの増分ビュー維持そのものである。これをIaCに当てると、plan自体を常駐クエリにできる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>純粋性はplanを常駐クエリに変える前提条件である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-11-world-acquisition-incremental-plan/README.md §3, §5</code>
+  </p>
+
+  <p>worldを変更イベントで維持される実体化ビューにするという構図は、データベースの<strong>増分ビュー維持</strong> (incremental view maintenance)そのものである。さらにDBSP / differential dataflowの系統は「入力の差分から出力の差分を直接計算する」一般理論を与える。これをIaCに当てると、<strong>plan自体を常駐クエリにできる</strong>。</p>
+
+  <p>desiredとworldの差分(= plan)を、worldの変更イベントが届くたびに増分更新し続ける。すると<code>carina plan</code>は「計算する」コマンドから「<strong>維持されている差分を表示する</strong>」コマンドになる。</p>
+
+  <p>ここで言語側の性質が効く。<strong>増分化が安全なのは参照透明な計算だけ</strong>であり、planが(source, world)の純関数であること — 静的段階の全域性と純粋性 — は、この最適化の前提条件をちょうど満たしている。汎用言語埋め込み型のツール(synthが外界を読みうる)では、この変換は同じ安全性では成立しない。つまり純粋性は「読みやすさ」や「検証しやすさ」だけの性質ではなく、<strong>性能最適化の可能性そのものを開く条件</strong>である。</p>
+
+  <p>よりエンジニアリング寄りの実現形は、コンパイラ/ビルドシステムの依存追跡である。Build systems à la carte、Salsa(rustcのクエリ基盤)、self-adjusting computation (Acar)の核は「入力が変わっていなければ再計算しない、変わっても依存の影響範囲だけ再計算する」ことにある。world側の変更イベントと組み合わせると、「VPCの1属性が変わった → それに依存する差分計算ノードだけ無効化 → planの大半はキャッシュヒット」という増分planが組める。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>planが(source, world)の純関数であることはソース・ドキュメントで確認済み。一方、DBSP / differential dataflow / Build systems à la carte / Salsa / self-adjusting computationへの言及はAIの学習データ由来で、一次ソース未確認。増分plan案は実装・実測を伴わない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/dirty-bit-for-the-cloud.html">クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/dirty-bit-for-the-cloud.html">クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-増分計算">#増分計算</a>
+    <a href="/notes/#tag-純粋性">#純粋性</a>
+    <a href="/notes/#tag-plan">#plan</a>
+  </p>
+</article>
+</body>
+</html>

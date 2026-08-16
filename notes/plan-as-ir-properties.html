@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>planはSSA的で直列化可能なIRである - notes</title>
+<meta name="description" content="中間表現としてのplanは、コンパイラのIRが持つ古典的な性質をいくつも備えている。単一定義性、直列化可能性、そして「検査済みであること」の三つである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>planはSSA的で直列化可能なIRである</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §4</code>
+  </p>
+
+  <p>中間表現としてのplanは、コンパイラのIRが持つ古典的な性質をいくつも備えている。単一定義性、直列化可能性、そして「検査済みであること」の三つである。</p>
+
+  <p><strong>単一定義性。</strong> 各リソースはplan内でちょうど一つのノードとして定義され、他のノードはその属性を参照するだけである。SSA(静的単一代入)形式が変数の再代入を許さないのと同じ規律で、これが依存解析(DAG構築)を自明にしている。</p>
+
+  <p><strong>直列化可能性。</strong> <code>plan --out</code>はIRをファイルに書き出す。これはオブジェクトファイルに相当し、リンク前の成果物を持ち運べる。保存されたplanには生成時のstateの系譜(lineage)と版(serial)が記録され、apply側はロック下でそれを照合し、系譜不一致なら拒否、版のずれなら警告する — <strong>オブジェクトファイルのABI整合性検査に正確に対応する</strong>。</p>
+
+  <p><strong>検査済みであること。</strong> 型検査はIR生成の最中に完了しており、applyは型を見ない。「well-typedなIRだけがバックエンドに渡る」というコンパイラの標準的な契約である。ただしこの契約は再配置(applyでの値の代入)によって破られうる、というのが別に立つ論点になる。</p>
+
+  <p>IRの中身は、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種の<code>Effect</code>値の列と依存DAGである。効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。IRに継続が残らない — 効果の結果に依存して次の効果を構成する部分は静的段階で済ませてある — ことが、planが検査可能・表示可能・保存可能であることを支えている。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>Effectが8種であること、<code>plan --out</code>のlineage / serial照合の挙動はソースで確認済み。SSA・オブジェクトファイルとの対応づけは解釈である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-ir">#ir</a>
+    <a href="/notes/#tag-コンパイラ">#コンパイラ</a>
+  </p>
+</article>
+</body>
+</html>

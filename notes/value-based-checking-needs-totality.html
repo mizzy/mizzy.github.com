@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>値ベースの全数検査は停止性の配当である - notes</title>
+<meta name="description" content="Carinaの型検査は、評価済みの値がその型に属するかを判定する様式を取る。これができるのは静的段階が全域的だからで、値ベースの検査様式は停止性の配当として読める。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>値ベースの全数検査は停止性の配当である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §1, §3</code>
+  </p>
+
+  <p>Carinaの型検査は、項(構文)にラベルを付ける体系ではなく、<strong>評価済みの値がその型に属するかを判定する</strong>様式を取る。これができるのは静的段階が全域的だからで、値ベースの検査様式は停止性の配当として読める。</p>
+
+  <p>型理論の分類でいえば、これは型を「項に付く構文的な札」ではなく「値の集合(値の分類器)」とみなし、型付けを所属判定として与える意味論的型付け(semantic typing)の系譜である。型と値を一つの束に統合したCUEや、スキーマを値の分類器とするJSON Schemaが同族に当たる。Γ ⊢ e : T形式の構文的な判断体系はほぼ持たない。</p>
+
+  <p>配当が最もはっきり出るのは篩型(refinement types)である。Carinaに「カスタム型」という独立した型構成子はなく、代わりに<code>String</code> / <code>Int</code> / <code>Float</code>の各変種が</p>
+
+  <ul>
+    <li>正規表現パターン(<code>pattern</code>)</li>
+    <li>長さ・値域の区間(<code>length</code> / <code>range</code>、両端の省略で開区間を表現)</li>
+    <li>任意の検証関数</li>
+  </ul>
+
+  <p>を持ち運ぶ。これは<code>{ x: String | P(x) }</code>のように基底型を述語で絞り込んだ篩型に相当する。検査はすべて静的段階で評価済みの値に対して行われるため、<strong>篩の述語は決定可能性の心配なしに任意の計算を含められる</strong>。項ベースの篩型システムなら述語の含意判定が決定可能かを常に気にしなければならないところを、完全評価できる言語はその問題を丸ごと回避する。</p>
+
+  <p>ただし完全に値ベースというわけでもない。静的段階の時点で値が手に入らない参照(他リソースの属性への参照など)に対しては、宣言型どうしの代入可能性を照合する項レベルの検査が補完的に走る。つまり実態は「値がある所では所属判定、ない所では宣言型の判定」というハイブリッドである。</p>
+
+  <p>配当には限界もある。篩の述語のうち構造的な表現を持つのは区間とパターンだけで、それを超える部分は不透明な関数に逃がしている。述語が一階の表現を持つか否かは、型を直列化してプラグイン境界を越えられるかを分ける線でもある。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-全域性">#全域性</a>
+    <a href="/notes/#tag-契約検査">#契約検査</a>
+  </p>
+</article>
+</body>
+</html>

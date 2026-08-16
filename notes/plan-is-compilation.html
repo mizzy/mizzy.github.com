@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>planはコンパイルである - notes</title>
+<meta name="description" content="carina planは、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳するコンパイラである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>planはコンパイルである</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §1, §8</code>
+  </p>
+
+  <p><code>carina plan</code>は、ソース言語(.crn)のプログラムを、検査を通しながら中間言語(Effectのリスト + 依存DAG)へ翻訳する<strong>コンパイラ</strong>である。applyはその中間言語の実行系である。この対応は比喩ではなく、コンパイラの段ごとに具体的な対応物が取れる。</p>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>コンパイラの段</th><th>Carinaでの対応物</th></tr></thead>
+      <tbody>
+        <tr><td>字句・構文解析</td><td>pest文法による.crnのパース</td></tr>
+        <tr><td>マクロ展開・脱糖</td><td>letのfixed-point解決、for展開、補間、モジュール展開</td></tr>
+        <tr><td>意味解析・型検査</td><td>スキーマ検証(値の所属)+ 参照の代入可能性(エッジの型)</td></tr>
+        <tr><td>命令選択(lowering)</td><td>差分計算 — desiredとstateの差を8種の命令(Effect)に落とす</td></tr>
+        <tr><td>中間表現(IR)</td><td>plan = Effectのリスト + 依存DAG</td></tr>
+        <tr><td>オブジェクトファイル</td><td><code>plan --out</code>の保存形式</td></tr>
+        <tr><td>未解決シンボル・再配置情報</td><td>deferred参照とUnknown</td></tr>
+        <tr><td>リンク・ロード</td><td>apply — DAGの位相順に再配置(値の代入)しながら実行</td></tr>
+        <tr><td>ターゲットアーキテクチャ</td><td>プロバイダ(aws / awscc / mock)</td></tr>
+        <tr><td>IRダンプ</td><td>plan表示・carina-tui</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>フロントエンドの読みが最も素直に効く。コンパイラのフロントエンドは、人間向けの構文(糖衣)を中間表現が知らなくてよい形に展開する。Carinaのlet・for・補間・モジュールがこれに当たり、planの時点ではすべて消えて、残るのは型付きノード(リソース定義)とエッジ(依存)だけである。設計上の立場で蒸発条件と呼んだもの — 言語機能は静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される — は、コンパイラの言葉では「すべての言語機能はフロントエンドでlowering可能でなければならない」という<strong>IR中心の言語設計原則そのもの</strong>である。</p>
+
+  <p>この観点で型検査の位置も定まる。Carinaの検査は完全評価された値に対する所属判定であり、コンパイラの語彙では「脱糖後の正規形に対して意味解析を行う」ことに当たる。検査対象が項ではなく値であるという特異性は、フロントエンドが全域的(評価が必ず停止し、脱糖が必ず完了する)だから許される贅沢である。</p>
+
+  <p>こう読むと、Carinaの構成要素は一つのコンパイラパイプラインとして整列する。蒸発条件はフロントエンドの設計原則、値ベース検査は脱糖後の意味解析、差分計算は(ソース,世界)を引数とする命令選択、planはSSA的で直列化可能で人間がレビューするIR、applyは再配置しながら実行するリンカ兼ローダ、プロバイダはプラグイン化されたターゲット、WITはABIである。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>コンパイラ各段への対応づけ全体は解釈であり、実装の自己記述ではない。類比は分析の道具として置かれている。個々の事実(Effectが8種であること、<code>plan --out</code>の保存形式、検証と代入の順序)はソースで確認済み。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-コンパイラ">#コンパイラ</a>
+    <a href="/notes/#tag-plan">#plan</a>
+  </p>
+</article>
+</body>
+</html>

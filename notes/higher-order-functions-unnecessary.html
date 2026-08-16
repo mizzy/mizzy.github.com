@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない - notes</title>
+<meta name="description" content="ハイブリッド象限への合流は構造的整合性の議論であって、ユーザの実需要とは別の問題である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/carina-position.md §6 / explorations/2026-06-10-carina-type-system-type-theory/design-position.md §3</code>
+  </p>
+
+  <p>ハイブリッド象限への合流は構造的整合性の議論であって、<strong>ユーザの実需要とは別の問題</strong>である。実需要の観点から見ると、IaCで高階関数は「あれば嬉しいが必須ではない」機能かもしれない。</p>
+
+  <h2>高階関数なしで十分かもしれない根拠</h2>
+
+  <ul>
+    <li><strong>Bicepが意図的に入れていない</strong>: Microsoft設計で、<code>func</code>のみを持ち高階関数は仕様にない。それでもAzureのIaCとして広く使われている</li>
+    <li><strong>Terraformが14年高階関数なしで運用</strong>: <code>for_each</code> / <code>dynamic</code>で大半の用途を満たしている</li>
+    <li><strong>CDK / Pulumiの高階関数活用は実は限定的</strong>:命名関数や<code>map</code>でループする程度で、Constructを関数で渡す/返すパターンは現場では稀</li>
+  </ul>
+
+  <h2>IaCで実際に必要な抽象化</h2>
+
+  <ul>
+    <li><strong>値計算の再利用</strong>:命名規則 / 環境別パラメタ → <code>fn</code>で十分</li>
+    <li><strong>構成のテンプレート化</strong>: VPC + Subnet × N + IGWのセット → moduleで十分</li>
+    <li><strong>多数生成</strong>: multi-region展開 / リスト要素ごと → <code>for</code>式で十分</li>
+  </ul>
+
+  <p>この三つでIaCの現実的な用途はカバーできる可能性が高い。IaCが本当に必要とする再利用は<strong>検証済みパターンのパラメータ付き合成</strong>であって任意計算ではなく、それはモジュール・<code>for</code>・exportsという有界な合成手段で足りる。汎用言語に人が求める「表現力」の実態の多くは繰り返しの除去であり、チューリング完全性はそれに対して過剰である。</p>
+
+  <h2>取りうる立場</h2>
+
+  <ul>
+    <li><strong>A.入れない(Bicep路線)</strong>: 「IaCでは値計算と構成テンプレート化で十分」と割り切る。Bicep成功の経験的裏付けあり</li>
+    <li><strong>B.入れる(KCL路線)</strong>:構造的に5DSLと整合し、長期的な拡張余地がある。ただし大改修コスト</li>
+    <li><strong>C.保留</strong>:現状の<code>fn</code> + 関数合成で実需要を観察し、ユーザから具体ユースケースが出てきたら検討</li>
+  </ul>
+
+  <p>実験的プロジェクトという位置づけからは、A / CよりB(積極導入)の方が学びが多い。境界設計はgraph出力DSLでは先行例がない領域なので、新しい設計象限の実証として価値が高い。「IaCで本当に必要か」の答えは入れてみないと分からない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/ai-lowers-demand-for-abstraction.html">AIは抽象化の実需要をむしろ下げる</a></li>
+      <li><a href="/notes/ref-carina-feature-inventory.html">Carina機能点検(2026-04-27時点)</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/ai-lowers-demand-for-abstraction.html">AIは抽象化の実需要をむしろ下げる</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/ref-carina-feature-inventory.html">Carina機能点検(2026-04-27時点)</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-高階関数">#高階関数</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-懐疑">#懐疑</a>
+  </p>
+</article>
+</body>
+</html>

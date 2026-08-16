@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terraform / CDK / Pulumi / Carina比較マトリクス - notes</title>
+<meta name="description" content="4ツール(Terraform / CDK / Pulumi / Carina)を軸ごとに横断比較した概観表を集約したもの。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Terraform / CDK / Pulumi / Carina比較マトリクス</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1〜5</code>
+  </p>
+
+  <p>4ツール(Terraform / CDK / Pulumi / Carina)を軸ごとに横断比較した概観表を集約したもの。<strong><span class="todo">(要確認)</span>と書かれたセルは埋まっていないまま残してある</strong> — 何が確認できていないかも情報である。ここでの「CDK」はAWS CDKを指す(cdktf / cdk8sは別engineへsynthする派生で対象外)。</p>
+
+  <nav class="toc">
+    <a href="#notation"><span class="t">記述言語と実行モデル(§1-1)</span></a>
+    <a href="#abstraction"><span class="t">抽象化機構(§1-2)</span></a>
+    <a href="#freedoms"><span class="t">3自由度の偏り(§1-3-2)</span></a>
+    <a href="#predictability"><span class="t">結果予測性(§1-3-4)</span></a>
+    <a href="#exec"><span class="t">実行モデル概観(章2)</span></a>
+    <a href="#types"><span class="t">schema / 型 / unknown概観(章3)</span></a>
+    <a href="#state"><span class="t">state概観(章4)</span></a>
+    <a href="#identity"><span class="t">identity概観(章5)</span></a>
+  </nav>
+
+  <h2 id="notation">記述言語と実行モデル(§1-1)</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>記述言語</th><th>ユーザワークフロー</th><th>内部実行モデル</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>HCL (専用DSL)</td><td>plan → apply</td><td>DSLを解析してresource graph構築 → 全体の差分を一括計算 → 順次実行</td></tr>
+        <tr><td>CDK</td><td>TS / Python / Java / C# / Go (汎用言語経由)</td><td>synth → diff → deploy</td><td>コード実行でCFNテンプレート生成(synth) → CFN engineがapply</td></tr>
+        <tr><td>Pulumi</td><td>TS / Python / Go / .NET / Java (各言語ネイティブSDK)</td><td>preview → up</td><td>コード実行中にengineへgRPCストリーミングで<code>RegisterResource</code>を逐次送信 → engineが随時差分判断・実行(ランタイム経路に静的中間テンプレートなし)</td></tr>
+        <tr><td>Carina</td><td>Carina DSL (<code>.crn</code>)</td><td>plan → apply</td><td>DSLを解析してresource graph構築 → 全体の差分を一括計算 → 順次実行</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Pulumiは<strong>ランタイム実行経路には静的中間テンプレートを持たない</strong>が、エコシステム全体には中間表現的なものが存在する: <code>pulumi convert</code>の<strong>PCL (Pulumi Configuration Language)</strong> は公式に "intermediate representation" と呼ばれ、<code>pulumi preview --save-plan</code>は<strong>静的planファイル(Update Plans)</strong> を生成して後で<code>pulumi up --plan</code>で適用できる。「中間IRが一切ない」とは言えない。</p>
+
+  <p>CDKはjsii(実装はTypeScriptで、jsiiがPython/Java/C#/Goへbridging、APIのセマンティクスはTSが原本)。Pulumiは各言語ネイティブ実装で、多言語Component (MLC)は別建てのschema-driven codegenで実現される。</p>
+
+  <h2 id="abstraction">抽象化機構(§1-2)</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>単位(複数リソースを束ねる抽象化)</th><th>読み込み + インスタンス化の構文</th><th>実体</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>module (子moduleは再利用、root moduleはデプロイ単位)</td><td><code>module "network" { source = "./modules/network"; ... }</code> (DSLレベルで読み込みとインスタンス化が一体)</td><td>ディレクトリ(HCLファイル群)</td></tr>
+        <tr><td>CDK</td><td>Stack (デプロイ単位) / ユーザ定義Construct (再利用単位) / L3 Construct (既製パターン)</td><td>ホスト言語の<code>import</code> + <code>new MyStack(app, 'main')</code> (DSLレベルの読み込み構文はなくホスト言語に委譲)</td><td>TypeScriptクラス(jsiiで多言語化)</td></tr>
+        <tr><td>Pulumi</td><td>Stack (デプロイ単位、設定単位) / ユーザ定義ComponentResource / 既製Component (Crosswalk等)</td><td>ホスト言語の<code>import</code> + <code>new NetworkComponent('network', args, opts)</code></td><td>各言語ネイティブのクラス</td></tr>
+        <tr><td>Carina</td><td>module (子moduleは再利用、root moduleはデプロイ単位)</td><td>読み込み: <code>let network = use { source = './modules/network' }</code> / インスタンス化: <code>network { ... }</code> (DSLレベルで分離)</td><td>ディレクトリ(<code>.crn</code>ファイル群)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>CDKの<strong>L2 Construct</strong>はサービスにより性格が大きく異なる中間層である。<code>s3.Bucket</code>のような単一リソース寄りのL2もあれば、<code>ec2.Vpc</code> (VPC + サブネット6個 + IGW + NAT Gateway)、<code>rds.DatabaseCluster</code> (Cluster + Instance + SubnetGroup + SG)、<code>lambda.Function</code> (Function + IAM Role + Log Group)のように複数リソース束ね寄りのL2もある。</p>
+
+  <p>層の対応:</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>層</th><th>Terraform</th><th>CDK</th><th>Pulumi</th><th>Carina</th></tr></thead>
+      <tbody>
+        <tr><td>複数リソース束ね層</td><td><code>module "..." { ... }</code></td><td>Stack / ユーザ定義Construct / L3</td><td>Stack / ユーザ定義ComponentResource / 既製Component</td><td><code>use { source = "..." }</code> + <code>name { ... }</code></td></tr>
+        <tr><td>個別リソース層</td><td><code>resource "aws_s3_bucket" "foo" { ... }</code></td><td>L1 (<code>new CfnBucket(...)</code>)、L2は中間層</td><td><code>new aws.s3.Bucket(...)</code> (<code>CustomResource</code>)</td><td><code>aws.s3.Bucket { ... }</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="freedoms">3自由度の偏り(§1-3-2)</h2>
+
+  <p>各セルはgraph形状側と属性値側の両方を含む評価。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>対象</th><th>Terraform</th><th>CDK</th><th>Pulumi</th><th>Carina</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>抽象化の追加</strong></td>
+          <td><strong>言語</strong>: graph側はmodule切り出しのみ、<strong>属性値側もユーザ定義関数不可</strong> (組込み関数 + provider functionのみ)</td>
+          <td><strong>規約</strong>: graph側はConstructクラス、<strong>属性値側はTSの関数 / クラス / 高階関数 / 外部libで自由</strong>、組織が縛る</td>
+          <td><strong>規約</strong>:同左(ComponentとTS/Python/Goの関数機構)</td>
+          <td><strong>言語</strong>: graph側はmodule、<strong>属性値側は<code>fn</code> (型注釈・再帰検出) + 関数合成<code>&gt;&gt;</code> + パイプ<code>|&gt;</code> + closure</strong>。高階関数と一級関数値は未実装</td>
+        </tr>
+        <tr>
+          <td><strong>複数量の制御</strong></td>
+          <td><strong>言語</strong>: graph側は<code>for_each</code> / <code>count</code> / <code>dynamic</code>の専用構文、属性値側は<code>for</code>式 / <code>[for ...]</code>の専用構文のみ</td>
+          <td><strong>規約</strong>: graph側 / 属性値側ともTSの<code>for</code> / <code>map</code> / <code>filter</code>等で自由</td>
+          <td><strong>規約</strong>:同左</td>
+          <td><strong>言語</strong>: graph側 / 属性値側とも<code>for</code>式 / <code>if</code>式の専用構文のみ(<code>count</code>相当は未実装)</td>
+        </tr>
+        <tr>
+          <td><strong>実装の切替</strong></td>
+          <td><strong>言語</strong>: graph側は<code>source</code>リテラルのみ、属性値側も組込み関数のみで動的計算ロジック差し替え不可</td>
+          <td><strong>規約</strong>: graph側は普通のクラス選択で自由、属性値側もホスト言語の関数選択で自由</td>
+          <td><strong>規約</strong>:同左</td>
+          <td><strong>言語</strong>: graph側は<code>source</code>リテラルのみ + <code>use</code>式は<code>let</code>束縛RHSのみ、属性値側も<code>fn</code>値が一級でないので動的差し替え不可</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Terraformはprovider function (1.8+)をprovider開発者が定義できるが、ユーザのconfig内で任意のヘルパー関数を定義する構文はない。属性値計算の自由度はTerraform (組込み関数のみ) &lt; Bicep (<code>func</code>あり) &lt; Carina (<code>fn</code> + 関数合成 + closure) &lt; CDK / Pulumi (高階関数 + クラス継承 + 外部lib)の順で表現力が上がる。</p>
+
+  <h2 id="predictability">結果予測性(§1-3-4)</h2>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>ツール</th><th>コードからの結果予測性(記述自由度に起因する範囲)</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>高い(graph形状・属性値とも<code>for_each</code> / <code>dynamic</code>使用時、およびmodule経由で低下)</td></tr>
+        <tr><td>CDK</td><td><strong>書き方依存</strong> (graph形状・属性値ともL1ベタ書きなら高、ループ/条件/継承/高階関数を駆使すると低)</td></tr>
+        <tr><td>Pulumi</td><td><strong>書き方依存</strong> (同様)</td></tr>
+        <tr><td>Carina</td><td>高い(graph形状: <code>for</code>のdeferredはplan表示で確認可能。属性値: <code>fn</code>で値計算が抽象化されるが高階関数なしのため動的差し替えは不可。いずれもmodule経由で低下)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="exec">実行モデル概観(章2)</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>評価モデル</th><th>中間表現</th><th>実行境界</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>DSL → resource graph → 全体差分一括計算 → 順次実行</td><td>tfplan (binary、不可侵)</td><td>provider pluginのgRPC、state backend</td></tr>
+        <tr><td>CDK</td><td>TS code実行 → cloud assembly (CFNテンプレート + assets)生成 → CFN deploy</td><td>CFNテンプレート(静的、JSON/YAML)</td><td>CFNサービスへのChangeSet経由deploy</td></tr>
+        <tr><td>Pulumi</td><td>コード実行中にengineへgRPC streaming <code>RegisterResource</code> → engine随時差分判断・実行</td><td>ランタイム経路に中間テンプレートなし。ただしPCL、Update Plans (<code>--save-plan</code>)は存在</td><td>engine ↔ language host gRPC、provider gRPC</td></tr>
+        <tr><td>Carina</td><td>DSL → resource graph → 全体差分一括計算 → 順次実行(Terraformと同じ宣言型)</td><td><code>Plan&lt;Effect&gt;</code>型付きRust値、同一プロセス内加工可</td><td>provider plugin (WASM等)、state backend</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="types">schema / 型 / unknown概観(章3)</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>schema表現</th><th>ユーザ側の型</th><th>unknown値の表現</th><th>特徴</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>cty (string/number/list/map/object/tuple)</td><td>variable type system (limited)</td><td>cty.Value + unknownフラグ、refinements (1.6+)で部分情報保持</td><td>provider pluginから<code>GetSchema</code> RPCで取得</td></tr>
+        <tr><td>CDK</td><td>CFN schema (CloudFormationの型情報、TSの型に変換)</td><td>TSの型(<code>BucketProps</code>等のinterface)</td><td>Token (stringに偽装、synth時に<code>Fn::GetAtt</code>等に解決)</td><td>型システムはunknown値を区別しない</td></tr>
+        <tr><td>Pulumi</td><td>Pulumi schema (providerが定義、各言語の型にcodegen)</td><td>TS/Python/Goの型 + <code>Output&lt;T&gt;</code></td><td><code>Output&lt;T&gt;</code>独立型、依存リソース・unknownフラグ・secretフラグをメタ情報として運ぶ</td><td>型システムでunknown値の扱いを強制</td></tr>
+        <tr><td>Carina</td><td><code>AttributeType</code> (Union/StringEnum/Custom (refinement)/Struct)</td><td>DSLの型(namespaced enum含む)</td><td>式木保持(<code>ResourceRef</code> / <code>Interpolation</code> / <code>FunctionCall</code>)、<code>for</code>でdeferred退避</td><td>partial evaluation / symbolic executionに近い</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>CDK Token vs Pulumi <code>Output&lt;T&gt;</code>の対比:</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>観点</th><th>CDK Token</th><th>Pulumi Output&lt;T&gt;</th></tr></thead>
+      <tbody>
+        <tr><td>型</td><td><code>string</code> (普通の文字列に偽装)</td><td><code>Output&lt;string&gt;</code> (独立した型)</td></tr>
+        <tr><td>文字列補間</td><td><code>${bucket.arn}</code>がそのまま書ける</td><td><code>pulumi.interpolate</code>を経由する必要あり</td></tr>
+        <tr><td>stringメソッド</td><td>呼べてしまうが意図通り動かないことがある</td><td>型エラーで呼べない</td></tr>
+        <tr><td>条件分岐</td><td>synth時のToken値で分岐になる(実値で分岐できない)</td><td><code>apply()</code>で実値が確定してから分岐できる</td></tr>
+        <tr><td>「うっかり間違い」</td><td>起きる(型システムが助けない)</td><td>防げる(型システムが強制)</td></tr>
+        <tr><td>書く時の負担</td><td>軽い(普通の文字列として書ける)</td><td>重い(<code>apply</code> / <code>interpolate</code>を経由)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="state">state概観(章4)</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>state所有者</th><th>state形式</th><th>refresh</th><th>drift detection</th><th>lock</th><th>暗号化</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>自前</td><td>tfstate (JSON)</td><td><code>terraform refresh</code> (applyに統合)</td><td><code>terraform plan</code>で検出</td><td>backendが提供(S3 + DynamoDB等)</td><td>backend依存</td></tr>
+        <tr><td>CDK</td><td>CFNサービスに委譲</td><td>CFN stack state (AWS側)</td><td>CFN drift detection</td><td>CFN drift detection機能</td><td>CFNサービス側</td><td>CFNサービス側</td></tr>
+        <tr><td>Pulumi</td><td>自前(Pulumi service / S3 / local)</td><td>checkpoint (JSON)</td><td><code>pulumi refresh</code></td><td><code>pulumi preview</code>で検出</td><td>backend側</td><td>Pulumi serviceの場合は組込、自前backendは要設定</td></tr>
+        <tr><td>Carina</td><td>自前</td><td><code>carina.state.json</code> (state v3、binding/dependency_bindings含む)</td><td><strong><span class="todo">(要確認: refresh機構があるか)</span></strong></td><td>plan時に差分計算</td><td><strong><span class="todo">(要確認)</span></strong></td><td><strong><span class="todo">(要確認)</span></strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>state操作の手段: Terraformは<code>state mv</code> / <code>state rm</code> / <code>import</code> / 手動JSON編集(非推奨)、Pulumiは<code>pulumi state delete</code> / <code>pulumi stack export</code> / <code>pulumi stack import</code>、CDKは該当なし(CFNコンソール / CLI経由)、Carinaは<strong><span class="todo">(要確認)</span></strong>。</p>
+
+  <h2 id="identity">identity概観(章5)</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>識別子</th><th>生成方式</th><th>リファクタ耐性</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>resource address (<code>aws_s3_bucket.foo</code>)</td><td>ユーザ制御(<code>&lt;type&gt;.&lt;ラベル&gt;</code>)</td><td><code>moved</code>ブロックでリネーム/移動を吸収</td></tr>
+        <tr><td>CDK</td><td>CFN論理ID (例: <code>MyBucketF68F3FF0</code>)</td><td>construct pathのMD5ハッシュ先頭8桁(大文字16進)。L2は内部でid <code>Resource</code>のCfnBucketを生成するためpath長2で必ずハッシュが付く。stack直下のL1のみ例外的にハッシュなし</td><td><code>overrideLogicalId()</code>で明示制御可、<code>cdk refactor</code> <strong><span class="todo">(新機能?)</span></strong></td></tr>
+        <tr><td>Pulumi</td><td>URN (<code>urn:pulumi:&lt;stack&gt;::&lt;project&gt;::&lt;parent$type&gt;::&lt;name&gt;</code>)</td><td>type/name/parent等をengineが連結、<code>Component$Resource</code>形式で親typeが<code>$</code>区切りで連結</td><td><code>aliases</code>で旧URNを保持して移動を吸収</td></tr>
+        <tr><td>Carina</td><td>named: binding名(ラベルそのまま) / anonymous: content-based hash (SimHash 16 hex、create-only attrsからstandard hash 8 hexも)</td><td>namedはユーザ制御、anonymousは<code>compute_anonymous_identifiers</code>で自動生成</td><td><strong><span class="todo">(要確認: rename機構、<code>moved</code>相当の有無)</span></strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>物理リソース名の自動生成(確認済み):</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>観点</th><th>CDK</th><th>Pulumi (デフォルト)</th></tr></thead>
+      <tbody>
+        <tr><td>形式</td><td><code>&lt;stack&gt;-&lt;logicalId&gt;-&lt;random&gt;</code></td><td><code>&lt;logicalName&gt;-&lt;7hex&gt;</code> (terraform-bridgeベース)</td></tr>
+        <tr><td>例(<code>new ... ("mybucket")</code>)</td><td><code>mystack-mybucketf68f3ff0-abc123xyz</code></td><td><code>mybucket-d7c2fa0</code></td></tr>
+        <tr><td>stack名を含む</td><td>はい</td><td>いいえ</td></tr>
+        <tr><td>論理IDのhashを含む</td><td>はい</td><td>いいえ</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/ref-source-pointers.html">ソース調査ポインタ集</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+      <li><a href="/notes/ref-source-pointers.html">ソース調査ポインタ集</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-参照">#参照</a>
+    <a href="/notes/#tag-比較表">#比較表</a>
+    <a href="/notes/#tag-iac">#iac</a>
+  </p>
+</article>
+</body>
+</html>

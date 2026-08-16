@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「汎用言語 × 言語が決める」の空席は偶然ではない - notes</title>
+<meta name="description" content="「汎用言語 × 言語が決める」象限に該当するIaCツールは、確認できる範囲で存在しない。これは偶然ではなく、ホスト言語をサブセット化しない限り埋まらないという構造から来る。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「汎用言語 × 言語が決める」の空席は偶然ではない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-4, explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §6, explorations/2026-04-26-cross-dsl-design-position/README.md問い3</code>
+  </p>
+
+  <p><strong>「汎用言語 × 言語が決める」</strong>象限に該当するIaCツールは、確認できる範囲で存在しない。これは偶然ではなく、<strong>ホスト言語をサブセット化しない限り埋まらない</strong>という構造から来る。</p>
+
+  <p>同じ空席は全域性の軸でも現れる。「専用言語かどうか」と「全域的かどうか」は独立の選択のはずだが、埋め込み×全域の象限は空である。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>全域的</th><th>チューリング完全</th></tr></thead>
+      <tbody>
+        <tr><td>専用言語</td><td>HCL / Starlark / Dhall / CUE / Carina</td><td>Nix / Pkl</td></tr>
+        <tr><td>汎用言語埋め込み</td><td>(構造的に不可能)</td><td>Pulumi / CDK</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>汎用言語に埋め込んだまま言語レベルの制約を課すには、ホスト言語をサブセット化するしかなく、それはもう別言語を作ることと同じである。</p>
+
+  <p>この象限に近く見えるものはいくつかあるが、いずれも該当しない。SDKが型を提供するパターン(Pulumiの<code>Output&lt;T&gt;</code>、CDKの<code>BucketProps</code>)は、<strong>ホスト言語の型システムをSDK側で活用しているだけ</strong>で、静的型言語かつユーザーが型を書く慣習を採用したときにのみ効く。Pkl(Apple)は汎用言語風だが評価モデルを制限するDSLで近いものの、PklはIaCツールではなく構成データ出力DSLである。</p>
+
+  <p>実装するとすれば「汎用言語の中にDSLを入れる」アプローチ(F#のcomputation expression、Scalaのimplicit + macro等)が該当しうるが、IaC領域での全面実装例は確認できていない。<strong>理論的な設計余地としては開いているが、汎用言語のホスト機構と整合させるコストが高いと推測される</strong>。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+      <li><a href="/notes/empty-quadrant-selection-pressure.html">「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-selection-pressure.html">「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</a></li>
+      <li><a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a></li>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計空間">#設計空間</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-全域性">#全域性</a>
+  </p>
+</article>
+</body>
+</html>

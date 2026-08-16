@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ソース調査ポインタ集 - notes</title>
+<meta name="description" content="このノートは腐る。行番号は当時のリポジトリのスナップショットであり、ここにあるのは結論ではなく再調査の足がかりである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>ソース調査ポインタ集</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-2, chapter-3, chapter-5各「ソース調査ポインタ」</code>
+  </p>
+
+  <div class="accuracy">
+    <h2>このノートは腐る</h2>
+    <p>行番号は当時のリポジトリのスナップショットであり、対象リポジトリが更新されれば合わなくなる。ここにあるのは結論ではなく<strong>再調査の足がかり</strong> — 「どのファイルのどのあたりを見れば確認できるか」の記録である。行番号が合わない場合は関数名・シンボル名で探し直すこと。調査時点は2026-04-26〜2026-04-27。</p>
+  </div>
+
+  <nav class="toc">
+    <a href="#cdk"><span class="t">CDK</span></a>
+    <a href="#pulumi"><span class="t">Pulumi</span></a>
+    <a href="#terraform"><span class="t">Terraform</span></a>
+    <a href="#carina"><span class="t">Carina</span></a>
+  </nav>
+
+  <h2 id="cdk">CDK</h2>
+
+  <h3>論理ID生成</h3>
+
+  <ul>
+    <li><code>aws/constructs</code> リポジトリの <code>src/construct.ts:503</code> (<code>Construct</code> クラス)</li>
+    <li><code>node.path</code>: scope列を <code>/</code> 区切りで連結(<code>construct.ts:92-100</code>)</li>
+    <li><code>Stack.allocateLogicalId</code> (<code>packages/aws-cdk-lib/core/lib/stack.ts:1393-1398</code>)</li>
+    <li><code>makeUniqueId()</code> (<code>packages/aws-cdk-lib/core/lib/private/uniqueid.ts:21-23, 65-83</code>)
+      <ul>
+        <li>MD5(path.join('/'))の先頭8文字を大文字16進</li>
+        <li>removeNonAlphanumeric(各component).join('')を最大240文字に切ったもの + 8文字ハッシュ(合計 ≤ 255)</li>
+        <li>親stack名はpathに含まれない(stack単位でローカル)</li>
+        <li><code>Default</code> は完全除外、<code>Resource</code> はhuman portionからは除かれるがハッシュには含まれる</li>
+      </ul>
+    </li>
+    <li>ハッシュなし条件(<code>uniqueid.ts:34-63</code>): components.length === 1かつ非英数字除去後が255文字以内、stack直下のL1のみ</li>
+  </ul>
+
+  <h3>Escape hatches</h3>
+
+  <p><a href="https://docs.aws.amazon.com/cdk/v2/guide/cfn-layer.html">Customize constructs</a></p>
+
+  <ul>
+    <li><code>node.defaultChild</code> でL1取得</li>
+    <li><code>addPropertyOverride</code> / <code>addOverride</code> / <code>addDeletionOverride</code></li>
+    <li><code>overrideLogicalId('FixedId')</code> で論理ID明示制御</li>
+  </ul>
+
+  <h3>synth / deploy</h3>
+
+  <ul>
+    <li>公式: <a href="https://docs.aws.amazon.com/cdk/v2/guide/configure-synth.html">Configure synth</a>, <a href="https://docs.aws.amazon.com/cdk/v2/guide/deploy.html">Deploy applications</a>, <a href="https://docs.aws.amazon.com/cdk/v2/guide/ref-cli-cmd-deploy.html">cdk deploy CLI ref</a></li>
+    <li>出力: cloud assembly (<code>cdk.out/</code> 配下、CFNテンプレート + assets + metadata)</li>
+    <li>deployment method:デフォルトChangeSet経由(<code>--method change-set</code>)、<code>--method direct</code> でスキップ可、<code>hotswap</code> モードあり</li>
+  </ul>
+
+  <h3>Token</h3>
+
+  <ul>
+    <li>公式<a href="https://docs.aws.amazon.com/cdk/v2/guide/tokens.html">Tokens</a></li>
+    <li><code>Token.asString()</code> / <code>Token.asNumber()</code> / <code>Token.asList()</code> で生成</li>
+    <li>内部にplaceholder文字列 <code>${Token[Bucket.Arn.0]}</code> を持ち、synth時にCFNテンプレートの <code>Fn::GetAtt</code>, <code>Fn::Join</code> 等に変換される</li>
+  </ul>
+
+  <h3>Best practices</h3>
+
+  <ul>
+    <li><a href="https://docs.aws.amazon.com/cdk/v2/guide/best-practices.html">Best practices</a> — 「Make decisions at synthesis time」。ホスト言語ループでのConstruct生成を推奨、配列/Map格納も推奨例。statefulリソースのlogical ID変更で置き換えが発生する旨の注意喚起あり</li>
+  </ul>
+
+  <h2 id="pulumi">Pulumi</h2>
+
+  <h3>URN</h3>
+
+  <ul>
+    <li>フォーマット: <code>urn:pulumi:&lt;Stack&gt;::&lt;Project&gt;::&lt;Qualified$Type$Name&gt;::&lt;Name&gt;</code> (<code>sdk/go/common/resource/urn/urn.go:38</code>)</li>
+    <li>区切り文字: <code>NameDelimiter = "::"</code>, <code>TypeDelimiter = "$"</code> (L54-55)</li>
+    <li>親type連結ロジック(L80-93):
+<pre><code>if parentType != "" &amp;&amp; parentType != tokens.RootStackType {
+    typ = string(parentType) + TypeDelimiter + typ
+}</code></pre>
+    </li>
+    <li>physical name生成(<code>pulumi-terraform-bridge/pkg/tfbridge/names.go:181-185</code>): "8 character random suffix ('-' + 7 random chars)"</li>
+    <li><code>aliases</code> で旧URNを保持: <strong><span class="todo">docsを要確認</span></strong></li>
+    <li>公式<a href="https://www.pulumi.com/docs/concepts/resources/names/">Names and URNs</a> — resourceオブジェクト参照を変数で渡すパターンを推奨。名前やparentの階層変更でURNが変わると別リソース扱いになる警告あり</li>
+  </ul>
+
+  <h3>実行モデル</h3>
+
+  <ul>
+    <li>公式: <a href="https://www.pulumi.com/docs/iac/concepts/how-pulumi-works/">How Pulumi Works</a>, <a href="https://github.com/pulumi/pulumi/blob/master/developer-docs/architecture/resource-registration.md">resource-registration.md</a></li>
+    <li>proto: <code>proto/pulumi/resource.proto</code> (<code>ResourceMonitor</code> サービス、<code>RegisterResource</code> RPC)、<code>proto/pulumi/provider.proto</code>、<code>proto/pulumi/language.proto</code>、<code>proto/pulumi/engine.proto</code></li>
+    <li>TS SDK: <code>sdk/nodejs/runtime/resource.ts</code> (<code>registerResource()</code>)、<code>sdk/nodejs/resource.ts</code> (Resourceクラス)</li>
+    <li>engine側: <code>pkg/resource/deploy/source_eval.go</code> (RegisterResource受信ループ)、<code>step_generator.go</code> (差分→step生成)、<code>deployment_executor.go</code> (step実行)</li>
+    <li>preview/up: <code>pkg/engine/preview.go</code>, <code>pkg/engine/update.go</code></li>
+    <li>Update Plans: <a href="https://www.pulumi.com/docs/iac/guides/basics/update-plans/">docs</a>, PR #8448</li>
+    <li>PCL: <a href="https://pulumi-developer-docs.readthedocs.io/latest/docs/architecture/converters.html">Converters docs</a></li>
+  </ul>
+
+  <h3>Output&lt;T&gt;</h3>
+
+  <ul>
+    <li>実装: <code>sdk/nodejs/output.ts:64-144</code> (<code>OutputImpl&lt;T&gt;</code> クラス、<code>OutputInstance&lt;T&gt;</code> interface)</li>
+    <li>型定義: <code>export type Output&lt;T&gt; = OutputInstance&lt;T&gt; &amp; Lifted&lt;T&gt;</code> (L1137)</li>
+    <li><code>then</code> 不在: Proxyで <code>if (prop === "then") return undefined</code> (L300-305)</li>
+    <li>内部状態: <code>isSecret: Promise&lt;boolean&gt;</code> (L84)、<code>isKnown: Promise&lt;boolean&gt;</code> (L96、preview時に未確定ならfalse)、<code>promise: () =&gt; Promise&lt;T&gt;</code> (L110)、<code>resources: () =&gt; Set&lt;Resource&gt;</code> (L124)、<code>allResources?: () =&gt; Promise&lt;Set&lt;Resource&gt;&gt;</code> (L144)</li>
+    <li><code>Input&lt;T&gt;</code>: <code>export type Input&lt;T&gt; = T | Promise&lt;T&gt; | OutputInstance&lt;T&gt;</code> (L935)</li>
+    <li>連鎖メソッド: <code>apply()</code> (L369), <code>pulumi.all()</code> (L771-792), <code>pulumi.interpolate</code> (L1248), <code>concat</code> (L1232)</li>
+    <li>preview時の挙動: <code>applyHelperAsync</code> で <code>if (!doApply) return { value: undefined, isKnown: false, ... }</code> (L499-507) — <code>func</code> を実行せず未知Outputを返す</li>
+    <li><code>toString</code> / <code>toJSON</code>: <code>OutputToStringError</code> を投げる(L22-53, L167, L190)</li>
+    <li>secret伝播: <code>applyHelperAsync</code> の戻り <code>liftInnerOutput(allResources, transformed, true, isSecret)</code> (L520)。<code>all</code> では <code>some(isSecret)</code> でOR集約(L854)</li>
+    <li>公式docs: <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/">inputs-outputs</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/apply/">applyページ</a>, <a href="https://www.pulumi.com/docs/iac/concepts/inputs-outputs/all/">allページ</a></li>
+  </ul>
+
+  <h2 id="terraform">Terraform</h2>
+
+  <h3>resource address</h3>
+
+  <ul>
+    <li><code>&lt;type&gt;.&lt;label&gt;</code> 形式(例: <code>aws_s3_bucket.foo</code>)</li>
+    <li>module内: <code>module.network.aws_s3_bucket.foo</code></li>
+    <li><code>for_each</code> 付き: <code>aws_s3_bucket.foo["key"]</code></li>
+    <li><code>count</code> 付き: <code>aws_s3_bucket.foo[0]</code></li>
+    <li><code>moved</code> ブロック(1.1+):
+<pre><code>moved {
+  from = aws_s3_bucket.old
+  to   = aws_s3_bucket.new
+}</code></pre>
+    </li>
+  </ul>
+
+  <h3>plan / state / 型</h3>
+
+  <ul>
+    <li>tfplan binaryは不可侵だが <code>terraform show -json</code> でJSON出力可、<code>terraform-json</code> Goライブラリで型付き読み取り可。内部加工する標準手段はない</li>
+    <li><code>terraform test</code> でアサーション、OPA/Sentinel/conftestでポリシー検査エコシステムが成立</li>
+    <li>backend設計: <a href="https://developer.hashicorp.com/terraform/language/backend">Terraform backends</a></li>
+    <li>state操作: <a href="https://developer.hashicorp.com/terraform/cli/commands/state"><code>terraform state</code> CLI</a></li>
+    <li>refinements (1.6+): 「unknownだがnonnull」「unknownだが長さ既知」「unknownだがprefix既知」等の部分情報を保持。cty.Valueのunknownフラグの拡張</li>
+    <li>module: <code>module.&lt;MODULE NAME&gt;</code> はmoduleブロックの結果を表す値(<a href="https://developer.hashicorp.com/terraform/language/expressions/references">expressions/references</a>)。<code>source</code> はリテラル文字列のみ(<a href="https://developer.hashicorp.com/terraform/language/block/module">block/module</a>)。OpenTofu 1.8+ のearly evaluationでもstaticにしか解決できない</li>
+  </ul>
+
+  <h2 id="carina">Carina</h2>
+
+  <h3>identity</h3>
+
+  <ul>
+    <li>named binding: <code>let foo = ...</code> で <code>id.name = "foo"</code> (ハッシュなし)</li>
+    <li>anonymous resource: <code>aws.s3.Bucket { name = "foo" }</code> (letなし)
+      <ul>
+        <li>parse時: <code>id.name = ""</code> (empty)</li>
+        <li>後処理 <code>compute_anonymous_identifiers</code> でcreate-only attributesから <strong>standard hash (u32, 8 hex)</strong> を計算</li>
+        <li>create-only attrsがない場合は <strong>SimHash (u64, 16 hex)</strong> にフォールバック</li>
+        <li>出典: <code>carina-core/src/identifier/mod.rs:380-468</code></li>
+      </ul>
+    </li>
+    <li>anonymous module call: <code>thing { name = 'alpha' }</code>
+      <ul>
+        <li><code>instance_prefix = thing_&lt;16hex SimHash&gt;</code></li>
+        <li>SimHashはmodule_name + flattened argumentsから決定(content-based)</li>
+        <li>Hamming distance対応で小さい引数変更時もstate内のリソースを追跡可能</li>
+        <li>出典: <code>carina-core/src/module_resolver/mod.rs:577-591</code></li>
+      </ul>
+    </li>
+    <li><code>name</code> 属性とstate identifierは<strong>独立</strong> (<code>carina-core/src/parser/mod.rs:5395-5404</code>)</li>
+  </ul>
+
+  <h3>plan / effect / state</h3>
+
+  <ul>
+    <li><code>Plan&lt;Effect&gt;</code>: <code>carina-core/src/plan.rs</code> (Plan構造体、Effects集合)</li>
+    <li><code>add_state_block_effects</code>: <code>wiring.rs</code> でplan生成後にstate blocks反映</li>
+    <li>Effect: <code>carina-core/src/effect.rs</code> (Create/Update/Delete/Read enum)</li>
+    <li>state v3: <code>carina-state</code> crate。binding/dependency_bindingsの意味、state CLI、手動編集機構は<strong><span class="todo">要確認</span></strong></li>
+  </ul>
+
+  <h3>型とunknown</h3>
+
+  <ul>
+    <li><code>Value</code> enum: <code>String, Int, Float, Bool, List, Map, ResourceRef { path }, Interpolation(parts), FunctionCall { name, args }, Secret, Closure</code> (<code>carina-core/src/resource.rs:173-216</code>)。<code>Value::Unknown</code> バリアントは存在しない</li>
+    <li>resolver (<code>carina-core/src/resolver.rs</code>)の挙動: <code>ResourceRef</code> はstateから解決できれば具体値に置換しできなければRefのまま、<code>Interpolation</code> は全パーツ解決でStringに連結し未解決なら <code>Interpolation</code> のまま、<code>FunctionCall</code> は全引数解決で即評価し未解決なら <code>FunctionCall</code> のまま(部分評価)</li>
+    <li><code>for</code> 式が未解決なiterableを持つ場合: <code>DeferredForExpression</code> として <code>deferred_for_expressions</code> に退避(<code>carina-core/src/parser/mod.rs:531</code>)</li>
+    <li><code>expand_deferred_for_expressions()</code> でupstream_state (他プロジェクトのstate)から解決できれば展開、できなければdeferredのままplan表示に回される(<code>carina-cli/src/display.rs:248-251</code>)</li>
+    <li><code>AttributeType</code>: <code>Union { members }</code> (sum type)、<code>StringEnum { values, namespace }</code>、<code>Custom { base, validate, pattern, length, semantic_name, namespace }</code> (nominal refinement type)、<code>Struct { name, fields }</code></li>
+  </ul>
+
+  <h3>DSL構文の制約</h3>
+
+  <ul>
+    <li><code>source</code> フィールドはリテラル文字列のみ: parserで <code>Value::String</code> 以外を弾く(<code>carina-core/src/parser/mod.rs:1664-1669</code>)</li>
+  </ul>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-参照">#参照</a>
+    <a href="/notes/#tag-ポインタ">#ポインタ</a>
+  </p>
+</article>
+</body>
+</html>

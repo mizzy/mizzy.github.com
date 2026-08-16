@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>論理IDと物理リソース名は別物だが漏れる - notes</title>
+<meta name="description" content="論理ID / URN / binding名はstate/IR内部の識別子であり、AWS上の物理リソース名とは別物である。ただしリソース名を省略したときに内部識別子が物理名へ漏れる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>論理IDと物理リソース名は別物だが漏れる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-5-identity-and-refactoring-stability.md物理リソース名との関係</code>
+  </p>
+
+  <p>論理ID / URN / binding名は<strong>state/IR内部の識別子</strong>であり、AWS上の物理リソース名(S3 bucket名、IAM Role名等)とは別物である。ただし完全に独立しているわけではなく、<strong>リソース名を省略したときに内部識別子が物理名へ漏れる</strong>。</p>
+
+  <ul>
+    <li><strong>リソース名を明示指定</strong>すれば(CDKの<code>bucketName</code>、Carinaの<code>name</code>属性等)、物理名は完全に制御でき、論理ID / URNとは独立する</li>
+    <li><strong>リソース名を省略</strong>すると、CFNは<code>&lt;stack&gt;-&lt;logicalId&gt;-&lt;random&gt;</code>形式(例: <code>mystack-mybucketf68f3ff0-abc123xyz</code>)で自動生成する。<strong>論理IDが物理名にサフィックスとして埋め込まれる</strong></li>
+  </ul>
+
+  <p>CDKとPulumiのデフォルト命名を比べると差がはっきりする。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>観点</th><th>CDK</th><th>Pulumi (デフォルト)</th></tr></thead>
+      <tbody>
+        <tr><td>形式</td><td><code>&lt;stack&gt;-&lt;logicalId&gt;-&lt;random&gt;</code></td><td><code>&lt;logicalName&gt;-&lt;7hex&gt;</code> (terraform-bridgeベース)</td></tr>
+        <tr><td>例(<code>new ... ("mybucket")</code>)</td><td><code>mystack-mybucketf68f3ff0-abc123xyz</code></td><td><code>mybucket-d7c2fa0</code></td></tr>
+        <tr><td>stack名を含む</td><td>はい</td><td>いいえ</td></tr>
+        <tr><td>論理IDのhashを含む</td><td>はい(<code>MyBucketF68F3FF0</code>)</td><td>いいえ(logical nameそのまま)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Pulumiの方がCDKよりユーザフレンドリーである。</p>
+
+  <h2>長さ制限による切り詰め(CDK特有)</h2>
+
+  <p>AWSリソース名には長さ制限がある — S3が63文字、IAM Roleが64文字、Lambda Functionが64文字、そしてALB Target Groupは<strong>32文字</strong>。<code>MyAppProductionStack-MyServiceTargetGroupF68F3FF0</code>は51文字で、ALB TGの32文字制限にかかると<code>MyAppProductionStaMyServ-XXXXXXXX</code>のように真ん中が削られる。元の意味のある部分が削られて識別がより困難になる。</p>
+
+  <h2>運用面の弊害</h2>
+
+  <ul>
+    <li><strong>認知負荷</strong>:一覧で何のbucketか分からない</li>
+    <li><strong>コミュニケーション摩擦</strong>:ハッシュ付き名前を口頭やIssueで共有しにくい</li>
+    <li><strong>ドキュメント乖離</strong>:設計時の名前と運用時の名前のズレ</li>
+    <li><strong>クロスサービス連携の不便</strong>: IAMポリシーで正確な名前が必要になる</li>
+    <li><strong>URL/ドメインの見栄え</strong>: S3 website / CloudFront originではURLに直接出る</li>
+  </ul>
+
+  <p>なおCarinaでは<code>name</code>属性とstate identifierは<strong>独立</strong>しており、CDK / Pulumiの自動名生成とは異なる設計になっている。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-identity">#identity</a>
+    <a href="/notes/#tag-命名">#命名</a>
+    <a href="/notes/#tag-運用">#運用</a>
+  </p>
+</article>
+</body>
+</html>

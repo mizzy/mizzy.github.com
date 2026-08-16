@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>差分計算は命令選択である - notes</title>
+<meta name="description" content="IaCの差分エンジンがやっていることは、コンパイラの命令選択(instruction selection)の変種として読める。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>差分計算は命令選択である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §3</code>
+  </p>
+
+  <p>IaCの差分エンジンがやっていることは、コンパイラの<strong>命令選択(instruction selection)の変種</strong>として読める。ターゲットの命令セットが固定されていて、ユーザーはその命令をどれも書かず、エンジンが自動的に選ぶ、という構造が同じだからである。</p>
+
+  <p>Carinaのターゲット命令セットはCreate / Update / Replace / Delete / Import / Remove / Move / Waitの8命令である。ユーザーはこのどれも書かない。差分エンジンが、desiredのノードとstateのノードを突き合わせ、各ノードに対して適切な命令を選択する。</p>
+
+  <p>命令選択として読むと、複合的な変更の扱いも位置づけがつく。Replaceがcascading updateや一時名を伴うのは、<strong>単一の論理的変更が複数命令の定型列に展開される、複合命令のlowering</strong>に相当する。コンパイラで一つの高水準演算が複数のマシン命令の定型パターンに落ちるのと同じ構図である。</p>
+
+  <p>普通の命令選択との違いは入力にある。コンパイラの命令選択はIRだけを見て命令を選ぶが、差分計算はdesired(ソース由来)とstate(世界由来)の二つを突き合わせて選ぶ。命令選択が二引数であることは、IaCのコンパイルが本質的に増分であることの現れである。</p>
+
+  <p>出力側の性質も命令選択に対応する。選ばれた命令の列は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。つまり命令選択の成果物は「効果の自由モノイド(列)」であって、その先に継続が隠れていない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-コンパイラ">#コンパイラ</a>
+    <a href="/notes/#tag-差分">#差分</a>
+  </p>
+</article>
+</body>
+</html>

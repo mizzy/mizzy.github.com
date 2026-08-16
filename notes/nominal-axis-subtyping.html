@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>公称軸ごとの幅部分型付けが再利用と混同防止を両立する - notes</title>
+<meta name="description" content="列挙やカスタム文字列型にはTypeIdentityという公称的な識別が付く。注目すべきはその等価性・代入可能性の定義で、単純な全フィールド一致ではない。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>公称軸ごとの幅部分型付けが再利用と混同防止を両立する</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §5</code>
+  </p>
+
+  <p>列挙やカスタム文字列型には<code>TypeIdentity { provider, segments, kind }</code>という公称的な識別が付く(providerは省略可能)。注目すべきはその等価性・代入可能性の定義で、<strong>単純な全フィールド一致ではない</strong>。</p>
+
+  <ul>
+    <li><strong>等価性(<code>same_type</code>)は「両者が値を持っている軸だけ」を比較する。</strong> provider無指定の型は、provider軸について「より広い型」として振る舞う。</li>
+    <li><strong>代入可能性(<code>assignable_to</code>)は方向付き</strong>で、受け側が特定している軸は送り側も一致しなければならないが、受け側が特定していない軸は問わない。</li>
+  </ul>
+
+  <p>これは公称型に<strong>幅部分型付け(width subtyping)を一軸ずつ載せた構造</strong>である。<code>aws.iam.Role.Arn &lt;: Arn</code>(provider非依存のArn)のような包摂が成り立ち、provider無指定のbare identityは実質的にそのkindの上限(top)として機能する。</p>
+
+  <h2>二つの要求を一つの機構で</h2>
+
+  <p>一方で<code>aws.Region</code>と<code>gcp.Region</code>のように両軸が特定されていれば別型であり、provider越しの混同は型として弾かれる。</p>
+
+  <p>「公称的な核(kind)+ 省略可能な公称軸による包摂」というこの設計は、<strong>完全公称型と完全構造型の中間</strong>にある。完全公称型なら<code>aws.iam.Role.Arn</code>と汎用<code>Arn</code>は無関係な別型になり、共通のArn型を書けない。完全構造型ならどちらも単なる文字列になり、<code>aws.Region</code>と<code>gcp.Region</code>の混同を弾けない。軸ごとの部分型付けは、マルチプロバイダ環境での<strong>型再利用</strong>と<strong>プロバイダ間の混同防止</strong>を一つの機構で両立させている。</p>
+
+  <h2>表記と正規形</h2>
+
+  <p>DSL上の列挙値の表記(<code>aws.s3.Bucket.VersioningStatus.enabled</code>のような名前空間付き識別子)は、この公称識別への構文的な参照であり、静的段階で「identity + プロバイダAPI値」という正規形へ解決される。比較・直列化は解決済みの形でのみ行われる。</p>
+
+  <p>この公称軸の包摂は、値が未解決の参照に対する宣言型検査でも使われる。値なしでも<code>role_arn = role.role_name</code>のような型違いを弾けるのは、この方向付きの代入可能性判定があるからである。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/ownership-proves-you-need-not-read.html">排他所有が証明できれば読まなくてよい</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/type-checking-reduces-to-nodes-and-edges.html">検査対象はノード上の値とエッジ両端の型の二種に還元できる</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+    <a href="/notes/#tag-公称型">#公称型</a>
+  </p>
+</article>
+</body>
+</html>

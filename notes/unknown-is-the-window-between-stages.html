@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unknownは二段階の間に開いた窓である - notes</title>
+<meta name="description" content="静的段階では値が決まらないものがある。CarinaはこれをValue::Unknown(理由)として値の一級表現にしている。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Unknownは二段階の間に開いた窓である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §6</code>
+  </p>
+
+  <p>静的段階では値が決まらないものがある。上流スタックのapply結果への参照、まだ作られていないリソースの属性、for展開の変数などで、Terraformの「(known after apply)」に相当する。Carinaはこれを<code>Value::Unknown(理由)</code>として<strong>値の一級表現</strong>にしている。</p>
+
+  <p>型理論的に見ると、これは二つの段階の間に開いた窓の扱いの問題である。planは動的段階の挙動の静的近似であり、Unknownはその近似で確定できなかった箇所を明示する装置と言える。窓が開くこと自体は二段階言語の構造から必然で、問うべきは「窓をどう扱うか」の意味論である。</p>
+
+  <p>Carinaの扱いは二点に整理できる。</p>
+
+  <ol>
+    <li><strong>値の所属検査はUnknownを素通しする。</strong> 「動的段階で解決されるはずの値」に偽の型エラーを出さない楽観的な扱いである。</li>
+    <li><strong>等価性においてUnknownは何とも等しくない。</strong> 差分計算は「不明な値は変化したとみなす」方向に倒れる。</li>
+  </ol>
+
+  <p>この二点の組み合わせは「偽の型エラーを出さず、怪しい差分は出す」方向に揃っており、インフラツールとして健全側に倒れている。</p>
+
+  <h2>Unknownは⊥ではない</h2>
+
+  <p>Unknownが単なる⊥(情報なしの底値)ではなく、<strong>理由を持ち運ぶ</strong>点は実務的に優れている。上流参照、for変数、編集途中の補間など7種の理由が区別されており、近似が確定できなかった箇所の診断品質を支えている。「値が不明である」だけを伝える表現なら、なぜ不明なのか・いつ確定するのかをユーザーに示せない。理由付きのUnknownは、静的近似の失敗を診断可能な形で持ち運ぶ設計である。</p>
+
+  <p>この設計は、未知値をホスト言語の<code>string</code>に偽装するCDKのTokenや、型付きコンテナに包むPulumiの<code>Output&lt;T&gt;</code>とは別の位置にある。未知値をどう扱うかが言語の意味論として固定されている、という点が要である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-unknown">#unknown</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-段階分離">#段階分離</a>
+  </p>
+</article>
+</body>
+</html>

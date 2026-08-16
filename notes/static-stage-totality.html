@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>静的段階の全域性は構文制限だけでは得られない - notes</title>
+<meta name="description" content="「静的段階の評価が必ず停止する」という性質は、構文制限と参照グラフの非循環性強制という二本の柱で初めて成り立つ。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>静的段階の全域性は構文制限だけでは得られない</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §1 / totality-comparison.md §1</code>
+  </p>
+
+  <p>「静的段階の評価が必ず停止する」という性質は、一般再帰を禁じてループを有限に限るだけでは出てこない。<strong>構文制限と参照グラフの非循環性強制という二本の柱</strong>で初めて成り立つ。</p>
+
+  <p>一本目の柱は構文制限である。CarinaのDSLに一般再帰はなく、forは有限コレクション上の展開しかできない。ここまでは言語仕様を小さく保てば得られる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 180" role="img" aria-label="全域性は構文制限と参照グラフの非循環性強制という二本の柱で支えられ、それぞれ一般再帰と値の流れの循環という別の発散源を塞いでいることを示す図">
+      <style>
+        .pil text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .pil .box { fill: var(--surface); stroke: var(--rule); }
+        .pil .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .pil .ttl { font-size: 13px; font-weight: 600; }
+        .pil .dim { fill: var(--faint); font-size: 11px; }
+        .pil .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="pil">
+        <rect class="hi" x="200" y="8" width="240" height="34" rx="4"/>
+        <text class="ttl" x="320" y="30" text-anchor="middle">静的段階の全域性(必ず停止する)</text>
+
+        <rect class="box" x="30" y="86" width="260" height="76" rx="4"/>
+        <text class="ttl" x="46" y="108">柱1 — 構文制限</text>
+        <text x="46" y="128">一般再帰なし / forは有限展開のみ</text>
+        <text class="dim" x="46" y="148">言語仕様を小さく保てば得られる</text>
+
+        <rect class="box" x="350" y="86" width="260" height="76" rx="4"/>
+        <text class="ttl" x="366" y="108">柱2 — 参照グラフの非循環性強制</text>
+        <text x="366" y="128">値の流れの循環を塞ぐ</text>
+        <text class="dim" x="366" y="148">構文では塞げないもう一つの発散源</text>
+
+        <path class="arw" d="M160 86 L 240 42"/>
+        <path class="arw" d="M480 86 L 400 42"/>
+      </g>
+    </svg>
+    <figcaption>構文制限だけでは停止しない。値の流れというグラフ上の制約が必ずもう一本要る。</figcaption>
+  </figure>
+
+  <p>しかし構文制限だけでは停止は出ない。<strong>値の流れの循環</strong>という、構文では塞げないもう一つの発散源があるからである。相互に参照し合う束縛やリソースがそれで、二本目の柱である参照グラフの非循環性強制で塞ぐ。具体的には:</p>
+
+  <ul>
+    <li>循環するlet束縛はfixed-point評価の前に静的に拒否される(<code>Cyclic let binding detected</code>)。letのfixed-point自体にも束縛数+1の反復上限がある。</li>
+    <li>リソース間の参照については、評価器がそもそも式を収束まで反復しない。静的段階で解決できない参照はdeferredのまま残り、動的段階が依存グラフの位相順で解決する。その上でグラフの循環は明示エラーで拒否される(<code>Circular dependency detected: a -&gt; b -&gt; a</code>)。「自分の出力に依存するリソースへの参照」は、このDAG強制が遮断する形になっている。</li>
+  </ul>
+
+  <p>全域性に加えて、評価結果がソースとstateだけの関数であるという<strong>純粋性</strong>も同時に立っている。この二つが言語の性質として成り立っているために、「プログラムを完全評価してから、出てきた値を全数検査する」が完全な決定手続きになる。</p>
+
+  <p>つまり全域性は言語を制限することでしか得られず、その制限は構文の形をしたものだけではない。値の流れというグラフ上の制約が必ず要る。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/plan-as-a-standing-query.html">純粋性はplanを常駐クエリに変える前提条件である</a></li>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/totality-value-depends-on-what-it-gates.html">全域性の価値は「何をゲートするか」で決まる</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-全域性">#全域性</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+  </p>
+</article>
+</body>
+</html>

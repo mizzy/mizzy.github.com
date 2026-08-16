@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる - notes</title>
+<meta name="description" content="「動的段階では、コードに書いたこと以外の副作用が発生しない」という性質を動的段階の効果の閉包性と呼ぶと、これは二つの独立した命題に分解できる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §4末尾</code>
+  </p>
+
+  <p>「動的段階では、コードに書いたこと以外の副作用が発生しない」という性質を<strong>動的段階の効果の閉包性</strong>と呼ぶと、これは二つの独立した命題に分解できる。</p>
+
+  <ul>
+    <li><strong>P1(完全性)</strong>:動的段階で起きる効果はすべて実行前の成果物に列挙されている。エンジンが勝手に足さず、ユーザーコードが途中で混ざらない。</li>
+    <li><strong>P2(帰属性)</strong>:成果物の各効果はユーザーが書いたコードに遡れる。ライブラリが黙って注入しない。</li>
+  </ul>
+
+  <p>モノイド性が「成果物に継続が残らない」という静的側の性質だとすれば、<strong>閉包性はその実行時側の対偶</strong>である。</p>
+
+  <h2>Carinaは両方を構造的に満たす</h2>
+
+  <p>applyが実行するのはplanに列挙されたEffectだけで、apply中にユーザーコードが走る仕組み(フック、プロビジョナ、コールバック)はない。失敗時の自動ロールバックもなく、途中失敗は中途状態で止まるだけで、誰も書いていない削除をエンジンが自律的に実行することはない。モジュールやforは展開結果がそのままplanに見える糖衣で、書いていないリソースを注入する層がない。</p>
+
+  <p>ただし条件が二つある。第一に、性質が成り立つのは<strong>Effectの粒度</strong>である。1効果の実装としてプロバイダは複数のAPI呼び出しを行い、クラウド側が付随リソースを暗黙に作ることもある。第二に、<strong>プロバイダは効果を忠実に実装すると信頼されたコード</strong>である。ただしWASMサンドボックス内で動きI/Oがホスト経由なので、この信頼を機構で縛る余地が構造的にある。</p>
+
+  <h2>CDKとPulumiの破れ方は違う</h2>
+
+  <p><strong>CDKはP1にもP2にも破れがある。</strong>CloudFormationは失敗時に自動ロールバックする — 作ったものを勝手に消すという、誰も書いていない効果をエンジンが自律的に実行する。カスタムリソース(Lambda-backed)はデプロイ中に任意コードを走らせ、その副作用はテンプレートから不透明である。そしてP2の破れは日常的で、constructライブラリは利用者が書いていないリソース(補助Lambda、IAMロール)をスタックに注入する。成果物には載るので「テンプレートに対する完全性」は保たれるが、「コードに書いたこと」への帰属は薄れる。</p>
+
+  <p><strong>PulumiはP1が言語構造として成立しない。</strong><code>Output.apply</code>のコールバックとdynamic providerはデプロイ中に任意のユーザーコードを実行し、そのコードはリソースとして表現されない副作用を自由に持てて、previewには現れない。行儀よく書けば満たせるが、言語は保証しない — モナド的という構造の帰結である。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>P1:効果は成果物に閉じる</th><th>P2:効果はユーザーコードに遡れる</th></tr></thead>
+      <tbody>
+        <tr><td>Carina</td><td>成り立つ(Effect粒度、プロバイダを信頼の根として)</td><td>成り立つ</td></tr>
+        <tr><td>CDK</td><td>破れ(自動ロールバック、カスタムリソース)</td><td>破れ(constructの暗黙注入)</td></tr>
+        <tr><td>Pulumi</td><td>構造的に不成立(デプロイ中の任意コード)</td><td>CDKと同様の注入あり</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>P1とP2に分けることの利点は、破れ方の質が区別できる点にある。P1の破れは「見えない効果が起きる」、P2の破れは「見える効果の出所が辿れない」であり、前者はレビューを無効化し、後者はレビューを重くする。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-効果">#効果</a>
+    <a href="/notes/#tag-比較">#比較</a>
+    <a href="/notes/#tag-安全性">#安全性</a>
+  </p>
+</article>
+</body>
+</html>

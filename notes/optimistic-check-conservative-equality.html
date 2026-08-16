@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>検査は素通し、等価性は不成立 — Unknownの一貫した保守性 - notes</title>
+<meta name="description" content="Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、どちらも「インフラを壊さない側」に倒すという一つの原則の現れである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>検査は素通し、等価性は不成立 — Unknownの一貫した保守性</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §6 (1)(2)</code>
+  </p>
+
+  <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、<strong>どちらも「インフラを壊さない側」に倒す</strong>という一つの原則の現れである。</p>
+
+  <h2>(1)所属検査は素通しする</h2>
+
+  <p>値の所属検査はUnknownを素通しする。「動的段階で解決されるはずの値」に偽の型エラーを出さない楽観的な扱いで、漸進的型付け(gradual typing)における動的型<code>?</code>と既知型の整合(consistency)関係と同型の判断である。ただしCarinaの場合これは検査を実行時へ先送りするのではなく、<strong>静的近似の精度限界を受け入れる</strong>という意味を持つ。gradual typingが実行時キャストで埋め合わせるところを、Carinaは埋め合わせない。</p>
+
+  <p>素通しの粒度も重要である。素通しはUnknownが現れた<strong>葉の位置単位</strong>であり、リストは具体値と未解決値の混在が許されて要素ごとに個別に判定される。したがって兄弟要素の所属検査やコンテナの形状・必須フィールドの検査は通常どおり走る。実装上は、検証器の最上位で値を具体軸へ射影し、射影できない値だけを受理する一点に、この素通しの判断が集約されている。</p>
+
+  <h2>(2)等価性は成立しない</h2>
+
+  <p>等価性においてUnknownは何とも等しくない。差分計算は「不明な値は変化したとみなす」方向に倒れるため、<strong>健全(変化の見逃しを出さない)だが完全ではない</strong>(実際には変化しない差分を表示しうる)。三値論理の「不明」を二値の判定に埋め込む際の保守的な選択である。</p>
+
+  <h2>二つを合わせた意味</h2>
+
+  <p>検査は素通し、等価性は不成立という組み合わせは、「偽の型エラーを出さず、怪しい差分は出す」方向に揃っている。偽陽性の型エラーはユーザーが正しいコードを書けなくする一方、余分な差分表示はレビューで捨てられる。コストの非対称に合わせて楽観と悲観を使い分けた結果が、Unknownの一貫した保守性である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-unknown">#unknown</a>
+    <a href="/notes/#tag-健全性">#健全性</a>
+    <a href="/notes/#tag-差分">#差分</a>
+  </p>
+</article>
+</body>
+</html>

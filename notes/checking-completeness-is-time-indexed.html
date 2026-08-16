@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「全数検査」は検証ステップの時点で確定している値に限られる - notes</title>
+<meta name="description" content="値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「全数検査」は検証ステップの時点で確定している値に限られる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §8弱み6, §6(a)</code>
+  </p>
+
+  <p>値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。<strong>検査されるのは、検証ステップの時点で値が確定しているものだけ</strong>である。</p>
+
+  <p>「静的段階で確定する値」ではない。静的段階の内部でも、検証ステップより後に代入される値がある。</p>
+
+  <h2>代入の時刻は二通りある</h2>
+
+  <p>段階を跨ぐ値の篩所属は、最終的に誰も検査しない。検証はplanの早い段階で一度だけ走り、そのあとに二種類の代入が起きる。</p>
+
+  <ul>
+    <li><strong>上流stateの値</strong>は、plan時に代入される。ただし検証ステップの<strong>後</strong>である。</li>
+    <li><strong>リソース出力</strong>は、apply時に代入される。</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 640 170" role="img" aria-label="検証ステップが最初に一度だけ走り、その後に上流state値のplan時代入とリソース出力のapply時代入が続くが、どちらの代入点にも検証経路がないことを示す時間軸の図">
+      <style>
+        .tl text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .tl .ttl { font-size: 13px; font-weight: 600; }
+        .tl .dim { fill: var(--faint); font-size: 11px; }
+        .tl .axis { stroke: var(--rule); fill: none; }
+        .tl .dot { fill: var(--surface); stroke: var(--rule); }
+        .tl .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .tl .tick { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="tl">
+        <path class="axis" d="M20 96 H 620"/>
+        <text class="dim" x="596" y="118">時刻</text>
+
+        <circle class="hi" cx="96" cy="96" r="9"/>
+        <path class="tick" d="M96 87 V 62"/>
+        <text class="ttl" x="96" y="52" text-anchor="middle">検証ステップ</text>
+        <text class="dim" x="96" y="36" text-anchor="middle">ここで一度だけ走る</text>
+
+        <circle class="dot" cx="316" cy="96" r="9"/>
+        <path class="tick" d="M316 105 V 128"/>
+        <text class="ttl" x="316" y="146" text-anchor="middle">上流stateの値の代入</text>
+        <text class="dim" x="316" y="162" text-anchor="middle">plan時 — 検証の後</text>
+
+        <circle class="dot" cx="536" cy="96" r="9"/>
+        <path class="tick" d="M536 105 V 128"/>
+        <text class="ttl" x="536" y="146" text-anchor="middle">リソース出力の代入</text>
+        <text class="dim" x="536" y="162" text-anchor="middle">apply時</text>
+
+        <text class="dim" x="426" y="52" text-anchor="middle">この二点には検証経路がない</text>
+        <path class="tick" d="M316 62 H 536"/>
+        <path class="tick" d="M316 62 V 87"/>
+        <path class="tick" d="M536 62 V 87"/>
+      </g>
+    </svg>
+    <figcaption>検証は最初の一点にしかなく、その後に起きる二種類の代入は検査器の視界に入らない。必要なのは、検査を一回のステップではなく値が到着した各時点に置くことである。</figcaption>
+  </figure>
+
+  <p>どちらの代入点にも検証経路がなく、代入された値は検査器の視界に入らない。参照の宣言型検査が粗い型を通した場合(例えば宣言上はただのStringを、長さ・パターン付きの型が期待される場所へ渡した場合)、代入で解決された値が篩を満たすかを確かめる経路が存在しない。違反値はplanの表示に現れてさえ検査されず、<strong>最終判定はプロバイダAPIのエラーに委ねられる</strong>(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)。</p>
+
+  <h2>なぜこの限定が重要か</h2>
+
+  <p>値ベース検査の全域性は「値が手に入るなら検査できる」を保証するが、「検査の時点で値が手に入っている」ことは保証しない。この二つを混同すると、値ベース検査を採用しただけで全数検査が達成されたと読んでしまう。</p>
+
+  <p>実際に必要なのは、検査を一回のステップではなく<strong>値が到着した各時点に置く</strong>ことである。篩の述語は値依存であり、値は代入されて初めて生まれるのだから、値が到着した時点で述語を走らせる以外にない。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>「全数」性の限定は探索中に二度精密化された。当初の「静的段階で確定する値」という言い方では、検証ステップより後にplan時代入される上流state値を取りこぼす。正しくは「検証ステップの時点で確定している値」である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-検査">#検査</a>
+    <a href="/notes/#tag-バグクラス">#バグクラス</a>
+  </p>
+</article>
+</body>
+</html>

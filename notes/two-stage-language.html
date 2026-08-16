@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IaC言語は二段階の言語である - notes</title>
+<meta name="description" content="Carinaのようなインフラ記述言語は、静的段階(validate/plan)と動的段階(apply)という二つの段階を持つ言語として読むのが正確である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>IaC言語は二段階の言語である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §1 / totality-comparison.md §1</code>
+  </p>
+
+  <p>Carinaのようなインフラ記述言語は「実行時に型を検査する動的型付き言語」ではないし、古典的な静的型付き言語でもない。<strong>静的段階と動的段階という二つの段階を持つ言語</strong>として読むのが正確である。</p>
+
+  <p>この読みの起点は「何を実行と呼ぶか」の定義にある。Carinaプログラムの実行とは、apply段階でEffectが実際のインフラに作用することである。validateとplanはそれに先立つ段階であり、そこで行われるのは式の評価(let束縛、補間、for展開)、スキーマ型に対する検査、そして実行すべき操作(Create / Update / DeleteなどのEffect)のリスト、つまりplanの生成である。型エラーはどの操作も実行される前に報告される。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 190" role="img" aria-label="静的段階(validate/plan)で評価・型検査・plan生成を終え、planを境界として動的段階(apply)が効果を実行する図">
+      <style>
+        .stage text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .stage .box { fill: var(--surface); stroke: var(--rule); }
+        .stage .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .stage .ttl { font-size: 13px; font-weight: 600; }
+        .stage .dim { fill: var(--faint); font-size: 11px; }
+        .stage .arw { stroke: var(--faint); fill: none; }
+        .stage .cut { stroke: var(--accent); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+      </style>
+      <g class="stage">
+        <rect class="box" x="8" y="30" width="250" height="86" rx="4"/>
+        <text class="ttl" x="24" y="52">静的段階 — validate / plan</text>
+        <text x="24" y="74">評価・型検査・planの生成</text>
+        <text class="dim" x="24" y="94">外界には一切触れない</text>
+        <text class="dim" x="24" y="109">エラーはここで報告される</text>
+
+        <rect class="hi" x="290" y="55" width="70" height="36" rx="4"/>
+        <text class="ttl" x="325" y="78" text-anchor="middle">plan</text>
+        <text class="dim" x="325" y="112" text-anchor="middle">検査と実行の境界</text>
+
+        <rect class="box" x="392" y="30" width="240" height="86" rx="4"/>
+        <text class="ttl" x="408" y="52">動的段階 — apply</text>
+        <text x="408" y="74">効果の実行(外界への作用)</text>
+        <text class="dim" x="408" y="94">ここで初めてインフラが変わる</text>
+
+        <path class="arw" d="M258 73 H 286"/>
+        <path class="arw" d="M360 73 H 388"/>
+        <path class="cut" d="M325 20 V 145"/>
+        <text class="dim" x="334" y="160">この線の左で検査が完結する</text>
+      </g>
+    </svg>
+    <figcaption>段階の分離が効くのは、検査が実行に先立って完結するからである。静的段階の成果物であるplanが、検査と実行の境界そのものになっている。</figcaption>
+  </figure>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>段階</th><th>行われること</th><th>型理論上の対応</th></tr></thead>
+      <tbody>
+        <tr><td>静的段階(validate / plan)</td><td>評価・型検査・plan(実行する操作のリスト)の生成</td><td>型検査しながらの中間表現へのコンパイル</td></tr>
+        <tr><td>動的段階(apply)</td><td>効果の実行(外界への作用)</td><td>実行</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>段階の分離が効いているのは、検査が実行に先立って<strong>完結する</strong>からである。静的段階の成果物であるplanが、検査と実行の境界そのものになっている。エラーは外界に一切触れる前に報告される。</p>
+
+  <p>この二段階構成が可能なのは静的段階が全域的であるためで、検査の対象が原則として項(構文)ではなく評価済みの値になっているのもそれが理由である。プログラムを完全評価してから値をスキーマ型と照合する、という構成が成り立つ。したがって型付けの様式は、型推論を持つ項ベースの型システムというより、plan生成というコンパイルの最中に全数実行される契約検査(contract checking)に近い。</p>
+
+  <p>段階の分離は「どこに窓が開くか」も決める。静的段階では値が決まらないもの(上流スタックのapply結果への参照、まだ作られていないリソースの属性)が必ず残り、それが二つの段階の間に開いた窓になる。planは動的段階の挙動の静的近似であり、近似で確定できなかった箇所を明示する装置が要る。</p>
+
+  <p>なおLSP診断は、この静的段階の検査をエディタ上で前倒しに実行するもう一つの実装であり、検査の意味論としてはvalidateと同一であること(パリティ)が要求されている。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>二段階言語という読みそのものは分析上の枠組みであり、実装がそう自称しているわけではない。段階ごとに何が起きるか(評価・検査・plan生成の順序、applyでの効果実行)はソース・実行で確認済み。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である（意味論的型付け）</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/totality-value-depends-on-what-it-gates.html">全域性の価値は「何をゲートするか」で決まる</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-段階分離">#段階分離</a>
+  </p>
+</article>
+</body>
+</html>

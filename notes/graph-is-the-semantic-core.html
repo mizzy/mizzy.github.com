@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IaC言語の意味的本体はリソース定義と依存グラフだけである - notes</title>
+<meta name="description" content="IaC言語の意味的本体は、リソースの定義と、その依存関係グラフである。それ以外のすべての言語機能は、あれば便利という程度のものにすぎない。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>IaC言語の意味的本体はリソース定義と依存グラフだけである</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/design-position.md §1</code>
+  </p>
+
+  <p><strong>IaC言語の意味的本体は、リソースの定義と、その依存関係グラフである。それ以外のすべての言語機能は、あれば便利という程度のものにすぎない。</strong></p>
+
+  <p>この一文が設計上の立場全体の起点になる。関数、モジュール、ループ、補間といった機構は、それ自体が言語の目的ではなく、グラフを書き下すための便宜でしかない。だから機能の追加可否は「便利か」ではなく「グラフに還元されるか」で判定される(<a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a>)。</p>
+
+  <p>ただし「依存関係グラフの記述」には精密化が要る。<strong>エッジの大半はユーザーが明示するのではなく、値の参照(<code>vpc.vpc_id</code>)から推論される</strong>。つまり言語がユーザーに記述させるのは「グラフそのもの」ではなく「<strong>グラフが一意に定まるだけの情報</strong>」である。ユーザーはノードを宣言し、他ノードの属性を参照する。エッジはその参照から導出される。</p>
+
+  <p>この立場を採ると、いくつかの派生的な性質が説明として自動的に出てくる。型を付けるべき「プログラム」が実質存在しないため、型検査は項ベースの体系をほぼ必要とせず、検査対象はグラフそのもの — ノード上の値の所属とエッジ両端の型の適合 — に還元される。汎用言語が提供する高階関数・クラス・任意計算とパッケージエコシステムは、「失ったもの」ではなく「このドメインでは要らないもの」として数えられる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a></li>
+      <li><a href="/notes/type-checking-reduces-to-nodes-and-edges.html">検査対象はノード上の値とエッジ両端の型の二種に還元できる</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/credentials-adjacent-code-is-attack-surface.html">資格情報の傍で任意パッケージが動くこと自体が攻撃面である</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a></li>
+      <li><a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a></li>
+      <li><a href="/notes/type-checking-reduces-to-nodes-and-edges.html">検査対象はノード上の値とエッジ両端の型の二種に還元できる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-グラフ">#グラフ</a>
+  </p>
+</article>
+</body>
+</html>

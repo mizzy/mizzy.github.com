@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プラグイン境界の型消去は事故クラスを予測する - notes</title>
+<meta name="description" content="WASMプラグイン境界(WITプロトコル)では、型情報の一部が不可逆に消える。消去された情報に依存する処理が境界の先にあると、静かに壊れる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>プラグイン境界の型消去は事故クラスを予測する</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md付録</code>
+  </p>
+
+  <p>WASMプラグイン境界(WITプロトコル)では、<strong>型情報の一部が不可逆に消える</strong>。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 230" role="img" aria-label="WITプロトコル境界を越えると、列挙値はタグと公称識別を失って文字列になり、再帰的なコレクションはJSON文字列として運ばれ、往復後に一部の構造区別は復元されない。境界の向こうは実質的に単型の世界である図">
+      <style>
+        .er text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .er .box { fill: var(--surface); stroke: var(--rule); }
+        .er .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .er .ttl { font-size: 13px; font-weight: 600; }
+        .er .dim { fill: var(--faint); font-size: 11px; }
+        .er .arw { stroke: var(--faint); fill: none; }
+        .er .cut { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .er .lost { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="er">
+        <text class="ttl" x="8" y="20">境界の手前 — 型付きの世界</text>
+        <rect class="box" x="8" y="30" width="212" height="120" rx="4"/>
+        <text x="24" y="54">列挙(タグ + 公称識別)</text>
+        <text x="24" y="80">再帰的コレクション</text>
+        <text x="24" y="106">篩(パターン・区間)</text>
+        <text class="dim" x="24" y="132">構造の区別が保たれている</text>
+
+        <path class="cut" d="M320 16 V 176"/>
+        <text class="ttl" x="320" y="196" text-anchor="middle">WITプロトコル境界</text>
+
+        <path class="arw" d="M220 62 H 316"/>
+        <path class="arw" d="M220 88 H 316"/>
+        <path class="arw" d="M220 114 H 316"/>
+        <text class="lost" x="238" y="54">タグを失う</text>
+        <text class="lost" x="230" y="80">JSON文字列になる</text>
+        <text class="lost" x="238" y="106">脱落しうる</text>
+
+        <text class="ttl" x="420" y="20">境界の向こう — 実質的に単型</text>
+        <rect class="box" x="420" y="30" width="212" height="120" rx="4"/>
+        <text x="436" y="54">文字列</text>
+        <text x="436" y="80">文字列</text>
+        <text x="436" y="106">情報なし</text>
+        <text class="dim" x="436" y="132">「情報がない」ことに気づかない</text>
+
+        <text class="lost" x="8" y="220">エラーにならない — 消去された情報に依存する処理は静かに壊れる</text>
+      </g>
+    </svg>
+    <figcaption>境界の向こうでは型が単なる文字列になっているため、公称識別に依存した判定も篩のパターンに依存した検証も、情報がないことに気づかないまま素通りする。</figcaption>
+  </figure>
+
+  <ul>
+    <li>列挙値はタグと公称識別を失って文字列になる</li>
+    <li>再帰的なコレクションはJSON文字列として運ばれる</li>
+    <li>往復後に一部の構造区別は復元されない</li>
+  </ul>
+
+  <p>これは静的型付き言語のコンパイルにおける<strong>型消去(type erasure)と同型の現象</strong>であり、境界の向こうは実質的に単型(uni-typed)の世界である。</p>
+
+  <h2>予測できる事故クラス</h2>
+
+  <p>この構図から一つの事故クラスが予測できる。<strong>消去された情報に依存する処理が境界の先にあると、静かに壊れる。</strong></p>
+
+  <p>エラーにならないのが要点である。境界の向こうでは型が単なる文字列になっているのだから、公称識別に依存した判定も、篩のパターンに依存した検証も、「情報がない」ことに気づかないまま素通りする。実際に篩のパターンが境界で脱落する事故が起きている(<a href="https://github.com/carina-rs/carina/issues/3364">carina#3364</a>)。</p>
+
+  <p>同型の現象はコンパイラの世界で見慣れたものである。名前マングリングで失われる情報、C ABIに落ちるときに消えるジェネリクス — ABIが表現できる型がソース言語の型より粗い、という一般的な構図の一例である。</p>
+
+  <h2>緩和策</h2>
+
+  <p><strong>プロトコルへの版数付与</strong>は、この消去境界に契約を置く標準的な緩和策である(<code>protocol_version</code>の照合がABIバージョニングに当たる)。消去そのものを無くすことはできないが、境界の両側が同じ消去規則を前提にしていることは確認できる。</p>
+
+  <p>より根本的には、篩の制約を構造的な表現(パターン・区間)へ寄せるほど、境界を越えられる情報が増える。任意の検証関数は原理的に運べないが、一階の表現を持つ制約は運べる。<strong>述語が一階の表現を持つか否かが、型が境界を越えられるかを分ける線</strong>になっている。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型消去">#型消去</a>
+    <a href="/notes/#tag-プラグイン">#プラグイン</a>
+    <a href="/notes/#tag-バグクラス">#バグクラス</a>
+  </p>
+</article>
+</body>
+</html>

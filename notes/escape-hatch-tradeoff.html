@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>逃げ道の有無が表現力の上限と組織コストを交換する - notes</title>
+<meta name="description" content="記述自由度の二層は、逃げ道の有無という一点でトレードオフを作る。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>逃げ道の有無が表現力の上限と組織コストを交換する</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-3</code>
+  </p>
+
+  <p>記述自由度の二層は、<strong>逃げ道の有無</strong>という一点でトレードオフを作る。</p>
+
+  <p><strong>言語が決める</strong>(Terraform / Carina)が得るもの:</p>
+
+  <ul>
+    <li>「読めない書き方」を構造的に書けない → ベテランも新人も同じ表現力に揃う</li>
+    <li>静的解析・LSP・自動修正ツールが効きやすい</li>
+    <li>レビュアーが「文法が通っているなら最低ラインは満たす」と判断できる</li>
+    <li>組織コストが低い(規約を作って教育する手間が要らない)</li>
+  </ul>
+
+  <p>失うもの:</p>
+
+  <ul>
+    <li><strong>逃げ道がない</strong> — 文法の表現力を超えると別アプローチに逃げる必要がある。Terraformでは<code>dynamic</code>ブロックがlimitedで<code>for_each</code>の制約に苦しみ、結局moduleを切ったり外部スクリプトで生成したりする。高階関数や一級関数値がない言語では、関数を引数で渡したりmoduleを引数で受け取って加工する設計が書けない</li>
+    <li><strong>言語拡張のコストが高い</strong> — 新しい構文を追加するにはparser/evaluator/LSPすべてを触る必要がある</li>
+    <li><strong>「言語の表現力」がツールの上限を決める</strong></li>
+  </ul>
+
+  <p><strong>規約に委ねる</strong>(CDK / Pulumi)は鏡像になる。得るのは逃げ道 — 何でも書けるので複雑な構成も表現でき、社内のベテランがutilを作れば全員が使える。言語のエコシステムと統合され、IDE/デバッガ/テストフレームワークが普通に使え、ツール側の実装コストも低い。失うのは、「読めない書き方」を防げないこと、lintルール・コードレビュー・オンボーディング教育という<strong>規約の維持コストを組織が負担する</strong>こと、「ベテランしか保守できないコード」が生まれやすいこと、そして<strong>表現力の差がチーム内のスキル差として顕在化する</strong>ことである。</p>
+
+  <p>つまり交換されているのは「表現力の上限」と「組織コスト」であり、どちらかが単純に優れているのではない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-トレードオフ">#トレードオフ</a>
+    <a href="/notes/#tag-組織">#組織</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+  </p>
+</article>
+</body>
+</html>

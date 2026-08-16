@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる - notes</title>
+<meta name="description" content="ユーザーの記述自由度をどこまで許すかという設計判断は、誰が制限するかで二層に分かれる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-1</code>
+  </p>
+
+  <p>ユーザーの記述自由度をどこまで許すかという設計判断は、<strong>誰が制限するか</strong>で二層に分かれる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="同じ「望ましくない書き方」に対して、言語が決める層では文法・評価器・型検査が書いた瞬間に落とし、規約に委ねる層では文法上は通ってlint・レビュー・教育が組織側で止めることを示す図">
+      <style>
+        .lo text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .lo .box { fill: var(--surface); stroke: var(--rule); }
+        .lo .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .lo .ttl { font-size: 13px; font-weight: 600; }
+        .lo .dim { fill: var(--faint); font-size: 11px; }
+        .lo .arw { stroke: var(--faint); fill: none; }
+        .lo .stop { stroke: var(--accent); fill: none; stroke-width: 2; }
+        .lo .soft { stroke: var(--accent-2); fill: none; stroke-width: 2; stroke-dasharray: 4 3; }
+        .lo .softt { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="lo">
+        <rect class="box" x="8" y="66" width="120" height="52" rx="4"/>
+        <text class="ttl" x="68" y="88" text-anchor="middle">ユーザーが書く</text>
+        <text class="dim" x="68" y="108" text-anchor="middle">望ましくない記述</text>
+
+        <path class="arw" d="M128 80 C 170 80, 180 46, 220 46"/>
+        <path class="arw" d="M128 104 C 170 104, 180 148, 220 148"/>
+
+        <rect class="hi" x="252" y="20" width="200" height="56" rx="4"/>
+        <text class="ttl" x="352" y="42" text-anchor="middle">言語が決める</text>
+        <text class="dim" x="352" y="62" text-anchor="middle">文法・評価器・型検査</text>
+        <path class="stop" d="M232 30 V 66"/>
+        <text x="470" y="42">書けない</text>
+        <text class="dim" x="470" y="62">強制力は絶対</text>
+
+        <rect class="box" x="252" y="122" width="200" height="56" rx="4"/>
+        <text class="ttl" x="352" y="144" text-anchor="middle">規約に委ねる</text>
+        <text class="dim" x="352" y="164" text-anchor="middle">lint・レビュー・ガイドライン</text>
+        <path class="soft" d="M232 132 V 168"/>
+        <text x="470" y="144">書けるが許されない</text>
+        <text class="softt" x="470" y="164">維持コストは組織が負う</text>
+
+        <text class="dim" x="8" y="200">Terraform / Carinaは上、CDK / Pulumiは下。BicepはCarinaと類似の中間。</text>
+      </g>
+    </svg>
+    <figcaption>止める主体が処理系か組織かで、強制力とコストの落ちる先が変わる。同じ「制約」でも性質が違う。</figcaption>
+  </figure>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>区分</th><th>仕組み</th><th>ユーザーから見ると</th></tr></thead>
+      <tbody>
+        <tr><td><strong>言語が決める</strong></td><td>文法・評価器・型検査でユーザーの選択肢が制限される</td><td>書けない(文法エラー / 型エラー / 評価エラー)</td></tr>
+        <tr><td><strong>規約に委ねる</strong></td><td>文法上は何でも書けるが、lint・コードレビュー・社内ガイドラインで縛る</td><td>書けるが組織内で許されない</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>両者とも「ユーザーの選択肢を狭める方向の制約」だが、<strong>強制力と組織コストが大きく異なる</strong>。前者は書いた瞬間に落ちるので強制力は絶対だが、言語拡張のコストが高く逃げ道がない。後者は逃げ道がある代わりに、lintルール・コードレビュー・オンボーディング教育をすべて組織が負担する。</p>
+
+  <p>4ツールを当てはめると、Terraform / Carinaは「言語が決める」、CDK / Pulumiは「規約に委ねる」に落ちる。BicepはCarinaと類似の中間(<code>func</code>あり、高階関数なし)。</p>
+
+  <p>この二層と記述言語の選択(外部DSL / 汎用言語)は<strong>強い相関を持つが、概念的に区別できる別軸</strong>である。外部DSLは言語が決める範囲を広く取りやすく、汎用言語は規約に頼りやすい、という傾向はあるが、それは論理的な含意ではない。この区別を潰すと「DSLだから読みやすい」という誤った因果に落ちる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-selection-pressure.html">「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</a></li>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+      <li><a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a></li>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-組織">#組織</a>
+  </p>
+</article>
+</body>
+</html>

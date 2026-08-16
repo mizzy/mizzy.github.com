@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である - notes</title>
+<meta name="description" content="記述言語と記述自由度の所在の2×2で、「外部DSL × 規約に委ねる」に該当するツールがない。これは偶然の空白ではなく淘汰圧の結果である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-4, explorations/2026-04-26-cross-dsl-design-position/README.md問い2</code>
+  </p>
+
+  <p>記述言語と記述自由度の所在の2×2で、「<strong>外部DSL × 規約に委ねる</strong>」— 動的な<code>source</code>と任意関数を持つ専用DSL — に該当するツールがない。これは偶然の空白ではなく<strong>淘汰圧の結果</strong>である。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 260" role="img" aria-label="記述言語と記述自由度の所在の2×2。外部DSL×規約に委ねると汎用言語×言語が決めるの二つの席が空いており、空いている理由が経済的成立性と技術的コストで異なることを示す図">
+      <style>
+        .q text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .q .box   { fill: var(--surface); stroke: var(--rule); }
+        .q .empty { fill: none; stroke: var(--rule); stroke-dasharray: 5 4; }
+        .q .ttl { font-size: 13px; font-weight: 600; }
+        .q .dim { fill: var(--faint); font-size: 11px; }
+        .q .ax  { fill: var(--faint); font-size: 12px; }
+        .q .em  { fill: var(--accent); font-size: 11px; }
+      </style>
+      <g class="q">
+        <text class="ax" x="196" y="20" text-anchor="middle">言語が決める</text>
+        <text class="ax" x="452" y="20" text-anchor="middle">規約に委ねる</text>
+        <text class="ax" x="8" y="70">外部DSL</text>
+        <text class="ax" x="8" y="180">汎用言語</text>
+
+        <rect class="box" x="80" y="32" width="232" height="86" rx="4"/>
+        <text class="ttl" x="196" y="60" text-anchor="middle">Terraform / Carina / Bicep</text>
+        <text class="dim" x="196" y="82" text-anchor="middle">専用文法で望ましくない</text>
+        <text class="dim" x="196" y="98" text-anchor="middle">書き方を禁じる</text>
+
+        <rect class="empty" x="336" y="32" width="232" height="86" rx="4"/>
+        <text class="ttl" x="452" y="60" text-anchor="middle">空席</text>
+        <text class="em" x="452" y="82" text-anchor="middle">経済的に成立しないから</text>
+        <text class="em" x="452" y="98" text-anchor="middle">空いている</text>
+
+        <rect class="empty" x="80" y="142" width="232" height="86" rx="4"/>
+        <text class="ttl" x="196" y="170" text-anchor="middle">空席</text>
+        <text class="em" x="196" y="192" text-anchor="middle">技術的コストが高いから</text>
+        <text class="em" x="196" y="208" text-anchor="middle">空いている</text>
+
+        <rect class="box" x="336" y="142" width="232" height="86" rx="4"/>
+        <text class="ttl" x="452" y="170" text-anchor="middle">CDK / Pulumi</text>
+        <text class="dim" x="452" y="192" text-anchor="middle">何でも書けて、lintと</text>
+        <text class="dim" x="452" y="208" text-anchor="middle">レビューで縛る</text>
+
+        <text class="dim" x="80" y="250">二つの空席は同じ「空」でも性質が違う。前者には設計余地が残らない。</text>
+      </g>
+    </svg>
+    <figcaption>2×2の対角に埋まった席が並び、残る二席が空いている。ただし空いている理由は異なる — 右上は経済的に成立しないため、左下は技術的コストが高いためである。</figcaption>
+  </figure>
+
+  <p>論理はこうなる。専用文法を作っておきながら任意の動的選択を許すなら、<strong>汎用言語を使う方が経済的</strong>である。外部DSLを作るコスト(parser、evaluator、LSP、エコシステムの不在)を払う見返りが「文法レベルで望ましくない書き方を禁止できる」ことなのだから、それを放棄した外部DSLには存在理由が残らない。だから作られても生き残らない。</p>
+
+  <p>構成記述系DSL 11個への検証はこの仮説を<strong>補強する</strong>。この象限は<strong>ほぼ空</strong>で、Nickelが部分的に近い(3自由度のうち2つが規約寄り)だけである。そのNickelも実装切替(import path)は依然として言語が決める。「外部DSLを作っておきながら3自由度すべてを規約に委ねる」DSLは、11個の中には存在しない。</p>
+
+  <p>この空席は、隣の空席(「汎用言語 × 言語が決める」)とは性質が違う点に注意が要る。こちらは<strong>経済的に成立しないから空いている</strong>のに対し、あちらは<strong>技術的コストが高いから空いている</strong>と説明される。前者は設計余地が残っているという話にはならない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計空間">#設計空間</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-淘汰圧">#淘汰圧</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる - notes</title>
+<meta name="description" content="「記述言語 × 記述自由度の所在」の2×2は、暗黙に「ツール = 1象限」を前提していた。多くのDSLは3自由度ごとに別の象限に落ちる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/README.md結論・問い1, explorations/2026-04-26-cross-dsl-design-position/carina-position.md §2</code>
+  </p>
+
+  <p>「記述言語(外部DSL / 汎用言語)× 記述自由度の所在(言語が決める / 規約に委ねる)」の2×2は、暗黙に「<strong>ツール = 1象限</strong>」を前提していた。構成記述系DSL 11個を同じ枠組みで点検すると、この前提は部分的に破綻する。<strong>多くのDSLは3自由度ごとに別の象限に落ちる。</strong></p>
+
+  <ul>
+    <li><strong>Pkl / KCL / Dhall / Jsonnet / Nickel</strong>:抽象化追加だけ「規約に委ねる」、複数量制御と実装切替は「言語が決める」という共通パターン</li>
+    <li><strong>Crossplane</strong>: YAML層とfunction層で<strong>別象限を同時に占める</strong>(二層構造)</li>
+    <li><strong>cdktf</strong>:複数量制御でホスト言語とTerraform <code>for_each</code>の<strong>2経路</strong>を併用できる</li>
+  </ul>
+
+  <p>したがって2×2は、3自由度の<strong>集計値</strong>としてではなく、<strong>3自由度ごとに別マップ</strong>として読み替えるのが正確である。ツールを一点に配置する図は概観としては使えるが、比較の道具として使うときは自由度ごとに分解しないと実態を取り逃す。</p>
+
+  <p>Terraform(3自由度すべて言語)、CDK / Pulumi(3自由度すべて規約)のように一象限に収まるツールもあるので、前提が常に間違っているわけではない。単純化が効くツールと効かないツールがあり、それを判定せずに一象限に配置することが粗いのである。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/layered-extension-point.html">拡張ポイントを言語境界で開けるのは第三の選択肢である</a></li>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-selection-pressure.html">「外部DSL × 規約に委ねる」が空席なのは淘汰圧の結果である</a></li>
+      <li><a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/layered-extension-point.html">拡張ポイントを言語境界で開けるのは第三の選択肢である</a></li>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/ref-config-dsl-survey.html">構成記述DSL 11本の調査</a></li>
+      <li><a href="/notes/ref-three-freedoms-matrix.html">3自由度サマリ表</a></li>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計空間">#設計空間</a>
+    <a href="/notes/#tag-比較軸">#比較軸</a>
+    <a href="/notes/#tag-方法論">#方法論</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>等価判定は正規形へ簡約してから型ごとに行う - notes</title>
+<meta name="description" content="差分計算の中核にあるのは、等価性が型ごとに定義される(type-directed equality)という原則である。同じ値の組でも、期待される型によって判定が変わる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>等価判定は正規形へ簡約してから型ごとに行う</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §7</code>
+  </p>
+
+  <p>差分計算の中核にあるのは、<strong>等価性が型ごとに定義される(type-directed equality)</strong> という原則である。同じ値の組でも、期待される型によって判定が変わる。</p>
+
+  <ul>
+    <li>順序付きリストは列として位置比較、順序なしリストは多重集合として比較(<code>List</code>の<code>ordered</code>フラグが「列(sequence)」と「多重集合(multiset)」を同じ構成子で表し分けている)</li>
+    <li>列挙はプロバイダAPI値の正規形で比較し、公称識別が両側にあればidentityも厳密に比較</li>
+    <li>合併型はメンバを順に試す(合併の等価性はメンバ等価性の存在量化)</li>
+    <li>秘匿値はハッシュ経由で比較し、平文を状態に残さない</li>
+  </ul>
+
+  <h2>正規化が先に来る</h2>
+
+  <p>比較の前には<strong>正規化</strong>が入る。<code>Union[String, List&lt;String&gt;]</code>の標準形化、DSL綴りの列挙値からAPI正規形への解決などを型に導かれて行い、<strong>正規形(canonical form)同士でのみ等価性を判定する</strong>。</p>
+
+  <p>型理論の言葉では、値の同値関係を型ごとの定義的等価(definitional equality)として与え、判定は正規形への簡約を経てから行う、という型付き等価性の標準的な構成である。</p>
+
+  <h2>正規化を飛ばすと壊れる</h2>
+
+  <p>この構成には理論側からの予言が付いてくる。<strong>正規形を経ない等価判定は不健全である。</strong></p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="正規化を経る比較経路と経ない比較経路の対比。型に導かれて正規形へ簡約してから比較すれば意味的に同じ値は等しいと判定されるが、DSL綴りのまま保存された値をAPI正規形と直接比較すると毎回変更扱いになる">
+      <style>
+        .eq text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .eq .box { fill: var(--surface); stroke: var(--rule); }
+        .eq .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .eq .ttl { font-size: 13px; font-weight: 600; }
+        .eq .dim { fill: var(--faint); font-size: 11px; }
+        .eq .arw { stroke: var(--faint); fill: none; }
+        .eq .bad { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+        .eq .badt { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="eq">
+        <text class="ttl" x="8" y="20">正しい経路 — 正規形を経る</text>
+        <rect class="box" x="8" y="30" width="130" height="44" rx="4"/>
+        <text x="24" y="57">DSL綴りの値</text>
+        <path class="arw" d="M138 52 H 166"/>
+        <rect class="hi" x="170" y="30" width="130" height="44" rx="4"/>
+        <text x="186" y="57">正規形へ簡約</text>
+        <path class="arw" d="M300 52 H 328"/>
+        <rect class="box" x="332" y="30" width="150" height="44" rx="4"/>
+        <text x="348" y="57">型ごとの同値関係</text>
+        <text class="dim" x="494" y="57">差分なし</text>
+
+        <text class="ttl" x="8" y="120">壊れる経路 — 正規化を飛ばす</text>
+        <rect class="box" x="8" y="130" width="130" height="44" rx="4"/>
+        <text x="24" y="157">DSL綴りの値</text>
+        <path class="bad" d="M138 152 H 328"/>
+        <text class="badt" x="176" y="146">直接比較</text>
+        <rect class="box" x="332" y="130" width="150" height="44" rx="4"/>
+        <text x="348" y="157">API正規形の値</text>
+        <text class="badt" x="494" y="152">永遠に変更扱い</text>
+      </g>
+    </svg>
+    <figcaption>state中の列挙値が永遠に変更扱いされ続けた事故は、正規化を経ない比較経路が残っていたことが原因だった。差分が中心機能であるツールでは、これは機能が静かに無意味になる種類のバグである。</figcaption>
+  </figure>
+
+  <p>そして実際にその形の事故が起きている。state中の列挙値が永遠に変更扱いされ続ける現象は、正規化を経ない比較経路が残っていたことが原因だった。DSL綴りのまま保存された値とAPI正規形の値を直接比較すれば、意味的に同じ値が毎回「変わった」と判定され続ける。差分が中心機能であるツールにおいて、これは機能が静かに無意味になる種類のバグである。</p>
+
+  <p>裏返せば、等価性・正規化が型主導で一元化されていること自体がCarinaの強みである。差分という中心機能が「正規形に簡約してから型ごとの同値関係で比較」という単一の原則に載っており、比較経路が増えるたびに個別対処するのではなく、原則から外れた経路を潰す形で議論できる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+      <li><a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-差分">#差分</a>
+    <a href="/notes/#tag-等価性">#等価性</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+  </p>
+</article>
+</body>
+</html>

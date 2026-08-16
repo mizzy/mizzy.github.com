@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stateの「所有」と「運用責任」は分離できる二軸である - notes</title>
+<meta name="description" content="stateをめぐる設計判断は一つの軸ではなく、どこにデータがあるかという所有と、lock/暗号化/migrationを誰が担うかという運用責任の二つがある。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>stateの「所有」と「運用責任」は分離できる二軸である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-4-state-ownership-and-operational-responsibility.md</code>
+  </p>
+
+  <p>stateをめぐる設計判断は一つの軸ではなく二つある。</p>
+
+  <ul>
+    <li><strong>所有</strong> = どこにデータがあるか(Terraform / Pulumi / Carina = 自前、CDK = CFN)</li>
+    <li><strong>運用責任</strong> = lock / 暗号化 / migrationを誰が担うか(Terraform / Pulumi = ユーザがbackendを設定、CDK = CFNに委ねる)</li>
+  </ul>
+
+  <p>この2軸は同じツールでも分離できる。例えばPulumi serviceを使うと、<strong>所有は自前だが運用責任の多くはPulumi社に委ねる</strong>という組み合わせになる。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ツール</th><th>state所有者</th><th>state形式</th><th>refresh</th><th>drift detection</th><th>lock</th><th>暗号化</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td>自前</td><td>tfstate (JSON)</td><td><code>terraform refresh</code> (applyに統合)</td><td><code>terraform plan</code>で検出</td><td>backendが提供(S3 + DynamoDB等)</td><td>backend依存</td></tr>
+        <tr><td>CDK</td><td>CFNサービスに委譲</td><td>CFN stack state (AWS側)</td><td>CFN drift detection</td><td>CFN drift detection機能</td><td>CFNサービス側</td><td>CFNサービス側</td></tr>
+        <tr><td>Pulumi</td><td>自前(Pulumi service / S3 / local)</td><td>checkpoint (JSON)</td><td><code>pulumi refresh</code></td><td><code>pulumi preview</code>で検出</td><td>backend側</td><td>Pulumi serviceなら組込、自前backendは要設定</td></tr>
+        <tr><td>Carina</td><td>自前</td><td><code>carina.state.json</code> (state v3、binding/dependency_bindings含む)</td><td><span class="todo">(要確認)</span></td><td>plan時に差分計算</td><td><span class="todo">(要確認)</span></td><td><span class="todo">(要確認)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>トレードオフは明快である。<strong>自前</strong>(Terraform / Pulumi / Carina)はbackend設計の自由度を得る代わりに運用責任を負う。<strong>委譲</strong>(CDK → CFN)は運用がCFN側に委ねられ、ロック / drift / 暗号化を任せられる代わりにCFNにロックインされる。</p>
+
+  <p>state操作の手段も所有の帰結として分かれる。Terraformは<code>state mv</code> / <code>state rm</code> / <code>import</code> / 手動JSON編集(非推奨)、Pulumiは<code>pulumi state delete</code> / <code>pulumi stack export</code> / <code>pulumi stack import</code>、CDKは該当なし(CFNコンソール / CLI経由)。いずれも「文法で禁じる」のではなく規約で縛る形になっている。</p>
+
+  <p>state schemaの進化も所有者の責任範囲に入る。Terraformはschema versionとprovider state migration、Pulumiはcheckpoint formatのバージョン、Carinaはstate v3(現行)と過去バージョンとの互換性を自分で面倒を見る必要がある。</p>
+
+  <p>state加工の自由度には設計思想の差が現れる。Terraformはstate blocks (<code>moved</code>/<code>removed</code>/<code>import</code>)の処理が分散している(pre-planで<code>moved</code>、graph内で<code>removed</code>/<code>import</code>)のに対し、Carinaは<code>Plan&lt;Effect&gt;</code>生成後に<code>add_state_block_effects()</code>で統一的に反映する。「plan完成前/中にstate/graphへ吸収する」か「plan完成後に統一加工する」かの差である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-state">#state</a>
+    <a href="/notes/#tag-運用">#運用</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+  </p>
+</article>
+</body>
+</html>

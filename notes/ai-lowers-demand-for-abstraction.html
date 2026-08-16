@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIは抽象化の実需要をむしろ下げる - notes</title>
+<meta name="description" content="「IaCで高階関数は本当に必要か」という問いは、AI時代の観点から見直すと必要性が上がるのではなく下がる方向に傾く。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>AIは抽象化の実需要をむしろ下げる</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/carina-position.md §7</code>
+  </p>
+
+  <p>「IaCで高階関数は本当に必要か」という問いは、AI時代の観点から見直すと<strong>必要性が上がるのではなく下がる</strong>方向に傾く。IaCで実際に必要とされる三つの抽象化のいずれも、AIが肩代わりできるからである。</p>
+
+  <ul>
+    <li><strong>値計算の再利用はAIが肩代わりできる</strong>: 「環境別ポート計算ヘルパー」を関数で書く代わりに、AIが一括展開した値を生成できる。高階関数の実需要はむしろ下がる</li>
+    <li><strong>構成のテンプレート化もmoduleで十分</strong>: AIがmoduleを組み合わせる形で構成を生成できる</li>
+    <li><strong>多数生成も<code>for</code>専用構文で十分</strong>: AIが<code>for</code>の専用構文を生成するのは難しくない</li>
+  </ul>
+
+  <p>つまり、抽象化機構の主用途である「人が繰り返しを手で書きたくない」という需要は、生成側がAIになると弱まる。一方で、生成されたコードを<strong>読んで検証する</strong>側のコストは、抽象化が厚いほど上がる。需要と負担が逆向きに動く。</p>
+
+  <p>この観点から、<strong>Bicepが高階関数を入れていない設計判断はAI時代でむしろ正当化されやすい</strong>。表現力を絞ったDSLの方が、生成・読解・修正のすべてでAIにとって扱いやすいからである。</p>
+
+  <p>したがって高階関数の導入は、<strong>構造的整合性(ハイブリッド象限への合流)とAI時代の機械可読性(絞り込みを保つこと)の間でトレードオフを取る</strong>設計判断になる。どちらが正しいかは、「高階関数を入れたDSLはAIにとっても扱いやすいか」「属性値計算の自由度を上げても静的監査は成立するか」を実際に入れて使ってみないと分からない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-ai">#ai</a>
+    <a href="/notes/#tag-高階関数">#高階関数</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+  </p>
+</article>
+</body>
+</html>

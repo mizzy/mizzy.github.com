@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDKが型を提供することは言語が制約を課すことではない - notes</title>
+<meta name="description" content="PulumiのOutput&lt;T&gt;やCDKのTokenのようにSDK側が型を提供するパターンを「言語が決める」象限の実例と数えるのは過大評価である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>SDKが型を提供することは言語が制約を課すことではない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-4, explorations/2026-04-26-cross-dsl-design-position/README.md問い3</code>
+  </p>
+
+  <p>Pulumiの<code>Output&lt;T&gt;</code>やCDKの<code>Token</code> / <code>BucketProps</code>のように、SDK側が型を提供して依存追跡や未知値伝播を表現するパターンがある。これを「言語が決める」象限の実例と数えるのは<strong>過大評価</strong>である。</p>
+
+  <p>理由は、これらが<strong>ホスト言語の型システムの機能をSDKが活用しているだけ</strong>で、ツール側が言語を拡張しているわけではないから。効くのは次の二条件が揃ったときだけである。</p>
+
+  <ul>
+    <li>(a) <strong>静的型言語</strong>であること — Python / JavaScriptで型ヒントを書かなければruntimeまで分からない</li>
+    <li>(b) <strong>ユーザーが型を書く慣習</strong>を採用していること</li>
+  </ul>
+
+  <p>条件付きでしか効かない仕組みは、文法エラーとして必ず落ちる制約とは強制力が違う。外部DSLが「文法レベルで望ましくない書き方を禁止できる(ユーザーの記述意思に依存しない)」のに対し、SDKの型はユーザーの記述意思に依存する。</p>
+
+  <p>Pulumiの内部構造についても正確に押さえておく必要がある。Pulumiは<strong>ランタイム実行経路には静的中間テンプレートを持たない</strong> — コード実行中にengineへgRPCストリーミングで<code>RegisterResource</code>を逐次送信し、engineが随時差分判断・実行する。ただしエコシステム全体には中間表現的なものが存在する。<code>pulumi convert</code>でTF/CFN/BicepをPulumiコードに変換する際の<strong>PCL (Pulumi Configuration Language)</strong> は公式に「intermediate representation」と呼ばれ、<code>pulumi preview --save-plan</code>は<strong>静的planファイル</strong>(Update Plans)を生成して後で<code>pulumi up --plan</code>で適用できる(Terraformの<code>plan -out</code>相当)。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+      <li><a href="/notes/unknown-token-output-trilemma.html">未知値の規律と段階分離は三すくみである</a></li>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-評価">#評価</a>
+  </p>
+</article>
+</body>
+</html>

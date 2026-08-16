@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全域性の価値は「何をゲートするか」で決まる - notes</title>
+<meta name="description" content="全域性は、それ自体が普遍的に望ましい性質なのではない。静的段階が何の門番をしているかによって、その価値が変わる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>全域性の価値は「何をゲートするか」で決まる</h1>
+  <p class="meta">
+    <span class="epistemic ai-sourced">AI由来</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §6</code>
+  </p>
+
+  <p>全域性は、それ自体が普遍的に望ましい性質なのではない。<strong>静的段階が何の門番をしているかによって、その価値が変わる</strong>。同じ「評価が止まらないかもしれない」欠陥でも、ビルドが失敗するだけの言語と、実インフラを変更する段階の手前に立つ言語とでは重さが違う。</p>
+
+  <p>この点を照らすのがPkl(Apple)の位置である。Pklは専用の設定記述言語で、型注釈に任意の述語を付けられる(<code>port: Int(this &gt; 0 &amp;&amp; this &lt; 65536)</code>)。検査はその述語を評価済みの値へ適用する方式で、意味論的型付け + 値ベースの契約検査という<strong>検査様式だけ見れば、設定記述言語の系譜の中でCarinaに最も近い</strong>。</p>
+
+  <p>ところが停止性の軸では反対側にいる。Pklは再帰関数を書けるチューリング完全な言語で、評価は停止しないことがあり得る。CLIに評価タイムアウトのオプションがあるのはその裏返しである。純粋性はモジュール・外部リソースへのアクセス許可制というサンドボックスで運用的に確保するが、全域性は言語の定理としては持たない。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="評価が止まらないという同じ欠陥が、Pklではビルド失敗にとどまり世界は変わらないのに対し、Carina / Terraformでは実インフラを変更する動的段階の門番が倒れることを示す図">
+      <style>
+        .gate text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .gate .box { fill: var(--surface); stroke: var(--rule); }
+        .gate .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .gate .ttl { font-size: 13px; font-weight: 600; }
+        .gate .dim { fill: var(--faint); font-size: 11px; }
+        .gate .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="gate">
+        <text class="ttl" x="8" y="18">Pkl — 門の先は成果物</text>
+        <rect class="box" x="8" y="30" width="140" height="52" rx="4"/>
+        <text x="24" y="52">評価(全域でない)</text>
+        <text class="dim" x="24" y="70">止まらないことがある</text>
+        <path class="arw" d="M148 56 H 176"/>
+        <rect class="box" x="180" y="30" width="140" height="52" rx="4"/>
+        <text x="196" y="52">JSON / YAML</text>
+        <text class="dim" x="196" y="70">ビルドが失敗するだけ</text>
+        <text class="dim" x="332" y="60">世界は何も変わらない</text>
+
+        <text class="ttl" x="8" y="120">Carina / Terraform — 門の先は実インフラ</text>
+        <rect class="hi" x="8" y="132" width="140" height="52" rx="4"/>
+        <text x="24" y="154">静的段階(全域)</text>
+        <text class="dim" x="24" y="172">必ず停止する</text>
+        <path class="arw" d="M148 158 H 176"/>
+        <rect class="box" x="180" y="132" width="140" height="52" rx="4"/>
+        <text x="196" y="154">apply</text>
+        <text class="dim" x="196" y="172">実インフラを変更する</text>
+        <text class="dim" x="332" y="162">門番が倒れる方が重い</text>
+      </g>
+    </svg>
+    <figcaption>同じ「評価が止まらない」欠陥でも、門の先にあるものが違えば重さが違う。Pklの門の先は成果物であり、Carina / Terraformの門の先は実インフラである。</figcaption>
+  </figure>
+
+  <p>なぜPklは全域性を捨てて値ベースの篩検査だけを取れたのか。<strong>評価結果が何をゲートするかが違う</strong>からだと読める。Pklの評価結果はJSON/YAMLという成果物で、評価が止まらなければビルドが失敗するだけ — 世界は何も変わらない。一方CarinaやTerraformの静的段階は、実インフラを変更する動的段階の門番であり、門番が停止しないことは成果物生成の失敗より重い。</p>
+
+  <p>同じことは未知値の問題にも及ぶ。Pklには守るべきapply段階がなく、したがって段階を跨ぐ値(applyまで決まらない値)の問題自体を持たない。値ベースの検査様式は共有できても、二段階言語であることに由来する要請までは共有していない。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>Pklがチューリング完全であること・評価タイムアウトのオプションがあることはAIの学習データ由来で、一次ソース未確認。方向は確からしいが引用前に公式ドキュメントでの確認を推奨する。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-全域性">#全域性</a>
+    <a href="/notes/#tag-pkl">#pkl</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>typestateで壊れた状態を書けなくする - notes</title>
+<meta name="description" content="Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは静的段階の内部不変条件を実装言語の型でコンパイル時に固定することである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>typestateで壊れた状態を書けなくする</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md付録</code>
+  </p>
+
+  <p>Carinaの処理系は<strong>「処理が進むと値の型が変わる」typestateパターン</strong>を系統的に使っている。狙いは一貫していて、<strong>静的段階の内部不変条件を、実装言語の型でコンパイル時に固定する</strong>ことである。</p>
+
+  <p>適用例は複数の層に及ぶ。</p>
+
+  <ul>
+    <li><strong>未解決の列挙識別子と解決済み正規形は別の型</strong>であり、後者はリゾルバしか生成できない(<a href="https://github.com/carina-rs/carina/issues/3438">carina#3438</a>)。DSL綴りのまま比較に持ち込むことが型で書けなくなる。</li>
+    <li><strong>μ型の参照を展開した後の型ビューには参照変種が存在しない</strong>(<a href="https://github.com/carina-rs/carina/issues/3349">carina#3349</a>)。未展開のまま照合する状態がそもそも書けない。</li>
+    <li><strong>効果の部分集合しか受理しない実行器には、絞り込み済みの型を渡す</strong>(<a href="https://github.com/carina-rs/carina/issues/3164">carina#3164</a>)。</li>
+    <li><strong>パーサの段階(パース直後 / 推論後)は型パラメータで区別される。</strong></li>
+  </ul>
+
+  <h2>「覚えている」に依存しないこと</h2>
+
+  <p>いずれの例も、対応する不変条件は「各消費地点が処理を忘れないこと」でも守れる。列挙値は比較の前に正規化する、μ型の参照は照合の前に展開する、と規約に書くこともできる。</p>
+
+  <p>しかし規約に依存する限り、同じバグクラスに未来の呼び出し側が再び到達できる。<strong>正規化を経ない比較経路が残っていたために列挙値が永遠に変更扱いされ続けた事故</strong>は、まさにその形で起きた。一箇所の消費地点が忘れたことが、差分という中心機能を静かに壊した。</p>
+
+  <p>typestateはこれを型の形に変える。壊れた状態を表す値が構成できないなら、忘れることが可能な地点がそもそも存在しない。<strong>「呼び出し側が覚えていること」に依存する不変条件は、型の形に作り直すまで根が残っている</strong>、という原則の実装である。</p>
+
+  <h2>適用先の見当</h2>
+
+  <p>この原則は未解決の問題にも指し示す先を持つ。代入で解決された値がスキーマで再検証されない問題(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)に対しては、deferredの穴に期待型を持たせ、穴を埋める唯一のAPIが「その型の検証器だけが生成できる検証済み値」を要求するようにすれば、<strong>検査を飛ばした代入が実装言語の型レベルで書けなくなる</strong>。検査を置くこと(信頼境界での再検証)と、検査を外せなくすること(typestate)は独立の手当てであり、併用が完成形である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+      <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+      <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+      <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-typestate">#typestate</a>
+    <a href="/notes/#tag-型安全">#型安全</a>
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+  </p>
+</article>
+</body>
+</html>

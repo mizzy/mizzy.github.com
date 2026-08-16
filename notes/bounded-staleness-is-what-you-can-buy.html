@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である - notes</title>
+<meta name="description" content="world取得を速くする三つの攻め口を一つの設計に落とすと、三層になる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-11-world-acquisition-incremental-plan/README.md §7, §8</code>
+  </p>
+
+  <p>world取得を速くする三つの攻め口を一つの設計に落とすと、三層になる。</p>
+
+  <ol>
+    <li><strong>既定</strong>:排他所有が宣言・検証できるリソースはstateを真とし、APIを叩かない(リース / 所有権)</li>
+    <li><strong>共有リソース</strong>:イベント駆動のdirty追跡(変更フィードを購読する常駐エージェントがworldビューを維持)+ 低頻度の反エントロピー全同期。planは常にビューから即答する</li>
+    <li><strong>正しさの錨</strong>: apply直前のロック下でのリソース単位の再読・検証(OCCのコミット検証)</li>
+  </ol>
+
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="第1層(所有権でAPIを叩かない)と第2層(イベント駆動のdirty追跡)は速さのための近似であり、第3層(apply直前のロック下での再検証)が正しさの錨として下支えする三層構造の図">
+      <style>
+        .layers text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .layers .box { fill: var(--surface); stroke: var(--rule); }
+        .layers .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .layers .ttl { font-size: 13px; font-weight: 600; }
+        .layers .dim { fill: var(--faint); font-size: 11px; }
+        .layers .arw { stroke: var(--faint); fill: none; }
+        .layers .brk { stroke: var(--rule); fill: none; }
+      </style>
+      <g class="layers">
+        <text class="dim" x="8" y="20">速さとUXのための近似</text>
+
+        <rect class="box" x="8" y="30" width="290" height="62" rx="4"/>
+        <text class="ttl" x="24" y="52">第1層 — 排他所有のリソース</text>
+        <text x="24" y="74">stateを真とし、APIを叩かない</text>
+
+        <rect class="box" x="8" y="102" width="290" height="62" rx="4"/>
+        <text class="ttl" x="24" y="124">第2層 — 共有リソース</text>
+        <text x="24" y="146">変更フィードで維持するビューから即答</text>
+
+        <path class="brk" d="M310 40 H 318 V 154 H 310"/>
+        <text class="dim" x="326" y="101">この二層は誤ってもよい</text>
+
+        <rect class="hi" x="8" y="174" width="290" height="30" rx="4"/>
+        <text class="ttl" x="24" y="194">第3層 — apply直前の再読・検証</text>
+        <text class="dim" x="326" y="194">正しさはここだけが担保する</text>
+
+        <path class="arw" d="M153 92 V 100"/>
+        <path class="arw" d="M153 164 V 172"/>
+      </g>
+    </svg>
+    <figcaption>第3層があるからこそ、第1層と第2層をすべて速さとUXのための近似と位置づけられる。近似の誤りは正しさの問題ではなく、planの表示が実際と食い違うという体感の問題に還元される。</figcaption>
+  </figure>
+
+  <p>第3層があるからこそ、第1層と第2層をすべて「<strong>速さとUXのための近似</strong>」と位置づけられる。近似の誤りは正しさの問題ではなく、planの表示が実際と食い違うという体感の問題に還元される。</p>
+
+  <p>そして限界も明確である。クラウドのイベント配信は遅延(分オーダー)と欠落があり、トランザクショナルでもない。したがって「<strong>plan時点の完全な鮮度」は原理的に買えない</strong>。買えるのは次の三つの組である。</p>
+
+  <ul>
+    <li>有界の古さ</li>
+    <li>変更量比例のコスト(リソース総数比例ではなく)</li>
+    <li>applyでの最終検証</li>
+  </ul>
+
+  <p>これは「planは予測であり、真実はapplyが確立する」という既存の契約の延長線上にあり、<strong>契約を変えずに体感だけを変える種類の最適化</strong>である。逆に言えば、この最適化はplanの鮮度を保証する方向には決して進めない。鮮度を保証しようとすればロックを取ることになり、それはplanの性格そのものを変えてしまう。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>三層構造はアイデアの整理であり、実装・実測による裏づけを持たない。イベント配信の遅延と欠落に関する記述はAIの学習データ由来で、各サービスの公式ドキュメントとの突き合わせをしていない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+      <li><a href="/notes/dirty-bit-for-the-cloud.html">クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</a></li>
+      <li><a href="/notes/ownership-proves-you-need-not-read.html">排他所有が証明できれば読まなくてよい</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/dirty-bit-for-the-cloud.html">クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</a></li>
+      <li><a href="/notes/ownership-proves-you-need-not-read.html">排他所有が証明できれば読まなくてよい</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-限界">#限界</a>
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-分散システム">#分散システム</a>
+  </p>
+</article>
+</body>
+</html>

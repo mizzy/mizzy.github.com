@@ -69,6 +69,9 @@
      表と図がこの中に収まる必要があるので、本文だけの場合より広く取る。 */
   --measure: 62rem;
 
+  /* index専用。カードを4〜5列並べるための幅。本文には使わない。 */
+  --index-wide: 90rem;
+
   /* ---- 図（インラインSVG）用の別名 ----
    * 各ノートのページ固有CSSはこの短い名前でBroadsheetのトークンを参照する。
    * 図の中で色を直書きしないための唯一の入口。新しい図もこの名前を使う。
@@ -105,7 +108,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--color-accent-700); text-underline-offset: 3px; }
+a {
+  color: var(--color-accent-700);
+  text-underline-offset: 3px;
+  /* 長いURLを本文にそのまま書いた行が、狭い画面でページ幅を超えないように。
+     URLは分割できる位置が無いので、指定しないと1語がそのまま横幅になる。 */
+  overflow-wrap: anywhere;
+}
 a:hover { color: var(--color-accent-2-700); }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
@@ -120,6 +129,8 @@ header.site {
   margin: 0 auto;
   padding: var(--space-6) var(--space-4) 0;
 }
+/* index はカードを広く並べるので、題字の罫も同じ幅に合わせる */
+body.index header.site { max-width: var(--index-wide); }
 
 header.site .rule {
   display: flex;
@@ -477,6 +488,41 @@ figcaption {
   color: color-mix(in srgb, var(--color-text) 55%, transparent);
 }
 
+/* ---- 確度マーカー ---- */
+/* このノートの主張がどの種類のものかを見出し直下で示す。
+   verified=確認済み / interpretation=解釈 / ai-sourced=AI由来 / normative=規範的主張 */
+
+.epistemic {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  padding: 0.1em 0.6em;
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-700);
+}
+.epistemic.verified      { background: var(--color-accent-100); color: var(--color-accent-800); }
+.epistemic.ai-sourced    { background: var(--color-accent-2-100); color: var(--color-accent-2-700); }
+.epistemic.normative     { background: var(--color-neutral-200); color: var(--color-neutral-800); }
+
+/* ---- 逆リンク ---- */
+/* このノートを参照している他のノート。evergreen notesでは
+   どこから参照されているかが、そのノートの位置を示す。 */
+
+.backlinks {
+  margin-top: var(--space-6);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+.backlinks h2 {
+  margin: 0 0 var(--space-2);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+}
+.backlinks ul { list-style: none; padding: 0; margin: 0; }
+.backlinks li { margin-bottom: 2px; font-size: 15px; }
+
 /* ---- 関連・タグ ---- */
 
 nav.links {
@@ -517,7 +563,7 @@ p.tags a:hover { color: var(--color-accent-2-700); }
 /* ---- index ---- */
 
 .index-head {
-  max-width: var(--measure);
+  max-width: var(--index-wide);
   margin: 0 auto;
   padding: var(--space-8) var(--space-4) 0;
 }
@@ -525,20 +571,49 @@ p.tags a:hover { color: var(--color-accent-2-700); }
 .index-head p {
   color: color-mix(in srgb, var(--color-text) 65%, transparent);
   font-size: 16px;
+  max-width: 46rem;   /* 説明文だけは行長を抑える */
+}
+
+/* タグの絞り込み。ノートが増えると一覧だけでは辿れないため。 */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+}
+.filters button {
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 0.15em 0.7em;
+  border: 1px solid var(--color-divider);
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in srgb, var(--color-text) 62%, transparent);
+  cursor: pointer;
+}
+.filters button:hover { border-color: var(--color-accent); color: var(--color-accent-700); }
+.filters button.on {
+  background: var(--color-accent-100);
+  border-color: var(--color-accent);
+  color: var(--color-accent-800);
 }
 
 /* 一覧はカードで並べる。
    Broadsheetは罫と箱でページを構造化しないが、.card は
    「listings のような個別の項目」のための唯一の箱として用意されている。
-   ノート1本ずつは独立した項目なので、ここは .card を使ってよい場面。 */
+   ノート1本ずつは独立した項目なので、ここは .card を使ってよい場面。
+
+   一覧は本文ではないので、読みやすさのためのコラム幅(--measure)に縛られない。
+   カードを4〜5列並べるために --index-wide まで広げる。 */
 .cards {
-  max-width: var(--measure);
+  max-width: var(--index-wide);
   margin: 0 auto;
   padding: var(--space-6) var(--space-4) 6rem;
   display: grid;
-  /* min() で、ビューポートが 24rem より狭いときはカードを縮められるようにする。
-     minmax(24rem, …) のままだと狭い画面でカードが画面幅を超える。 */
-  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
+  /* 広い画面で4〜5列。min() は、ビューポートが最小幅より狭いときに
+     カードを縮められるようにするため（無いと狭い画面で画面幅を超える）。 */
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
   gap: var(--space-4);
   align-items: stretch;
 }

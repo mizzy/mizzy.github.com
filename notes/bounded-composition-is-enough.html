@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない - notes</title>
+<meta name="description" content="IaCが本当に必要とする再利用は、検証済みパターンのパラメータ付き合成であって、任意計算ではない。モジュール・for・exportsという有界な合成手段で足りる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/design-position.md §3, explorations/2026-04-26-cross-dsl-design-position/carina-position.md §6</code>
+  </p>
+
+  <p><strong>IaCが本当に必要とする再利用は、検証済みパターンのパラメータ付き合成であって、任意計算ではない。</strong>それはモジュール・for・exportsという有界な合成手段 — すべて蒸発条件を満たす — で足りる。</p>
+
+  <p>汎用言語に人が求める「表現力」の実態の多くは<strong>繰り返しの除去</strong>であり、チューリング完全性はそれに対して過剰である。必要なのは「同じ形のものをN個作る」「同じ構成をパラメータ違いで使い回す」であって、「任意の計算をして構成を導く」ではない。</p>
+
+  <p>実需要を分解すると三つに収まる。</p>
+
+  <ul>
+    <li><strong>値計算の再利用</strong>(命名規則、環境別パラメタ) → ユーザー定義関数で足りる</li>
+    <li><strong>構成のテンプレート化</strong>(VPC + Subnet × N + IGWのセット) → moduleで足りる</li>
+    <li><strong>多数生成</strong>(multi-region展開、リスト要素ごと) → <code>for</code>式で足りる</li>
+  </ul>
+
+  <p>経験的な裏付けもある。Terraformは高階関数なしで長年成立しており、<code>for_each</code> / <code>dynamic</code>で大半の用途を満たしている。Bicepは意図的に高階関数を入れず、<code>func</code>のみでAzure IaCとして広く使われている。CDK / Pulumiでの高階関数の実際の活用も、命名関数や<code>map</code>でのループ程度が中心で、Constructを関数で渡す/返すパターンは現場では稀である。</p>
+
+  <p>つまり高階関数は「あれば嬉しいが必須ではない」機能かもしれない、という位置づけになる。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>「Terraformが高階関数なしで長年成立している」は一般知識ベースで、統計的な用法調査に基づくものではない。「現場では稀」も同様に印象ベースの観察。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/boring-verbatim-beats-clever-abstraction.html">IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</a></li>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/ai-lowers-demand-for-abstraction.html">AIは抽象化の実需要をむしろ下げる</a></li>
+      <li><a href="/notes/credentials-adjacent-code-is-attack-surface.html">資格情報の傍で任意パッケージが動くこと自体が攻撃面である</a></li>
+      <li><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/ref-carina-feature-inventory.html">Carina機能点検(2026-04-27時点)</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-再利用">#再利用</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+  </p>
+</article>
+</body>
+</html>

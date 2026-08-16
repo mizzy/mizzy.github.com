@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carina機能点検(2026-04-27時点) - notes</title>
+<meta name="description" content="2026-04-27時点のスナップショット。carina-rs/carina repoをIaCツールとして必要な20項目で点検した結果である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Carina機能点検(2026-04-27時点)</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/carina-position.md §8</code>
+  </p>
+
+  <div class="draft">
+    <p><strong>2026-04-27時点のスナップショット。</strong> <a href="https://github.com/carina-rs/carina">carina-rs/carina</a> repoをIaCツールとして必要な20項目で点検した結果である。実装状況は時間とともに変わるので、現在の状態は必ずリポジトリで確認すること。</p>
+  </div>
+
+  <p>この点検はCarinaプロジェクト<strong>全体(DSL + ツール)を一体として</strong>評価している。state管理 / CRUD実行はDSL仕様ではなくツール側の機能だが、プロジェクトとしての成熟度を測るために含めている。</p>
+
+  <h2>必須7項目: 7/7揃っている</h2>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>項目</th><th>状況</th></tr></thead>
+      <tbody>
+        <tr><td>ノード宣言</td><td>✅ <code>aws.s3.Bucket { ... }</code> / named binding / anonymous</td></tr>
+        <tr><td>edgeの表現</td><td>✅ ResourceRefによる参照、string interpolation対応</td></tr>
+        <tr><td>plan/apply</td><td>✅ Differ + plan generation + validate→plan→apply CLI</td></tr>
+        <tr><td>identity</td><td>✅ ResourceId (provider + type + name)、apply間でstable</td></tr>
+        <tr><td>unknown値</td><td>✅ deferred退避(plan時fully resolved制約あり、issue #2209で改善検討)</td></tr>
+        <tr><td>依存解決と実行順序</td><td>✅ deps.rsでgraph抽出、topological order</td></tr>
+        <tr><td>state管理</td><td>✅ Local backend + S3 backend + DynamoDB lock</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>準必須9項目: 7/9</h2>
+
+  <p>不足しているもの:</p>
+
+  <ul>
+    <li>❌ <code>count</code>相当(<code>for</code>で代替可能)</li>
+    <li>❌ 明示的依存(<code>depends_on</code>相当) → <a href="https://github.com/carina-rs/carina/issues/2239">carina#2239</a></li>
+  </ul>
+
+  <p>実装済みで注目すべきもの:</p>
+
+  <ul>
+    <li>✅ <strong>import (既存リソース取り込み)</strong>: DSL構文<code>import { to = ..., id = ... }</code>実装済み</li>
+    <li>✅ <strong>moved block (state migration)</strong>: Terraform <code>moved</code>相当、<code>removed</code> blockも対応</li>
+    <li>✅ <strong>provider拡張</strong>: WASM plugin systemで言語横断対応(carina-plugin-sdk / carina-plugin-host)</li>
+    <li>✅ <strong>lifecycle制御(部分)</strong>: <code>create_before_destroy</code> / <code>prevent_destroy</code> / <code>force_delete</code>実装済み(<code>replace_on_changes</code> / <code>ignore_changes</code>は未実装)</li>
+  </ul>
+
+  <h2>あると便利4項目: 3/4</h2>
+
+  <p>不足しているもの:</p>
+
+  <ul>
+    <li>❌ partial apply / <code>--target</code> → <a href="https://github.com/carina-rs/carina/issues/2240">carina#2240</a></li>
+    <li>🚧 drift detection:ロジックは実装済みだがCLI公開なし → <a href="https://github.com/carina-rs/carina/issues/2241">carina#2241</a></li>
+  </ul>
+
+  <p>実装済み:</p>
+
+  <ul>
+    <li>✅ policy / validation: <code>require</code> statement、arguments validation</li>
+    <li>✅ plan可視化: TUI (<code>carina-tui</code>、ratatui) + tree-like表示</li>
+  </ul>
+
+  <h2>言語機能の実装状況</h2>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>機能</th><th>状況</th></tr></thead>
+      <tbody>
+        <tr><td>関数定義(<code>fn</code>、型注釈・再帰検出)</td><td>✅ 実装済み</td></tr>
+        <tr><td>関数合成(<code>&gt;&gt;</code>) / パイプ(<code>|&gt;</code>) / 部分適用(closure)</td><td>✅ 実装済み</td></tr>
+        <tr><td>高階関数(関数を引数/戻り値に取る、関数値が一級)</td><td>❌ 未実装</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>点検からの読み</h2>
+
+  <p>必須7項目 + import + moved + WASM providerまで揃っており、IaCツールとしての骨格は完成している。ここから先の進化方向は2軸ある。</p>
+
+  <ul>
+    <li><strong>軸1:運用補助機能の充実(実需要先行)</strong> — <code>depends_on</code> (#2239)、<code>--target</code> (#2240)、<code>carina drift</code> (#2241)の3項目。graph出力DSLの根本構造ではなく実運用のための補助機能で、Terraformに追従する漸進的改善</li>
+    <li><strong>軸2:新しい設計象限の実証(構造先行)</strong> — 高階関数を導入してハイブリッド象限に踏み込む(#2238)。境界設計でgraph形状の静的予測可能性を維持することが核心</li>
+  </ul>
+
+  <p>現状の点検結果から、<strong>軸1で実用性を保ちつつ軸2を実験できる</strong>状態にあると読める。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-参照">#参照</a>
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-スナップショット">#スナップショット</a>
+  </p>
+</article>
+</body>
+</html>

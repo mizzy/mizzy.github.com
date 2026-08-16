@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIのコンテキスト窓は人の局所読解と同質の制約である - notes</title>
+<meta name="description" content="巨大なIaCリポジトリでは、AIが全コードを一度にコンテキストへ入れられない。このとき効くのは「局所読みでgraph形状と属性値が分かる」という性質である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>AIのコンテキスト窓は人の局所読解と同質の制約である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/carina-position.md §7 / explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-4</code>
+  </p>
+
+  <p>巨大なIaCリポジトリでは、AIが全コードを一度にコンテキストへ入れられない。このとき効くのは「局所読みでgraph形状と属性値が分かる」という性質であり、これは<strong>人の局所読解性と同質の制約</strong>である。AIを持ち出したからといって、局所性の要求が消えるわけではない。</p>
+
+  <p>この構図は<strong>抽象化境界の透明性</strong>と深く関わる。module / Construct / Componentを呼び出した瞬間、呼び出し側からは中身(リソース数・identity・依存関係、および各ノードの属性値)が見えなくなる。AIがmodule中身までコンテキストに入れないと修正できない場合、透明性の低い抽象化はAI検証性・plan精度・静的監査の<strong>前提条件を毀損する</strong>。</p>
+
+  <p>つまり透明性は予測可能性の内実ではなく、AI時代の予測可能性議論を成立させる<strong>射程条件</strong>である。透明性そのものは記述言語や記述自由度の所在に依存しない独立した軸で、「呼び出し側がどれだけ中身を読みに行く必要があるか」で決まり、ドキュメント文化・テスト文化・型情報の充実度・preview UIが補う部分である。</p>
+
+  <p>構文レベルで境界を明示する設計 — 読み込み(<code>use</code>式)とインスタンス化の分離、同一templateから複数インスタンス化、<code>use</code>式の<code>let</code> RHS限定 — は、境界管理を明示しやすいという意味で汎用言語の<code>new</code>慣習より透明性に優位を持つ可能性がある。ただし<strong>構文レベルでの明示性は、呼び出し側透明性そのものを自動では保証しない</strong>。module中身を読まずに呼び出し側だけでgraph形状/属性値を予測できるかは、依然としてmodule設計者のドキュメント文化・テスト文化・型情報の充実度に依存する。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>構文設計と透明性の関係は仮説であり、経験的検証を経ていない。構文設計は透明性を促す方向に効きうるが、それだけでAI検証性/plan精度/静的監査が成立する保証にはならない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/predictability-rationale-shifts-under-ai.html">AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-ai">#ai</a>
+    <a href="/notes/#tag-透明性">#透明性</a>
+    <a href="/notes/#tag-局所性">#局所性</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>再配置後に検証がないのは型検査済みIRの不変条件の破壊である - notes</title>
+<meta name="description" content="「well-typedなIRだけがバックエンドに渡る」というコンパイラの標準的な契約が、applyの再配置によって破壊可能になっている。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>再配置後に検証がないのは型検査済みIRの不変条件の破壊である</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §6 / type-system-analysis.md §8弱み6</code>
+  </p>
+
+  <p>「well-typedなIRだけがバックエンドに渡る」というのがコンパイラの標準的な契約である。しかしapplyの再配置はIRに<strong>新しい値を書き込む</strong>。すると問いが立つ:再配置で書き込まれた値は、IRが持っていた型(篩)に対して検証されるのか?</p>
+
+  <p>答えは否で、これは確認済みの実バグである(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 190" role="img" aria-label="検証はplanの早い段階で一度だけ走り、その後ろのplan時の上流state代入とapply時のリソース出力代入という二つの代入点には検証経路がないことを示す時系列の図">
+      <style>
+        .tl text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .tl .ttl { font-size: 13px; font-weight: 600; }
+        .tl .dim { fill: var(--faint); font-size: 11px; }
+        .tl .axis { stroke: var(--rule); fill: none; }
+        .tl .dot { fill: var(--surface); stroke: var(--rule); }
+        .tl .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .tl .gap { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+        .tl .lbl2 { fill: var(--accent-2); font-size: 11px; }
+      </style>
+      <g class="tl">
+        <path class="axis" d="M20 96 H 620"/>
+        <text class="dim" x="20" y="176">時間 →</text>
+
+        <circle class="hi" cx="110" cy="96" r="9"/>
+        <text class="ttl" x="110" y="66" text-anchor="middle">検証ステップ</text>
+        <text class="dim" x="110" y="46" text-anchor="middle">planの早い段階、一度だけ</text>
+
+        <circle class="dot" cx="330" cy="96" r="9"/>
+        <text class="ttl" x="330" y="126" text-anchor="middle">上流stateの値を代入</text>
+        <text class="dim" x="330" y="144" text-anchor="middle">plan時 — 検証ステップより後</text>
+        <path class="gap" d="M330 87 V 62"/>
+        <text class="lbl2" x="330" y="54" text-anchor="middle">検証経路なし</text>
+
+        <circle class="dot" cx="540" cy="96" r="9"/>
+        <text class="ttl" x="540" y="126" text-anchor="middle">リソース出力を代入</text>
+        <text class="dim" x="540" y="144" text-anchor="middle">apply時</text>
+        <path class="gap" d="M540 87 V 62"/>
+        <text class="lbl2" x="540" y="54" text-anchor="middle">検証経路なし</text>
+      </g>
+    </svg>
+    <figcaption>違反値はplanの表示に現れてさえ検査されず、プロバイダAPIのエラーとしてapplyの途中で初めて顕在化する。</figcaption>
+  </figure>
+
+  <p>検証はplanの早い段階で一度だけ走る。ところが代入の時刻は二通りあり、上流stateの値はその後ろで(plan時に)、リソース出力はapply時に代入される。<strong>どちらの代入点にも検証経路がない</strong>。違反値はplanの表示に現れてさえ検査されず、プロバイダAPIのエラーとしてapplyの途中で初めて顕在化する。</p>
+
+  <p>型システムの側から見ると、これは段階を跨ぐ値の篩所属を最終的に誰も検査していない、ということである。未解決参照に対しては宣言型ベースの代入可能性検査が別経路で走るが、その検査が粗い型を通した場合 — 例えば宣言上はただの<code>String</code>を、長さ・パターン付きの型が期待される場所へ補間して渡す場合 — 最終値が篩を満たすかは宣言型からは決定できない。値が確定して代入された後も、Carina自身はどの経路でも再検査しない。</p>
+
+  <p>コンパイラの言葉で言えば「<strong>型検査済み</strong>」というIRの不変条件が再配置で破壊可能である、ということになる。そして修正の縫い目も類比から直ちに出る:各再配置点の直後に、書き込んだ値をその穴の型で検証する。</p>
+
+  <p>この事例は、値ベース検査の「全数」性が何に対する全数なのかも精密化する。全数なのは<strong>検証ステップの時点で値が確定しているもの</strong>に限られる。静的段階で確定する値、ではない — 検証ステップより後にplan時代入される上流state値は、静的段階の値でありながら検査を免れている。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/apply-is-linker-and-loader.html">applyはリンカ兼ローダである</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/ref-carina-issue-index.html">探索から出たissue索引</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-バグクラス">#バグクラス</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-apply">#apply</a>
+  </p>
+</article>
+</body>
+</html>

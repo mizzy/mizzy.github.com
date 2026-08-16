@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>リファクタ耐性はidentityを歴史的に繋ぐ機構で買う - notes</title>
+<meta name="description" content="コード構造を変えたときに既存リソースが破壊されないかは、identityの生成規則ではなく、旧identityと新identityを歴史的に繋ぐ機構があるかで決まる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>リファクタ耐性はidentityを歴史的に繋ぐ機構で買う</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-5-identity-and-refactoring-stability.md</code>
+  </p>
+
+  <p>コード構造を変えたとき(rename / move / refactor)に既存リソースが破壊されないかどうかは、identityの生成規則そのものではなく、<strong>旧identityと新identityを歴史的に繋ぐ機構</strong>があるかどうかで決まる。identityの生成規則は「同じコードなら同じ識別子」を保証するだけで、コードが変わったときの連続性は別建ての機構が担う。</p>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>ツール</th><th>リファクタ耐性の機構</th></tr></thead>
+      <tbody>
+        <tr><td>Terraform</td><td><code>moved</code>ブロック(1.1+)でリネーム/移動を吸収</td></tr>
+        <tr><td>CDK</td><td><code>overrideLogicalId()</code>で論理IDを明示制御。<code>cdk refactor</code> <span class="todo">(新機能?)</span></td></tr>
+        <tr><td>Pulumi</td><td><code>aliases</code>で旧URNを保持して移動を吸収</td></tr>
+        <tr><td>Carina</td><td><code>moved</code> block実装済み(<code>removed</code> blockも対応)。リネーム自動検知はcarina#2194で起票済み</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Terraformの<code>moved</code>ブロックはこう書く。</p>
+
+<pre><code>moved {
+  from = aws_s3_bucket.old
+  to   = aws_s3_bucket.new
+}</code></pre>
+
+  <p>CDKの<code>overrideLogicalId('FixedId')</code>は、escape hatchesの一つとして位置づけられている(<code>node.defaultChild</code>でL1を取得し、<code>addPropertyOverride</code> / <code>addOverride</code> / <code>addDeletionOverride</code>と並ぶ)。construct pathからMD5ハッシュを生成する仕組みは、Construct構造を変えると論理IDが変わることを意味するので、この明示制御が必要になる。</p>
+
+  <p>CarinaのanonymousリソースがSimHashによるcontent-basedな識別子を使うのは、この問題への別方向の答えである。<strong>Hamming distance対応で、小さい引数変更時もstate内のリソースを追跡できる</strong>。identityを固定するのではなく、identityの近さで同一性を判定する設計になっている。</p>
+
+  <p>CDK / Pulumiは動的選択を言語側で遮断しない代わりに、<strong>identity安定性の責任をユーザに委ねる</strong>。AWS CDK公式のBest practicesは「Make decisions at synthesis time」としてホスト言語ループでのConstruct生成を推奨しつつ、「statefulリソースのlogical IDを変更すると置き換えが発生する」「単体テストでlogical IDの固定性を検証すべき」と注意喚起する。Pulumi公式も同様に、名前やparentの階層変更でURNが変わると別リソース扱い(削除→新規作成)になると警告する。これは「規約に委ねる」象限の典型挙動である。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>CDKの<code>cdk refactor</code>の存在と機能範囲、Pulumiの<code>aliases</code>の使い方詳細は未確認。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/logical-id-vs-physical-name.html">論理IDと物理リソース名は別物だが漏れる</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/logical-id-vs-physical-name.html">論理IDと物理リソース名は別物だが漏れる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-identity">#identity</a>
+    <a href="/notes/#tag-リファクタリング">#リファクタリング</a>
+    <a href="/notes/#tag-state">#state</a>
+  </p>
+</article>
+</body>
+</html>

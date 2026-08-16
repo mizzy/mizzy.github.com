@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い - notes</title>
+<meta name="description" content="インフラ記述の主要な読者はレビューアと将来の運用者である。彼らが問うのは「この記述から実際に何が作られるか」の判読性である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>IaCでは賢い抽象より退屈で逐語的な記述の方が価値が高い</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/design-position.md §3, explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3-3</code>
+  </p>
+
+  <p>インフラ記述の主要な読者は<strong>レビューアと将来の運用者</strong>である。彼らが問うのは「このコードは何を計算するか」ではなく「<strong>この記述から実際に何が作られるか</strong>」の判読性である。抽象の層が厚くなるほど記述と成果物の距離が開き、plan / diffの判読コストが上がる。だからIaCでは、賢い抽象より退屈で逐語的な記述の方が価値が高い。</p>
+
+  <p>これは一般のソフトウェア開発の価値観とは逆向きである。通常のプログラミングでは重複の除去と抽象化の巧みさが美徳になるが、IaCでは成果物(実インフラ)との対応が読み取れることが優先される。抽象化は距離を作るという一点で、このドメインではコストの側に数えられる。</p>
+
+  <p>同じ判断は「言語が決める」側の得るものとしても現れる。文法の上で「読めない書き方」を構造的に書けなくすると、ベテランも新人も同じ表現力に揃い、レビュアーは「文法が通っているなら最低ラインは満たす」と判断できる。静的解析・LSP・自動修正ツールも効きやすい。規約を作って教育する組織コストも要らない。</p>
+
+  <p>代償として逃げ道がなくなる。文法の表現力を超える構成を書きたいとき、別アプローチ(module分割、外部スクリプトでの生成)に逃げる必要が出る。この立場は、その代償を払ってでも判読性を取るという選択である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/ai-lowers-demand-for-abstraction.html">AIは抽象化の実需要をむしろ下げる</a></li>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/readability-comes-from-the-locus-not-the-language.html">「DSLだから読みやすい」のではない</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-可読性">#可読性</a>
+    <a href="/notes/#tag-iac">#iac</a>
+  </p>
+</article>
+</body>
+</html>

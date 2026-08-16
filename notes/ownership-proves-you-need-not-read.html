@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>排他所有が証明できれば読まなくてよい - notes</title>
+<meta name="description" content="worldを速くする三つの攻め口のうち、最も踏み込んだものは「読まなくてよい条件を作る」である。自分しか書かないリソースについては、自分の記録が真であり、クラウドAPIを叩く必要がない。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>排他所有が証明できれば読まなくてよい</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-11-world-acquisition-incremental-plan/README.md §4, §6</code>
+  </p>
+
+  <p>worldを速くする三つの攻め口のうち、最も踏み込んだものは「<strong>読まなくてよい条件を作る</strong>」である。自分しか書かないリソースについては、自分の記録が真であり、クラウドAPIを叩く必要がない。</p>
+
+  <p>古典的な対応物はリース(Gray &amp; Cheriton)である。「期限付きの所有権があるあいだは、再確認なしで自分のキャッシュを信じてよい」。IaCでは「このstateの所有者だけがこのリソース群を書く」という運用前提がリースに当たり、前提が成り立つ間はrefresh自体が不要になる。</p>
+
+  <p>型システムの角度から見ると、これはRustの所有権が「排他なら同期不要」をコンパイル時に証明するのと同じ形である。リソースごとに「<strong>書き手は誰か</strong>」を宣言のレベルで持たせ、自分(このstate)が排他所有するリソースはrefresh不要(自分の記録が真)とし、共有(コンソール操作や他パイプラインがありうる)と宣言されたリソースだけをイベント購読や同期GETの対象にする。</p>
+
+  <p>この宣言は単なる自己申告に留めなくてよい。<strong>IAM / SCPで「このロールしか書けない」が実際に強制されていれば、排他所有は運用上の仮定ではなく検証可能な前提になる</strong>。並行プログラム検証のrely-guarantee推論 — 環境の干渉をこの範囲と仮定して証明する枠組み — のIaC版である。</p>
+
+  <p>宣言された前提を機構で裏づけるこの形は、公称軸の部分型付けと同じ設計の型である。名前で宣言された区別を、その名前が指す実体の側で保証する。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>リース、rely-guarantee推論への言及はAIの学習データ由来で一次ソース未確認。IAM / SCPによる排他所有の強制が実際にどこまで検証可能な前提になるかは実装・実測を伴わないアイデアの段階。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-所有権">#所有権</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-分散システム">#分散システム</a>
+  </p>
+</article>
+</body>
+</html>

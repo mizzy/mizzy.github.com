@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拡張ポイントを言語境界で開けるのは第三の選択肢である - notes</title>
+<meta name="description" content="「言語が決める」か「規約に委ねる」かという二択の外側に、拡張ポイントを言語境界で開けるという第三の選択肢がある。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>拡張ポイントを言語境界で開けるのは第三の選択肢である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/tier-3-crossplane.md §5, explorations/2026-04-26-cross-dsl-design-position/README.md</code>
+  </p>
+
+  <p>「言語が決める」か「規約に委ねる」かという二択の外側に、<strong>拡張ポイントを言語境界で開ける</strong>という第三の選択肢がある。Crossplane Compositionsがその実例で、PulumiのMLC (multi-language components)も類似の発想にある。</p>
+
+  <p>Crossplaneは<strong>Kubernetes API上に構築された二層IaC</strong>として読める。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="CrossplaneのYAML層は宣言的に閉じており、function層に拡張性を全部押し付ける二層構造。言語境界そのものが拡張ポイントになっている図">
+      <style>
+        .lx text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .lx .box { fill: var(--surface); stroke: var(--rule); }
+        .lx .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .lx .ttl { font-size: 13px; font-weight: 600; }
+        .lx .dim { fill: var(--faint); font-size: 11px; }
+        .lx .arw { stroke: var(--faint); fill: none; }
+        .lx .seam { stroke: var(--accent); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .lx .seamt { fill: var(--accent); font-size: 11px; }
+      </style>
+      <g class="lx">
+        <rect class="hi" x="8" y="24" width="424" height="60" rx="4"/>
+        <text class="ttl" x="24" y="48">YAML層 — 宣言的に閉じている</text>
+        <text class="dim" x="24" y="70">KubernetesリソースとしてCRUD可能。kubectl / kustomize / Helmと組み合わせられる</text>
+
+        <path class="seam" d="M8 96 H 432"/>
+        <text class="seamt" x="440" y="100">言語境界がそのまま拡張ポイントになる</text>
+
+        <rect class="box" x="8" y="108" width="424" height="60" rx="4"/>
+        <text class="ttl" x="24" y="132">function層 — 拡張性を全部押し付ける</text>
+        <text class="dim" x="24" y="154">パッチ変換・命名規則・複雑なロジック。OCIイメージとして配布され、複数言語で書ける</text>
+
+        <path class="arw" d="M220 84 V 106"/>
+        <text class="dim" x="8" y="190">Composition Selector: XRのlabelに応じて適用Compositionを動的に選択できる</text>
+      </g>
+    </svg>
+    <figcaption>拡張性の所在を言語の中でも規約でもなく、言語の外に置く。「外部DSL × 言語が決める」と「汎用言語 × 規約に委ねる」の両方に同時に足を置く形になる。</figcaption>
+  </figure>
+
+  <ul>
+    <li><strong>YAML層は宣言的に閉じている</strong> — KubernetesリソースとしてCRUD可能、kubectlで操作でき、kustomizeやHelmと組み合わせられる</li>
+    <li><strong>function層に拡張性を全部押し付ける</strong> — パッチ変換・命名規則・複雑なロジックはfunction側で書く。functionはOCIイメージとして配布され、複数言語で書ける</li>
+    <li><strong>Composition Selector</strong> — XRのlabelに応じて適用Compositionを動的に選択でき、環境別(dev/staging/prod)に別Compositionを使い分けられる。これはTerraform / Bicep / Carinaにはない動的選択軸</li>
+  </ul>
+
+  <p>この設計は「<strong>外部DSL × 言語が決める</strong>」象限と「<strong>汎用言語 × 規約に委ねる</strong>」象限の<strong>両方に同時に足を置く</strong>。Bicepの<code>func</code>やCarinaの<code>fn</code>が言語内蔵の拡張機構であるのに対し、Crossplaneは<strong>ツールチェーン全体で多言語を許容する</strong>という設計判断を取っている。「functionを組み込めば任意のDSL/汎用言語の特性を取り込める」という形で、拡張性の所在を言語の外に置く。</p>
+
+  <p>代償も明確である。得たのはKubernetes API上の宣言性、functionによる任意言語拡張、Composition Selectorによる環境切替。失ったのは<strong>全体像の見通し</strong>(YAML + functionコード + XRDの三者を読む必要がある)、デバッグの複雑化(function chainのどこで何が起きたか)、そして<strong>type safetyの弱さ</strong>(YAMLレイヤの型は動的)である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/ref-config-dsl-survey.html">構成記述DSL 11本の調査</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計空間">#設計空間</a>
+    <a href="/notes/#tag-拡張性">#拡張性</a>
+    <a href="/notes/#tag-crossplane">#crossplane</a>
+  </p>
+</article>
+</body>
+</html>

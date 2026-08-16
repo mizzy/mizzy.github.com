@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「信頼できるworld = 全リソースの同期GET」という等式をほどく - notes</title>
+<meta name="description" content="IaCのコンパイルは二引数plan(source, world)である。このうちworldの取得が遅い。等式をほどくと、攻め口は三つに分かれる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「信頼できるworld = 全リソースの同期GET」という等式をほどく</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-11-world-acquisition-incremental-plan/README.md §1</code>
+  </p>
+
+  <p>IaCのコンパイルは二引数plan(source, world)である。このうち<strong>worldの取得が遅い</strong>。信頼できるworldを作ろうとすると全リソースをクラウドAPIへの同期GETで読む(refresh)ことになり、所要時間はリソース総数に比例し、レート制限にも当たる。</p>
+
+  <p>しかしこの遅さは「信頼性 = 全リソースの同期GET」という等式を無条件に受け入れた結果である。等式をほどくと、攻め口は三つに分かれる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 250" role="img" aria-label="「信頼できるworld = 全リソースの同期GET」という等式を、読む量を減らす・読む時刻をずらす・読まなくてよい条件を作るの三つの攻め口にほどく図。三つはそれぞれdirty bitと無効化通知、増分ビュー維持、リースと所有権に対応物を持ち、排他ではなく重ねられる">
+      <style>
+        .wa text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .wa .box { fill: var(--surface); stroke: var(--rule); }
+        .wa .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .wa .ttl { font-size: 13px; font-weight: 600; }
+        .wa .dim { fill: var(--faint); font-size: 11px; }
+        .wa .arw { stroke: var(--faint); fill: none; }
+        .wa .num { fill: var(--accent); font-size: 13px; font-weight: 600; }
+      </style>
+      <g class="wa">
+        <rect class="hi" x="8" y="24" width="624" height="42" rx="4"/>
+        <text class="ttl" x="320" y="50" text-anchor="middle">信頼できるworld = 全リソースの同期GET</text>
+
+        <path class="arw" d="M160 66 V 92"/>
+        <path class="arw" d="M320 66 V 92"/>
+        <path class="arw" d="M480 66 V 92"/>
+
+        <rect class="box" x="8" y="96" width="196" height="94" rx="4"/>
+        <text class="num" x="24" y="120">1</text>
+        <text class="ttl" x="44" y="120">読む量を減らす</text>
+        <text x="24" y="142">変わったものだけ読む</text>
+        <text class="dim" x="24" y="164">dirty bitと無効化通知</text>
+        <text class="dim" x="24" y="180">(CPUは全走査をしない)</text>
+
+        <rect class="box" x="222" y="96" width="196" height="94" rx="4"/>
+        <text class="num" x="238" y="120">2</text>
+        <text class="ttl" x="258" y="120">読む時刻をずらす</text>
+        <text x="238" y="142">planの同期パスから外す</text>
+        <text class="dim" x="238" y="164">データベースの</text>
+        <text class="dim" x="238" y="180">増分ビュー維持</text>
+
+        <rect class="box" x="436" y="96" width="196" height="94" rx="4"/>
+        <text class="num" x="452" y="120">3</text>
+        <text class="ttl" x="472" y="120">読まなくてよい条件</text>
+        <text x="452" y="142">自分しか書かないなら</text>
+        <text x="452" y="158">自分の記録が真</text>
+        <text class="dim" x="452" y="180">分散システムのリース / 所有権</text>
+
+        <text class="dim" x="8" y="222">三つは排他ではなく重ねられる — 既定は所有権、共有分はdirty追跡、最終的な正しさはapply直前の検証。</text>
+      </g>
+    </svg>
+    <figcaption>等式をほどくと攻め口は三つに分かれ、それぞれ別分野に対応物を持つ。三つは排他ではなく層構造に重ねられる。</figcaption>
+  </figure>
+
+  <ol>
+    <li><strong>読む量を減らす</strong> — 変わったものだけ読む</li>
+    <li><strong>読む時刻をずらす</strong> — planの同期パスから外す</li>
+    <li><strong>読まなくてよい条件を作る</strong> — 自分しか書かないなら自分の記録が真</li>
+  </ol>
+
+  <p>三つはそれぞれ別分野に対応物を持つ。1と2はハードウェア/OSのdirty bitと無効化通知(CPUはメモリの全走査をしない)、およびデータベースの増分ビュー維持に対応する。3は分散システムのリース — 期限付きの所有権があるあいだは再確認なしで自分のキャッシュを信じてよい — と、型システムの所有権に対応する。</p>
+
+  <p>重要なのは、この三つが<strong>排他ではなく重ねられる</strong>ことである。既定は所有権で読まずに済ませ、共有リソースだけをイベント駆動のdirty追跡でカバーし、最終的な正しさはapply直前の検証で担保する、という層構造に落ちる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/dirty-bit-for-the-cloud.html">クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</a></li>
+      <li><a href="/notes/ownership-proves-you-need-not-read.html">排他所有が証明できれば読まなくてよい</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+      <li><a href="/notes/compilation-takes-source-and-world.html">IaCのコンパイルは二引数である</a></li>
+      <li><a href="/notes/dirty-bit-for-the-cloud.html">クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</a></li>
+      <li><a href="/notes/ownership-proves-you-need-not-read.html">排他所有が証明できれば読まなくてよい</a></li>
+      <li><a href="/notes/plan-as-a-standing-query.html">純粋性はplanを常駐クエリに変える前提条件である</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-性能">#性能</a>
+    <a href="/notes/#tag-設計">#設計</a>
+  </p>
+</article>
+</body>
+</html>

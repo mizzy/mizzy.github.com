@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>未解決の問い - notes</title>
+<meta name="description" content="これらの探索で答えが出なかった問いの一覧。概念ノートではなく、次に調べるべきことのリストである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>未解決の問い</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1〜5「未確認の論点」/ explorations/2026-04-26-cross-dsl-design-position/README.md残された論点, carina-position.md §10</code>
+  </p>
+
+  <p>これらの探索で<strong>答えが出なかった問い</strong>の一覧。概念ノートではなく、次に調べるべきことのリストである。既に解決したものは各概念ノートに事実として書かれているのでここには含まない。</p>
+
+  <h2>高階関数と境界設計</h2>
+
+  <ul>
+    <li><strong>境界設計の技術的成立性</strong>:高階関数を入れたとき、関数値がresource生成位置・module選択位置・identity決定位置に到達しない型/文法/評価制約は実装可能か。graph形状の静的予測可能性を保つ条件として成立するか</li>
+    <li><strong>unknown値と高階関数の相互作用</strong>:関数引数/戻り値を流れるdeferred値をどう扱うか</li>
+    <li><strong>identityの安定性</strong>:高階関数経由で生成されるanonymous resourceの自動命名は安定するか</li>
+    <li><strong>plan表示</strong>:高階関数を経由した展開を予測可能な形で見せるUI設計(graph形状側 / 属性値側とも)</li>
+    <li><strong>「IaCで高階関数は実需要があるか」の経験的検証</strong>:入れた後でユーザがどう使うかの観察</li>
+  </ul>
+
+  <h2>AI時代の予測可能性</h2>
+
+  <ul>
+    <li><strong>属性値レベルの動的計算が静的監査に与える影響の経験的検証</strong>:高階関数経由で属性値計算が複雑化したとき、コンプライアンス監査 / セキュリティスキャン(tfsec, checkov相当)がどこまで成立するか</li>
+    <li><strong>生成AIが動的構造を持つIaCコードでどの程度誤読・誤修正するか</strong>: AI時代の予測可能性議論を支える経験的根拠の収集(LLMベンチマーク、実運用事故の事例分析)。属性値レベルの動的計算とgraph形状レベルの動的計算でAI誤読率が異なるかも論点</li>
+    <li><strong>「人前提」と「AI自律apply前提」の予測可能性要件の差</strong>:同方向と整理したが、AI自律でapplyまで完結する場合に追加の要件(より強い不変条件、例えばapply前のrollback可能性)が要るか</li>
+    <li><strong>抽象化境界の透明性と構文設計の関係</strong>: 「<code>use</code> + インスタンス化分離は境界管理を明示しやすいが、呼び出し側透明性そのものは保証しない」という仮説の経験的検証。実プロジェクトでのmodule設計プラクティス・ドキュメント文化・型情報充実度との相互作用を観察する必要がある</li>
+  </ul>
+
+  <h2>DSL横断分析の残り</h2>
+
+  <ul>
+    <li><strong>11 DSLの属性値計算自由度の再評価</strong>: cross-DSL分析の3自由度評価はgraph形状側に偏っている。Pkl / KCL / Dhall / Jsonnet / Nickelなど構成データ出力DSLは属性値計算が主用途なので、属性値自由度で見ると評価が変わる可能性がある</li>
+    <li><strong>Pklの構成データ計算vs IaCのresource graph</strong>:軸の読み替え(graph形状 → 最終value形状)が元の前提を緩めることになる</li>
+    <li><strong>Crossplaneの二層構造の評価</strong>: function言語選択は「設計判断」というより「ユーザの実装選択」で、3自由度の枠組みとレイヤが違う</li>
+    <li><strong>lazy評価の影響</strong>: Jsonnet / Nickel / Dhallのlazy性が「複数量の制御」「実装の切替」のセマンティクスに与える影響は未検証</li>
+    <li><strong>Pulumi MLCとの比較</strong>: MLC (multi-language components)はcross-DSL分析で扱わなかった(CDKのjsiiと同じ「単一原本からの自動bridging」軸)</li>
+  </ul>
+
+  <h2>型・schema・unknown (章3)</h2>
+
+  <ul>
+    <li><strong>Pulumi schemaの表現力</strong>: enum / oneOf / refinementの扱い、provider間の差</li>
+    <li><strong>CDKのjsiiでTS型をPython/Java/Goにbridgingする時の精度</strong>:型情報の損失があるか</li>
+  </ul>
+
+  <h2>state (章4)</h2>
+
+  <ul>
+    <li><strong>Carinaのstate v3の詳細</strong>: binding/dependency_bindingsの意味、state CLI、手動編集機構、refresh機構の有無</li>
+    <li><strong>Pulumi serviceの運用責任範囲</strong>:具体的に何をPulumi社が担うか</li>
+    <li><strong>CFN drift detectionの精度と限界</strong></li>
+    <li><strong><code>terraform state rm</code>後のresource復元方法、<code>pulumi state delete</code>後の復元方法</strong></li>
+    <li><strong>multi-region / multi-account state設計</strong></li>
+    <li><strong>secret値がstateにどう保存されるか</strong>: Pulumi secret機構との接続</li>
+  </ul>
+
+  <h2>identity (章5)</h2>
+
+  <ul>
+    <li><strong>CDKの<code>cdk refactor</code>の存在と機能範囲</strong></li>
+    <li><strong>Pulumiの<code>aliases</code>の使い方詳細</strong></li>
+    <li><strong>Carinaの<code>moved</code>相当機構の有無</strong>(carina#2194の進捗。機能点検では実装済みと記録されているが、章5の概観表では未確認のまま)</li>
+    <li><strong>CDKで「Construct構造を変えると論理IDが変わる」の具体例とその回避策</strong></li>
+    <li><strong>multi-stack / multi-environmentでのidentity設計</strong></li>
+  </ul>
+
+  <h2>world取得の高速化</h2>
+
+  <p>これらは「実装・実測をしていない設計アイデア」全体が未検証である。特に:</p>
+
+  <ul>
+    <li><strong>awsccのCloud Control API由来の一様な同定子が、変更フィードとstateの対応づけを構造的に易しくするか</strong>(未検証だが、検証する価値が高いと評価されている)</li>
+    <li><strong>AWS Config / EventBridgeの配信遅延と欠落の実際の程度</strong></li>
+    <li><strong>排他所有の宣言をIAM / SCPで裏づけたとき、どこまで「読まなくてよい」を証明できるか</strong></li>
+  </ul>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/about-these-notes-accuracy.html">これらのノートの精度について</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-未解決">#未解決</a>
+    <a href="/notes/#tag-todo">#todo</a>
+  </p>
+</article>
+</body>
+</html>

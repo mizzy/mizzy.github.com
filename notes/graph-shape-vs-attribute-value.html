@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>予測可能性はgraph形状と属性値の二側面を持つ - notes</title>
+<meta name="description" content="コードから読み取りたいものは二つある。graph形状と、各ノードの属性値である。三つの記述自由度はどちらの側にも適用される。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>予測可能性はgraph形状と属性値の二側面を持つ</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3, §1-3-3</code>
+  </p>
+
+  <p>コードから読み取りたいものは二つある。<strong>graph形状</strong>(どんなリソースがいくつ、どう繋がって作られるか)と、<strong>各ノードの属性値</strong>(そのリソースが具体的にどう設定されるか)である。三つの記述自由度はどちらの側にも適用される。</p>
+
+  <p>属性値の予測可能性は、運用上「このリソースは具体的にどう設定されているか」をコードから知りたい場面 — インシデント対応 / コンプライアンス監査 / セキュリティレビュー — でgraph形状と並ぶ重要性を持つ。<strong>属性値計算の抽象化自由度には明確な差がある</strong>: Terraform(組込み関数のみ) &lt; Bicep(<code>func</code>あり) &lt; Carina(関数合成 + closure) &lt; CDK / Pulumi(高階関数 + クラス継承)。graph形状側では同列に「言語が決める」と評価される3ツール(Terraform / Bicep / Carina)でも、属性値側では差が出る。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 180" role="img" aria-label="同じfor構文でも、resourceブロックやmodule呼び出しで使われるとノードが増減してgraph形状側に効き、属性内のコレクション生成で使われるとノード数もidentityも変わらず属性値の中身だけが動くことを示す図">
+      <style>
+        .gs text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .gs .box { fill: var(--surface); stroke: var(--rule); }
+        .gs .ttl { font-size: 13px; font-weight: 600; }
+        .gs .dim { fill: var(--faint); font-size: 11px; }
+        .gs .node { fill: var(--accent-bg); stroke: var(--accent); }
+        .gs .ghost { fill: none; stroke: var(--accent); stroke-dasharray: 4 3; }
+        .gs .mono { font-family: var(--mono); font-size: 11px; }
+      </style>
+      <g class="gs">
+        <text class="ttl" x="8" y="20">graph形状側に効く</text>
+        <text class="mono" x="8" y="40">for_each = var.subnet_cidrs</text>
+        <rect class="node" x="8" y="52" width="54" height="24" rx="3"/>
+        <rect class="node" x="70" y="52" width="54" height="24" rx="3"/>
+        <rect class="ghost" x="132" y="52" width="54" height="24" rx="3"/>
+        <rect class="ghost" x="194" y="52" width="54" height="24" rx="3"/>
+        <text class="dim" x="8" y="98">要素ごとに別resourceノード(別identity)</text>
+        <text class="dim" x="8" y="116">要素数の動的化 = ノード数の動的化</text>
+        <text class="dim" x="8" y="134">planには「resourceがN個増減する」と現れる</text>
+
+        <text class="ttl" x="336" y="20">属性値側に閉じる</text>
+        <text class="mono" x="336" y="40">tags = { for k in keys: … }</text>
+        <rect class="node" x="336" y="52" width="54" height="24" rx="3"/>
+        <text class="dim" x="400" y="68">ノード数もidentityも変わらない</text>
+        <text class="dim" x="336" y="98">動くのは属性値の中身だけ</text>
+        <text class="dim" x="336" y="116">planには「属性Xが複雑な値になる」と現れる</text>
+        <text class="dim" x="336" y="134">レビュー時の認知負荷も別物である</text>
+      </g>
+    </svg>
+    <figcaption>同じ<code>for</code>構文でも、適用位置がengineの見る同一性を変えるかどうかで、効き方が二つに分かれる。</figcaption>
+  </figure>
+
+  <p>三自由度のうち「<strong>複数量の制御</strong>」だけは、同じ構文でも適用位置でどちらに効くかが分かれる。区別の基準は「<strong>engineが別ノード/別identityとして扱うか</strong>」:</p>
+
+  <ul>
+    <li><strong>graph形状側に効く</strong>: <code>for_each = var.subnet_cidrs</code>のようにresourceブロックやmodule呼び出しで使われると、要素ごとに別resourceノード(別identity)が生成される。要素数の動的化はそのままノード数の動的化</li>
+    <li><strong>属性値側に閉じる</strong>: <code>tags = { for k in keys: k =&gt; format(...) }</code>のように属性内のコレクション生成で使われると、ノード数もidentityも変わらず属性値の中身だけが動く</li>
+  </ul>
+
+  <p>両者は同じ<code>for</code>構文を使うが、結果予測性への効き方が異なる。graph形状側の<code>for_each</code>はplanで「resourceがN個増減する」として現れ、属性値側の<code>for</code>は「あるresourceの属性Xが複雑な値になる」として現れる。AI修正やレビュー時の認知負荷も別物である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/attribute-audit-needs-static-values.html">属性値が動的計算だと静的監査が破綻する</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/abstraction-boundary-opacity.html">抽象化境界の透明性は記述自由度とは独立した軸である</a></li>
+      <li><a href="/notes/attribute-audit-needs-static-values.html">属性値が動的計算だと静的監査が破綻する</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/three-freedoms-of-description.html">結果予測性に効く記述自由度は三つに絞れる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-予測可能性">#予測可能性</a>
+    <a href="/notes/#tag-比較軸">#比較軸</a>
+    <a href="/notes/#tag-差分">#差分</a>
+  </p>
+</article>
+</body>
+</html>

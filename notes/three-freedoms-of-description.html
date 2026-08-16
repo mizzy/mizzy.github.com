@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>結果予測性に効く記述自由度は三つに絞れる - notes</title>
+<meta name="description" content="記述自由度は無数に立てられるが、resource graphの形と属性値の決まり方に直接効く軸に絞ると、抽象化の追加・複数量の制御・実装の切替の三つになる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>結果予測性に効く記述自由度は三つに絞れる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-1-notation-and-abstraction.md §1-3, explorations/2026-04-26-cross-dsl-design-position/README.md</code>
+  </p>
+
+  <p>記述自由度は無数に立てられるが、「実行前にコードを読んだ時点で、resource graphの形と各ノードの属性値がどう決まるかを読み取れるか」に<strong>直接</strong>効く軸に絞ると、三つになる。</p>
+
+  <ul>
+    <li><strong>抽象化の追加</strong> — ユーザーが新しい抽象(任意ヘルパー関数 / クラス / 薄いwrapper)を足せるか。graph形状側ではmodule / Construct / Componentの切り出し、属性値側では値計算ヘルパー(命名規則 / 環境別パラメタ計算 / 文字列処理)や型抽象が該当</li>
+    <li><strong>複数量の制御</strong> — 同じ抽象や要素を何個展開するかを動的に決められるか。graph形状側では<code>for_each</code>/<code>count</code>でresourceノード数を動かす、属性値側では<code>tags = { for k in keys: ... }</code>のようなcomprehensionで属性内コレクションの要素数を動かす</li>
+    <li><strong>実装の切替</strong> — どの実装を選ぶかを動的に決められるか。graph形状側では<code>source</code>ディレクトリやクラスの動的選択、属性値側では計算ロジックの動的選択(ストラテジ的な分岐)</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 640 230" role="img" aria-label="三つの自由度がそれぞれgraph形状側と属性値側の二側面を持ち、その両方が結果予測性に効くことを示す図">
+      <style>
+        .fr text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .fr .box { fill: var(--surface); stroke: var(--rule); }
+        .fr .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .fr .ttl { font-size: 13px; font-weight: 600; }
+        .fr .dim { fill: var(--faint); font-size: 11px; }
+        .fr .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="fr">
+        <text class="dim" x="188" y="24" text-anchor="middle">graph形状側</text>
+        <text class="dim" x="392" y="24" text-anchor="middle">属性値側</text>
+
+        <text class="ttl" x="8" y="58">抽象化の追加</text>
+        <rect class="box" x="140" y="36" width="96" height="30" rx="4"/>
+        <text x="188" y="56" text-anchor="middle">module切り出し</text>
+        <rect class="box" x="296" y="36" width="192" height="30" rx="4"/>
+        <text x="392" y="56" text-anchor="middle">値計算ヘルパー / 型抽象</text>
+
+        <text class="ttl" x="8" y="106">複数量の制御</text>
+        <rect class="box" x="140" y="84" width="96" height="30" rx="4"/>
+        <text x="188" y="104" text-anchor="middle">ノード数</text>
+        <rect class="box" x="296" y="84" width="192" height="30" rx="4"/>
+        <text x="392" y="104" text-anchor="middle">コレクション要素数</text>
+
+        <text class="ttl" x="8" y="154">実装の切替</text>
+        <rect class="box" x="140" y="132" width="96" height="30" rx="4"/>
+        <text x="188" y="152" text-anchor="middle">source / クラス</text>
+        <rect class="box" x="296" y="132" width="192" height="30" rx="4"/>
+        <text x="392" y="152" text-anchor="middle">計算ロジックの選択</text>
+
+        <path class="arw" d="M500 51 H 540"/>
+        <path class="arw" d="M500 99 H 540"/>
+        <path class="arw" d="M500 147 H 540"/>
+        <rect class="hi" x="540" y="70" width="92" height="58" rx="4"/>
+        <text class="ttl" x="586" y="94" text-anchor="middle">結果</text>
+        <text class="ttl" x="586" y="112" text-anchor="middle">予測性</text>
+
+        <text class="dim" x="8" y="196">除外した軸:実行モデル / 型 / state / identity — これらは別軸である</text>
+      </g>
+    </svg>
+    <figcaption>三つの自由度はそれぞれgraph形状側と属性値側の二側面を持つ。表記/抽象化の層で説明できるものだけを残し、実行モデル・型・state・identityは別軸として除外している。</figcaption>
+  </figure>
+
+  <p>選定基準は二つ。(i) resource graphの形または各ノードの属性値を変える自由度に直接効くこと、(ii)表記/抽象化の層で説明できること — 実行モデル・型・state・identityは別軸なので除外する。</p>
+
+  <p>この三つは構成記述系DSL全般の比較軸としても有用だが、IaC固有の偏りもある。「実装の切替」(import pathの動的性)は構成記述DSL11個すべてに当てはまる。「複数量の制御」も適用可能だが、graphを出力しないDSL(Pkl / CUE / Dhall)では「graphの個数」ではなく「<strong>最終valueの集合サイズ</strong>」として読み替える必要がある。「抽象化の追加」は普遍的だが、graph形状への影響はIaC以外では希薄。つまり三自由度そのものは一般的で、「graph形状を変えるか」という基準の方がIaC固有である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/ref-three-freedoms-matrix.html">3自由度サマリ表</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/graph-output-vs-config-data-output.html">構成データ出力DSLとgraph出力DSLはレイヤが違う</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/locus-of-descriptive-freedom.html">記述自由度は「言語が決める」か「規約に委ねる」かの二層に分かれる</a></li>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/ref-three-freedoms-matrix.html">3自由度サマリ表</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-比較軸">#比較軸</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+  </p>
+</article>
+</body>
+</html>

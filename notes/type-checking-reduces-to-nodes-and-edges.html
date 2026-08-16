@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>検査対象はノード上の値とエッジ両端の型の二種に還元できる - notes</title>
+<meta name="description" content="IaC言語の型検査が項ベースの型体系をほぼ必要としないのは、意味的本体がグラフだけであることの帰結である。検査対象はグラフそのものになる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>検査対象はノード上の値とエッジ両端の型の二種に還元できる</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/design-position.md §2</code>
+  </p>
+
+  <p>IaC言語の型検査が項ベースの型体系をほぼ必要としないのは、実装上の手抜きではなく、意味的本体がグラフだけであることの帰結である。<strong>型を付けるべき「プログラム」が実質存在しないので、検査対象はグラフそのものになる</strong>。</p>
+
+  <p>グラフを検査するとは、次の二種を検査することである。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 190" role="img" aria-label="グラフの検査が二種に還元されることを示す図。ノード上では各属性値が宣言された型・制約に属しているかを検査し、ノード間のエッジでは参照先の型が参照元の要求する型に代入可能かを検査する">
+      <style>
+        .ne text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ne .box { fill: var(--surface); stroke: var(--rule); }
+        .ne .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .ne .ttl { font-size: 13px; font-weight: 600; }
+        .ne .dim { fill: var(--faint); font-size: 11px; }
+        .ne .arw { stroke: var(--accent); fill: none; }
+      </style>
+      <g class="ne">
+        <rect class="box" x="24" y="46" width="180" height="72" rx="4"/>
+        <text class="ttl" x="40" y="70">リソース定義(ノード)</text>
+        <text x="40" y="92">属性値</text>
+        <text class="dim" x="40" y="110">宣言された型・制約に属するか</text>
+        <text class="dim" x="24" y="36">検査1:ノード上の値の所属(スキーマ検証)</text>
+
+        <path class="arw" d="M204 82 H 316" marker-end="url(#ne-a)"/>
+        <defs>
+          <marker id="ne-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+        <text class="dim" x="212" y="72">参照(エッジ)</text>
+        <text class="dim" x="212" y="106">検査2:代入可能性</text>
+
+        <rect class="box" x="320" y="46" width="180" height="72" rx="4"/>
+        <text class="ttl" x="336" y="70">他ノードの属性</text>
+        <text x="336" y="92">参照先の型</text>
+        <text class="dim" x="336" y="110">参照元の要求型に代入可能か</text>
+
+        <rect class="hi" x="524" y="46" width="108" height="72" rx="4"/>
+        <text class="ttl" x="578" y="76" text-anchor="middle">蒸発条件</text>
+        <text class="dim" x="578" y="96" text-anchor="middle">糖衣が消えて</text>
+        <text class="dim" x="578" y="110" text-anchor="middle">この二種に閉じる</text>
+
+        <text class="dim" x="24" y="160">蒸発しない機能を一つ入れるたび、この二種に収まらない検査対象が言語に混入する。</text>
+      </g>
+    </svg>
+    <figcaption>let・for・補間・モジュールが静的段階の終わりまでに消え、残るのが型付きノードとエッジだけになるからこそ、検査対象が二種に閉じる。</figcaption>
+  </figure>
+
+  <ul>
+    <li><strong>ノード上の値の所属</strong>(スキーマ検証) — このリソース定義の各属性値が、宣言された型・制約に属しているか</li>
+    <li><strong>エッジ両端の型の適合</strong>(参照の代入可能性) — ある属性が他ノードの属性を参照するとき、参照先の型が参照元の要求する型に代入可能か</li>
+  </ul>
+
+  <p>型システム分析レポートで記述された検査機構は、すべてこの二種に還元できる。意味論的型付けも、篩の任意述語も、型主導の等価性も、Unknownの一貫した意味論も、「ノード上の値」か「エッジ両端の型」のどちらかに属する検査として位置づけられる。</p>
+
+  <p>この還元が成り立つ前提が蒸発条件である。let・for・補間・モジュールといった糖衣が静的段階の終わりまでに消え、残るのが型付きノードとエッジだけになるからこそ、検査対象が二種に閉じる。逆に言えば、蒸発しない言語機能を一つ入れるたびに、この二種に収まらない検査対象 — つまり項ベースの型付けを必要とする「プログラム」 — が言語に混入する。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/evaporation-condition.html">言語機能はグラフへ消える糖衣である限りで許される</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-グラフ">#グラフ</a>
+  </p>
+</article>
+</body>
+</html>

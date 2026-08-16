@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「専用言語か」と「全域か」は独立した二軸である - notes</title>
+<meta name="description" content="設定記述言語の系譜は「汎用言語に埋め込むか、専用言語を作るか」の一本の線ではない。「専用言語かどうか」と「全域的かどうか」は独立した選択である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「専用言語か」と「全域か」は独立した二軸である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §6</code>
+  </p>
+
+  <p>設定記述言語の系譜は「汎用言語に埋め込むか、専用言語を作るか」の一本の線ではない。<strong>「専用言語かどうか」と「全域的かどうか」は独立した選択</strong>であり、その二軸が張る空間として見た方が正確である。</p>
+
+  <p>Carinaの選択は孤立したものではない。TerraformのHCL、BazelのStarlark、Dhall、CUEはいずれも「全域的な設定記述言語」の系譜にあり、評価の停止を言語で保証した上で、評価結果に対する検査や合成を組み立てている。逆にNixはチューリング完全であり、この系譜には入らない(Nixの評価は停止しないことがある)。</p>
+
+  <p>ここにPklを加えると、系譜が二軸の空間として見えてくる。Pklは専用の設定記述言語でありながらチューリング完全で、Nixと同じ象限にいる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 260" role="img" aria-label="専用言語か汎用言語埋め込みかを縦軸、全域的かチューリング完全かを横軸に取った2×2。専用言語×全域にHCL/Starlark/Dhall/CUE/Carina、専用言語×チューリング完全にNix/Pkl、汎用言語埋め込み×チューリング完全にPulumi/CDKが入り、汎用言語埋め込み×全域の象限だけが構造的に空である図">
+      <style>
+        .quad text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .quad .box   { fill: var(--surface); stroke: var(--rule); }
+        .quad .hi    { fill: var(--accent-bg); stroke: var(--accent); }
+        .quad .empty { fill: none; stroke: var(--rule); stroke-dasharray: 5 4; }
+        .quad .hd    { fill: var(--faint); font-size: 12px; font-weight: 600; }
+        .quad .dim   { fill: var(--faint); font-size: 11px; }
+        .quad .nm    { font-size: 12px; }
+      </style>
+      <g class="quad">
+        <text class="hd" x="196" y="22">全域的</text>
+        <text class="hd" x="424" y="22">チューリング完全</text>
+
+        <text class="hd" x="8" y="76">専用言語</text>
+        <rect class="hi" x="120" y="34" width="248" height="84" rx="4"/>
+        <text class="nm" x="136" y="58">HCL / Starlark / Dhall</text>
+        <text class="nm" x="136" y="78">CUE / Carina</text>
+        <text class="dim" x="136" y="100">停止を言語で保証する系譜</text>
+
+        <rect class="box" x="392" y="34" width="240" height="84" rx="4"/>
+        <text class="nm" x="408" y="58">Nix / Pkl</text>
+        <text class="dim" x="408" y="80">専用言語でも</text>
+        <text class="dim" x="408" y="98">全域とは限らない</text>
+
+        <text class="hd" x="8" y="182">汎用言語埋め込み</text>
+        <rect class="empty" x="120" y="140" width="248" height="84" rx="4"/>
+        <text class="nm" x="136" y="176">(構造的に不可能)</text>
+        <text class="dim" x="136" y="198">ホスト言語をサブセット化</text>
+        <text class="dim" x="136" y="214">しない限り埋まらない</text>
+
+        <rect class="box" x="392" y="140" width="240" height="84" rx="4"/>
+        <text class="nm" x="408" y="176">Pulumi / CDK</text>
+        <text class="dim" x="408" y="198">ホスト言語の任意実行</text>
+      </g>
+    </svg>
+    <figcaption>四象限のうち「埋め込み + 全域」だけが空である。空席は偶然ではなく、ホスト言語をサブセット化しない限り埋まらないという構造から来る。</figcaption>
+  </figure>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>全域的</th><th>チューリング完全</th></tr></thead>
+      <tbody>
+        <tr><td>専用言語</td><td>HCL / Starlark / Dhall / CUE / Carina</td><td>Nix / Pkl</td></tr>
+        <tr><td>汎用言語埋め込み</td><td>(構造的に不可能)</td><td>Pulumi / CDK</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>四象限のうち一つだけが空である。<strong>「埋め込み + 全域」の象限が空なのは偶然ではない</strong> — ホスト言語をサブセット化しない限り埋まらず、サブセット化はもう別言語を作ることと同じだからである。</p>
+
+  <p>この二軸で見ると、専用言語であることは全域性を意味しないし(Pkl / Nix)、全域性を欲しがることが専用言語を選ぶ十分な理由になるわけでもない。二つの軸を混同すると「DSLだから安全」「汎用言語だから危険」という粗い対比に落ちてしまう。分けて見れば、Carinaの立ち位置は「専用言語のうち、さらに全域を選んだ側」という二重の選択として記述できる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/totality-cannot-be-retrofitted.html">全域性は後付けできない</a></li>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+      <li><a href="/notes/totality-value-depends-on-what-it-gates.html">全域性の価値は「何をゲートするか」で決まる</a></li>
+      <li><a href="/notes/two-by-two-is-per-freedom.html">ツール=1象限という前提は粗い — 象限は自由度ごとに落ちる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/empty-quadrant-embedded-total.html">「汎用言語 × 言語が決める」の空席は偶然ではない</a></li>
+      <li><a href="/notes/totality-value-depends-on-what-it-gates.html">全域性の価値は「何をゲートするか」で決まる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-dsl">#dsl</a>
+    <a href="/notes/#tag-系譜">#系譜</a>
+    <a href="/notes/#tag-設計空間">#設計空間</a>
+  </p>
+</article>
+</body>
+</html>

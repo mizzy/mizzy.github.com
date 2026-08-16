@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>型は値の分類器である(意味論的型付け) - notes</title>
+<meta name="description" content="Carinaの型付けの様式は、型を「値の集合(値の分類器)」とみなし、型付けを所属判定として与える意味論的型付けの系譜である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>型は値の分類器である(意味論的型付け)</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §1後半</code>
+  </p>
+
+  <p>Carinaの型付けの様式は、型を「項に付く構文的な札」ではなく<strong>「値の集合(値の分類器)」</strong>とみなし、型付けを所属判定として与える<strong>意味論的型付け(semantic typing)</strong>の系譜である。</p>
+
+  <p>Γ ⊢ e : T形式の構文的な判断体系はほぼ持たない。代わりに、プログラムを完全評価してから、出てきた値がスキーマ型の表す集合に属するかを判定する。型推論を持つ項ベースの型システムというより、<strong>plan生成というコンパイルの最中に全数実行される契約検査(contract checking)</strong>に近い、と性格づけるのが正確である。</p>
+
+  <h2>なぜ値ベースにできるのか</h2>
+
+  <p>この構成が成り立つのは静的段階が全域的であるためである。評価が必ず停止し、結果がソースとstateだけの関数であるから、「完全評価してから値を検査する」が完全な決定手続きになる。停止しない言語では、そもそも「評価済みの値」が手に入る保証がない。</p>
+
+  <p>値ベースであることの配当は篩の述語に現れる。検査はすべて静的段階で評価済みの値に対して行われるため、篩の述語は決定可能性の心配なしに任意の計算を含められる。項レベルで含意を証明しようとすれば決定可能性の壁にぶつかる制約も、値に適用するだけなら走らせれば済む。</p>
+
+  <h2>完全に値ベースではない</h2>
+
+  <p>ただし実態はハイブリッドである。静的段階の時点で値が手に入らない参照(他リソースの属性への参照など)に対しては、宣言型どうしの代入可能性を照合する項レベルの検査が補完的に走る。つまり<strong>「値がある所では所属判定、ない所では宣言型の判定」</strong>という二本立てになっている。</p>
+
+  <h2>同族</h2>
+
+  <p>型と値を一つの束に統合したCUEや、スキーマを値の分類器とするJSON Schemaが同族に当たる。Pklも、型注釈に任意の述語を付けて評価済みの値へ適用する方式であり、検査様式だけ見ればこの系譜の中でCarinaに最も近い。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>CUE / JSON Schemaとの同族性の記述はAIの学習データ由来で、一次ソース未確認。意味論的型付けへの対応づけ自体も分析上の主張であり、実装がそう自称しているわけではない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/type-checking-reduces-to-nodes-and-edges.html">検査対象はノード上の値とエッジ両端の型の二種に還元できる</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-型理論">#型理論</a>
+    <a href="/notes/#tag-cue">#cue</a>
+  </p>
+</article>
+</body>
+</html>

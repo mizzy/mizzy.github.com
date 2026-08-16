@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI時代に予測可能性の根拠は組み替わるが重要性は落ちない - notes</title>
+<meta name="description" content="予測可能性の基準を置くとき、暗黙に読む主体は人間が前提されていた。結論は、予測可能性は依然として重要だが、その重要性の根拠が組み替わるというものである。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>AI時代に予測可能性の根拠は組み替わるが重要性は落ちない</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/carina-position.md §7</code>
+  </p>
+
+  <p>予測可能性の基準を「実行前にコードを読んだ時点でresource graphの形と各ノードの属性値を読み取れるか」と置くとき、暗黙に<strong>読む主体は人間</strong>が前提されていた。生成AIによるIaCコードの生成・読解・修正が普及しつつある現在、この前提は再検討を要する。結論は、<strong>予測可能性は依然として重要だが、その重要性の根拠が組み替わる</strong>というものである。</p>
+
+  <p>根拠は「人の認知負荷の軽減」から、<strong>機械可読性 + AI検証性 + plan精度 + AI自律applyのガードレール + 静的監査の成立性</strong>へ移る。予測可能性議論そのものは人前提に縛られていない。静的解析・plan精度・AI解釈・コンプライアンス監査もすべて予測可能性の恩恵を受けるからである。</p>
+
+  <p>三つの命題で整理できる。</p>
+
+  <ul>
+    <li><strong>「人が読めればAIも読める」</strong>: graph形状も属性値も静的に決定的なコードは、AIにも好都合である</li>
+    <li><strong>「人が読めないがAIなら読める」は限定的</strong>: AIも動的構造で誤読するし、コンテキスト制約もある</li>
+    <li><strong>「人もAIも読めないがapplyはできる」は危険</strong>: plan予測が崩れると、IaCの根本価値(apply前に結果を見せる)が毀損する</li>
+  </ul>
+
+  <p>「AIが書くから人が読めなくていい」という論は破綻する。AIが動的構造を多用したコードを生成すると、それを検証する人(またはレビューAI)のコストが跳ね上がるからである。</p>
+
+  <p>したがってgraph形状と属性値の両側で静的予測可能性を保つ設計を取ることの正当性は、AI時代にむしろ<strong>強まる</strong>。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/ai-context-window-is-a-locality-constraint.html">AIのコンテキスト窓は人の局所読解と同質の制約である</a></li>
+      <li><a href="/notes/attribute-audit-needs-static-values.html">属性値が動的計算だと静的監査が破綻する</a></li>
+      <li><a href="/notes/ai-lowers-demand-for-abstraction.html">AIは抽象化の実需要をむしろ下げる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/ai-context-window-is-a-locality-constraint.html">AIのコンテキスト窓は人の局所読解と同質の制約である</a></li>
+      <li><a href="/notes/ai-lowers-demand-for-abstraction.html">AIは抽象化の実需要をむしろ下げる</a></li>
+      <li><a href="/notes/attribute-audit-needs-static-values.html">属性値が動的計算だと静的監査が破綻する</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-ai">#ai</a>
+    <a href="/notes/#tag-予測可能性">#予測可能性</a>
+    <a href="/notes/#tag-設計判断">#設計判断</a>
+  </p>
+</article>
+</body>
+</html>

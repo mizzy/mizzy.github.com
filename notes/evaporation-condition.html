@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>言語機能はグラフへ消える糖衣である限りで許される - notes</title>
+<meta name="description" content="IaC言語に機能を足してよいかどうかには、はっきりした判定条件がある。言語機能は、静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>言語機能はグラフへ消える糖衣である限りで許される</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/design-position.md §1-2, explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §2</code>
+  </p>
+
+  <p>IaC言語に機能を足してよいかどうかには、はっきりした判定条件がある。<strong>言語機能は、静的段階の終わりまでにグラフへ正規化されて消える糖衣である限りで許容される</strong>。以後これを蒸発条件と呼ぶ。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 200" role="img" aria-label="let・for・補間・モジュール・exportsは静的段階の終わりまでに展開されてグラフだけが残るのに対し、Output.applyコールバックは蒸発せずデプロイ段階まで生き残ることを示す図">
+      <style>
+        .ev text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .ev .box { fill: var(--surface); stroke: var(--rule); }
+        .ev .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .ev .ttl { font-size: 13px; font-weight: 600; }
+        .ev .dim { fill: var(--faint); font-size: 11px; }
+        .ev .arw { stroke: var(--faint); fill: none; }
+        .ev .bad { stroke: var(--accent-2); fill: none; }
+        .ev .badt { fill: var(--accent-2); font-size: 11px; }
+        .ev .cut { stroke: var(--rule); fill: none; stroke-dasharray: 4 3; }
+      </style>
+      <g class="ev">
+        <text class="dim" x="80" y="18">静的段階</text>
+        <text class="dim" x="470" y="18">動的段階</text>
+        <path class="cut" d="M424 24 V 178"/>
+
+        <rect class="box" x="8" y="30" width="150" height="76" rx="4"/>
+        <text class="ttl" x="24" y="52">糖衣</text>
+        <text x="24" y="74">let / for / 補間</text>
+        <text x="24" y="92">module / exports</text>
+
+        <path class="arw" d="M158 68 H 200"/>
+        <text class="dim" x="179" y="60" text-anchor="middle">展開・置換</text>
+
+        <rect class="hi" x="204" y="30" width="200" height="76" rx="4"/>
+        <text class="ttl" x="304" y="56" text-anchor="middle">グラフ</text>
+        <text x="304" y="78" text-anchor="middle">型付きノード + エッジ</text>
+        <text class="dim" x="304" y="96" text-anchor="middle">糖衣は蒸発しきっている</text>
+
+        <path class="arw" d="M404 68 H 460"/>
+        <rect class="box" x="464" y="42" width="168" height="52" rx="4"/>
+        <text class="ttl" x="548" y="74" text-anchor="middle">apply</text>
+
+        <rect class="box" x="8" y="124" width="150" height="52" rx="4"/>
+        <text class="ttl" x="24" y="146">蒸発しない糖衣</text>
+        <text class="dim" x="24" y="166">Output.applyコールバック</text>
+
+        <path class="bad" d="M158 150 H 460"/>
+        <text class="badt" x="300" y="142" text-anchor="middle">グラフに正規化されず、デプロイ段階まで生き残る</text>
+      </g>
+    </svg>
+    <figcaption>蒸発条件を満たす機能は静的段階の終わりで消え、あとにはグラフだけが残る。生き残るプログラム片はグラフの外にはみ出た異物になる。</figcaption>
+  </figure>
+
+  <p>let、for、補間、モジュール、exportsはこの条件を満たす。planの時点ではすべて展開・置換され、残るのは型付きノード(リソース定義)とエッジ(依存)だけである。「あれば便利」の限界がここで定められる — 便利さそれ自体は許可の根拠にならず、蒸発するかどうかだけが根拠になる。</p>
+
+  <p>この条件は判定基準として働き、設計空間の各点に評価を下せる。</p>
+
+  <ul>
+    <li><strong>全域性(評価の停止保証)とは、糖衣が必ず蒸発しきることの保証である</strong>。評価が止まらない・循環するとは、グラフに正規化しきれない記述が残るということにほかならない。</li>
+    <li>planがモノイド(平らな宣言の集まり)であるのは、蒸発後にグラフ以外の何も残らないからである。</li>
+    <li>Pulumiの<code>Output.apply</code>コールバックが問題なのは、蒸発しない糖衣 — デプロイ段階まで生き残るプログラム片 — だからである。「言語に必要なのはグラフの記述だけ」という立場からは、あれはグラフの外にはみ出た異物である。</li>
+    <li>型検査が項ベースの体系をほぼ必要としないことも同じ理由で説明がつく。型を付けるべき「プログラム」が実質存在しない。</li>
+  </ul>
+
+  <p>コンパイラの言葉に翻訳すると、蒸発条件は「すべての言語機能はフロントエンドでlowering可能でなければならない」というIR中心の言語設計原則そのものである。字句解析・脱糖・意味解析までで人間向けの構文が消え、中間表現が知らなくてよい形に落ちる。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/bounded-composition-is-enough.html">IaCが必要とする再利用は検証済みパターンのパラメータ付き合成であって任意計算ではない</a></li>
+      <li><a href="/notes/graph-is-the-semantic-core.html">IaC言語の意味的本体はリソース定義と依存グラフだけである</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/static-stage-totality.html">静的段階の全域性は構文制限だけでは得られない</a></li>
+      <li><a href="/notes/type-checking-reduces-to-nodes-and-edges.html">検査対象はノード上の値とエッジ両端の型の二種に還元できる</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-蒸発条件">#蒸発条件</a>
+    <a href="/notes/#tag-dsl">#dsl</a>
+  </p>
+</article>
+</body>
+</html>

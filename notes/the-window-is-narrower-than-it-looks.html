@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>未知値の周りは無検査ではない - notes</title>
+<meta name="description" content="Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。値が無くても宣言型どうしを照合する別経路の検査が走る。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>未知値の周りは無検査ではない</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §6後半</code>
+  </p>
+
+  <p>Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。<strong>値が無くても宣言型どうしを照合する別経路の検査が走る</strong>ため、静的近似が本当に確定できない窓は見かけより狭い。</p>
+
+  <h2>値なしで走る検査</h2>
+
+  <p>値が未解決の参照に対しては、参照元属性のスキーマ型をアクセスパス(<code>.field</code> / <code>[idx]</code>)に沿って絞り込み、代入先の型へ方向付きの代入可能性で照合する、宣言型ベースの項レベル検査が別経路で走る。この判定は公称識別の包摂に加えて長さ・値域の区間の包含まで見るため、<strong>篩型のうち決定可能な断片については宣言レベルで含意(部分型)検査が成立</strong>しており、<code>role_arn = role.role_name</code>のような型違いの参照は値なしで弾ける。</p>
+
+  <p>スタックを跨ぐ<code>upstream_state</code>参照にも同種の検査がある。型の供給源はstateファイルではなく<strong>上流の設定ディレクトリ</strong>で、そのexports宣言を静的にパースし、export名の存在・宣言型と参照位置の期待型の照合・for / フィールドアクセス / 添字の形状をそれぞれ値なしで検査する。stateのexports自体は型なしのJSON値だが、スタック境界の型付けは設定側の宣言が担う、という構図である。</p>
+
+  <p>なおこの検査の被覆には実装上の欠落が確認されている。検査対象は属性のトップレベルに現れた参照だけで、リストや構造体の要素に埋まった同じ型違いの参照は素通りする(<a href="https://github.com/carina-rs/carina/issues/2786">carina#2786</a>)。またパース時に値が解決できた参照は具体値へ置換されて出自が消えるため、この検査自体に到達しない(<a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>)。いずれも設計上の窓ではなく修正可能な欠落である。</p>
+
+  <h2>真に残る窓は二つだけ</h2>
+
+  <p>(a) <strong>値依存の篩所属。</strong> 参照元の宣言型が代入先の篩より粗い場合(例:宣言上はただのStringを、長さ・パターン付きの型が期待される場所へ補間して渡す場合)、最終値が篩を満たすかは宣言型から決定できない。そして値が確定して代入された後も、Carina自身はどの経路でも再検査しない。代入の時刻は二通りあり、上流stateの値はplan時(ただし検証ステップの後)、リソース出力はapply時だが、どちらの代入点にも検証経路がなく、最終判定はプロバイダAPIのエラーに委ねられる。</p>
+
+  <p>(b) <strong>宣言型のない上流exportへの参照。</strong> 上流のexports宣言に型注釈がなく推論でも型が取れない場合、比較対象が存在せず型検査はスキップされる。型を書いた境界は検査され、書かなかった所だけ穴が開く。</p>
+
+  <p>一方、for変数由来のUnknownなどは型が構文から決まるので窓の外である。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>「Unknownの窓」の範囲は探索中に二度訂正されている。未解決参照への宣言型検査が存在すること、上流参照の型供給源がstateではなく設定ディレクトリであることが、いずれも後から判明した。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-unknown">#unknown</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-検査">#検査</a>
+  </p>
+</article>
+</body>
+</html>

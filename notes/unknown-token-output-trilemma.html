@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>未知値の規律と段階分離は三すくみである - notes</title>
+<meta name="description" content="段階を跨ぐ値の扱いに、IaCツールの設計差が最も鮮明に現れる。CDKは段階の分離を保って未知値の規律を失い、Pulumiは未知値の規律を強めて段階の分離を失う。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>未知値の規律と段階分離は三すくみである</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/totality-comparison.md §4 / 2026-04-26-cdk-pulumi-terraform-carina-comparison/chapter-3-types-schema-and-unknown.md</code>
+  </p>
+
+  <p>段階を跨ぐ値(applyまで決まらない値)の扱いに、IaCツールの設計差が最も鮮明に現れる。<strong>CDKは段階の分離を保って未知値の規律を失い、Pulumiは未知値の規律を強めて段階の分離を失い、Carinaは言語を小さくすることで両方を同時に手にしている</strong>、という三すくみになる。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 330" role="img" aria-label="三つの性質 — 平らな成果物・型で守られた穴・全域的な生成器 — のうち、CDKは平らな成果物だけ、Pulumiは型で守られた穴だけを取り、Carinaは言語を小さくすることで三つすべてを同時に持つことを示す三角形の図">
+      <style>
+        .tri text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .tri .edge { stroke: var(--rule); fill: none; }
+        .tri .box  { fill: var(--surface); stroke: var(--rule); }
+        .tri .hi   { fill: var(--accent-bg); stroke: var(--accent); }
+        .tri .ttl  { font-size: 13px; font-weight: 600; }
+        .tri .dim  { fill: var(--faint); font-size: 11px; }
+        .tri .miss { fill: var(--accent-2); font-size: 11px; }
+        .tri .have { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .tri .lack { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+      </style>
+      <g class="tri">
+        <text class="ttl" x="320" y="20" text-anchor="middle">三つの性質</text>
+
+        <rect class="box" x="228" y="32" width="184" height="42" rx="4"/>
+        <text x="320" y="58" text-anchor="middle">モノイドの成果物(平らなplan)</text>
+
+        <rect class="box" x="24" y="150" width="176" height="42" rx="4"/>
+        <text x="112" y="176" text-anchor="middle">型と意味論で守られた穴</text>
+
+        <rect class="box" x="440" y="150" width="176" height="42" rx="4"/>
+        <text x="528" y="176" text-anchor="middle">全域的な生成器</text>
+
+        <path class="edge" d="M228 60 L 150 150"/>
+        <path class="edge" d="M412 60 L 490 150"/>
+        <path class="edge" d="M200 171 H 440"/>
+
+        <text class="ttl" x="24" y="232">CDK</text>
+        <text class="dim" x="24" y="252">段階の分離は保つ</text>
+        <text class="miss" x="24" y="270">穴の規律を失う(Token = string)</text>
+
+        <text class="ttl" x="236" y="232">Pulumi</text>
+        <text class="dim" x="236" y="252">穴は型で守る</text>
+        <text class="miss" x="236" y="270">段階の分離を失う(モナド)</text>
+
+        <text class="ttl" x="448" y="232">Carina</text>
+        <text class="dim" x="448" y="252">言語を小さくすることで</text>
+        <text class="dim" x="448" y="270">三つを同時に持つ</text>
+
+        <rect class="lack" x="16" y="216" width="200" height="66" rx="4"/>
+        <rect class="lack" x="228" y="216" width="200" height="66" rx="4"/>
+        <rect class="have" x="440" y="216" width="184" height="66" rx="4"/>
+
+        <text class="dim" x="24" y="312">CDKとPulumiは「穴を型で守ること」と「成果物を平らに保つこと」を片方ずつしか取れていない。</text>
+      </g>
+    </svg>
+    <figcaption>三つの性質を同時に持つのがCarinaの位置である。CDKとPulumiが片方ずつしか取れないのは、どちらもチューリング完全な汎用言語を生成器に選んだことの帰結である。</figcaption>
+  </figure>
+
+  <h2>三者の未知値</h2>
+
+  <p><strong>Carinaの<code>Unknown</code></strong> は定義された意味論を持つ一級の値である。値の所属検査は葉の位置で素通しし(周囲の構造検査は続く)、等価性は何とも成立せず、未解決参照には宣言型ベースの代入可能性検査が別経路で走る。未知値をどう扱うかが<strong>言語の意味論として固定されている</strong>。</p>
+
+  <p><strong>CDKのToken</strong> は未解決値のプレースホルダだが、型上はただの<code>string</code>である。<code>Token.asString()</code>等で生成され、内部にプレースホルダ文字列(<code>${Token[Bucket.Arn.0]}</code>のような形)を持ち、synth時にCloudFormationテンプレートの<code>Fn::GetAtt</code>や<code>Fn::Join</code>へ変換される。ところが<code>if (vpcId === "...")</code>のような分岐や比較に使ってもコンパイルも実行も通り、<code>bucket.bucketArn.split(':')[5]</code>のような文字列操作も呼べてしまう。プレースホルダ文字列への操作として<strong>黙って間違った結果を返す</strong>のがCDKの有名な落とし穴で、汎用言語に埋め込むと未知値の意味論をホスト言語の制御フローに守らせる手段がない、ということの帰結である。</p>
+
+  <p><strong>Pulumiの<code>Output&lt;T&gt;</code></strong> はCDKより規律が強い。型付きのコンテナなので、TypeScript上で<code>Output&lt;string&gt;</code>を素の<code>string</code>として使えば型エラーになり、値に触るには<code>apply()</code>を経由するしかない。<code>then</code>を持たないことで<code>await</code>が不可能になり、<code>toString</code>は例外を投げる。文字列補間も<code>pulumi.interpolate</code>を経由する必要がある。未知値の型レベルの規律という一点では<strong>三者で最も明示的</strong>とも言える。</p>
+
+  <h2>規律の代価</h2>
+
+  <p>ただしその<code>apply()</code>こそが、依存リソースが実体化した後 — つまりdeployの最中 — に実行されるコールバックである。プログラムの一部が動的段階で走るので、<code>pulumi preview</code>は構造的に近似でしかなく、コールバック内の分岐でリソースを作るようなコードはpreviewに現れないことがある。Carinaの「planは動的段階の静的近似であり、近似誤差はUnknownとして明示される」という性質に対して、<strong>Pulumiは近似誤差の所在がプログラム中の任意のクロージャに分散する</strong>。</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>成果物の構造</th><th>穴(未知値)の扱い</th><th>成果物を作る言語</th></tr></thead>
+      <tbody>
+        <tr><td>Carina</td><td>モノイド(plan + DAG)</td><td>一級のUnknown(意味論が定義済み)</td><td>全域的なDSL</td></tr>
+        <tr><td>CDK</td><td>モノイド(テンプレート + DAG)</td><td>Token = ただのstring(誤用が無音)</td><td>チューリング完全な汎用言語</td></tr>
+        <tr><td>Pulumi</td><td>モナド(継続がデプロイ中に走る)</td><td><code>Output&lt;T&gt;</code>(型で守られた継続)</td><td>チューリング完全な汎用言語</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>「穴を型で守ること」と「成果物を平らに保つこと」を、CDKとPulumiは片方ずつしか取れていない。三つの性質 — モノイドの成果物・型と意味論で守られた穴・全域的な生成器 — を同時に持つのがCarinaの位置である。</p>
+
+  <p>なおTerraformは1.6以降refinementsを持ち、「unknownだがnonnull」「unknownだが長さ既知」「unknownだがprefix既知」といった部分情報をunknownフラグの拡張として保持する。依存グラフベースの実行モデルの制約を型システム側で緩和する方向である。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>CDKのTokenが文字列操作で無音に壊れることは、公式ドキュメントと複数の日本語記事で確認済み。Pulumi <code>Output.apply</code>のデプロイ中実行とpreviewの近似性の詳細、CDKのcontext lookupの挙動詳細はAIの学習データ由来で一次ソース未確認。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/general-purpose-embedding-tradeoff.html">汎用言語埋め込みとの取引は構造的に対称、価値づけは非対称</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/sdk-types-are-not-language-constraints.html">SDKが型を提供することは言語が制約を課すことではない</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-unknown">#unknown</a>
+    <a href="/notes/#tag-比較">#比較</a>
+    <a href="/notes/#tag-iac">#iac</a>
+  </p>
+</article>
+</body>
+</html>

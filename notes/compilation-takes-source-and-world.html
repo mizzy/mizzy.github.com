@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IaCのコンパイルは二引数である - notes</title>
+<meta name="description" content="通常のコンパイラはソースだけの関数である。IaCのコンパイルは二引数である: plan(source, state) = patch。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>IaCのコンパイルは二引数である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §3</code>
+  </p>
+
+  <p>通常のコンパイラはソースだけの関数である: compile(source) = binary。IaCのコンパイルは<strong>二引数</strong>である: plan(source, state) = patch。ソースが記述するのは「あるべき状態」であり、出力されるのは「現状との差分を埋める命令列」だからだ。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 180" role="img" aria-label="通常のコンパイルがソースだけを引数に取ってバイナリを出すのに対し、IaCのplanはソースとstateの二引数を取ってpatchを出すことを対比した図">
+      <style>
+        .args text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .args .box { fill: var(--surface); stroke: var(--rule); }
+        .args .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .args .ttl { font-size: 13px; font-weight: 600; }
+        .args .dim { fill: var(--faint); font-size: 11px; }
+        .args .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="args">
+        <text class="dim" x="8" y="20">通常のコンパイラ</text>
+        <rect class="box" x="8" y="30" width="110" height="30" rx="4"/>
+        <text x="63" y="50" text-anchor="middle">source</text>
+        <path class="arw" d="M118 45 H 150"/>
+        <rect class="box" x="150" y="30" width="96" height="30" rx="4"/>
+        <text class="ttl" x="198" y="50" text-anchor="middle">compile</text>
+        <path class="arw" d="M246 45 H 278"/>
+        <rect class="box" x="278" y="30" width="110" height="30" rx="4"/>
+        <text x="333" y="50" text-anchor="middle">binary</text>
+
+        <text class="dim" x="8" y="104">IaCのコンパイル</text>
+        <rect class="box" x="8" y="114" width="110" height="26" rx="4"/>
+        <text x="63" y="132" text-anchor="middle">source</text>
+        <rect class="hi" x="8" y="146" width="110" height="26" rx="4"/>
+        <text x="63" y="164" text-anchor="middle">state(世界)</text>
+        <path class="arw" d="M118 127 H 136 V 143"/>
+        <path class="arw" d="M118 159 H 136 V 143"/>
+        <path class="arw" d="M136 143 H 150"/>
+        <rect class="box" x="150" y="128" width="96" height="30" rx="4"/>
+        <text class="ttl" x="198" y="148" text-anchor="middle">plan</text>
+        <path class="arw" d="M246 143 H 278"/>
+        <rect class="box" x="278" y="128" width="110" height="30" rx="4"/>
+        <text x="333" y="148" text-anchor="middle">patch</text>
+        <text class="dim" x="400" y="140">世界が違えば同じソースでも</text>
+        <text class="dim" x="400" y="156">違うpatchが出る</text>
+      </g>
+    </svg>
+    <figcaption>第二引数が入ることが、コンパイラ類比の中でIaC固有の性質を最も多く生む。増分性も、結果が世界のスナップショットに依存することも、ここから出る。</figcaption>
+  </figure>
+
+  <p>この一点が、コンパイラ類比の中でIaC固有の性質を最も多く生む。</p>
+
+  <p>第一に、<strong>コンパイルは本質的に増分(incremental)である</strong>。同じソースでも世界が違えば違うpatchが出るし、世界がすでにソースの意味と一致していれば空のplanが出る — 不動点に達した増分ビルドがno-opになるのと同じである。</p>
+
+  <p>第二に、<strong>コンパイル結果の正しさが世界のスナップショットに依存する</strong>。planが読んだstateが古くなればpatchは陳腐化する。これがTOCTOUドリフト検出(planの前後でstateの指紋を比べ、動いていれば警告)の存在理由であり、通常のコンパイラには無い段である。</p>
+
+  <p>ビルドシステムの用語でいえば、Carinaは「ソース → 成果物」のビルドではなく「世界を宣言へ収束させる」自己調整計算(self-adjusting computation)を、毎回のplanで一段ずつ実行している。</p>
+
+  <p>二引数性は、類比が切れる場所としても現れる。refreshは世界の現状を観測してから差分を取る。ソースしか読まない通常のコンパイルと違い、<strong>コンパイラ自身がターゲットを読む</strong>。これは限界というより、IaCのコンパイルを定義づける本質的な差である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></li>
+      <li><a href="/notes/plan-as-a-standing-query.html">純粋性はplanを常駐クエリに変える前提条件である</a></li>
+      <li><a href="/notes/plan-is-compilation.html">planはコンパイルである</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-iac">#iac</a>
+    <a href="/notes/#tag-コンパイラ">#コンパイラ</a>
+    <a href="/notes/#tag-増分計算">#増分計算</a>
+  </p>
+</article>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである - notes</title>
+<meta name="description" content="CPUはメモリの全走査をしない。「全部読む」を「変わったと通知されたものだけ読む」に変える構造は、クラウドのworld取得にも移せる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>クラウドのdirty bitはAPI呼び出しログではなくリソース指向の変更フィードである</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-11-world-acquisition-incremental-plan/README.md §2</code>
+  </p>
+
+  <p>CPUはメモリの全走査をしない。ページテーブルのdirty bitが「変わったページ」だけを教え、キャッシュ一貫性プロトコル(MESI系)は無効化通知を受けたキャッシュ行だけを再取得する。「全部読む」を「変わったと通知されたものだけ読む」に変える構造である。</p>
+
+  <p>クラウドにもdirty bitに相当する仕組みはある。これを購読すればworldは「planのたびに全GETで作るスナップショット」ではなく「変更イベントで維持される実体化ビュー」になり、refreshは「前回チェックポイント以降のイベント再生 + dirtyなリソースだけのGET」に縮む。API呼び出し数はリソース総数ではなく<strong>変更数に比例</strong>する。</p>
+
+  <p>ただし供給源の選定が肝心である。「CloudTrailを購読する」という素朴な形には壁が二つある。</p>
+
+  <ul>
+    <li><strong>同定の壁</strong>: CloudTrailはAPI呼び出しのログであり、イベント中のリソースの表現(リクエストパラメータ、ARN、名前)がサービスごとに不揃いで、イベントをIaC側のリソース(state上のアドレス)へ一意に対応づけるのが難しい</li>
+    <li><strong>量の壁</strong>: CloudTrailは読み取りを含む全API呼び出しを記録するため、ログが膨大になる</li>
+  </ul>
+
+  <p>したがってdirty bitの供給源は、<strong>API呼び出しログではなくリソース指向の変更フィード</strong>にすべきである。AWS Configのconfiguration item、またはEventBridgeで書き込み系・対象リソース型に絞ったルールを一次チャネルに置く。Configは「リソース型 + リソースID」をキーに構成変更だけを配信するので、量の壁は構造的に小さく、同定の壁もリソースの語彙に最初から揃っている。</p>
+
+  <p>さらにawsccプロバイダはCloud Control APIの上にあり、すべてのリソースが「リソース型(AWS::EC2::VPC)+ primary identifier」という一様な同定子を持つ。stateが保持する識別子とConfigイベントの語彙がほぼ一致するため、CloudTrailで問題になった対応づけが構造的に易しくなる可能性がある。それでも残る不一致(識別子の表記揺れ、複合識別子)に対しては、購読対象をstateに存在するリソース型・識別子の集合へ事前に絞り込み、対応づけられないイベントは「不明な変更 → 反エントロピー同期の対象」へ落とす、という保守的な設計で吸収する。</p>
+
+  <p>イベント配信は遅延も欠落もあるので、それだけに頼ると静かにずれる。Dynamo系の反エントロピー — 低頻度のバックグラウンド全同期で補正する — を併用する。Merkle木的なダイジェスト比較で「どの部分木がずれたか」だけを特定して同期する発想も借りられる。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>CloudTrailの二つの壁(同定・量)は、Terraformとの組み合わせで筆者が実際に試みた確認済みの問題である。一方、AWS Config / Cloud Control APIの挙動と配信遅延に関する記述はAIの学習データ由来で、一次ソースとの突き合わせをしていない。awsccの一様な同定子が対応づけを易しくするという見立ても未検証。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+      <li><a href="/notes/plan-as-a-standing-query.html">純粋性はplanを常駐クエリに変える前提条件である</a></li>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/bounded-staleness-is-what-you-can-buy.html">買えるのは「有界の古さ＋変更量比例のコスト＋applyでの最終検証」である</a></li>
+      <li><a href="/notes/plan-as-a-standing-query.html">純粋性はplanを常駐クエリに変える前提条件である</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-増分計算">#増分計算</a>
+    <a href="/notes/#tag-aws">#aws</a>
+    <a href="/notes/#tag-確認済み経験">#確認済み経験</a>
+  </p>
+</article>
+</body>
+</html>

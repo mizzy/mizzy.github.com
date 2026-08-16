@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>効果の具体化 — planは効果の自由モノイドである - notes</title>
+<meta name="description" content="静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種のEffect値の列である。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>効果の具体化 — planは効果の自由モノイドである</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §7</code>
+  </p>
+
+  <p>静的段階の出力であるplanは、Create / Update / Replace / Delete / Import / Remove / Move / Waitの8種の<code>Effect</code>値の列である。<strong>効果は純粋な値であり、実行は解釈器(Provider)が動的段階で与える。</strong></p>
+
+  <p>これは副作用の具体化(reification)であり、構造としては「プログラム = 効果の自由構造、意味 = 解釈器」というfree monad / algebraic effectsの発想の初等形に当たる。</p>
+
+  <h2>free monadではなく自由モノイド</h2>
+
+  <p>正確にはfree monadではない。<strong>継続を持たない</strong>からである。効果の結果に依存して次の効果を構成する部分は、静的段階で済ませてある。したがって構造は<strong>効果の自由モノイド(列)+ 複数解釈器</strong>(実プロバイダ、mock、表示)である。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="効果の列(自由モノイド)に対して、実プロバイダ・mock・表示器という三つの解釈器を差し替えられることを示す図">
+      <style>
+        .fm text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .fm .box { fill: var(--surface); stroke: var(--rule); }
+        .fm .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .fm .ttl { font-size: 13px; font-weight: 600; }
+        .fm .dim { fill: var(--faint); font-size: 11px; }
+        .fm .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="fm">
+        <text class="ttl" x="8" y="20">効果の列(自由モノイド) — 継続を持たない平らな並び</text>
+        <rect class="hi" x="8" y="32" width="86" height="34" rx="4"/>
+        <text x="51" y="54" text-anchor="middle">Create</text>
+        <rect class="hi" x="102" y="32" width="86" height="34" rx="4"/>
+        <text x="145" y="54" text-anchor="middle">Update</text>
+        <rect class="hi" x="196" y="32" width="86" height="34" rx="4"/>
+        <text x="239" y="54" text-anchor="middle">Delete</text>
+        <rect class="hi" x="290" y="32" width="86" height="34" rx="4"/>
+        <text x="333" y="54" text-anchor="middle">Move</text>
+        <text class="dim" x="390" y="54">… 全8種のEffect値</text>
+        <text class="dim" x="8" y="86">全要素を列挙・検査・表示・保存できる</text>
+
+        <path class="arw" d="M192 96 V 122"/>
+        <path class="arw" d="M320 96 V 122"/>
+        <path class="arw" d="M448 96 V 122"/>
+        <text class="dim" x="330" y="112">解釈器を差し替える</text>
+
+        <rect class="box" x="128" y="128" width="128" height="52" rx="4"/>
+        <text class="ttl" x="192" y="150" text-anchor="middle">実プロバイダ</text>
+        <text class="dim" x="192" y="168" text-anchor="middle">世界に作用する</text>
+
+        <rect class="box" x="256" y="128" width="128" height="52" rx="4"/>
+        <text class="ttl" x="320" y="150" text-anchor="middle">mock</text>
+        <text class="dim" x="320" y="168" text-anchor="middle">エミュレートする</text>
+
+        <rect class="box" x="384" y="128" width="128" height="52" rx="4"/>
+        <text class="ttl" x="448" y="150" text-anchor="middle">表示器</text>
+        <text class="dim" x="448" y="168" text-anchor="middle">人間に読ませる</text>
+
+        <text class="dim" x="8" y="200">効果が値であって手続きでないから、意味を後から与えられる</text>
+      </g>
+    </svg>
+    <figcaption>継続がないからこそ、効果の列は全要素を並べて読める。同じ列に対して解釈器を差し替えられることも、この構造の配当である。</figcaption>
+  </figure>
+
+  <p>この区別は装飾ではない。継続がないからこそplanは全要素を列挙・検査・表示・保存できる。free monadなら「次に何をするか」が関数の中に隠れ、実行するまで中身を見られない。「planは検査可能・表示可能・保存可能であり、applyだけが世界に触る」というCarinaの中心的性質は、自由モノイドであることに直接由来している。</p>
+
+  <h2>複数解釈器という帰結</h2>
+
+  <p>同じ効果の列に対して解釈器を差し替えられることも、この構造の配当である。実プロバイダは世界に作用し、mockはエミュレートし、表示器は人間に読ませる。効果が値であって手続きでないから、意味を後から与えられる。</p>
+
+  <h2>型システムから見た意味</h2>
+
+  <p>型システムの観点では、静的段階の成果物が<strong>「型検査済みの効果プログラム」という明確な中間言語</strong>になっていることが重要である。検査と実行の境界がplanという具体的なデータに一致している。抽象的な「検査は実行前に終わる」という主張が、ファイルに書き出して持ち運べる具体物として存在する、ということでもある。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+      <li><a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/diffing-is-instruction-selection.html">差分計算は命令選択である</a></li>
+      <li><a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/plan-as-ir-properties.html">planはSSA的で直列化可能なIRである</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-効果">#効果</a>
+    <a href="/notes/#tag-代数">#代数</a>
+    <a href="/notes/#tag-plan">#plan</a>
+  </p>
+</article>
+</body>
+</html>

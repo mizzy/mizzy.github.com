@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである - notes</title>
+<meta name="description" content="graph出力DSLに高階関数を入れる核心は属性値計算の自由度を上げることにあるが、その自由度がgraph形状側に染み出すと不変条件が壊れる。">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <code>explorations/2026-04-26-cross-dsl-design-position/carina-position.md §5</code>
+  </p>
+
+  <p>graph出力DSLに高階関数を入れる核心は<strong>属性値計算の自由度を上げる</strong>ことにあるが、その自由度がgraph形状側(resource生成位置 / module選択位置 / identity決定位置)に染み出すと、「実装の切替」自由度を言語側で縛る不変条件が壊れる。したがって境界設計の必要条件は、<strong>関数値がresource生成位置・module選択位置・identity決定位置に到達しない</strong>という型/文法境界である。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 230" role="img" aria-label="関数値は属性値計算の領域では自由に使ってよいが、resource生成位置・module選択位置・identity決定位置には到達させてはならず、参照やbooleanを介した間接経路も塞ぐ必要があることを示す図">
+      <style>
+        .bd text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .bd .box { fill: var(--surface); stroke: var(--rule); }
+        .bd .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .bd .ttl { font-size: 13px; font-weight: 600; }
+        .bd .dim { fill: var(--faint); font-size: 11px; }
+        .bd .arw { stroke: var(--accent-2); fill: none; stroke-dasharray: 4 3; }
+        .bd .badt { fill: var(--accent-2); font-size: 11px; }
+        .bd .wall { stroke: var(--accent-2); fill: none; stroke-width: 2; }
+      </style>
+      <g class="bd">
+        <rect class="hi" x="8" y="30" width="230" height="112" rx="4"/>
+        <text class="ttl" x="24" y="54">属性値計算</text>
+        <text x="24" y="76">関数値を自由に使ってよい</text>
+        <text class="dim" x="24" y="98">命名規則・環境別パラメタ</text>
+        <text class="dim" x="24" y="116">tags = compose(f, g, h)(env)</text>
+        <text class="dim" x="24" y="134">ここが高階関数の狙いどころ</text>
+
+        <path class="wall" d="M300 20 V 200"/>
+        <text class="badt" x="308" y="18">越えてはならない境界</text>
+
+        <rect class="box" x="336" y="30" width="290" height="112" rx="4"/>
+        <text class="ttl" x="352" y="54">graph形状決定位置</text>
+        <text x="352" y="76">resource生成位置</text>
+        <text x="352" y="94">module選択位置</text>
+        <text x="352" y="112">identity決定位置</text>
+        <text class="dim" x="352" y="134">関数値が到達してはならない</text>
+
+        <path class="arw" d="M120 154 C 120 190, 430 190, 430 148"/>
+        <text class="badt" x="275" y="212" text-anchor="middle">参照やbooleanを介した間接経路も塞がないと十分条件にならない</text>
+      </g>
+    </svg>
+    <figcaption>禁じるべきは「関数がModuleを返すこと」という一点ではない。属性値領域から形状決定位置へ至る経路すべてが対象になる。</figcaption>
+  </figure>
+
+  <p>禁じる必要があるパターンは次の形で書ける。</p>
+
+  <pre><code>fn pick_module(env: string) -&gt; Module { ... }
+let net = (pick_module("prod")) { cidr = "..." }  # 関数呼び出し結果をmodule callの起点に</code></pre>
+
+  <p>これを許すと、Carinaの現行の不変条件(<code>source</code>はリテラル文字列限定、<code>use</code>式は<code>let</code>束縛RHSのみ)が骨抜きになる。</p>
+
+  <p>重要なのは、<strong>「実装の切替」のgraph形状側だけを厳格分離するだけでは十分条件にならない</strong>という点である。属性値レベルの関数値が、参照やbooleanを介して後段の<code>for</code> / <code>if</code> / module選択に流れれば、結局graph形状を変えうる。つまり禁止すべきなのは「関数がModuleを返すこと」という一点ではなく、<strong>関数値が形状決定位置に到達する経路すべて</strong>である。</p>
+
+  <p>制約の置き場所として三つの選択肢がある。</p>
+
+  <ol>
+    <li><strong>型レベル制約</strong>: <code>Module</code>型を関数の戻り値型/引数型に置けないようにする。さらにresource typeも関数値で扱えないようにする</li>
+    <li><strong>文法レベル制約</strong>: module call (<code>name { ... }</code>)の起点に式を許さず識別子のみ許す。resource declarationの起点も同様に識別子のみ</li>
+    <li><strong>評価レベル制約</strong>:関数値がmodule call / resource生成位置に評価された場合はparse/evaluatorで弾く</li>
+  </ol>
+
+  <p>AI時代の文脈ではこの境界の緩さは、plan予測精度とAI検証性の悪化として現れる。境界設計が緩いとplanがunknownだらけになり、人にもAIにも判別不能になる。また<code>tags = compose(f, g, h)(env)</code>のような複雑な合成は、graph形状を変えずとも属性監査を破綻させうる。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>境界設計の技術的成立性は未検証。上記の型/文法/評価制約が実装可能かどうかは、carina#2238で議論中の未決の論点である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/attribute-audit-needs-static-values.html">属性値が動的計算だと静的監査が破綻する</a></li>
+      <li><a href="/notes/higher-order-functions-unnecessary.html">IaCで高階関数は「あれば嬉しいが必須ではない」かもしれない</a></li>
+      <li><a href="/notes/hybrid-quadrant-convergence.html">5つのDSLが独立に「抽象化追加だけ規約寄り」へ収束した</a></li>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-境界設計">#境界設計</a>
+    <a href="/notes/#tag-高階関数">#高階関数</a>
+  </p>
+</article>
+</body>
+</html>
