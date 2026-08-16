@@ -88,6 +88,14 @@
   <h2 class="all">すべてのノート <span class="count">89本</span> <span class="order">更新が新しい順</span></h2>
 </div>
 
+<div class="search">
+  <label class="field">
+    <span class="visually-hidden">ノートを検索</span>
+    <input type="search" id="q" placeholder="本文を検索" autocomplete="off" spellcheck="false">
+  </label>
+  <p class="hits" id="q-status" role="status" aria-live="polite"></p>
+</div>
+
 <div class="legend">
   <span><i class="verified"></i>確認済み 36</span>
   <span><i class="interpretation"></i>解釈 43</span>
@@ -818,17 +826,150 @@
 <script>
 (function(){
   var bs=document.querySelectorAll('.filters button');
-  var cs=document.querySelectorAll('.cards .card');
+  var cs=[].slice.call(document.querySelectorAll('.cards .card'));
+  var q=document.getElementById('q');
+  var status=document.getElementById('q-status');
+
+  var tag='';            // タグの絞り込み
+  var index=null;        // slug -> 正規化済み本文。search-index.json から
+  var loading=null;
+
+  // カードの元の要約。検索を消したときに戻すため、最初に控えておく
+  var byslug={};
+  cs.forEach(function(c){
+    var slug=c.getAttribute('href').replace(/^\/notes\//,'').replace(/\.html$/,'');
+    var p=c.querySelector('p');
+    byslug[slug]=c;
+    c.dataset.slug=slug;
+    c._p=p;
+    c._lead=p.textContent;
+  });
+
+  // 索引側(build.py)と同じ正規化。片方だけ変えると引けなくなる
+  function norm(s){ return s.normalize('NFKC').toLowerCase(); }
+
+  function load(){
+    if(loading) return loading;
+    loading=fetch('/notes/search-index.json').then(function(r){
+      if(!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function(d){
+      index={};
+      d.n.forEach(function(n){ index[n.s]=n.b; });
+    });
+    return loading;
+  }
+
+  // 一致箇所の前後を切り出す。読める単位にしたいので、
+  // 手前に句点・改行があればそこから始める。
+  //
+  // 返すのは抜き出した本文だけで、前後の「…」は付けない。
+  // 付けてしまうと、この文字列を後から検索して印を付ける highlight() の
+  // 位置がずれる。飾りは印を付けた後に足す（呼び出し側の仕事）。
+  function snippet(text, needle){
+    var i=text.indexOf(needle);
+    if(i<0) return null;
+    var from=Math.max(0, i-40), to=Math.min(text.length, i+needle.length+60);
+    var head=text.slice(from, i);
+    var cut=head.search(/[。\n][^。\n]*$/);   // 一致より手前の最後の切れ目
+    if(cut>=0) from+=cut+1;
+    return { text: text.slice(from, to), head: from>0, tail: to<text.length };
+  }
+
+  function esc(s){
+    return s.replace(/[&<>"]/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+
+  function highlight(text, needle){
+    var out='', rest=text, low=norm(text), n=needle, at;
+    // 正規化で長さが変わる文字があるので、位置は正規化後の文字列で探し、
+    // 元の文字列から同じ位置を切り出す（NFKCは基本的に1文字→1文字）
+    while((at=low.indexOf(n))>=0){
+      out+=esc(rest.slice(0,at))+'<mark>'+esc(rest.slice(at,at+n.length))+'</mark>';
+      rest=rest.slice(at+n.length); low=low.slice(at+n.length);
+    }
+    return out+esc(rest);
+  }
+
+  function render(){
+    var term=norm(q.value.trim());
+    var shown=0;
+
+    cs.forEach(function(c){
+      var okTag = !tag || (' '+c.dataset.tags+' ').indexOf(' '+tag+' ')>=0;
+      var okTerm = true;
+
+      if(term){
+        var body = index ? index[c.dataset.slug] : null;
+        // 索引が届く前は、カード上のタイトルと要約だけで暫定的に引く
+        if(body==null) body = norm(c.querySelector('h2').textContent+'\n'+c._lead);
+        okTerm = body.indexOf(term)>=0;
+
+        if(okTerm && index){
+          var sn=snippet(index[c.dataset.slug], term);
+          c._p.innerHTML = sn
+            ? (sn.head?'…':'')+highlight(sn.text.trim(), term)+(sn.tail?'…':'')
+            : esc(c._lead);
+          c._p.classList.toggle('excerpt', !!sn);
+        }
+      } else {
+        c._p.textContent=c._lead;
+        c._p.classList.remove('excerpt');
+      }
+
+      var show = okTag && okTerm;
+      c.style.display = show ? '' : 'none';
+      if(show) shown++;
+    });
+
+    if(!term && !tag){ status.textContent=''; status.classList.remove('none'); }
+    else {
+      status.textContent = shown ? shown+'本' : '一致するノートは無い';
+      status.classList.toggle('none', shown===0);
+    }
+  }
+
   bs.forEach(function(b){
     b.addEventListener('click', function(){
-      var t=b.dataset.tag;
+      tag=b.dataset.tag;
       bs.forEach(function(x){ x.classList.toggle('on', x===b); });
-      cs.forEach(function(c){
-        var show = !t || (' '+c.dataset.tags+' ').indexOf(' '+t+' ')>=0;
-        c.style.display = show ? '' : 'none';
-      });
+      render();
     });
   });
+
+  // 日本語の変換中は input が確定前の文字で何度も飛ぶ。
+  // そのまま引くと「かたけんさ」のような未確定文字で一旦0本になり、
+  // 紙面が畳まれてから戻る。変換が確定するまで引かない。
+  var composing=false;
+  q.addEventListener('compositionstart', function(){ composing=true; });
+  q.addEventListener('compositionend', function(){ composing=false; schedule(); });
+
+  var timer=null;
+  function schedule(){
+    if(composing) return;
+    clearTimeout(timer);
+    // 1文字ごとに89枚を組み直すと打鍵に対して重い。
+    // 打ち終わりに一度だけ引く。
+    timer=setTimeout(render, 120);
+  }
+
+  q.addEventListener('input', function(){
+    // 索引は最初の入力で初めて取りに行く。読むだけの人には落とさない
+    if(!index) load().then(schedule).catch(function(){
+      status.textContent='索引を読めなかった。タイトルと要約だけで検索している';
+    });
+    schedule();
+  });
+
+  // Escで検索を解除。待たせる理由が無いので即座に戻す
+  q.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && q.value){ q.value=''; clearTimeout(timer); render(); }
+  });
+
+  // ブラウザの戻るなどで値が残っている場合
+  if(q.value) q.dispatchEvent(new Event('input'));
 })();
 </script>
 </body>

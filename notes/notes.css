@@ -676,6 +676,61 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   color: color-mix(in srgb, var(--color-text) 42%, transparent);
 }
 
+/* 本文の検索。タグの絞り込みと併用でき、両方に合うものだけが残る。
+   罫と箱で構造化しないのがBroadsheetの原則なので、入力欄も箱にせず、
+   下に罫1本だけ引く（紙面の記入欄の見え方）。 */
+.search {
+  max-width: var(--index-wide);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) 0;
+}
+.search .field { display: block; }
+.search input {
+  font: inherit;
+  font-size: 15px;
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-neutral-400);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.search input::placeholder { color: color-mix(in srgb, var(--color-text) 38%, transparent); }
+.search input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+/* 検索欄は打つそばから結果が変わるので、件数を出さないと
+   「何も出ない」のか「絞り込めている」のかが分からない。
+   `.status` は書きかけを示すチップで別物なので、名前を分けている。 */
+.search .hits {
+  margin: var(--space-2) 0 0;
+  min-height: 1.4em;
+  font-size: 12px;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+/* 0本はマゼンタ。稀な状態を示す第二のスポットカラー */
+.search .hits.none { color: var(--color-accent-2-700); }
+
+/* 一致箇所。カード本文の抜粋にだけ出る */
+.cards .card mark {
+  background: var(--color-accent-200);
+  color: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* タグの絞り込み。ノートが増えると一覧だけでは辿れないため。 */
 .filters {
   max-width: var(--index-wide);
@@ -714,6 +769,9 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   max-width: var(--index-wide);
   margin: 0 auto;
   padding: var(--space-6) var(--space-4) 6rem;
+  /* 絞り込んで1本になってもページが極端に縮まないよう、一画面ぶん確保する。
+     縮みすぎるとスクロール位置が文書の外に出て、ブラウザが上へ引き戻す。 */
+  min-height: 100vh;
   display: grid;
   /* 広い画面で4〜5列。min() は、ビューポートが最小幅より狭いときに
      カードを縮められるようにするため（無いと狭い画面で画面幅を超える）。 */
@@ -723,9 +781,13 @@ p.tags a:hover { color: var(--color-accent-2-700); }
 }
 /* カードは影で浮かせず、細罫1本で囲む（Broadsheetは影ではなく罫線）。
    天の3pxの罫が確信度を示す。順序ではなく種類なので、罫の高さは全部同じ。 */
+/* 高さは固定。要約と抜粋は長さがまちまちなので、内容で高さが決まると
+   検索欄に1文字打つたびに全カードの背が変わって紙面が揺れる。
+   高さを内容から切り離しておけば、絞り込みで残ったカードが動かない。 */
 .cards a.card {
   display: flex;
   flex-direction: column;
+  height: 17rem;
   padding: 0 0 var(--space-3);
   border: 1px solid var(--color-neutral-300);
   border-radius: var(--radius-md);
@@ -758,11 +820,17 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   padding: var(--space-3) var(--space-4) 0;
   flex: 1;
 }
+/* 題は3行まで。いま一番長い題が3行なので、切れる題は無い。
+   行数を決めておかないと、題の長さでカードの背が変わる。 */
 .cards .card h2 {
   margin: 0;
   font-size: 15px;
   line-height: 1.4;
   color: var(--color-accent-700);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 .cards a.card:hover h2 { color: var(--color-accent-2-700); }
 .cards .card p {
@@ -771,6 +839,10 @@ p.tags a:hover { color: var(--color-accent-2-700); }
   font-size: 12.5px;
   line-height: 1.7;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
+  /* 溢れたぶんは切る。カードの高さが固定なので、切らないと
+     タグが下へ押し出される（要約でも検索の抜粋でも同じ） */
+  min-height: 0;
+  overflow: hidden;
 }
 .cards .card .tags {
   display: flex;
