@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>出力先に重ねる層があるなら、状態を溜めずに済む - notes</title>
+<meta name="description" content="deckが出力先に状態を溜めるのは設計者が緩かったからではなく、Google Slidesにカスケードが無いからである。stateは本質的な必要物ではなく、出力先が非合成的であることへの補償である。">
+<meta property="og:title" content="出力先に重ねる層があるなら、状態を溜めずに済む">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/cascade-replaces-accumulated-state.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/cascade-replaces-accumulated-state.png">
+<meta property="og:description" content="deckが出力先に状態を溜めるのは設計者が緩かったからではなく、Google Slidesにカスケードが無いからである。stateは本質的な必要物ではなく、出力先が非合成的であることへの補償である。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="出力先に重ねる層があるなら、状態を溜めずに済む">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/cascade-replaces-accumulated-state.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>出力先に重ねる層があるなら、状態を溜めずに済む</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>peitho/docs/PEITHO_KICKOFF.md §7 (Model B), §11</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p>プレゼンツールには共通の要求がある。「このスライドのコード枠だけ、もう少し右に寄せて小さくしたい」— 一枚ごとの手作業の微調整だ。そしてその調整は、<strong>Markdownを直して再生成しても消えてはならない</strong>。</p>
+
+  <p>素朴に解くと、生成器は純粋関数でいられなくなる。k1LoW/deckはGoogle Slides上のスライドに調整を溜め、再生成のときにそれを避けて更新する。つまり<strong>出力先が状態を持つ</strong>。</p>
+
+  <p>peithoは純粋な生成器のままこれを実現している。調整はスライドキーを的にしたCSSの上書きとして、<strong>ソース側</strong>に置かれる。</p>
+
+  <pre><code>[data-slide-key="arch-1"] .slot-code { grid-column: 2 / 3; width: 60%; }</code></pre>
+
+  <p>再レンダリングすれば同じHTMLが出て、同じCSSがまた重なる。<strong>調整は「残る」のではなく「毎回やり直される」。</strong> 純粋関数のまま、調整が生き延びる。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 260" role="img" aria-label="出力先にカスケードが無い場合、微調整は出力先のスライドに溜まり、再生成のたびに生成器がそれを避けて更新する必要があるため生成器が状態を持つ。出力先にカスケードがある場合、微調整はソース側のCSS層として置かれ、生成器は純粋なまま毎回同じ出力を出し、その上に調整が重なる。">
+      <style>
+        .cs text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .cs .box { fill: var(--surface); stroke: var(--rule); }
+        .cs .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .cs .ttl { font-size: 13px; font-weight: 600; }
+        .cs .dim { fill: var(--faint); font-size: 11px; }
+        .cs .arw { stroke: var(--faint); fill: none; }
+        .cs .ok  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .cs .bad { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .cs .a2t { fill: var(--accent-2); font-size: 11px; }
+        .cs .sep { stroke: var(--rule); fill: none; }
+        .cs .lyr { fill: var(--sunken); stroke: var(--rule); }
+      </style>
+      <g class="cs">
+        <text class="ttl" x="12" y="20">カスケードが無い出力先 — 状態は出力先に溜まる</text>
+        <rect class="box" x="12" y="32" width="120" height="44" rx="4"/>
+        <text x="72" y="58" text-anchor="middle">Markdown</text>
+        <rect class="box" x="212" y="32" width="130" height="44" rx="4"/>
+        <text x="277" y="50" text-anchor="middle">生成器</text>
+        <text class="a2t" x="277" y="68" text-anchor="middle">純粋でいられない</text>
+        <rect class="box" x="422" y="32" width="160" height="44" rx="4"/>
+        <text x="502" y="50" text-anchor="middle">スライド(出力先)</text>
+        <text class="dim" x="502" y="68" text-anchor="middle">調整がここに溜まる</text>
+        <path class="arw" d="M136 54 H 208"/>
+        <path class="arw" d="M346 54 H 418"/>
+        <path class="bad" d="M502 78 C 502 104, 277 104, 277 80"/>
+        <text class="a2t" x="390" y="118" text-anchor="middle">溜まった調整を読んで避けながら更新する</text>
+
+        <path class="sep" d="M12 138 H 688"/>
+
+        <text class="ttl" x="12" y="166">カスケードがある出力先 — 調整はソース側の層</text>
+        <rect class="box" x="12" y="178" width="120" height="40" rx="4"/>
+        <text x="72" y="202" text-anchor="middle">Markdown</text>
+        <rect class="hi" x="212" y="178" width="130" height="40" rx="4"/>
+        <text x="277" y="196" text-anchor="middle">生成器</text>
+        <text class="dim" x="277" y="212" text-anchor="middle">純粋関数</text>
+        <rect class="box" x="422" y="178" width="160" height="40" rx="4"/>
+        <text x="502" y="202" text-anchor="middle">HTML(毎回同じ)</text>
+        <path class="ok" d="M136 198 H 208"/>
+        <path class="ok" d="M346 198 H 418"/>
+
+        <rect class="lyr" x="12" y="228" width="120" height="26" rx="4"/>
+        <text class="dim" x="72" y="245" text-anchor="middle">override.css</text>
+        <path class="ok" d="M132 241 H 490 V 222"/>
+        <text class="dim" x="330" y="252" text-anchor="middle">重なる — 毎回やり直される</text>
+      </g>
+    </svg>
+    <figcaption>上段では調整が出力先に蓄積し、生成器がそれを知っている必要がある。下段では調整が入力の一部になり、生成器は何も覚えない。</figcaption>
+  </figure>
+
+  <h2>差を作っているのは純粋性への意志ではない</h2>
+
+  <p>ここが面白いところで、peithoが状態を持たずに済んでいるのは設計者がより厳格だったからではない。<strong>出力先の性質が違う</strong>からである。</p>
+
+  <p>HTML/CSSにはカスケードがある。後から書いた規則が先の規則に重なるという合成の仕組みが、出力媒体そのものに備わっている。Google Slidesにはそれが無い。だからdeckには<strong>対象に状態を溜める以外の選択肢が無かった。</strong></p>
+
+  <div class="term">
+    <h2>一般化</h2>
+    <p>出力先が「重ね合わせ」を持つなら、調整は差分の層としてソース側に置ける。持たないなら、調整は出力先に溜まる。<strong>純粋性は意志の問題ではなく、出力媒体が合成的かどうかで決まっている。</strong></p>
+  </div>
+
+  <p>これは<a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a>が扱う話の、出力先の側から見た版である。あちらは成果物の構造(平らな列か、継続が残るか)が何を可能にするかを見ていた。こちらは<strong>成果物を受け取る先に結合則があるか</strong>を見ている。</p>
+
+  <h2>IaCとの対応と、対応しない部分</h2>
+
+  <p>IaCのstateは「現実がどうなっているか」の帳簿で、<a href="/notes/state-blocks-decouple-code-from-reality.html">import / removed / moved は現実を動かさずに帳簿だけを書き換える</a>の言う通り現実を動かさずに書き換えられる。peithoのCSS上書きはこれとは違う — 現実(ブラウザの描画)は毎回ゼロから作り直される。</p>
+
+  <p>対応しているのは<strong>なぜstateが要るのか</strong>という問いの方である。IaCがstateを持つのは、クラウドという出力先が「宣言を重ねる」ことを許さず、命令的なAPIしか受け付けないからだ。もしクラウドがカスケードのように「望ましい状態の層を重ねると合成される」性質を持っていれば、<a href="/notes/world-acquisition-is-the-bottleneck.html">worldの取得</a>の問題ごと形が変わっていたはずである。</p>
+
+  <p><strong>stateは本質的な必要物ではなく、出力先が非合成的であることへの補償である。</strong></p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/state-blocks-decouple-code-from-reality.html">import / removed / moved は現実を動かさずに帳簿だけを書き換える</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+      <li><a href="/notes/content-derived-identity-unsticks-silently.html">内容から導いた識別子は、内容を直した瞬間に静かに外れる</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/content-derived-identity-unsticks-silently.html">内容から導いた識別子は、内容を直した瞬間に静かに外れる</a></li>
+      <li><a href="/notes/shell-executes-ui-only-requests.html">遷移を実行する場所を一箇所に閉じ込める</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/state-blocks-decouple-code-from-reality.html">import / removed / moved は現実を動かさずに帳簿だけを書き換える</a></li>
+      <li><a href="/notes/state-ownership-vs-operational-responsibility.html">stateの「所有」と「運用責任」は分離できる二軸である</a></li>
+      <li><a href="/notes/world-acquisition-is-the-bottleneck.html">「信頼できるworld = 全リソースの同期GET」という等式をほどく</a></li>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-state">#state</a>
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-peitho">#peitho</a>
+  </p>
+</article>
+</body>
+</html>

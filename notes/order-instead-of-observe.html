@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>競合は観測では閉じない。順序づけでしか閉じない - notes</title>
+<meta name="description" content="PDF出力の非同期後処理との競合を、痕跡の観測で二度捕まえ損ねた実測記録。痕跡の不在が「やっていない」と同値でない時点で、観測は判定器になりえない。">
+<meta property="og:title" content="競合は観測では閉じない。順序づけでしか閉じない">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/order-instead-of-observe.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/order-instead-of-observe.png">
+<meta property="og:description" content="PDF出力の非同期後処理との競合を、痕跡の観測で二度捕まえ損ねた実測記録。痕跡の不在が「やっていない」と同値でない時点で、観測は判定器になりえない。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="競合は観測では閉じない。順序づけでしか閉じない">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/order-instead-of-observe.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  .attempts { margin: var(--space-6) 0; }
+  .attempts > div {
+    padding: var(--space-3) 0 var(--space-3) var(--space-4);
+    border-left: 2px solid var(--color-accent-2);
+    margin-bottom: var(--space-4);
+  }
+  .attempts > div.win { border-left-color: var(--color-accent); }
+  .attempts h3 {
+    margin: 0 0 var(--space-1);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--color-accent-2-700);
+  }
+  .attempts > div.win h3 { color: var(--color-accent-700); }
+  .attempts p { margin: 0; font-size: 15px; line-height: 1.8; }
+  .attempts .why { color: var(--muted); font-size: 14px; margin-top: var(--space-1); }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>競合は観測では閉じない。順序づけでしか閉じない</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>peitho/docs/plans/2026-08-05-cdp-ordered-pdf-print.md</code> / <code>peitho/CLAUDE.md Pitfalls (Issues #402/#408、いずれも実測)</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p>peithoのPDF書き出しは、Chromeの <code>--print-to-pdf</code> でページを印刷する。ところがページ側には非同期の後処理(グラデーションとbox-shadowをラスタライズする「平坦化」)が走っていて、<strong>Chromeはそれの完了を待たない</strong>。Chromeが「読み込み終わった」と判断した時点で印刷する。平坦化が間に合わなければ、壊れたPDFが黙って出る。</p>
+
+  <p>修正の試みが二段階あったのが要点になっている。</p>
+
+  <div class="attempts">
+    <div>
+      <h3>一段目 — 観測</h3>
+      <p>「平坦化が走らなかった」ことをstderrの合図で検出する。</p>
+      <p class="why">しかしこれでは「<strong>走ったが競合に負けた</strong>」を捕まえられない。合図が届くころにはPDFのバイト列はもうディスク上にある。</p>
+    </div>
+    <div>
+      <h3>二段目 — 観測</h3>
+      <p>出力されたPDFを検査して、平坦化の痕跡が無ければ失敗とする。</p>
+      <p class="why">これも駄目だった。平坦化器は意図的に処理を飛ばす図形があり(痕跡が残らないのが正常)、SVGの内側は見えない。<strong>痕跡の有無から「平坦化が済んだか」を判定することは原理的にできない。</strong></p>
+    </div>
+    <div class="win">
+      <h3>三段目 — 順序づけ</h3>
+      <p>印刷を自分で駆動し、平坦化の完了を確認してから印刷を指示する。</p>
+      <p class="why">競合そのものが存在しなくなる。</p>
+    </div>
+  </div>
+
+  <blockquote>
+    <p>The only shape that closes the gap is one that <em>orders</em> rather than <em>observes</em>.</p>
+    <cite>— <code>docs/plans/2026-08-05-cdp-ordered-pdf-print.md</code></cite>
+  </blockquote>
+
+  <h2>採った形</h2>
+
+  <p><code>--print-to-pdf</code> を捨て、CDP(Chrome DevTools Protocol)で印刷を自分で駆動する。</p>
+
+  <ol class="steps">
+    <li><code>--remote-debugging-port=0</code> でChromeを起動する(印刷の指示はまだ出さない)</li>
+    <li><code>Runtime.evaluate</code> で <code>data-peitho-pdf-flattened</code> 属性が現れるまで待つ</li>
+    <li><strong>現れてから</strong> <code>Page.printToPDF</code> を呼ぶ</li>
+  </ol>
+
+  <p>属性は平坦化器の成功経路と最上位catchの両方で立つので、スクリプトが動きさえすれば必ず現れる。現れなければ期限切れで大きな音を立てて失敗する。そして<strong><code>--print-to-pdf</code> への退避経路は用意しない</strong> — 静かな退避は競合を呼び戻すからである。</p>
+
+  <h2>一般化</h2>
+
+  <p>「AがBより先に終わっていること」を保証したいとき、取れる形は二つしかない。</p>
+
+  <div class="scroll narrow">
+    <table class="compare">
+      <thead>
+        <tr><th></th><th>形</th><th>保証の強さ</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>観測</td><td>Bを走らせ、Aの完了の痕跡を後から探す</td><td>痕跡とAの完了が同値のときだけ成立</td></tr>
+        <tr><td>順序づけ</td><td>Aの完了を確認してからBを起動する</td><td>構成上、競合が存在しない</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>観測が成り立つ条件は思ったより厳しい。<strong>痕跡の不在が「やっていない」と同値でなければならない</strong>が、ここでは「やったが対象が無かった」も痕跡ゼロを生む。この二つが区別できない時点で、観測は判定器になりえない。</p>
+
+  <p>そしてこれは、<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>が型について言っていることの、時間についての版である。あちらは「壊れた状態を表す値を構成できなくする」。こちらは「<strong>壊れた順序を実行できなくする</strong>」。どちらも、後から検査するのではなく、そもそも到達不能にしている。</p>
+
+  <h2>静かな失敗であることも同じ根</h2>
+
+  <p>この不具合が二度も対処を要したのは、失敗が静かだったからでもある。壊れたPDFは開けるし、見た目も一見おかしくない。<a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a>と同じ構図で、<strong>損失の小ささと発覚の遅さが釣り合っていない</strong>。</p>
+
+  <p>同じリポジトリに、これと双子の実測がある。Linuxのheadless Chromeで <code>image.decode()</code> が<strong>解決も拒否もせず永遠に止まる</strong>という事象で、拒否されないので <code>.catch()</code> が発火せず、止まったこと自体が静かだった。ここでも手当ては同じ方向 — 期限を切って大きな音で失敗させる、退避経路は作らない。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/absolute-state-over-coalescing-channel.html">まとめられる通り道にトグルを流してはいけない</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/absolute-state-over-coalescing-channel.html">まとめられる通り道にトグルを流してはいけない</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-並行性">#並行性</a>
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-peitho">#peitho</a>
+  </p>
+</article>
+</body>
+</html>

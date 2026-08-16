@@ -85,7 +85,7 @@
 </div>
 
 <div class="index-head">
-  <h2 class="all">すべてのノート <span class="count">96本</span> <span class="order">更新が新しい順</span></h2>
+  <h2 class="all">すべてのノート <span class="count">103本</span> <span class="order">更新が新しい順</span></h2>
 </div>
 
 <div class="search">
@@ -105,10 +105,66 @@
 
 <div class="filters">
   <button type="button" data-tag="" class="on">すべて</button>
-  <button type="button" data-tag="型システム">#型システム</button> <button type="button" data-tag="dsl">#dsl</button> <button type="button" data-tag="iac">#iac</button> <button type="button" data-tag="plan">#plan</button> <button type="button" data-tag="設計判断">#設計判断</button> <button type="button" data-tag="設計原則">#設計原則</button> <button type="button" data-tag="コンパイラ">#コンパイラ</button> <button type="button" data-tag="設計空間">#設計空間</button> <button type="button" data-tag="設計負債">#設計負債</button> <button type="button" data-tag="参照">#参照</button> <button type="button" data-tag="部分型">#部分型</button> <button type="button" data-tag="差分">#差分</button> <button type="button" data-tag="全域性">#全域性</button> <button type="button" data-tag="バグクラス">#バグクラス</button> <button type="button" data-tag="予測可能性">#予測可能性</button> <button type="button" data-tag="比較軸">#比較軸</button> <button type="button" data-tag="unknown">#unknown</button>
+  <button type="button" data-tag="型システム">#型システム</button> <button type="button" data-tag="dsl">#dsl</button> <button type="button" data-tag="iac">#iac</button> <button type="button" data-tag="plan">#plan</button> <button type="button" data-tag="設計判断">#設計判断</button> <button type="button" data-tag="設計原則">#設計原則</button> <button type="button" data-tag="peitho">#peitho</button> <button type="button" data-tag="コンパイラ">#コンパイラ</button> <button type="button" data-tag="設計空間">#設計空間</button> <button type="button" data-tag="設計負債">#設計負債</button> <button type="button" data-tag="参照">#参照</button> <button type="button" data-tag="部分型">#部分型</button> <button type="button" data-tag="差分">#差分</button> <button type="button" data-tag="全域性">#全域性</button> <button type="button" data-tag="バグクラス">#バグクラス</button> <button type="button" data-tag="予測可能性">#予測可能性</button> <button type="button" data-tag="比較軸">#比較軸</button> <button type="button" data-tag="unknown">#unknown</button>
 </div>
 
 <div class="cards">
+  <a class="card verified" href="/notes/silent-drop-is-the-worst-failure-mode.html" data-tags="設計原則 型安全 peitho">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>黙って捨てるのは、落とすことより悪い</h2>
+      <p>失敗の悪さは損失の大きさではなく、気付けるかどうかで決まる。溢れた内容を無言で捨てる設計が最悪なのはそのため。</p>
+      <span class="tags"><span>#設計原則</span> <span>#型安全</span> <span>#peitho</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/the-template-is-the-schema.html" data-tags="設計原則 契約 peitho">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>契約を別ファイルに切り出すと必ずずれる</h2>
+      <p>テンプレートがスキーマを兼ねる設計。同居できない言語境界では、片方を正として生成する。狙いはどちらも同じ。</p>
+      <span class="tags"><span>#設計原則</span> <span>#契約</span> <span>#peitho</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/content-derived-identity-unsticks-silently.html" data-tags="identity リファクタリング peitho">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>内容から導いた識別子は、内容を直した瞬間に静かに外れる</h2>
+      <p>タイトルのslugをキーにすると、誤字を直しただけで上書きが的を失う。IaCの論理IDと同じ問題の別領域での再演。</p>
+      <span class="tags"><span>#identity</span> <span>#リファクタリング</span> <span>#peitho</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/cascade-replaces-accumulated-state.html" data-tags="state 設計原則 peitho">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>出力先に重ねる層があるなら、状態を溜めずに済む</h2>
+      <p>純粋性は意志の問題ではない。stateは本質的な必要物ではなく、出力先が非合成的であることへの補償である。</p>
+      <span class="tags"><span>#state</span> <span>#設計原則</span> <span>#peitho</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/order-instead-of-observe.html" data-tags="並行性 設計原則 peitho">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>競合は観測では閉じない。順序づけでしか閉じない</h2>
+      <p>痕跡の不在が「やっていない」と同値でない時点で、観測は判定器になりえない。二度捕まえ損ねた実測記録。</p>
+      <span class="tags"><span>#並行性</span> <span>#設計原則</span> <span>#peitho</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/absolute-state-over-coalescing-channel.html" data-tags="並行性 宣言的 peitho">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>まとめられる通り道にトグルを流してはいけない</h2>
+      <p>差分は失うと戻らない。絶対状態を、一度ではなく毎回送ることで初めて収束する。宣言的であることの実務上の利得。</p>
+      <span class="tags"><span>#並行性</span> <span>#宣言的</span> <span>#peitho</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/shell-executes-ui-only-requests.html" data-tags="設計原則 アーキテクチャ peitho">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>遷移を実行する場所を一箇所に閉じ込める</h2>
+      <p>本体がシェルを知らないのは行儀ではなく、配布物にシェルが入っていないための必要条件である。</p>
+      <span class="tags"><span>#設計原則</span> <span>#アーキテクチャ</span> <span>#peitho</span></span>
+    </span>
+  </a>
   <a class="card verified" href="/notes/variance-is-forced-by-position.html" data-tags="型システム 部分型 型理論">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">

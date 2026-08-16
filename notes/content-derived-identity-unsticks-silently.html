@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>内容から導いた識別子は、内容を直した瞬間に静かに外れる - notes</title>
+<meta name="description" content="タイトルのslugからキーを導くと、誤字を直しただけでキーが変わり、そのキーを的にしていた上書きが的を失う。IaCの論理IDと同じ問題が別領域で再演している。">
+<meta property="og:title" content="内容から導いた識別子は、内容を直した瞬間に静かに外れる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/content-derived-identity-unsticks-silently.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/content-derived-identity-unsticks-silently.png">
+<meta property="og:description" content="タイトルのslugからキーを導くと、誤字を直しただけでキーが変わり、そのキーを的にしていた上書きが的を失う。IaCの論理IDと同じ問題が別領域で再演している。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="内容から導いた識別子は、内容を直した瞬間に静かに外れる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/content-derived-identity-unsticks-silently.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>内容から導いた識別子は、内容を直した瞬間に静かに外れる</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: <code>peitho/docs/PEITHO_KICKOFF.md §6</code>
+    <span class="dates"><time datetime="2026-08-16">2026-08-16</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+  </p>
+
+  <p>peithoは各スライドに安定キーを持たせ、CSSの上書きはそのキーを的にする。</p>
+
+  <pre><code>[data-slide-key="arch-1"] .slot-code { grid-column: 2 / 3; }</code></pre>
+
+  <p>キーは著者が明示するのが原則で、指定が無ければタイトルのslug等から導出したキーが振られる。ただし<strong>上書きの的にする価値のあるスライドには必ず明示キーを振る</strong>、という運用規則が付いている。</p>
+
+  <p>理由は導出キーの性質にある。<strong>タイトルを1文字直せばキーが変わり、そのキーを的にしていたCSSは的を失う。</strong> 誤字を直しただけで、当てたはずの調整が消える。しかも消えたことはどこにも現れない。</p>
+
+  <figure>
+    <svg viewBox="0 0 700 230" role="img" aria-label="導出キーの場合、タイトルの誤字を直すとslugが変わり、上書きCSSのセレクタが指す先が消えて調整が静かに失われる。明示キーの場合はタイトルを直してもキーが動かないので、上書きは的を保ち続ける。">
+      <style>
+        .dk text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .dk .box { fill: var(--surface); stroke: var(--rule); }
+        .dk .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+        .dk .ttl { font-size: 13px; font-weight: 600; }
+        .dk .dim { fill: var(--faint); font-size: 11px; }
+        .dk .ky  { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+        .dk .arw { stroke: var(--faint); fill: none; }
+        .dk .ok  { stroke: var(--accent); fill: none; stroke-width: 1.5; }
+        .dk .bad { stroke: var(--accent-2); fill: none; stroke-width: 1.5; stroke-dasharray: 4 3; }
+        .dk .a2t { fill: var(--accent-2); font-size: 11px; }
+        .dk .sep { stroke: var(--rule); fill: none; }
+        .dk .no  { stroke: var(--accent-2); fill: none; stroke-width: 2; }
+      </style>
+      <g class="dk">
+        <text class="ttl" x="12" y="20">導出キー — タイトルのslug</text>
+        <rect class="box" x="12" y="30" width="170" height="46" rx="4"/>
+        <text x="97" y="48" text-anchor="middle">見出しを1文字直す</text>
+        <text class="dim" x="97" y="66" text-anchor="middle">「構成」→「構成図」</text>
+        <rect class="box" x="252" y="30" width="150" height="46" rx="4"/>
+        <text x="327" y="48" text-anchor="middle">キーが変わる</text>
+        <text class="ky" x="327" y="66" text-anchor="middle">kousei → kouseizu</text>
+        <rect class="box" x="472" y="30" width="200" height="46" rx="4"/>
+        <text x="572" y="48" text-anchor="middle">上書きが的を失う</text>
+        <text class="ky" x="572" y="66" text-anchor="middle">[data-slide-key="kousei"]</text>
+        <path class="bad" d="M186 53 H 248"/>
+        <path class="bad" d="M406 53 H 468"/>
+        <text class="a2t" x="342" y="94" text-anchor="middle">調整が消えたことはどこにも現れない</text>
+
+        <path class="sep" d="M12 116 H 688"/>
+
+        <text class="ttl" x="12" y="144">明示キー + 参照の検査</text>
+        <rect class="box" x="12" y="154" width="170" height="46" rx="4"/>
+        <text x="97" y="172" text-anchor="middle">見出しを1文字直す</text>
+        <text class="dim" x="97" y="190" text-anchor="middle">内容の変更</text>
+        <rect class="hi" x="252" y="154" width="150" height="46" rx="4"/>
+        <text x="327" y="172" text-anchor="middle">キーは動かない</text>
+        <text class="ky" x="327" y="190" text-anchor="middle">key: "arch-1"</text>
+        <rect class="hi" x="472" y="154" width="200" height="46" rx="4"/>
+        <text x="572" y="172" text-anchor="middle">上書きは的を保つ</text>
+        <text class="ky" x="572" y="190" text-anchor="middle">存在しない的はビルドエラー</text>
+        <path class="ok" d="M186 177 H 248"/>
+        <path class="ok" d="M406 177 H 468"/>
+        <path class="no" d="M210 166 L 226 188"/>
+        <path class="no" d="M226 166 L 210 188"/>
+        <text class="dim" x="218" y="150" text-anchor="middle">伝播しない</text>
+      </g>
+    </svg>
+    <figcaption>上段は内容の変更が識別子を経由して下流へ伝播する。下段はその経路を切ってある。</figcaption>
+  </figure>
+
+  <h2>「参照が外れた」ことを検出できる形にする</h2>
+
+  <p>peithoはさらに、<strong>存在しないキーを指すCSSセレクタをビルドエラーにする</strong>。手当てが外れたら赤く止まる。</p>
+
+  <p>ここで二つの手当てが重なっていることに注意したい。</p>
+
+  <div class="contrast">
+    <div class="yes">
+      <h3>明示キーにする</h3>
+      <p>内容の変更でキーが動かないようにする(原因を断つ)。ただし明示キー自体を著者が改名したときには守れない。</p>
+    </div>
+    <div class="yes">
+      <h3>参照の検査</h3>
+      <p>それでも外れたら気付けるようにする(症状を捕まえる)。ただしこれだけでは、外れるたびに直す作業が発生し続ける。</p>
+    </div>
+  </div>
+
+  <p><strong>併用が完成形</strong>という形は<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>の末尾と同じ構造をしている。</p>
+
+  <h2>IaCの論理IDと同じ問題である</h2>
+
+  <p>これは<a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則である</a>が扱う問題の、別領域での再演である。あちらでは識別子が変わるとstate上で別リソースになり、リファクタリングがそのまま作り直しになる。こちらでは識別子が変わると上書きCSSが的を失う。</p>
+
+  <div class="scroll">
+    <table class="compare">
+      <thead>
+        <tr><th></th><th>IaC</th><th>peitho</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>識別子</td><td>resource address / 論理ID / URN</td><td><code>data-slide-key</code></td></tr>
+        <tr><td>内容から導出すると</td><td>CDKはconstruct pathのハッシュ、Pulumiはtype/name/parentの連結</td><td>タイトルのslug</td></tr>
+        <tr><td>導出が動くと起きること</td><td>別リソース扱い → Delete + Create</td><td>上書きが的を失う</td></tr>
+        <tr><td>手当て</td><td>ユーザ制御の識別子 / <code>moved</code> で写像を書く</td><td>明示キー + 参照の検査</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>識別子を何から導くかは、リファクタリングのしやすさをそのまま決める。</strong> 内容から導けば書く手間は減るが、内容を直す自由を失う。<a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構が要る</a>が扱っているのはこの交換である。</p>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/logical-id-vs-physical-name.html">論理IDと物理リソース名は別物だが漏れる</a></li>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構が要る</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/cascade-replaces-accumulated-state.html">出力先に重ねる層があるなら、状態を溜めずに済む</a></li>
+    </ul>
+  </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/the-template-is-the-schema.html">契約を別ファイルに切り出すと必ずずれる</a></li>
+      <li><a href="/notes/cascade-replaces-accumulated-state.html">出力先に重ねる層があるなら、状態を溜めずに済む</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/logical-id-vs-physical-name.html">論理IDと物理リソース名は別物だが漏れる</a></li>
+      <li><a href="/notes/refactoring-stability-mechanisms.html">リファクタ耐性はidentityを歴史的に繋ぐ機構が要る</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+    </ul>
+  </div>
+
+  <p class="tags">
+    <a href="/notes/#tag-identity">#identity</a>
+    <a href="/notes/#tag-リファクタリング">#リファクタリング</a>
+    <a href="/notes/#tag-peitho">#peitho</a>
+  </p>
+</article>
+</body>
+</html>
