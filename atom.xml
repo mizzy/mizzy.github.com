@@ -3,12 +3,26 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-09-19T09:06:17+09:00</updated>
+    <updated>2026-09-21T11:03:49+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[Peithoのpreviewでスピーカーノートとスライド本文を直接編集できるようにした]]></title>
+        <link href="https://mizzy.org/blog/2026/09/21/1/"/>
+        <updated>2026-09-21T11:03:49+09:00</updated>
+        <id>https://mizzy.org/blog/2026/09/21/1/</id>
+        <content type="html"><![CDATA[
+<p>自作プレゼンツール<a href="https://github.com/mizzy/peitho">Peitho</a>の<code>peitho preview</code>に、ブラウザ上で直接テキストを直す機能を入れた。1.30.0でスピーカーノート（<a href="https://github.com/mizzy/peitho/pull/496">PR #496</a>ほか）、1.32.0でスライド本文（<a href="https://github.com/mizzy/peitho/pull/555">PR #555</a>ほか）。どちらも書き戻し先はMarkdownのソースそのもので、<code>dist/</code>には一切入らない。</p>
+<p>35秒のデモ。オーバービュー、単一スライド表示、スピーカーノートの入力、そしてスライドの箇条書きと見出しをその場で直すところまで。</p>
+<p><video src="/images/2026/09/peitho-preview-editing.mp4" controls muted playsinline style="max-width:100%"></video></p>
+<p>できるのは既にある要素の修正だけで、要素の追加や削除はできない。プレビューで全体感を見ながら微調整するのが目的なので、これで十分だと考えている。</p>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[Peithoのリハーサル機能で録音に対応した]]></title>
@@ -674,27 +688,6 @@ like
 <li><a href="https://peitho.gosu.ke/">デモサイト peitho.gosu.ke</a></li>
 <li><a href="/blog/2026/07/18/2/">前回の記事: Peithoにスライドのはみ出し検査（peitho lint）を入れた</a></li>
 </ul>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[肘部管症候群の手術に向けてアレルギー科を受診した]]></title>
-        <link href="https://mizzy.org/blog/2026/07/31/1/"/>
-        <updated>2026-07-31T15:57:22+09:00</updated>
-        <id>https://mizzy.org/blog/2026/07/31/1/</id>
-        <content type="html"><![CDATA[
-<p>肘部管症候群シリーズの続き。<a href="/blog/2026/07/29/1/">以前の記事</a>で、入院前検査の肺機能検査で気になる数値があり、手術に支障はないレベルだけど、念のためアレルギー科で診てもらうことになっている、と書いた。その受診をしてきた話。</p>
-<hr />
-<h2>診察の内容</h2>
-<p>受診したのは、手術を受けるのと同じ大病院のアレルギー科（呼吸器内科）。整形外科の医師からは、肺機能検査のどの数値が気になるのか、具体的に指摘されたわけではなかった。ただ、かなり前に肺活量の検査をしたときに、吐く力が弱い、と指摘されたことがあるのと、今回の肺機能検査でも、思いっきり一気に息を吐き出して1秒率（最初の1秒間で吐き出せる息の割合）を測る検査をやり直したりしていたので、そのあたりかな、という気がしていた。</p>
-<p>アレルギー科での診察は、問診と確認のみで、追加の検査は特になし。肺機能検査の結果としては、閉塞性換気障害との指摘だった。閉塞性換気障害の原因にはたばこや喘息があるけど、たばこを吸わないのであれば、子供の頃の喘息が原因でしょうね、という話が医師からあった。</p>
-<p>自分は子供の頃から喘息持ちで、中学生の時が一番ひどかったが、大人になってからは落ち着いていて、発作はもう10年以上出ていない。聴診でも音はきれいなので、問題はないだろう、とのこと。</p>
-<p>手術中に発作が起きる可能性についての説明もあった。ただこれも、10年発作が出ていないなら、おそらく大丈夫でしょう、と。挿管まわりの説明もあった気がするが、あまり覚えていない。</p>
-<hr />
-<h2>手術までテリルジーを吸入</h2>
-<p>問題はないだろう、とのことだったけど、念のため、テリルジー200という吸入薬を手術まで毎日吸入することになった。ステロイドと2種類の気管支拡張薬が配合された、1日1回タイプの吸入薬。</p>
-<p>というわけで、呼吸器まわりは、手術に支障が出るような問題はなさそう。あとは手術まで、毎日テリルジーを吸入しながら備える。</p>
 
 ]]></content>
     </entry>
