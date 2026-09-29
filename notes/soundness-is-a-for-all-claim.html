@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>型システムが難しいのは、健全性が「すべての経路で」を要求するからだ - notes</title>
+<meta name="description" content="Carinaのissue/PRを辿ると、型システムの難しさは規則そのものより、健全性が全称命題であることにある。反例は一箇所で足り、直しは一箇所ずつ来る。">
+<meta property="og:title" content="型システムが難しいのは、健全性が「すべての経路で」を要求するからだ">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/soundness-is-a-for-all-claim.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/soundness-is-a-for-all-claim.png">
+<meta property="og:description" content="Carinaのissue/PRを辿ると、型システムの難しさは規則そのものより、健全性が全称命題であることにある。反例は一箇所で足り、直しは一箇所ずつ来る。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="型システムが難しいのは、健全性が「すべての経路で」を要求するからだ">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/soundness-is-a-for-all-claim.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  .forall text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .forall .box { fill: var(--surface); stroke: var(--rule); }
+  .forall .ttl { font-size: 14px; font-weight: 600; }
+  .forall .dim { fill: var(--muted); font-size: 11px; }
+  .forall .leak { fill: var(--accent-2); font-size: 11px; }
+  .forall .brace { stroke: var(--accent); fill: none; }
+  .forall .brace-2 { stroke: var(--accent-2); fill: none; }
+  .forall .lbl { fill: var(--accent); font-size: 12px; }
+  .forall .lbl-2 { fill: var(--accent-2); font-size: 12px; }
+
+  .swing text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .swing .date { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+  .swing .num { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+  .swing .head { fill: var(--muted); font-size: 11px; }
+  .swing .guide { stroke: var(--rule); stroke-dasharray: 2 3; }
+  .swing .path { stroke: var(--faint); fill: none; }
+  .swing .bug { fill: var(--accent-2); }
+  .swing .fix { fill: var(--bg); stroke: var(--accent); stroke-width: 2; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>carina-rs/carina, carina-provider-aws, carina-provider-awsccのissue/PR(2026-02〜08)</code>
+    <span class="dates"><time datetime="2026-09-29">2026-09-29</time> 作成</span>
+  </p>
+
+  <p>型システムは難しい、と感じる。Carinaのissue/PRを辿ると、その難しさは規則そのものにはあまり無い。個々の規則は短い — 受け側が合併なら「いずれかに代入可能」、送り側が合併なら「全メンバが代入可能」。難しいのは、<strong>健全性が全称命題だ</strong>ということである。</p>
+
+  <p>「この型の値は必ずこの検査を通っている」は、<strong>すべての経路・すべての段階・すべての表現・すべての境界で</strong>成り立って初めて真になる。反例は一箇所あれば足りる。一方でバグ報告は常に一箇所から来て、直すのも一箇所になりやすい。<strong>直しは存在命題、要求は全称命題</strong>。この非対称が、同じ種類のバグが形を変えて戻ってくる理由になっている。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 214" role="img" aria-label="健全性は向き・段階・表現・境界・拡張の五つの場所すべてで成り立つ必要があり、それぞれに実際に起きた破れがある">
+      <g class="forall">
+        <path class="brace" d="M4 34 V 26 H 636 V 34"/>
+        <text class="lbl" x="4" y="16">健全性の要求 — ∀: 五つの場所すべてで成り立つ</text>
+
+        <rect class="box" x="0"   y="44" width="120" height="68" rx="4"/>
+        <rect class="box" x="130" y="44" width="120" height="68" rx="4"/>
+        <rect class="box" x="260" y="44" width="120" height="68" rx="4"/>
+        <rect class="box" x="390" y="44" width="120" height="68" rx="4"/>
+        <rect class="box" x="520" y="44" width="120" height="68" rx="4"/>
+
+        <text class="ttl" x="12"  y="70">向き</text>
+        <text class="ttl" x="142" y="70">段階</text>
+        <text class="ttl" x="272" y="70">表現</text>
+        <text class="ttl" x="402" y="70">境界</text>
+        <text class="ttl" x="532" y="70">拡張</text>
+
+        <text class="dim" x="12"  y="94">代入の両方向</text>
+        <text class="dim" x="142" y="94">plan時とapply時</text>
+        <text class="dim" x="272" y="94">同じ値の別の綴り</text>
+        <text class="dim" x="402" y="94">WASMの向こう側</text>
+        <text class="dim" x="532" y="94">後から足す構成子</text>
+
+        <text class="leak" x="12"  y="134">抽象→具体が通る</text>
+        <text class="leak" x="12"  y="150">#3218</text>
+        <text class="leak" x="142" y="134">参照経由だと</text>
+        <text class="leak" x="142" y="150">検査されない #3767</text>
+        <text class="leak" x="272" y="134">片側だけ正規化</text>
+        <text class="leak" x="272" y="150">#3736</text>
+        <text class="leak" x="402" y="134">検証器が何もしない</text>
+        <text class="leak" x="402" y="150">#2354</text>
+        <text class="leak" x="532" y="134">Refを知らない分岐</text>
+        <text class="leak" x="532" y="150">#3762</text>
+
+        <path class="brace-2" d="M4 166 V 174 H 636 V 166"/>
+        <text class="lbl-2" x="4" y="198">反例 — ∃: どれか一箇所で破れれば健全ではない。報告も直しも一箇所ずつ来る</text>
+      </g>
+    </svg>
+    <figcaption>上段が満たすべき場所、下段が実際に破れた例。要求は五つ全部に掛かるが、issueは常にそのうちの一つから来る。</figcaption>
+  </figure>
+
+  <h2>全称が破れる五つの場所</h2>
+
+  <h3>向き — 同一性と包摂を取り違える</h3>
+
+  <p><code>AwsResourceId</code>を受ける属性に<code>InternetGatewayId</code>を渡すと拒否された(<a href="https://github.com/carina-rs/carina/issues/158">carina#158</a>)。次に逆向き、一般の<code>Arn</code>を特定の<code>IamRoleArn</code>に渡すと拒否された(<a href="https://github.com/carina-rs/carina/issues/260">carina#260</a>)。こちらは<code>iam_role.arn</code>の出力が汎用の<code>Arn</code>で型付けされていたのが原因で、issueには「出力を<code>IamRoleArn</code>で型付けし直す」案と「一般から特定への代入を許す」案が並んでいる。後者が不健全であることは、後で#3218が示す。</p>
+
+  <p>長さ制約が違うだけのID同士で拒否されたので、String基底のカスタム型を全部相互に互換にした(<a href="https://github.com/carina-rs/carina/pull/1796">carina#1796</a>、2026-04-14)。5日後、それが<code>IdentityStoreId → AwsAccountId</code>の取り違えを通すようになった(<a href="https://github.com/carina-rs/carina/issues/2079">carina#2079</a>)。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 290" role="img" aria-label="代入可能性の規則が、拒否しすぎと通しすぎの間を2026年2月から5月にかけて往復した時系列">
+      <g class="swing">
+        <text class="head" x="440" y="18" text-anchor="middle">拒否しすぎ</text>
+        <text class="head" x="525" y="18" text-anchor="middle">方向付き</text>
+        <text class="head" x="610" y="18" text-anchor="middle">通しすぎ</text>
+        <line class="guide" x1="440" y1="28" x2="440" y2="252"/>
+        <line class="guide" x1="525" y1="28" x2="525" y2="252"/>
+        <line class="guide" x1="610" y1="28" x2="610" y2="252"/>
+
+        <polyline class="path" points="440,44 440,76 610,108 610,140 525,172 610,204 525,236"/>
+
+        <text class="date" x="0" y="48">02-12</text><text class="num" x="44" y="48">#158</text>
+        <text x="104" y="48">特定のIDを一般のIDに渡すと拒否</text>
+        <circle class="bug" cx="440" cy="44" r="6"/>
+
+        <text class="date" x="0" y="80">02-18</text><text class="num" x="44" y="80">#260</text>
+        <text x="104" y="80">汎用のArnを特定のArnに渡すと拒否</text>
+        <circle class="bug" cx="440" cy="76" r="6"/>
+
+        <text class="date" x="0" y="112">04-14</text><text class="num" x="44" y="112">#1796</text>
+        <text x="104" y="112">String基底のカスタム型を相互互換に</text>
+        <circle class="fix" cx="610" cy="108" r="6"/>
+
+        <text class="date" x="0" y="144">04-19</text><text class="num" x="44" y="144">#2079</text>
+        <text x="104" y="144">IdentityStoreIdをAccountIdに通す</text>
+        <circle class="bug" cx="610" cy="140" r="6"/>
+
+        <text class="date" x="0" y="176">04-19</text><text class="num" x="44" y="176">#2091</text>
+        <text x="104" y="176">対称な互換判定を方向付きの判定へ</text>
+        <circle class="fix" cx="525" cy="172" r="6"/>
+
+        <text class="date" x="0" y="208">05-23</text><text class="num" x="44" y="208">#3218</text>
+        <text x="104" y="208">抽象のArnを具体のArnに通す</text>
+        <circle class="bug" cx="610" cy="204" r="6"/>
+
+        <text class="date" x="0" y="240">05-23</text><text class="num" x="44" y="240">#3221</text>
+        <text x="104" y="240">same_typeとassignable_toを分離</text>
+        <circle class="fix" cx="525" cy="236" r="6"/>
+
+        <circle class="bug" cx="6" cy="276" r="5"/><text class="head" x="18" y="280">報告された問題</text>
+        <circle class="fix" cx="120" cy="276" r="5"/><text class="head" x="132" y="280">入った変更</text>
+      </g>
+    </svg>
+    <figcaption>代入可能性の規則が振れた跡(日付は2026年)。拒否しすぎを直す変更が通しすぎを生み、方向付きの判定に落ち着いた後も、同じ形の穴が別の軸で開いた。</figcaption>
+  </figure>
+
+  <p>根は、<strong>対称な「互換」で方向のある「代入可能」を判定していた</strong>ことだった。<a href="https://github.com/carina-rs/carina/pull/2091">carina#2091</a>で方向付きの<code>is_assignable_to</code>に置き換えたとき、PRにはこう書かれている。</p>
+
+  <blockquote>
+    <p>The existing LSP test <code>string_based_custom_types_are_compatible</code> froze the bug; it is inverted into <code>distinct_semantic_customs_are_rejected</code>.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/pull/2091">carina#2091</a></cite>
+  </blockquote>
+
+  <p>試験がバグを仕様として固定していた。そして1か月後、型の同一性を構造化した直後に<strong>同じ形の穴がもう一度</strong>見つかる(<a href="https://github.com/carina-rs/carina/issues/3218">carina#3218</a>)。抽象の<code>aws.Arn</code>が具体の<code>aws.iam.Role.Arn</code>に代入できてしまう — #260で並んでいた二案のうち、採ってはいけない方の挙動である。同日<a href="https://github.com/carina-rs/carina/pull/3221">carina#3221</a>で、対称な<code>same_type</code>と方向付きの<code>assignable_to</code>が分けられた。</p>
+
+  <blockquote>
+    <p>This is essentially Java's array covariance unsoundness, but at the identity-axis level.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/issues/3218">carina#3218</a></cite>
+  </blockquote>
+
+  <p>→ <a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></p>
+
+  <h3>段階 — 値がまだ無いときの検査</h3>
+
+  <p>IaCでは値の一部がplan時点で分からない。これを型の外(番兵文字列)に置くと、扱う全箇所が忘れずに処理しなければならない。型の中に入れると、全パターンマッチに波及する。Carinaは「未知」を<code>Value::Unknown</code>に集め(<a href="https://github.com/carina-rs/carina/issues/2371">carina#2371</a>)、値の型そのものを<code>Concrete</code>と<code>Deferred</code>に割った(<a href="https://github.com/carina-rs/carina/issues/2972">carina#2972</a>)。そのRFCの途中で、一度出した「後段は延期」の判断が撤回されている。</p>
+
+  <blockquote>
+    <p>I conflated "validate sub-system has type-level proof" with "the bug class is structurally unrepresentable". They are not the same.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/issues/2972">carina#2972</a></cite>
+  </blockquote>
+
+  <p>割った後も穴は残る。検証は参照を解決する前に1回だけ走り、<code>Deferred</code>は素通りする。<strong>リテラルなら検査されるのに、同じ値が参照経由で来ると検査されない</strong>(<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>、open)。逆向きの穴もある。パース時の置換で参照がリテラルに化けると出所が消え、<code>String → VpcId</code>の取り違えが通る。</p>
+
+  <blockquote>
+    <p>The same wiring mistake therefore gets two different verdicts depending only on whether the source value happens to be known at parse time.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>(open)</cite>
+  </blockquote>
+
+  <p>型注釈を省略可能にした<code>Option&lt;TypeExpr&gt;</code>も同じ場所の穴だった。「型が分からない」を型に入れた結果、各消費地点がデフォルトを選ばされ、</p>
+
+  <blockquote>
+    <p>the default they all picked is "skip the check entirely", which is unsound.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/issues/2360">carina#2360</a></cite>
+  </blockquote>
+
+  <p>→ <a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a> / <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a> / <a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></p>
+
+  <h3>表現 — 同じ値が別の姿で来る</h3>
+
+  <p><code>"x"</code>と<code>["x"]</code>、<code>RSA-2048</code>と<code>RSA_2048</code>、属性なしと<code>[]</code>。意味が同じでも表現が違えば、差分は永遠に消えない。IAM条件の単一要素リストをAWSがスカラーに戻すせいで、applyが成功してもplanの差分が残った(<a href="https://github.com/carina-rs/carina/issues/2481">carina#2481</a>)。比較器で特例にせず、型レベルの正規形を全層で強制する道が選ばれた。</p>
+
+  <p>それでも正規化は<strong>片側だけ</strong>に掛かりやすい。ACM証明書の<code>key_algorithm</code>を直すためにプロバイダ側へ正規化を足したPR(<a href="https://github.com/carina-rs/carina-provider-aws/pull/477">carina-provider-aws#477</a>)は、マージから1時間半でrevertされた(<a href="https://github.com/carina-rs/carina-provider-aws/pull/480">#480</a>)。本当の原因はcore側の列挙照合が区切り文字を片方向にしか畳んでいなかったことだった(<a href="https://github.com/carina-rs/carina/issues/3670">carina#3670</a>)。後に同じ種類がまとめて洗い出されている。</p>
+
+  <blockquote>
+    <p>These are one bug class: <strong>a comparison where normalization is applied to one side and not the other</strong> — which either manufactures a phantom diff or hides a real one.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/issues/3736">carina#3736</a></cite>
+  </blockquote>
+
+  <p>→ <a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></p>
+
+  <h3>境界 — 型が言語をまたぐと消える</h3>
+
+  <p>WASMプラグインの境界(WIT)を越えられるのはデータだけである。WITに合併型が無かった間、合併はStringに縮退していた(<a href="https://github.com/carina-rs/carina/issues/1491">carina#1491</a>)。カスタム型の検証関数は関数ポインタなので越えられず、境界で何もしない検証器に差し替わり、<code>vpc_id = 'test'</code>が通っていた(<a href="https://github.com/carina-rs/carina/issues/2354">carina#2354</a>)。<strong>型検査が通っていることと、境界の向こうでその型がまだ存在することは別</strong>である。</p>
+
+  <p>→ <a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></p>
+
+  <h3>拡張 — 新しい構成子を既存の分岐が知らない</h3>
+
+  <p>循環スキーマのために参照型<code>Ref</code>を足したとき(<a href="https://github.com/carina-rs/carina/issues/3340">carina#3340</a>)、懸念はすでに書かれていた — ワイルドカードの腕が<code>Ref</code>を黙って受けて型を捨てる。2か月半後、合併のメンバ判定と代入可能性判定がまだ<code>Ref</code>を知らず、値の検証は通るのに代入検査だけが拒否するという食い違いが見つかった(<a href="https://github.com/carina-rs/carina/issues/3757">carina#3757</a>、<a href="https://github.com/carina-rs/carina/issues/3762">carina#3762</a>)。</p>
+
+  <p>判定器が二系統あるのも同じ構図である。</p>
+
+  <blockquote>
+    <p>Risk: fixing one and forgetting the other has already happened repeatedly</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/issues/3211">carina#3211</a>(open)</cite>
+  </blockquote>
+
+  <p>実際、片方では<code>'dev' | 'prod'</code>がInt型の受け側に互換と判定される(<a href="https://github.com/carina-rs/carina/issues/2648">carina#2648</a>、open)。</p>
+
+  <p>→ <a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a> / <a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a> / <a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></p>
+
+  <h2>緩めても締めても間違える</h2>
+
+  <p>健全性を守るだけなら全部拒否すればよい。難しさのもう半分は、<strong>正しいプログラムを拒否しないこと</strong>との綱引きにある。</p>
+
+  <p>上の時系列はその振り子だった。名前空間でも同じ往復が起きた。各プロバイダが自前の公称型を持つようにした2日後、<code>aws.AccountId</code>を<code>awscc.AccountId</code>に渡すと拒否されることが問題になる。</p>
+
+  <blockquote>
+    <p>There is no semantic difference between <code>aws.AccountId</code> and <code>awscc.AccountId</code>.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/issues/3413">carina#3413</a></cite>
+  </blockquote>
+
+  <p>共有する型を4つだけに絞る案はrevertされた(<a href="https://github.com/carina-rs/carina/pull/3420">carina#3420</a>)。「何を同じ型と見なすか」は、値の意味で決めるのか出所で決めるのか、という設計判断そのものであり、型検査器の側では決められない。</p>
+
+  <blockquote>
+    <p>State ownership belongs in the state layer, not in the type system.</p>
+    <cite>— <a href="https://github.com/carina-rs/carina/pull/3420">carina#3420</a></cite>
+  </blockquote>
+
+  <p>正規表現の包含のように<strong>決定不能な問いも混じる</strong>。Carinaは「パターンが違えば保守的に非互換」を選んだ(<a href="https://github.com/carina-rs/carina/issues/2218">carina#2218</a>)。これは正しいプログラムの一部を拒否することを、はっきり受け入れた選択である。</p>
+
+  <h2>解の形は収束している</h2>
+
+  <p>五つの場所で、修正はだんだん同じ形に寄っていく。一箇所を直すPRが閉じられ、<strong>表現を変えて壊れた状態を書けなくする</strong>PRに置き換わる。</p>
+
+  <ul>
+    <li>対称な判定を方向付きの判定に置き換える(#2091、#3221)</li>
+    <li>値の型を<code>Concrete</code> / <code>Deferred</code>に割る(#2972)</li>
+    <li>正規化を唯一の関門に移し、それ以外から構築できなくする(<a href="https://github.com/carina-rs/carina/pull/3664">carina#3664</a>)</li>
+    <li>透過的な型エイリアスをnewtypeにする(<a href="https://github.com/carina-rs/carina/pull/3744">carina#3744</a>)</li>
+  </ul>
+
+  <p>全称命題を一箇所ずつの修正で守ることはできない。<strong>実装言語の型で「すべての経路」を代わりに数えさせる</strong>しかない。もう一つの道具は、部分型関係の反射性・推移性・反対称性を性質試験で押さえることで、こちらはまだ無い(<a href="https://github.com/carina-rs/carina/issues/3208">carina#3208</a>、open)。</p>
+
+  <p>→ <a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a> / <a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+
+    <p>2026-09-29にcarina-rs org配下のissue/PRを検索し、約80件の本文とコメントを読んだ(読んだのはサブエージェントで、要約をもとに書いている)。引用した英文はすべてissue/PR本文にあることを確認済み。「open」と書いたissueの状態は同日にGitHub APIで確認した。</p>
+
+    <p>「五つの場所」への分け方と「直しは存在命題、要求は全称命題」という見立ては私の解釈で、issue本文に書かれているわけではない。#3689のように報告者の診断自体が外れていた事例もあり、上の分類に入らない難しさ(症状が型の問題に見えるが原因は別)もある。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
+      <li><a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-健全性">#健全性</a>
+    <a href="/notes/#tag-バグクラス">#バグクラス</a>
+  </p>
+</article>
+</body>
+</html>

@@ -85,7 +85,7 @@
 </div>
 
 <div class="index-head">
-  <h2 class="all">すべてのノート <span class="count">105本</span> <span class="order">更新が新しい順</span></h2>
+  <h2 class="all">すべてのノート <span class="count"><span data-count="">106</span>本</span> <span class="order">更新が新しい順</span></h2>
 </div>
 
 <div class="search">
@@ -97,10 +97,10 @@
 </div>
 
 <div class="legend">
-  <span><i class="verified"></i>確認済み 36</span>
-  <span><i class="interpretation"></i>解釈 43</span>
-  <span><i class="normative"></i>規範 8</span>
-  <span><i class="ai-sourced"></i>AI由来 2</span>
+  <span><i class="verified"></i>確認済み <span data-count="verified">45</span></span>
+  <span><i class="interpretation"></i>解釈 <span data-count="interpretation">51</span></span>
+  <span><i class="normative"></i>規範 <span data-count="normative">8</span></span>
+  <span><i class="ai-sourced"></i>AI由来 <span data-count="ai-sourced">2</span></span>
 </div>
 
 <div class="filters">
@@ -109,6 +109,14 @@
 </div>
 
 <div class="cards">
+  <a class="card interpretation" href="/notes/soundness-is-a-for-all-claim.html" data-tags="型システム 健全性 バグクラス">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</h2>
+      <p>Carinaのissue/PRを辿ると、難しさは規則より健全性が全称命題であることにある。向き・段階・表現・境界・拡張のどこか一箇所で破れれば足り、直しは一箇所ずつ来る。</p>
+      <span class="tags"><span>#型システム</span> <span>#健全性</span> <span>#バグクラス</span></span>
+    </span>
+  </a>
   <a class="card interpretation" href="/notes/predictability-has-two-sources.html" data-tags="予測可能性 抽象化 設計判断">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -955,6 +963,12 @@
 (function(){
   var bs=document.querySelectorAll('.filters button');
   var cs=[].slice.call(document.querySelectorAll('.cards .card'));
+  // 本数と凡例の内訳はカードから数える。手書きの数はJSが無いときの代替で、
+  // 手で更新し忘れても表示はずれない。
+  [].forEach.call(document.querySelectorAll('[data-count]'),function(el){
+    var k=el.getAttribute('data-count');
+    el.textContent=cs.filter(function(c){return !k||c.classList.contains(k);}).length;
+  });
   var q=document.getElementById('q');
   var status=document.getElementById('q-status');
 
