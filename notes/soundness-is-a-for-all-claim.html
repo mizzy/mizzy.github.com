@@ -180,7 +180,7 @@
     <cite>— <a href="https://github.com/carina-rs/carina/issues/2972">carina#2972</a></cite>
   </blockquote>
 
-  <p>割った後も穴は残る。検証は参照を解決する前に1回だけ走り、<code>Deferred</code>は素通りする。<strong>リテラルなら検査されるのに、同じ値が参照経由で来ると検査されない</strong>(<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>、open)。逆向きの穴もある。パース時の置換で参照がリテラルに化けると出所が消え、<code>String → VpcId</code>の取り違えが通る。</p>
+  <p>割った後も穴は残る。検証は参照を解決する前に1回だけ走り、<code>Deferred</code>は素通りする。<strong>リテラルなら検査されるのに、同じ値が参照経由で来ると検査されない</strong>(<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>。2026-09-29に同じ根を持つ<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>の重複としてclose)。逆向きの穴もある。パース時の置換で参照がリテラルに化けると出所が消え、<code>String → VpcId</code>の取り違えが通る。</p>
 
   <blockquote>
     <p>The same wiring mistake therefore gets two different verdicts depending only on whether the source value happens to be known at parse time.</p>
@@ -290,6 +290,13 @@
       <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
     </ul>
   </nav>
+
+  <div class="backlinks">
+    <h2>ここへリンクしているノート</h2>
+    <ul>
+      <li><a href="/notes/carina-type-system-position.html">Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</a></li>
+    </ul>
+  </div>
 
   <p class="tags">
     <a href="/notes/#tag-型システム">#型システム</a>

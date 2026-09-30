@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある - notes</title>
+<meta name="description" content="Carinaの型システムを型理論の地図に置く。スキーマの篩型と公称軸に評価済みの値を照らす検査系で、規則はおおむね正しく、穴は段階・型言語・境界・関係の継ぎ目にある。とくに漸進的型付けの動的な半分が無い。">
+<meta property="og:title" content="Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/carina-type-system-position.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/carina-type-system-position.png">
+<meta property="og:description" content="Carinaの型システムを型理論の地図に置く。スキーマの篩型と公称軸に評価済みの値を照らす検査系で、規則はおおむね正しく、穴は段階・型言語・境界・関係の継ぎ目にある。とくに漸進的型付けの動的な半分が無い。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/carina-type-system-position.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  .seams text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .seams .hdr { fill: var(--muted); font-size: 11px; }
+  .seams .box { fill: var(--surface); stroke: var(--rule); }
+  .seams .gap { fill: var(--bg); stroke: var(--accent-2); stroke-dasharray: 5 3; }
+  .seams .ttl { font-size: 13px; font-weight: 600; }
+  .seams .code { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .seams .dim { fill: var(--faint); font-size: 11px; }
+  .seams .leak { fill: var(--accent-2); font-size: 11px; }
+  .seams .arw { stroke: var(--muted); fill: none; marker-end: url(#seams-head); }
+  .seams .head { fill: var(--muted); }
+
+  .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--space-4) var(--space-6); margin: var(--space-4) 0 var(--space-6); }
+  .rules > div { min-width: 0; }
+  .rules .name { display: block; font-family: var(--sans); font-size: 12px; color: var(--accent); }
+  .rules .odd .name { color: var(--accent-2); }
+  .rules .frac { display: flex; flex-direction: column; align-items: center; margin: var(--space-2) 0; font-family: var(--mono); font-size: 13px; }
+  .rules .frac > span { padding: 0 var(--space-2); text-align: center; overflow-wrap: anywhere; }
+  .rules .frac > span + span { border-top: 1.5px solid var(--text); padding-top: 2px; }
+  .rules .gloss { display: block; font-size: 13px; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <code>carina-rs/carina main 0fb456c1(2026-09-30)のソースとissue、同日のレポート「Carinaの型システムを型理論から読む」(main d0445d0b)、既存ノート群</code>
+    <span class="dates"><time datetime="2026-09-30">2026-09-30</time> 作成</span>
+  </p>
+
+  <p>Carinaの型システムについて個別のノートがかなり溜まったので、型理論の地図の上でどこにいるのか、何が強くて何が弱いのかを一枚にまとめる。細部は各ノートにあり、ここは索引を兼ねた見取り図である。</p>
+
+  <p>一言でいえば、<strong>プロバイダのスキーマが供給する型(篩型+公称軸)に、評価し切った値を照らして所属を判定する検査系</strong>である。ユーザーが型を定義する言語ではなく、型の大半はcodegenが作ったスキーマから来る。値が無いところだけ、宣言型どうしの代入可能性で補う。</p>
+
+  <p>規則そのものはおおむね正しい。<strong>穴は規則ではなく継ぎ目 — 段階の継ぎ目、二つの型言語の継ぎ目、プラグイン境界、同じ関係の複数の実装 — に集まっている</strong>。とくに大きいのは、<strong>漸進的型付けの静的な半分だけがあって、動的な半分が無い</strong>ことである。</p>
+
+  <h2>ポジション — 軸ごとに見る</h2>
+
+  <div class="scroll narrow">
+    <table>
+      <thead><tr><th>軸</th><th>Carinaの選択</th><th>型理論上の名前</th></tr></thead>
+      <tbody>
+        <tr><td>型付けの様式</td><td>評価済みの値がスキーマ型の集合に属するかを判定。値が無い参照だけ宣言型で照合</td><td>意味論的型付け+宣言型検査のハイブリッド</td></tr>
+        <tr><td>基底型の制約</td><td><code>String</code>/<code>Int</code>/<code>Float</code>がpattern・length・range・検証関数を持つ</td><td>篩型(refinement types)</td></tr>
+        <tr><td>同一性</td><td><code>TypeIdentity { provider, segments, kind }</code>の軸ごとの包摂、方向付き</td><td>公称型+軸ごとの幅部分型</td></tr>
+        <tr><td>構造体</td><td>名前は見ず、フィールド集合の一致を要求。未知フィールドを拒否</td><td>閉じたレコード(深さのみ、幅部分型なし)</td></tr>
+        <tr><td>合併</td><td>「いずれかのメンバが受理すれば妥当」</td><td>タグなし合併(集合論的合併)</td></tr>
+        <tr><td>再帰</td><td><code>Ref(名前)</code>とdefs、<code>Shape</code>ビューで剥がしてから使う</td><td>名前付きμ型</td></tr>
+        <tr><td>コンテナの変性</td><td><code>List</code>/<code>Map</code>/<code>Struct</code>は共変。ただし書かれていない</td><td>暗黙の共変</td></tr>
+        <tr><td>未確定</td><td><code>Value::Deferred</code>が値の軸にある。素の<code>String</code>が受け手側で<code>?</code>のように振る舞う</td><td>漸進的型付けの静的な半分</td></tr>
+        <tr><td>推論</td><td>注釈の無いexports/attributesの右辺から下から上へ合成するだけ</td><td>ほぼ検査のみ</td></tr>
+        <tr><td>多相・関数型</td><td>どちらも無い。ユーザ関数はパース時に展開され、呼ぶたびに実引数の値を検査。組み込み関数のシグネチャは説明用の文字列</td><td>型ではなく契約</td></tr>
+        <tr><td>書き手と時刻</td><td><code>InputMode</code>と<code>deferred_populate</code>が注釈として持つ</td><td>型の外(モダリティの候補)</td></tr>
+        <tr><td>効果</td><td>Effectは命令の平たい列</td><td>深い埋め込み。型レベルの効果系ではない</td></tr>
+        <tr><td>等価性</td><td>正規形に簡約してから型ごとの同値関係で比較。Unknownは自分自身とも等しくない</td><td>型主導の等価性</td></tr>
+        <tr><td>健全性と完全性</td><td>正規表現の包含は保守的に非互換</td><td>健全性優先</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>近い言語と並べると、<strong>検査の様式はPklやNickelの契約、型の語彙はCUE寄り、全域性はDhall・CUE・HCLの系譜</strong>という混合になる。Dhallのような構文的な型体系(判断規則と推論、多相)は持たず、Terraformのように<code>string</code>+検証述語に落とすのでもない。他と一番違うのは、<strong>「このARNはIAMロールのARNか」という出所を公称軸で型に持たせている</strong>ことである。PulumiのTypeScript型はstringとstringを区別しない。→ <a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a> / <a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></p>
+
+  <h3>強さの源は全域性にある</h3>
+
+  <p>値で検査できるのは、静的段階が必ず停止し、結果がソースとstateだけで決まるからである。そのおかげで篩の述語に任意の計算を置いても決定可能性の問題が起きない。項レベルで含意を証明する篩型システムが、述語をSMTで決定可能な論理に絞る(<a href="https://ucsd-progsys.github.io/liquidhaskell-tutorial/Tutorial_02_Logic.html">Liquid Haskell</a>など)のと対照的で、Carinaは<strong>証明の代わりに実行する</strong>。</p>
+
+  <p>逆にいえば、この様式は<strong>値が手に入る場所でしか働かない</strong>。弱みのほとんどはここから出る。→ <a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a> / <a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a> / <a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></p>
+
+  <h3>型は三つの層にある</h3>
+
+  <p>「Carinaの型」と言うとき、性格の違う三つの層がある。</p>
+
+  <ul>
+    <li><strong>DSL層</strong>(<code>TypeExpr</code>) — ユーザーが書く注釈。<code>arguments</code>・<code>attributes</code>・<code>exports</code>・<code>fn</code>で使える。<code>let</code>には書けない</li>
+    <li><strong>スキーマ層</strong>(<code>AttributeType</code>) — プロバイダがWASM越しに渡すスキーマ。部分型関係<code>is_assignable_to</code>と値検査器を持つ</li>
+    <li><strong>実装層</strong> — 処理系自身の不変条件をRustのnewtype/typestateで封じる層</li>
+  </ul>
+
+  <p>弱点の多くは層と層のつなぎ目にある。</p>
+
+  <h2>部分型の規則</h2>
+
+  <p><code>is_assignable_to</code>の手書きの分岐を判断規則の形に直すと、おおむね次のとおりになる。<code>A &lt;: B</code>は「A型の値をB型の受け手に渡してよい」。</p>
+
+  <div class="rules">
+    <div><span class="name">Union-L</span><span class="frac"><span>∀i. A<sub>i</sub> &lt;: B</span><span>A<sub>1</sub>|…|A<sub>n</sub> &lt;: B</span></span><span class="gloss">送り手が合併なら全メンバが通ること</span></div>
+    <div><span class="name">Union-R</span><span class="frac"><span>∃i. A &lt;: B<sub>i</sub></span><span>A &lt;: B<sub>1</sub>|…|B<sub>n</sub></span></span><span class="gloss">受け手が合併ならどれか一つに通ればよい</span></div>
+    <div><span class="name">List/Map</span><span class="frac"><span>A &lt;: B</span><span>list(A) &lt;: list(B)</span></span><span class="gloss">共変。変性の注釈は無い</span></div>
+    <div><span class="name">Struct</span><span class="frac"><span>dom(S) = dom(T)　∀f. S.f &lt;: T.f</span><span>S &lt;: T</span></span><span class="gloss">深さのみ。名前は見ない</span></div>
+    <div><span class="name">Struct→Map</span><span class="frac"><span>∀f. S.f &lt;: V</span><span>S &lt;: map(V)</span></span><span class="gloss">唯一の構造的な変換</span></div>
+    <div><span class="name">Identity</span><span class="frac"><span>id(A) ⊑ id(B)　range(A) ⊆ range(B)　pat(A) = pat(B)</span><span>A &lt;: B</span></span><span class="gloss">具体→抽象の向きだけ。パターンは文字列一致で近似</span></div>
+    <div><span class="name">匿名→識別付き</span><span class="frac"><span>id(A) = ∅　id(B) ≠ ∅</span><span>A ≮: B</span></span><span class="gloss">識別の証拠が無い値は通さない</span></div>
+    <div class="odd"><span class="name">Rule 10</span><span class="frac"><span>Aは篩の無い基本型　id(B) = ∅</span><span>A &lt;: B(値の検査に委ねる)</span></span><span class="gloss">素の<code>String</code>が<code>?</code>として振る舞う</span></div>
+  </div>
+
+  <p>Rule 10があるので推移律が崩れる。<code>pattern=alpha → String → pattern=digits</code>は一段ずつなら通るが、直接は拒否される。試験(<code>carina-core/src/schema/tests.rs</code>)は有限個の型を総当たりして反射律と推移律を確かめており、<strong>推移律の試験は「Rule 10を中継したときだけ崩れてよい」と例外を明示し、その例外が少なくとも1件あることまで確かめている</strong>。非推移性を意図として宣言しているのは誠実である。</p>
+
+  <h2>強み</h2>
+
+  <ol>
+    <li><strong>段階が明確</strong>。型検査はどの効果よりも先に終わり、planが検査と実行の境界そのものになっている。(<a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a>)</li>
+    <li><strong>篩の述語に制限が無い</strong>。上の全域性の配当。</li>
+    <li><strong>出所を運ぶ公称軸</strong>。共通型の再利用(<code>aws.iam.Role.Arn &lt;: aws.Arn</code>)とプロバイダ間の混同防止(<code>aws.Region</code>≠<code>gcp.Region</code>)を一つの機構で両立する。「形は合っているが別物のIDを渡す」事故を型で止められる。#3218以降は方向付きの<code>assignable_to</code>と対称な<code>same_type</code>が分かれている。(<a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a>)</li>
+    <li><strong>広い型で宣言して篩を消す抜け道を塞いでいる</strong>。モジュールの属性を<code>String</code>と宣言しても、転送元の篩は証拠(evidence)として保持され、受け手では宣言と証拠の両方が通ることを要求する(<a href="https://github.com/carina-rs/carina/issues/3798">carina#3798</a>)。</li>
+    <li><strong>Unknownの扱いが一貫して保守的</strong>。検査は素通し、等価性はSQLのNULLと同じく自分自身とも不成立で、「偽の型エラーは出さず、怪しい差分は出す」側に揃っている。(<a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a>)</li>
+    <li><strong>差分が型主導</strong>。順序付き/なしのリスト、列挙の正規形、合併のメンバ比較が、すべて型に導かれる。(<a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a>)</li>
+    <li><strong>実装層で壊れた状態を書けなくしている</strong>。<code>Ref</code>を剥がした<code>Shape</code>ビュー、<code>Concrete</code>/<code>Deferred</code>の分離、正規化済みでないリソースを渡せない<code>NormalizedResource</code>など。<code>compile_fail</code>のdoctestが27本あり、「コンパイルできてはいけないコード」を否定的な型付けの試験として固定している。WASM境界では網羅的な分解代入で、プロトコルに増えたフィールドを黙って捨てることをコンパイルエラーにしている。(<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a> / <a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a>)</li>
+    <li><strong>決定不能な問いを正直に扱っている</strong>。正規表現の包含は判定せず、パターンが違えば非互換とする。完全性を捨てて健全性を取る、と明示的に選んでいる。</li>
+  </ol>
+
+  <h2>弱み — 穴の場所ごとに</h2>
+
+  <figure>
+    <svg viewBox="0 0 640 392" role="img" aria-label="Carinaの型検査の穴が集まる三つの継ぎ目。段階の継ぎ目ではplanとapplyで代入された値が検査されない。型言語と境界の継ぎ目では注釈の一部が未検査になり、WASM境界で型が薄くなる。関係の継ぎ目では同じ代入可能性の問いに三つの実装がある">
+      <defs>
+        <marker id="seams-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path class="head" d="M0 0 L8 4 L0 8 z"/>
+        </marker>
+      </defs>
+      <g class="seams">
+        <text class="hdr" x="0" y="14">段階の継ぎ目</text>
+        <rect class="box" x="0"   y="24" width="104" height="44" rx="4"/>
+        <rect class="box" x="134" y="24" width="104" height="44" rx="4"/>
+        <rect class="gap" x="268" y="24" width="104" height="44" rx="4"/>
+        <rect class="gap" x="402" y="24" width="104" height="44" rx="4"/>
+        <rect class="box" x="536" y="24" width="104" height="44" rx="4"/>
+        <line class="arw" x1="104" y1="46" x2="132" y2="46"/>
+        <line class="arw" x1="238" y1="46" x2="266" y2="46"/>
+        <line class="arw" x1="372" y1="46" x2="400" y2="46"/>
+        <line class="arw" x1="506" y1="46" x2="534" y2="46"/>
+        <text class="ttl" x="52"  y="43" text-anchor="middle">パース・展開</text>
+        <text class="ttl" x="186" y="43" text-anchor="middle">validate</text>
+        <text class="ttl" x="320" y="43" text-anchor="middle">plan</text>
+        <text class="ttl" x="454" y="43" text-anchor="middle">apply</text>
+        <text class="ttl" x="588" y="43" text-anchor="middle">プロバイダAPI</text>
+        <text class="dim" x="52"  y="60" text-anchor="middle">関数・モジュール展開</text>
+        <text class="dim" x="186" y="60" text-anchor="middle">値と宣言型を検査</text>
+        <text class="dim" x="320" y="60" text-anchor="middle">上流の値を代入</text>
+        <text class="dim" x="454" y="60" text-anchor="middle">出力を代入</text>
+        <text class="dim" x="588" y="60" text-anchor="middle">ここで初めて失敗</text>
+        <text class="leak" x="52"  y="88"  text-anchor="middle">参照がリテラルに</text>
+        <text class="leak" x="52"  y="103" text-anchor="middle">化けると宣言型検査が飛ぶ</text>
+        <text class="leak" x="52"  y="118" text-anchor="middle">#3450</text>
+        <text class="dim"  x="186" y="88"  text-anchor="middle">Deferredは素通し</text>
+        <text class="dim"  x="186" y="103" text-anchor="middle">Rule 10は値に委ねる</text>
+        <text class="leak" x="320" y="88"  text-anchor="middle">委ねた検査が</text>
+        <text class="leak" x="320" y="103" text-anchor="middle">どこでも走らない</text>
+        <text class="leak" x="320" y="118" text-anchor="middle">#3448</text>
+        <text class="leak" x="454" y="88"  text-anchor="middle">委ねた検査が</text>
+        <text class="leak" x="454" y="103" text-anchor="middle">どこでも走らない</text>
+        <text class="leak" x="454" y="118" text-anchor="middle">#3448</text>
+        <text class="dim"  x="588" y="88"  text-anchor="middle">篩の違反が</text>
+        <text class="dim"  x="588" y="103" text-anchor="middle">APIエラーで出る</text>
+
+        <text class="hdr" x="0" y="160">型言語と境界の継ぎ目</text>
+        <rect class="box" x="0"   y="170" width="150" height="44" rx="4"/>
+        <rect class="box" x="260" y="170" width="150" height="44" rx="4"/>
+        <rect class="box" x="490" y="170" width="150" height="44" rx="4"/>
+        <line class="arw" x1="150" y1="192" x2="258" y2="192"/>
+        <line class="arw" x1="488" y1="192" x2="412" y2="192"/>
+        <text class="code" x="75"  y="189" text-anchor="middle">TypeExpr</text>
+        <text class="dim"  x="75"  y="206" text-anchor="middle">ユーザーが書く注釈</text>
+        <text class="code" x="335" y="189" text-anchor="middle">AttributeType</text>
+        <text class="dim"  x="335" y="206" text-anchor="middle">スキーマ型</text>
+        <text class="ttl"  x="565" y="189" text-anchor="middle">プロバイダ</text>
+        <text class="dim"  x="565" y="206" text-anchor="middle">WASMプラグイン</text>
+        <text class="dim"  x="205" y="184" text-anchor="middle">lift</text>
+        <text class="dim"  x="450" y="184" text-anchor="middle">JSON</text>
+        <text class="leak" x="205" y="236" text-anchor="middle">Ref・リテラル型は</text>
+        <text class="leak" x="205" y="251" text-anchor="middle">None = 未検査</text>
+        <text class="leak" x="205" y="266" text-anchor="middle">#2648 #3803</text>
+        <text class="leak" x="450" y="236" text-anchor="middle">検証関数は越えない</text>
+        <text class="leak" x="450" y="251" text-anchor="middle">壊れたJSONは既定値に</text>
+        <text class="leak" x="450" y="266" text-anchor="middle">#3811</text>
+
+        <text class="hdr" x="0" y="300">関係の継ぎ目 — 代入可能性の実装</text>
+        <rect class="box" x="0"   y="310" width="196" height="44" rx="4"/>
+        <rect class="gap" x="222" y="310" width="196" height="44" rx="4"/>
+        <rect class="gap" x="444" y="310" width="196" height="44" rx="4"/>
+        <text class="code" x="98"  y="329" text-anchor="middle">is_assignable_to</text>
+        <text class="dim"  x="98"  y="346" text-anchor="middle">本体(方向付き)</text>
+        <text class="code" x="320" y="329" text-anchor="middle">type_expr_compatible</text>
+        <text class="dim"  x="320" y="346" text-anchor="middle">モジュール引数の転送</text>
+        <text class="code" x="542" y="329" text-anchor="middle">LSP</text>
+        <text class="dim"  x="542" y="346" text-anchor="middle">参照検査の再実装</text>
+        <text class="leak" x="320" y="378" text-anchor="middle">同じ問いに三つの答え — 送り側の合併を「いずれか」で通す #3211 / ネストを見逃す #3043</text>
+      </g>
+    </svg>
+    <figcaption>点線の枠が検査の届いていない所。規則が間違っているのではなく、規則を通らない経路がある。段階の継ぎ目では、静的に「値に委ねた」検査の行き先が無い。</figcaption>
+  </figure>
+
+  <h3>段階の継ぎ目: 漸進的型付けの動的な半分が無い</h3>
+
+  <p>漸進的型付けは、型の分からない値が静的な型の世界に入る境界で実行時検査(キャスト)を挟み、違反したら出所を指して失敗させる(blame)ことで健全性を保つ。Carinaには静的な半分 — Rule 10で素の<code>String</code>を受け入れて「値の検査に委ねる」、<code>Deferred</code>を素通しする — はあるが、<strong>委ねた先の検査が参照の解決後に走らない</strong>。</p>
+
+  <p>値の検証は参照を解決する前に1回だけ走る。上流stateの値はplan時に、リソースの出力はapply時に代入されるが、どちらの代入点にも検証経路が無い(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>、open)。2026-09-29に、同じ根を持つ<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>がこの重複としてcloseされた。同じ根から別の症状も出ている。</p>
+
+  <ul>
+    <li>モジュール引数の<code>validation { condition = ... }</code>は展開時に評価されるので、参照を渡すと<code>Deferred</code>のまま評価されてエラーになる(<a href="https://github.com/carina-rs/carina/issues/3805">carina#3805</a>、open)</li>
+    <li>識別の無い篩に素の<code>String</code>を渡すのはRule 10で静的に通し、値の検査に回す。その値が参照経由なら、値の検査も走らない。<strong>「委ねた」はずの検査がどこでも行われない</strong></li>
+    <li>逆向きに、パース時の置換で参照がリテラルに化けると、宣言型の検査が飛ぶ(<a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>、open)</li>
+  </ul>
+
+  <p>→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a> / <a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a> / <a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></p>
+
+  <h3>関係の継ぎ目: 代入可能性が一つの定義になっていない</h3>
+
+  <ul>
+    <li>モジュール引数を転送するときだけ別の判定器<code>type_expr_compatible</code>が使われる。これは文字列っぽい型をidentity無視で互いに通し、<strong>送り側の合併を「いずれかのメンバが合えば可」で通す</strong>(<code>carina-core/src/module_resolver/typecheck.rs</code>)。Union-Lは∀でなければならないので、これは不健全である(<a href="https://github.com/carina-rs/carina/issues/3211">carina#3211</a>、open)</li>
+    <li>LSPは参照の検査を再実装しており、ネストした型違いを見逃す(<a href="https://github.com/carina-rs/carina/issues/3043">carina#3043</a>、open)</li>
+    <li>本体の<code>is_assignable_to</code>も、<code>List</code>/<code>Map</code>/<code>Struct</code>は構成子で比べるようになったが、最後の腕はまだ表示名の文字列比較である(<a href="https://github.com/carina-rs/carina/issues/3209">carina#3209</a>、open)</li>
+    <li>性質試験は反射律と推移律まで。反対称律が無く、宇宙が手書きの有限リストに留まる(<a href="https://github.com/carina-rs/carina/issues/3208">carina#3208</a>、open)。変性も書かれていない(<a href="https://github.com/carina-rs/carina/issues/3210">carina#3210</a>、open)</li>
+  </ul>
+
+  <p>→ <a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a> / <a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a> / <a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a> / <a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></p>
+
+  <h3>検査器の中: 分からないと通す</h3>
+
+  <ul>
+    <li>注釈に対する値検査<code>validate_type_expr_value</code>は、既知の組み合わせだけエラーを返し、最後の腕が<code>_ =&gt; None</code>(問題なし)である(<code>carina-core/src/validation/mod.rs</code>)。明示の腕が無い組み合わせは素通りする</li>
+    <li>篩のパターンは検査のたびに<code>Regex::new</code>し、<strong>コンパイルに失敗すると検査全体を飛ばす</strong>(<code>if let Ok(re) = ...</code>、<code>carina-core/src/schema/mod.rs</code>)。不正なパターンを持つ型は、どんな文字列も通す</li>
+  </ul>
+
+  <h3>型言語の継ぎ目: ユーザーが書ける型が貧しい</h3>
+
+  <p>プロバイダのスキーマ型は篩・公称軸・合併・再帰を持つ。ユーザーが書く注釈の型はそれより狭く、しかも一部はスキーマ型へ写せない。写像<code>lift_type_expr</code>(<code>carina-core/src/validation/mod.rs</code>)は<code>Ref</code>・<code>StringLiteral</code>・<code>DottedUnresolved</code>・<code>Unknown</code>に対して<code>None</code>を返し、<strong><code>None</code>は「検査しない」として扱われる</strong>。</p>
+
+  <ul>
+    <li>リテラル型とその合併(<code>'dev' | 'prod'</code>)はどこへでも通る(<a href="https://github.com/carina-rs/carina/issues/2648">carina#2648</a>、open)</li>
+    <li>リソース型の注釈(<code>vpc: aws.ec2.Vpc</code>)は未検査で、ハンドルとしての意味も定まっていない。リソースそのものをモジュール境界越しに渡すこともできない(<a href="https://github.com/carina-rs/carina/issues/3803">carina#3803</a>、open)</li>
+    <li><code>let</code>の注釈、型エイリアス、名前付きの構造体型(<a href="https://github.com/carina-rs/carina/issues/2142">carina#2142</a>)、ジェネリクス、関数型が無い。<code>null</code>と<code>??</code>は言語にあるのに、null許容の型が無い</li>
+    <li>⊤と⊥が無く、「何でも受ける」は広い合併や識別なしの<code>String</code>で代用している(<a href="https://github.com/carina-rs/carina/issues/3220">carina#3220</a>、open)</li>
+    <li>組み込み関数に型のシグネチャが無い。戻り値は<code>String/Int/List/Map/Any/Secret</code>の粗い6種類で、<code>List</code>や<code>Map</code>は要素型を持たない。関数引数の中の参照は存在確認しかされないので、<code>join(...)</code>の結果をARN型の属性に入れてもvalidateは通る。<strong>関数呼び出しは型システムにとって事実上の<code>?</code>である</strong></li>
+    <li>ユーザ関数の引数・戻り値の検査は、リスト・マップ・構造体で浅く(<a href="https://github.com/carina-rs/carina/issues/2810">carina#2810</a>)、合併は文字列形のメンバしか扱えない(<a href="https://github.com/carina-rs/carina/issues/2812">carina#2812</a>)</li>
+  </ul>
+
+  <p><strong>プロバイダ作者はユーザーより強い型を書ける</strong>、という非対称になっている。モジュールを書く人は篩をスキーマ型で表せず、<code>validation</code>ブロックという実行時述語に逃がすしかない — そしてそれが上の段階の穴に落ちる。→ <a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></p>
+
+  <h3>境界の継ぎ目: WASMの向こうで型が薄くなる</h3>
+
+  <p>スキーマはWITの型ではなくJSON文字列で渡され、検証関数は越えられないので<code>validate-custom-type</code>のコールバックに置き換わる。壊れたJSONを<code>unwrap_or_default()</code>で空にしてしまう箇所が残っている(<a href="https://github.com/carina-rs/carina/issues/3811">carina#3811</a>、open)。プロトコル側のスキーマはまだ<code>required: bool</code>と<code>read_only: bool</code>の組で、不正な組み合わせを境界で弾いている。境界で解析して型に上げる正しい形ではあるが、ワイヤ形式でも3値にすれば境界のエラー経路自体が要らなくなる。→ <a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></p>
+
+  <h3>表現の継ぎ目: 残っている理論的負債</h3>
+
+  <ul>
+    <li>タグなし合併の判別はヒューリスティック。(<a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a>)</li>
+    <li>属性の出所(ユーザー/プロバイダ/サーバ既定)が型に乗っていない。(<a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a>)</li>
+    <li>「分からない」の語彙が層をまたいで複数ある — <code>Value::Deferred</code>/<code>Unknown</code>、参照型の<code>RefType::Unchecked</code>、<code>lift_type_expr</code>の<code>None</code>、推論失敗の<code>TypeExpr::Unknown</code>。どこで静的な保証が切れているかを利用者に見せる手段が無い(<a href="https://github.com/carina-rs/carina/issues/3212">carina#3212</a>、open)。(<a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a>)</li>
+  </ul>
+
+  <h2>改善すべき点 — 効く順に</h2>
+
+  <ol>
+    <li><strong>委ねた検査を解決後に必ず走らせる</strong>。漸進的型付けのキャスト挿入に当たる。Rule 10や<code>Unchecked</code>で静的検査を通った値に「後でこの型で検査する」義務を残し、参照が解決した時点で受け手の篩を検査して、失敗したら送り手の位置を指す。解決後の値を<code>Deferred</code>を含まない別の型(<code>ResolvedValue</code>)にし、そこへの変換関数だけが検査を行う形にすれば、呼び忘れが型で書けなくなる。#3448・#3805・#3767はこれで一箇所で閉じる。applyで動いている<code>assert_fully_resolved</code>という実行時の表明も、この型に置き換えられる。(<a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a>)</li>
+    <li><strong>代入可能性を一つの関係にする</strong>。<code>type_expr_compatible</code>を消して、展開前も<code>lift_type_expr</code>で持ち上げてから<code>is_assignable_to</code>で判定する。LSPも同じ入口を呼ぶ。最後の文字列比較の腕と<code>validate_type_expr_value</code>の<code>_ =&gt; None</code>を網羅的な構成子の腕に置き換えれば、構成子を足したときにコンパイラが判断を迫る。</li>
+    <li><strong>パターンを構築時にコンパイルするnewtypeにする</strong>。<code>pattern: Option&lt;String&gt;</code>を<code>Pattern</code>型にし、不正なパターンはスキーマのデコード時に型付きのエラーにする。検査が黙って消える状態が書けなくなり、毎回の再コンパイルも消える。</li>
+    <li><strong><code>lift_type_expr</code>を全域にし、リソースハンドル型を足す</strong>。<code>None</code>=検査しない、をやめる。<code>StringLiteral</code>は1値の列挙として、<code>Ref</code>は「そのリソースの属性を持つレコード」として居場所を作り、IDだけを渡すなら<code>aws.ec2.Vpc.Id</code>で書く、と役割を分ける(#3803)。写せないものはエラーにする。<a href="https://github.com/carina-rs/carina/issues/2360">carina#2360</a>で<code>Option&lt;TypeExpr&gt;</code>を潰したのと同じ直しを、写像の側にも当てることになる。</li>
+    <li><strong>「未検査」を明示の<code>Dyn</code>型に集め、書いた場所が分かる抜け道を用意する</strong>。⊤・⊥(#3220)と合わせて格子の端を定義で決め、LSPのホバーで<code>?</code>として見せる。正しいのに弾かれる偽陽性には<code>unchecked(x)</code>のような明示のキャストを入れ(<a href="https://github.com/carina-rs/carina/issues/3808">carina#3808</a>)、1.の検査の対象にする。</li>
+    <li><strong>組み込み関数に型のシグネチャを与える</strong>。<code>map</code>・<code>concat</code>・<code>lookup</code>程度ならランク1の単純な型スキームで足り、Hindley-Milnerまでは要らない。関数引数にも受け手の型が届くようになる。</li>
+    <li><strong>性質試験を広げる</strong>。反対称律を足し、宇宙をproptestの生成型にする(#3208)。2.の後なら新しい構成子も自動で網羅される。</li>
+    <li><strong>出所をモダリティにする</strong>。差分の個別補正が型主導の規則になる。効果は大きいが、1〜4より後でよい。</li>
+  </ol>
+
+  <h2>他に気づいたこと</h2>
+
+  <h3>素の<code>String</code>は二つ目の<code>?</code>になっている</h3>
+
+  <p>Rule 10による非推移性はバグではなく、素の<code>String</code>が漸進的型付けの<code>?</code>の役を兼ねていることの表れと読める。漸進的型付けで型の等しさの代わりに使う整合性(consistency)関係は、反射的・対称的だが推移的でない(<a href="https://en.wikipedia.org/wiki/Gradual_typing">Siek &amp; Taha 2006</a>)。ただ、それなら「<code>String</code>は<code>?</code>である」と明示したほうが意味論が読みやすい。<code>Dyn</code>と明示のキャストがあれば、素の<code>String</code>をただの基本型に戻せる。</p>
+
+  <h3><code>same_type</code>も推移的でない</h3>
+
+  <p>軸が空なら何とでも一致するので、<code>Arn</code>は<code>aws.Arn</code>とも<code>gcp.Arn</code>とも「同じ」だが、後の二つは同じでない。関数名は同値関係を連想させるが、実態は整合性関係である。<code>consistent_with</code>のような名前にするだけでも誤用を防げる。→ <a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></p>
+
+  <h3>「無い」が「許可」として読まれるパターンが繰り返されている</h3>
+
+  <p>注釈の<code>Option&lt;TypeExpr&gt;</code>が<code>None</code>なら検査を飛ばす(#2360、直った)。<code>identity: None</code>が三つの意味を兼ねる。<code>lift_type_expr</code>の<code>None</code>は未検査。値検査の<code>_ =&gt; None</code>は問題なし。正規表現がコンパイルできなければ検査しない。プラグイン境界で検証関数が無いと何もしない検証器になる(#2354、直った)。壊れたJSONは既定値になる(#3811)。どれも「分からない」を<code>None</code>や既定値で表し、消費側が一番楽な既定 — 通す — を選んでいる。個別には直っていくが、<strong>不在が許可に化けない型の形</strong>(不在を<code>Result</code>のエラーにする、<code>Unchecked</code>を明示の変種にして網羅マッチを強いる)を一般原則にしたほうがよい。→ <a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></p>
+
+  <h3>ユーザ関数は型の上では関数ではない</h3>
+
+  <p>パース時に展開され、注釈は呼び出しごとに実引数の値で確かめる契約として働く。関数型が無いのはそのためで、高階関数を入れるなら、まず関数型を型の言語に入れる必要がある。そこで初めて変性(引数位置の反変)と「関数値がgraph形状に届かない」制約の置き場所が問題になる。→ <a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a> / <a href="/notes/variance-is-forced-by-position.html">変性は選ぶものではなく、位置が決めるものである</a></p>
+
+  <h3><code>deferred_populate</code>は時刻の型の芽である</h3>
+
+  <p>作成後に値が届く属性を、<code>wait</code>ブロックが無ければ連鎖参照させないという検査は、型理論でいえば「後で」様相(▷)に近い。今は「そのバインディングに何らかの<code>wait</code>があればよい」という粗い判定で、どの<code>wait</code>がどの属性を待つのかまで対応づければ、時刻についても型で保証できる。</p>
+
+  <h3>Secretは型ではなく値の包みである</h3>
+
+  <p><code>Secret</code>は<code>DeferredValue</code>の一種で、注釈の無いexportでは<code>String</code>と推論される(<code>carina-core/src/validation/inference.rs</code>)。秘密であることが型に現れないので、境界を越えた先で秘密性を静的に追えない。情報フロー型の考え方で<code>Secret&lt;T&gt;</code>を型にすれば、漏洩経路を型検査で探せる。実害があるかは確かめていない。</p>
+
+  <h3>型の実効的な強さはcodegenの注釈の細かさで決まる</h3>
+
+  <p><code>vpc.vpc_id</code>をSubnetIdの受け手に入れて弾けるかは、プロバイダのスキーマがその属性に<code>aws.ec2.Vpc.Id</code>という識別を付けているかだけで決まる。本体をいくら健全にしても、スキーマ側の注釈が粗ければ保証も粗い。識別が付いている属性の割合をプロバイダごとに測って回帰を監視すれば、型システムの強さを数字で追える。→ <a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></p>
+
+  <h3>Effectは型の上では追跡されていない</h3>
+
+  <p>Effectは命令の平たい列で、依存は別のグラフが持つ。DSLの型はどのリソースがどの効果を起こすかを表さない。IaCとしてはこれで足りるが、型理論の文脈で「エフェクトシステム」と呼ぶと誤解を招く。→ <a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></p>
+
+  <h3>未確定が型ではなく値の側にある</h3>
+
+  <p>漸進的型付けの標準形は<code>?</code>という型を一つ置くが、Carinaの未確定は<code>Value::Deferred</code>である。IaCの未確定は段階を追って必ず消えるので、解決段階をtypestateにする設計(<code>Raw</code>→<code>Inferred</code>→<code>ResolvedRefs</code>→<code>Applied</code>)が書かれているが、コードにはまだ無い。改善点1の<code>ResolvedValue</code>は、この計画のうち一番効く1段を先に切り出したものに当たる。</p>
+
+  <h3>最近のissueの多くは規則の誤りではなく配線の欠落である</h3>
+
+  <p>2026-09末に開いている型関連のissueは、「規則が間違っている」ものより「検査はあるが、その経路には呼ばれていない」もの(#3448、#3805、#3450、#3043、#3803)が多い。規則を正しく書くことより、<strong>すべての経路がその規則を通ることを型で強制すること</strong>が今のボトルネックである。→ <a href="/notes/soundness-is-a-for-all-claim.html">型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+
+    <p>このノートは二つの調査を合わせている。一つは2026-09-30に<code>0fb456c1</code>をサブエージェントと自分で読んだもの、もう一つは同日に別セッションで<code>d0445d0b</code>を読んで書いたレポート「Carinaの型システムを型理論から読む」である(二つのコミットは同じ日のmainで、型システムの部分に差は無いと見ている)。</p>
+
+    <p>自分でコードを読んで確認したのは次のとおり。<code>lift_type_expr</code>が4つの形に<code>None</code>を返すこと、<code>type_expr_compatible</code>が送り側の合併を「いずれか」で通すこと、ユーザ関数が呼び出しごとに実引数を検査すること、Rule 10の腕と、推移律の試験が例外を明示していること、<code>Regex::new</code>の失敗で検査が飛ぶこと、<code>validate_type_expr_value</code>の最後が<code>_ =&gt; None</code>であること、<code>compile_fail</code>が27箇所あること、Secretが<code>String</code>と推論されること、<code>deferred_populate</code>が「何らかのwait」で満たされること。issueの状態は同日にGitHub APIで確認した。</p>
+
+    <p><strong>レポートに依っていて自分では確かめていない</strong>のは、<code>NormalizedResource</code>等のnewtype群、WASM境界の網羅的な分解代入、プロトコル側の<code>required</code>/<code>read_only</code>、組み込み関数の引数中の参照が存在確認だけであること、null許容型の欠如と解釈できない型のStringへのフォールバック、<code>assert_fully_resolved</code>、READMEのEffect一覧のずれ。</p>
+
+    <p>再帰型を、レポートはequi-recursive(暗黙の同一視)と呼び、<a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a>はiso-recursive(明示展開)と呼んでいる。<code>Ref</code>を剥がした<code>Shape</code>ビューを通さないと中身を見られないという実装を「展開が明示操作」と読むのが後者で、ここでは後者を採る。どちらに分類するかは解釈の問題である。</p>
+
+    <p>ポジションの表の「型理論上の名前」と、Pkl・Nickel・CUE・Dhall・Pulumiとの位置関係は解釈であり、実装がそう自称しているわけではない。他言語の性質は<a href="/notes/ref-config-dsl-survey.html">構成記述系DSL 11本の調査</a>とレポートの記述に依っていて、このノートのために一次資料を読み直してはいない。</p>
+
+    <p>「改善すべき点」の順位は二つの調査の提案を合わせた私の判断で、コストの見積もりはしていない。「無いが許可に化ける」を一つのパターンとして括ったのも解釈である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/value-based-checking-needs-totality.html">値ベースの全数検査は停止性の配当である</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
+      <li><a href="/notes/two-stage-language.html">IaC言語は二段階の言語である</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a></li>
+      <li><a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a></li>
+      <li><a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a></li>
+      <li><a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></li>
+      <li><a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+      <li><a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+      <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+      <li><a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+      <li><a href="/notes/variance-is-forced-by-position.html">変性は選ぶものではなく、位置が決めるものである</a></li>
+      <li><a href="/notes/abstract-to-concrete-leak.html">同値関係を方向付き判定に流用すると抽象から具体への代入が漏れる</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/soundness-is-a-for-all-claim.html">型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</a></li>
+      <li><a href="/notes/two-axis-config-language-genealogy.html">「専用言語か」と「全域か」は独立した二軸である</a></li>
+      <li><a href="/notes/schema-vocabulary-is-the-ceiling.html">プロトコルで型が潰れるのは共通で、差はschemaの型語彙にある</a></li>
+      <li><a href="/notes/ref-config-dsl-survey.html">構成記述系DSL 11本の調査</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-型理論">#型理論</a>
+    <a href="/notes/#tag-carina">#carina</a>
+  </p>
+</article>
+</body>
+</html>
