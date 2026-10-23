@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Effect systemと「副作用を値にする」は別の軸である - notes</title>
+<meta name="description" content="Effect systemは起こしうる効果を型で追跡する仕組みで、副作用の値化は記述と実行を分ける設計である。CarinaのEffectは後者で、IOモナドと同じなのは記述と実行を分けるところまで。">
+<meta property="og:title" content="Effect systemと「副作用を値にする」は別の軸である">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/effect-system-vs-effects-as-values.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/effect-system-vs-effects-as-values.png">
+<meta property="og:description" content="Effect systemは起こしうる効果を型で追跡する仕組みで、副作用の値化は記述と実行を分ける設計である。CarinaのEffectは後者で、IOモナドと同じなのは記述と実行を分けるところまで。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Effect systemと「副作用を値にする」は別の軸である">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/effect-system-vs-effects-as-values.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* 二つの軸の2x2図 */
+  .ax text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .ax .box { fill: var(--surface); stroke: var(--rule); }
+  .ax .hi  { fill: var(--accent-bg); stroke: var(--accent); }
+  .ax .hd  { font-weight: 600; font-size: 12.5px; }
+  .ax .nm  { font-weight: 600; font-size: 13px; }
+  .ax .dim { fill: var(--faint); font-size: 11px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Effect systemと「副作用を値にする」は別の軸である</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: Koka公式ドキュメント、Effect-TS公式ドキュメント、carina-rs/carina main 2e75b9d2のソース、既存ノート群
+    <span class="dates"><time datetime="2026-10-23">2026-10-23</time> 作成</span>
+  </p>
+
+  <p>Carinaの<code>Effect</code>は名前のせいでEffect systemと取り違えられやすい。だが二つは答えている問いが違う。<strong>Effect systemは「この関数は何を起こしうるか」を型で追跡してコンパイル時に検査する仕組み</strong>で、<strong>「副作用を値にする」は副作用の記述をデータとして作り、実行を後に回す設計</strong>である。前者は型の話、後者は実行時の表現の話で、片方だけを持つ言語もライブラリも普通にある。</p>
+
+  <h2>Effect system — 起こしうることを型に書く</h2>
+
+  <p>普通の型は戻り値の形しか言わない。<code>fn load(path: &amp;str) -&gt; Config</code>からは、ファイルを読むのか、ネットワークに出るのか、途中で止まらないのかは分からない。Effect systemはこれを関数型の一部にする。</p>
+
+  <p>Kokaはこれを中心に据えた言語で、関数型は引数・効果・戻り値の3つで書かれる。公式ドキュメントの例:</p>
+
+  <pre><code>fun square1( x : int ) : total int   { x*x }
+fun square2( x : int ) : console int { println( "a not so secret side-effect" ); x*x }
+fun square3( x : int ) : div int     { x * square3( x ) }
+fun square4( x : int ) : exn int     { throw( "oops" ); x*x }</code></pre>
+
+  <p><code>total</code>は効果なし、<code>console</code>は出力、<code>div</code>は停止しないかもしれない、<code>exn</code>は例外。Kokaはすべての関数の効果を推論して追跡するので、<code>total</code>と宣言した関数の中で<code>println</code>を呼べば型エラーになる。呼んだ関数の効果は呼び出し元へ伝わる。</p>
+
+  <p>対象を1種類に絞った小さなEffect systemなら身近にある。Javaの検査例外(<code>throws IOException</code>)は例外だけを追跡するEffect systemで、Rustの<code>async</code>は「中断しうる」という効果を印として持ち、呼び出し側に<code>.await</code>を要求する。Rustには<code>async</code> / <code>const</code>を効果として統一的に扱う議論(<a href="https://blog.rust-lang.org/inside-rust/2022/07/27/keyword-generics/">Keyword Generics Initiative</a>)がある。</p>
+
+  <p><strong>エフェクトハンドラはEffect systemとは別物である。</strong>ハンドラは「効果をどう処理するか」を呼び出し側が与える実行時の仕組みで、型で追跡するかどうかとは独立している。OCaml 5はエフェクトハンドラを持つが、どの関数がどの効果を起こすかを型で追跡しない。追跡がなければEffect systemとは呼ばない。</p>
+
+  <h2>副作用を値にする — 記述と実行を分ける</h2>
+
+  <p>こちらは副作用をその場で起こさず、「何をするか」をデータとして作っておく。実行は解釈器が後で与える。HaskellのIO、Effect-TSの<code>Effect</code>、Carinaのplanがこの形をしている。Effect-TSの説明では<code>Effect</code>は遅延実行されるワークフローの記述で、不変な値である。</p>
+
+  <h2>二つの軸に並べる</h2>
+
+  <figure>
+    <svg viewBox="0 0 640 300" role="img" aria-label="横軸を効果を型で追跡するかどうか、縦軸を副作用を値にするかどうかとした2x2の図。値にするが追跡しない象限にCarina、値にして追跡もする象限にHaskellのIOとEffect-TS、どちらもしない象限にOCaml 5、追跡するが値にしない象限にKokaとJavaの検査例外がある">
+      <g class="ax">
+        <text class="hd" x="232" y="22" text-anchor="middle">型で追跡しない</text>
+        <text class="hd" x="497" y="22" text-anchor="middle">型で追跡する</text>
+        <text class="hd" x="8" y="105">値にする</text>
+        <text class="hd" x="8" y="235">値にしない</text>
+
+        <rect class="hi" x="100" y="36" width="265" height="130"/>
+        <text class="nm" x="116" y="76">Carina</text>
+        <text class="dim" x="116" y="94">planは継続を持たない列。開いて読める</text>
+
+        <rect class="box" x="365" y="36" width="265" height="130"/>
+        <text class="nm" x="381" y="76">HaskellのIO</text>
+        <text class="dim" x="381" y="94">IOか否かの1ビットだけ追跡</text>
+        <text class="nm" x="381" y="124">Effect-TS</text>
+        <text class="dim" x="381" y="142">失敗Eと依存Rを型で追跡</text>
+
+        <rect class="box" x="100" y="166" width="265" height="130"/>
+        <text class="nm" x="116" y="206">OCaml 5</text>
+        <text class="dim" x="116" y="224">ハンドラはあるが型に出ない</text>
+
+        <rect class="box" x="365" y="166" width="265" height="130"/>
+        <text class="nm" x="381" y="206">Koka</text>
+        <text class="dim" x="381" y="224">全効果を推論。直接実行しハンドラで解釈</text>
+        <text class="nm" x="381" y="254">Javaの検査例外</text>
+        <text class="dim" x="381" y="272">例外だけ追跡</text>
+      </g>
+    </svg>
+    <figcaption>二つの軸は独立していて、4つの象限すべてに実例がある。</figcaption>
+  </figure>
+
+  <p>境界がぼやけて見えるのは右上の象限のせいである。HaskellのIOもEffect-TSも値でありながら型に効果の情報を載せているので、二つの軸が同じものに見える。Effect-TSの<code>Effect&lt;Success, Error, Requirements&gt;</code>は、値化と型による追跡を一つの型に同居させた設計である。</p>
+
+  <h2>「IOモナドと同じ」と言えるのはどこまでか</h2>
+
+  <p>CarinaのEffectを「IOモナドと同じく副作用を値として扱う」と説明できるのは、<strong>記述と実行を分ける</strong>ところまでである。そこから先は違う。</p>
+
+  <div class="contrast">
+    <div>
+      <h3>HaskellのIO</h3>
+      <p>IOはモナドで、<code>&gt;&gt;=</code>の右側は関数である。「前の結果を受けて次に何をするか」が関数の中に隠れるので、IOの値は実行するまで中を開けない。表示も保存もできない。</p>
+    </div>
+    <div class="yes">
+      <h3>Carinaのplan</h3>
+      <p>継続を持たない効果の並びで、全要素を列挙し、表示し、ファイルに書き出せる。applyの前に人が全部を読める。</p>
+    </div>
+  </div>
+
+  <p>同じ「副作用の値化」でも、IOは合成の力を取って検査可能性を捨て、Carinaは検査可能性を取って合成の力を捨てている。planを人が承認してからapplyするワークフローは後者でしか成り立たない。この差は<a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a>と<a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a>で書いたものそのもので、planの側の構造は<a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a>にある。</p>
+
+  <h2>Carinaの位置</h2>
+
+  <p>Carinaは左上の象限で、値化はするが型で追跡しない。DSLの型が見ているのは属性値とスキーマで、どの式がどの効果を起こすかは型に現れない。「型安全」と「Effect」が同じ製品の説明に並ぶので、合わせて型レベルのEffect systemだと読まれやすいが、二つの語は別の軸を指している。<a href="/notes/carina-type-system-position.html">Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>Kokaのコード例と「すべての関数の効果を推論して追跡する」という説明は、<a href="https://koka-lang.github.io/koka/doc/book.html">公式ドキュメント</a>のEffect typesの節から写した。Effect-TSの型パラメータ名と「遅延実行されるワークフローの記述」「不変」という説明は<a href="https://effect.website/docs/getting-started/the-effect-type/">公式ドキュメント</a>による。OCaml 5が効果を型で追跡しないことは、<a href="https://arxiv.org/abs/2304.02145">漸進的エフェクト型付けの論文</a>の記述による。リリース済みのOCamlに効果の型付けが入っていないことは、最新のリリースノートでは確認していない(要確認: 最新版でも未導入か)。Keyword Generics Initiativeは2022年の発表を見たが、現状どこまで進んでいるかは確認していない。</p>
+    <p>Carinaの<code>Effect</code>がRead / Create / Update / Delete / Import / Remove / Move / Wait / DeferredCreateなどの変種を持つenumで、<code>Plan</code>が<code>effects: Vec&lt;Effect&gt;</code>を持つことは、carina main 2e75b9d2の<code>carina-core/src/effect.rs</code>と<code>plan.rs</code>で確認した。図の分類(とくにHaskellのIOを「1ビットのEffect system」と読むこと)と、IOとplanの対比は解釈である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a></li>
+      <li><a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a></li>
+      <li><a href="/notes/carina-type-system-position.html">Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-効果">#効果</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-比較">#比較</a>
+  </p>
+</article>
+</body>
+</html>
