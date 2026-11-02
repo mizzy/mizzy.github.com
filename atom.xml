@@ -16,7 +16,7 @@
         <updated>2026-11-02T13:50:53+09:00</updated>
         <id>https://mizzy.org/blog/2026/11/02/1/</id>
         <content type="html"><![CDATA[
-<p><a href="https://github.com/carina-rs/carina">Carina</a>の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、githubの5つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktreeを切って並行に作業する。</p>
+<p><a href="https://github.com/carina-rs/carina">Carina</a>の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、github、infraの6つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktreeを切って並行に作業する。</p>
 <p>Rustのプロジェクトでこれをやると、worktreeの数だけ<code>target</code>ができて、そのどれもがビルドとテストを回す。ここ数日、PCが重い、ディスクが足りない、という状態になっていたので、やった対策をまとめておく。雑なメモです。</p>
 <p>ちなみにマシンはMacBook Pro（Apple M4 Max、16コア（Performance 12、Efficiency 4）、メモリ128GB、SSD 2TB）。それなりに良いマシンのはずなんだけど、それでも重くなるし、ディスクも足りなくなる。</p>
 <hr />
@@ -43,7 +43,7 @@
 </span></span><span class="line"><span class="cl">mkdir -p <span class="s2">&#34;</span><span class="nv">$dest</span><span class="s2">&#34;</span>
 </span></span><span class="line"><span class="cl">ln -s <span class="s2">&#34;</span><span class="nv">$dest</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">/target&#34;</span>
 </span></span></code></pre><p><code>--git-dir</code>と<code>--git-common-dir</code>が違えば、追加で作ったworktreeだと判断できる。メインのチェックアウトでは両方とも同じ<code>.git</code>を指すので、何もせずに抜ける。</p>
-<p>5つのリポジトリで、post-checkoutフックからこれを呼ぶ。</p>
+<p>infraを除くRustの5つのリポジトリで、post-checkoutフックからこれを呼ぶ。</p>
 <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
 </span></span></span><span class="line"><span class="cl"><span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$3</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> ~/.local/bin/link-cargo-target . <span class="o">||</span> <span class="nb">true</span>
 </span></span></code></pre><p>post-checkoutフックの3番目の引数は、ブランチのチェックアウトなら<code>1</code>、ファイル単位のチェックアウトなら<code>0</code>になる。<code>git worktree add</code>でもこのフックが走るので、worktreeを作った時点でシンボリックリンクができる。</p>

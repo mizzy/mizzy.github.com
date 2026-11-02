@@ -15,7 +15,7 @@
     <meta property="og:type" content="article"/>
     <meta property="og:url" content="https://mizzy.org/blog/2026/11/02/1/"/>
     <meta property="og:image" content="https://mizzy.org/blog/2026/11/02/1/ogp.png"/>
-    <meta property="og:description" content="Carina の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、githubの5つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktree…"/>
+    <meta property="og:description" content="Carina の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、github、infraの6つに分かれていて、それぞれのリポジトリで、複数のエージェントがwo…"/>
     <meta property="og:site_name" content="Gosuke Miyashita"/>
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image"/>
@@ -60,7 +60,7 @@
         <a href="https://github.com/carina-rs/carina">
           Carina
         </a>
-        の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、githubの5つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktreeを切って並行に作業する。
+        の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、github、infraの6つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktreeを切って並行に作業する。
       </p>
       <p>
         Rustのプロジェクトでこれをやると、worktreeの数だけ
@@ -124,7 +124,7 @@
         を指すので、何もせずに抜ける。
       </p>
       <p>
-        5つのリポジトリで、post-checkoutフックからこれを呼ぶ。
+        infraを除くRustの5つのリポジトリで、post-checkoutフックからこれを呼ぶ。
       </p>
       <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
 </span></span></span><span class="line"><span class="cl"><span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$3</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> ~/.local/bin/link-cargo-target . <span class="o">||</span> <span class="nb">true</span>
