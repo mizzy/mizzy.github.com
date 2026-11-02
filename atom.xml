@@ -3,12 +3,250 @@
     <title><![CDATA[Gosuke Miyashita]]></title>
     <link href="https://mizzy.org/atom.xml" rel="self"/>
     <link href="https://mizzy.org/"/>
-    <updated>2026-11-02T13:50:53+09:00</updated>
+    <updated>2026-11-02T19:31:49+09:00</updated>
     <id>https://mizzy.org/</id>
     <author>
         <name><![CDATA[Gosuke Miyashita]]></name>
     </author>
     <generator uri="https://github.com/mizzy/nebel/">Nebel</generator>
+
+    <entry>
+        <title type="html"><![CDATA[AIの時代だからこそ、強い型付けのIaCツールをつくっている]]></title>
+        <link href="https://mizzy.org/blog/2026/11/02/2/"/>
+        <updated>2026-11-02T19:31:49+09:00</updated>
+        <id>https://mizzy.org/blog/2026/11/02/2/</id>
+        <content type="html"><![CDATA[
+<p>AIがあれば型は要らない、IaCも要らない、と主張する人がいる。多数派ではないと思うけど。自分はむしろ、強い型付けをコンセプトにしたIaCツール、<a href="https://github.com/carina-rs/carina">Carina</a>をつくっている。</p>
+<p>AIがあればIaCは要らない、という話を最初に見たときは、正直こう思っただけだった。</p>
+<blockquote class="twitter-tweet"><a href="https://x.com/gosukenator/status/2116755457411080208"></a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>その後、ymotongpooさんが、IaCがなくならない理由について筋道立てた記事を書いた。また、tadsanさんとnishioさんの型に関するツイートも流れてきたので、それらに絡めて、自分がなぜAIの時代に型付きのIaCツールをつくっているのかを書いておく。</p>
+<p>ついでに、nishioさんが提案していた「LLMが生成した最初のコードが型エラーになる確率」を、Carinaの開発ログから実際に測ってみた。</p>
+<hr />
+<h2>ymotongpooさんの記事</h2>
+<iframe class="hatenablogcard" style="width:100%;height:155px;max-width:680px;" src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fymotongpoo.hatenablog.com%2Fentry%2F2026%2F11%2F02%2F093500" frameborder="0" scrolling="no"></iframe>
+<p>発端は、James Ward氏が2026年10月31日にXに投稿した「IaC is dead」。AIがシステムのソースコードと実際のインフラを読めば、変更の内容も承認の可否も判断できるので、望ましい構成をコードとして書いておく必要はない、という主張とのこと。</p>
+<p>ymotongpooさんの記事は、これに対して、IaCがこれまで何を担ってきたのかを整理し直している。TL;DRから引用する。</p>
+<blockquote>
+<p>IaCは、望ましい状態をコードとして残す、意図を記録する役割と、状態を保持して差分を計算し、適用する、実行基盤としての役割を担ってきました。</p>
+</blockquote>
+<p>そして、AIに変更を任せるには少なくとも4つの条件が要る、としている。</p>
+<ol>
+<li>現在の状態の把握</li>
+<li>部分的な失敗に耐える収束</li>
+<li>検証できる目標の状態</li>
+<li>適用前の差分と承認</li>
+</ol>
+<blockquote>
+<p>このうち最初の2つはプラットフォームが担えますが、残りの2つは望ましい状態を記録したものがなければ満たせません。</p>
+</blockquote>
+<p>Kubernetesはクラスタの内側で、実行基盤としての役割をプラットフォームに組み込んだけど、利用者は今もマニフェストを書いてGitで管理している。AIが記述を書くようになっても、承認し、再現し、元に戻すための記述は残る。だいたいそういう話で、自分もこの整理には全面的に同意する。</p>
+<hr />
+<h2>Serverspecが出てきた</h2>
+<p>記事の中で、Serverspecが、サーバーのあるべき状態をテストとして書いて、実際の状態を確かめる試みとして紹介されていた。それだけでなく、脚注には自分のことも書かれていて、</p>
+<blockquote>
+<p>執筆時点ではフリーランスのソフトウェアエンジニアで、余暇に、Rustで書かれた型付きのIaCツールであるCarinaを開発しています。</p>
+</blockquote>
+<p>と、Carinaまで紹介してもらっていた。ありがとうございます。</p>
+<p>自分の中では、ServerspecとCarinaはつながっている。Serverspecは、あるべき状態をテストとして書いて、実際の状態がそれと合っているかを、適用した後に確かめるもの。Carinaの型は、望ましい状態の記述そのものに誤りがないかを、適用する前に確かめるもの。どちらも「意図を書いて、機械に確かめさせる」という点では同じで、確かめる対象とタイミングが違う。</p>
+<hr />
+<h2>もう1つの役割：クラウドのバッドノウハウを吸収する</h2>
+<p>ymotongpooさんの整理は「意図の記録」と「実行基盤」の2つだけど、IaCツールにはもう1つ、クラウドのバッドノウハウを吸収する、という面もあると思っている。</p>
+<p>バッドノウハウは高林哲さんの言葉で、「ソフトウェアを使いこなすためには必要だが、本来は知りたくもない、ソフトウェアの設計次第では不要なはずのノウハウのこと。」（<a href="https://gihyo.jp/dev/serial/01/alpha-geek/0007">gihyo.jpのインタビュー記事</a>の注より）。クラウドのAPIを正しく叩くには、こういう知識がいろいろ要る。たとえば、</p>
+<ul>
+<li>作ったばかりのIAMロールを指定してVPC Flow Logを作ろうとすると、IAMの結果整合性のせいで、まだロールを引き受けられずに失敗することがある。Carinaのawsプロバイダーでは、<code>Unable to assume IAM role</code>などのエラーメッセージを見分けて、5秒おきに最大12回まで試している</li>
+<li>作成に成功したはずのリソースが、直後に読みにいくと見つからないことがある。awsccプロバイダーで、S3バケットの作成が成功したのに、直後の読み込みでは<code>not_found</code>が返ってきた（<a href="https://github.com/carina-rs/carina/issues/4168">carina#4168</a>）。今は、読めるようになるまで、デフォルトで最大2分待つようにしている</li>
+<li>IAMの信頼ポリシーのprincipalにロールのARNを書くと、AWSは保存時にそれをロールの一意ID（<code>AROA...</code>）に変換する（表示するときはARNに戻す）。権限昇格を防ぐための<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html">仕様</a>だけど、参照先のロールを削除して作り直すと、ポリシーは新しいロールには効かなくなり、ARNに戻せない古い一意IDがそのまま見えるようになる。planにはARNと<code>AROA...</code>の差分として出てくるけど、それだけでは何が起きているのか分からない（<a href="https://github.com/carina-rs/carina-provider-aws/issues/381">carina-provider-aws#381</a>、これはまだ吸収しきれていない）</li>
+<li>Cloud ControlのS3バケットのスキーマでは、<code>ObjectLockEnabled</code>は作成後も変更できる属性になっていて、S3のAPIを直接使えば既存のバケットでも有効にできる。なのに、Cloud ControlのUpdateResourceで変更すると、成功が返ってくるのに、実際には何も変わらない。以前のCarinaは、これをそのまま適用済みとして記録していた。今は、更新後に読み直して、変更した属性が反映されていなければ部分的な成功として報告するようにしている（<a href="https://github.com/carina-rs/carina-provider-awscc/issues/419">carina-provider-awscc#419</a>）</li>
+</ul>
+<p>IaCツールがなければ、こういったバッドノウハウは、AIが毎回その場で踏み抜いて学び直すことになる。AIが自力で気づいて対処できることもあるだろうけど、毎回そうできる保証はない。</p>
+<p>IaCツールがバッドノウハウを吸収しておけば、人間もAIも、それを知らずに済む。一度直せば全員が同じ挙動を得られるし、受け入れテストで検証もできる。</p>
+<p>本来こういうことは、バッドノウハウの定義どおり、クラウドの側の設計で不要にできるはずのもの。ymotongpooさんの4条件でいうと、2つ目の「部分的な失敗に耐える収束」に近く、記事でもプラットフォームが担えるものとされている。ただ、今のクラウドについては</p>
+<blockquote>
+<p>現在のクラウドは、最初の2つの条件からも離れています。</p>
+</blockquote>
+<p>とも書かれていて、今のところその役割はIaCツールが担っている。</p>
+<hr />
+<h2>記述が残っても、人間の検証が追いつかない</h2>
+<p>ymotongpooさんは、AIが記述を書く場合について、こう書いている。</p>
+<blockquote>
+<p>生成が速くなるほど、人がレビューする差分も増え、記述を残しておく必要も大きくなります。</p>
+</blockquote>
+<p>ここは本当にそうで、自分もCarinaの開発や、Carinaで管理しているインフラの変更を全部AIにやらせているけど、AIが書く量に対して、人間が全部読んでレビューするのはもう無理になっている。</p>
+<p>なので、記述が残るだけでは足りなくて、その記述を、人間が全部読まなくても検証できる必要がある。機械が確かめられる部分は機械に任せて、人間はplanを見て「これは意図した変更か」だけを判断すれば良い、という状態にしたい。その「機械が確かめられる部分」をできるだけ広げるのが、Carinaの型の役割だと考えている。</p>
+<hr />
+<h2>汎用言語の型と、ドメインの型</h2>
+<p>ymotongpooさんの記事では、AWS CDKやPulumiのような汎用言語で書くIaCについて、こう書かれている。</p>
+<blockquote>
+<p>汎用の言語で書く利点の1つは型です。</p>
+</blockquote>
+<blockquote>
+<p>TypeScriptで書けば、存在しない項目名や型の合わない値、必須の項目の書き忘れを、デプロイする前にコンパイラーが検出します。</p>
+</blockquote>
+<p>これはそのとおりなんだけど、ここで挙げられているのは、項目名、値の型、必須の項目といった、構造についてのチェック。インフラの意味までは、型がいつも見てくれるわけではない。</p>
+<p>CDKでも、L2やL3のコンストラクトの多くは、VPCを<code>IVpc</code>というオブジェクトとして受け取るので、同じアプリの中で作ったリソースを参照する限り、取り違えはコンパイル時に分かる。ただ、L1の<a href="https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ec2.CfnSubnetProps.html"><code>CfnSubnetProps</code></a>の<code>vpcId</code>は<code>string | IVPCRef</code>だし、既存のVPCを取り込む<a href="https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ec2.VpcAttributes.html"><code>Vpc.fromVpcAttributes</code></a>では、<code>vpcId</code>は<code>string</code>、サブネットIDは<code>string[]</code>。IDを文字列として扱う所では、VPC IDを入れるべき所にサブネットIDを入れても、コンパイルは通る。</p>
+<p>AWSのAPIの上では、VPC IDもサブネットIDも、VPCのテナンシー（<code>instance_tenancy</code>）も、ただの文字列。なので、IDを取り違えたり、取れない値を書いたりしても、実際に適用するまで分からない。</p>
+<p>Carinaでは、IDやARNはリソースごとに別の型にし、テナンシーのような値は取れる値だけを持つ型にしている。試しに、2つ目のサブネットの<code>vpc_id</code>に、わざと1つ目のサブネットのIDを渡してみる。</p>
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="n">let vpc</span> <span class="o">=</span> <span class="k">aws</span><span class="p">.</span><span class="k">ec2</span><span class="p">.</span><span class="k">Vpc</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  cidr_block</span> <span class="o">=</span> <span class="err">&#39;</span><span class="m">10</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">0</span><span class="err">/</span><span class="m">16</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">let public</span> <span class="o">=</span> <span class="k">aws</span><span class="p">.</span><span class="k">ec2</span><span class="p">.</span><span class="k">Subnet</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  vpc_id</span>     <span class="o">=</span> <span class="k">vpc</span><span class="p">.</span><span class="k">vpc_id</span>
+</span></span><span class="line"><span class="cl"><span class="n">  cidr_block</span> <span class="o">=</span> <span class="err">&#39;</span><span class="m">10</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">1</span><span class="p">.</span><span class="m">0</span><span class="err">/</span><span class="m">24</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">let private</span> <span class="o">=</span> <span class="k">aws</span><span class="p">.</span><span class="k">ec2</span><span class="p">.</span><span class="k">Subnet</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  vpc_id</span>     <span class="o">=</span> <span class="k">public</span><span class="p">.</span><span class="k">subnet_id</span>
+</span></span><span class="line"><span class="cl"><span class="n">  cidr_block</span> <span class="o">=</span> <span class="err">&#39;</span><span class="m">10</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">2</span><span class="p">.</span><span class="m">0</span><span class="err">/</span><span class="m">24</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre><p><code>carina validate</code>を実行すると、こうなる。</p>
+<pre><code>$ carina validate .
+Validating...
+Error: aws.ec2.Subnet.private: cannot assign aws.ec2.Subnet.Id to 'vpc_id': expected aws.ec2.Vpc.Id, got aws.ec2.Subnet.Id (from public.subnet_id)
+</code></pre>
+<p>AWSのAPIを1回も呼ばずに、<code>plan</code>より前の段階で間違いが分かる。</p>
+<p>同じ構成をTerraform（AWS provider 6.71.0）で書くと、<code>terraform validate</code>も<code>terraform plan</code>も通る。<code>aws_subnet</code>の<code>vpc_id</code>はただの文字列で、しかもplanの時点では1つ目のサブネットのIDがまだ決まっていないので、検証しようがない。間違いに気づくのは、applyしたときになる。</p>
+<p>言語の型システムが強いか弱いかではなく、インフラのドメイン知識をどこまで型にしているか、の違い。そして、Carinaが汎用言語ではなくDSLなのは、汎用言語の自由度を持ち込まずに、ドメインの型だけを持ち込みたいから。何でも書ける言語は、AIにとっても何でも書けてしまう言語なので。</p>
+<hr />
+<h2>型はAIにとってもテストになる</h2>
+<p>型についてはXでも議論になっていた。tadsanさんのツイート。</p>
+<blockquote class="twitter-tweet"><a href="https://x.com/tadsan/status/2116870753950089400"></a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>それを引用したnishioさんのツイート。</p>
+<blockquote class="twitter-tweet"><a href="https://x.com/nishio/status/2117143616913285200"></a></blockquote> <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>Carinaの開発は、全部Claude CodeとCodexにやらせていて、ログは手元にある。なので、nishioさんの言う統計を実際にとってみた。</p>
+<p>ここで測るのは、Carinaの実装（Rust）の方で、.crnの型ではない。ただ、AIが書いたものを、実行する前に型で機械的に止める、という構図は同じ。</p>
+<h3>測り方</h3>
+<ul>
+<li>対象は、Carina関連のリポジトリでのClaude Codeのログ（サブエージェントも含む）と、Carina関連のリポジトリで動かしたCodexのセッション</li>
+<li>AIが<code>.rs</code>ファイルを編集した後、最初に実行した<code>cargo check</code>、<code>build</code>、<code>test</code>、<code>clippy</code>、<code>nextest</code>を1回の「試行」とする</li>
+<li>同じセッションで直前のコンパイルが失敗していた試行は、エラーを直した後の「再試行」として分け、それ以外を新しく書いたコードの1回目とする</li>
+<li>出力に<code>error[E....]</code>（rustcのエラーコード）が含まれていれば失敗とする。テストが落ちただけの場合や、clippyの警告、構文エラー、ビルドスクリプトの失敗は数えていない</li>
+</ul>
+<h3>結果</h3>
+<p>新しく書いたコードの1回目の結果。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>試行</th>
+<th>エラーコードあり</th>
+<th>割合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Code</td>
+<td>6,019</td>
+<td>461</td>
+<td>7.7%</td>
+</tr>
+<tr>
+<td>Codex</td>
+<td>11,051</td>
+<td>1,325</td>
+<td>12.0%</td>
+</tr>
+<tr>
+<td>合計</td>
+<td>17,070</td>
+<td>1,786</td>
+<td>10.5%</td>
+</tr>
+</tbody>
+</table>
+<p>AIが新しく書いたRustのコードは、だいたい10回に1回、最初のコンパイルで落ちて、直されている。また、一度エラーになった後の再試行では、27%くらいがまたエラーになっていた。nishioさんの言う「実行前におかしなコードを検出するテスト」に、少なくとも10回に1回は引っかかっていることになる。</p>
+<p>月ごとに見ると、Claude Codeでの試行は5月まででほぼ終わっていて、6月以降はCodexがほとんど。これは実装をCodexに任せるようにした時期と一致する。試行が1,000回を超える月で見ると、割合は7〜13%くらいで、月によって幅があった。一番高かったのは10月のCodex（13.2%）。</p>
+<p>1回目で失敗したときに出ていたエラーの上位はこんな感じ。</p>
+<table>
+<thead>
+<tr>
+<th>エラー</th>
+<th>内容</th>
+<th>Claude Code</th>
+<th>Codex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E0308</td>
+<td>型の不一致</td>
+<td>93</td>
+<td>328</td>
+</tr>
+<tr>
+<td>E0599</td>
+<td>存在しないメソッド</td>
+<td>94</td>
+<td>328</td>
+</tr>
+<tr>
+<td>E0425</td>
+<td>未解決の名前</td>
+<td>56</td>
+<td>243</td>
+</tr>
+<tr>
+<td>E0277</td>
+<td>traitを満たしていない</td>
+<td>23</td>
+<td>182</td>
+</tr>
+<tr>
+<td>E0433</td>
+<td>未解決のパス</td>
+<td>54</td>
+<td>159</td>
+</tr>
+<tr>
+<td>E0061</td>
+<td>引数の数の誤り</td>
+<td>27</td>
+<td>117</td>
+</tr>
+<tr>
+<td>E0063</td>
+<td>構造体のフィールドの書き忘れ</td>
+<td>57</td>
+<td>63</td>
+</tr>
+<tr>
+<td>E0004</td>
+<td>matchの網羅漏れ</td>
+<td>16</td>
+<td>55</td>
+</tr>
+</tbody>
+</table>
+<p>E0004は、典型的には、enumにバリアントを足したのに、それを使っている<code>match</code>を直していない、というケース。</p>
+<h3>注意点</h3>
+<ul>
+<li>判定は雑なヒューリスティック。複数の編集をまとめて1回の試行として数えているし、テストコードだけを編集した場合も含まれている。1回目と再試行の分け方も、同じセッションで直前のコンパイルが失敗したかどうかを見ているだけ</li>
+<li>エラーコードには、E0425（未解決の名前）のように、厳密には型エラーと呼ばないものも含めている</li>
+<li>出力を<code>tail</code>で切ったり、ファイルに書き出したり、バックグラウンドで実行したりした試行は、エラーコードが見えないので成功に数えている。なので、実際の割合はもう少し高い可能性がある</li>
+<li>型のない言語と比べたわけではないので、「型がなかったら、この10%がどこで見つかっていたか」までは分からない</li>
+</ul>
+<h3>.crnの型の場合</h3>
+<p>ちなみに、Carinaの方の型（.crnファイル）でも同じことを測ろうとしたけど、carina-rs/infraなどでの<code>carina validate</code>の実行約790回のうち、失敗は38回で、そのほとんどは型エラーではなく、providerが入っていなかった、一緒に実行した別のコマンドが失敗した、といった別の理由だった。Rustのときのように「編集した後の最初の1回」で数えたわけでもないので、割合は出していない。型エラーとして引っかかっていたのは、たとえば次のようなもの（5月時点のメッセージ）。</p>
+<pre><code>Error: ../../../modules/github-oidc: attribute 'oidc_provider_arn': type mismatch: expected iam_oidc_provider_arn, got arn (from oidc_provider.arn)
+</code></pre>
+<p>OIDCプロバイダーのARNを期待している所に、ただのARNを渡していて、型で弾かれている。</p>
+<p>なお、tadsanさんのツイートにある、型を書くことはAIへの文脈になるのか、トークンの浪費なのか、という話は、コードに型を書く前提の話だと思う。Carinaでは、リソースの属性の型はプロバイダーのスキーマの側にあって、.crnには書かない（書くのはモジュールの引数の型くらい）。なので、.crnを書くAIにとって、型は自分で書くものではなく、間違えたときに<code>carina validate</code>が返してくれるもの、という位置づけになる。</p>
+<hr />
+<h2>まとめ</h2>
+<ul>
+<li>ymotongpooさんの整理のとおり、AIが記述を書くようになっても、意図の記録としてのIaCは残る</li>
+<li>それに加えて、IaCツールには、クラウドのバッドノウハウを吸収する役割もある</li>
+<li>AIが書く量が増えるほど、人間のレビューは追いつかなくなるので、人間が全部読まなくても記述を検証できる必要がある</li>
+<li>CDKのような、汎用言語で書くIaCツールでも、リソースの関係はある程度型で表せるけど、IDそのものは文字列のまま。インフラの意味まで型にするには、ドメインの型が要る</li>
+<li>AIが新しく書いたRustのコードは、10%くらいが最初のコンパイルで落ちていて、型チェックが実行前に止めている</li>
+</ul>
+<p>というわけで、AIの時代だからこそ、強い型付けのIaCツールが要る、と思ってCarinaをつくっている。</p>
+<ul>
+<li><a href="https://github.com/carina-rs/carina">carina-rs/carina</a></li>
+</ul>
+
+]]></content>
+    </entry>
 
     <entry>
         <title type="html"><![CDATA[生成AIにRustで開発させるときのPC負荷対策]]></title>
@@ -578,178 +816,6 @@ audio   .peitho/rehearsals/rehearsal-20260719-135241.webm
 <p>LLMに投げるプロンプトを短くしたいとき、カタカナ語を漢語に言い換えると効く場面がありそうだが、そこまでして削る価値があるかは場合によりそう。</p>
 <hr />
 <p>トークナイザーの実装そのものについては<a href="/blog/2026/08/02/2/">前の記事</a>に書いた。次回は出力ヘッドとサンプリングを実装して、テキストからテキストへの推論をつなげる予定。</p>
-
-]]></content>
-    </entry>
-
-    <entry>
-        <title type="html"><![CDATA[Pyxisの開発: トークナイザー]]></title>
-        <link href="https://mizzy.org/blog/2026/08/02/2/"/>
-        <updated>2026-08-02T11:59:11+09:00</updated>
-        <id>https://mizzy.org/blog/2026/08/02/2/</id>
-        <content type="html"><![CDATA[
-<p><a href="/blog/2026/07/23/1/">前回の記事</a>でTransformer本体ができた。ただしこの時点でPyxisが受け取れるのはトークンIDの列だけで、テキストを渡すことはできない。今回はその入口にあたるトークナイザーを組み込んだ。対応するPRは<a href="https://github.com/mizzy/pyxis/pull/23">#23</a>。</p>
-<p>BPEそのものについては<a href="/blog/2026/07/01/1/">embeddingの記事</a>で一度書いたので、今回はその先、実際のトークナイザーファイルの中に何が入っていて、テキストがどういう順序でトークンIDになるのかを見ていく。</p>
-<hr />
-<h2>トークナイザーは訓練済みのデータ</h2>
-<p>トークナイザーというと文字列を分割するロジックを思い浮かべるが、モデルと一緒に配布される<code>tokenizer.json</code>の中身は<strong>全部データ</strong>だった。</p>
-<p>BPEは「訓練データ中で隣り合う頻出ペアを繰り返しマージする」というアルゴリズムだが、これはトークナイザーを作るとき（訓練時）に済ませておく処理で、推論時に走らせるわけではない。推論時に必要なのは、その訓練の結果として得られた2つのテーブル。</p>
-<ul>
-<li><strong>vocab</strong>: トークン文字列 → トークンIDの対応表</li>
-<li><strong>merges</strong>: どのペアをどの順番でマージするか、という規則の列</li>
-</ul>
-<p>Qwen3-1.7Bの<code>tokenizer.json</code>を実際に覗いてみると、vocabが151643エントリ、mergesが151387エントリ入っていた。ファイルサイズは11MBほどある。</p>
-<p>このファイルには他に<code>normalizer</code>、<code>pre_tokenizer</code>、<code>decoder</code>といった項目もあるが、中身はこんな調子。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="s2">&#34;normalizer&#34;</span><span class="err">:</span> <span class="p">{</span><span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;NFC&#34;</span><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="s2">&#34;decoder&#34;</span><span class="err">:</span> <span class="p">{</span><span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;ByteLevel&#34;</span><span class="p">,</span> <span class="nt">&#34;add_prefix_space&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nt">&#34;trim_offsets&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nt">&#34;use_regex&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">}</span>
-</span></span></code></pre><p>処理の名前と、必要ならそのパラメータが書いてあるだけで、処理そのものは書かれていない。<code>{&quot;type&quot;: &quot;NFC&quot;}</code>は「Unicode正規化のNFCをかけろ」という指示であって、NFCが何をするかはこのファイルの外にある。つまり<code>tokenizer.json</code>が持っているのは、どの処理を使えという指示と、訓練で得られたテーブルだけ。処理の中身は、これを読む側が実装しておく必要がある。</p>
-<p>mergesの先頭はこうなっている。</p>
-<pre><code>[&quot;Ġ&quot;, &quot;Ġ&quot;], [&quot;ĠĠ&quot;, &quot;ĠĠ&quot;], [&quot;i&quot;, &quot;n&quot;], [&quot;Ġ&quot;, &quot;t&quot;], [&quot;ĠĠĠĠ&quot;, &quot;ĠĠĠĠ&quot;], [&quot;e&quot;, &quot;r&quot;]
-</code></pre>
-<p><code>Ġ</code>は半角スペースを表す記号（後述）。スペース2個、スペース4個、<code>in</code>、<code> t</code>、スペース8個、<code>er</code>という順に並んでいる。訓練データ中でこの順に頻出だった、ということがそのまま規則の順序になっている。インデント由来と思われるスペースの連結が上位を占めているのが、いかにも実データという感じで面白い。</p>
-<hr />
-<h2>マージを追ってみる</h2>
-<p>「マージ」というのは、隣り合った2つの要素をくっつけて1つにする操作のこと。訓練時は「データ中で最も頻出するペアをマージする」を繰り返し、マージしたペアを順にmergesへ書き足していく。Qwen3では151387回繰り返した結果があのテーブル、ということになる。</p>
-<p>一方、推論時はこのテーブルを引く側になる。入力に対して<strong>mergesに載っているマージだけを適用していく</strong>、という手順になる。</p>
-<ol>
-<li>入力をバラバラの要素に分解する</li>
-<li>隣り合うペアのうち、mergesに載っているものを探す</li>
-<li>複数見つかったら、mergesの中で順位が最も早いものをマージする</li>
-<li>2に戻る。どのペアも載っていなければ終了</li>
-</ol>
-<p><code>like</code>で追ってみる。Qwen3のmergesを実際に引くと、<code>(l,i)</code>が486番目、<code>(i,k)</code>が1323番目、<code>(k,e)</code>が184番目、<code>(li,ke)</code>が4547番目だった。</p>
-<pre><code>l i k e
-  ↓ (k,e) が184番目で最も早い
-l i ke
-  ↓ (l,i) が486番目
-li ke
-  ↓ (li,ke) が4547番目
-like
-</code></pre>
-<p>3回のマージで1トークンになった。ここで注意したいのは、左から順に処理しているわけではないこと。最初にくっつくのは<code>li</code>ではなく<code>ke</code>で、あくまでmergesの順位が早い順に適用される。<code>(i,k)</code>も1323番目に載ってはいるが、先に<code>(k,e)</code>と<code>(l,i)</code>が適用されて<code>i</code>と<code>k</code>が隣り合わなくなるので、出番が来ないまま終わる。</p>
-<p>ここで<code>like</code>が1トークンまで到達できたのは、必要なマージが3つとも載っていたから。載っていないペアに当たれば、そこでマージが尽きて複数トークンのまま終わる。</p>
-<hr />
-<h2>byte-level BPE</h2>
-<p>embeddingの記事でBPEを説明したときに「最初は1文字ずつの辞書から始めて」と書いたが、現代のLLMのトークナイザーは正確には文字単位ではなく<strong>バイト単位</strong>から始める。byte-level BPEと呼ばれる方式で、GPT-2で採用されて以降、広く使われている。</p>
-<p>まず前提として、トークンの種類は無制限に増やせるわけではない。トークナイザーを作るときに「何種類まで」という上限を決めていて、これを<code>vocab_size</code>と呼ぶ。Qwen3-1.7Bなら151936で、トークンIDは0から151935の範囲に収まる（先ほどのvocabの151643に特殊トークン26個を足しても151669にしかならないが、残りは128の倍数に切り上げるための余白で、実際には使われていない）。</p>
-<p>なぜ上限が要るかというと、この数がそのままモデルのサイズに効いてくるため。モデルはトークンIDを受け取ると、<a href="/blog/2026/07/01/1/">embeddingテーブル</a>からそのIDに対応するベクトルを引いて計算を始める。このテーブルはトークン1つにつき1行を持つ<code>vocab_size × hidden_dim</code>の行列なので、トークンの種類が増えればその分だけ行が増える。Qwen3-1.7Bは<code>hidden_dim</code>が2048なので、151936行 × 2048列で約3.1億個の数値がこのテーブルに入っていることになる。この「訓練で学習された数値ひとつひとつ」がパラメータで、モデル名の「1.7B」もパラメータの総数（17億）を指している。</p>
-<p>3.1億がどれくらいかというと、Transformerブロック1層分（アテンション+FFNで約5000万）の6層分に相当する。ブロックは全部で28層なので、embeddingテーブル1枚でその2割強を別に抱えている勘定。トークンの種類を増やすコストはそれなりに重い。</p>
-<p>その前提で文字単位のBPEを考えると、初期辞書にUnicodeの全文字を入れる必要がある。Unicodeで割り当て済みのコードポイントは29万個以上あり、そのうち文字（Letter）だけでも14万個ある。15万の枠のうち14万を初期辞書が占めてしまい、マージして語彙を育てる余地がほとんど残らない。かといって一部の文字だけを入れると、辞書にない文字が来たときに表現できず、<code>&lt;unk&gt;</code>（unknown）という「知らない文字」トークンに潰すしかない。</p>
-<p>byte-level BPEでは、テキストをUTF-8のバイト列に変換してから、その256種類のバイトを初期辞書にする。どんな文字列も最終的にはバイトの列なので、初期辞書が256個あればあらゆる入力を表現できる。絵文字だろうが未知の言語だろうが、必ず何らかのトークン列になり、<code>&lt;unk&gt;</code>が原理的に発生しない。</p>
-<p>ここでひとつ問題がある。バイト値の中には制御文字（改行、タブなど）や、そもそも単体では正しいUTF-8にならないバイトが含まれていて、これらをそのまま辞書のキーとしてJSONに書き出すのは扱いにくい。そこでGPT-2では、256個のバイトそれぞれを「印字可能なUnicode文字」に1対1で対応づけてから辞書に載せる、という方式を取っている。</p>
-<p><code>tokenizer.json</code>の中で見かける<code>Ġ</code>はこれ。半角スペース（バイト値0x20）に対応づけられた文字で、スペースそのものではない。同様に<code>Ċ</code>が改行に対応する。日本語のトークンが<code>ãģĵãĤĵãģ«ãģ¡ãģ¯</code>のような文字化けした見た目になっているのも同じ理由で、これは「こんにちは」のUTF-8バイト列を1バイトずつこの対応表で変換した結果。文字化けしているのではなく、そういう表記法になっている。</p>
-<hr />
-<h2>前処理の正規表現</h2>
-<p>もうひとつ、BPEの前段に<strong>pre-tokenizer</strong>という処理が入る。</p>
-<p>先ほどのマージの手順を、テキスト全体に対して無制限にかけると困ったことが起きる。<code>I like this</code>をバラすと<code>I ␣ l i k e ␣ t h i s</code>となるが、ここでは<code>like</code>の<code>e</code>と次の<code>␣</code>も「隣り合うペア」になってしまう。訓練データに<code>like this</code>が頻出していればこのペアがマージされ、単語の境界をまたいだ塊が1トークンになりうる。</p>
-<p>これを防ぐのがpre-tokenizer。BPEにかける前に、正規表現でテキストを大まかに区切っておく。</p>
-<pre><code>[I] [␣like] [␣this]
-</code></pre>
-<p>そしてマージは、この区切られた塊の中だけで行う。塊が違えば隣り合っているとみなさないので、<code>e</code>と<code>␣</code>のペアはそもそも候補に上がらず、<code>like this</code>という1トークンは原理的に生成されない。</p>
-<p>区切っておく利点は他にもある。<code>like this</code>や<code>like that</code>のような組み合わせを辞書に入れ始めると際限がなく、15万しかない語彙の枠を食い潰してしまう。また、<code>like</code>が単独では1トークン、<code>like this</code>の中では別トークンの一部、となるとモデルから見た単語の同一性も崩れる。</p>
-<p>Qwen3の<code>tokenizer.json</code>に入っている正規表現がこれ。</p>
-<pre><code>(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+
-</code></pre>
-<p>パイプ区切りで、先頭から順に:</p>
-<ol>
-<li><code>'s</code>や<code>'ll</code>などの英語の短縮形</li>
-<li>直前に記号を1つ許した文字の連続（<code>\p{L}</code>はUnicodeの「文字」カテゴリ）— スペース+単語がここで1つの塊になる</li>
-<li>数字1桁（<code>\p{N}</code>）</li>
-<li>スペースを1つ許した記号の連続</li>
-<li>改行、末尾のスペース、その他の空白</li>
-</ol>
-<p>3番目が「数字1桁」なのがポイントで、これによって数字は必ず1桁ずつのトークンに分割される。<code>2026</code>は<code>2</code>, <code>0</code>, <code>2</code>, <code>6</code>の4トークン、<code>1234567</code>なら7トークンになる。<a href="https://arxiv.org/abs/2309.16609">Qwen Technical Report</a>にある「数字を1桁ずつに分割するようにした」というのは、辞書側ではなくこの正規表現で実現されている。</p>
-<p>2番目のパターンで単語の直前のスペースが単語側に取り込まれるので、英語では「スペース+単語」が1トークンになりやすい。<code>Ġworld</code>のようなトークンが辞書にあるのはそのため。</p>
-<hr />
-<h2>実際に分割してみる</h2>
-<p>実際のQwen3のトークナイザーで試してみた結果。</p>
-<pre><code>'Hello'
-  → ['Hello']  → [9707]
-
-'Hello, Pyxis!'
-  → ['Hello', ',', 'ĠPy', 'xis', '!']  → [9707, 11, 5355, 7191, 0]
-
-'こんにちは'
-  → ['ãģĵãĤĵãģ«ãģ¡ãģ¯']  → [89015]
-
-'日本語のトークン化'
-  → ['æĹ¥æľ¬', 'èªŀ', 'ãģ®', 'ãĥĪãĥ¼', 'ãĤ¯', 'ãĥ³', 'åĮĸ']
-  → [101059, 102819, 15767, 137084, 28120, 15698, 32108]
-</code></pre>
-<p><code>Hello</code>は1トークンだが、<code>Pyxis</code>は<code>ĠPy</code> + <code>xis</code>の2トークンに割れている。<code>(ĠPy, xis)</code>というペアがmergesに載っていないためで、そこでマージが尽きて止まっている。頻出する単語ほど訓練時に深くマージされてテーブルを辿りきり1トークンに収まるが、珍しい単語は途中で尽きて複数トークンのまま残る、というBPEの性質がそのまま出ている。<code>ĠPy</code>の先頭に<code>Ġ</code>が付いているのは、前段の正規表現で直前のスペースが取り込まれたため。</p>
-<p>日本語は「こんにちは」が1トークンなのに対して、「日本語のトークン化」は9文字で7トークンに割れている。トークンごとに区切るとこうなる。</p>
-<pre><code>日本 / 語 / の / トー / ク / ン / 化
-</code></pre>
-<p>「日本」は2文字で1トークンにまとまっているのに、「トークン」の4文字は<code>トー</code> <code>ク</code> <code>ン</code>と3トークンに分解されている。日本語の扱いはこれ以外にも調べていて面白かったので、<a href="/blog/2026/08/02/3/">別記事</a>にまとめた。</p>
-<hr />
-<h2>特殊トークン</h2>
-<p>BPEのvocabは151643エントリだが、その後ろに特殊トークンが26個、<code>tokenizer.json</code>の<code>added_tokens</code>として別途定義されている。IDは151643から151668まで。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">151643</span><span class="p">,</span> <span class="nt">&#34;content&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;|endoftext|&gt;&#34;</span><span class="p">,</span> <span class="nt">&#34;special&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">151644</span><span class="p">,</span> <span class="nt">&#34;content&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;|im_start|&gt;&#34;</span><span class="p">,</span> <span class="nt">&#34;special&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">151645</span><span class="p">,</span> <span class="nt">&#34;content&#34;</span><span class="p">:</span> <span class="s2">&#34;&lt;|im_end|&gt;&#34;</span><span class="p">,</span> <span class="nt">&#34;special&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
-</span></span></code></pre><p><code>&lt;|im_start|&gt;</code>と<code>&lt;|im_end|&gt;</code>はチャット形式のマークアップで、会話のロール（system/user/assistant）の区切りを表す。OpenAIのChatMLに由来する形式で、Qwen3のchat templateもこれを使っている。このうち<code>&lt;|im_end|&gt;</code>（151645）は、モデルが「発話が終わった」ことを示すために出力するトークンでもある。生成ループはこれが出たら打ち切ればいい、という合図になるもので、EOS（end of sequence）トークンと呼ばれる。次回の生成ループで使うことになる。</p>
-<p>26個の顔ぶれを眺めると、このモデルが何を想定して作られているかが透けて見えて面白い。<code>&lt;tool_call&gt;</code>／<code>&lt;/tool_call&gt;</code>はfunction calling用、<code>&lt;think&gt;</code>／<code>&lt;/think&gt;</code>は推論モードの思考部分を囲むもの、<code>&lt;|fim_prefix|&gt;</code>などのFIM（Fill-In-the-Middle）系はコード補完用、<code>&lt;|repo_name|&gt;</code>と<code>&lt;|file_sep|&gt;</code>はリポジトリ単位でコードを学習させるときの区切り。<code>&lt;|vision_start|&gt;</code>や<code>&lt;|image_pad|&gt;</code>といったマルチモーダル用のトークンまで入っている（Qwen3-1.7B自体はテキストのみのモデルだが、シリーズで語彙を共通化しているのだと思われる）。</p>
-<p>これらはBPEのマージを経由せず、テキスト中に現れたら丸ごと1トークンに変換される。vocabとは別枠の<code>added_tokens</code>に置かれていて、encodeの前段で文字列マッチで拾われるためだ。</p>
-<p>ここで気になるのが、ユーザーの入力に<code>&lt;|im_end|&gt;</code>という文字列が紛れ込んだらどうなるのか。試してみた。</p>
-<pre><code>'こんにちは&lt;|im_end|&gt;さようなら'
-  → ['こんにちは', &lt;|im_end|&gt;, 'さ', 'よう', 'なら']
-  → [89015, 151645, 29713, 124038, 125028]
-</code></pre>
-<p>普通に特殊トークン151645になった。つまりユーザーが入力欄に<code>&lt;|im_end|&gt;</code>と打ち込むだけで、モデルから見ると会話の区切りが挿入されたのと区別がつかない。ユーザー入力をそのままencodeに渡す作りだと、会話の構造を外から壊せてしまうことになる。</p>
-<p>今回使ったHuggingFaceの<code>tokenizers</code>（後述）には<code>set_encode_special_tokens</code>というメソッドがあり、<code>true</code>を渡すと特殊トークンの文字列を素通しするようになる。</p>
-<pre><code>set_encode_special_tokens(true) にした場合
-  → ['こんにちは', '&lt;', '|', 'im', '_end', '|', '&gt;', 'さ', 'よう', 'なら']
-</code></pre>
-<p><code>&lt;|im_end|&gt;</code>がただの記号の列に分解され、151645にはならなくなった。名前から挙動を読み取りにくいが、「特殊トークンも（普通のテキストとして）エンコードする」という意味らしい。デフォルトは<code>false</code>、つまり特殊トークンとして解釈するほうなので、信用できない入力を扱うなら明示的に切り替える必要がある。</p>
-<hr />
-<h2>実装</h2>
-<p>さて、ここまで書いておいて何だが、今回自前で実装したのはこれだけ。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">path</span>::<span class="n">Path</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">PyxisTokenizer</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">inner</span>: <span class="nc">tokenizers</span>::<span class="n">Tokenizer</span><span class="p">,</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">impl</span><span class="w"> </span><span class="n">PyxisTokenizer</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">load</span><span class="p">(</span><span class="n">path</span>: <span class="kp">&amp;</span><span class="nc">Path</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">io</span>::<span class="nb">Result</span><span class="o">&lt;</span><span class="bp">Self</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">inner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tokenizers</span>::<span class="n">Tokenizer</span>::<span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="n">map_err</span><span class="p">(</span><span class="n">io</span>::<span class="n">Error</span>::<span class="n">other</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="bp">Self</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">inner</span><span class="w"> </span><span class="p">})</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">encode</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">text</span>: <span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">inner</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">).</span><span class="n">unwrap</span><span class="p">().</span><span class="n">get_ids</span><span class="p">().</span><span class="n">to_vec</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">decode</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">token_ids</span>: <span class="kp">&amp;</span><span class="p">[</span><span class="kt">u32</span><span class="p">])</span><span class="w"> </span>-&gt; <span class="nb">String</span> <span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">inner</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token_ids</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">).</span><span class="n">unwrap</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>HuggingFaceの<a href="https://github.com/huggingface/tokenizers">tokenizers</a> crateの薄いラッパー。21行。</p>
-<p>Pyxisは「LLMの推論を自分で実装して理解する」というのが目的なので、本来ならBPEも自分で書くべきところだけど、ここは既存のcrateに任せることにした。理由は、トークナイザーは推論の本体ではなく前処理・後処理であること、そして<code>tokenizer.json</code>のフォーマット（normalizer、pre_tokenizer、decoderの組み合わせ）を正確に再現するのが、得られる理解に対して手間が大きすぎると判断したため。ここでの1バイトのズレは全く違うトークンIDになって、モデル本体が正しくても出力が壊れる。デバッグしたい対象はそこじゃない、という気持ちがある。</p>
-<p><code>encode</code>の第2引数<code>false</code>は<code>add_special_tokens</code>で、<code>&lt;|im_start|&gt;</code>などを自動で付けないという指定。今回は素のテキストをそのまま推論に流したいので付けない。チャット形式で使うときはテンプレートを別途組み立てる必要があるが、それは後回し。</p>
-<p><code>decode</code>の第2引数<code>true</code>は<code>skip_special_tokens</code>で、こちらは逆に特殊トークンを出力から除去する指定。生成結果に<code>&lt;|im_end|&gt;</code>のような文字列がそのまま混ざるのを防ぐ。</p>
-<p><code>unwrap()</code>しているのは、<code>tokenizers</code>のエラー型が<code>Box&lt;dyn Error&gt;</code>で<code>io::Error</code>に素直に変換できないため。ここは後で見直すかもしれない。</p>
-<p>依存は<code>default-features = false</code>にして<code>onig</code>だけを有効にしている。デフォルトでは<code>onig</code>に加えて<code>progressbar</code>（indicatif）と<code>esaxx_fast</code>（C++実装のsuffix array、トークナイザーの訓練で使う）が有効になるが、どちらも推論には要らないので切った。</p>
-<hr />
-<h2>テスト</h2>
-<p>テストはこう書いた。</p>
-<pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#[test]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">decode_roundtrips_with_encode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_test_tokenizer</span><span class="p">()</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">};</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;Hello, Pyxis!&#34;</span><span class="p">;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">token_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tokenizer</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tokenizer</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token_ids</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">);</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
-</span></span></span></code></pre><p>実際のQwen3-1.7Bの<code>tokenizer.json</code>を読み込んで、encodeしてdecodeすると元に戻ることを確認している。byte-level BPEは情報を落とさない変換なので、往復すれば必ず元通りになるはず、という性質のテスト。</p>
-<p><code>load_test_tokenizer()</code>がOptionを返していて、ファイルが無ければテストを素通りさせている。11MBのモデルファイルをリポジトリに置くわけにもいかず、手元にモデルをダウンロードしていない環境ではスキップしたいため。ただしこれは「テストが通っている」のか「テストが走っていない」のかが区別できない書き方なので、あまり良くはない。CIを整備するときに考え直す予定。</p>
-<hr />
-<p>これで入口（テキスト → トークンID）ができた。あとは出口、つまりTransformerの出力ベクトルからトークンIDを選ぶ処理を書けば、テキストからテキストへの推論がつながる。次回は出力ヘッドとサンプリングを実装する。</p>
 
 ]]></content>
     </entry>

@@ -11,16 +11,16 @@
     <meta name="Hatena::Bookmark" content="nocomment"/>
     <link rel="author" href="https://www.hatena.ne.jp/MIZZY/"/>
     <!-- OGP -->
-    <meta property="og:title" content="生成AIにRustで開発させるときのPC負荷対策"/>
+    <meta property="og:title" content="AIの時代だからこそ、強い型付けのIaCツールをつくっている"/>
     <meta property="og:type" content="article"/>
-    <meta property="og:url" content="https://mizzy.org/blog/2026/11/02/1/"/>
-    <meta property="og:image" content="https://mizzy.org/blog/2026/11/02/1/ogp.png"/>
-    <meta property="og:description" content="Carina の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、github、infraの6つに分かれていて、それぞれのリポジトリで、複数のエージェントがwo…"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2026/11/02/2/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2026/11/02/2/ogp.png"/>
+    <meta property="og:description" content="AIがあれば型は要らない、IaCも要らない、と主張する人がいる。多数派ではないと思うけど。自分はむしろ、強い型付けをコンセプトにしたIaCツール、 Carina をつくっている。 AIがあればIaCは要らない、という話を最初に見たときは、正…"/>
     <meta property="og:site_name" content="Gosuke Miyashita"/>
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:title" content="生成AIにRustで開発させるときのPC負荷対策"/>
-    <meta name="twitter:image" content="https://mizzy.org/blog/2026/11/02/1/ogp.png"/>
+    <meta name="twitter:title" content="AIの時代だからこそ、強い型付けのIaCツールをつくっている"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2026/11/02/2/ogp.png"/>
     <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
     <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
     <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
@@ -49,239 +49,611 @@
     </header>
     <article>
       <h1>
-        <a href="/blog/2026/11/02/1">
-          生成AIにRustで開発させるときのPC負荷対策
+        <a href="/blog/2026/11/02/2">
+          AIの時代だからこそ、強い型付けのIaCツールをつくっている
         </a>
       </h1>
       <div class="byline">
         2 November 2026
       </div>
       <p>
+        AIがあれば型は要らない、IaCも要らない、と主張する人がいる。多数派ではないと思うけど。自分はむしろ、強い型付けをコンセプトにしたIaCツール、
         <a href="https://github.com/carina-rs/carina">
           Carina
         </a>
-        の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、github、infraの6つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktreeを切って並行に作業する。
+        をつくっている。
       </p>
       <p>
-        Rustのプロジェクトでこれをやると、worktreeの数だけ
-        <code>target</code>
-        ができて、そのどれもがビルドとテストを回す。ここ数日、PCが重い、ディスクが足りない、という状態になっていたので、やった対策をまとめておく。雑なメモです。
+        AIがあればIaCは要らない、という話を最初に見たときは、正直こう思っただけだった。
+      </p>
+      <blockquote class="twitter-tweet">
+        <a href="https://x.com/gosukenator/status/2116755457411080208"></a>
+      </blockquote>
+      <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+      <p>
+        その後、ymotongpooさんが、IaCがなくならない理由について筋道立てた記事を書いた。また、tadsanさんとnishioさんの型に関するツイートも流れてきたので、それらに絡めて、自分がなぜAIの時代に型付きのIaCツールをつくっているのかを書いておく。
       </p>
       <p>
-        ちなみにマシンはMacBook Pro（Apple M4 Max、16コア（Performance 12、Efficiency 4）、メモリ128GB、SSD 2TB）。それなりに良いマシンのはずなんだけど、それでも重くなるし、ディスクも足りなくなる。
-      </p>
-      <hr />
-      <h2>
-        ディスク容量
-      </h2>
-      <h3>
-        ビルド出力専用のボリュームを作った
-      </h3>
-      <p>
-        APFSのボリューム
-        <code>/Volumes/CargoTargets</code>
-        を作って、Time Machineの対象から外した。
-      </p>
-      <p>
-        以前は、ビルド出力を消しても空きがなかなか戻らなかった。消した分がTime Machineのローカルスナップショットに残っていたため。専用のボリュームにして対象から外したので、消せばすぐに空きが戻る。
-      </p>
-      <h3>
-        worktreeの
-        <code>target</code>
-        をそのボリュームへ向けた
-      </h3>
-      <p>
-        <code>~/.local/bin/link-cargo-target</code>
-        というスクリプトを書いて、worktreeの
-        <code>target</code>
-        を
-        <code>/Volumes/CargoTargets/&lt;repo&gt;/&lt;worktree&gt;</code>
-        へのシンボリックリンクにしている。メインのチェックアウトは対象外。
-      </p>
-      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
-</span></span></span><span class="line"><span class="cl"><span class="c1"># Point a linked worktree&#39;s `target/` at /Volumes/CargoTargets, a volume</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># excluded from Time Machine, so deleted build output frees disk space</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># immediately instead of lingering in local snapshots.</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Usage: link-cargo-target [worktree-dir]   (called from post-checkout hooks)</span>
-</span></span><span class="line"><span class="cl"><span class="nb">set</span> -eu
-</span></span><span class="line"><span class="cl"><span class="nv">vol</span><span class="o">=</span>/Volumes/CargoTargets
-</span></span><span class="line"><span class="cl"><span class="nv">wt</span><span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="p">.</span><span class="si">}</span><span class="s2">&#34;</span> <span class="o">&amp;&amp;</span> git rev-parse --show-toplevel<span class="k">)</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Only linked worktrees; the main checkout keeps its own target/.</span>
-</span></span><span class="line"><span class="cl"><span class="o">[</span> <span class="s2">&#34;</span><span class="k">$(</span>git -C <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span> rev-parse --git-dir<span class="k">)</span><span class="s2">&#34;</span> !<span class="o">=</span> <span class="s2">&#34;</span><span class="k">$(</span>git -C <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span> rev-parse --git-common-dir<span class="k">)</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit</span> <span class="m">0</span>
-</span></span><span class="line"><span class="cl"><span class="o">[</span> -d <span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit</span> <span class="m">0</span>
-</span></span><span class="line"><span class="cl"><span class="o">[</span> -e <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">/target&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> -L <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">/target&#34;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">exit</span> <span class="m">0</span>
-</span></span><span class="line"><span class="cl"><span class="nv">repo</span><span class="o">=</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="k">$(</span>dirname <span class="s2">&#34;</span><span class="k">$(</span>git -C <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span> rev-parse --path-format<span class="o">=</span>absolute --git-common-dir<span class="k">)</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2">&#34;</span><span class="k">)</span>
-</span></span><span class="line"><span class="cl"><span class="nv">dest</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">/</span><span class="nv">$repo</span><span class="s2">/</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">mkdir -p <span class="s2">&#34;</span><span class="nv">$dest</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">ln -s <span class="s2">&#34;</span><span class="nv">$dest</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">/target&#34;</span>
-</span></span></code></pre>
-      <p>
-        <code>--git-dir</code>
-        と
-        <code>--git-common-dir</code>
-        が違えば、追加で作ったworktreeだと判断できる。メインのチェックアウトでは両方とも同じ
-        <code>.git</code>
-        を指すので、何もせずに抜ける。
-      </p>
-      <p>
-        infraを除くRustの5つのリポジトリで、post-checkoutフックからこれを呼ぶ。
-      </p>
-      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
-</span></span></span><span class="line"><span class="cl"><span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$3</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> ~/.local/bin/link-cargo-target . <span class="o">||</span> <span class="nb">true</span>
-</span></span></code></pre>
-      <p>
-        post-checkoutフックの3番目の引数は、ブランチのチェックアウトなら
-        <code>1</code>
-        、ファイル単位のチェックアウトなら
-        <code>0</code>
-        になる。
-        <code>git worktree add</code>
-        でもこのフックが走るので、worktreeを作った時点でシンボリックリンクができる。
-      </p>
-      <p>
-        ひとつハマりどころがあって、
-        <code>.gitignore</code>
-        の
-        <code>/target/</code>
-        はシンボリックリンクには一致しない。末尾に
-        <code>/</code>
-        が付いたパターンはディレクトリにしか一致しないため。なので、5つのリポジトリすべてで
-        <code>.git/info/exclude</code>
-        に
-        <code>/target</code>
-        を足した。
-      </p>
-      <h3>
-        消したworktreeのビルド出力を掃除する
-      </h3>
-      <p>
-        worktreeを消しても、
-        <code>/Volumes/CargoTargets</code>
-        側のビルド出力は残る。なので、worktreeがもう存在しない
-        <code>/Volumes/CargoTargets/&lt;repo&gt;/&lt;worktree&gt;</code>
-        を消す
-        <code>~/.local/bin/prune-cargo-targets</code>
-        を書いた。
-      </p>
-      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
-</span></span></span><span class="line"><span class="cl"><span class="c1"># Delete per-worktree build dirs on /Volumes/CargoTargets whose worktree no longer exists.</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># link-cargo-target creates &lt;vol&gt;/&lt;repo&gt;/&lt;worktree&gt;; removing the worktree leaves it behind.</span>
-</span></span><span class="line"><span class="cl"><span class="nb">set</span> -eu
-</span></span><span class="line"><span class="cl"><span class="nv">vol</span><span class="o">=</span>/Volumes/CargoTargets
-</span></span><span class="line"><span class="cl"><span class="nv">src</span><span class="o">=</span><span class="nv">$HOME</span>/src/github.com/carina-rs
-</span></span><span class="line"><span class="cl"><span class="o">[</span> -d <span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit</span> <span class="m">0</span>
-</span></span><span class="line"><span class="cl"><span class="k">for</span> d in <span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">&#34;</span>/*/*<span class="p">;</span> <span class="k">do</span>
-</span></span><span class="line"><span class="cl">  <span class="o">[</span> -d <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="k">continue</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">repo</span><span class="o">=</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="k">$(</span>dirname <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2">&#34;</span><span class="k">)</span>
-</span></span><span class="line"><span class="cl">  <span class="nv">wt</span><span class="o">=</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span><span class="k">)</span>
-</span></span><span class="line"><span class="cl">  <span class="o">[</span> -e <span class="s2">&#34;</span><span class="nv">$src</span><span class="s2">/</span><span class="nv">$repo</span><span class="s2">/.worktrees/</span><span class="nv">$wt</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="k">continue</span>
-</span></span><span class="line"><span class="cl">  <span class="nb">echo</span> <span class="s2">&#34;removing </span><span class="nv">$d</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl">  rm -rf <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="k">done</span>
-</span></span></code></pre>
-      <p>
-        worktreeはどのリポジトリでも
-        <code>.worktrees/</code>
-        の下に作る決まりにしているので、そこに同じ名前のディレクトリがなければ消す、というだけのもの。
-      </p>
-      <p>
-        これは、PRとCIを見張るスクリプト（
-        <code>~/.local/bin/carina-watch</code>
-        ）から、30分ごとに呼ぶようにしている。初めて回したときは134GBが空いて、空きが206GiBから334GiBになった。
-      </p>
-      <h3>
-        Codexの書き込み先
-      </h3>
-      <p>
-        Codexのサンドボックスから
-        <code>/Volumes</code>
-        以下に書き込むには、
-        <code>--add-dir /Volumes/CargoTargets</code>
-        を付ける必要がある。
+        ついでに、nishioさんが提案していた「LLMが生成した最初のコードが型エラーになる確率」を、Carinaの開発ログから実際に測ってみた。
       </p>
       <hr />
       <h2>
-        PCが重い
+        ymotongpooさんの記事
       </h2>
-      <h3>
-        Microsoft Defenderのシステム拡張を立ち上げ直した
-      </h3>
+      <iframe class="hatenablogcard" style="width:100%;height:155px;max-width:680px;" src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fymotongpoo.hatenablog.com%2Fentry%2F2026%2F11%2F02%2F093500" frameborder="0" scrolling="no"></iframe>
       <p>
-        いちばん効いたのがこれ。
-      </p>
-      <pre><code>sudo killall epsext</code></pre>
-      <p>
-        Defenderのリアルタイム保護はオフにしてあるのに、
-        <code>epsext</code>
-        が5日間、CPUを1コア分（約100%）使い続けていた。立ち上げ直したら、CPUは2.7%、メモリは2.9GBから16MBになった。
+        発端は、James Ward氏が2026年10月31日にXに投稿した「IaC is dead」。AIがシステムのソースコードと実際のインフラを読めば、変更の内容も承認の可否も判断できるので、望ましい構成をコードとして書いておく必要はない、という主張とのこと。
       </p>
       <p>
-        ついでにDefenderの除外に、CargoTargets、
-        <code>~/Library/Caches/Mozilla.sccache</code>
-        、
-        <code>~/.cargo</code>
-        、
-        <code>~/.rustup</code>
-        の4つを足してみたけど、これは効かなかった。リアルタイム保護がもともとオフなので、当然と言えば当然。
+        ymotongpooさんの記事は、これに対して、IaCがこれまで何を担ってきたのかを整理し直している。TL;DRから引用する。
       </p>
+      <blockquote>
+        <p>
+          IaCは、望ましい状態をコードとして残す、意図を記録する役割と、状態を保持して差分を計算し、適用する、実行基盤としての役割を担ってきました。
+        </p>
+      </blockquote>
       <p>
-        ただ、一連の対策を終えたあとで、リアルタイム保護はオンに戻した。なので、この除外は今はちゃんと意味を持っている（
-        <code>~/src/</code>
-        は前から除外済み）。
+        そして、AIに変更を任せるには少なくとも4つの条件が要る、としている。
       </p>
-      <h3>
-        CargoTargetsのSpotlight索引を止めた
-      </h3>
-      <pre><code>sudo mdutil -i off /Volumes/CargoTargets</code></pre>
+      <ol>
+        <li>
+          現在の状態の把握
+        </li>
+        <li>
+          部分的な失敗に耐える収束
+        </li>
+        <li>
+          検証できる目標の状態
+        </li>
+        <li>
+          適用前の差分と承認
+        </li>
+      </ol>
+      <blockquote>
+        <p>
+          このうち最初の2つはプラットフォームが担えますが、残りの2つは望ましい状態を記録したものがなければ満たせません。
+        </p>
+      </blockquote>
       <p>
-        ビルド出力をSpotlightが索引に入れていたので、止めた。
+        Kubernetesはクラスタの内側で、実行基盤としての役割をプラットフォームに組み込んだけど、利用者は今もマニフェストを書いてGitで管理している。AIが記述を書くようになっても、承認し、再現し、元に戻すための記述は残る。だいたいそういう話で、自分もこの整理には全面的に同意する。
       </p>
       <hr />
       <h2>
-        ビルドの負荷を抑える運用
+        Serverspecが出てきた
       </h2>
       <p>
-        ここからは、エージェントに守らせているルール。
+        記事の中で、Serverspecが、サーバーのあるべき状態をテストとして書いて、実際の状態を確かめる試みとして紹介されていた。それだけでなく、脚注には自分のことも書かれていて、
+      </p>
+      <blockquote>
+        <p>
+          執筆時点ではフリーランスのソフトウェアエンジニアで、余暇に、Rustで書かれた型付きのIaCツールであるCarinaを開発しています。
+        </p>
+      </blockquote>
+      <p>
+        と、Carinaまで紹介してもらっていた。ありがとうございます。
+      </p>
+      <p>
+        自分の中では、ServerspecとCarinaはつながっている。Serverspecは、あるべき状態をテストとして書いて、実際の状態がそれと合っているかを、適用した後に確かめるもの。Carinaの型は、望ましい状態の記述そのものに誤りがないかを、適用する前に確かめるもの。どちらも「意図を書いて、機械に確かめさせる」という点では同じで、確かめる対象とタイミングが違う。
+      </p>
+      <hr />
+      <h2>
+        もう1つの役割：クラウドのバッドノウハウを吸収する
+      </h2>
+      <p>
+        ymotongpooさんの整理は「意図の記録」と「実行基盤」の2つだけど、IaCツールにはもう1つ、クラウドのバッドノウハウを吸収する、という面もあると思っている。
+      </p>
+      <p>
+        バッドノウハウは高林哲さんの言葉で、「ソフトウェアを使いこなすためには必要だが、本来は知りたくもない、ソフトウェアの設計次第では不要なはずのノウハウのこと。」（
+        <a href="https://gihyo.jp/dev/serial/01/alpha-geek/0007">
+          gihyo.jpのインタビュー記事
+        </a>
+        の注より）。クラウドのAPIを正しく叩くには、こういう知識がいろいろ要る。たとえば、
       </p>
       <ul>
         <li>
-          1つのリポジトリで同時に動くエージェントは2つまで。これは負荷対策というより、並列にしすぎるとコンフリクトが起きるため。
+          作ったばかりのIAMロールを指定してVPC Flow Logを作ろうとすると、IAMの結果整合性のせいで、まだロールを引き受けられずに失敗することがある。Carinaのawsプロバイダーでは、
+          <code>Unable to assume IAM role</code>
+          などのエラーメッセージを見分けて、5秒おきに最大12回まで試している
         </li>
         <li>
-          手元でビルドするのは、マシン全体で同時に1つだけ。
-          <code>nice -n 19</code>
-          で回し、始める前に1分のload averageが32未満かを確かめる。
+          作成に成功したはずのリソースが、直後に読みにいくと見つからないことがある。awsccプロバイダーで、S3バケットの作成が成功したのに、直後の読み込みでは
+          <code>not_found</code>
+          が返ってきた（
+          <a href="https://github.com/carina-rs/carina/issues/4168">
+            carina#4168
+          </a>
+          ）。今は、読めるようになるまで、デフォルトで最大2分待つようにしている
         </li>
         <li>
-          workspace全体のテスト、clippy、doctestはCIに任せる。手元では、名前で選んだテストだけを流す。
+          IAMの信頼ポリシーのprincipalにロールのARNを書くと、AWSは保存時にそれをロールの一意ID（
+          <code>AROA...</code>
+          ）に変換する（表示するときはARNに戻す）。権限昇格を防ぐための
+          <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html">
+            仕様
+          </a>
+          だけど、参照先のロールを削除して作り直すと、ポリシーは新しいロールには効かなくなり、ARNに戻せない古い一意IDがそのまま見えるようになる。planにはARNと
+          <code>AROA...</code>
+          の差分として出てくるけど、それだけでは何が起きているのか分からない（
+          <a href="https://github.com/carina-rs/carina-provider-aws/issues/381">
+            carina-provider-aws#381
+          </a>
+          、これはまだ吸収しきれていない）
+        </li>
+        <li>
+          Cloud ControlのS3バケットのスキーマでは、
+          <code>ObjectLockEnabled</code>
+          は作成後も変更できる属性になっていて、S3のAPIを直接使えば既存のバケットでも有効にできる。なのに、Cloud ControlのUpdateResourceで変更すると、成功が返ってくるのに、実際には何も変わらない。以前のCarinaは、これをそのまま適用済みとして記録していた。今は、更新後に読み直して、変更した属性が反映されていなければ部分的な成功として報告するようにしている（
+          <a href="https://github.com/carina-rs/carina-provider-awscc/issues/419">
+            carina-provider-awscc#419
+          </a>
+          ）
         </li>
       </ul>
+      <p>
+        IaCツールがなければ、こういったバッドノウハウは、AIが毎回その場で踏み抜いて学び直すことになる。AIが自力で気づいて対処できることもあるだろうけど、毎回そうできる保証はない。
+      </p>
+      <p>
+        IaCツールがバッドノウハウを吸収しておけば、人間もAIも、それを知らずに済む。一度直せば全員が同じ挙動を得られるし、受け入れテストで検証もできる。
+      </p>
+      <p>
+        本来こういうことは、バッドノウハウの定義どおり、クラウドの側の設計で不要にできるはずのもの。ymotongpooさんの4条件でいうと、2つ目の「部分的な失敗に耐える収束」に近く、記事でもプラットフォームが担えるものとされている。ただ、今のクラウドについては
+      </p>
+      <blockquote>
+        <p>
+          現在のクラウドは、最初の2つの条件からも離れています。
+        </p>
+      </blockquote>
+      <p>
+        とも書かれていて、今のところその役割はIaCツールが担っている。
+      </p>
       <hr />
       <h2>
-        また重くなったときに見るもの
+        記述が残っても、人間の検証が追いつかない
       </h2>
-      <pre><code>uptime
-ps -Ao pcpu,rss,command -r | head
-ps -o etime=,pcpu= -p $(pgrep -f epsext | head -1)
-df -g /</code></pre>
+      <p>
+        ymotongpooさんは、AIが記述を書く場合について、こう書いている。
+      </p>
+      <blockquote>
+        <p>
+          生成が速くなるほど、人がレビューする差分も増え、記述を残しておく必要も大きくなります。
+        </p>
+      </blockquote>
+      <p>
+        ここは本当にそうで、自分もCarinaの開発や、Carinaで管理しているインフラの変更を全部AIにやらせているけど、AIが書く量に対して、人間が全部読んでレビューするのはもう無理になっている。
+      </p>
+      <p>
+        なので、記述が残るだけでは足りなくて、その記述を、人間が全部読まなくても検証できる必要がある。機械が確かめられる部分は機械に任せて、人間はplanを見て「これは意図した変更か」だけを判断すれば良い、という状態にしたい。その「機械が確かめられる部分」をできるだけ広げるのが、Carinaの型の役割だと考えている。
+      </p>
+      <hr />
+      <h2>
+        汎用言語の型と、ドメインの型
+      </h2>
+      <p>
+        ymotongpooさんの記事では、AWS CDKやPulumiのような汎用言語で書くIaCについて、こう書かれている。
+      </p>
+      <blockquote>
+        <p>
+          汎用の言語で書く利点の1つは型です。
+        </p>
+      </blockquote>
+      <blockquote>
+        <p>
+          TypeScriptで書けば、存在しない項目名や型の合わない値、必須の項目の書き忘れを、デプロイする前にコンパイラーが検出します。
+        </p>
+      </blockquote>
+      <p>
+        これはそのとおりなんだけど、ここで挙げられているのは、項目名、値の型、必須の項目といった、構造についてのチェック。インフラの意味までは、型がいつも見てくれるわけではない。
+      </p>
+      <p>
+        CDKでも、L2やL3のコンストラクトの多くは、VPCを
+        <code>IVpc</code>
+        というオブジェクトとして受け取るので、同じアプリの中で作ったリソースを参照する限り、取り違えはコンパイル時に分かる。ただ、L1の
+        <a href="https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ec2.CfnSubnetProps.html">
+          <code>CfnSubnetProps</code>
+        </a>
+        の
+        <code>vpcId</code>
+        は
+        <code>string | IVPCRef</code>
+        だし、既存のVPCを取り込む
+        <a href="https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ec2.VpcAttributes.html">
+          <code>Vpc.fromVpcAttributes</code>
+        </a>
+        では、
+        <code>vpcId</code>
+        は
+        <code>string</code>
+        、サブネットIDは
+        <code>string[]</code>
+        。IDを文字列として扱う所では、VPC IDを入れるべき所にサブネットIDを入れても、コンパイルは通る。
+      </p>
+      <p>
+        AWSのAPIの上では、VPC IDもサブネットIDも、VPCのテナンシー（
+        <code>instance_tenancy</code>
+        ）も、ただの文字列。なので、IDを取り違えたり、取れない値を書いたりしても、実際に適用するまで分からない。
+      </p>
+      <p>
+        Carinaでは、IDやARNはリソースごとに別の型にし、テナンシーのような値は取れる値だけを持つ型にしている。試しに、2つ目のサブネットの
+        <code>vpc_id</code>
+        に、わざと1つ目のサブネットのIDを渡してみる。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="n">let vpc</span> <span class="o">=</span> <span class="k">aws</span><span class="p">.</span><span class="k">ec2</span><span class="p">.</span><span class="k">Vpc</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  cidr_block</span> <span class="o">=</span> <span class="err">&#39;</span><span class="m">10</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">0</span><span class="err">/</span><span class="m">16</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">let public</span> <span class="o">=</span> <span class="k">aws</span><span class="p">.</span><span class="k">ec2</span><span class="p">.</span><span class="k">Subnet</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  vpc_id</span>     <span class="o">=</span> <span class="k">vpc</span><span class="p">.</span><span class="k">vpc_id</span>
+</span></span><span class="line"><span class="cl"><span class="n">  cidr_block</span> <span class="o">=</span> <span class="err">&#39;</span><span class="m">10</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">1</span><span class="p">.</span><span class="m">0</span><span class="err">/</span><span class="m">24</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">let private</span> <span class="o">=</span> <span class="k">aws</span><span class="p">.</span><span class="k">ec2</span><span class="p">.</span><span class="k">Subnet</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  vpc_id</span>     <span class="o">=</span> <span class="k">public</span><span class="p">.</span><span class="k">subnet_id</span>
+</span></span><span class="line"><span class="cl"><span class="n">  cidr_block</span> <span class="o">=</span> <span class="err">&#39;</span><span class="m">10</span><span class="p">.</span><span class="m">0</span><span class="p">.</span><span class="m">2</span><span class="p">.</span><span class="m">0</span><span class="err">/</span><span class="m">24</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre>
+      <p>
+        <code>carina validate</code>
+        を実行すると、こうなる。
+      </p>
+      <pre><code>$ carina validate .
+Validating...
+Error: aws.ec2.Subnet.private: cannot assign aws.ec2.Subnet.Id to 'vpc_id': expected aws.ec2.Vpc.Id, got aws.ec2.Subnet.Id (from public.subnet_id)</code></pre>
+      <p>
+        AWSのAPIを1回も呼ばずに、
+        <code>plan</code>
+        より前の段階で間違いが分かる。
+      </p>
+      <p>
+        同じ構成をTerraform（AWS provider 6.71.0）で書くと、
+        <code>terraform validate</code>
+        も
+        <code>terraform plan</code>
+        も通る。
+        <code>aws_subnet</code>
+        の
+        <code>vpc_id</code>
+        はただの文字列で、しかもplanの時点では1つ目のサブネットのIDがまだ決まっていないので、検証しようがない。間違いに気づくのは、applyしたときになる。
+      </p>
+      <p>
+        言語の型システムが強いか弱いかではなく、インフラのドメイン知識をどこまで型にしているか、の違い。そして、Carinaが汎用言語ではなくDSLなのは、汎用言語の自由度を持ち込まずに、ドメインの型だけを持ち込みたいから。何でも書ける言語は、AIにとっても何でも書けてしまう言語なので。
+      </p>
+      <hr />
+      <h2>
+        型はAIにとってもテストになる
+      </h2>
+      <p>
+        型についてはXでも議論になっていた。tadsanさんのツイート。
+      </p>
+      <blockquote class="twitter-tweet">
+        <a href="https://x.com/tadsan/status/2116870753950089400"></a>
+      </blockquote>
+      <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+      <p>
+        それを引用したnishioさんのツイート。
+      </p>
+      <blockquote class="twitter-tweet">
+        <a href="https://x.com/nishio/status/2117143616913285200"></a>
+      </blockquote>
+      <script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+      <p>
+        Carinaの開発は、全部Claude CodeとCodexにやらせていて、ログは手元にある。なので、nishioさんの言う統計を実際にとってみた。
+      </p>
+      <p>
+        ここで測るのは、Carinaの実装（Rust）の方で、.crnの型ではない。ただ、AIが書いたものを、実行する前に型で機械的に止める、という構図は同じ。
+      </p>
+      <h3>
+        測り方
+      </h3>
       <ul>
         <li>
-          <code>epsext</code>
-          がずっと高いなら、
-          <code>sudo killall epsext</code>
-          で立ち上げ直す。
+          対象は、Carina関連のリポジトリでのClaude Codeのログ（サブエージェントも含む）と、Carina関連のリポジトリで動かしたCodexのセッション
         </li>
         <li>
-          空きが少ないなら、
-          <code>prune-cargo-targets</code>
-          を回す。それでも足りないなら、
-          <code>tmutil listlocalsnapshots /</code>
-          でローカルスナップショットを確かめる。
+          AIが
+          <code>.rs</code>
+          ファイルを編集した後、最初に実行した
+          <code>cargo check</code>
+          、
+          <code>build</code>
+          、
+          <code>test</code>
+          、
+          <code>clippy</code>
+          、
+          <code>nextest</code>
+          を1回の「試行」とする
+        </li>
+        <li>
+          同じセッションで直前のコンパイルが失敗していた試行は、エラーを直した後の「再試行」として分け、それ以外を新しく書いたコードの1回目とする
+        </li>
+        <li>
+          出力に
+          <code>error[E....]</code>
+          （rustcのエラーコード）が含まれていれば失敗とする。テストが落ちただけの場合や、clippyの警告、構文エラー、ビルドスクリプトの失敗は数えていない
+        </li>
+      </ul>
+      <h3>
+        結果
+      </h3>
+      <p>
+        新しく書いたコードの1回目の結果。
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>
+              試行
+            </th>
+            <th>
+              エラーコードあり
+            </th>
+            <th>
+              割合
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Claude Code
+            </td>
+            <td>
+              6,019
+            </td>
+            <td>
+              461
+            </td>
+            <td>
+              7.7%
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Codex
+            </td>
+            <td>
+              11,051
+            </td>
+            <td>
+              1,325
+            </td>
+            <td>
+              12.0%
+            </td>
+          </tr>
+          <tr>
+            <td>
+              合計
+            </td>
+            <td>
+              17,070
+            </td>
+            <td>
+              1,786
+            </td>
+            <td>
+              10.5%
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        AIが新しく書いたRustのコードは、だいたい10回に1回、最初のコンパイルで落ちて、直されている。また、一度エラーになった後の再試行では、27%くらいがまたエラーになっていた。nishioさんの言う「実行前におかしなコードを検出するテスト」に、少なくとも10回に1回は引っかかっていることになる。
+      </p>
+      <p>
+        月ごとに見ると、Claude Codeでの試行は5月まででほぼ終わっていて、6月以降はCodexがほとんど。これは実装をCodexに任せるようにした時期と一致する。試行が1,000回を超える月で見ると、割合は7〜13%くらいで、月によって幅があった。一番高かったのは10月のCodex（13.2%）。
+      </p>
+      <p>
+        1回目で失敗したときに出ていたエラーの上位はこんな感じ。
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>
+              エラー
+            </th>
+            <th>
+              内容
+            </th>
+            <th>
+              Claude Code
+            </th>
+            <th>
+              Codex
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              E0308
+            </td>
+            <td>
+              型の不一致
+            </td>
+            <td>
+              93
+            </td>
+            <td>
+              328
+            </td>
+          </tr>
+          <tr>
+            <td>
+              E0599
+            </td>
+            <td>
+              存在しないメソッド
+            </td>
+            <td>
+              94
+            </td>
+            <td>
+              328
+            </td>
+          </tr>
+          <tr>
+            <td>
+              E0425
+            </td>
+            <td>
+              未解決の名前
+            </td>
+            <td>
+              56
+            </td>
+            <td>
+              243
+            </td>
+          </tr>
+          <tr>
+            <td>
+              E0277
+            </td>
+            <td>
+              traitを満たしていない
+            </td>
+            <td>
+              23
+            </td>
+            <td>
+              182
+            </td>
+          </tr>
+          <tr>
+            <td>
+              E0433
+            </td>
+            <td>
+              未解決のパス
+            </td>
+            <td>
+              54
+            </td>
+            <td>
+              159
+            </td>
+          </tr>
+          <tr>
+            <td>
+              E0061
+            </td>
+            <td>
+              引数の数の誤り
+            </td>
+            <td>
+              27
+            </td>
+            <td>
+              117
+            </td>
+          </tr>
+          <tr>
+            <td>
+              E0063
+            </td>
+            <td>
+              構造体のフィールドの書き忘れ
+            </td>
+            <td>
+              57
+            </td>
+            <td>
+              63
+            </td>
+          </tr>
+          <tr>
+            <td>
+              E0004
+            </td>
+            <td>
+              matchの網羅漏れ
+            </td>
+            <td>
+              16
+            </td>
+            <td>
+              55
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        E0004は、典型的には、enumにバリアントを足したのに、それを使っている
+        <code>match</code>
+        を直していない、というケース。
+      </p>
+      <h3>
+        注意点
+      </h3>
+      <ul>
+        <li>
+          判定は雑なヒューリスティック。複数の編集をまとめて1回の試行として数えているし、テストコードだけを編集した場合も含まれている。1回目と再試行の分け方も、同じセッションで直前のコンパイルが失敗したかどうかを見ているだけ
+        </li>
+        <li>
+          エラーコードには、E0425（未解決の名前）のように、厳密には型エラーと呼ばないものも含めている
+        </li>
+        <li>
+          出力を
+          <code>tail</code>
+          で切ったり、ファイルに書き出したり、バックグラウンドで実行したりした試行は、エラーコードが見えないので成功に数えている。なので、実際の割合はもう少し高い可能性がある
+        </li>
+        <li>
+          型のない言語と比べたわけではないので、「型がなかったら、この10%がどこで見つかっていたか」までは分からない
+        </li>
+      </ul>
+      <h3>
+        .crnの型の場合
+      </h3>
+      <p>
+        ちなみに、Carinaの方の型（.crnファイル）でも同じことを測ろうとしたけど、carina-rs/infraなどでの
+        <code>carina validate</code>
+        の実行約790回のうち、失敗は38回で、そのほとんどは型エラーではなく、providerが入っていなかった、一緒に実行した別のコマンドが失敗した、といった別の理由だった。Rustのときのように「編集した後の最初の1回」で数えたわけでもないので、割合は出していない。型エラーとして引っかかっていたのは、たとえば次のようなもの（5月時点のメッセージ）。
+      </p>
+      <pre><code>Error: ../../../modules/github-oidc: attribute 'oidc_provider_arn': type mismatch: expected iam_oidc_provider_arn, got arn (from oidc_provider.arn)</code></pre>
+      <p>
+        OIDCプロバイダーのARNを期待している所に、ただのARNを渡していて、型で弾かれている。
+      </p>
+      <p>
+        なお、tadsanさんのツイートにある、型を書くことはAIへの文脈になるのか、トークンの浪費なのか、という話は、コードに型を書く前提の話だと思う。Carinaでは、リソースの属性の型はプロバイダーのスキーマの側にあって、.crnには書かない（書くのはモジュールの引数の型くらい）。なので、.crnを書くAIにとって、型は自分で書くものではなく、間違えたときに
+        <code>carina validate</code>
+        が返してくれるもの、という位置づけになる。
+      </p>
+      <hr />
+      <h2>
+        まとめ
+      </h2>
+      <ul>
+        <li>
+          ymotongpooさんの整理のとおり、AIが記述を書くようになっても、意図の記録としてのIaCは残る
+        </li>
+        <li>
+          それに加えて、IaCツールには、クラウドのバッドノウハウを吸収する役割もある
+        </li>
+        <li>
+          AIが書く量が増えるほど、人間のレビューは追いつかなくなるので、人間が全部読まなくても記述を検証できる必要がある
+        </li>
+        <li>
+          CDKのような、汎用言語で書くIaCツールでも、リソースの関係はある程度型で表せるけど、IDそのものは文字列のまま。インフラの意味まで型にするには、ドメインの型が要る
+        </li>
+        <li>
+          AIが新しく書いたRustのコードは、10%くらいが最初のコンパイルで落ちていて、型チェックが実行前に止めている
+        </li>
+      </ul>
+      <p>
+        というわけで、AIの時代だからこそ、強い型付けのIaCツールが要る、と思ってCarinaをつくっている。
+      </p>
+      <ul>
+        <li>
+          <a href="https://github.com/carina-rs/carina">
+            carina-rs/carina
+          </a>
         </li>
       </ul>
     </article>
     <footer class="foot">
-      <a href="/blog/2026/10/17/1" rel="next">
+      <a href="/blog/2026/11/02/1" rel="next">
         ← older
       </a>
       <a href="/" class="home">
