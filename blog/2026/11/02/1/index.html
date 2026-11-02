@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      生成AIにRustで開発させるときのPC負荷対策 - Gosuke Miyashita
+    </title>
+    <meta name="author" content="Gosuke Miyashita"/>
+    <meta name="description" content="Carina の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、githubの5つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktree…"/>
+    <meta name="Hatena::Bookmark" content="nocomment"/>
+    <link rel="author" href="https://www.hatena.ne.jp/MIZZY/"/>
+    <!-- OGP -->
+    <meta property="og:title" content="生成AIにRustで開発させるときのPC負荷対策"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://mizzy.org/blog/2026/11/02/1/"/>
+    <meta property="og:image" content="https://mizzy.org/blog/2026/11/02/1/ogp.png"/>
+    <meta property="og:description" content="Carina の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、githubの5つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktree…"/>
+    <meta property="og:site_name" content="Gosuke Miyashita"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="生成AIにRustで開発させるときのPC負荷対策"/>
+    <meta name="twitter:image" content="https://mizzy.org/blog/2026/11/02/1/ogp.png"/>
+    <link rel="alternate" type="application/rss+xml" href="/atom.xml"/>
+    <link rel="stylesheet" href="/css/base.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/chroma.css" type="text/css"/>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+    <link rel="icon" href="/favicon.png" type="image/png"/>
+  </head>
+  <body>
+    <header class="head">
+      <a href="/" class="name">
+        Gosuke Miyashita
+      </a>
+      <span class="nav">
+        <a href="/archive/">
+          archive
+        </a>
+        <a href="/notes/">
+          notes
+        </a>
+        <a href="https://gosu.ke/" target="_blank" rel="noopener">
+          about
+        </a>
+        <a href="/atom.xml">
+          feed
+        </a>
+      </span>
+    </header>
+    <article>
+      <h1>
+        <a href="/blog/2026/11/02/1">
+          生成AIにRustで開発させるときのPC負荷対策
+        </a>
+      </h1>
+      <div class="byline">
+        2 November 2026
+      </div>
+      <p>
+        <a href="https://github.com/carina-rs/carina">
+          Carina
+        </a>
+        の開発は、ほぼClaude CodeとCodexにやらせている。リポジトリはcarina本体、aws、awscc、registry、githubの5つに分かれていて、それぞれのリポジトリで、複数のエージェントがworktreeを切って並行に作業する。
+      </p>
+      <p>
+        Rustのプロジェクトでこれをやると、worktreeの数だけ
+        <code>target</code>
+        ができて、そのどれもがビルドとテストを回す。ここ数日、PCが重い、ディスクが足りない、という状態になっていたので、やった対策をまとめておく。雑なメモです。
+      </p>
+      <p>
+        ちなみにマシンはMacBook Pro（Apple M4 Max、16コア（Performance 12、Efficiency 4）、メモリ128GB、SSD 2TB）。それなりに良いマシンのはずなんだけど、それでも重くなるし、ディスクも足りなくなる。
+      </p>
+      <hr />
+      <h2>
+        ディスク容量
+      </h2>
+      <h3>
+        ビルド出力専用のボリュームを作った
+      </h3>
+      <p>
+        APFSのボリューム
+        <code>/Volumes/CargoTargets</code>
+        を作って、Time Machineの対象から外した。
+      </p>
+      <p>
+        以前は、ビルド出力を消しても空きがなかなか戻らなかった。消した分がTime Machineのローカルスナップショットに残っていたため。専用のボリュームにして対象から外したので、消せばすぐに空きが戻る。
+      </p>
+      <h3>
+        worktreeの
+        <code>target</code>
+        をそのボリュームへ向けた
+      </h3>
+      <p>
+        <code>~/.local/bin/link-cargo-target</code>
+        というスクリプトを書いて、worktreeの
+        <code>target</code>
+        を
+        <code>/Volumes/CargoTargets/&lt;repo&gt;/&lt;worktree&gt;</code>
+        へのシンボリックリンクにしている。メインのチェックアウトは対象外。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl"><span class="c1"># Point a linked worktree&#39;s `target/` at /Volumes/CargoTargets, a volume</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># excluded from Time Machine, so deleted build output frees disk space</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># immediately instead of lingering in local snapshots.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Usage: link-cargo-target [worktree-dir]   (called from post-checkout hooks)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">set</span> -eu
+</span></span><span class="line"><span class="cl"><span class="nv">vol</span><span class="o">=</span>/Volumes/CargoTargets
+</span></span><span class="line"><span class="cl"><span class="nv">wt</span><span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="p">.</span><span class="si">}</span><span class="s2">&#34;</span> <span class="o">&amp;&amp;</span> git rev-parse --show-toplevel<span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Only linked worktrees; the main checkout keeps its own target/.</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> <span class="s2">&#34;</span><span class="k">$(</span>git -C <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span> rev-parse --git-dir<span class="k">)</span><span class="s2">&#34;</span> !<span class="o">=</span> <span class="s2">&#34;</span><span class="k">$(</span>git -C <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span> rev-parse --git-common-dir<span class="k">)</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> -d <span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> -e <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">/target&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> -L <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">/target&#34;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">exit</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="nv">repo</span><span class="o">=</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="k">$(</span>dirname <span class="s2">&#34;</span><span class="k">$(</span>git -C <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span> rev-parse --path-format<span class="o">=</span>absolute --git-common-dir<span class="k">)</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2">&#34;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">dest</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">/</span><span class="nv">$repo</span><span class="s2">/</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">mkdir -p <span class="s2">&#34;</span><span class="nv">$dest</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">ln -s <span class="s2">&#34;</span><span class="nv">$dest</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$wt</span><span class="s2">/target&#34;</span>
+</span></span></code></pre>
+      <p>
+        <code>--git-dir</code>
+        と
+        <code>--git-common-dir</code>
+        が違えば、追加で作ったworktreeだと判断できる。メインのチェックアウトでは両方とも同じ
+        <code>.git</code>
+        を指すので、何もせずに抜ける。
+      </p>
+      <p>
+        5つのリポジトリで、post-checkoutフックからこれを呼ぶ。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl"><span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$3</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> ~/.local/bin/link-cargo-target . <span class="o">||</span> <span class="nb">true</span>
+</span></span></code></pre>
+      <p>
+        post-checkoutフックの3番目の引数は、ブランチのチェックアウトなら
+        <code>1</code>
+        、ファイル単位のチェックアウトなら
+        <code>0</code>
+        になる。
+        <code>git worktree add</code>
+        でもこのフックが走るので、worktreeを作った時点でシンボリックリンクができる。
+      </p>
+      <p>
+        ひとつハマりどころがあって、
+        <code>.gitignore</code>
+        の
+        <code>/target/</code>
+        はシンボリックリンクには一致しない。末尾に
+        <code>/</code>
+        が付いたパターンはディレクトリにしか一致しないため。なので、5つのリポジトリすべてで
+        <code>.git/info/exclude</code>
+        に
+        <code>/target</code>
+        を足した。
+      </p>
+      <h3>
+        消したworktreeのビルド出力を掃除する
+      </h3>
+      <p>
+        worktreeを消しても、
+        <code>/Volumes/CargoTargets</code>
+        側のビルド出力は残る。なので、worktreeがもう存在しない
+        <code>/Volumes/CargoTargets/&lt;repo&gt;/&lt;worktree&gt;</code>
+        を消す
+        <code>~/.local/bin/prune-cargo-targets</code>
+        を書いた。
+      </p>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl"><span class="c1"># Delete per-worktree build dirs on /Volumes/CargoTargets whose worktree no longer exists.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># link-cargo-target creates &lt;vol&gt;/&lt;repo&gt;/&lt;worktree&gt;; removing the worktree leaves it behind.</span>
+</span></span><span class="line"><span class="cl"><span class="nb">set</span> -eu
+</span></span><span class="line"><span class="cl"><span class="nv">vol</span><span class="o">=</span>/Volumes/CargoTargets
+</span></span><span class="line"><span class="cl"><span class="nv">src</span><span class="o">=</span><span class="nv">$HOME</span>/src/github.com/carina-rs
+</span></span><span class="line"><span class="cl"><span class="o">[</span> -d <span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">exit</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> d in <span class="s2">&#34;</span><span class="nv">$vol</span><span class="s2">&#34;</span>/*/*<span class="p">;</span> <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="o">[</span> -d <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">||</span> <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">repo</span><span class="o">=</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="k">$(</span>dirname <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span><span class="k">)</span><span class="s2">&#34;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nv">wt</span><span class="o">=</span><span class="k">$(</span>basename <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">  <span class="o">[</span> -e <span class="s2">&#34;</span><span class="nv">$src</span><span class="s2">/</span><span class="nv">$repo</span><span class="s2">/.worktrees/</span><span class="nv">$wt</span><span class="s2">&#34;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">echo</span> <span class="s2">&#34;removing </span><span class="nv">$d</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">  rm -rf <span class="s2">&#34;</span><span class="nv">$d</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">done</span>
+</span></span></code></pre>
+      <p>
+        worktreeはどのリポジトリでも
+        <code>.worktrees/</code>
+        の下に作る決まりにしているので、そこに同じ名前のディレクトリがなければ消す、というだけのもの。
+      </p>
+      <p>
+        これは、PRとCIを見張るスクリプト（
+        <code>~/.local/bin/carina-watch</code>
+        ）から、30分ごとに呼ぶようにしている。初めて回したときは134GBが空いて、空きが206GiBから334GiBになった。
+      </p>
+      <h3>
+        Codexの書き込み先
+      </h3>
+      <p>
+        Codexのサンドボックスから
+        <code>/Volumes</code>
+        以下に書き込むには、
+        <code>--add-dir /Volumes/CargoTargets</code>
+        を付ける必要がある。
+      </p>
+      <hr />
+      <h2>
+        PCが重い
+      </h2>
+      <h3>
+        Microsoft Defenderのシステム拡張を立ち上げ直した
+      </h3>
+      <p>
+        いちばん効いたのがこれ。
+      </p>
+      <pre><code>sudo killall epsext</code></pre>
+      <p>
+        Defenderのリアルタイム保護はオフにしてあるのに、
+        <code>epsext</code>
+        が5日間、CPUを1コア分（約100%）使い続けていた。立ち上げ直したら、CPUは2.7%、メモリは2.9GBから16MBになった。
+      </p>
+      <p>
+        ついでにDefenderの除外に、CargoTargets、
+        <code>~/Library/Caches/Mozilla.sccache</code>
+        、
+        <code>~/.cargo</code>
+        、
+        <code>~/.rustup</code>
+        の4つを足してみたけど、これは効かなかった。リアルタイム保護がもともとオフなので、当然と言えば当然。
+      </p>
+      <p>
+        ただ、一連の対策を終えたあとで、リアルタイム保護はオンに戻した。なので、この除外は今はちゃんと意味を持っている（
+        <code>~/src/</code>
+        は前から除外済み）。
+      </p>
+      <h3>
+        CargoTargetsのSpotlight索引を止めた
+      </h3>
+      <pre><code>sudo mdutil -i off /Volumes/CargoTargets</code></pre>
+      <p>
+        ビルド出力をSpotlightが索引に入れていたので、止めた。
+      </p>
+      <hr />
+      <h2>
+        ビルドの負荷を抑える運用
+      </h2>
+      <p>
+        ここからは、エージェントに守らせているルール。
+      </p>
+      <ul>
+        <li>
+          1つのリポジトリで同時に動くエージェントは2つまで。これは負荷対策というより、並列にしすぎるとコンフリクトが起きるため。
+        </li>
+        <li>
+          手元でビルドするのは、マシン全体で同時に1つだけ。
+          <code>nice -n 19</code>
+          で回し、始める前に1分のload averageが32未満かを確かめる。
+        </li>
+        <li>
+          workspace全体のテスト、clippy、doctestはCIに任せる。手元では、名前で選んだテストだけを流す。
+        </li>
+      </ul>
+      <hr />
+      <h2>
+        また重くなったときに見るもの
+      </h2>
+      <pre><code>uptime
+ps -Ao pcpu,rss,command -r | head
+ps -o etime=,pcpu= -p $(pgrep -f epsext | head -1)
+df -g /</code></pre>
+      <ul>
+        <li>
+          <code>epsext</code>
+          がずっと高いなら、
+          <code>sudo killall epsext</code>
+          で立ち上げ直す。
+        </li>
+        <li>
+          空きが少ないなら、
+          <code>prune-cargo-targets</code>
+          を回す。それでも足りないなら、
+          <code>tmutil listlocalsnapshots /</code>
+          でローカルスナップショットを確かめる。
+        </li>
+      </ul>
+    </article>
+    <footer class="foot">
+      <a href="/blog/2026/10/17/1" rel="next">
+        ← older
+      </a>
+      <a href="/" class="home">
+        mizzy.org · since 2005
+      </a>
+      <span></span>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad: true, theme: 'dark'});
+    </script>
+  </body>
+</html>
