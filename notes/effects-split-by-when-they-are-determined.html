@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>effectは「何がいつ確定するか」で三つに分かれる - notes</title>
+<meta name="description" content="静的に確定するもの、値だけapply時に決まるもの、個数がapply時に決まるもの。三つ目もループの本体はplan時に分かるのでMonadまでは行かないが、planの表示で問題になる(carina#3589)。">
+<meta property="og:title" content="effectは「何がいつ確定するか」で三つに分かれる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/effects-split-by-when-they-are-determined.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/effects-split-by-when-they-are-determined.png">
+<meta property="og:description" content="静的に確定するもの、値だけapply時に決まるもの、個数がapply時に決まるもの。三つ目もループの本体はplan時に分かるのでMonadまでは行かないが、planの表示で問題になる(carina#3589)。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="effectは「何がいつ確定するか」で三つに分かれる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/effects-split-by-when-they-are-determined.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>effectは「何がいつ確定するか」で三つに分かれる</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: ChatGPTとの対話(2026-11-06)、carina-rs/carina#3589、carina-rs/carina main 273a2520の<code>carina-core/src/effect.rs</code>
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>CarinaのplanはApplicative的な静的グラフに近い。VPCとSubnetの依存はapply前に分かり、分からないのはVPCのIDという値だけである。だがそれだけでは説明できないeffectが現実にある。effectを「何がいつ確定するか」で並べると三つになる。</p>
+
+  <div class="scroll">
+  <table class="compare">
+    <thead><tr><th>種類</th><th>plan時に分かる</th><th>apply時に分かる</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>静的に確定</td><td>構造も値も</td><td>—</td><td>固定のCIDRを持つVPC</td></tr>
+      <tr><td>値だけ後で確定</td><td>構造(個数・依存)</td><td>属性値</td><td><code>vpc_id = vpc.vpc_id</code>のSubnet</td></tr>
+      <tr><td>個数が後で確定</td><td>ループの本体</td><td>繰り返し回数</td><td>証明書の検証オプションごとに作るDNSレコード</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>三つ目の例は<a href="https://github.com/carina-rs/carina/issues/3589">carina#3589</a>にある。</p>
+
+  <pre><code>let validation_records = for opt in cert.domain_validation_options {
+  aws.route53.RecordSet {
+    hosted_zone_id   = zone_id
+    name             = opt.resource_record.name
+    ...
+  }
+}</code></pre>
+
+  <p>ACM証明書を作るまで<code>domain_validation_options</code>の要素数が分からないので、作るレコードの数もapplyまで決まらない。Carinaはこれを<code>DeferredCreate</code>というeffectとして扱う。#3589は、このdeferredな作成がplanの木と集計で<code>+</code>として数えられず、同じ系列の古い要素の<code>-</code>だけが目立って「削除だけのplan」に見えた、という報告である(2026-06-21にクローズ)。</p>
+
+  <h2>Monadへ行かずに済む理由</h2>
+
+  <p>三つ目はgraph形状がapply時に決まるので、一見Monad的である。だが自由ではない。<strong>ループの本体はplan時に分かっていて、決まらないのは回数だけ</strong>である。前のeffectの結果を見て、まったく別の種類のeffectを作るわけではない。</p>
+
+  <p>だから「完全に静的」と「任意の動的生成」の間に段を一つ置けば足りる。この段のeffectも、planに「この形のものが後でN個作られる」と書ける。何が作られうるかは事前に読める。モノイドとモナドの対比は<a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a>、graph形状と属性値の区別は<a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a>にある。</p>
+
+  <h2>表示の問題として出てくる</h2>
+
+  <p>#3589が示すように、この段のeffectは型より先に<strong>planの表示</strong>で問題になる。予測可能性はplanを読む人のためのものなので、「後でN個」を<code>+</code>として数えないと、構造上は予測可能でも人には予測できない。<a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a> <a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>#3589の内容とDSL例はissue本文から写した。<code>DeferredCreate</code> / <code>DeferredReplace</code>が<code>Effect</code>の変種であることはcarina main 273a2520で確認した。#3589の修正後にplan表示がどうなったかは確認していない(要確認)。三分類と「回数だけが決まらないのでMonadまで行かない」という整理は、ChatGPTとの対話をもとにした解釈である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/effects-as-free-monoid.html">効果の具体化 — planは効果の自由モノイドである</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/function-values-must-not-reach-graph-shape.html">高階関数の境界条件は「関数値がgraph形状決定位置に到達しない」ことである</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-効果">#効果</a>
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-予測可能性">#予測可能性</a>
+    <a href="/notes/#tag-carina">#carina</a>
+  </p>
+</article>
+</body>
+</html>

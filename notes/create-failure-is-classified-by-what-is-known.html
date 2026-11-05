@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>createの失敗は「外部世界について何が分かっているか」で分ける - notes</title>
+<meta name="description" content="Carinaはcreateの失敗を、APIが何を返したかではなく、外部世界について何が分かっているかで4つに分ける。分類が回復手段を決め、typestateがproviderに分類を守らせる。">
+<meta property="og:title" content="createの失敗は「外部世界について何が分かっているか」で分ける">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/create-failure-is-classified-by-what-is-known.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/create-failure-is-classified-by-what-is-known.png">
+<meta property="og:description" content="Carinaはcreateの失敗を、APIが何を返したかではなく、外部世界について何が分かっているかで4つに分ける。分類が回復手段を決め、typestateがproviderに分類を守らせる。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="createの失敗は「外部世界について何が分かっているか」で分ける">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/create-failure-is-classified-by-what-is-known.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* CreateAttemptからの遷移図 */
+  .ts text { font-family: var(--mono); font-size: 12px; fill: var(--text); }
+  .ts .box { fill: var(--surface); stroke: var(--rule); }
+  .ts .src { fill: var(--accent-bg); stroke: var(--accent); }
+  .ts .ln  { stroke: var(--muted); fill: none; }
+  .ts .lbl { font-size: 11px; fill: var(--muted); }
+  .ts .note { font-family: var(--sans); font-size: 11px; fill: var(--faint); }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>createの失敗は「外部世界について何が分かっているか」で分ける</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: ChatGPTとの対話(2026-11-06)、carina-rs/carina main 273a2520の<code>carina-core/src/provider.rs</code> <code>effect.rs</code> <code>plan.rs</code>
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>createの失敗を<code>Result&lt;T, E&gt;</code>の<code>Err</code>一つで返すと、<strong>失敗した操作の中に、既に起きた副作用が含まれている</strong>場合を表せない。APIがタイムアウトしても、クラウド側ではリソースができているかもしれない。そこでCarinaは、create失敗を「APIが何を返したか」ではなく、<strong>その時点で外部世界について何が分かっているか</strong>で分類している。</p>
+
+  <p><code>CreateFailureKind</code>は4つに分かれる。</p>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th>変種</th><th>分かっていること</th><th>stateの扱い</th></tr></thead>
+    <tbody>
+      <tr><td><code>NoResource</code></td><td>何も作られていない。リクエストが出ていないか、クラウドが何も作らずに拒否した</td><td>記録しない</td></tr>
+      <tr><td><code>OutcomeUnknown</code></td><td>リクエストはクラウドに届いたかもしれないが、識別子も継続も無い</td><td>アドレスと開始時刻だけを保護された行として残す</td></tr>
+      <tr><td><code>IdentifierReported</code></td><td>識別子は返ったが、リソースの存在は観測できていないかもしれない</td><td>識別子を残す</td></tr>
+      <tr><td><code>InFlight</code></td><td>再開できる継続(トークン)がある。識別子は有ったり無かったり</td><td>次のapplyで同じ操作に戻れるよう残す</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>成功の側も二値ではなく、作成後の読み戻しが不完全だった<code>PartialSuccess</code>がある。</p>
+
+  <h2>分類が回復手段を決める</h2>
+
+  <p>この分け方が効くのは、変種ごとに<strong>次に取るべき手当てが違う</strong>からである。とくに<code>OutcomeUnknown</code>は、stateに「あるかもしれない」行として残り、解消されるまでplanをエラーで止める。解消の経路は二つしかない。</p>
+
+  <ul>
+    <li>実在を確かめてimportする。importでこの行を置き換えることを許す<code>OutcomeUnknownImportReplacement</code>は、対応する<code>Effect::Import</code>と一緒にしか作れない</li>
+    <li>実在しないことを確かめて<code>state forget</code>する</li>
+  </ul>
+
+  <p>どちらも「分からない」を黙って「無い」とも「有る」とも扱わない。<a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></p>
+
+  <h2>分類を型の進み方で強制する</h2>
+
+  <p>分類は列挙子を選ぶだけでは守れない。providerが勝手に<code>Success</code>を組み立てれば終わりだからだ。Carinaでは<code>CreateOutcome</code>のフィールドがprivateで、成功値を直接作るコードはコンパイルできない(<code>compile_fail</code>のdoctestがある)。providerは、executorが渡した<code>CreateAttempt</code>を消費して先へ進めるしかない。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 250" role="img" aria-label="CreateAttemptから4本の遷移が出る図。issuedでIssuedCreateを経て成功へ、pendingでPendingCreateへ、not_createdでNoResourceへ、outcome_unknownでOutcomeUnknownへ。outcome_unknownにはhostが作るEgressSentが要る">
+      <g class="ts">
+        <rect class="src" x="10" y="105" width="140" height="40" rx="4"/>
+        <text x="80" y="130" text-anchor="middle">CreateAttempt</text>
+
+        <path class="ln" d="M150 125 C 200 125, 200 30, 250 30"/>
+        <path class="ln" d="M150 125 C 200 125, 200 90, 250 90"/>
+        <path class="ln" d="M150 125 C 200 125, 200 160, 250 160"/>
+        <path class="ln" d="M150 125 C 200 125, 200 220, 250 220"/>
+
+        <text class="lbl" x="258" y="20">issued(identifier, sent)</text>
+        <rect class="box" x="250" y="26" width="150" height="26" rx="4"/>
+        <text x="325" y="44" text-anchor="middle">IssuedCreate</text>
+        <path class="ln" d="M400 39 L 450 39"/>
+        <rect class="box" x="450" y="26" width="180" height="26" rx="4"/>
+        <text x="540" y="44" text-anchor="middle">… → 成功</text>
+
+        <text class="lbl" x="258" y="80">pending(token, …)</text>
+        <rect class="box" x="250" y="86" width="150" height="26" rx="4"/>
+        <text x="325" y="104" text-anchor="middle">PendingCreate</text>
+        <text class="note" x="412" y="104">後で再開する(Cloneできない)</text>
+
+        <text class="lbl" x="258" y="150">not_created(error)</text>
+        <rect class="box" x="250" y="156" width="150" height="26" rx="4"/>
+        <text x="325" y="174" text-anchor="middle">NoResource</text>
+
+        <text class="lbl" x="258" y="210">outcome_unknown(sent, error)</text>
+        <rect class="box" x="250" y="216" width="150" height="26" rx="4"/>
+        <text x="325" y="234" text-anchor="middle">OutcomeUnknown</text>
+        <text class="note" x="412" y="234">sentはhostしか作れない証拠</text>
+      </g>
+    </svg>
+    <figcaption>どの遷移も<code>self</code>を消費するので、同じ試行から二つの結果は作れない。</figcaption>
+  </figure>
+
+  <p>どの経路を通るかを決める「送ったかどうか」は、providerではなくhostが観測する。<a href="/notes/send-evidence-is-observed-by-the-host.html">「送ったかどうか」はproviderの申告ではなくhostが観測する</a>。型で壊れた状態を書けなくする原則そのものは<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>にある。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>4変種の定義とコメント、<code>CreateOutcomeKind</code>の<code>Success</code> / <code>PartialSuccess</code>、<code>CreateAttempt</code>のメソッド、<code>compile_fail</code>のdoctest、<code>OutcomeUnknownImportReplacement</code>の生成関数、<code>CreateOutcomeUnknownAbsentResolution::StateForget</code>はcarina main 273a2520のソースで確認した。表の「stateの扱い」は型とコメントから読んだもので、executorのstate書き込み経路をすべて追ったわけではない(要確認: <code>IdentifierReported</code>が次のplanでどう扱われるか)。</p>
+    <p>ChatGPTが会話の中で<code>issued</code>を<code>(identifier, sent)</code>と引用していた点は<code>CreateAttempt::issued</code>と一致する。ただし<code>PollAttempt::issued</code>は<code>identifier</code>だけを取るので、同名でも型ごとに引数が違う。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/send-evidence-is-observed-by-the-host.html">「送ったかどうか」はproviderの申告ではなくhostが観測する</a></li>
+      <li><a href="/notes/provider-discretion-vs-typed-authority.html">Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/where-the-analogy-breaks.html">類比が切れるのはターゲットが生きている場所である</a></li>
+      <li><a href="/notes/new-provider-is-a-counterexample-search.html">providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-typestate">#typestate</a>
+    <a href="/notes/#tag-state">#state</a>
+  </p>
+</article>
+</body>
+</html>

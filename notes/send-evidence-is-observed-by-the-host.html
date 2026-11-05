@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「送ったかどうか」はproviderの申告ではなくhostが観測する - notes</title>
+<meta name="description" content="create失敗が「作られていない」か「作られたかもしれない」かを分ける手がかりは、リクエストが出たかどうか。Carinaはこれをproviderに申告させず、HTTPを送り出すhostが観測し、hostしか作れない証拠として渡す。">
+<meta property="og:title" content="「送ったかどうか」はproviderの申告ではなくhostが観測する">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/send-evidence-is-observed-by-the-host.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/send-evidence-is-observed-by-the-host.png">
+<meta property="og:description" content="create失敗が「作られていない」か「作られたかもしれない」かを分ける手がかりは、リクエストが出たかどうか。Carinaはこれをproviderに申告させず、HTTPを送り出すhostが観測し、hostしか作れない証拠として渡す。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="「送ったかどうか」はproviderの申告ではなくhostが観測する">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/send-evidence-is-observed-by-the-host.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+  /* guest / host / ネットワークの境界図 */
+  .eg text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+  .eg .code { font-family: var(--mono); font-size: 11.5px; }
+  .eg .zone { fill: var(--sunken); stroke: none; }
+  .eg .box  { fill: var(--surface); stroke: var(--rule); }
+  .eg .hi   { fill: var(--accent-bg); stroke: var(--accent); }
+  .eg .ln   { stroke: var(--muted); fill: none; }
+  .eg .hd   { font-weight: 600; fill: var(--muted); }
+  .eg .dim  { fill: var(--faint); font-size: 11px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>「送ったかどうか」はproviderの申告ではなくhostが観測する</h1>
+  <p class="meta">
+    <span class="epistemic verified">確認済み</span>
+    出典: ChatGPTとの対話(2026-11-06)、carina-rs/carina main 273a2520の<code>carina-core/src/provider.rs</code>
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>createが失敗したとき、「何も作られていない」と「作られたかもしれない」を分ける一番強い手がかりは、<strong>リクエストが実際にネットワークへ出たかどうか</strong>である。出ていなければ、クラウドに何かが起きた可能性は無い。<a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a></p>
+
+  <p>この事実をproviderの自己申告に任せると、providerのバグや手抜きがそのまま「作られていない」という誤った帳簿になり、孤立したリソースが残る。Carinaはこれをprovider(WASMのguest)から取り上げ、<strong>HTTPを実際に送り出すhostが観測する</strong>。</p>
+
+  <figure>
+    <svg viewBox="0 0 640 230" role="img" aria-label="左にprovider(guest)、中央にhost、右にクラウド。guestのHTTP要求はhostを通り、hostのCallEgressRecorderが送出の有無を記録する。記録はNoEgressならnot_created、EgressSentならoutcome_unknownへ分岐する">
+      <g class="eg">
+        <rect class="zone" x="0" y="0" width="170" height="230"/>
+        <rect class="zone" x="190" y="0" width="300" height="230"/>
+        <text class="hd" x="85" y="22" text-anchor="middle">provider(guest)</text>
+        <text class="hd" x="340" y="22" text-anchor="middle">host</text>
+        <text class="hd" x="570" y="22" text-anchor="middle">クラウド</text>
+
+        <rect class="box" x="20" y="50" width="130" height="36" rx="4"/>
+        <text x="85" y="73" text-anchor="middle">HTTP要求</text>
+
+        <rect class="hi" x="210" y="44" width="260" height="48" rx="4"/>
+        <text class="code" x="340" y="64" text-anchor="middle">CallEgressRecorder</text>
+        <text class="dim" x="340" y="82" text-anchor="middle">begin_request() → dispatched()</text>
+
+        <rect class="box" x="520" y="50" width="100" height="36" rx="4"/>
+        <text x="570" y="73" text-anchor="middle">API</text>
+
+        <path class="ln" d="M150 68 L 210 68"/>
+        <path class="ln" d="M470 68 L 520 68"/>
+
+        <path class="ln" d="M300 92 L 260 140"/>
+        <path class="ln" d="M380 92 L 420 140"/>
+
+        <rect class="box" x="200" y="140" width="120" height="30" rx="4"/>
+        <text class="code" x="260" y="160" text-anchor="middle">NoEgress</text>
+        <rect class="box" x="360" y="140" width="120" height="30" rx="4"/>
+        <text class="code" x="420" y="160" text-anchor="middle">EgressSent</text>
+
+        <text class="code" x="260" y="196" text-anchor="middle">not_created</text>
+        <text class="code" x="420" y="196" text-anchor="middle">outcome_unknown</text>
+        <text class="dim" x="260" y="214" text-anchor="middle">拒否・DNS失敗・キャンセル</text>
+        <text class="dim" x="420" y="214" text-anchor="middle">届いたかもしれない</text>
+      </g>
+    </svg>
+    <figcaption>証拠を作れるのはhostの記録係だけで、providerはそれを受け取って使うことしかできない。</figcaption>
+  </figure>
+
+  <h2>仕組み</h2>
+
+  <ul>
+    <li>hostはguestの呼び出し1回ごとに<code>CallEgressRecorder</code>を用意する。複製しても「どの呼び出しの記録係か」は保たれるので、遅れて出たリクエストが後の呼び出しの記録を汚すことはない</li>
+    <li>送信の直前に<code>begin_request()</code>でガードを取り、HTTPトランスポートに渡す直前に<code>dispatched()</code>で消費する。ポリシーでの拒否、DNSの失敗、タスクのキャンセルでガードが捨てられた場合は「送っていない」になる</li>
+    <li>呼び出しが終わると、記録係は<code>CallEgress::None(NoEgress)</code>か<code>CallEgress::Sent(EgressSent)</code>のどちらかを返す</li>
+    <li>失敗の分類はこれで分岐する。<code>None</code>なら<code>attempt.not_created(error)</code>、<code>Sent</code>なら<code>attempt.outcome_unknown(sent, error)</code></li>
+  </ul>
+
+  <p>要点は<code>NoEgress</code>と<code>EgressSent</code>のフィールドがprivateなことである。<strong>hostの記録係しかこの証拠を作れない</strong>。<code>outcome_unknown</code>は<code>EgressSent</code>を引数に要求するので、観測なしに「届いたかもしれない」を作ることもできない。</p>
+
+  <h2>信頼境界の置き方として</h2>
+
+  <p>これは<a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a>の一例だが、向きが少し違う。境界を越えてきた値を検証し直すのではなく、<strong>境界の外の主体に申告させること自体をやめ、境界の内側で観測できる事実で置き換えている</strong>。providerがどう書かれていても、「出ていないのに出たことにする」も「出たのに出ていないことにする」もできない。</p>
+
+  <p>観測できるのは「出たか」までで、「クラウドで何が起きたか」ではない。だから<code>Sent</code>は成功ではなく<code>OutcomeUnknown</code>に落ちる。観測した事実より強いことを主張しない、という線の引き方である。<a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p><code>CallEgressRecorder</code> / <code>PendingCallEgress</code> / <code>CallEgress</code> / <code>NoEgress</code> / <code>EgressSent</code>の定義とコメント、<code>GuestCallFailure::classify</code>の分岐、<code>CreateAttempt::outcome_unknown</code>の引数はcarina main 273a2520で確認した。キャンセル時に<code>may_have_dispatched()</code>で報告する経路があることも見たが、その後のstateの扱いまでは追っていない(要確認)。「申告をやめて観測に置き換える」という整理は解釈である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a></li>
+      <li><a href="/notes/provider-discretion-vs-typed-authority.html">Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+      <li><a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-信頼境界">#信頼境界</a>
+    <a href="/notes/#tag-typestate">#typestate</a>
+    <a href="/notes/#tag-provider">#provider</a>
+  </p>
+</article>
+</body>
+</html>
