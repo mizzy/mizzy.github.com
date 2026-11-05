@@ -109,6 +109,30 @@
 </div>
 
 <div class="cards">
+  <a class="card normative" href="/notes/output-length-determined-by-inputs.html" data-tags="carina 型システム plan 提案">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</h2>
+      <p>ACMのdomain_validation_optionsはドメイン名ごとに1要素。出力の長さを入力との関係としてschemaに書けば、deferredなforをplan時に展開できる(carina#4286)。</p>
+      <span class="tags"><span>#carina</span> <span>#型システム</span> <span>#plan</span> <span>#提案</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/deferred-approval-should-bind-the-count.html" data-tags="carina plan 予測可能性 提案">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>deferredな作成を承認するなら、個数も承認の対象にする</h2>
+      <p>planに載るのはテンプレートだけで、承認は「何個でも作ってよい」になっている。決められるなら展開し、決められないなら上限を承認に含める。</p>
+      <span class="tags"><span>#carina</span> <span>#plan</span> <span>#予測可能性</span> <span>#提案</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/host-side-fault-injection-for-conformance.html" data-tags="carina provider 方法論 提案">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>providerの適合試験は、host側の障害注入で書ける</h2>
+      <p>通信はすべてhostを通るので、hostで障害を注入すれば同じ失敗シナリオを全providerに当てられる。土台はあり、実providerへの適用が無い(carina#4287)。</p>
+      <span class="tags"><span>#carina</span> <span>#provider</span> <span>#方法論</span> <span>#提案</span></span>
+    </span>
+  </a>
   <a class="card verified" href="/notes/create-failure-is-classified-by-what-is-known.html" data-tags="carina typestate state">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">

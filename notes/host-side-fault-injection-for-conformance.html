@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>providerの適合試験は、host側の障害注入で書ける - notes</title>
+<meta name="description" content="Carinaではproviderの通信はすべてhostを通るので、hostで障害を注入すれば同じ失敗シナリオを全providerに当てられる。土台(HttpTestRouteとmock-http)はあり、足りないのは実providerへの適用。">
+<meta property="og:title" content="providerの適合試験は、host側の障害注入で書ける">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/host-side-fault-injection-for-conformance.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/host-side-fault-injection-for-conformance.png">
+<meta property="og:description" content="Carinaではproviderの通信はすべてhostを通るので、hostで障害を注入すれば同じ失敗シナリオを全providerに当てられる。土台(HttpTestRouteとmock-http)はあり、足りないのは実providerへの適用。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="providerの適合試験は、host側の障害注入で書ける">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/host-side-fault-injection-for-conformance.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>providerの適合試験は、host側の障害注入で書ける</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <a href="https://github.com/carina-rs/carina/issues/4287">carina-rs/carina#4287</a>、carina-rs/carina main 273a2520の<code>carina-plugin-host</code>と<code>carina-provider-mock</code>
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>providerを増やすことをモデルへの反例探しとして扱うなら、反例を偶然に任せず、決まった失敗シナリオを全providerに当てたい。<a href="/notes/new-provider-is-a-counterexample-search.html">providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである</a></p>
+
+  <p>普通、こうした試験はprovider側でAPIクライアントをmockして書く。だがCarinaではproviderの外向きの通信はすべてhostを通る。だから<strong>hostの側で障害を注入すれば、providerの実装に手を入れずに同じシナリオを全providerに当てられる</strong>。<a href="/notes/send-evidence-is-observed-by-the-host.html">「送ったかどうか」はproviderの申告ではなくhostが観測する</a></p>
+
+  <h2>シナリオ</h2>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th>注入する障害</th><th>期待する分類</th></tr></thead>
+    <tbody>
+      <tr><td>送信前に拒否する</td><td><code>NoResource</code></td></tr>
+      <tr><td>送信後に応答を落とす</td><td><code>OutcomeUnknown</code>(識別子やトークンを持っていれば<code>IdentifierReported</code> / <code>InFlight</code>)</td></tr>
+      <tr><td>送信後に期限を過ぎるまで遅らせる</td><td>応答を落とした場合と同じ</td></tr>
+      <tr><td>createは通し、続く読み戻しを失敗させる</td><td><code>IdentifierReported</code>か<code>PartialSuccess</code>。<code>NoResource</code>は誤り</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>シナリオはcoreの型に対して一度だけ書き、providerは作成するリソースのfixtureだけを用意する。上流はローカルの偽サーバーか、記録した通信の再生にすれば、クラウドの認証情報も要らない。<a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a></p>
+
+  <h2>既にあるもの、足りないもの</h2>
+
+  <p>土台はある。hostの統合テストは、テスト専用の<code>carina-provider-mock-http</code>と、HTTPの宛先をローカルに差し替える<code>HttpTestRoute</code>を使って「送信後にtrapすれば<code>outcome_unknown</code>」「送信前なら<code>not_created</code>」を確かめている。<code>carina-provider-mock</code>には<code>CreateMode</code> / <code>ResumeMode</code>で結果を指定する仕組みがある。</p>
+
+  <p>足りないのは、同じシナリオを<strong>実際のprovider</strong>(aws、awscc、github)に当てることである。今は、実providerが「応答が消えた」を正しい変種に落とすかは、実際のapplyで起きたときにしか分からない。</p>
+
+  <h2>型が保証しないものを試験で埋める</h2>
+
+  <p>型はproviderが書ける遷移を絞る。hostが送信を観測するので、「送っていないのに<code>OutcomeUnknown</code>」も書けない。だが「応答が消えたのに、providerが自分の判断で<code>not_created</code>を選ぶ」ことは型の上では書ける。送信が観測されていても、providerがクラウドの拒否を根拠に<code>not_created</code>を返すのは正当な経路だからである。この区別は型ではなく振る舞いの問題で、試験で押さえるしかない。<a href="/notes/provider-discretion-vs-typed-authority.html">Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p><code>HttpTestRoute</code>、<code>carina-provider-mock-http</code>を使う統合テスト(<code>initial_create_trap_after_dispatched_egress_is_outcome_unknown</code>ほか)、<code>carina-provider-mock</code>の<code>CreateMode</code> / <code>ResumeMode</code>はcarina main 273a2520で確認した。hostにfault injectionの仕組みが無いこと、似たissueが無いことは、コードとissueの検索で確認した(2026-11-06)。</p>
+    <p>送信が観測された後でもproviderが<code>not_created</code>を返せることは、統合テスト<code>provider_declared_not_created_remains_not_created_after_egress</code>で確認した。リクエストが実際にguestから出たことを確かめたうえで、providerが宣言した<code>not_created</code>が<code>NoResource</code>のまま残ることを検査している。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/new-provider-is-a-counterexample-search.html">providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである</a></li>
+      <li><a href="/notes/send-evidence-is-observed-by-the-host.html">「送ったかどうか」はproviderの申告ではなくhostが観測する</a></li>
+      <li><a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a></li>
+      <li><a href="/notes/provider-discretion-vs-typed-authority.html">Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-provider">#provider</a>
+    <a href="/notes/#tag-方法論">#方法論</a>
+    <a href="/notes/#tag-提案">#提案</a>
+  </p>
+</article>
+</body>
+</html>
