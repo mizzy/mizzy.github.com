@@ -92,6 +92,29 @@
 
   <p>計算は1つのままで、失敗するかどうかも変わらない。結果を加工するだけなので、計算を2つ組み合わせることはできない。</p>
 
+  <h3><code>fmap</code>の型の読み方</h3>
+
+  <pre><code>class Functor f where
+    fmap :: (a -&gt; b) -&gt; f a -&gt; f b</code></pre>
+
+  <p><code>f</code>は<code>Maybe</code>や<code>[]</code>のような、型引数を1つ受け取る型である(<code>Maybe</code>単体はまだ型ではなく、<code>Maybe Int</code>で型になる。<code>Maybe</code>はRustの<code>Option</code>に当たる)。素直に読むと「<code>a -&gt; b</code>の関数と、<code>a</code>を返す計算を受け取り、<code>b</code>を返す計算を返す」で、Rustの<code>Option::map</code>がこれに当たる。</p>
+
+  <p><code>-&gt;</code>は右結合なので、この型は<code>(a -&gt; b) -&gt; (f a -&gt; f b)</code>と同じである。こう括ると「普通の関数を、<code>f</code>の世界で動く関数に持ち上げる」と読める。<code>(+1) :: Int -&gt; Int</code>が<code>fmap (+1) :: Maybe Int -&gt; Maybe Int</code>になる。</p>
+
+  <p>型だけなら中身を無視する実装も書けるので、法則が2つ付く。</p>
+
+  <pre><code>fmap id      == id
+fmap (g . h) == fmap g . fmap h</code></pre>
+
+  <p>1つ目と、<code>fmap</code>が中身の型を知らないこと(パラメトリシティ)から、<code>fmap</code>は計算の形に手を出せない。<code>Just</code>は<code>Just</code>のまま、リストの長さも変わらない。「Functorは加工だけ」と言えるのはこの法則のおかげである。</p>
+
+  <p>Monadの<code>&gt;&gt;=</code>と並べると、違いは渡す関数の戻り値だけになる。</p>
+
+  <pre><code>fmap  :: (a -&gt; b)   -&gt; f a -&gt; f b
+(&gt;&gt;=) :: f a -&gt; (a -&gt; f b) -&gt; f b</code></pre>
+
+  <p>戻り値が<code>b</code>なら前の値は加工されるだけだが、<code>f b</code>なら前の値を見て次の計算を作れる。この差がそのまま、次の計算が前の値に依存できるかどうかの分かれ目になっている。</p>
+
   <h2>Applicative — 独立した計算をいくつか実行し、結果を合わせる</h2>
 
   <pre><code>(,) &lt;$&gt; readHost &lt;*&gt; readPort</code></pre>
