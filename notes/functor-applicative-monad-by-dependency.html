@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Functor・Applicative・Monadは、次の計算が前の値に依存できるかで分かれる - notes</title>
+<meta name="description" content="F&lt;A&gt;を「Aを返す計算」と読むと、三つの違いは「次に実行する計算が前の結果の値に依存するか」の一点になる。表現力が上がるほど実行前に分かることは減り、IaCのplanでは属性参照・条件付きリソース・deferredなループがそれぞれの段に当たる。">
+<meta property="og:title" content="Functor・Applicative・Monadは、次の計算が前の値に依存できるかで分かれる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/functor-applicative-monad-by-dependency.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/functor-applicative-monad-by-dependency.png">
+<meta property="og:description" content="F&amp;lt;A&amp;gt;を「Aを返す計算」と読むと、三つの違いは「次に実行する計算が前の結果の値に依存するか」の一点になる。表現力が上がるほど実行前に分かることは減り、IaCのplanでは属性参照・条件付きリソース・deferredなループがそれぞれの段に当たる。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Functor・Applicative・Monadは、次の計算が前の値に依存できるかで分かれる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/functor-applicative-monad-by-dependency.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Functor・Applicative・Monadは、次の計算が前の値に依存できるかで分かれる</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: Claudeとの対話(2026-11-06)、<a href="https://www.staff.city.ac.uk/~ross/papers/Applicative.html">McBride &amp; Paterson "Applicative programming with effects" (JFP 18(1), 2008)</a>、<a href="https://dl.acm.org/doi/10.1145/3341694">Mokhov et al. "Selective Applicative Functors" (ICFP 2019)</a>
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p><code>F&lt;A&gt;</code>を「<code>A</code>を返す計算」として読む。ただの計算ではなく、失敗する、まだ終わっていない、値が決まらない、といった普通の値には無い性質を伴う。<code>Result&lt;A, E&gt;</code>なら「<code>A</code>を返すか<code>E</code>で失敗する計算」である。箱として読まない理由は<a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a>に書いた。</p>
+
+  <p>Functor・Applicative・Monadは、この計算を<strong>どうつなげられるか</strong>の違いであり、分かれ目は一点しかない。</p>
+
+  <blockquote><p>次に実行する計算は、前の計算の<strong>結果の値</strong>に依存するか?</p></blockquote>
+
+  <figure>
+    <svg viewBox="0 0 640 300" role="img" aria-label="Applicativeでは独立した計算AとBが並び両方とも事前に見えている。Selectiveでは計算Bが点線で描かれ、走るかどうかはAの値で決まるが存在は事前に見えている。Monadでは計算Aの後に値を受け取る関数があり、その先の計算は実行するまで分からない。">
+      <style>
+        .fam text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .fam .hi   { fill: var(--accent-bg); stroke: var(--accent); }
+        .fam .maybe { fill: var(--accent-bg); stroke: var(--accent); stroke-dasharray: 4 3; }
+        .fam .opaque { fill: var(--surface); stroke: var(--rule); stroke-dasharray: 4 3; }
+        .fam .ttl  { font-size: 13px; font-weight: 600; }
+        .fam .dim  { fill: var(--faint); font-size: 11px; }
+        .fam .arw  { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="fam">
+        <text class="ttl" x="8" y="20">Applicative — 計算の顔ぶれは値と無関係に決まっている</text>
+        <rect class="hi" x="8" y="32" width="86" height="28" rx="4"/>
+        <text x="51" y="50" text-anchor="middle">readHost</text>
+        <rect class="hi" x="8" y="66" width="86" height="28" rx="4"/>
+        <text x="51" y="84" text-anchor="middle">readPort</text>
+        <path class="arw" d="M94 46 L 140 63 M94 80 L 140 63"/>
+        <rect class="hi" x="144" y="49" width="100" height="28" rx="4"/>
+        <text x="194" y="67" text-anchor="middle">結果を合わせる</text>
+        <text class="dim" x="8" y="114">実行前に分かる: 走る計算の一覧すべて</text>
+
+        <text class="ttl" x="8" y="146">Selective — 走るかどうかは値次第、選択肢は事前に見えている</text>
+        <rect class="hi" x="8" y="160" width="86" height="28" rx="4"/>
+        <text x="51" y="178" text-anchor="middle">条件</text>
+        <path class="arw" d="M94 174 H 140"/>
+        <rect class="maybe" x="144" y="160" width="100" height="28" rx="4"/>
+        <text x="194" y="178" text-anchor="middle">走るかもしれない</text>
+        <text class="dim" x="8" y="206">実行前に分かる: 走りうる計算の一覧(上下の見積もり)</text>
+
+        <text class="ttl" x="8" y="238">Monad — 前の値を見て、次の計算を作る</text>
+        <rect class="hi" x="8" y="250" width="86" height="28" rx="4"/>
+        <text x="51" y="268" text-anchor="middle">readEnv</text>
+        <path class="arw" d="M94 264 H 120"/>
+        <rect class="opaque" x="124" y="250" width="130" height="28" rx="4"/>
+        <text x="189" y="268" text-anchor="middle">λ(値) → 次の計算</text>
+        <path class="arw" d="M254 264 H 280"/>
+        <rect class="opaque" x="284" y="250" width="60" height="28" rx="4"/>
+        <text class="dim" x="314" y="268" text-anchor="middle">?</text>
+        <text class="dim" x="8" y="296">実行前に分かる: 最初の一手だけ</text>
+      </g>
+    </svg>
+    <figcaption>実線の計算は実行前に存在が見えている。点線は「走るかどうかが値で決まる」か「実行するまで正体が分からない」かのどちらかで、その差がSelectiveとMonadの差である。</figcaption>
+  </figure>
+
+  <h2>Functor — 結果に普通の関数を後から適用する</h2>
+
+  <pre><code>read_port()            // Result&lt;u16, E&gt;
+    .map(|p| p + 1)    // Result&lt;u16, E&gt;</code></pre>
+
+  <p>計算は1つのままで、失敗するかどうかも変わらない。結果を加工するだけなので、計算を2つ組み合わせることはできない。</p>
+
+  <h2>Applicative — 独立した計算をいくつか実行し、結果を合わせる</h2>
+
+  <pre><code>(,) &lt;$&gt; readHost &lt;*&gt; readPort</code></pre>
+
+  <p><code>readHost</code>と<code>readPort</code>は互いの結果を必要としない。<strong>どの計算を実行するかは、実行する前に全部決まっている。</strong>値が何であっても顔ぶれは変わらないので、実行せずに「この処理はhostとportを読む」と列挙できるし、並列に走らせることも、失敗を全部集めることもできる。</p>
+
+  <p>Rustの<code>Option::zip</code>はこの形だが、<code>Result</code>には対応する標準のメソッドが無く、<code>and_then</code>で代用することになる。書けてしまうことと、依存していないことは別である。</p>
+
+  <h2>Monad — 前の結果を見て、次の計算を決める</h2>
+
+  <pre><code>read_env().and_then(|env| match env {
+    Env::Prod =&gt; read_prod_secrets(),
+    Env::Dev  =&gt; Ok(Secrets::dummy()),
+})</code></pre>
+
+  <p>2つ目にどの計算を実行するかは、<code>read_env</code>が返した値で決まる。回数も決められる(取ってきたリストの長さだけ繰り返す)。代わりに、<strong>実行してみるまで、どんな計算が走るのか全体が分からない。</strong>継続が関数として渡されることの帰結は<a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a>に書いた。</p>
+
+  <h2>Selective — 分岐はするが、選択肢は事前に宣言する</h2>
+
+  <p>ApplicativeとMonadの間に段がある。</p>
+
+  <pre><code>select :: f (Either a b) -&gt; f (a -&gt; b) -&gt; f b</code></pre>
+
+  <p>1つ目の結果が<code>Left</code>なら2つ目を実行し、<code>Right</code>なら飛ばす。実行されうる計算はすべて静的に並んでいて、そのうちどれを実際に実行するかだけが値で決まる。だから実行前に「最大でこれだけ走る」「最低でもこれだけ走る」という上下の見積もりが取れる。</p>
+
+  <h2>力と解析しやすさは逆向き</h2>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th></th><th>次の計算は前の値に依存するか</th><th>実行前に分かること</th></tr></thead>
+    <tbody>
+      <tr><td>Functor</td><td>次の計算が無い(加工だけ)</td><td>すべて</td></tr>
+      <tr><td>Applicative</td><td>依存しない</td><td>実行される計算の一覧</td></tr>
+      <tr><td>Selective</td><td>依存するが、選択肢は事前に列挙</td><td>実行されうる計算の一覧</td></tr>
+      <tr><td>Monad</td><td>自由に依存する</td><td>最初の一手だけ</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>表現力は下ほど強い(Monad ⊃ Selective ⊃ Applicative ⊃ Functor)。分かることは下ほど減る。同じ性質の裏表なので、両方を同時には取れない。</p>
+
+  <p>設計の指針は、<strong>必要な一番弱い構造で書けるようにする</strong>ことになる。強い構造を使わずに済む箇所が増えるほど、実行前の解析が正確になる。</p>
+
+  <h2>IaCのplanに当てはめる</h2>
+
+  <p>planは「applyする前に構造を見渡す」作業なので、静的解析そのものである。ここでの計算は「リソースを作ること」になる。</p>
+
+  <ul>
+    <li>属性値の参照はApplicativeである。値が未確定でも、どのリソースを作るかは決まっている。<a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+    <li>条件付きリソース(<code>enabled ? 1 : 0</code>)はSelectiveである。作りうるものは全部見えている。</li>
+    <li>apply後に分かるリストに対する<code>for</code>ループはMonadである。いくつ作るかが前の結果で決まる。<a href="/notes/effects-split-by-when-they-are-determined.html">effectは「何がいつ確定するか」で三つに分かれる</a></li>
+  </ul>
+
+  <p>Terraformは最後のものをplan時に拒む。<code>count</code>に未確定の値を渡すと「<code>count</code>の値がapplyまで決まらない属性に依存しているので、いくつ作られるか予測できない」というエラーになる。</p>
+
+  <p><a href="/notes/output-length-determined-by-inputs.html">出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</a>は、このMonadな依存のうち、長さが入力から決まるものをApplicativeに戻す提案として読める。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>ApplicativeがMonadより弱く、したがって適用範囲が広い構造として導入されたことはMcBride &amp; Patersonの論文の要旨にある。Selectiveについて「効果はすべて静的に宣言し、どれを実行するかは動的に選ぶ」中間の抽象であることと<code>select</code>の型は、Mokhovらの論文とHackageの<a href="https://hackage.haskell.org/package/selective">selective</a>パッケージで確認した。上下の見積もりはパッケージの<code>Over</code> / <code>Under</code>に当たる。</p>
+    <p><code>Monad ⊃ Selective ⊃ Applicative</code>の包含は、「すべてのMonadはSelectiveにでき(<code>selectM</code>)、すべてのApplicativeはSelectiveにできる(<code>selectA</code>)」という意味での表現力の順序である。型クラスの継承関係は、Haskellの<code>Monad</code>が<code>Selective</code>を上位クラスに持つわけではないので、それと同じではない。</p>
+    <p>Terraformのエラーは<a href="https://github.com/hashicorp/terraform/issues/25815">hashicorp/terraform#25815</a>などに報告されている文言を要約した。条件付きリソースをSelectiveと見ること、<code>for</code>ループをMonadと見ることは解釈である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/monad-is-not-a-box.html">モナドは箱ではなく合成戦略である</a></li>
+      <li><a href="/notes/monoid-and-monad.html">モノイドとモナドを分けるのは継続を持てるかどうかである</a></li>
+      <li><a href="/notes/effects-split-by-when-they-are-determined.html">effectは「何がいつ確定するか」で三つに分かれる</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/output-length-determined-by-inputs.html">出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</a></li>
+      <li><a href="/notes/monoid-artifact-vs-monad-artifact.html">デプロイ計画がモノイドかモナドかで見通しが決まる</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-モナド">#モナド</a>
+    <a href="/notes/#tag-構造">#構造</a>
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+  </p>
+</article>
+</body>
+</html>
