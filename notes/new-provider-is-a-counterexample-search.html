@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである - notes</title>
+<meta name="description" content="AWS中心に作った型がGitHubやCloudflareでも成り立つかを確かめるためにproviderを書く。反例に出会ったときの行き先は三つで、評価すべきは変更量ではなく、モデルが単純になるか例外が積み重なるか。">
+<meta property="og:title" content="providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/new-provider-is-a-counterexample-search.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/new-provider-is-a-counterexample-search.png">
+<meta property="og:description" content="AWS中心に作った型がGitHubやCloudflareでも成り立つかを確かめるためにproviderを書く。反例に出会ったときの行き先は三つで、評価すべきは変更量ではなく、モデルが単純になるか例外が積み重なるか。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/new-provider-is-a-counterexample-search.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: ChatGPTとの対話(2026-11-06)
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>CarinaはAWSを中心に実装してきたので、コアの型(とくにcreate結果の型)がAWS固有の前提に寄っていないかは分からない。GitHubとCloudflareのproviderを書くのは、使える範囲を広げるためではなく、<strong>AWSで作った抽象が他のサービスでも成り立つかを確かめるため</strong>である。</p>
+
+  <p>型でproviderの裁量を絞る設計では、これが避けて通れない。providerが自由にstateを書けるなら、サービス固有の妙な振る舞いはprovider内部で吸収されて表に出ない。裁量が無いと、型が用意していない状況はそのまま型の問題として表に出る。<a href="/notes/provider-discretion-vs-typed-authority.html">Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</a></p>
+
+  <h2>反例に出会ったときの三つの行き先</h2>
+
+  <ol class="steps">
+    <li><strong>既存の型で表せる</strong>AWSで作った抽象が他でも通用した証拠になる。</li>
+    <li><strong>型を広げる必要がある</strong>抽象が足りなかった場所が見つかった。モデルを直す。</li>
+    <li><strong>provider固有の処理として閉じるべきだと分かる</strong>コアが責任を持つ範囲の境界が引き直される。</li>
+  </ol>
+
+  <p>3が一番情報量が多い。providerの裁量を減らすことは、すべての振る舞いをコアで決めることではない。APIごとのリトライ条件やリソース固有の更新制約まではコアが知らなくてよい。一方で「createの結果が分からないときstateをどう扱うか」は、サービスによらず揃えたい。<strong>サービスに依らない不変条件と、サービス固有の振る舞いの境界</strong>を見つける作業になる。<a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a></p>
+
+  <h2>評価の基準</h2>
+
+  <p>コアの型をどれだけ変えたか、の量では測れない。既存の型に無理に押し込めば変更は少なく見えるが、provider内部に不自然な処理が溜まる。逆に型を変えて、より単純で一般的なモデルに着けば前進である。見るべきは、<strong>新しいサービスに当たるたびにモデルが単純になっていくのか、例外が積み重なっていくのか</strong>である。</p>
+
+  <p>当たりそうな場所の見当(未検証):</p>
+
+  <ul>
+    <li>GitHub: 名前が識別子を兼ねる(リポジトリのrename、削除直後に同名で作り直せない)。identityの規則が試される。<a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+    <li>Cloudflare: DNSレコードのように、同じ内容のものが複数存在しうる。createがタイムアウトしたとき、名前と内容だけで「作られたか」を判定できるかが試される</li>
+  </ul>
+
+  <h2>共通の失敗試験</h2>
+
+  <p>反例探しを偶然に任せないなら、provider固有の知識を外した共通の試験が要る。「createは成功したが直後のreadが失敗する」「送信後に応答が失われる」「識別子だけが返る」といった状況を、全providerに同じ形で注入して、型が約束している性質を各providerが満たすかを見る。これはproviderの試験ではなく、実行モデルの試験になる。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>GitHub / Cloudflare providerをモデル検証のために書いているという動機は本人の発言による。<a href="https://github.com/carina-rs/carina-provider-github">carina-rs/carina-provider-github</a>が存在することは確認した(2026-05-28作成)。三つの行き先、評価の基準、共通試験の案はChatGPTとの対話で出たもので、まだ実装も検証もしていない。GitHubとCloudflareで当たりそうな場所は推測で、各APIの仕様では確認していない(要確認)。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/provider-discretion-vs-typed-authority.html">Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</a></li>
+      <li><a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/constraint-origin-has-four-layers.html">ツールの限界は出自を四層に分けないと解消手段を取り違える</a></li>
+      <li><a href="/notes/open-questions.html">未解決の問い</a></li>
+      <li><a href="/notes/host-side-fault-injection-for-conformance.html">providerの適合試験は、host側の障害注入で書ける</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-provider">#provider</a>
+    <a href="/notes/#tag-設計原則">#設計原則</a>
+    <a href="/notes/#tag-方法論">#方法論</a>
+  </p>
+</article>
+</body>
+</html>

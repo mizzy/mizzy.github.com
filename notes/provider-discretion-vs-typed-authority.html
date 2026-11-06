@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terraformはproviderに裁量を渡し、Carinaは型で取り上げる - notes</title>
+<meta name="description" content="create失敗の後にstateへ何が残るかを、Terraformはproviderが書いた分で決め、Carinaは失敗の種類ごとにコアが型で決める。代わりにCarinaは、型が用意していない状況に出会うと逃げ場が無い。">
+<meta property="og:title" content="Terraformはproviderに裁量を渡し、Carinaは型で取り上げる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/provider-discretion-vs-typed-authority.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/provider-discretion-vs-typed-authority.png">
+<meta property="og:description" content="create失敗の後にstateへ何が残るかを、Terraformはproviderが書いた分で決め、Carinaは失敗の種類ごとにコアが型で決める。代わりにCarinaは、型が用意していない状況に出会うと逃げ場が無い。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Terraformはproviderに裁量を渡し、Carinaは型で取り上げる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/provider-discretion-vs-typed-authority.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: ChatGPTとの対話(2026-11-06)、Terraform Plugin Framework公式ドキュメント、terraform-plugin-framework#927、carina-rs/carina main 273a2520のソース
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>create失敗の後に何がstateに残るかを、誰が決めるか。ここでTerraformとCarinaは逆を向いている。</p>
+
+  <div class="contrast">
+    <div>
+      <h3>Terraform — providerがstateに何を書いたかで決まる</h3>
+      <p>SDKv2では、<code>d.SetId("…")</code>を呼んだ時点でリソースはstateに入り、エラーを返してもそのまま残る。Plugin Frameworkでは<code>resp.State</code>に書いたものが残り、エラーがあればtaintedになる。IDを書く前に失敗して早期returnすれば何も残らず、外部にできたリソースは管理外に落ちる。</p>
+    </div>
+    <div class="yes">
+      <h3>Carina — providerが選べる遷移を型で絞る</h3>
+      <p>providerは成功値を直接作れず、executorが渡した試行の証拠を消費して、許された遷移のどれかを選ぶしかない。「送ったかどうか」はhostが観測し、providerは申告できない。</p>
+    </div>
+  </div>
+
+  <p>Terraformの公式ドキュメントは"Any response errors will cause Terraform to mark the resource as tainted"と書く。つまり「作られたかもしれない」をstateに残すかどうかは、各providerの実装者が正しい順序でstateを書くかに懸かっている。コアはproviderの申告を信じるしかない。</p>
+
+  <p>Carina側の中身は<a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a>と<a href="/notes/send-evidence-is-observed-by-the-host.html">「送ったかどうか」はproviderの申告ではなくhostが観測する</a>に書いた。</p>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th></th><th>Terraform</th><th>Carina</th></tr></thead>
+    <tbody>
+      <tr><td>失敗後のstate</td><td>providerが書いた分だけ残る</td><td>失敗の種類ごとにコアが決める</td></tr>
+      <tr><td>「送ったか」の根拠</td><td>providerの実装次第</td><td>hostの観測</td></tr>
+      <tr><td>成功値の作り方</td><td>providerが組み立てて返す</td><td>試行の証拠を消費してしか作れない</td></tr>
+      <tr><td>正しさの担保</td><td>provider実装者の規律</td><td>型(書けない遷移はコンパイルできない)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>代わりに払うもの</h2>
+
+  <p>裁量を取り上げると、型が用意していない状況に出会ったとき逃げ場が無い。Terraformのproviderなら、サービス固有の妙な振る舞いもstateの書き方で吸収できる。Carinaでは、既存の型で表せるか、型を広げるか、provider内部に閉じるかを決めなければならない。この問いは対応サービスを増やすたびに起きる。<a href="/notes/new-provider-is-a-counterexample-search.html">providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである</a>。逃げ道の一般論は<a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a>にある。</p>
+
+  <p>これは「呼び出し側が覚えていること」に依存する不変条件を型の形に作り直す、という原則(<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a>)をprovider境界に当てたものとも読める。SetIdの呼び順は、まさに「providerが覚えていること」である。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>Plugin Frameworkの引用は<a href="https://developer.hashicorp.com/terraform/plugin/framework/resources/create">公式ドキュメント</a>のCaveatsから写した。SDKv2で<code>SetId</code>を呼べばエラーでもstateに入ることと、IDを書く前の失敗でリソースが管理外に落ちることは、<a href="https://github.com/hashicorp/terraform-plugin-framework/issues/927">terraform-plugin-framework#927</a>の報告者の記述による。SDKv2のドキュメント本体では確認していない(要確認)。Carina側の事実は関連ノートを参照。「裁量」と「取り上げる」という対比の立て方は解釈である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/create-failure-is-classified-by-what-is-known.html">createの失敗は「外部世界について何が分かっているか」で分ける</a></li>
+      <li><a href="/notes/send-evidence-is-observed-by-the-host.html">「送ったかどうか」はproviderの申告ではなくhostが観測する</a></li>
+      <li><a href="/notes/new-provider-is-a-counterexample-search.html">providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである</a></li>
+      <li><a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a></li>
+      <li><a href="/notes/escape-hatch-tradeoff.html">逃げ道の有無が表現力の上限と組織コストを交換する</a></li>
+      <li><a href="/notes/ref-four-tool-comparison-matrices.html">Terraform / CDK / Pulumi / Carina比較マトリクス</a></li>
+      <li><a href="/notes/host-side-fault-injection-for-conformance.html">providerの適合試験は、host側の障害注入で書ける</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-provider">#provider</a>
+    <a href="/notes/#tag-比較">#比較</a>
+  </p>
+</article>
+</body>
+</html>

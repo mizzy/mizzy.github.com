@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deferredな作成を承認するなら、個数も承認の対象にする - notes</title>
+<meta name="description" content="deferredな作成のplanに載るのはテンプレートだけで、承認は「apply時に決まる数だけ作ってよい」になる。個数を決められるなら展開し、決められないなら上限を承認に含め、超えたら承認し直す。">
+<meta property="og:title" content="deferredな作成を承認するなら、個数も承認の対象にする">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/deferred-approval-should-bind-the-count.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/deferred-approval-should-bind-the-count.png">
+<meta property="og:description" content="deferredな作成のplanに載るのはテンプレートだけで、承認は「apply時に決まる数だけ作ってよい」になる。個数を決められるなら展開し、決められないなら上限を承認に含め、超えたら承認し直す。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="deferredな作成を承認するなら、個数も承認の対象にする">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/deferred-approval-should-bind-the-count.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>deferredな作成を承認するなら、個数も承認の対象にする</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: ChatGPTとの対話(2026-11-06)、carina-rs/carina main 273a2520の<code>carina-core/src/effect.rs</code>
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>planを人が読んで承認してからapplyする、というワークフローは「承認したものだけが実行される」ことに支えられている。Carinaはeffectの粒度でこれを満たす。applyが実行するのはplanに列挙されたeffectだけである。<a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></p>
+
+  <p>deferredな作成はこの粒度を一段粗くする。planに載るのは個々のリソースではなくテンプレートで、<code>DeferredCreatePayload</code>が持つのはループ本体のテンプレートと依存関係だけである。個数の上限も期待値も持たない。</p>
+
+  <div class="contrast">
+    <div>
+      <h3>いま承認しているもの</h3>
+      <p>「このテンプレートを、apply時に決まる数だけ作ってよい」。apply時に100個に展開されても承認の範囲内になる。</p>
+    </div>
+    <div class="yes">
+      <h3>個数を含めた承認</h3>
+      <p>「このテンプレートを、この個数(または上限)まで作ってよい」。展開が外れたら止まり、改めて承認を求める。</p>
+    </div>
+  </div>
+
+  <p>ChatGPTとの対話では、planを段階的に作る案(plan 1を実行し、結果を見てplan 2を作る)について「plan 1を承認した人が、まだ中身の確定していないplan 2まで承認したことにしてよいのか」という問いが出た。deferredな作成は、この問いを小さな形で既に抱えている。<a href="/notes/effects-split-by-when-they-are-determined.html">effectは「何がいつ確定するか」で三つに分かれる</a></p>
+
+  <h2>承認に個数を含める</h2>
+
+  <ul>
+    <li><strong>個数を決められるなら決める。</strong>出力リストの長さが入力で決まるなら、plan時に展開して個々の<code>+</code>として承認させる。これが一番よい。<a href="/notes/output-length-determined-by-inputs.html">出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</a></li>
+    <li><strong>決められないなら、承認時に縛る。</strong>planに個数の期待値か上限を書き、承認はそれを含めて行う。apply時の展開がそれを超えたら止め、改めてplanと承認を求める。</li>
+  </ul>
+
+  <p>後者は「planは予測であり、真実はapplyが確立する」を承認の側に当てたものである。予測(上限)を承認し、真実(実際の個数)が予測を外れたら、承認は効力を失う。<a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></p>
+
+  <p>上限の決め方は自明ではない。ユーザーが書くのか、providerのschema(Listの最大要素数)から取るのか、前回のapply結果から取るのか。どれを選んでも、承認が何を縛っているかがplanに表示されている必要がある。<a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p><code>DeferredCreatePayload</code>が<code>template</code>と<code>dependency_template</code>だけを持つことはcarina main 273a2520で確認した。apply時の展開結果を、改めて人に見せたり確認を求めたりする経路があるかは調べていない(要確認)。保存済みplanをapplyするときに、展開の個数がどう扱われるかも未確認。似たissueは2026-11-06の時点で見つからなかった。提案は解釈と規範であって、実装はしていない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/dynamic-stage-effect-closure.html">動的段階の効果の閉包性はP1完全性とP2帰属性に分解できる</a></li>
+      <li><a href="/notes/effects-split-by-when-they-are-determined.html">effectは「何がいつ確定するか」で三つに分かれる</a></li>
+      <li><a href="/notes/output-length-determined-by-inputs.html">出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/ir-is-the-user-interface.html">IaCではIRダンプが一級の製品機能である</a></li>
+      <li><a href="/notes/predictability-is-the-core-value.html">実行前に結果が読めることがIaCの根本価値である</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-予測可能性">#予測可能性</a>
+    <a href="/notes/#tag-提案">#提案</a>
+  </p>
+</article>
+</body>
+</html>

@@ -109,6 +109,70 @@
 </div>
 
 <div class="cards">
+  <a class="card normative" href="/notes/output-length-determined-by-inputs.html" data-tags="carina 型システム plan 提案">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</h2>
+      <p>ACMのdomain_validation_optionsはドメイン名ごとに1要素。出力の長さを入力との関係としてschemaに書けば、deferredなforをplan時に展開できる(carina#4286)。</p>
+      <span class="tags"><span>#carina</span> <span>#型システム</span> <span>#plan</span> <span>#提案</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/deferred-approval-should-bind-the-count.html" data-tags="carina plan 予測可能性 提案">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>deferredな作成を承認するなら、個数も承認の対象にする</h2>
+      <p>planに載るのはテンプレートだけで、承認は「何個でも作ってよい」になっている。決められるなら展開し、決められないなら上限を承認に含める。</p>
+      <span class="tags"><span>#carina</span> <span>#plan</span> <span>#予測可能性</span> <span>#提案</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/host-side-fault-injection-for-conformance.html" data-tags="carina provider 方法論 提案">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>providerの適合試験は、host側の障害注入で書ける</h2>
+      <p>通信はすべてhostを通るので、hostで障害を注入すれば同じ失敗シナリオを全providerに当てられる。土台はあり、実providerへの適用が無い(carina#4287)。</p>
+      <span class="tags"><span>#carina</span> <span>#provider</span> <span>#方法論</span> <span>#提案</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/create-failure-is-classified-by-what-is-known.html" data-tags="carina typestate state">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>createの失敗は「外部世界について何が分かっているか」で分ける</h2>
+      <p>Carinaはcreate失敗をNoResource / OutcomeUnknown / IdentifierReported / InFlightの4つに分け、分類ごとに回復手段が決まる。providerはtypestateでしか結果を作れない。</p>
+      <span class="tags"><span>#carina</span> <span>#typestate</span> <span>#state</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/send-evidence-is-observed-by-the-host.html" data-tags="carina 信頼境界 typestate provider">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「送ったかどうか」はproviderの申告ではなくhostが観測する</h2>
+      <p>リクエストがネットワークに出たかを、HTTPを送り出すhostが記録する。証拠はhostしか作れず、出ていなければnot_created、出ていればoutcome_unknownに落ちる。</p>
+      <span class="tags"><span>#carina</span> <span>#信頼境界</span> <span>#typestate</span> <span>#provider</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/provider-discretion-vs-typed-authority.html" data-tags="carina provider 比較">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>Terraformはproviderに裁量を渡し、Carinaは型で取り上げる</h2>
+      <p>create失敗後のstateを、Terraformはproviderが書いた分で決め、Carinaはコアが型で決める。代わりにCarinaは型が用意していない状況で逃げ場が無い。</p>
+      <span class="tags"><span>#carina</span> <span>#provider</span> <span>#比較</span></span>
+    </span>
+  </a>
+  <a class="card normative" href="/notes/new-provider-is-a-counterexample-search.html" data-tags="carina provider 設計原則 方法論">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>providerを増やすのは対応範囲の拡大ではなく、モデルへの反例探しである</h2>
+      <p>GitHub / Cloudflare providerはAWSで作った型の一般性を試すためにある。反例の行き先は三つ。見るべきは変更量ではなく、モデルが単純になるか例外が溜まるか。</p>
+      <span class="tags"><span>#carina</span> <span>#provider</span> <span>#設計原則</span> <span>#方法論</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/effects-split-by-when-they-are-determined.html" data-tags="効果 plan 予測可能性 carina">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>effectは「何がいつ確定するか」で三つに分かれる</h2>
+      <p>静的に確定、値だけapply時、個数がapply時。三つ目もループの本体はplan時に分かるのでMonadまで行かないが、planの表示で問題になる(carina#3589)。</p>
+      <span class="tags"><span>#効果</span> <span>#plan</span> <span>#予測可能性</span> <span>#carina</span></span>
+    </span>
+  </a>
   <a class="card interpretation" href="/notes/effect-system-vs-effects-as-values.html" data-tags="効果 型システム 比較">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">

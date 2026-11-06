@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる - notes</title>
+<meta name="description" content="ACMのdomain_validation_optionsはドメイン名ごとに1要素で、ドメイン名は入力にある。出力の長さを入力との関係としてschemaに書けば、deferredなforをplan時に展開でき、子のidentityもキーで決められる。">
+<meta property="og:title" content="出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/output-length-determined-by-inputs.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/output-length-determined-by-inputs.png">
+<meta property="og:description" content="ACMのdomain_validation_optionsはドメイン名ごとに1要素で、ドメイン名は入力にある。出力の長さを入力との関係としてschemaに書けば、deferredなforをplan時に展開でき、子のidentityもキーで決められる。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/output-length-determined-by-inputs.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</h1>
+  <p class="meta">
+    <span class="epistemic normative">規範的主張</span>
+    出典: <a href="https://github.com/carina-rs/carina/issues/4286">carina-rs/carina#4286</a>、carina-rs/carina#3589、AWS ACM API Reference(CertificateDetail)
+    <span class="dates"><time datetime="2026-11-06">2026-11-06</time> 作成</span>
+  </p>
+
+  <p>ACM証明書の検証レコードを作る<code>for opt in cert.domain_validation_options { ... }</code>は、applyまで要素数が分からないのでdeferredになる。effectを確定時点で分けると「個数が後で確定」の段で、planには「この形のものが後で作られる」としか書けない。<a href="/notes/effects-split-by-when-they-are-determined.html">effectは「何がいつ確定するか」で三つに分かれる</a></p>
+
+  <p>だが、この要素数は本当に分からないわけではない。ACMのAPIリファレンスは<code>DomainValidationOptions</code>を"contains information about the initial validation of each domain name"と書く。要素はリクエストしたドメイン名ごとに1つで、ドメイン名は<code>domain_name</code>と<code>subject_alternative_names</code>という入力に書いてある。分からないのは各要素の値(<code>resource_record.name</code> / <code>.value</code>)だけである。</p>
+
+  <h2>長さの関係をschemaに書く</h2>
+
+  <p>providerが「この出力リストは、この入力リストの要素ごとに1要素を持つ」という関係を宣言できれば、plannerはplan時にループを展開できる。</p>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th></th><th>いま</th><th>関係を宣言した後</th></tr></thead>
+    <tbody>
+      <tr><td>段</td><td>個数が後で確定</td><td>値だけ後で確定</td></tr>
+      <tr><td>planの表示</td><td>テンプレート1つ</td><td><code>+</code>がN個、集計にも入る</td></tr>
+      <tr><td>子の識別子</td><td>位置(何番目か)</td><td>キー(ドメイン名)</td></tr>
+      <tr><td>apply時</td><td>テンプレートを展開する</td><td>実際のリストが宣言と合うか検査する</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>効くのは表示だけではない。キーをドメイン名にすれば、SANの並びを入れ替えても子のidentityがずれない。位置で識別すると、並び替えだけで「削除して作り直す」planになる。<a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></p>
+
+  <p>apply時に実際のリストが宣言と食い違ったら、黙って別の集合を作らずに失敗させる。宣言は予測であって、真実はapplyが確立する。食い違いを検査する場所があることで、宣言の誤りが静かに通らない。<a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a> <a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></p>
+
+  <h2>何を取り込もうとしているか</h2>
+
+  <p>型の言葉で言えば、<strong>値の長さを型(schema)に持ち上げて、出力の長さを入力の関数として書く</strong>ことである。Carinaの型は値を検査する篩型で、Listには既に要素数の上限・下限がある。今回足したいのは定数の範囲ではなく、別の属性との関係である。<a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></p>
+
+  <p>依存型まで行く必要はない。関係の形を「入力リストの要素ごとに1つ(キー付き)」程度に絞れば、宣言はデータとして書け、検査も機械的にできる。承認の側から同じ問題を見たのが<a href="/notes/deferred-approval-should-bind-the-count.html">deferredな作成を承認するなら、個数も承認の対象にする</a>である。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>DomainValidationOptionsの説明は<a href="https://docs.aws.amazon.com/acm/latest/APIReference/API_CertificateDetail.html">ACMのAPIリファレンス</a>から引いた。SubjectAlternativeNamesが証明書のCN(domain_name)を含むことも同じページの記述による。ただし「要素数 = 重複を除いたドメイン名の数」が常に成り立つかは実際のACMで確かめていない。とくに<code>*.example.com</code>と<code>example.com</code>は同じ検証CNAMEを受け取るので、要素数と作るべきレコードの数が食い違う可能性がある(要確認)。</p>
+    <p>Listが要素数の範囲を持ち、入力との関係を書く仕組みが無いことは、carina#4256と既存issueの検索で確認した(2026-11-06)。ほかにどの出力リストが入力で長さの決まるものかは調べていない。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/effects-split-by-when-they-are-determined.html">effectは「何がいつ確定するか」で三つに分かれる</a></li>
+      <li><a href="/notes/deferred-approval-should-bind-the-count.html">deferredな作成を承認するなら、個数も承認の対象にする</a></li>
+      <li><a href="/notes/identity-is-what-the-engine-considers-the-same-resource.html">identityは「何を同一資源と見なすか」の規則であり、stateとは独立軸である</a></li>
+      <li><a href="/notes/graph-shape-vs-attribute-value.html">予測可能性はgraph形状と属性値の二側面を持つ</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/carina-type-system-position.html">Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-carina">#carina</a>
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-plan">#plan</a>
+    <a href="/notes/#tag-提案">#提案</a>
+  </p>
+</article>
+</body>
+</html>
