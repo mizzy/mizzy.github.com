@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>述語付き部分型は、述語の検査をどこで払うかで分かれる - notes</title>
-<meta name="description" content="Adaのsubtypeは「型 + 値の制約」で、篩型そのもの。同じ形はPascal、Nim、Raku、Common Lisp、PVS、SPARK、Leanにもあり、違いは述語を満たす義務を実行時検査・証明責務・値が持つ証明・hybridのどれで払うかにある。">
+<meta name="description" content="Adaのsubtypeは「型 + 値の制約」で、篩型そのもの。Pascalの部分範囲型への批判から、絞った型を型と呼ばないと決めたのがAdaの新しさ。同じ形はPascal、Nim、Raku、Common Lisp、PVS、SPARK、Leanにもあり、違いは述語を満たす義務を実行時検査・証明責務・値が持つ証明・hybridのどれで払うかにある。">
 <meta property="og:title" content="述語付き部分型は、述語の検査をどこで払うかで分かれる">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://mizzy.org/notes/predicate-subtypes-by-where-the-check-is-paid.html">
 <meta property="og:image" content="https://mizzy.org/notes/ogp/predicate-subtypes-by-where-the-check-is-paid.png">
-<meta property="og:description" content="Adaのsubtypeは「型 + 値の制約」で、篩型そのもの。同じ形はPascal、Nim、Raku、Common Lisp、PVS、SPARK、Leanにもあり、違いは述語を満たす義務を実行時検査・証明責務・値が持つ証明・hybridのどれで払うかにある。">
+<meta property="og:description" content="Adaのsubtypeは「型 + 値の制約」で、篩型そのもの。Pascalの部分範囲型への批判から、絞った型を型と呼ばないと決めたのがAdaの新しさ。同じ形はPascal、Nim、Raku、Common Lisp、PVS、SPARK、Leanにもあり、違いは述語を満たす義務を実行時検査・証明責務・値が持つ証明・hybridのどれで払うかにある。">
 <meta property="og:site_name" content="notes — mizzy.org">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="述語付き部分型は、述語の検査をどこで払うかで分かれる">
@@ -42,6 +42,24 @@
 
   <p>これは篩型<code>{x: Integer | 0 ≤ x ≤ 9}</code>そのもので、Ada固有のものではない。同じ形の型を持つ言語は多い。違いは<strong>「この値は述語を満たすか」という義務を、誰が、いつ払うか</strong>にある。</p>
 
+  <h2>Adaのsubtypeは、Pascalの部分範囲型への批判から出てきた</h2>
+
+  <p>値の範囲で絞った型そのものはAdaより前にある。Pascal(<a href="https://link.springer.com/article/10.1007/BF00264291">Wirth 1971</a>)の部分範囲型<code>0..9</code>がそれで、Adaの<code>range</code>制約と中身は同じである。</p>
+
+  <p>ただしPascalでは、部分範囲を型として扱ったことが問題にされた。<a href="https://link.springer.com/article/10.1007/BF00288652">Habermann (1973)</a>は、Pascalの問題は主に範囲・型・構造の混同から来ていると批判し、<a href="https://doi.org/10.1002/spe.4380070604">Welsh, Sneeringer, Hoare (1977)</a>もPascalの曖昧さと危うさを列挙している。</p>
+
+  <p>Adaの設計理由書(<a href="http://archive.adaic.com/standards/83rat/html/ratl-04-01.html">Ada 83 Rationale §4.1</a>)は、この批判を名指しで受けている。</p>
+
+  <blockquote><p>Several difficulties in the types of Pascal that have been noted by Habermann and others [Hab 73, WSH 77] are overcome in Ada by the notion of subtype.</p><p>— <a href="http://archive.adaic.com/standards/83rat/html/ratl-04-01.html">Ada 83 Rationale §4.1</a></p></blockquote>
+
+  <p>Adaがやったのは、<strong>静的な性質と動的な性質を2つの概念に分けた</strong>ことである。型は値の集合と、適用できる演算などの静的な性質を持つ。部分型は型に制約を足したもので、制約を満たすかは一般に動的に検査する。名前を付けた部分型は「型名 + 制約」の略記にすぎないので、新しい型は作らない。つまりAdaの新しさは範囲で絞ることではなく、絞った結果を型と呼ばないと決めたことにある。</p>
+
+  <p>Ada 83の時点ではこの区別もまだ曖昧で、「型は部分型でもあった」。Ada 95で整理し直されている(<a href="https://www.aise.ics.saitama-u.ac.jp/~cheng/ADA/ada95rat/rat2_3.htm">Ada 95 Rationale</a>)。</p>
+
+  <p>同じ理由書の§4.4(<a href="http://archive.adaic.com/standards/83rat/html/ratl-04-04.html">Constraints and Subtypes</a>)は、制約の違反は原則として実行時に<code>CONSTRAINT_ERROR</code>で報告すると書いたうえで、コンパイラは一部の違反をコンパイル時に報告でき、前の検査で成功が保証された検査は省けるとしている。例でも代入ごとに「static check」「dynamic check」を書き分けている。静的に決まる分は静的に、残りを実行時にという分け方は、2006年のhybrid type checkingの20年前、1986年版の設計理由書に既にある(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。違いは、Adaが静的に分かった違反を不正なプログラムにはせず、報告にとどめることである。</p>
+
+  <p>オブジェクト指向や型理論でいう部分型(<code>S &lt;: T</code>、置き換えられる型)とは、語が同じだけで系統が違う(要確認: それぞれの語の初出)。</p>
+
   <h2>払い方で並べる</h2>
 
   <div class="scroll narrow">
@@ -61,7 +79,7 @@
 
   <ul>
     <li><strong>Ada</strong> — <code>range</code>制約は実行時検査。Ada 2012で任意の論理式を述語にできる<code>Static_Predicate</code> / <code>Dynamic_Predicate</code>が入った。静的述語は許された形に限られる代わりに、<code>case</code>文の網羅性検査などに使える。動的述語は実行時に検査されるが、規格は全ての違反を捕まえることを要求していない(レコードの成分への代入後は検査されない)。</li>
-    <li><strong>Pascal</strong> — 部分範囲型<code>0..9</code>。基底型(host type)の値の区間で、Adaのrange制約の祖先に当たる。</li>
+    <li><strong>Pascal</strong> — 部分範囲型<code>0..9</code>。基底型(host type)の値の区間で、Adaのsubtypeが出てくるきっかけになった(上記)。</li>
     <li><strong>Nim</strong> — <code>range[1..10]</code>。外れると<code>RangeDefect</code>。<code>-d:danger</code>で全ての実行時検査を外せるので、検査は捨てられる前提の安全網になっている。</li>
     <li><strong>Raku</strong> — <code>subset BigInt of Int where * &gt; 1_000_000</code>。代入と引数の束縛で<code>where</code>節を検査する。</li>
     <li><strong>Common Lisp</strong> — <code>(and integer (satisfies evenp))</code>は偶数の整数を表す型指定子。<code>deftype</code>で名前を付けられる。述語は任意の型の値で呼ばれうるので、副作用を持たず、どんな値でも答えられるように書く。</li>
@@ -91,7 +109,8 @@
 
   <div class="accuracy">
     <h2>根拠の確度</h2>
-    <p>Adaのsubtypeの定義はARM 3.2の文言で確認した。<code>Static_Predicate</code> / <code>Dynamic_Predicate</code>の区別、全ての違反を捕まえない設計、SPARKが述語を制限して証明することは、AdaCoreのSPARK 2014 Rationaleの記事とGNATのドキュメントによる。GNATの警告文は<a href="https://forum.ada-lang.io/t/gnat-compiler-warning-constraint-error-will-be-raised-at-run-time/790">Ada Forumのスレッド</a>で、警告であってエラーでないことを確認した。「拒否する根拠を持たない」はその理由についての解釈である。</p>
+    <p>Adaのsubtypeの定義はARM 3.2の文言で確認した。<code>Static_Predicate</code> / <code>Dynamic_Predicate</code>の区別、全ての違反を捕まえない設計、SPARKが述語を制限して証明することは、AdaCoreのSPARK 2014 Rationaleの記事とGNATのドキュメントによる。GNATの警告文は<a href="https://forum.ada-lang.io/t/gnat-compiler-warning-constraint-error-will-be-raised-at-run-time/790">Ada Forumのスレッド</a>で、警告であってエラーでないことを確認した。「拒否する根拠を持たない」はその理由についての解釈だが、Ada 83 Rationale §4.4も制約と部分型を「一般にプログラムの動的な振る舞いに関わる概念」と書いている。</p>
+    <p>AdaのsubtypeがPascalへの批判を受けたものであること、型と部分型の分け方、static check / dynamic checkの書き分けは、Ada 83 Rationaleの<a href="http://archive.adaic.com/standards/83rat/html/ratl-04-01.html">§4.1</a>と<a href="http://archive.adaic.com/standards/83rat/html/ratl-04-04.html">§4.4</a>の本文で確認した。Habermannの論文は要旨(範囲・型・構造の混同)だけを確認し、本文の個々の指摘は読んでいない。Welsh, Sneeringer, Hoareの論文は書誌情報だけを確認した。Pascalの部分範囲型が1971年の論文の時点で入っていたことは、論文本文ではなく二次資料で確認した。</p>
     <p>PascalはJensen &amp; Wirth『Pascal User Manual and Report』の部分範囲型による。Nimの<code>RangeDefect</code>はランタイムの<code>chcks.nim</code>、<code>-d:danger</code>は<a href="https://nim-lang.org/docs/nimc.html">コンパイラのユーザーガイド</a>(「全ての実行時検査を外し、最適化を有効にする」)で確認した。古い版では<code>-d:release</code>でも範囲検査が外れたという<a href="https://www.mail-archive.com/nim-general@thregr.org/msg07225.html">メーリングリストの発言</a>があるが、現行のガイドでは<code>-d:release</code>は最適化を有効にするだけである。「捨てられる前提の安全網」は解釈。Rakuの<code>subset</code>は<a href="https://github.com/Raku/roast/blob/887d301936abd8c2e3f74723da757ea800523db4/S12-subset/type-subset.t">テストスイートroast</a>、Common Lispの<code>satisfies</code>は<a href="https://www.lispworks.com/documentation/HyperSpec/Body/04_bc.htm">HyperSpec</a>とCLtL2による。</p>
     <p>PVSの述語部分型とTCCは<a href="https://pvs.csl.sri.com/description.html">PVSの説明ページ</a>と<a href="https://www.csl.sri.com/papers/tse98/tse98.pdf">Rushby, Owre, Shankar "Subtypes for Specifications" (TSE 1998)</a>、Leanの<code>Subtype</code>は言語リファレンスで確認した。</p>
     <p>Liquid typesは<a href="https://www.cs.utexas.edu/~tdillig/cs395/liquid_types.pdf">Rondon, Kawaguchi, Jhala "Liquid Types" (PLDI 2008)</a>で、述語を決定可能な論理の修飾子の連言に限り、部分型判定をSMTで判定できる含意に落とす。LiquidHaskellはこれをHaskellに適用したもので、後にrefinement reflection(POPL 2018)で利用者定義の関数を述語に使えるようにした。表の「決定可能な論理の述語だけ」は2008年の形である。</p>
