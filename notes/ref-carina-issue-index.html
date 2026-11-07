@@ -31,7 +31,7 @@
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/README.md, type-system-analysis.md / explorations/2026-04-26-cross-dsl-design-position/carina-position.md / explorations/2026-04-26-cdk-pulumi-terraform-carina-comparison/README.md, chapter-5</code>
-    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
   <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
@@ -41,7 +41,7 @@
   <p>実行再現を伴う発見として起票されたもの。</p>
 
   <ul>
-    <li><a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a> — 代入で解決された値がスキーマで再検証されない(上流値はplan時、リソース出力はapply時に代入されるが、どちらの代入点にも検証経路がない)。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+    <li><a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a> — 代入で解決された値がスキーマで再検証されない(上流値はplan時、リソース出力はapply時に代入されるが、どちらの代入点にも検証経路がない)。2026-10-07に<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>でclose。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
     <li><a href="https://github.com/carina-rs/carina/issues/3449">carina#3449</a> — 再export連鎖で上流exportの型推論が無音で型なしに落ちる。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
     <li><a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a> — パース時置換が参照型検査をバイパスする。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
     <li><a href="https://github.com/carina-rs/carina/issues/2786">carina#2786</a>(既存)— 入れ子参照の型未検査。実行再現をコメントで追記。→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>

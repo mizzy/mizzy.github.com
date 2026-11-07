@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある - notes</title>
-<meta name="description" content="Carinaの型システムを型理論の地図に置く。スキーマの篩型と公称軸に評価済みの値を照らす検査系で、規則はおおむね正しく、穴は段階・型言語・境界・関係の継ぎ目にある。とくに漸進的型付けの動的な半分が無い。">
+<meta name="description" content="Carinaの型システムを型理論の地図に置く。スキーマの篩型と公称軸に評価済みの値を照らす検査系で、規則はおおむね正しく、穴は段階・型言語・境界・関係の継ぎ目にある。漸進的型付けの動的な半分は2026-10に入った。">
 <meta property="og:title" content="Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://mizzy.org/notes/carina-type-system-position.html">
 <meta property="og:image" content="https://mizzy.org/notes/ogp/carina-type-system-position.png">
-<meta property="og:description" content="Carinaの型システムを型理論の地図に置く。スキーマの篩型と公称軸に評価済みの値を照らす検査系で、規則はおおむね正しく、穴は段階・型言語・境界・関係の継ぎ目にある。とくに漸進的型付けの動的な半分が無い。">
+<meta property="og:description" content="Carinaの型システムを型理論の地図に置く。スキーマの篩型と公称軸に評価済みの値を照らす検査系で、規則はおおむね正しく、穴は段階・型言語・境界・関係の継ぎ目にある。漸進的型付けの動的な半分は2026-10に入った。">
 <meta property="og:site_name" content="notes — mizzy.org">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある">
@@ -52,14 +52,14 @@
   <p class="meta">
     <span class="epistemic interpretation">解釈</span>
     出典: <code>carina-rs/carina main 0fb456c1(2026-09-30)のソースとissue、同日のレポート「Carinaの型システムを型理論から読む」(main d0445d0b)、既存ノート群</code>
-    <span class="dates"><time datetime="2026-09-30">2026-09-30</time> 作成</span>
+    <span class="dates"><time datetime="2026-09-30">2026-09-30</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
   <p>Carinaの型システムについて個別のノートがかなり溜まったので、型理論の地図の上でどこにいるのか、何が強くて何が弱いのかを一枚にまとめる。細部は各ノートにあり、ここは索引を兼ねた見取り図である。</p>
 
   <p>一言でいえば、<strong>プロバイダのスキーマが供給する型(篩型+公称軸)に、評価し切った値を照らして所属を判定する検査系</strong>である。ユーザーが型を定義する言語ではなく、型の大半はcodegenが作ったスキーマから来る。値が無いところだけ、宣言型どうしの代入可能性で補う。</p>
 
-  <p>規則そのものはおおむね正しい。<strong>穴は規則ではなく継ぎ目 — 段階の継ぎ目、二つの型言語の継ぎ目、プラグイン境界、同じ関係の複数の実装 — に集まっている</strong>。とくに大きいのは、<strong>漸進的型付けの静的な半分だけがあって、動的な半分が無い</strong>ことである。</p>
+  <p>規則そのものはおおむね正しい。<strong>穴は規則ではなく継ぎ目 — 段階の継ぎ目、二つの型言語の継ぎ目、プラグイン境界、同じ関係の複数の実装 — に集まっている</strong>。長く一番大きかった<strong>漸進的型付けの動的な半分</strong>(委ねた検査の行き先)は、2026-10に入った(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。</p>
 
   <h2>ポジション — 軸ごとに見る</h2>
 
@@ -138,7 +138,7 @@
   <h2>弱み — 穴の場所ごとに</h2>
 
   <figure>
-    <svg viewBox="0 0 640 392" role="img" aria-label="Carinaの型検査の穴が集まる三つの継ぎ目。段階の継ぎ目ではplanとapplyで代入された値が検査されない。型言語と境界の継ぎ目では注釈の一部が未検査になり、WASM境界で型が薄くなる。関係の継ぎ目では同じ代入可能性の問いに三つの実装がある">
+    <svg viewBox="0 0 640 392" role="img" aria-label="Carinaの型検査の穴が集まる三つの継ぎ目。段階の継ぎ目では、planとapplyで代入された値は検査されるが、パース時に参照がリテラルに化けると宣言型検査が飛ぶ。型言語と境界の継ぎ目では注釈の一部が未検査になり、WASM境界で型が薄くなる。関係の継ぎ目では同じ代入可能性の問いに三つの実装がある">
       <defs>
         <marker id="seams-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
           <path class="head" d="M0 0 L8 4 L0 8 z"/>
@@ -148,8 +148,8 @@
         <text class="hdr" x="0" y="14">段階の継ぎ目</text>
         <rect class="box" x="0"   y="24" width="104" height="44" rx="4"/>
         <rect class="box" x="134" y="24" width="104" height="44" rx="4"/>
-        <rect class="gap" x="268" y="24" width="104" height="44" rx="4"/>
-        <rect class="gap" x="402" y="24" width="104" height="44" rx="4"/>
+        <rect class="box" x="268" y="24" width="104" height="44" rx="4"/>
+        <rect class="box" x="402" y="24" width="104" height="44" rx="4"/>
         <rect class="box" x="536" y="24" width="104" height="44" rx="4"/>
         <line class="arw" x1="104" y1="46" x2="132" y2="46"/>
         <line class="arw" x1="238" y1="46" x2="266" y2="46"/>
@@ -164,20 +164,20 @@
         <text class="dim" x="186" y="60" text-anchor="middle">値と宣言型を検査</text>
         <text class="dim" x="320" y="60" text-anchor="middle">上流の値を代入</text>
         <text class="dim" x="454" y="60" text-anchor="middle">出力を代入</text>
-        <text class="dim" x="588" y="60" text-anchor="middle">ここで初めて失敗</text>
+        <text class="dim" x="588" y="60" text-anchor="middle">最後の判定者</text>
         <text class="leak" x="52"  y="88"  text-anchor="middle">参照がリテラルに</text>
         <text class="leak" x="52"  y="103" text-anchor="middle">化けると宣言型検査が飛ぶ</text>
         <text class="leak" x="52"  y="118" text-anchor="middle">#3450</text>
         <text class="dim"  x="186" y="88"  text-anchor="middle">Deferredは素通し</text>
         <text class="dim"  x="186" y="103" text-anchor="middle">Rule 10は値に委ねる</text>
-        <text class="leak" x="320" y="88"  text-anchor="middle">委ねた検査が</text>
-        <text class="leak" x="320" y="103" text-anchor="middle">どこでも走らない</text>
-        <text class="leak" x="320" y="118" text-anchor="middle">#3448</text>
-        <text class="leak" x="454" y="88"  text-anchor="middle">委ねた検査が</text>
-        <text class="leak" x="454" y="103" text-anchor="middle">どこでも走らない</text>
-        <text class="leak" x="454" y="118" text-anchor="middle">#3448</text>
-        <text class="dim"  x="588" y="88"  text-anchor="middle">篩の違反が</text>
-        <text class="dim"  x="588" y="103" text-anchor="middle">APIエラーで出る</text>
+        <text class="dim"  x="320" y="88"  text-anchor="middle">解決した値を検査</text>
+        <text class="dim"  x="320" y="103" text-anchor="middle">違反はplanエラー</text>
+        <text class="dim"  x="320" y="118" text-anchor="middle">#3825</text>
+        <text class="dim"  x="454" y="88"  text-anchor="middle">送信の直前に検査</text>
+        <text class="dim"  x="454" y="103" text-anchor="middle">未決なら失敗させる</text>
+        <text class="dim"  x="454" y="118" text-anchor="middle">#3825 #4267</text>
+        <text class="dim"  x="588" y="88"  text-anchor="middle">schemaに無い制約の</text>
+        <text class="dim"  x="588" y="103" text-anchor="middle">違反だけがここで出る</text>
 
         <text class="hdr" x="0" y="160">型言語と境界の継ぎ目</text>
         <rect class="box" x="0"   y="170" width="150" height="44" rx="4"/>
@@ -216,17 +216,13 @@
     <figcaption>点線の枠が検査の届いていない所。規則が間違っているのではなく、規則を通らない経路がある。段階の継ぎ目では、静的に「値に委ねた」検査の行き先が無い。</figcaption>
   </figure>
 
-  <h3>段階の継ぎ目: 漸進的型付けの動的な半分が無い</h3>
+  <h3>段階の継ぎ目: 動的な半分は入り、逆向きの穴が残る</h3>
 
-  <p>漸進的型付けは、型の分からない値が静的な型の世界に入る境界で実行時検査(キャスト)を挟み、違反したら出所を指して失敗させる(blame)ことで健全性を保つ。Carinaには静的な半分 — Rule 10で素の<code>String</code>を受け入れて「値の検査に委ねる」、<code>Deferred</code>を素通しする — はあるが、<strong>委ねた先の検査が参照の解決後に走らない</strong>。</p>
+  <p>漸進的型付けは、型の分からない値が静的な型の世界に入る境界で実行時検査(キャスト)を挟み、違反したら出所を指して失敗させる(blame)ことで健全性を保つ。Carinaは静的な半分 — Rule 10で素の<code>String</code>を受け入れて「値の検査に委ねる」、<code>Deferred</code>を素通しする — に加えて、<strong>委ねた先の検査も持つ</strong>。参照が解決した時点で受け手の篩を検査し、違反はどの参照から来た値かを示して報告する(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。</p>
 
-  <p>値の検証は参照を解決する前に1回だけ走る。上流stateの値はplan時に、リソースの出力はapply時に代入されるが、どちらの代入点にも検証経路が無い(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>、open)。2026-09-29に、同じ根を持つ<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>がこの重複としてcloseされた。同じ根から別の症状も出ている。</p>
+  <p>値の検証は、参照を解決した後にも走る。planで分かった値はplanで、applyで初めて分かった値はプロバイダに送る直前に検査し、送信用の値は検査を通らないと作れない。モジュール引数の<code>validation</code>も、参照の値が分かるまで評価を待つ(<a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>、<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>。これで<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>・<a href="https://github.com/carina-rs/carina/issues/3805">carina#3805</a>・<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>がclose)。</p>
 
-  <ul>
-    <li>モジュール引数の<code>validation { condition = ... }</code>は展開時に評価されるので、参照を渡すと<code>Deferred</code>のまま評価されてエラーになる(<a href="https://github.com/carina-rs/carina/issues/3805">carina#3805</a>、open)</li>
-    <li>識別の無い篩に素の<code>String</code>を渡すのはRule 10で静的に通し、値の検査に回す。その値が参照経由なら、値の検査も走らない。<strong>「委ねた」はずの検査がどこでも行われない</strong></li>
-    <li>逆向きに、パース時の置換で参照がリテラルに化けると、宣言型の検査が飛ぶ(<a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>、open)</li>
-  </ul>
+  <p>残る穴は逆向きのものである。パース時の置換で参照がリテラルに化けると、宣言型の検査が飛ぶ(<a href="https://github.com/carina-rs/carina/issues/3450">carina#3450</a>、open)。</p>
 
   <p>→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a> / <a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a> / <a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></p>
 
@@ -278,7 +274,7 @@
   <h2>改善すべき点 — 効く順に</h2>
 
   <ol>
-    <li><strong>委ねた検査を解決後に必ず走らせる</strong>。漸進的型付けのキャスト挿入に当たる。Rule 10や<code>Unchecked</code>で静的検査を通った値に「後でこの型で検査する」義務を残し、参照が解決した時点で受け手の篩を検査して、失敗したら送り手の位置を指す。解決後の値を<code>Deferred</code>を含まない別の型(<code>ResolvedValue</code>)にし、そこへの変換関数だけが検査を行う形にすれば、呼び忘れが型で書けなくなる。#3448・#3805・#3767はこれで一箇所で閉じる。applyで動いている<code>assert_fully_resolved</code>という実行時の表明も、この型に置き換えられる。(<a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a>)</li>
+    <li><strong>委ねた検査を解決後に必ず走らせる</strong>。漸進的型付けのキャスト挿入に当たる。これは入った(<a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>、<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>)。実装は、解決後の値を別の型にするのではなく、プロバイダに送る値を<code>ProviderReady&lt;T&gt;</code>にし、それを作る関数だけが検査を行う形になった。呼び忘れが型で書けない点は同じである。(<a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a>)</li>
     <li><strong>代入可能性を一つの関係にする</strong>。<code>type_expr_compatible</code>を消して、展開前も<code>lift_type_expr</code>で持ち上げてから<code>is_assignable_to</code>で判定する。LSPも同じ入口を呼ぶ。最後の文字列比較の腕と<code>validate_type_expr_value</code>の<code>_ =&gt; None</code>を網羅的な構成子の腕に置き換えれば、構成子を足したときにコンパイラが判断を迫る。</li>
     <li><strong>パターンを構築時にコンパイルするnewtypeにする</strong>。<code>pattern: Option&lt;String&gt;</code>を<code>Pattern</code>型にし、不正なパターンはスキーマのデコード時に型付きのエラーにする。検査が黙って消える状態が書けなくなり、毎回の再コンパイルも消える。</li>
     <li><strong><code>lift_type_expr</code>を全域にし、リソースハンドル型を足す</strong>。<code>None</code>=検査しない、をやめる。<code>StringLiteral</code>は1値の列挙として、<code>Ref</code>は「そのリソースの属性を持つレコード」として居場所を作り、IDだけを渡すなら<code>aws.ec2.Vpc.Id</code>で書く、と役割を分ける(#3803)。写せないものはエラーにする。<a href="https://github.com/carina-rs/carina/issues/2360">carina#2360</a>で<code>Option&lt;TypeExpr&gt;</code>を潰したのと同じ直しを、写像の側にも当てることになる。</li>
@@ -324,7 +320,7 @@
 
   <h3>未確定が型ではなく値の側にある</h3>
 
-  <p>漸進的型付けの標準形は<code>?</code>という型を一つ置くが、Carinaの未確定は<code>Value::Deferred</code>である。IaCの未確定は段階を追って必ず消えるので、解決段階をtypestateにする設計(<code>Raw</code>→<code>Inferred</code>→<code>ResolvedRefs</code>→<code>Applied</code>)が書かれているが、コードにはまだ無い。改善点1の<code>ResolvedValue</code>は、この計画のうち一番効く1段を先に切り出したものに当たる。</p>
+  <p>漸進的型付けの標準形は<code>?</code>という型を一つ置くが、Carinaの未確定は<code>Value::Deferred</code>である。IaCの未確定は段階を追って必ず消えるので、解決段階をtypestateにする設計(<code>Raw</code>→<code>Inferred</code>→<code>ResolvedRefs</code>→<code>Applied</code>)が書かれているが、コードにはまだ無い。改善点1は、この計画のうち一番効く1段を、送信直前の型として先に入れたものに当たる。</p>
 
   <h3>最近のissueの多くは規則の誤りではなく配線の欠落である</h3>
 
@@ -382,6 +378,7 @@
       <li><a href="/notes/ref-config-dsl-survey.html">構成記述系DSL 11本の調査</a></li>
       <li><a href="/notes/effect-system-vs-effects-as-values.html">Effect systemと「副作用を値にする」は別の軸である</a></li>
       <li><a href="/notes/output-length-determined-by-inputs.html">出力リストの長さが入力で決まるなら、deferredは値だけの問題に格下げできる</a></li>
+      <li><a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)</a></li>
     </ul>
   </nav>
 

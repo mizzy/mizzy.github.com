@@ -31,7 +31,7 @@
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §6後半</code>
-    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成</span>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
   <p>Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。<strong>値が無くても宣言型どうしを照合する別経路の検査が走る</strong>ため、静的近似が本当に確定できない窓は見かけより狭い。</p>
@@ -100,7 +100,7 @@
 
   <h2>真に残る窓は二つだけ</h2>
 
-  <p>(a) <strong>値依存の篩所属。</strong> 参照元の宣言型が代入先の篩より粗い場合(例:宣言上はただのStringを、長さ・パターン付きの型が期待される場所へ補間して渡す場合)、最終値が篩を満たすかは宣言型から決定できない。そして値が確定して代入された後も、Carina自身はどの経路でも再検査しない。代入の時刻は二通りあり、上流stateの値はplan時(ただし検証ステップの後)、リソース出力はapply時だが、どちらの代入点にも検証経路がなく、最終判定はプロバイダAPIのエラーに委ねられる。</p>
+  <p>(a) <strong>値依存の篩所属。</strong> 参照元の宣言型が代入先の篩より粗い場合(例:宣言上はただのStringを、長さ・パターン付きの型が期待される場所へ補間して渡す場合)、最終値が篩を満たすかは宣言型から決定できない。値が確定した時点では検査される。上流stateの値はplan時に代入されるのでplanで、リソース出力はapply時に代入されるのでプロバイダへ送る直前に検査する(<a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a>)。窓として残るのは後者で、planの時点では未検査のまま承認され、違反はapplyの途中で見つかる(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。</p>
 
   <p>(b) <strong>宣言型のない上流exportへの参照。</strong> 上流のexports宣言に型注釈がなく推論でも型が取れない場合、比較対象が存在せず型検査はスキップされる。型を書いた境界は検査され、書かなかった所だけ穴が開く。</p>
 
@@ -108,7 +108,7 @@
 
   <div class="accuracy">
     <h2>根拠の確度</h2>
-    <p>「Unknownの窓」の範囲は探索中に二度訂正されている。未解決参照への宣言型検査が存在すること、上流参照の型供給源がstateではなく設定ディレクトリであることが、いずれも後から判明した。</p>
+    <p>「Unknownの窓」の範囲は探索中に二度訂正されている。未解決参照への宣言型検査が存在すること、上流参照の型供給源がstateではなく設定ディレクトリであることが、いずれも後から判明した。(a)の値が確定した時点での検査は、PR <a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a> と <a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a> による(2026-11-07時点のmain)。</p>
   </div>
 
   <nav class="links">
@@ -118,6 +118,7 @@
       <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
       <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
       <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)</a></li>
     </ul>
   </nav>
 

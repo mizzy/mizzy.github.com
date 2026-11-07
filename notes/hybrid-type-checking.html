@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking) - notes</title>
+<meta name="description" content="任意の述語を持つ篩型では部分型判定が決定不能になる。Flanaganのhybrid type checkingは、証明できたら受理、反証できたら拒否、どちらも言えなければキャストを挿入して実行時に検査する。Carinaの値制約の検査もProven / Violation / Undecidedの3値で、planとapplyがコンパイル時と実行時に当たる。">
+<meta property="og:title" content="判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mizzy.org/notes/hybrid-type-checking.html">
+<meta property="og:image" content="https://mizzy.org/notes/ogp/hybrid-type-checking.png">
+<meta property="og:description" content="任意の述語を持つ篩型では部分型判定が決定不能になる。Flanaganのhybrid type checkingは、証明できたら受理、反証できたら拒否、どちらも言えなければキャストを挿入して実行時に検査する。Carinaの値制約の検査もProven / Violation / Undecidedの3値で、planとapplyがコンパイル時と実行時に当たる。">
+<meta property="og:site_name" content="notes — mizzy.org">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)">
+<meta name="twitter:image" content="https://mizzy.org/notes/ogp/hybrid-type-checking.png">
+<link rel="stylesheet" href="/notes/notes.css">
+<link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body>
+<header class="site">
+  <div class="rule">
+    <a class="home" href="/notes/">notes</a>
+    <span class="spacer"></span>
+    <a href="https://mizzy.org/">mizzy.org</a>
+  </div>
+</header>
+
+<article class="note">
+  <h1>判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)</h1>
+  <p class="meta">
+    <span class="epistemic interpretation">解釈</span>
+    出典: <a href="https://escholarship.org/uc/item/0j63v3dn">Flanagan "Hybrid Type Checking" (POPL 2006)</a>、<a href="https://www.cs.williams.edu/~freund/papers/htc-fool.pdf">Flanagan, Freund, Tomb "Hybrid Types, Invariants, and Refinements for Imperative Objects" (FOOL/WOOD 2006)</a>、<a href="https://www.schemeworkshop.org/2006/06-freund.pdf">Gronski et al. "Sage: Hybrid Checking for Flexible Specifications" (Scheme Workshop 2006)</a>、carina <code>main</code> 8ca84565f(2026-11-07)
+    <span class="dates"><time datetime="2026-11-07">2026-11-07</time> 作成</span>
+  </p>
+
+  <p><code>{x: Int | x &gt; 0}</code>のような篩型(refinement type)に任意の述語を許すと、部分型判定<code>{x: B | p} &lt;: {x: B | q}</code>は「<code>p</code>ならば<code>q</code>」という任意の述語の含意判定になり、決定不能になる。普通の型検査器は部分型を「証明できた → 受理」「反証できた → 拒否」の二値で扱うが、表現力の高い型では<strong>どちらも言えない場合</strong>が残る。</p>
+
+  <p>Flanaganのhybrid type checkingは、この3つ目の場合の扱い方についての提案である。</p>
+
+  <h2>3つの結果と、「分からない」の3つの扱い</h2>
+
+  <figure>
+    <svg viewBox="0 0 640 190" role="img" aria-label="部分型判定の結果が3つに分かれる図。反証できたものは静的に拒否し、Carinaでは型エラーかplanエラーになる。決められないものはキャストを入れて受理し、Carinaではeffectに結び付けた義務としてapplyへ持ち越す。証明できたものはそのまま受理し、Carinaでは何もしない。">
+      <style>
+        .htc text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
+        .htc .box { fill: var(--surface); stroke: var(--rule); }
+        .htc .mid { fill: var(--accent-bg); stroke: var(--accent); }
+        .htc .ttl { font-size: 14px; font-weight: 600; }
+        .htc .lbl { fill: var(--faint); font-size: 11px; }
+        .htc .arw { stroke: var(--faint); fill: none; }
+      </style>
+      <g class="htc">
+        <text class="lbl" x="8" y="14">S &lt;: Tの判定</text>
+        <rect class="box" x="8"   y="22" width="200" height="40" rx="4"/>
+        <rect class="mid" x="220" y="22" width="200" height="40" rx="4"/>
+        <rect class="box" x="432" y="22" width="200" height="40" rx="4"/>
+        <text class="ttl" x="108" y="47" text-anchor="middle">× 反証できた</text>
+        <text class="ttl" x="320" y="47" text-anchor="middle">? どちらも言えない</text>
+        <text class="ttl" x="532" y="47" text-anchor="middle">√ 証明できた</text>
+        <path class="arw" d="M108 62 V78 M320 62 V78 M532 62 V78"/>
+        <text class="lbl" x="8" y="94">hybrid type checking</text>
+        <text x="108" y="114" text-anchor="middle">静的に拒否</text>
+        <text x="320" y="114" text-anchor="middle">受理し、キャストを挿入</text>
+        <text x="532" y="114" text-anchor="middle">そのまま受理</text>
+        <path class="arw" d="M108 122 V138 M320 122 V138 M532 122 V138"/>
+        <text class="lbl" x="8" y="154">Carina</text>
+        <text x="108" y="174" text-anchor="middle">型エラー / planエラー</text>
+        <text x="320" y="174" text-anchor="middle">義務としてapplyへ持ち越す</text>
+        <text x="532" y="174" text-anchor="middle">何もしない</text>
+      </g>
+    </svg>
+  </figure>
+
+  <p>含意判定のアルゴリズムは、√ 証明できた、× 反証できた、? 時間内にどちらも言えなかった、のどれかを返すと仮定する。<code>?</code>の扱いには3つの選択肢があり、論文は前の2つを退けている。</p>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th><code>?</code>を</th><th>起きること</th></tr></thead>
+    <tbody>
+      <tr><td>拒否する</td><td>深く調べれば正しいプログラムも落ちる。どれが通るか予測できず脆い</td></tr>
+      <tr><td>楽観的に受理する</td><td>仕様違反が実行時に素通りする</td></tr>
+      <tr><td>キャストを入れて受理する</td><td>違反は実行時に必ず止まる。元のプログラムが正しければキャストは失敗しない</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>関数適用<code>t1 t2</code>で<code>S &lt;: T</code>が<code>?</code>なら、<code>t1 (⟨S ▷ T⟩ t2)</code>に変換する。キャストは「<code>t2</code>の値が<code>T</code>に属するか」を実行時に調べる。実行時に<code>S &lt;: T</code>そのものを調べるのではない(相の区別を壊すので)。<code>T</code>が「素数だけを受け付ける」なら、キャストは素数判定を走らせる。</p>
+
+  <h2>何が嬉しいのか</h2>
+
+  <p>純粋な動的検査(契約)と比べると、<strong>確実に間違っているものはコンパイル時に落とせる</strong>。純粋な静的検査と比べると、決定可能な述語に制限せずに済む。論文のTheorem 14は、どんな計算可能な抽象化<code>γ</code>で述語を決定可能な断片に落としても、静的検査器は「正しいプログラムを拒否する」か「hybridなら静的に見つけた誤りを見逃す」のどちらかになることを示している。</p>
+
+  <p>静的解析が強くなるほど<code>?</code>は減り、√と×に吸収されていく。<code>?</code>の範囲は言語仕様ではなく実装の能力で決まる。</p>
+
+  <p>Sageはこれを言語にしたもので、型<code>Dynamic</code>(全ての型の上位型)、第一級の型、任意の篩型を持ち、<code>?</code>の判定に自動定理証明器と「反証済みの部分型判定のデータベース」を使う。型注釈を省くと<code>Dynamic</code>になるので、動的型付けの書き方から始めて少しずつ精密な仕様にしていける。</p>
+
+  <h2>Carinaの値制約の検査は同じ形をしている</h2>
+
+  <p>Carinaの値制約(<code>pattern</code> / <code>length</code> / <code>range</code>を持つ篩型、プロバイダが宣言する入力ルール)の検査は、同じ3値で組まれている。ただし<code>?</code>の原因が違う。</p>
+
+  <p><strong>Flanaganの<code>?</code>は論理の限界、Carinaの<code>?</code>は世界の限界である。</strong> Flanaganでは値はいつか具体的になり、決められないのは型どうしの含意だけである。Carinaでは型の含意(正規表現の包含など)が決められないことに加えて、<strong>値そのものがapplyまで存在しない</strong>ことがある。</p>
+
+  <h3>型の段: キャスト相当を選ぶ場所と、選ばない場所</h3>
+
+  <p>代入可能性(<code>is_assignable_to</code>)の規則は、<code>?</code>の扱いを場合ごとに選んでいる。</p>
+
+  <ul>
+    <li>篩の付いていない<code>String</code>から、識別を持たない篩付き<code>String</code>(長さだけ等)へは<strong>受理し、値の検査に回す</strong>(規則10)。識別を持つ型の値(<code>aws.Arn</code>等)からも同じく受理する(<a href="https://github.com/carina-rs/carina/issues/4230">carina#4230</a>)。キャストを挿入する選択に当たる。</li>
+    <li>識別を持たない篩付き型どうしは<strong>拒否する</strong>。パターンは文字列として一致しなければ認めず、長さは区間の包含を要求する(規則8)。<code>?</code>を×に倒す選択で、<a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a>に書いた保守的な近似はここに残っている。</li>
+    <li>識別を持つ受け側へは、識別の証拠が無い限り拒否する(<a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付け</a>)。</li>
+  </ul>
+
+  <p>#4230に至った経緯が、論文の「<code>?</code>を拒否すると脆い」の実例になっている。プロバイダが属性を<code>String</code>から<code>String(len: 1..=1024)</code>に締めると、そこへ<code>aws.Arn</code>の参照を渡していた既存の設定が型エラーになった。ARNは実際にはその長さに収まるのに、型の上では証明できなかった。</p>
+
+  <h3>値の段: Proven / Violation / Undecided</h3>
+
+  <p>プロバイダが宣言する入力ルール(<a href="https://github.com/carina-rs/carina/issues/4267">carina#4267</a>)は、判定結果を<code>InputVerdict::{Proven, Violation, Undecided}</code>で返す。</p>
+
+  <ol class="steps">
+    <li><strong>plan</strong> — 値が分かっていればそのまま判定する。値がまだ無くても、書かれた式と宣言型から長さの区間や文字種を健全に見積もり、決められる分は決める。Violationはplanエラー、Undecidedは対象のeffectに「未決の義務」として結び付けて持ち越す。</li>
+    <li><strong>apply</strong> — プロバイダに送る正確なリクエストに対してもう一度判定する。送信用の型はこの判定を通らないと作れない。置換のdeleteは、対になるcreateがこの判定を通ったという許可が無いと実行できないので、createが拒否されれば古いリソースは残る。</li>
+    <li><strong>apply時にもUndecidedなら失敗</strong>させる(fail-closed)。</li>
+  </ol>
+
+  <p>schemaの<code>pattern</code> / <code>length</code>と、モジュール引数の<code>validation</code>も、参照の値が分かった時点で検査する(<a href="https://github.com/carina-rs/carina/issues/3805">carina#3805</a>)。planで分かればplanで、applyまで分からなければプロバイダへの送信直前に、それでも決まらない複数引数の条件はapply終了時の一掃で判定する。</p>
+
+  <h3>対応と違い</h3>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th></th><th>Flanagan</th><th>Carina</th></tr></thead>
+    <tbody>
+      <tr><td>√</td><td>そのまま受理</td><td>Proven: 何もしない</td></tr>
+      <tr><td>×</td><td>静的に拒否</td><td>型エラー、またはplanエラー</td></tr>
+      <tr><td>? の原因</td><td>含意の証明が時間内に終わらない</td><td>正規表現の包含が決められない / 値がapplyまで無い</td></tr>
+      <tr><td>キャストの位置</td><td>適用箇所のコード</td><td>対象effectに結び付けた義務。送信直前に解消</td></tr>
+      <tr><td>キャストの失敗</td><td>元が正しければ起きない</td><td>起きうる。同じapplyの先行effectは実行済みでありうる</td></tr>
+      <tr><td>実行時にも決まらない</td><td>起きない(値は具体的)</td><td>起きうる。失敗にする</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>最後の2行が一番大きな違いである。プログラムの実行時エラーはプロセスを止めれば済むが、applyの途中の失敗は、既に作ったリソースを外部世界に残す。Carinaが置換のdeleteにcreate側の許可を要求しているのは、この部分適用の害のうち最悪のもの(古いリソースを消したのに新しいものが作れない)を型で塞いでいる。</p>
+
+  <p><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a>の言い方をすれば、hybrid type checkingの「コンパイル時」と「実行時」はplanとapplyに対応し、Undecidedはその間に開いた窓(<a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a>)である。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>3つの結果、<code>?</code>の3つの扱いと退ける理由、キャストへの変換、Theorem 14、元のプログラムが正しければキャストは失敗しないことは、POPL論文の本文で確認した。<code>{x : B | t}</code>の構文と、篩型どうしの部分型が述語の含意判定に帰着して決定不能になることは、FOOL/WOOD論文で確認した。Sageの構成要素(<code>Dynamic</code>、第一級の型、任意の篩型、定理証明器、反証済み判定のデータベース)はSage論文の要旨による。</p>
+    <p>Carinaの規則8・規則10の内容は<code>carina-core/src/schema/mod.rs</code>の<code>is_assignable_to</code>のdocコメント、3値の判定とapply時の扱いは<code>carina-core/src/input_rules.rs</code>と<code>carina-core/src/executor/input_discharge.rs</code>を読んで確認した。schema制約の参照値への再検査とapply終了時の一掃は、PR <a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>の説明による。いずれも2026-11-07時点のmainで、入力ルールの一連の変更はその日に入ったばかりである。</p>
+    <p>Carinaの機構をhybrid type checkingとして読むのは解釈で、実装がそう名乗っているわけではない。「先行effectは実行済みでありうる」は、送信直前の判定とPR #3825のKnown limits(複数引数の<code>require</code>が、片方の値を使う側が走った後に決まる)からの推論である。</p>
+  </div>
+
+  <nav class="links">
+    <h2>関連</h2>
+    <ul>
+      <li><a href="/notes/predicate-subtypes-by-where-the-check-is-paid.html">述語付き部分型は、述語の検査をどこで払うかで分かれる</a></li>
+      <li><a href="/notes/refinement-types-as-constrained-base.html">カスタム型は独立の構成子ではなく篩型である</a></li>
+      <li><a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a></li>
+      <li><a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a></li>
+      <li><a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></li>
+      <li><a href="/notes/plan-is-prediction-apply-is-truth.html">planは予測であり、真実はapplyが確立する</a></li>
+      <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
+      <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a></li>
+      <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
+      <li><a href="/notes/carina-type-system-position.html">Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</a></li>
+    </ul>
+  </nav>
+
+  <p class="tags">
+    <a href="/notes/#tag-型システム">#型システム</a>
+    <a href="/notes/#tag-篩型">#篩型</a>
+    <a href="/notes/#tag-部分型">#部分型</a>
+    <a href="/notes/#tag-型理論">#型理論</a>
+  </p>
+</article>
+</body>
+</html>

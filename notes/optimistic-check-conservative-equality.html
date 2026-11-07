@@ -31,7 +31,7 @@
   <p class="meta">
     <span class="epistemic interpretation">解釈</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md §6 (1)(2)</code>
-    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成</span>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
   <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、<strong>どちらも「インフラを壊さない側」に倒す</strong>という一つの原則の現れである。</p>
@@ -86,7 +86,7 @@
 
   <h2>(1)所属検査は素通しする</h2>
 
-  <p>値の所属検査はUnknownを素通しする。「動的段階で解決されるはずの値」に偽の型エラーを出さない楽観的な扱いで、漸進的型付け(gradual typing)における動的型<code>?</code>と既知型の整合(consistency)関係と同型の判断である。ただしCarinaの場合これは検査を実行時へ先送りするのではなく、<strong>静的近似の精度限界を受け入れる</strong>という意味を持つ。gradual typingが実行時キャストで埋め合わせるところを、Carinaは埋め合わせない。</p>
+  <p>値の所属検査はUnknownを素通しする。「動的段階で解決されるはずの値」に偽の型エラーを出さない楽観的な扱いで、漸進的型付け(gradual typing)における動的型<code>?</code>と既知型の整合(consistency)関係と同型の判断である。gradual typingは素通しした箇所に実行時キャストを入れて埋め合わせる。Carinaも値が分かった時点で検査し直す。planで分かればplanで、applyまで分からなければプロバイダへ送る直前である(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。</p>
 
   <p>素通しの粒度も重要である。素通しはUnknownが現れた<strong>葉の位置単位</strong>であり、リストは具体値と未解決値の混在が許されて要素ごとに個別に判定される。したがって兄弟要素の所属検査やコンテナの形状・必須フィールドの検査は通常どおり走る。実装上は、検証器の最上位で値を具体軸へ射影し、射影できない値だけを受理する一点に、この素通しの判断が集約されている。</p>
 
@@ -104,6 +104,7 @@
       <li><a href="/notes/unknown-is-the-window-between-stages.html">Unknownは二段階の間に開いた窓である</a></li>
       <li><a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a></li>
       <li><a href="/notes/semantic-typing.html">型は値の分類器である(意味論的型付け)</a></li>
+      <li><a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)</a></li>
     </ul>
   </nav>
 

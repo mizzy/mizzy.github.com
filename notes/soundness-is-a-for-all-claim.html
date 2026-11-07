@@ -51,7 +51,7 @@
   <p class="meta">
     <span class="epistemic interpretation">解釈</span>
     出典: <code>carina-rs/carina, carina-provider-aws, carina-provider-awsccのissue/PR(2026-02〜08)</code>
-    <span class="dates"><time datetime="2026-09-29">2026-09-29</time> 作成</span>
+    <span class="dates"><time datetime="2026-09-29">2026-09-29</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
   <p>型システムは難しい、と感じる。Carinaのissue/PRを辿ると、その難しさは規則そのものにはあまり無い。個々の規則は短い — 受け側が合併なら「いずれかに代入可能」、送り側が合併なら「全メンバが代入可能」。難しいのは、<strong>健全性が全称命題だ</strong>ということである。</p>
@@ -180,7 +180,7 @@
     <cite>— <a href="https://github.com/carina-rs/carina/issues/2972">carina#2972</a></cite>
   </blockquote>
 
-  <p>割った後も穴は残る。検証は参照を解決する前に1回だけ走り、<code>Deferred</code>は素通りする。<strong>リテラルなら検査されるのに、同じ値が参照経由で来ると検査されない</strong>(<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>。2026-09-29に同じ根を持つ<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>の重複としてclose)。逆向きの穴もある。パース時の置換で参照がリテラルに化けると出所が消え、<code>String → VpcId</code>の取り違えが通る。</p>
+  <p>割った後も穴が残った。検証は参照を解決する前に1回だけ走り、<code>Deferred</code>は素通りしていた。<strong>リテラルなら検査されるのに、同じ値が参照経由で来ると検査されない</strong>(<a href="https://github.com/carina-rs/carina/issues/3767">carina#3767</a>。2026-09-29に同じ根を持つ<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>の重複としてclose)。こちらは2026-10に、解決した値もプロバイダに送る前に検査する形で塞がった(<a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>、<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>)。逆向きの穴は今も開いている。パース時の置換で参照がリテラルに化けると出所が消え、<code>String → VpcId</code>の取り違えが通る。</p>
 
   <blockquote>
     <p>The same wiring mistake therefore gets two different verdicts depending only on whether the source value happens to be known at parse time.</p>

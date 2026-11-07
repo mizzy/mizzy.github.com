@@ -109,6 +109,86 @@
 </div>
 
 <div class="cards">
+  <a class="card verified" href="/notes/ref-carina-issue-index.html" data-tags="参照 issue carina">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>探索から出たissue索引</h2>
+      <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
+      <span class="tags"><span>#参照</span> <span>#issue</span> <span>#carina</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/soundness-is-a-for-all-claim.html" data-tags="型システム 健全性 バグクラス">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</h2>
+      <p>Carinaのissue/PRを辿ると、難しさは規則より健全性が全称命題であることにある。向き・段階・表現・境界・拡張のどこか一箇所で破れれば足り、直しは一箇所ずつ来る。</p>
+      <span class="tags"><span>#型システム</span> <span>#健全性</span> <span>#バグクラス</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/make-the-broken-state-unrepresentable.html" data-tags="typestate 型安全 設計原則">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>typestateで壊れた状態を書けなくする</h2>
+      <p>Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは一貫していて、静的段階の内部不変条件を、実装言語の型でコンパイル時に固定することである。</p>
+      <span class="tags"><span>#typestate</span> <span>#型安全</span> <span>#設計原則</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/carina-type-system-position.html" data-tags="型システム 型理論 carina">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</h2>
+      <p>型理論の地図の上での位置・強み・弱み・改善点の見取り図。規則はおおむね正しく、穴は継ぎ目に集まる。漸進的型付けの動的な半分(委ねた検査の行き先)は2026-10に入った。</p>
+      <span class="tags"><span>#型システム</span> <span>#型理論</span> <span>#carina</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/optimistic-check-conservative-equality.html" data-tags="unknown 健全性 差分">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>検査は素通し、等価性は不成立 — Unknownの一貫した保守性</h2>
+      <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、どちらも「インフラを壊さない側」に倒すという一つの原則の現れである。</p>
+      <span class="tags"><span>#unknown</span> <span>#健全性</span> <span>#差分</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/the-window-is-narrower-than-it-looks.html" data-tags="unknown 型システム 検査">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>未知値の周りは無検査ではない</h2>
+      <p>Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。値が無くても宣言型どうしを照合する別経路の検査が走るため、静的近似が本当に確定できない窓は見かけより狭い。</p>
+      <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#検査</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/checking-completeness-is-time-indexed.html" data-tags="型システム 検査 バグクラス">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>「全数検査」は検証ステップの時点で確定している値に限られる</h2>
+      <p>値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。検査されるのは、検証ステップの時点で値が確定しているものだけである。</p>
+      <span class="tags"><span>#型システム</span> <span>#検査</span> <span>#バグクラス</span></span>
+    </span>
+  </a>
+  <a class="card verified" href="/notes/relocation-without-verification.html" data-tags="バグクラス 型システム apply">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>再配置後に検証がないのは型検査済みIRの不変条件の破壊である</h2>
+      <p>「well-typedなIRだけがバックエンドに渡る」というのがコンパイラの標準的な契約である。しかしapplyの再配置はIRに新しい値を書き込む。</p>
+      <span class="tags"><span>#バグクラス</span> <span>#型システム</span> <span>#apply</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/hybrid-type-checking.html" data-tags="型システム 篩型 部分型 型理論">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)</h2>
+      <p>証明できたら受理、反証できたら拒否、どちらも言えなければキャストを入れて実行時に検査する。Carinaの値制約もProven / Violation / Undecidedの3値で、planとapplyがコンパイル時と実行時に当たる。</p>
+      <span class="tags"><span>#型システム</span> <span>#篩型</span> <span>#部分型</span> <span>#型理論</span></span>
+    </span>
+  </a>
+  <a class="card interpretation" href="/notes/predicate-subtypes-by-where-the-check-is-paid.html" data-tags="型システム 篩型 部分型 型理論">
+    <span class="rule" aria-hidden="true"></span>
+    <span class="body">
+      <h2>述語付き部分型は、述語の検査をどこで払うかで分かれる</h2>
+      <p>Adaのsubtypeは篩型そのもので、Pascal・Nim・Raku・Common Lisp・PVS・SPARK・Leanにも同じ形がある。違いは実行時検査・証明責務・値が持つ証明・hybridのどれで払うか。</p>
+      <span class="tags"><span>#型システム</span> <span>#篩型</span> <span>#部分型</span> <span>#型理論</span></span>
+    </span>
+  </a>
   <a class="card interpretation" href="/notes/functor-applicative-monad-by-dependency.html" data-tags="モナド 構造 plan 型システム">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -187,22 +267,6 @@
       <h2>Effect systemと「副作用を値にする」は別の軸である</h2>
       <p>Effect systemは起こしうる効果を型で追跡し、値化は記述と実行を分ける。CarinaのEffectは後者で、IOモナドと同じなのは記述と実行を分けるところまで。IOは中を開けず、planは開ける。</p>
       <span class="tags"><span>#効果</span> <span>#型システム</span> <span>#比較</span></span>
-    </span>
-  </a>
-  <a class="card interpretation" href="/notes/carina-type-system-position.html" data-tags="型システム 型理論 carina">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</h2>
-      <p>型理論の地図の上での位置・強み・弱み・改善点の見取り図。規則はおおむね正しく、穴は継ぎ目に集まる。とくに漸進的型付けの動的な半分(委ねた検査の行き先)が無い。</p>
-      <span class="tags"><span>#型システム</span> <span>#型理論</span> <span>#carina</span></span>
-    </span>
-  </a>
-  <a class="card interpretation" href="/notes/soundness-is-a-for-all-claim.html" data-tags="型システム 健全性 バグクラス">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</h2>
-      <p>Carinaのissue/PRを辿ると、難しさは規則より健全性が全称命題であることにある。向き・段階・表現・境界・拡張のどこか一箇所で破れれば足り、直しは一箇所ずつ来る。</p>
-      <span class="tags"><span>#型システム</span> <span>#健全性</span> <span>#バグクラス</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/predictability-has-two-sources.html" data-tags="予測可能性 抽象化 設計判断">
@@ -291,14 +355,6 @@
       <h2>変性は書かれていないだけで、既に決まっている</h2>
       <p>List/Mapは全て共変で、Mapはキーも共変。だがそれを確定させたのは変性を決めるための検討ではなく、別目的の修正の副産物だった。</p>
       <span class="tags"><span>#型システム</span> <span>#部分型</span> <span>#設計負債</span></span>
-    </span>
-  </a>
-  <a class="card verified" href="/notes/ref-carina-issue-index.html" data-tags="参照 issue carina">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>探索から出たissue索引</h2>
-      <p>これらの探索から起票された、あるいは探索中に参照されたissueの一覧。各項目に「何のissueか」と「どの概念ノートに属するか」を付す。</p>
-      <span class="tags"><span>#参照</span> <span>#issue</span> <span>#carina</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/abstract-to-concrete-leak.html" data-tags="型システム バグクラス 部分型">
@@ -435,14 +491,6 @@
       <h2>planはSSA的で直列化可能なIRである</h2>
       <p>中間表現としてのplanは、コンパイラのIRが持つ古典的な性質をいくつも備えている。単一定義性、直列化可能性、そして「検査済みであること」の三つである。</p>
       <span class="tags"><span>#plan</span> <span>#ir</span> <span>#コンパイラ</span></span>
-    </span>
-  </a>
-  <a class="card verified" href="/notes/make-the-broken-state-unrepresentable.html" data-tags="typestate 型安全 設計原則">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>typestateで壊れた状態を書けなくする</h2>
-      <p>Carinaの処理系は「処理が進むと値の型が変わる」typestateパターンを系統的に使っている。狙いは一貫していて、静的段階の内部不変条件を、実装言語の型でコンパイル時に固定することである。</p>
-      <span class="tags"><span>#typestate</span> <span>#型安全</span> <span>#設計原則</span></span>
     </span>
   </a>
   <a class="card interpretation" href="/notes/general-purpose-embedding-tradeoff.html" data-tags="トレードオフ 設計判断 比較">
@@ -661,14 +709,6 @@
       <span class="tags"><span>#dsl</span> <span>#系譜</span> <span>#設計空間</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/the-window-is-narrower-than-it-looks.html" data-tags="unknown 型システム 検査">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>未知値の周りは無検査ではない</h2>
-      <p>Unknownの素通しは「未解決の値の周りは無検査」という意味ではない。値が無くても宣言型どうしを照合する別経路の検査が走るため、静的近似が本当に確定できない窓は見かけより狭い。</p>
-      <span class="tags"><span>#unknown</span> <span>#型システム</span> <span>#検査</span></span>
-    </span>
-  </a>
   <a class="card verified" href="/notes/static-stage-totality.html" data-tags="全域性 dsl 型システム">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -693,14 +733,6 @@
       <span class="tags"><span>#型システム</span> <span>#型理論</span> <span>#cue</span></span>
     </span>
   </a>
-  <a class="card verified" href="/notes/relocation-without-verification.html" data-tags="バグクラス 型システム apply">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>再配置後に検証がないのは型検査済みIRの不変条件の破壊である</h2>
-      <p>「well-typedなIRだけがバックエンドに渡る」というのがコンパイラの標準的な契約である。しかしapplyの再配置はIRに新しい値を書き込む。</p>
-      <span class="tags"><span>#バグクラス</span> <span>#型システム</span> <span>#apply</span></span>
-    </span>
-  </a>
   <a class="card interpretation" href="/notes/refinement-types-as-constrained-base.html" data-tags="型システム 篩型 型理論">
     <span class="rule" aria-hidden="true"></span>
     <span class="body">
@@ -715,14 +747,6 @@
       <h2>属性の出所は型に昇格させるべきモダリティである</h2>
       <p>「この属性は誰が書くのか」— ユーザー指定か、プロバイダ算出か、サーバ既定か — という区別が、Carinaでは型に乗っていない。フラグと投影で表現されている。これが理論的な負債になっている。</p>
       <span class="tags"><span>#型システム</span> <span>#差分</span> <span>#設計方向</span></span>
-    </span>
-  </a>
-  <a class="card interpretation" href="/notes/optimistic-check-conservative-equality.html" data-tags="unknown 健全性 差分">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>検査は素通し、等価性は不成立 — Unknownの一貫した保守性</h2>
-      <p>Unknownの扱いは、検査では楽観的に、等価性では悲観的に振る舞う。方向が逆に見えるが、どちらも「インフラを壊さない側」に倒すという一つの原則の現れである。</p>
-      <span class="tags"><span>#unknown</span> <span>#健全性</span> <span>#差分</span></span>
     </span>
   </a>
   <a class="card verified" href="/notes/nominal-axis-subtyping.html" data-tags="型システム 部分型 公称型">
@@ -787,14 +811,6 @@
       <h2>IaCのコンパイルは二引数である</h2>
       <p>通常のコンパイラはソースだけの関数である: compile(source) = binary。IaCのコンパイルは二引数である: plan(source, state) = patch。</p>
       <span class="tags"><span>#iac</span> <span>#コンパイラ</span> <span>#増分計算</span></span>
-    </span>
-  </a>
-  <a class="card verified" href="/notes/checking-completeness-is-time-indexed.html" data-tags="型システム 検査 バグクラス">
-    <span class="rule" aria-hidden="true"></span>
-    <span class="body">
-      <h2>「全数検査」は検証ステップの時点で確定している値に限られる</h2>
-      <p>値ベース検査の売りは「プログラムを完全評価してから、出てきた値を全数検査する」ことである。しかしこの「全数」性には時刻の指標が付く。検査されるのは、検証ステップの時点で値が確定しているものだけである。</p>
-      <span class="tags"><span>#型システム</span> <span>#検査</span> <span>#バグクラス</span></span>
     </span>
   </a>
   <a class="card normative" href="/notes/boring-verbatim-beats-clever-abstraction.html" data-tags="設計原則 可読性 iac">
