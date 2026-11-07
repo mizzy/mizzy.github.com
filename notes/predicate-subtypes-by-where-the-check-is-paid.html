@@ -58,7 +58,33 @@
 
   <p>同じ理由書の§4.4(<a href="http://archive.adaic.com/standards/83rat/html/ratl-04-04.html">Constraints and Subtypes</a>)は、制約の違反は原則として実行時に<code>CONSTRAINT_ERROR</code>で報告すると書いたうえで、コンパイラは一部の違反をコンパイル時に報告でき、前の検査で成功が保証された検査は省けるとしている。例でも代入ごとに「static check」「dynamic check」を書き分けている。静的に決まる分は静的に、残りを実行時にという分け方は、2006年のhybrid type checkingの20年前、1986年版の設計理由書に既にある(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。違いは、Adaが静的に分かった違反を不正なプログラムにはせず、報告にとどめることである。</p>
 
-  <p>オブジェクト指向や型理論でいう部分型(<code>S &lt;: T</code>、置き換えられる型)とは、語が同じだけで系統が違う(要確認: それぞれの語の初出)。</p>
+  <h2>一般的な部分型との違い</h2>
+
+  <p>型理論やオブジェクト指向でいう部分型(<code>S &lt;: T</code>)は、<strong>別の型だが、<code>T</code>が要る所で<code>S</code>の値を使ってよい</strong>という関係である。Adaのsubtypeは<strong>同じ型の値を絞ったもの</strong>で、同じ語でも中身が違う。</p>
+
+  <div class="scroll narrow">
+  <table class="compare">
+    <thead><tr><th></th><th>Adaのsubtype</th><th>一般的な部分型</th></tr></thead>
+    <tbody>
+      <tr><td>何か</td><td>型 + 値の制約。新しい型は作らない</td><td>別の型どうしの代入可能性</td></tr>
+      <tr><td>例</td><td><code>subtype Natural is Integer range 0 .. Integer'Last</code></td><td><code>Dog &lt;: Animal</code>、フィールドの多いレコード &lt;: 少ないレコード</td></tr>
+      <tr><td>演算</td><td>基の型の演算をすべて持ち、結果は基の型になる</td><td>足したり上書きしたりできる</td></tr>
+      <tr><td>狭い → 広い</td><td>自由</td><td>自由</td></tr>
+      <tr><td>広い → 狭い</td><td>書ける。代入時に検査し、外れたら<code>Constraint_Error</code></td><td>静的に拒否。やるなら明示のダウンキャスト</td></tr>
+      <tr><td>検査の時刻</td><td>主に実行時</td><td>主にコンパイル時</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>違いが一番はっきり出るのは向きである。一般的な部分型は「<code>T</code>が要る所に<code>S</code>を渡す」一方向だけを静的に許す。Adaの部分型どうしは型検査の上では同じ型なので、両方向とも書けて、狭くなる方向だけを代入の時点で実行時に検査する。</p>
+
+  <p>演算の結果が基の型になるので、部分型は演算について閉じていない。<code>Natural</code>どうしの引き算は負になりうる<code>Integer</code>で、<code>Natural</code>の変数に入れる時点で初めて検査される(<a href="http://archive.adaic.com/standards/83rat/html/ratl-05-02.html">Ada 83 Rationale §5.2</a>)。</p>
+
+  <p>書き込みも違いが出る所である。<code>Natural</code>の変数は<code>Integer</code>の変数の代わりにならない。負の値を書き込めないからである。型理論では、読みも書きもできる参照の部分型は、読む向きには共変、書く向きには反変でなければならず、両方を満たすには不変(<code>Ref S &lt;: Ref T</code>は<code>S = T</code>のときだけ)にするしかない(<a href="https://courses.cs.cornell.edu/cs611/2006fa/lectures/lec31-fa06.pdf">Cornell CS611の講義ノート</a>)。Adaはこれを型で禁じず、代入時の実行時検査で受けている。</p>
+
+  <p>重なる所もある。篩型で見ると<code>{x: T | p} &lt;: {x: T | q}</code>は「<code>p</code>ならば<code>q</code>」で成り立つので、値を絞った型は一般的な部分型の特殊な場合になる。ただしこの判定は一般には決定不能なので、Adaは静的に決めず実行時に回した(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。</p>
+
+  <p>Adaにもオブジェクト指向の意味の部分型はある。Ada 95のtagged typeは型の拡張(単一継承)を持ち、各tagged type <code>T</code>に対応するclass-wide type <code>T'Class</code>は、<code>T</code>とその子孫の値をまとめて受け付ける(<a href="https://docs.adacore.com/live/wave/arm95/html/arm95/arm95-3-9.html">Ada 95 RM §3.9</a>)。Adaはこれをsubtypeとは呼ばず、派生(derivation)の延長として扱っている。</p>
 
   <h2>払い方で並べる</h2>
 
@@ -107,10 +133,20 @@
 
   <p>Adaと違うのは、<strong>plan時に確実に違反と分かったものはエラーにする</strong>ことである。Adaの「必ず例外を投げるが合法」に当たるものは、Carinaでは「planは通るがapplyで必ず失敗する」になり、IaCでは途中まで作ったリソースが残る分だけ高くつく。</p>
 
+  <h3>同じidentityの中ではAdaの形にする</h3>
+
+  <p>2026-11-07に決まった変更(<a href="https://github.com/carina-rs/carina/issues/4309">carina#4309</a>)で、Carinaは二段構えになる。identityが違う型の間は一般的な(公称的な)部分型で、<code>aws.iam.Role.Arn &lt;: aws.Arn</code>のような包摂の辺で判定する(<a href="/notes/nominal-axis-subtyping.html">公称軸ごとの幅部分型付けが再利用と混同防止を両立する</a>)。identityが同じ型の間はAdaのsubtypeと同じで、長さやパターンの違いでは拒否せず、受け側の制約を値が分かった時点で検査する。identityがAdaの型、局所的な制約がAdaの制約に当たる。</p>
+
+  <p>きっかけは<code>identity_store_id</code>である。<code>awscc.sso.Instance.identity_store_id</code>はCFNのスキーマで長さ1..64・パターン<code>^[a-zA-Z0-9-]*$</code>、受け側の<code>awscc.identitystore.Group.identity_store_id</code>は長さ1..36・パターン<code>^d-[0-9a-f]{10}$|^&lt;uuid&gt;$</code>で、identityは同じ<code>identity_store_id()</code>である。篩型の部分型として見ると、64は36に収まらないので拒否になる。実際のIDは<code>d-</code>と16進10桁で、受け側に必ず収まる。</p>
+
+  <p>この拒否は判定できないこと(hybrid type checkingの「?」)から来ていない。宣言どうしなら「含まれない」と決められる。問題は宣言の側で、送り側の1..64は実際の値の集合を緩く書いた記述にすぎなかった。信用できるのはidentityの一致のほうで、局所的な制約は値の性質ではなく受け側の要求として扱う、という判断になる。Adaの理由書が制約を型から切り離して動的な性質としたのと同じ筋である。</p>
+
   <div class="accuracy">
     <h2>根拠の確度</h2>
     <p>Adaのsubtypeの定義はARM 3.2の文言で確認した。<code>Static_Predicate</code> / <code>Dynamic_Predicate</code>の区別、全ての違反を捕まえない設計、SPARKが述語を制限して証明することは、AdaCoreのSPARK 2014 Rationaleの記事とGNATのドキュメントによる。GNATの警告文は<a href="https://forum.ada-lang.io/t/gnat-compiler-warning-constraint-error-will-be-raised-at-run-time/790">Ada Forumのスレッド</a>で、警告であってエラーでないことを確認した。「拒否する根拠を持たない」はその理由についての解釈だが、Ada 83 Rationale §4.4も制約と部分型を「一般にプログラムの動的な振る舞いに関わる概念」と書いている。</p>
     <p>AdaのsubtypeがPascalへの批判を受けたものであること、型と部分型の分け方、static check / dynamic checkの書き分けは、Ada 83 Rationaleの<a href="http://archive.adaic.com/standards/83rat/html/ratl-04-01.html">§4.1</a>と<a href="http://archive.adaic.com/standards/83rat/html/ratl-04-04.html">§4.4</a>の本文で確認した。Habermannの論文は要旨(範囲・型・構造の混同)だけを確認し、本文の個々の指摘は読んでいない。Welsh, Sneeringer, Hoareの論文は書誌情報だけを確認した。Pascalの部分範囲型が1971年の論文の時点で入っていたことは、論文本文ではなく二次資料で確認した。</p>
+    <p><code>identity_store_id</code>の件は<a href="https://github.com/carina-rs/carina/issues/4309">carina#4309</a>の本文による(2026-11-07時点)。この変更は<a href="https://github.com/carina-rs/carina/issues/4304">carina#4304</a>の計画に組み込まれていて、どちらもまだopenで、実装は入っていない。applyまで値が分からない場合について、#4309は「AWSに拒否されるまで分からない」と書いているが、プロバイダへ送る直前に検査する経路(PR #3825)もあり、この経路でどちらになるかは確かめていない。</p>
+    <p>一般的な部分型との比較のうち、Adaの部分型が基の型の演算をすべて持ち、代入の前に範囲を検査することは<a href="http://archive.adaic.com/standards/83rat/html/ratl-05-02.html">Ada 83 Rationale §5.2</a>、class-wide typeは<a href="https://docs.adacore.com/live/wave/arm95/html/arm95/arm95-3-9.html">Ada 95 RM §3.9</a>で確認した。書き込める参照が不変でなければならないことは、<a href="https://courses.cs.cornell.edu/cs611/2006fa/lectures/lec31-fa06.pdf">Cornell CS611の講義ノート</a>と一般的な知識によるもので、Pierce『Types and Programming Languages』の該当節は読み直していない。</p>
     <p>PascalはJensen &amp; Wirth『Pascal User Manual and Report』の部分範囲型による。Nimの<code>RangeDefect</code>はランタイムの<code>chcks.nim</code>、<code>-d:danger</code>は<a href="https://nim-lang.org/docs/nimc.html">コンパイラのユーザーガイド</a>(「全ての実行時検査を外し、最適化を有効にする」)で確認した。古い版では<code>-d:release</code>でも範囲検査が外れたという<a href="https://www.mail-archive.com/nim-general@thregr.org/msg07225.html">メーリングリストの発言</a>があるが、現行のガイドでは<code>-d:release</code>は最適化を有効にするだけである。「捨てられる前提の安全網」は解釈。Rakuの<code>subset</code>は<a href="https://github.com/Raku/roast/blob/887d301936abd8c2e3f74723da757ea800523db4/S12-subset/type-subset.t">テストスイートroast</a>、Common Lispの<code>satisfies</code>は<a href="https://www.lispworks.com/documentation/HyperSpec/Body/04_bc.htm">HyperSpec</a>とCLtL2による。</p>
     <p>PVSの述語部分型とTCCは<a href="https://pvs.csl.sri.com/description.html">PVSの説明ページ</a>と<a href="https://www.csl.sri.com/papers/tse98/tse98.pdf">Rushby, Owre, Shankar "Subtypes for Specifications" (TSE 1998)</a>、Leanの<code>Subtype</code>は言語リファレンスで確認した。</p>
     <p>Liquid typesは<a href="https://www.cs.utexas.edu/~tdillig/cs395/liquid_types.pdf">Rondon, Kawaguchi, Jhala "Liquid Types" (PLDI 2008)</a>で、述語を決定可能な論理の修飾子の連言に限り、部分型判定をSMTで判定できる含意に落とす。LiquidHaskellはこれをHaskellに適用したもので、後にrefinement reflection(POPL 2018)で利用者定義の関数を述語に使えるようにした。表の「決定可能な論理の述語だけ」は2008年の形である。</p>
