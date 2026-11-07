@@ -51,7 +51,7 @@
   <h1>Carinaの型システムは値を検査する篩型の体系で、穴は段階と境界の継ぎ目にある</h1>
   <p class="meta">
     <span class="epistemic interpretation">解釈</span>
-    出典: <code>carina-rs/carina main 0fb456c1(2026-09-30)のソースとissue、同日のレポート「Carinaの型システムを型理論から読む」(main d0445d0b)、既存ノート群</code>
+    出典: <code>carina-rs/carina main 0fb456c1(2026-09-30)のソースとissue、同日のレポート「Carinaの型システムを型理論から読む」(main d0445d0b)、既存ノート群</code>。2026-11-07にmain <code>8ca84565f</code>で再確認
     <span class="dates"><time datetime="2026-09-30">2026-09-30</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
@@ -59,7 +59,7 @@
 
   <p>一言でいえば、<strong>プロバイダのスキーマが供給する型(篩型+公称軸)に、評価し切った値を照らして所属を判定する検査系</strong>である。ユーザーが型を定義する言語ではなく、型の大半はcodegenが作ったスキーマから来る。値が無いところだけ、宣言型どうしの代入可能性で補う。</p>
 
-  <p>規則そのものはおおむね正しい。<strong>穴は規則ではなく継ぎ目 — 段階の継ぎ目、二つの型言語の継ぎ目、プラグイン境界、同じ関係の複数の実装 — に集まっている</strong>。長く一番大きかった<strong>漸進的型付けの動的な半分</strong>(委ねた検査の行き先)は、2026-10に入った(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。</p>
+  <p>規則そのものはおおむね正しい。<strong>穴は規則ではなく継ぎ目 — 段階の継ぎ目、二つの型言語の継ぎ目、プラグイン境界、同じ関係の複数の実装 — に集まっている</strong>。長く一番大きかった<strong>漸進的型付けの動的な半分</strong>(委ねた検査の行き先)は2026-10に入り(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)</a>)、同じ月に代入可能性の判定器の重複もほぼ一本化された。残る穴は、LSPの再実装、ユーザーが書ける型の狭さ、⊤・⊥の不在あたりに寄ってきている。</p>
 
   <h2>ポジション — 軸ごとに見る</h2>
 
@@ -74,9 +74,9 @@
         <tr><td>合併</td><td>「いずれかのメンバが受理すれば妥当」</td><td>タグなし合併(集合論的合併)</td></tr>
         <tr><td>再帰</td><td><code>Ref(名前)</code>とdefs、<code>Shape</code>ビューで剥がしてから使う</td><td>名前付きμ型</td></tr>
         <tr><td>コンテナの変性</td><td><code>List</code>/<code>Map</code>/<code>Struct</code>は共変。ただし書かれていない</td><td>暗黙の共変</td></tr>
-        <tr><td>未確定</td><td><code>Value::Deferred</code>が値の軸にある。素の<code>String</code>が受け手側で<code>?</code>のように振る舞う</td><td>漸進的型付けの静的な半分</td></tr>
+        <tr><td>未確定</td><td><code>Value::Deferred</code>が値の軸にある。素の<code>String</code>が受け手側で<code>?</code>のように振る舞い、委ねた検査は値が分かった時点で走る</td><td>漸進的型付け(実行時検査つき)</td></tr>
         <tr><td>推論</td><td>注釈の無いexports/attributesの右辺から下から上へ合成するだけ</td><td>ほぼ検査のみ</td></tr>
-        <tr><td>多相・関数型</td><td>どちらも無い。ユーザ関数はパース時に展開され、呼ぶたびに実引数の値を検査。組み込み関数のシグネチャは説明用の文字列</td><td>型ではなく契約</td></tr>
+        <tr><td>多相・関数型</td><td>どちらも無い。ユーザ関数はパース時に展開され、呼ぶたびに実引数の値を検査。組み込み関数は戻り値の分類だけを持ち、シグネチャは説明用の文字列</td><td>型ではなく契約</td></tr>
         <tr><td>書き手と時刻</td><td><code>InputMode</code>と<code>deferred_populate</code>が注釈として持つ</td><td>型の外(モダリティの候補)</td></tr>
         <tr><td>効果</td><td>Effectは命令の平たい列</td><td>深い埋め込み。型レベルの効果系ではない</td></tr>
         <tr><td>等価性</td><td>正規形に簡約してから型ごとの同値関係で比較。Unknownは自分自身とも等しくない</td><td>型主導の等価性</td></tr>
@@ -131,7 +131,7 @@
     <li><strong>広い型で宣言して篩を消す抜け道を塞いでいる</strong>。モジュールの属性を<code>String</code>と宣言しても、転送元の篩は証拠(evidence)として保持され、受け手では宣言と証拠の両方が通ることを要求する(<a href="https://github.com/carina-rs/carina/issues/3798">carina#3798</a>)。</li>
     <li><strong>Unknownの扱いが一貫して保守的</strong>。検査は素通し、等価性はSQLのNULLと同じく自分自身とも不成立で、「偽の型エラーは出さず、怪しい差分は出す」側に揃っている。(<a href="/notes/optimistic-check-conservative-equality.html">検査は素通し、等価性は不成立 — Unknownの一貫した保守性</a>)</li>
     <li><strong>差分が型主導</strong>。順序付き/なしのリスト、列挙の正規形、合併のメンバ比較が、すべて型に導かれる。(<a href="/notes/type-directed-equality.html">等価判定は正規形へ簡約してから型ごとに行う</a>)</li>
-    <li><strong>実装層で壊れた状態を書けなくしている</strong>。<code>Ref</code>を剥がした<code>Shape</code>ビュー、<code>Concrete</code>/<code>Deferred</code>の分離、正規化済みでないリソースを渡せない<code>NormalizedResource</code>など。<code>compile_fail</code>のdoctestが27本あり、「コンパイルできてはいけないコード」を否定的な型付けの試験として固定している。WASM境界では網羅的な分解代入で、プロトコルに増えたフィールドを黙って捨てることをコンパイルエラーにしている。(<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a> / <a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a>)</li>
+    <li><strong>実装層で壊れた状態を書けなくしている</strong>。<code>Ref</code>を剥がした<code>Shape</code>ビュー、<code>Concrete</code>/<code>Deferred</code>の分離、正規化済みでないリソースを渡せない<code>NormalizedResource</code>など。<code>compile_fail</code>のdoctestが500本を超えて(2026-11-07時点で519本)あり、「コンパイルできてはいけないコード」を否定的な型付けの試験として固定している。WASM境界では網羅的な分解代入で、プロトコルに増えたフィールドを黙って捨てることをコンパイルエラーにしている。(<a href="/notes/make-the-broken-state-unrepresentable.html">typestateで壊れた状態を書けなくする</a> / <a href="/notes/named-mu-types-iso-recursive.html">循環スキーマは名前付きμ型で明示展開する</a>)</li>
     <li><strong>決定不能な問いを正直に扱っている</strong>。正規表現の包含は判定せず、パターンが違えば非互換とする。完全性を捨てて健全性を取る、と明示的に選んでいる。</li>
   </ol>
 
@@ -193,27 +193,27 @@
         <text class="dim"  x="565" y="206" text-anchor="middle">WASMプラグイン</text>
         <text class="dim"  x="205" y="184" text-anchor="middle">lift</text>
         <text class="dim"  x="450" y="184" text-anchor="middle">JSON</text>
-        <text class="leak" x="205" y="236" text-anchor="middle">Ref・リテラル型は</text>
-        <text class="leak" x="205" y="251" text-anchor="middle">None = 未検査</text>
-        <text class="leak" x="205" y="266" text-anchor="middle">#2648 #3803</text>
+        <text class="dim"  x="205" y="236" text-anchor="middle">リテラル型とRefは写る</text>
+        <text class="leak" x="205" y="251" text-anchor="middle">未解決名だけNone = 未検査</text>
+        <text class="dim"  x="205" y="266" text-anchor="middle">#3856 #4198</text>
         <text class="leak" x="450" y="236" text-anchor="middle">検証関数は越えない</text>
-        <text class="leak" x="450" y="251" text-anchor="middle">壊れたJSONは既定値に</text>
-        <text class="leak" x="450" y="266" text-anchor="middle">#3811</text>
+        <text class="dim"  x="450" y="251" text-anchor="middle">壊れた値は拒否する</text>
+        <text class="dim"  x="450" y="266" text-anchor="middle">#3843</text>
 
         <text class="hdr" x="0" y="300">関係の継ぎ目 — 代入可能性の実装</text>
         <rect class="box" x="0"   y="310" width="196" height="44" rx="4"/>
-        <rect class="gap" x="222" y="310" width="196" height="44" rx="4"/>
+        <rect class="box" x="222" y="310" width="196" height="44" rx="4"/>
         <rect class="gap" x="444" y="310" width="196" height="44" rx="4"/>
         <text class="code" x="98"  y="329" text-anchor="middle">is_assignable_to</text>
         <text class="dim"  x="98"  y="346" text-anchor="middle">本体(方向付き)</text>
-        <text class="code" x="320" y="329" text-anchor="middle">type_expr_compatible</text>
-        <text class="dim"  x="320" y="346" text-anchor="middle">モジュール引数の転送</text>
+        <text class="code" x="320" y="329" text-anchor="middle">check_type_expr_value</text>
+        <text class="dim"  x="320" y="346" text-anchor="middle">値の検査を一本化(#3856)</text>
         <text class="code" x="542" y="329" text-anchor="middle">LSP</text>
         <text class="dim"  x="542" y="346" text-anchor="middle">参照検査の再実装</text>
-        <text class="leak" x="320" y="378" text-anchor="middle">同じ問いに三つの答え — 送り側の合併を「いずれか」で通す #3211 / ネストを見逃す #3043</text>
+        <text class="leak" x="320" y="378" text-anchor="middle">LSPだけが参照の検査を別に持つ — ネストを見逃す #3043</text>
       </g>
     </svg>
-    <figcaption>点線の枠が検査の届いていない所。規則が間違っているのではなく、規則を通らない経路がある。段階の継ぎ目では、静的に「値に委ねた」検査の行き先が無い。</figcaption>
+    <figcaption>点線の枠が検査の届いていない所。規則が間違っているのではなく、規則を通らない経路がある。</figcaption>
   </figure>
 
   <h3>段階の継ぎ目: 動的な半分は入り、逆向きの穴が残る</h3>
@@ -226,58 +226,61 @@
 
   <p>→ <a href="/notes/relocation-without-verification.html">再配置後に検証がないのは型検査済みIRの不変条件の破壊である</a> / <a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a> / <a href="/notes/the-window-is-narrower-than-it-looks.html">未知値の周りは無検査ではない</a></p>
 
-  <h3>関係の継ぎ目: 代入可能性が一つの定義になっていない</h3>
+  <h3>関係の継ぎ目: 代入可能性はほぼ一つの定義にまとまった</h3>
+
+  <p>2026-10-15の<a href="https://github.com/carina-rs/carina/pull/3856">carina#3856</a>で、モジュール引数・export・属性・ユーザ関数の型検査が、具体値の検査器<code>check_type_expr_value</code>一つと、参照の判定(<code>BindingIndex</code> + <code>lift_type_expr</code> + <code>TypeInSchema</code>)一つにまとまった。モジュール引数を転送するときだけ使われていた別の判定器<code>type_expr_compatible</code>は、送り側の合併を「いずれかのメンバが合えば可」で通す不健全な規則ごと消えた。issueの<a href="https://github.com/carina-rs/carina/issues/3211">carina#3211</a>はopenのまま残っている。</p>
+
+  <p>残っているのは次のとおり。</p>
 
   <ul>
-    <li>モジュール引数を転送するときだけ別の判定器<code>type_expr_compatible</code>が使われる。これは文字列っぽい型をidentity無視で互いに通し、<strong>送り側の合併を「いずれかのメンバが合えば可」で通す</strong>(<code>carina-core/src/module_resolver/typecheck.rs</code>)。Union-Lは∀でなければならないので、これは不健全である(<a href="https://github.com/carina-rs/carina/issues/3211">carina#3211</a>、open)</li>
-    <li>LSPは参照の検査を再実装しており、ネストした型違いを見逃す(<a href="https://github.com/carina-rs/carina/issues/3043">carina#3043</a>、open)</li>
-    <li>本体の<code>is_assignable_to</code>も、<code>List</code>/<code>Map</code>/<code>Struct</code>は構成子で比べるようになったが、最後の腕はまだ表示名の文字列比較である(<a href="https://github.com/carina-rs/carina/issues/3209">carina#3209</a>、open)</li>
+    <li>LSPは属性の参照の型検査を自前で持っていて、属性の値が参照そのもののときに判定する(<code>check_resource_ref_type_mismatch</code>)。リストや構造体の中の参照で型違いを見逃すという<a href="https://github.com/carina-rs/carina/issues/3043">carina#3043</a>はopenで、今回は再現を確かめていない</li>
+    <li><code>is_assignable_to</code>の分岐は網羅的になったが、構成子が違う組の判定にまだ表示名の文字列比較が残る(<a href="https://github.com/carina-rs/carina/issues/3209">carina#3209</a>、open)</li>
     <li>性質試験は反射律と推移律まで。反対称律が無く、宇宙が手書きの有限リストに留まる(<a href="https://github.com/carina-rs/carina/issues/3208">carina#3208</a>、open)。変性も書かれていない(<a href="https://github.com/carina-rs/carina/issues/3210">carina#3210</a>、open)</li>
   </ul>
 
   <p>→ <a href="/notes/single-definition-checker.html">検査器が二系統あるのは設計負債である</a> / <a href="/notes/stringly-typed-assignability.html">型名の文字列比較で代入可能性を決めるのは構造を捨てている</a> / <a href="/notes/subtyping-lattice-is-unaxiomatized.html">部分型関係が公理化されていないと性質の破れを検出できない</a> / <a href="/notes/variance-is-implicit-not-absent.html">変性は書かれていないだけで、既に決まっている</a></p>
 
-  <h3>検査器の中: 分からないと通す</h3>
+  <h3>検査器の中: 「分からないと通す」は塞がった</h3>
 
   <ul>
-    <li>注釈に対する値検査<code>validate_type_expr_value</code>は、既知の組み合わせだけエラーを返し、最後の腕が<code>_ =&gt; None</code>(問題なし)である(<code>carina-core/src/validation/mod.rs</code>)。明示の腕が無い組み合わせは素通りする</li>
-    <li>篩のパターンは検査のたびに<code>Regex::new</code>し、<strong>コンパイルに失敗すると検査全体を飛ばす</strong>(<code>if let Ok(re) = ...</code>、<code>carina-core/src/schema/mod.rs</code>)。不正なパターンを持つ型は、どんな文字列も通す</li>
+    <li>注釈に対する値検査は<code>check_type_expr_value</code>に置き換わり、明示の腕に当たらない組み合わせは不一致を返す。以前の<code>validate_type_expr_value</code>は最後の腕が<code>_ =&gt; None</code>(問題なし)で、明示の腕が無い組み合わせを素通りさせていた</li>
+    <li>篩のパターンは、スキーマを受け入れる時点でコンパイルするようになった(<a href="https://github.com/carina-rs/carina/issues/4171">carina#4171</a>、2026-11-01)。受け入れ前の<code>Draft</code>ではパターンは文字列、受け入れ後の<code>Compiled</code>では<code>CompiledPattern</code>で、値の検査中にはコンパイルしない。以前は検査のたびに<code>Regex::new</code>し、失敗すると検査全体を飛ばしていた</li>
   </ul>
 
   <h3>型言語の継ぎ目: ユーザーが書ける型が貧しい</h3>
 
-  <p>プロバイダのスキーマ型は篩・公称軸・合併・再帰を持つ。ユーザーが書く注釈の型はそれより狭く、しかも一部はスキーマ型へ写せない。写像<code>lift_type_expr</code>(<code>carina-core/src/validation/mod.rs</code>)は<code>Ref</code>・<code>StringLiteral</code>・<code>DottedUnresolved</code>・<code>Unknown</code>に対して<code>None</code>を返し、<strong><code>None</code>は「検査しない」として扱われる</strong>。</p>
+  <p>プロバイダのスキーマ型は篩・公称軸・合併・再帰を持つ。ユーザーが書く注釈の型はそれより狭く、しかも一部はスキーマ型へ写せない。写像<code>lift_type_expr</code>(<code>carina-core/src/validation/mod.rs</code>)の<code>None</code>は「検査しない」として扱われるが、<code>None</code>を返すのは今は<code>DottedUnresolved</code>(スキーマでまだ解決していない点付きの名前)だけである。リテラル型は文字列リテラルの集合に、<code>Ref</code>はリソースハンドルに写る。</p>
 
   <ul>
-    <li>リテラル型とその合併(<code>'dev' | 'prod'</code>)はどこへでも通る(<a href="https://github.com/carina-rs/carina/issues/2648">carina#2648</a>、open)</li>
-    <li>リソース型の注釈(<code>vpc: aws.ec2.Vpc</code>)は未検査で、ハンドルとしての意味も定まっていない。リソースそのものをモジュール境界越しに渡すこともできない(<a href="https://github.com/carina-rs/carina/issues/3803">carina#3803</a>、open)</li>
+    <li>リテラル型とその合併(<code>'dev' | 'prod'</code>)は、文字列リテラルの集合として検査される(<a href="https://github.com/carina-rs/carina/issues/2648">carina#2648</a>、#3856でclose)</li>
+    <li>リソース型の注釈(<code>vpc: aws.ec2.Vpc</code>)はハンドルだけを意味するようになり、モジュールの出力としてハンドルを渡せる。exportにリソース型は書けない(<a href="https://github.com/carina-rs/carina/issues/3803">carina#3803</a>、<a href="https://github.com/carina-rs/carina/pull/4198">PR #4198</a>で2026-11-01にclose)</li>
     <li><code>let</code>の注釈、型エイリアス、名前付きの構造体型(<a href="https://github.com/carina-rs/carina/issues/2142">carina#2142</a>)、ジェネリクス、関数型が無い。<code>null</code>と<code>??</code>は言語にあるのに、null許容の型が無い</li>
     <li>⊤と⊥が無く、「何でも受ける」は広い合併や識別なしの<code>String</code>で代用している(<a href="https://github.com/carina-rs/carina/issues/3220">carina#3220</a>、open)</li>
-    <li>組み込み関数に型のシグネチャが無い。戻り値は<code>String/Int/List/Map/Any/Secret</code>の粗い6種類で、<code>List</code>や<code>Map</code>は要素型を持たない。関数引数の中の参照は存在確認しかされないので、<code>join(...)</code>の結果をARN型の属性に入れてもvalidateは通る。<strong>関数呼び出しは型システムにとって事実上の<code>?</code>である</strong></li>
-    <li>ユーザ関数の引数・戻り値の検査は、リスト・マップ・構造体で浅く(<a href="https://github.com/carina-rs/carina/issues/2810">carina#2810</a>)、合併は文字列形のメンバしか扱えない(<a href="https://github.com/carina-rs/carina/issues/2812">carina#2812</a>)</li>
+    <li>組み込み関数に型のシグネチャは無い(<code>signature</code>は説明用の文字列)。戻り値の分類(<code>BuiltinResultTyping</code>)は細かくなり、引数の型をそのまま返す<code>Argument(i)</code>、秘密の文字列、文字列の組み立て(<code>ConstructedString</code>)、要素が文字列だと分かるリストなどを区別する。<code>join(...)</code>のように文字列を組み立てる関数の結果は、補間と同じく、値が分かった時点で受け手の篩で検査される。要素型を持たない<code>List</code>/<code>Map</code>と、引数次第の<code>Any</code>(<code>lookup</code>・<code>map</code>・<code>min</code>・<code>max</code>)はまだ粗く、<strong>そこでは関数呼び出しが事実上の<code>?</code>である</strong></li>
+    <li>ユーザ関数の引数・戻り値も同じ関係で検査されるようになり、リストの要素や<code>Int | String</code>のような混合の合併も検査される(<a href="https://github.com/carina-rs/carina/issues/2810">carina#2810</a>・<a href="https://github.com/carina-rs/carina/issues/2812">carina#2812</a>はopenのまま)</li>
   </ul>
 
-  <p><strong>プロバイダ作者はユーザーより強い型を書ける</strong>、という非対称になっている。モジュールを書く人は篩をスキーマ型で表せず、<code>validation</code>ブロックという実行時述語に逃がすしかない — そしてそれが上の段階の穴に落ちる。→ <a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></p>
+  <p><strong>プロバイダ作者はユーザーより強い型を書ける</strong>、という非対称になっている。モジュールを書く人は篩をスキーマ型で表せず、<code>validation</code>ブロックという実行時述語に逃がすしかない。以前はそれが段階の穴に落ちたが、今は参照の値が分かるまで評価を待つ。→ <a href="/notes/two-type-languages-asymmetry.html">型注釈の言語とスキーマ型は別の言語である</a></p>
 
   <h3>境界の継ぎ目: WASMの向こうで型が薄くなる</h3>
 
-  <p>スキーマはWITの型ではなくJSON文字列で渡され、検証関数は越えられないので<code>validate-custom-type</code>のコールバックに置き換わる。壊れたJSONを<code>unwrap_or_default()</code>で空にしてしまう箇所が残っている(<a href="https://github.com/carina-rs/carina/issues/3811">carina#3811</a>、open)。プロトコル側のスキーマはまだ<code>required: bool</code>と<code>read_only: bool</code>の組で、不正な組み合わせを境界で弾いている。境界で解析して型に上げる正しい形ではあるが、ワイヤ形式でも3値にすれば境界のエラー経路自体が要らなくなる。→ <a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></p>
+  <p>スキーマはWITの型ではなくJSON文字列で渡され、検証関数は越えられないので<code>validate-custom-type</code>のコールバックに置き換わる。壊れた値は既定値で埋めず、境界で拒否するようになった(<a href="https://github.com/carina-rs/carina/issues/3811">carina#3811</a>、<a href="https://github.com/carina-rs/carina/pull/3843">PR #3843</a>で2026-10-06にclose)。プロトコル側のスキーマはまだ<code>required: bool</code>と<code>read_only: bool</code>の組で、不正な組み合わせを境界で弾いている。境界で解析して型に上げる正しい形ではあるが、ワイヤ形式でも3値にすれば境界のエラー経路自体が要らなくなる。→ <a href="/notes/type-erasure-at-plugin-boundary.html">プラグイン境界の型消去は事故クラスを予測する</a></p>
 
   <h3>表現の継ぎ目: 残っている理論的負債</h3>
 
   <ul>
-    <li>タグなし合併の判別はヒューリスティック。(<a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a>)</li>
-    <li>属性の出所(ユーザー/プロバイダ/サーバ既定)が型に乗っていない。(<a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a>)</li>
-    <li>「分からない」の語彙が層をまたいで複数ある — <code>Value::Deferred</code>/<code>Unknown</code>、参照型の<code>RefType::Unchecked</code>、<code>lift_type_expr</code>の<code>None</code>、推論失敗の<code>TypeExpr::Unknown</code>。どこで静的な保証が切れているかを利用者に見せる手段が無い(<a href="https://github.com/carina-rs/carina/issues/3212">carina#3212</a>、open)。(<a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a>)</li>
+    <li>タグなし合併の判別はヒューリスティック。<a href="/notes/untagged-union-discrimination.html">タグなし合併の判別はヒューリスティックに頼るしかない</a></li>
+    <li>属性の出所(ユーザー/プロバイダ/サーバ既定)が型に乗っていない。<a href="/notes/provenance-should-be-a-type.html">属性の出所は型に昇格させるべきモダリティである</a></li>
+    <li>「分からない」の語彙が層をまたいで複数ある — <code>Value::Deferred</code>/<code>Unknown</code>、参照型の<code>RefType::Unchecked</code>、<code>lift_type_expr</code>の<code>None</code>、静的な型が決まらないことを表す<code>StaticType::Unchecked</code>(以前の<code>TypeExpr::Unknown</code>)。今の形は文書化された(<a href="https://github.com/carina-rs/carina/issues/3212">carina#3212</a>、<a href="https://github.com/carina-rs/carina/pull/4095">PR #4095</a>でclose)が、どこで静的な保証が切れているかをエディタ上で見せる仕組みは確かめていない。<a href="/notes/four-kinds-of-undetermined.html">「未確定」を表す表現が四つあるのは漸進的型付けの境界が引けていない徴候である</a></li>
   </ul>
 
   <h2>改善すべき点 — 効く順に</h2>
 
   <ol>
     <li><strong>委ねた検査を解決後に必ず走らせる</strong>。漸進的型付けのキャスト挿入に当たる。これは入った(<a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>、<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>)。実装は、解決後の値を別の型にするのではなく、プロバイダに送る値を<code>ProviderReady&lt;T&gt;</code>にし、それを作る関数だけが検査を行う形になった。呼び忘れが型で書けない点は同じである。(<a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a>)</li>
-    <li><strong>代入可能性を一つの関係にする</strong>。<code>type_expr_compatible</code>を消して、展開前も<code>lift_type_expr</code>で持ち上げてから<code>is_assignable_to</code>で判定する。LSPも同じ入口を呼ぶ。最後の文字列比較の腕と<code>validate_type_expr_value</code>の<code>_ =&gt; None</code>を網羅的な構成子の腕に置き換えれば、構成子を足したときにコンパイラが判断を迫る。</li>
-    <li><strong>パターンを構築時にコンパイルするnewtypeにする</strong>。<code>pattern: Option&lt;String&gt;</code>を<code>Pattern</code>型にし、不正なパターンはスキーマのデコード時に型付きのエラーにする。検査が黙って消える状態が書けなくなり、毎回の再コンパイルも消える。</li>
-    <li><strong><code>lift_type_expr</code>を全域にし、リソースハンドル型を足す</strong>。<code>None</code>=検査しない、をやめる。<code>StringLiteral</code>は1値の列挙として、<code>Ref</code>は「そのリソースの属性を持つレコード」として居場所を作り、IDだけを渡すなら<code>aws.ec2.Vpc.Id</code>で書く、と役割を分ける(#3803)。写せないものはエラーにする。<a href="https://github.com/carina-rs/carina/issues/2360">carina#2360</a>で<code>Option&lt;TypeExpr&gt;</code>を潰したのと同じ直しを、写像の側にも当てることになる。</li>
+    <li><strong>代入可能性を一つの関係にする</strong>。大部分は入った(#3856)。<code>type_expr_compatible</code>は消え、値検査の<code>_ =&gt; None</code>も不一致に変わった。残りは、LSPの属性参照の検査を同じ入口に寄せること(#3043)と、構成子が違う組の表示名比較を構成子の腕に置き換えること(#3209)である。</li>
+    <li><strong>パターンを構築時にコンパイルするnewtypeにする</strong>。これは入った(#4171)。パターンの表現を<code>Draft</code>/<code>Compiled</code>で分け、受け入れ後は<code>CompiledPattern</code>しか持てない。</li>
+    <li><strong><code>lift_type_expr</code>を全域にし、リソースハンドル型を足す</strong>。大部分は入った。<code>StringLiteral</code>は文字列リテラルの集合に、<code>Ref</code>はリソースハンドルに写り(#3856、#4198)、<code>None</code>を返すのは<code>DottedUnresolved</code>だけになった。残りは、これも写すかエラーにすることである。<a href="https://github.com/carina-rs/carina/issues/2360">carina#2360</a>で<code>Option&lt;TypeExpr&gt;</code>を潰したのと同じ直しを、写像の側にも当てることになる。</li>
     <li><strong>「未検査」を明示の<code>Dyn</code>型に集め、書いた場所が分かる抜け道を用意する</strong>。⊤・⊥(#3220)と合わせて格子の端を定義で決め、LSPのホバーで<code>?</code>として見せる。正しいのに弾かれる偽陽性には<code>unchecked(x)</code>のような明示のキャストを入れ(<a href="https://github.com/carina-rs/carina/issues/3808">carina#3808</a>)、1.の検査の対象にする。</li>
     <li><strong>組み込み関数に型のシグネチャを与える</strong>。<code>map</code>・<code>concat</code>・<code>lookup</code>程度ならランク1の単純な型スキームで足り、Hindley-Milnerまでは要らない。関数引数にも受け手の型が届くようになる。</li>
     <li><strong>性質試験を広げる</strong>。反対称律を足し、宇宙をproptestの生成型にする(#3208)。2.の後なら新しい構成子も自動で網羅される。</li>
@@ -296,7 +299,7 @@
 
   <h3>「無い」が「許可」として読まれるパターンが繰り返されている</h3>
 
-  <p>注釈の<code>Option&lt;TypeExpr&gt;</code>が<code>None</code>なら検査を飛ばす(#2360、直った)。<code>identity: None</code>が三つの意味を兼ねる。<code>lift_type_expr</code>の<code>None</code>は未検査。値検査の<code>_ =&gt; None</code>は問題なし。正規表現がコンパイルできなければ検査しない。プラグイン境界で検証関数が無いと何もしない検証器になる(#2354、直った)。壊れたJSONは既定値になる(#3811)。どれも「分からない」を<code>None</code>や既定値で表し、消費側が一番楽な既定 — 通す — を選んでいる。個別には直っていくが、<strong>不在が許可に化けない型の形</strong>(不在を<code>Result</code>のエラーにする、<code>Unchecked</code>を明示の変種にして網羅マッチを強いる)を一般原則にしたほうがよい。→ <a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></p>
+  <p>注釈の<code>Option&lt;TypeExpr&gt;</code>が<code>None</code>なら検査を飛ばす(#2360、直った)。<code>identity: None</code>が三つの意味を兼ねる。<code>lift_type_expr</code>の<code>None</code>は未検査(今は未解決の点付きの名前だけ)。値検査の<code>_ =&gt; None</code>は問題なし(#3856で直った)。正規表現がコンパイルできなければ検査しない(#4171で直った)。プラグイン境界で検証関数が無いと何もしない検証器になる(#2354、直った)。壊れたJSONは既定値になる(#3811、直った)。どれも「分からない」を<code>None</code>や既定値で表し、消費側が一番楽な既定 — 通す — を選んでいる。個別には直っていくが、<strong>不在が許可に化けない型の形</strong>(不在を<code>Result</code>のエラーにする、<code>Unchecked</code>を明示の変種にして網羅マッチを強いる)を一般原則にしたほうがよい。→ <a href="/notes/silent-drop-is-the-worst-failure-mode.html">黙って捨てるのは、落とすことより悪い</a></p>
 
   <h3>ユーザ関数は型の上では関数ではない</h3>
 
@@ -324,7 +327,7 @@
 
   <h3>最近のissueの多くは規則の誤りではなく配線の欠落である</h3>
 
-  <p>2026-09末に開いている型関連のissueは、「規則が間違っている」ものより「検査はあるが、その経路には呼ばれていない」もの(#3448、#3805、#3450、#3043、#3803)が多い。規則を正しく書くことより、<strong>すべての経路がその規則を通ることを型で強制すること</strong>が今のボトルネックである。→ <a href="/notes/soundness-is-a-for-all-claim.html">型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</a></p>
+  <p>2026-09末に開いている型関連のissueは、「規則が間違っている」ものより「検査はあるが、その経路には呼ばれていない」もの(#3448、#3805、#3450、#3043、#3803)が多い。このうち#3448・#3805・#3803は2026-10〜11に閉じた。規則を正しく書くことより、<strong>すべての経路がその規則を通ることを型で強制すること</strong>が今のボトルネックである。→ <a href="/notes/soundness-is-a-for-all-claim.html">型システムが難しいのは、健全性が「すべての経路で」を要求するからだ</a></p>
 
   <div class="accuracy">
     <h2>根拠の確度</h2>
@@ -332,6 +335,7 @@
     <p>このノートは二つの調査を合わせている。一つは2026-09-30に<code>0fb456c1</code>をサブエージェントと自分で読んだもの、もう一つは同日に別セッションで<code>d0445d0b</code>を読んで書いたレポート「Carinaの型システムを型理論から読む」である(二つのコミットは同じ日のmainで、型システムの部分に差は無いと見ている)。</p>
 
     <p>自分でコードを読んで確認したのは次のとおり。<code>lift_type_expr</code>が4つの形に<code>None</code>を返すこと、<code>type_expr_compatible</code>が送り側の合併を「いずれか」で通すこと、ユーザ関数が呼び出しごとに実引数を検査すること、Rule 10の腕と、推移律の試験が例外を明示していること、<code>Regex::new</code>の失敗で検査が飛ぶこと、<code>validate_type_expr_value</code>の最後が<code>_ =&gt; None</code>であること、<code>compile_fail</code>が27箇所あること、Secretが<code>String</code>と推論されること、<code>deferred_populate</code>が「何らかのwait」で満たされること。issueの状態は同日にGitHub APIで確認した。</p>
+    <p>2026-11-07にmain <code>8ca84565f</code>で再確認した。issueの状態はGitHubで、コードは該当箇所を読んで確かめ、ユーザ関数の検査はcarina 0.11.0(<code>4297668</code>)で<code>carina validate</code>を走らせて確かめた。issue本文の「Status」が2026-09-29のままのものが多く、#3211・#2810・#2812はissueがopenでもコード上は直っている。<code>compile_fail</code>の519本は、11月に&lt;code&gt;```compile_fail&lt;/code&gt;で始まるdoctestを数えたもので、9月の27本と同じ数え方かは確かめていない。</p>
 
     <p><strong>レポートに依っていて自分では確かめていない</strong>のは、<code>NormalizedResource</code>等のnewtype群、WASM境界の網羅的な分解代入、プロトコル側の<code>required</code>/<code>read_only</code>、組み込み関数の引数中の参照が存在確認だけであること、null許容型の欠如と解釈できない型のStringへのフォールバック、<code>assert_fully_resolved</code>、READMEのEffect一覧のずれ。</p>
 
