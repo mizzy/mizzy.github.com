@@ -31,7 +31,7 @@
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/type-system-analysis.md付録</code>
-    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-08-16">2026-08-16</time> 更新</span>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
   <p>Carinaの処理系は<strong>「処理が進むと値の型が変わる」typestateパターン</strong>を系統的に使っている。狙いは一貫していて、<strong>静的段階の内部不変条件を、実装言語の型でコンパイル時に固定する</strong>ことである。</p>
@@ -119,7 +119,7 @@
 
   <h2>適用先の見当</h2>
 
-  <p>この原則は未解決の問題にも指し示す先を持つ。代入で解決された値がスキーマで再検証されない問題(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)に対しては、deferredの穴に期待型を持たせ、穴を埋める唯一のAPIが「その型の検証器だけが生成できる検証済み値」を要求するようにすれば、<strong>検査を飛ばした代入が実装言語の型レベルで書けなくなる</strong>。検査を置くこと(信頼境界での再検証)と、検査を外せなくすること(typestate)は独立の手当てであり、併用が完成形である。</p>
+  <p>この原則は、代入で解決された値がスキーマで再検証されない問題(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)の直し方も指した。deferredの穴に期待型を持たせ、穴を埋める唯一のAPIが「その型の検証器だけが生成できる検証済み値」を要求するようにすれば、<strong>検査を飛ばした代入が実装言語の型レベルで書けなくなる</strong>。実際の修正(<a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>、<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>)は同じ形を送信の側に置いた。プロバイダに送る値と設定を、検査を通った後にしか作れない型(<code>ProviderReady&lt;T&gt;</code>、<code>ProviderReadyConfig</code>)にしている。検査を置くこと(信頼境界での再検証)と、検査を外せなくすること(typestate)は独立の手当てであり、併用が完成形である。</p>
 
   <nav class="links">
     <h2>関連</h2>

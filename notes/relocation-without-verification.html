@@ -31,15 +31,15 @@
   <p class="meta">
     <span class="epistemic verified">確認済み</span>
     出典: <code>explorations/2026-06-10-carina-type-system-type-theory/plan-as-compilation.md §6 / type-system-analysis.md §8弱み6</code>
-    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成</span>
+    <span class="dates"><time datetime="2026-06-10">2026-06-10</time> 作成<span class="sep">/</span><time datetime="2026-11-07">2026-11-07</time> 更新</span>
   </p>
 
   <p>「well-typedなIRだけがバックエンドに渡る」というのがコンパイラの標準的な契約である。しかしapplyの再配置はIRに<strong>新しい値を書き込む</strong>。すると問いが立つ:再配置で書き込まれた値は、IRが持っていた型(篩)に対して検証されるのか?</p>
 
-  <p>答えは否で、これは確認済みの実バグである(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>)。</p>
+  <p>Carinaでは長くこの検証が無く、確認済みの実バグだった(<a href="https://github.com/carina-rs/carina/issues/3448">carina#3448</a>、2026-10に解決)。</p>
 
   <figure>
-    <svg viewBox="0 0 640 190" role="img" aria-label="検証はplanの早い段階で一度だけ走り、その後ろのplan時の上流state代入とapply時のリソース出力代入という二つの代入点には検証経路がないことを示す時系列の図">
+    <svg viewBox="0 0 640 190" role="img" aria-label="検証はplanの早い段階で一度だけ走り、その後ろのplan時の上流state代入とapply時のリソース出力代入という二つの代入点にも検証が要ることを示す時系列の図">
       <style>
         .tl text { font-family: var(--sans); font-size: 12px; fill: var(--text); }
         .tl .ttl { font-size: 13px; font-weight: 600; }
@@ -62,25 +62,42 @@
         <text class="ttl" x="330" y="126" text-anchor="middle">上流stateの値を代入</text>
         <text class="dim" x="330" y="144" text-anchor="middle">plan時 — 検証ステップより後</text>
         <path class="gap" d="M330 87 V 62"/>
-        <text class="lbl2" x="330" y="54" text-anchor="middle">検証経路なし</text>
+        <text class="lbl2" x="330" y="54" text-anchor="middle">ここにも検証が要る</text>
 
         <circle class="dot" cx="540" cy="96" r="9"/>
         <text class="ttl" x="540" y="126" text-anchor="middle">リソース出力を代入</text>
         <text class="dim" x="540" y="144" text-anchor="middle">apply時</text>
         <path class="gap" d="M540 87 V 62"/>
-        <text class="lbl2" x="540" y="54" text-anchor="middle">検証経路なし</text>
+        <text class="lbl2" x="540" y="54" text-anchor="middle">ここにも検証が要る</text>
       </g>
     </svg>
-    <figcaption>違反値はplanの表示に現れてさえ検査されず、プロバイダAPIのエラーとしてapplyの途中で初めて顕在化する。</figcaption>
+    <figcaption>検証を最初の一点にしか置かないと、後の二つの代入点で書き込まれた値は検査されず、違反はプロバイダAPIのエラーとしてapplyの途中で初めて見つかる。</figcaption>
   </figure>
 
-  <p>検証はplanの早い段階で一度だけ走る。ところが代入の時刻は二通りあり、上流stateの値はその後ろで(plan時に)、リソース出力はapply時に代入される。<strong>どちらの代入点にも検証経路がない</strong>。違反値はplanの表示に現れてさえ検査されず、プロバイダAPIのエラーとしてapplyの途中で初めて顕在化する。</p>
+  <p>検証はplanの早い段階で一度だけ走っていた。ところが代入の時刻は二通りあり、上流stateの値はその後ろで(plan時に)、リソース出力はapply時に代入される。<strong>どちらの代入点にも検証経路がなかった</strong>。違反値はplanの表示に現れてさえ検査されず、プロバイダAPIのエラーとしてapplyの途中で初めて顕在化した。</p>
 
-  <p>型システムの側から見ると、これは段階を跨ぐ値の篩所属を最終的に誰も検査していない、ということである。未解決参照に対しては宣言型ベースの代入可能性検査が別経路で走るが、その検査が粗い型を通した場合 — 例えば宣言上はただの<code>String</code>を、長さ・パターン付きの型が期待される場所へ補間して渡す場合 — 最終値が篩を満たすかは宣言型からは決定できない。値が確定して代入された後も、Carina自身はどの経路でも再検査しない。</p>
+  <p>型システムの側から見ると、これは段階を跨ぐ値の篩所属を最終的に誰も検査していなかった、ということである。未解決参照に対しては宣言型ベースの代入可能性検査が別経路で走るが、その検査が粗い型を通した場合 — 例えば宣言上はただの<code>String</code>を、長さ・パターン付きの型が期待される場所へ補間して渡す場合 — 最終値が篩を満たすかは宣言型からは決定できない。値が確定して代入された後に検査し直さなければ、篩所属は誰も確かめない。</p>
 
   <p>コンパイラの言葉で言えば「<strong>型検査済み</strong>」というIRの不変条件が再配置で破壊可能である、ということになる。そして修正の縫い目も類比から直ちに出る:各再配置点の直後に、書き込んだ値をその穴の型で検証する。</p>
 
-  <p>この事例は、値ベース検査の「全数」性が何に対する全数なのかも精密化する。全数なのは<strong>検証ステップの時点で値が確定しているもの</strong>に限られる。静的段階で確定する値、ではない — 検証ステップより後にplan時代入される上流state値は、静的段階の値でありながら検査を免れている。</p>
+  <h2>直し方は類比どおりだった</h2>
+
+  <p>修正(<a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>、<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>)は、各再配置点の後に検証を置き、さらに<strong>検証を通っていない値をプロバイダに渡せない型</strong>にした。</p>
+
+  <ul>
+    <li>plan: 参照を解決した値を、正規化の前にschemaの制約で検査する。違反はplanエラーになり、どの参照から来た値かも示す。</li>
+    <li>apply: applyで初めて分かった属性は、プロバイダに送る直前に検査する。送信用の値(<code>ProviderReady&lt;T&gt;</code>)は検査付きの関数でしか作れない。</li>
+    <li>provider設定: 上流の値を代入した後に検査する(<code>ProviderReadyConfig</code>)。</li>
+  </ul>
+
+  <p>信頼境界を越えて入ってきた値を、使う直前に検証する形である(<a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a>)。applyまで値が決まらないものをどう扱うかは、hybrid type checkingの「キャストを挿入する」に当たる(<a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す</a>)。</p>
+
+  <p>この事例は、値ベース検査の「全数」性が何に対する全数なのかも精密化する。全数なのは<strong>検証ステップの時点で値が確定しているもの</strong>に限られる。静的段階で確定する値、ではない — 検証ステップより後にplan時代入される上流state値は、静的段階の値でありながら検査を免れていた。</p>
+
+  <div class="accuracy">
+    <h2>根拠の確度</h2>
+    <p>修正の内容はPR <a href="https://github.com/carina-rs/carina/pull/3825">carina#3825</a>と<a href="https://github.com/carina-rs/carina/pull/3846">carina#3846</a>の説明による。#3846は#3448の筋書き(上流stateの値を補間してS3のバケット名に渡す)をそのまま回帰テストにしている。2026-11-07時点のmainで確認した。</p>
+  </div>
 
   <nav class="links">
     <h2>関連</h2>
@@ -89,6 +106,7 @@
       <li><a href="/notes/verify-at-the-trust-boundary.html">信頼境界を越えるデータは境界で再検証する</a></li>
       <li><a href="/notes/checking-completeness-is-time-indexed.html">「全数検査」は検証ステップの時点で確定している値に限られる</a></li>
       <li><a href="/notes/analogy-that-predicts-bugs.html">良い類比は実バグを予言する</a></li>
+      <li><a href="/notes/hybrid-type-checking.html">判定できない部分型は、拒否も受理もせず実行時の検査に回す(hybrid type checking)</a></li>
     </ul>
   </nav>
 
